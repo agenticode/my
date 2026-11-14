@@ -406,6 +406,117 @@ func (s *Store) Slots(ctx context.Context, host string) ([]model.Slot, error) {
 	return out, rows.Err()
 }
 
+// LatestCounterSamples returns the per-DIMM counter samples of the most
+// recent reading of a host: the EDAC DIMM objects that existed then.
+func (s *Store) LatestCounterSamples(ctx context.Context, host string) ([]model.CounterSample, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT observed_at, mc, mc_name, dimm_index, location, label, ce, ue, size_mb, mem_type, dev_type, edac_mode, source, raw_ref
+ FROM counter_sample
+ WHERE host = ? AND dimm_index >= 0 AND observed_at = (SELECT MAX(observed_at) FROM counter_sample WHERE host = ? AND dimm_index >= 0)
+ ORDER BY mc, dimm_index`, host, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []model.CounterSample
+	for rows.Next() {
+		var c model.CounterSample
+		var at sql.NullString
+		var ce, ue int64
+		var size sql.NullInt64
+		if err := rows.Scan(&at, &c.MC, &c.MCName, &c.DIMMIndex, &c.Location, &c.Label, &ce, &ue, &size, &c.MemType, &c.DevType, &c.EdacMode, &c.Source, &c.RawRef); err != nil {
+			return nil, err
+		}
+		c.ObservedAt, c.CE, c.UE, c.SizeMB = parseTS(at), uint64(ce), uint64(ue), toOptInt(size)
+		out = append(out, c)
+	}
+	return out, rows.Err()
+}
+
+// SlotOccupants returns, for each slot of a host that ever held a DIMM, the
+// DIMM of its most recent placement.
+func (s *Store) SlotOccupants(ctx context.Context, host string) (map[string]model.DIMM, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT p.slot, `+qualify("dimm", dimmColumns)+` FROM placement p
+ JOIN dimm ON dimm.dimm_uid = p.dimm_uid
+ WHERE p.host = ? AND p.id = (
+   SELECT q.id FROM placement q WHERE q.host = p.host AND q.slot = p.slot ORDER BY q.last_seen DESC, q.id DESC LIMIT 1)`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]model.DIMM{}
+	for rows.Next() {
+		var slot string
+		d, err := scanDIMM(prefixScanner{rows, &slot})
+		if err != nil {
+			return nil, err
+		}
+		out[slot] = *d
+	}
+	return out, rows.Err()
+}
+
+// qualify prefixes every column of a comma-separated list with a table name.
+func qualify(table, columns string) string {
+	parts := strings.Split(columns, ",")
+	for i, c := range parts {
+		parts[i] = table + "." + strings.TrimSpace(c)
+	}
+	return strings.Join(parts, ", ")
+}
+
+// prefixScanner scans one leading column before the columns its user asks for.
+type prefixScanner struct {
+	r     rowScanner
+	first any
+}
+
+func (p prefixScanner) Scan(dest ...any) error {
+	return p.r.Scan(append([]any{p.first}, dest...)...)
+}
+
+// PruneOrphans removes rows nothing refers to any more after slots were
+// re-mapped: slots that came from an EDAC label or an event and have no
+// alias, event, action or placement left, and placeholder DIMM identities
+// no record uses.
+func (s *Store) PruneOrphans(ctx context.Context, host string) error {
+	return s.Update(ctx, func(w *Writer) error {
+		if _, err := w.exec(`DELETE FROM slot WHERE host = ? AND locator = '' AND smbios_handle IS NULL
+ AND NOT EXISTS (SELECT 1 FROM slot_alias a WHERE a.host = slot.host AND a.slot = slot.name)
+ AND NOT EXISTS (SELECT 1 FROM event e WHERE e.host = slot.host AND e.slot = slot.name)
+ AND NOT EXISTS (SELECT 1 FROM action x WHERE x.host = slot.host AND x.slot = slot.name)
+ AND NOT EXISTS (SELECT 1 FROM placement p WHERE p.host = slot.host AND p.slot = slot.name)`, host); err != nil {
+			return fmt.Errorf("prune slots: %w", err)
+		}
+		if _, err := w.exec(`DELETE FROM dimm WHERE identity = 'slot'
+ AND NOT EXISTS (SELECT 1 FROM event e WHERE e.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM action x WHERE x.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM placement p WHERE p.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM fault f WHERE f.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM verdict v WHERE v.dimm_uid = dimm.dimm_uid)`); err != nil {
+			return fmt.Errorf("prune placeholder DIMMs: %w", err)
+		}
+		return nil
+	})
+}
+
+// SlotAliases returns the alias table of a host: alias to slot name.
+func (s *Store) SlotAliases(ctx context.Context, host string) (map[string]string, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT alias, slot FROM slot_alias WHERE host = ?`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]string{}
+	for rows.Next() {
+		var a, sl string
+		if err := rows.Scan(&a, &sl); err != nil {
+			return nil, err
+		}
+		out[a] = sl
+	}
+	return out, rows.Err()
+}
+
 // Placements returns placements in time order. Empty arguments do not restrict.
 func (s *Store) Placements(ctx context.Context, host, dimmUID string) ([]model.Placement, error) {
 	q := `SELECT id, dimm_uid, host, slot, first_seen, last_seen, source FROM placement`

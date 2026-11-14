@@ -115,6 +115,16 @@ CREATE TABLE slot (
   PRIMARY KEY (host, name)
 ) WITHOUT ROWID;
 
+-- The names sources use for a slot: an SMBIOS handle, an EDAC controller and
+-- layer position, a label, a socket/controller/channel/position tuple. An
+-- event is tied to a slot by looking up what its source called the place.
+CREATE TABLE slot_alias (
+  host  TEXT NOT NULL,
+  alias TEXT NOT NULL,
+  slot  TEXT NOT NULL,
+  PRIMARY KEY (host, alias)
+) WITHOUT ROWID;
+
 -- Which DIMM was seen in which slot, and when.
 CREATE TABLE placement (
   id         INTEGER PRIMARY KEY,

@@ -15,6 +15,15 @@ import (
 // ErrReadOnly is returned when a write is attempted on a read-only ledger.
 var ErrReadOnly = errors.New("ledger is open read-only")
 
+// ErrInvalidRecord marks an error about the content of a record, as opposed
+// to a failure of the ledger. A caller importing many records can skip the
+// record and go on.
+var ErrInvalidRecord = errors.New("invalid record")
+
+func invalid(format string, args ...any) error {
+	return fmt.Errorf("%w: %s", ErrInvalidRecord, fmt.Sprintf(format, args...))
+}
+
 // Writer applies changes inside one transaction. It is only valid inside the
 // function passed to Store.Update.
 type Writer struct {
@@ -158,25 +167,25 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 	}
 	switch {
 	case e.Host == "":
-		return false, errors.New("event: host is empty")
+		return false, invalid("event: host is empty")
 	case e.Source == "":
-		return false, errors.New("event: source is empty")
+		return false, invalid("event: source is empty")
 	case e.Fingerprint == "":
-		return false, errors.New("event: fingerprint is empty")
+		return false, invalid("event: fingerprint is empty")
 	case !validTime(e.ErrorDT):
-		return false, fmt.Errorf("event: ErrorDT %v is out of range", e.ErrorDT)
+		return false, invalid("event: ErrorDT %v is out of range", e.ErrorDT)
 	case !e.ErrorSeverity.Valid():
-		return false, fmt.Errorf("event: unknown ErrorSeverity %q", e.ErrorSeverity)
+		return false, invalid("event: unknown ErrorSeverity %q", e.ErrorSeverity)
 	case !e.ErrorScrubType.Valid():
-		return false, fmt.Errorf("event: unknown ErrorScrubType %q", e.ErrorScrubType)
+		return false, invalid("event: unknown ErrorScrubType %q", e.ErrorScrubType)
 	case !e.Grade.Valid():
-		return false, fmt.Errorf("event: unknown grade %q", e.Grade)
+		return false, invalid("event: unknown grade %q", e.Grade)
 	case e.Count < 1:
-		return false, fmt.Errorf("event: count %d is not positive", e.Count)
+		return false, invalid("event: count %d is not positive", e.Count)
 	case e.Covered < 0 || e.Covered > e.Count:
-		return false, fmt.Errorf("event: covered %d is outside 0..%d", e.Covered, e.Count)
+		return false, invalid("event: covered %d is outside 0..%d", e.Covered, e.Count)
 	case e.Kind != model.KindError && e.Kind != model.KindCounter:
-		return false, fmt.Errorf("event: unknown kind %q", e.Kind)
+		return false, invalid("event: unknown kind %q", e.Kind)
 	}
 	var dupOf, scanID any
 	if e.DupOf != 0 {
@@ -222,7 +231,7 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 // leaves them empty.
 func (w *Writer) UpsertHost(h *model.Host) error {
 	if h.Name == "" {
-		return errors.New("host: name is empty")
+		return invalid("host: name is empty")
 	}
 	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, first_seen, last_seen)
  VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -262,10 +271,10 @@ func qualityRank(q model.TimeQuality) int {
 // start times are within 30 seconds and at least one of them is derived.
 func (w *Writer) UpsertBoot(b *model.Boot) (string, error) {
 	if b.Host == "" {
-		return "", errors.New("boot: host is empty")
+		return "", invalid("boot: host is empty")
 	}
 	if !validTime(b.StartedAt) {
-		return "", fmt.Errorf("boot: start time %v is out of range", b.StartedAt)
+		return "", invalid("boot: start time %v is out of range", b.StartedAt)
 	}
 	if b.StartQuality == "" {
 		b.StartQuality = model.TimeExact
@@ -404,7 +413,7 @@ func (w *Writer) bootNear(host string, t time.Time) (*model.Boot, error) {
 // record leaves them empty.
 func (w *Writer) UpsertDIMM(d *model.DIMM) error {
 	if d.UID == "" {
-		return errors.New("dimm: uid is empty")
+		return invalid("dimm: uid is empty")
 	}
 	if d.Identity == "" {
 		d.Identity = model.IdentitySerial
@@ -444,7 +453,7 @@ func (w *Writer) UpsertDIMM(d *model.DIMM) error {
 // record leaves them empty.
 func (w *Writer) UpsertSlot(s *model.Slot) error {
 	if s.Host == "" || s.Name == "" {
-		return errors.New("slot: host and name are required")
+		return invalid("slot: host and name are required")
 	}
 	text := func(col string) string {
 		return fmt.Sprintf("%[1]s = CASE WHEN excluded.%[1]s != '' THEN excluded.%[1]s ELSE %[1]s END", col)
@@ -467,16 +476,44 @@ func (w *Writer) UpsertSlot(s *model.Slot) error {
 	return nil
 }
 
+// ReplaceSlot stores a slot row as given, dropping what the ledger held for
+// it before. It is used when the mapping between EDAC positions and SMBIOS
+// slots is recomputed: a mapping that no longer holds must not linger.
+func (w *Writer) ReplaceSlot(s *model.Slot) error {
+	if s.Host == "" || s.Name == "" {
+		return invalid("slot: host and name are required")
+	}
+	_, err := w.exec(`INSERT OR REPLACE INTO slot (host, name, locator, bank_locator, smbios_handle, socket, imc, channel, position,
+ edac_mc, edac_location, edac_label, mapping, populated) VALUES (`+placeholders(14)+`)`,
+		s.Host, s.Name, s.Locator, s.BankLocator, optInt(s.SMBIOSHandle), optInt(s.Socket), optInt(s.IMC), optInt(s.Channel),
+		optInt(s.Position), optInt(s.EdacMC), s.EdacLocation, s.EdacLabel, s.Mapping, optBool(s.Populated))
+	if err != nil {
+		return fmt.Errorf("slot %s: %w", s.Name, err)
+	}
+	return nil
+}
+
+// SetSlotAlias records that a source calls the slot by the given alias. A
+// later observation replaces an earlier one.
+func (w *Writer) SetSlotAlias(host, alias, slot string) error {
+	if host == "" || alias == "" || slot == "" {
+		return invalid("slot alias: host, alias and slot are required")
+	}
+	_, err := w.exec(`INSERT INTO slot_alias (host, alias, slot) VALUES (?, ?, ?)
+ ON CONFLICT(host, alias) DO UPDATE SET slot = excluded.slot`, host, alias, slot)
+	return err
+}
+
 // ObservePlacement records that the DIMM was seen in the slot at the given
 // time. A sighting that agrees with the neighbouring placement of the slot
 // extends it; otherwise a new placement starts. Sightings may arrive in any
 // order.
 func (w *Writer) ObservePlacement(dimmUID, host, slot string, at time.Time, source string) error {
 	if dimmUID == "" || host == "" || slot == "" {
-		return errors.New("placement: dimm, host and slot are required")
+		return invalid("placement: dimm, host and slot are required")
 	}
 	if !validTime(at) {
-		return fmt.Errorf("placement: time %v is out of range", at)
+		return invalid("placement: time %v is out of range", at)
 	}
 	t := ts(at)
 	var id int64
@@ -520,15 +557,15 @@ func (w *Writer) InsertAction(a *model.Action) (inserted bool, err error) {
 	}
 	switch {
 	case a.Host == "":
-		return false, errors.New("action: host is empty")
+		return false, invalid("action: host is empty")
 	case a.Source == "":
-		return false, errors.New("action: source is empty")
+		return false, invalid("action: source is empty")
 	case a.Fingerprint == "":
-		return false, errors.New("action: fingerprint is empty")
+		return false, invalid("action: fingerprint is empty")
 	case !validTime(a.At):
-		return false, fmt.Errorf("action: time %v is out of range", a.At)
+		return false, invalid("action: time %v is out of range", a.At)
 	case !a.Kind.Valid():
-		return false, fmt.Errorf("action: unknown kind %q", a.Kind)
+		return false, invalid("action: unknown kind %q", a.Kind)
 	}
 	var scanID any
 	if a.ScanID != 0 {
@@ -559,10 +596,10 @@ func (w *Writer) InsertAction(a *model.Action) (inserted bool, err error) {
 // counter at the same time is stored once.
 func (w *Writer) InsertCounterSample(host string, c *model.CounterSample) (inserted bool, err error) {
 	if host == "" {
-		return false, errors.New("counter sample: host is empty")
+		return false, invalid("counter sample: host is empty")
 	}
 	if !validTime(c.ObservedAt) {
-		return false, fmt.Errorf("counter sample: time %v is out of range", c.ObservedAt)
+		return false, invalid("counter sample: time %v is out of range", c.ObservedAt)
 	}
 	var resetAt time.Time
 	if c.SecondsSinceReset.Valid && c.SecondsSinceReset.V >= 0 {
@@ -582,10 +619,10 @@ func (w *Writer) InsertCounterSample(host string, c *model.CounterSample) (inser
 // InsertScan records the start of a collection run and sets sc.ID.
 func (w *Writer) InsertScan(sc *model.Scan) error {
 	if sc.Host == "" || sc.Kind == "" {
-		return errors.New("scan: host and kind are required")
+		return invalid("scan: host and kind are required")
 	}
 	if !validTime(sc.StartedAt) {
-		return fmt.Errorf("scan: start time %v is out of range", sc.StartedAt)
+		return invalid("scan: start time %v is out of range", sc.StartedAt)
 	}
 	res, err := w.exec(`INSERT INTO scan (host, kind, started_at, finished_at, tool_version, privileged, note) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		sc.Host, sc.Kind, ts(sc.StartedAt), ts(sc.FinishedAt), sc.ToolVersion, boolInt(sc.Privileged), sc.Note)
@@ -605,7 +642,7 @@ func (w *Writer) FinishScan(id int64, at time.Time) error {
 // InsertSource adds an entry to the source inventory of a scan and sets src.ID.
 func (w *Writer) InsertSource(src *model.Source) error {
 	if src.ScanID == 0 || src.Kind == "" {
-		return errors.New("source: scan and kind are required")
+		return invalid("source: scan and kind are required")
 	}
 	if src.Status == "" {
 		src.Status = model.SourceOK
@@ -643,13 +680,13 @@ func (w *Writer) DeleteAnalysis(host string) error {
 func (w *Writer) InsertFault(f *model.Fault) error {
 	switch {
 	case f.Host == "":
-		return errors.New("fault: host is empty")
+		return invalid("fault: host is empty")
 	case !f.Mode.Valid():
-		return fmt.Errorf("fault: unknown mode %q", f.Mode)
+		return invalid("fault: unknown mode %q", f.Mode)
 	case !f.Grade.Valid():
-		return fmt.Errorf("fault: unknown grade %q", f.Grade)
+		return invalid("fault: unknown grade %q", f.Grade)
 	case !validTime(f.FirstSeen) || !validTime(f.LastSeen):
-		return errors.New("fault: first and last seen are required")
+		return invalid("fault: first and last seen are required")
 	}
 	res, err := w.exec(`INSERT INTO fault (host, dimm_uid, slot, mode, estimated, grade, "Rank", "DeviceId", "BankGroup", "Bank",
  row_min, row_max, column_min, column_max, address_min, address_max, first_seen, last_seen, event_count, error_count,
@@ -681,11 +718,11 @@ func jsonText(v any) (string, error) {
 func (w *Writer) InsertVerdict(v *model.Verdict) error {
 	switch {
 	case v.Host == "":
-		return errors.New("verdict: host is empty")
+		return invalid("verdict: host is empty")
 	case !v.Grade.Valid():
-		return fmt.Errorf("verdict: unknown grade %q", v.Grade)
+		return invalid("verdict: unknown grade %q", v.Grade)
 	case !validTime(v.ComputedAt):
-		return errors.New("verdict: computed time is required")
+		return invalid("verdict: computed time is required")
 	}
 	orEmpty := func(s []string) []string {
 		if s == nil {
@@ -721,13 +758,13 @@ func (w *Writer) InsertVerdict(v *model.Verdict) error {
 func (w *Writer) InsertGPUMem(g *model.GPUMem) (inserted bool, err error) {
 	switch {
 	case g.Host == "":
-		return false, errors.New("gpu_mem: host is empty")
+		return false, invalid("gpu_mem: host is empty")
 	case g.Kind != model.GPUSnapshot && g.Kind != model.GPUXID:
-		return false, fmt.Errorf("gpu_mem: unknown kind %q", g.Kind)
+		return false, invalid("gpu_mem: unknown kind %q", g.Kind)
 	case g.Fingerprint == "" || g.Source == "":
-		return false, errors.New("gpu_mem: source and fingerprint are required")
+		return false, invalid("gpu_mem: source and fingerprint are required")
 	case !validTime(g.ObservedAt):
-		return false, fmt.Errorf("gpu_mem: time %v is out of range", g.ObservedAt)
+		return false, invalid("gpu_mem: time %v is out of range", g.ObservedAt)
 	}
 	res, err := w.exec(`INSERT INTO gpu_mem (host, observed_at, kind, gpu_serial, gpu_uuid, gpu_index, pci_bus, model, xid, xid_text,
  remap_correctable, remap_uncorrectable, remap_pending, remap_failure, bank_max, bank_high, bank_partial, bank_low, bank_none,
