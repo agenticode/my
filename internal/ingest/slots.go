@@ -278,7 +278,29 @@ func equalInts(a, b []int) bool {
 // the identity of the DIMM in each populated slot, and that the DIMM was in
 // that slot at the time of the scan.
 func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
-	names := slotNames(mods)
+	// A run may carry several inventory snapshots (one per source and
+	// time). Names are made unique within a snapshot: the same locator in
+	// two snapshots is the same slot.
+	names := make([]string, len(mods))
+	groups := map[string][]int{}
+	var order []string
+	for i, m := range mods {
+		key := m.Source + "|" + m.ObservedAt.UTC().Format("2006-01-02T15:04:05.000000")
+		if _, ok := groups[key]; !ok {
+			order = append(order, key)
+		}
+		groups[key] = append(groups[key], i)
+	}
+	for _, key := range order {
+		idx := groups[key]
+		snapshot := make([]*model.Module, len(idx))
+		for j, i := range idx {
+			snapshot[j] = mods[i]
+		}
+		for j, n := range slotNames(snapshot) {
+			names[idx[j]] = n
+		}
+	}
 	for i, m := range mods {
 		name := names[i]
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
