@@ -35,6 +35,34 @@ type Config struct {
 	// only known by physical address are taken to lie in one row. The mode
 	// is then marked as estimated.
 	RowWindowBytes uint64
+
+	// RecentDays and BaselineDays are the two windows a trend compares: the
+	// last RecentDays before the reference time, and the BaselineDays before
+	// those.
+	RecentDays   float64
+	BaselineDays float64
+	// MinBaselineDays is how much of the baseline window the ledger must
+	// cover before a trend is stated. A history shorter than that cannot
+	// tell a new fault from one that was always there.
+	MinBaselineDays float64
+	// RiseRatio and RiseMinRecent decide when errors are rising: the daily
+	// rate of the recent window is at least RiseRatio times the rate of the
+	// baseline window, and the recent window holds at least RiseMinRecent
+	// errors.
+	RiseRatio     float64
+	RiseMinRecent int
+	// SpreadDays and SpreadMinNew decide when a fault is spreading: at
+	// least SpreadMinNew places failed for the first time within the last
+	// SpreadDays, not counting the places of the fault's first day.
+	SpreadDays   float64
+	SpreadMinNew int
+	// StormMinutes and StormCount define a burst of errors: StormCount
+	// errors or more within StormMinutes.
+	StormMinutes float64
+	StormCount   int
+	// MinPeers is the number of DIMMs of one part number, the DIMM itself
+	// included, a ledger must hold before the DIMM is ranked among them.
+	MinPeers int
 }
 
 // DefaultConfig returns the default thresholds.
@@ -48,8 +76,23 @@ func DefaultConfig() Config {
 		ScatterWindowDays: 30,
 		WiderShare:        0.10,
 		RowWindowBytes:    64 << 10,
+
+		RecentDays:      7,
+		BaselineDays:    30,
+		MinBaselineDays: 7,
+		RiseRatio:       2,
+		RiseMinRecent:   10,
+		SpreadDays:      30,
+		SpreadMinNew:    2,
+		StormMinutes:    60,
+		StormCount:      100,
+		MinPeers:        5,
 	}
 }
+
+const microPerDay = int64(24 * time.Hour / time.Microsecond)
+
+func days(d float64) int64 { return int64(d * float64(microPerDay)) }
 
 func (c *Config) repeatGap() int64 {
 	return int64(c.RepeatGapHours * float64(time.Hour/time.Microsecond))

@@ -18,7 +18,7 @@ Early development. This tree holds the data model, the SQLite ledger, the input 
 | `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS and host facts |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
-| `internal/engine` | groups the errors of a DIMM into faults and gives each fault a mode: single bit, row, multi-row, column, bank, device or DIMM |
+| `internal/engine` | groups the errors of a DIMM into faults, gives each fault a mode (single bit, row, multi-row, column, bank, device, DIMM), and measures trend, spread and baselines |
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
 | `testdata` | fixtures for every adapter |
 
