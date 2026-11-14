@@ -1,6 +1,7 @@
 // Package engine is the analysis engine of MemorY. It reads the event
-// ledger and answers, per DIMM: which faults do the errors form, and what
-// mode does each fault have.
+// ledger and answers, per DIMM: which faults do the errors form, what mode
+// does each fault have, is it growing, and how unusual is the DIMM compared
+// with its own past and with the DIMMs of its part number.
 //
 // The engine uses rules only. Every step can be stated in one line and
 // traced to the ledger records it rests on. It reads; it never changes a
@@ -9,6 +10,7 @@ package engine
 
 import (
 	"sort"
+	"time"
 
 	"github.com/agenticode/my/internal/model"
 )
@@ -25,6 +27,16 @@ type Options struct {
 	// Adjacency says which rows are physical neighbours; nil means
 	// LogicalAdjacency.
 	Adjacency Adjacency
+	// PartBaseline supplies reference error rates per part number, the
+	// third baseline layer; nil means there is none.
+	PartBaseline PartBaseline
+	// Host limits the result to one host. The whole ledger is still read:
+	// a DIMM keeps the history it has from other hosts.
+	Host string
+	// AsOf sets the reference time and leaves out every record after it.
+	// The zero value uses, per host, the latest time the ledger knows
+	// something about the host.
+	AsOf time.Time
 }
 
 func (o Options) config() *Config {
@@ -83,7 +95,7 @@ type Classification struct {
 func Classify(in *Input, opts Options) *Classification {
 	cfg, adj := opts.config(), opts.adjacency()
 
-	byDIMM := make([][]int32, len(in.dimms))
+	byDIMM := in.byDIMM()
 	type looseKey struct {
 		host, slot int32
 		ambiguous  bool
@@ -92,7 +104,6 @@ func Classify(in *Input, opts Options) *Classification {
 	for i := range in.events {
 		e := &in.events[i]
 		if e.dimm >= 0 {
-			byDIMM[e.dimm] = append(byDIMM[e.dimm], int32(i))
 			continue
 		}
 		k := looseKey{e.host, e.slot, e.link == linkAmbiguous}
@@ -140,6 +151,17 @@ func Classify(in *Input, opts Options) *Classification {
 		return !a.Ambiguous && b.Ambiguous
 	})
 	return res
+}
+
+// byDIMM returns, per DIMM index, the records attributed to the DIMM.
+func (in *Input) byDIMM() [][]int32 {
+	out := make([][]int32, len(in.dimms))
+	for i := range in.events {
+		if d := in.events[i].dimm; d >= 0 {
+			out[d] = append(out[d], int32(i))
+		}
+	}
+	return out
 }
 
 // EventIDs returns the ledger IDs of the member records of a fault, in time
