@@ -26,7 +26,9 @@ FUZZ_TARGETS := \
 	./internal/decode/cper:FuzzParseBinary \
 	./internal/adapter/smbios:FuzzTables \
 	./internal/adapter/smbios:FuzzDmidecode \
-	./internal/adapter/klog:FuzzCollect
+	./internal/adapter/klog:FuzzCollect \
+	./internal/engine:FuzzConfigRead \
+	./internal/i18n:FuzzFormat
 
 .PHONY: all build test test-race fuzz lint fmt fmt-check vet cross clean
 

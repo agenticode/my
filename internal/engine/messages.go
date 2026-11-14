@@ -114,6 +114,7 @@ var Messages = i18n.Catalog{
 
 	// R-SOFT-01.
 	"soft.stray_once":       {EN: "{n} corrected {n|error|errors} at {places} {places|place|places} on {from}; no place failed again", KO: "{from} CE {n}건, 위치 {places}곳, 반복된 위치 없음"},
+	"soft.stray_undated":    {EN: "{n} corrected {n|error|errors} at {places} {places|place|places}, dated by seconds since boot only; no place is known to have failed again", KO: "CE {n}건, 위치 {places}곳, 부팅 후 경과 시간만 기록됨, 반복이 확인된 위치 없음"},
 	"soft.stray":            {EN: "{n} corrected {n|error|errors} at {places} {places|place|places} between {from} and {to}; no place failed again", KO: "{from}부터 {to}까지 CE {n}건, 위치 {places}곳, 반복된 위치 없음"},
 	"soft.cell":             {EN: "one cell fails repeatedly ({where}): {n} errors since {from}, {recent} in the last {days} days", KO: "셀 하나가 반복 실패({where}): {from}부터 {n}건, 최근 {days}일 {recent}건"},
 	"soft.fault":            {EN: "{mode} fault at {where}: {n} errors since {from}; the rate is not rising and no new place appeared in the last {days} days", KO: "{mode} 고장({where}): {from}부터 {n}건, 증가 없음, 최근 {days}일 새 위치 없음"},

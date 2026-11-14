@@ -296,8 +296,14 @@ func Analyze(in *Input, opts Options) (*Result, error) {
 	for uid := range actions {
 		uids[uid] = true
 	}
-	var all []*DIMMResult
+	// In a fixed order, so that two runs over one ledger give one result.
+	order := make([]string, 0, len(uids))
 	for uid := range uids {
+		order = append(order, uid)
+	}
+	sort.Strings(order)
+	var all []*DIMMResult
+	for _, uid := range order {
 		d := &DIMMResult{UID: uid, DIMM: info[uid], Faults: faults[uid], actions: actions[uid]}
 		if i, ok := in.dimmIdx[uid]; ok {
 			d.events = events[i]
