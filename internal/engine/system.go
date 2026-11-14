@@ -326,10 +326,11 @@ func (v *systemView) run(j *judge) {
 	v.reseats(j)
 	v.mappings(j)
 
-	// A fault whose errors a system rule explains is a system issue.
+	// A fault whose errors a system rule explains is a system issue: the
+	// channel, the slot or the contact, not a place inside the DIMM.
 	for d, evs := range v.fired {
 		for _, ev := range evs {
-			if ev.Rule != RuleChannel && ev.Rule != RuleSlot {
+			if ev.Rule != RuleChannel && ev.Rule != RuleSlot && ev.Rule != RuleReseat {
 				continue
 			}
 			for _, f := range d.Faults {
@@ -502,8 +503,11 @@ func (v *systemView) reseats(j *judge) {
 		if reseat != nil {
 			at := reseat.At.UnixMicro()
 			before, after := v.errorsOf(d, 0, at, hostSlot{}), v.errorsOf(d, at, 0, hostSlot{})
-			if before >= need && after == 0 && asOf-at >= quiet {
+			if before >= need && stopped(before, after, need) && asOf-at >= quiet {
 				st := statement("sys.reseat", "n", before, "when", dateText(at), "days", (asOf-at)/microPerDay)
+				if after > 0 {
+					st = statement("sys.reseat_few", "n", before, "when", dateText(at), "days", (asOf-at)/microPerDay, "after", after)
+				}
 				v.fire(j, d, RuleReseat, st, d.events)
 				j.addRecord(d, RuleReseat, model.RecordRef{Kind: model.RecordAction, ID: reseat.ID, RawRef: reseat.RawRef})
 			}
@@ -516,7 +520,7 @@ func (v *systemView) reseats(j *judge) {
 		}
 		prev, cur := stays[len(stays)-2], stays[len(stays)-1]
 		before, after := v.errorsOf(d, 0, cur.first, hostSlot{}), v.errorsOf(d, prev.last, 0, hostSlot{})
-		if before < need || after != 0 || asOf-cur.first < quiet {
+		if before < need || !stopped(before, after, need) || asOf-cur.first < quiet {
 			continue
 		}
 		// If the old slot went on failing with its next DIMM, the slot is
@@ -531,8 +535,18 @@ func (v *systemView) reseats(j *judge) {
 			continue
 		}
 		st := statement("sys.moved_quiet", "n", before, "from", prev.slot, "to", cur.slot, "when", dateText(cur.first), "days", (asOf-cur.first)/microPerDay)
+		if after > 0 {
+			st = statement("sys.moved_few", "n", before, "from", prev.slot, "to", cur.slot, "when", dateText(cur.first), "days", (asOf-cur.first)/microPerDay, "after", after)
+		}
 		v.fire(j, d, RuleReseat, st, d.events)
 	}
+}
+
+// stopped reports whether errors came to an end: none afterwards, or a few
+// stray ones that are fewer than the system rules compare and at most a
+// tenth of what there was before.
+func stopped(before, after, need int64) bool {
+	return after == 0 || (after < need && after*10 <= before)
 }
 
 // mappings is R-MAP-01: records tied to a slot carry a name of another slot.

@@ -1069,7 +1069,7 @@ func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 		switch {
 		case f.Mode == model.ModeSystemIssue:
 			fs.covered[f] = true
-			for _, r := range []string{RuleChannel, RuleSlot} {
+			for _, r := range []string{RuleChannel, RuleSlot, RuleReseat} {
 				if fs.has(r) {
 					fs.note(r, f)
 				}
