@@ -1,0 +1,11 @@
+5,0,0,-;Linux version 6.8.0-45-generic (buildd@build.example.org) (x86_64-linux-gnu-gcc-13 (Ubuntu 13.2.0-23ubuntu4) 13.2.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #45-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug 30 12:02:04 UTC 2024
+6,1,0,-;Command line: BOOT_IMAGE=/vmlinuz-6.8.0-45-generic root=/dev/mapper/vg-root ro
+6,412,1907155,-;DMI: Example Systems SYS-621C/X13DEM, BIOS 2.1 12/05/2023
+6,1340,18412233,-;EDAC MC1: Giving out device to module i10nm_edac controller Intel_10nm Socket#0 IMC#1: DEV 0000:7e:0d.0 (INTERRUPT)
+ SUBSYSTEM=edac
+ DEVICE=+edac:mc1
+4,1532,8041118302,-;EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 syndrome:0x0 -  err_code:0x0101:0x0090 ProcessorSocketId:0x0 MemoryControllerId:0x1 PhysicalRankId:0x0 Row:0x1a2f Column:0x3f8 Bank:0x3 BankGroup:0x0)
+ SUBSYSTEM=edac
+ DEVICE=+edac:mc1
+6,1533,8041118310,-;mce: [Hardware Error]: Machine check events logged
+3,1601,86400000001,-;RAS: Soft-offlining pfn: 0x1f8bd1
