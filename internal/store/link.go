@@ -92,6 +92,32 @@ func (w *Writer) SetEventSlot(host string, k LocationKey, slot string) error {
 	return err
 }
 
+// ActionLabels returns the distinct labels the actions of a host name their
+// target by.
+func (s *Store) ActionLabels(ctx context.Context, host string) ([]string, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT DISTINCT label FROM action WHERE host = ? AND label != '' ORDER BY label`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []string
+	for rows.Next() {
+		var l string
+		if err := rows.Scan(&l); err != nil {
+			return nil, err
+		}
+		out = append(out, l)
+	}
+	return out, rows.Err()
+}
+
+// SetActionSlot sets the slot of all actions of a host that name their
+// target by the given label.
+func (w *Writer) SetActionSlot(host, label, slot string) error {
+	_, err := w.exec(`UPDATE action SET slot = ? WHERE host = ? AND label = ? AND slot != ?`, slot, host, label, slot)
+	return err
+}
+
 // LinkDIMMs attributes the events and actions of a host to DIMM identities.
 // Events must have their slot set first (SetEventSlot) and boots must be
 // known for swaps to be placed in time.

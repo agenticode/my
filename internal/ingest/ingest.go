@@ -175,6 +175,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	}{
 		{"counter events", func() error { return s.DeriveCounterEvents(ctx, host) }},
 		{"event slots", func() error { return resolveEventSlots(ctx, s, host) }},
+		{"action slots", func() error { return resolveActionSlots(ctx, s, host) }},
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
 		{"DIMM attribution", func() error { return s.LinkDIMMs(ctx, host) }},
 		{"duplicates", func() (err error) {
