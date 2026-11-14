@@ -177,8 +177,10 @@ type Event struct {
 	Bank      Opt[int] `json:"Bank,omitzero"`
 	Row       Opt[int] `json:"Row,omitzero"`
 	Column    Opt[int] `json:"Column,omitzero"`
-	// ErrorVector identifies the failing bits (DQ and burst position) as a
-	// hexadecimal string, when the source reports them.
+	// ErrorVector identifies the failing bits, when the source reports
+	// them, in a form that names what it is: "bit:<n>" is a bit position
+	// within the data word (CPER), "dq:<hex mask>" a mask of the data lines
+	// of the device.
 	ErrorVector string `json:"ErrorVector,omitzero"`
 	// OsPhysicalAddress is the system physical address of the error.
 	OsPhysicalAddress Opt[uint64] `json:"OsPhysicalAddress,omitzero"`
