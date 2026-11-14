@@ -30,7 +30,7 @@ Go 1.26 or newer.
 ```
 make build    # bin/my
 make test
-make fuzz     # each parser fuzz target for 10 s (FUZZTIME=1m for longer)
+make fuzz     # each fuzz target for 10 s (FUZZTIME=1m for longer)
 make cross    # dist/my-linux-amd64, dist/my-linux-arm64, dist/my-darwin-arm64
 ```
 
@@ -55,7 +55,7 @@ CPU0_C1  S/N 3B9C56  CE 1,231  UE 1  row
             [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28
   checks    open: no other DIMM on this channel: there is nothing to compare with
             open: no slot move or reseat on record: a cause in the board is not ruled out
-            supports: the other 15 DIMMs of this host have no errors outside single confined places: a cause in the board is unlikely
+            supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
   missing   no ECS counters
             no DIMM temperature history
   next      Replace the DIMM. Attach a case bundle of this DIMM to the return.
@@ -64,7 +64,9 @@ $ echo $?
 3
 ```
 
-The exit code is the grade of the worst finding: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results; `my analyze -thresholds` lists them, and `-config file` or `-set key=value` changes them. `my analyze -rules` lists the 13 rules, `-lang ko` prints Korean, `-json` prints the whole result.
+The exit code is the grade of the worst finding: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results; `my analyze -thresholds` lists them, and `-config file` or `-set key=value` changes them. `my analyze -rules` lists the 13 rules, `-lang ko` prints Korean, `-json` prints the whole result. `my synth -list` names 17 scenarios; between them they reach the grades observe, consider replacement, replace now and hold replacement.
+
+An error is called unconfined when it lies outside faults that stay within one cell, row, column or bank. The rules that suspect the channel, the slot or the contact count only those.
 
 ## License
 
