@@ -412,6 +412,24 @@ func TestRuleScenarios(t *testing.T) {
 			t.Errorf("%d pages on %d days, want 6 on 3", len(pages), len(days))
 		}
 	})
+	t.Run("scrub-ue", func(t *testing.T) {
+		ds := generate(t, "scrub-ue", 3, noNoise)
+		var ue []model.Event
+		for i := range ds.Events {
+			if ds.Events[i].ErrorSeverity.Uncorrected() {
+				ue = append(ue, ds.Events[i])
+			}
+		}
+		// One uncorrected error, found by the scrubber, at the weak cell,
+		// and its page taken offline.
+		if len(ue) != 1 || ue[0].ErrorSeverity != model.SevRecoverable || ue[0].ErrorScrubType != model.ScrubPatrol ||
+			ue[0].Row != ds.Truth[0].Row || ue[0].Column != ds.Truth[0].Column || ds.Truth[0].UE != 1 || ds.Truth[0].CE != 40 {
+			t.Errorf("uncorrected events = %+v, truth %+v", ue, ds.Truth[0])
+		}
+		if n := kinds(ds); len(ds.Actions) != 1 || n[model.ActionPageOffline] != 1 || ds.Actions[0].OsPhysicalAddress.V != ue[0].OsPhysicalAddress.V&^0xfff {
+			t.Errorf("actions = %+v", ds.Actions)
+		}
+	})
 	t.Run("sparing names a rank and a device, no row", func(t *testing.T) {
 		ds := generate(t, "device", 3, func(sc *Scenario) {
 			sc.Repairs = []Repair{{At: sc.Reboots[1].At, Kind: model.ActionSparing, Fault: 0}}

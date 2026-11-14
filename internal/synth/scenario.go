@@ -100,8 +100,12 @@ type Fault struct {
 	Trend  Trend
 	// PatrolShare is the share of events found by the patrol scrubber.
 	PatrolShare float64
-	// UE lists times of uncorrected errors at the fault location.
+	// UE lists times of uncorrected errors at the fault location, found
+	// when the data was read.
 	UE []time.Time
+	// PatrolUE lists times of uncorrected errors at the fault location
+	// that the patrol scrubber found before anything read the data.
+	PatrolUE []time.Time
 	// StaysWithSlot makes the errors stay in the slot when the DIMM is
 	// moved, as a fault of the slot, channel or board does. Otherwise they
 	// follow the DIMM.
@@ -267,6 +271,14 @@ var builders = map[string]func(seed uint64) *Scenario{
 		s := base("repaired", seed)
 		s.Faults = []Fault{{Mode: model.ModeRow, Slot: "CPU0_C1", Start: day(2026, 8, 20), Events: 150, Trend: Flat, PatrolShare: 0.2, StopAfterRepair: true}}
 		s.Repairs = []Repair{{At: clock(2026, 10, 1, 3, 0), Kind: model.ActionHPPR, Fault: 0}}
+		return s
+	},
+	// A weak cell, and an uncorrected error at it that the patrol scrubber
+	// finds.
+	"scrub-ue": func(seed uint64) *Scenario {
+		s := base("scrub-ue", seed)
+		s.Faults = []Fault{{Mode: model.ModeSingleBit, Slot: "CPU1_D1", Events: 40, Trend: Flat, PatrolShare: 0.5,
+			PatrolUE: []time.Time{clock(2026, 11, 5, 2, 10)}}}
 		return s
 	},
 	// Errors of a bad contact: scattered over the DIMM, gone after it was

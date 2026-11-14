@@ -24,6 +24,7 @@ func TestScenarioFindings(t *testing.T) {
 		also []string
 	}
 	tests := map[string][]want{
+		"scrub-ue":        {{grade: model.VerdictConsiderReplacement, rules: []string{RuleScrub}}},
 		"reseated":        {{grade: model.VerdictHoldReplacement, rules: []string{RuleReseat}}},
 		"fw-disabled":     {{grade: model.VerdictReplaceNow, rules: []string{RuleFirmware}}},
 		"repair-failed":   {{grade: model.VerdictReplaceNow, rules: []string{RuleRepairGone, RuleRow}}},
@@ -834,5 +835,31 @@ func TestRecordsWithoutDates(t *testing.T) {
 	b.act("d1", model.ActionHPPR, boot(40), func(a *model.Action) { rel(a); repairRow(a) })
 	if v := verdictOf(t, b, asOf, "d1"); has(v.Rules, RuleRecurred) || has(v.Rules, RuleQuiet) {
 		t.Errorf("rules = %v", v.Rules)
+	}
+}
+
+// TestScrubberFindOnPlatforms: an uncorrected error that the patrol
+// scrubber found is graded lower than one that was read by a program. A
+// platform that does not say who found the error gets the higher grade.
+func TestScrubberFindOnPlatforms(t *testing.T) {
+	ds := generate(t, "scrub-ue", 1, nil)
+	uid := uidOf(ds.Truth[0].Serial)
+	for _, fl := range synth.Flavors {
+		res, err := Run(ctx, sharedLedger(t, "scrub-ue", 1, fl), Options{Now: computedAt})
+		if err != nil {
+			t.Fatal(err)
+		}
+		v := res.Hosts[0].DIMM(uid).Verdict
+		switch fl {
+		case synth.FlavorIntel:
+			// The EDAC error type names the scrubber.
+			wantVerdict(t, v, model.VerdictConsiderReplacement, RuleScrub)
+		default:
+			// Firmware and AMD records do not say how the error was found.
+			wantVerdict(t, v, model.VerdictReplaceNow, RuleUE)
+		}
+		if res.ExitCode() != v.Grade.ExitCode() {
+			t.Errorf("%s: exit code %d for %s", fl, res.ExitCode(), v.Grade)
+		}
 	}
 }

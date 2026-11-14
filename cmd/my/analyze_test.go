@@ -184,7 +184,7 @@ func TestAnalyzeJSON(t *testing.T) {
 
 func TestAnalyzeExitCodes(t *testing.T) {
 	for scenario, want := range map[string]int{"single-bit": 1, "column": 2, "device": 3, "system-channel": 4, "system-slot": 4, "repaired": 1,
-		"reseated": 4, "fw-disabled": 3, "repair-failed": 3, "offline-growing": 2} {
+		"reseated": 4, "fw-disabled": 3, "repair-failed": 3, "offline-growing": 2, "scrub-ue": 2} {
 		code, out, errOut := run("analyze", "-ledger", synthLedger(t, scenario))
 		if code != want {
 			t.Errorf("%s: exit code %d, want %d\n%s%s", scenario, code, want, out, errOut)

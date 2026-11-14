@@ -537,17 +537,25 @@ func (g *generator) fault(index int) error {
 			truth.CE++
 		}
 	}
-	for _, t := range f.UE {
+	uncorrected := func(t time.Time, sev model.Severity, scrub model.ScrubType, page string) {
 		l := draw(0)
-		if emit(t.Truncate(time.Microsecond), model.SevUE, model.ScrubDemand, l) {
+		if emit(t.Truncate(time.Microsecond), sev, scrub, l) {
 			truth.UE++
 			// The kernel takes the page of an uncorrected error offline.
 			e := g.ds.Events[len(g.ds.Events)-1]
 			g.action(model.Action{
 				At: e.ErrorDT.Add(300 * time.Millisecond), Kind: model.ActionPageOffline, Method: "hard", Result: model.ResultOK,
-				OsPhysicalAddress: model.Some(e.OsPhysicalAddress.V &^ 0xfff), Slot: e.Slot, Label: e.Label, Detail: "dirty LRU page: Recovered",
+				OsPhysicalAddress: model.Some(e.OsPhysicalAddress.V &^ 0xfff), Slot: e.Slot, Label: e.Label, Detail: page,
 			})
 		}
+	}
+	for _, t := range f.UE {
+		uncorrected(t, model.SevUE, model.ScrubDemand, "dirty LRU page: Recovered")
+	}
+	// The scrubber finds the error before the data is used: the system
+	// keeps running and the page is given up.
+	for _, t := range f.PatrolUE {
+		uncorrected(t, model.SevRecoverable, model.ScrubPatrol, "clean LRU page: Recovered")
 	}
 	g.ds.Truth = append(g.ds.Truth, truth)
 	return nil
