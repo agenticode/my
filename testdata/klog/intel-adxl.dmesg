@@ -1,0 +1,28 @@
+[    0.000000] Linux version 5.14.0-570.12.1.el9_6.x86_64 (mockbuild@build.example.org) (gcc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5), GNU ld version 2.35.2-63.el9) #1 SMP PREEMPT_DYNAMIC Tue May 13 06:11:55 EDT 2025
+[    0.000000] Command line: BOOT_IMAGE=(hd0,gpt2)/vmlinuz-5.14.0-570.12.1.el9_6.x86_64 root=/dev/mapper/rl-root ro crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M mce=print_all
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable
+[    0.000000] DMI: Example Systems R650/0PYXKY, BIOS 1.5.5 02/10/2022
+[    0.412201] smpboot: CPU0: Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz (family: 0x6, model: 0x6a, stepping: 0x6)
+[   18.412233] EDAC MC0: Giving out device to module i10nm_edac controller Intel_10nm Socket#0 IMC#0: DEV 0000:7e:0c.0 (INTERRUPT)
+[   18.412410] EDAC MC1: Giving out device to module i10nm_edac controller Intel_10nm Socket#0 IMC#1: DEV 0000:7e:0d.0 (INTERRUPT)
+[   21.908711] systemd[1]: Reached target Multi-User System.
+[ 8041.118302] EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 syndrome:0x0 -  err_code:0x0101:0x0090  SystemAddress:0x1f8bd19c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelAddress:0x1b8bd19c0 ChannelId:0x0 RankAddress:0xdc5e8cc0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x3f8 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+[ 8041.118310] mce: [Hardware Error]: Machine check events logged
+[ 8102.640011] EDAC MC1: 2 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x1f8bd1 offset:0x400 grain:32 syndrome:0x0 -  OVERFLOW err_code:0x0101:0x0090  SystemAddress:0x1f8bd1400 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelAddress:0x1b8bd1400 ChannelId:0x0 RankAddress:0xdc5e8a00 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x100 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+[ 8102.640020] mce: [Hardware Error]: Machine check events logged
+[ 9000.000100] EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 syndrome:0x0 -  err_code:0x0101:0x0090  SystemAddress:0x1f8bd19c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 Chan
+[86400.000001] RAS: Soft-offlining pfn: 0x1f8bd1
+[86400.210094] soft offline: 0x1f8bd1: migration failed 1, type 17ffffc0020014(uptodate|lru|mappedtodisk|node=0|zone=2|lastcpupid=0x1fffff)
+[90011.554120] EDAC MC1: 1 UE memory scrubbing error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 -  recoverable err_code:0x0008:0x00c0  SystemAddress:0x1f8bd19c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelAddress:0x1b8bd19c0 ChannelId:0x0 RankAddress:0xdc5e8cc0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x3f8 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+[90011.554400] Memory failure: 0x1f8bd1: recovery action for dirty LRU page: Recovered
+[90011.554410] mce: [Hardware Error]: Machine check events logged
+[90011.560000] Memory failure: 0x1f8bd1: already hardware poisoned
+[90500.000000] mce: [Hardware Error]: CPU 12: Machine Check: 0 Bank 13: 8c00004000010090
+[90500.000001] mce: [Hardware Error]: TSC 0 ADDR 2a0000040 MISC 200000c0a0001086 PPIN 2b4c1a00f1d2e3
+[90500.000002] mce: [Hardware Error]: PROCESSOR 0:606a6 TIME 1794359300 SOCKET 0 APIC 18 microcode d0003b9
+[90600.000000] mce: [Hardware Error]: CPU 3: Machine Check: 0 Bank 1: 9000004000000135
+[90600.000001] mce: [Hardware Error]: TSC 0 MISC 86
+[90600.000002] mce: [Hardware Error]: PROCESSOR 0:606a6 TIME 1794359400 SOCKET 0 APIC 6 microcode d0003b9
+[90700.000000] mce: [Hardware Error]: CPU 5: Machine Check: 0 Bank 13: 8c00004000010090
+[90700.500000] EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x5c7f01 offset:0x240 grain:32 syndrome:0x0 -  err_code:0x0101:0x0091  SystemAddress:0x5c7f01240 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0x0 Column:0x0 Bank:0x0 BankGroup:0x0 ChipSelect:0x1 ChipId:0x0)

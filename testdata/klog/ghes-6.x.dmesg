@@ -1,0 +1,39 @@
+[    0.000000] Booting Linux on physical CPU 0x0000120000 [0x413fd0c1]
+[    0.000000] Linux version 6.12.0-55.9.1.el10_0.aarch64 (mockbuild@build.example.org) (gcc (GCC) 14.2.1 20250110 (Red Hat 14.2.1-7), GNU ld version 2.41-53.el10) #1 SMP PREEMPT_DYNAMIC Thu Apr 10 09:21:44 UTC 2025
+[    0.000000] DMI: Example Computing ARMv8 Server/MP32-AR1, BIOS F31n 06/12/2024
+[    0.000000] Kernel command line: BOOT_IMAGE=(hd0,gpt2)/vmlinuz-6.12.0-55.9.1.el10_0.aarch64 root=UUID=8a3c ro
+[   12.004410] EDAC MC0: Giving out device to module ghes_edac controller ghes_edac: DEV ghes (INTERRUPT)
+[ 3600.100001] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
+[ 3600.100004] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
+[ 3600.100006] {1}[Hardware Error]: event severity: corrected
+[ 3600.100008] {1}[Hardware Error]:  Error 0, type: corrected
+[ 3600.100010] {1}[Hardware Error]:  fru_text: DIMM B1
+[ 3600.100012] {1}[Hardware Error]:   section_type: memory error
+[ 3600.100014] {1}[Hardware Error]:    error_status: Storage error in DRAM memory (0x0000000000000400)
+[ 3600.100016] {1}[Hardware Error]:   physical_address: 0x0000000b5689dc40
+[ 3600.100018] {1}[Hardware Error]:   physical_address_mask: 0xffffffffffffffc0
+[ 3600.100020] {1}[Hardware Error]:   node:0 card:1 module:0 rank:1 bank_group:1 bank_address:3 device:7 row:6703 column:1016 bit_position:5
+[ 3600.100022] {1}[Hardware Error]:   error_type: 2, single-bit ECC
+[ 3600.100024] {1}[Hardware Error]:   DIMM location: NODE 1 CPU1_DIMM_B1
+[ 3600.100101] EDAC MC0: 1 CE single-bit ECC on NODE 1 CPU1_DIMM_B1 (node:0 card:1 module:0 rank:1 bank_group:1 bank_address:3 device:7 row:6703 column:1016 bit_position:5 DIMM location: NODE 1 CPU1_DIMM_B1 page:0xb5689d offset:0xc40 grain:64 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:1 bank_address:3 device:7 row:6703 column:1016 bit_position:5 DIMM location: NODE 1 CPU1_DIMM_B1 status(0x0000000000000400): Storage error in DRAM memory)
+[ 3611.000000] EDAC MC0: 1 CE scrub corrected error on NODE 1 CPU1_DIMM_B1 (node:0 card:1 module:0 rank:1 bank_group:1 bank_address:3 device:7 row:6703 column:1040 bit_position:5 DIMM location: NODE 1 CPU1_DIMM_B1 page:0xb5689d offset:0xd00 grain:64 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:1 bank_address:3 device:7 row:6703 column:1040 bit_position:5 DIMM location: NODE 1 CPU1_DIMM_B1 status(0x0000000000000400): Storage error in DRAM memory)
+[ 7200.500001] {2}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
+[ 7200.500004] {2}[Hardware Error]: event severity: recoverable
+[ 7200.500006] {2}[Hardware Error]:  Error 0, type: recoverable
+[ 7200.500008] {2}[Hardware Error]:   section_type: memory error
+[ 7200.500010] {2}[Hardware Error]:    error_status: Storage error in DRAM memory (0x0000000000000400)
+[ 7200.500012] {2}[Hardware Error]:   physical_address: 0x000000012f4a6000
+[ 7200.500014] {2}[Hardware Error]:   node:1 card:2 module:1
+[ 7200.500016] {2}[Hardware Error]:   error_type: 14, scrub uncorrected error
+[ 7200.500018] {2}[Hardware Error]:   DIMM location: not present. DMI handle: 0x001a
+[ 7200.500020] {2}[Hardware Error]:  Error 1, type: recoverable
+[ 7200.500022] {2}[Hardware Error]:   section_type: ARM processor error
+[ 7200.500024] {2}[Hardware Error]:   MIDR: 0x00000000413fd0c1
+[ 7200.500101] EDAC MC0: 1 UE scrub uncorrected error on unknown memory (node:1 card:2 module:1 DIMM location: not present. DMI handle: 0x001a page:0x12f4a6 offset:0x0 grain:4096 - APEI location: node:1 card:2 module:1 DIMM location: not present. DMI handle: 0x001a status(0x0000000000000400): Storage error in DRAM memory)
+[ 7200.500400] Memory failure: 0x12f4a6: recovery action for free buddy page: Delayed
+[ 9000.000001] {3}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 9
+[ 9000.000004] {3}[Hardware Error]: event severity: corrected
+[ 9000.000006] {3}[Hardware Error]:  Error 0, type: corrected
+[ 9000.000008] {3}[Hardware Error]:   section_type: PCIe error
+[ 9000.000010] {3}[Hardware Error]:   port_type: 4, root port
+[ 9000.000012] {3}[Hardware Error]:   device_id: 0000:00:01.0

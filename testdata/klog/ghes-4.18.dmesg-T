@@ -1,0 +1,20 @@
+[Mon Feb 13 00:00:00 2023] Linux version 4.18.0-553.el8_10.aarch64 (mockbuild@build.example.org) (gcc version 8.5.0 20210514 (Red Hat 8.5.0-22) (GCC)) #1 SMP Fri May 24 13:05:39 UTC 2024
+[Mon Feb 13 00:00:00 2023] DMI: Example Computing ARMv8 Server/MP32-AR0, BIOS F21 03/02/2022
+[Mon Feb 13 00:00:11 2023] EDAC MC0: Giving out device to module ghes_edac.c controller ghes_edac: DEV ghes (INTERRUPT)
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 2
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]: event severity: corrected
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:  Error 0, type: corrected
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   section_type: memory error
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   error_status: 0x0000000000000400
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   physical_address: 0x0000000b5689dc40
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   physical_address_mask: 0xffffffffffffffc0
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   node: 0 card: 1 module: 0 rank: 1 bank: 3 device: 7 row: 6703 column: 1016 bit_position: 5
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   error_type: 2, single-bit ECC
+[Mon Feb 27 14:36:26 2023] {1}[Hardware Error]:   DIMM location: NODE 1 DIMM_B1
+[Mon Feb 27 14:36:26 2023] EDAC MC0: 1 CE Single-bit ECC on NODE 1 DIMM_B1 (node:0 card:1 module:0 rank:1 bank:3 row:6703 col:1016 bit_pos:5 DIMM location:NODE 1 DIMM_B1 page:0xb5689 offset:0xdc40 grain:0 syndrome:0x0 - status(0x0000000000000400): Storage error in DRAM memory)
+[Mon Feb 27 14:36:29 2023] EDAC MC0: 1 CE Single-bit ECC on NODE 1 DIMM_B1 (node:0 card:1 module:0 rank:1 bank:3 row:6703 col:1016 bit_pos:5 DIMM location:NODE 1 DIMM_B1 page:0xb5689 offset:0xdc40 grain:0 syndrome:0x0 - status(0x0000000000000400): Storage error in DRAM memory)
+[Mon Feb 27 14:40:00 2023] EDAC MC0: 1 CE Single-bit ECC on unknown label (node:0 card:1 module:0 rank:1 bank:3 row:12 col:8 bit_pos:0 DIMM DMI handle: 0x001a page:0xb5000 offset:0x40 grain:0 syndrome:0x0 - status(0x0000000000000400): Storage error in DRAM memory)
+[Tue Feb 28 08:00:00 2023] Linux version 4.18.0-553.el8_10.aarch64 (mockbuild@build.example.org) (gcc version 8.5.0 20210514 (Red Hat 8.5.0-22) (GCC)) #1 SMP Fri May 24 13:05:39 UTC 2024
+[Tue Feb 28 09:30:00 2023] EDAC MC0: 1 UE Multi-bit ECC on NODE 1 DIMM_B1 (node:0 card:1 module:0 rank:1 bank:3 row:6703 col:1016 DIMM location:NODE 1 DIMM_B1 page:0xb5689 offset:0xdc40 grain:0 - status(0x0000000000000400): Storage error in DRAM memory)
+[Tue Feb 28 09:30:00 2023] Memory failure: 0xb5689: recovery action for dirty LRU page: Recovered

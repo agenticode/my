@@ -1,0 +1,14 @@
+Feb 26 23:58:01 r07-n011 systemd[1]: Started Session 4211 of user root.
+Feb 27 00:00:03 r07-n011 kernel: [1209603.118302] EDAC MC0: 1 CE memory read error on CPU_SrcID#0_MC#0_Chan#1_DIMM#0 (channel:1 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 syndrome:0x0 -  err_code:0101:0091 socket:0 imc:0 rank:1 bg:1 ba:3 row:1b8b col:338)
+Feb 27 00:00:03 r07-n011 kernel: [1209603.118320] mce: [Hardware Error]: Machine check events logged
+Feb 27 00:00:03 r07-n011 rasdaemon[1203]: rasdaemon: mc_event store: 0x55d0c0a0
+Feb 27 00:00:04 r07-n011 rasdaemon[1203]:            <...>-112345 [012] 1209603.118310: mc_event:             2023-02-27 00:00:03 +0000 1 Corrected error: memory read error on CPU_SrcID#0_MC#0_Chan#1_DIMM#0 (mc: 0 location: 1:0 address: 0x1f8bd19c0 grain: 5  err_code:0101:0091 socket:0 imc:0 rank:1 bg:1 ba:3 row:1b8b col:338)
+Feb 27 03:14:07 r07-n011 kernel: [1221247.554120] EDAC MC0: 1 UE memory scrubbing error on CPU_SrcID#0_MC#0_Chan#1_DIMM#0 (channel:1 slot:0 page:0x1f8bd1 offset:0x9c0 grain:32 -  recoverable err_code:0008:00c1 socket:0 imc:0 rank:1 bg:1 ba:3 row:1b8b col:338)
+Feb 27 03:14:07 r07-n011 kernel: [1221247.554400] Memory failure: 0x1f8bd1: recovery action for clean LRU page: Recovered
+Feb 27 06:05:55 r07-n011 systemd[1]: Stopping User Manager for UID 0...
+Feb 27 06:10:00 r07-n011 kernel: [    0.000000] Linux version 4.18.0-553.el8_10.x86_64 (mockbuild@build.example.org) (gcc version 8.5.0 20210514 (Red Hat 8.5.0-22) (GCC)) #1 SMP Fri May 24 13:05:39 UTC 2024
+Feb 27 06:10:00 r07-n011 kernel: [    0.000000] Command line: BOOT_IMAGE=(hd0,msdos1)/vmlinuz-4.18.0-553.el8_10.x86_64 root=/dev/mapper/rl-root ro
+Feb 27 06:10:00 r07-n011 kernel: [    0.000000] DMI: Example Systems SYS-6029/X11DPi, BIOS 3.8b 01/27/2023
+Feb 27 06:10:31 r07-n011 kernel: [   31.402118] EDAC MC0: Giving out device to module skx_edac controller Skylake Socket#0 IMC#0: DEV 0000:64:0a.0 (INTERRUPT)
+Feb 27 06:25:14 r07-n011 kernel: [  914.220018] EDAC MC0: 2 CE memory read error on CPU_SrcID#0_MC#0_Chan#1_DIMM#0 (channel:1 slot:0 page:0x1f8bd1 offset:0xa40 grain:32 syndrome:0x0 -  err_code:0101:0091 socket:0 imc:0 rank:1 bg:1 ba:3 row:1b8b col:348)
+Feb 27 06:25:14 r07-n011 sshd[4410]: Accepted publickey for root from 10.0.0.5 port 51122 ssh2
