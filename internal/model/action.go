@@ -3,8 +3,8 @@ package model
 import "time"
 
 // ActionKind is a repair or isolation step taken on the host, by the kernel,
-// the firmware, a daemon or a person. MemorY records actions; it never takes
-// them.
+// the firmware, a daemon or a person, or a mark firmware put on a module.
+// MemorY records actions; it never takes them.
 type ActionKind string
 
 const (
@@ -15,12 +15,19 @@ const (
 	ActionRowRemap    ActionKind = "row-remap"
 	ActionReplacement ActionKind = "replacement"
 	ActionReseat      ActionKind = "reseat"
+	// ActionDisable: the BIOS or the BMC took the module, or a rank or
+	// channel that holds it, out of use.
+	ActionDisable ActionKind = "disable"
+	// ActionMarkFailed: the BIOS or the BMC reports the module as failed
+	// and left it in use.
+	ActionMarkFailed ActionKind = "mark-failed"
 )
 
 // Valid reports whether k is a defined action kind.
 func (k ActionKind) Valid() bool {
 	switch k {
-	case ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat:
+	case ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat,
+		ActionDisable, ActionMarkFailed:
 		return true
 	}
 	return false

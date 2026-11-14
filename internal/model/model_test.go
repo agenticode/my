@@ -274,3 +274,60 @@ func TestDerivedBootID(t *testing.T) {
 		t.Errorf("derived boot id = %q", a)
 	}
 }
+
+func TestActionKinds(t *testing.T) {
+	for _, k := range []ActionKind{ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat,
+		ActionDisable, ActionMarkFailed} {
+		if !k.Valid() {
+			t.Errorf("%q is not valid", k)
+		}
+	}
+	for _, k := range []ActionKind{"", "offline", "ppr", "enable"} {
+		if k.Valid() {
+			t.Errorf("%q is valid", k)
+		}
+	}
+}
+
+// TestVerdictJSON pins the JSON form of a finding: statements are flat
+// objects with code, args and text, and the grade is labelled a finding.
+func TestVerdictJSON(t *testing.T) {
+	st := Statement{Code: "ue.demand", Args: map[string]any{"n": 1}, Text: "1 uncorrected error"}
+	v := Verdict{
+		Host: "h1", DIMMUID: "dA", Slot: "CPU0_C1", Grade: VerdictReplaceNow, Label: VerdictLabel, Rules: []string{"R-UE-01"},
+		Evidence:          []Evidence{{Rule: "R-UE-01", Statement: st, Records: []RecordRef{{Kind: RecordEvent, ID: 7, RawRef: "mc_event/7"}}, Total: 1}},
+		CounterEvidence:   []Check{{Statement: Statement{Code: "check.neighbors_clean", Text: "no errors on the channel"}, Effect: EffectSupports}},
+		Missing:           []Statement{{Code: "missing.ecs", Text: "no ECS counters"}},
+		NextAction:        Statement{Code: "next.replace", Text: "Replace the DIMM."},
+		Confidence:        90,
+		ConfidenceFactors: []Factor{{Statement: Statement{Code: "conf.rule", Text: "an uncorrected error is on record"}, Delta: 90}},
+		EngineVersion:     "1", ComputedAt: time.Date(2026, 11, 13, 0, 0, 0, 0, time.UTC),
+	}
+	b, err := json.Marshal(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := `{"host":"h1","dimm_uid":"dA","slot":"CPU0_C1","grade":"replace-now","label":"finding","rules":["R-UE-01"],` +
+		`"evidence":[{"rule":"R-UE-01","code":"ue.demand","args":{"n":1},"text":"1 uncorrected error","records":[{"kind":"event","id":7,"raw_ref":"mc_event/7"}],"total":1}],` +
+		`"counter_evidence":[{"code":"check.neighbors_clean","text":"no errors on the channel","effect":"supports"}],` +
+		`"missing":[{"code":"missing.ecs","text":"no ECS counters"}],` +
+		`"next_action":{"code":"next.replace","text":"Replace the DIMM."},` +
+		`"confidence":90,"confidence_factors":[{"code":"conf.rule","text":"an uncorrected error is on record","delta":90}],` +
+		`"engine_version":"1","computed_at":"2026-11-13T00:00:00Z"}`
+	if string(b) != want {
+		t.Errorf("verdict JSON\n got: %s\nwant: %s", b, want)
+	}
+	var back Verdict
+	if err := json.Unmarshal(b, &back); err != nil || back.Evidence[0].Code != "ue.demand" || back.Evidence[0].Records[0].RawRef != "mc_event/7" ||
+		back.CounterEvidence[0].Effect != EffectSupports || back.NextAction.Code != "next.replace" || back.ConfidenceFactors[0].Delta != 90 {
+		t.Errorf("round trip: %+v, %v", back, err)
+	}
+	// A finding without a next step or checks leaves those out.
+	b, _ = json.Marshal(Verdict{Host: "h1", Grade: VerdictOK, Label: VerdictLabel, ComputedAt: v.ComputedAt})
+	if got := string(b); got != `{"host":"h1","grade":"ok","label":"finding","rules":null,"confidence":0,"engine_version":"","computed_at":"2026-11-13T00:00:00Z"}` {
+		t.Errorf("minimal verdict JSON = %s", got)
+	}
+	if VerdictLabel != "finding" {
+		t.Errorf("a verdict is called %q", VerdictLabel)
+	}
+}

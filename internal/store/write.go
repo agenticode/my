@@ -723,33 +723,56 @@ func (w *Writer) InsertVerdict(v *model.Verdict) error {
 		return invalid("verdict: unknown grade %q", v.Grade)
 	case !validTime(v.ComputedAt):
 		return invalid("verdict: computed time is required")
+	case v.DIMMUID != "" && v.GPU != "":
+		return invalid("verdict: a finding is about a DIMM or about a GPU, not both")
 	}
-	orEmpty := func(s []string) []string {
-		if s == nil {
-			return []string{}
-		}
-		return s
+	// Empty lists are stored as [], never as null.
+	lists := []any{v.Rules, v.Evidence, v.CounterEvidence, v.Missing, v.ConfidenceFactors}
+	if v.Rules == nil {
+		lists[0] = []string{}
 	}
-	ev := v.Evidence
-	if ev == nil {
-		ev = []model.Evidence{}
+	if v.Evidence == nil {
+		lists[1] = []model.Evidence{}
 	}
-	var parts [4]string
-	for i, x := range []any{orEmpty(v.Rules), ev, orEmpty(v.CounterEvidence), orEmpty(v.Missing)} {
+	if v.CounterEvidence == nil {
+		lists[2] = []model.Check{}
+	}
+	if v.Missing == nil {
+		lists[3] = []model.Statement{}
+	}
+	if v.ConfidenceFactors == nil {
+		lists[4] = []model.Factor{}
+	}
+	var parts [5]string
+	for i, x := range lists {
 		s, err := jsonText(x)
 		if err != nil {
-			return err
+			return fmt.Errorf("verdict: %w", err)
 		}
 		parts[i] = s
 	}
-	res, err := w.exec(`INSERT INTO verdict (host, dimm_uid, slot, grade, rules, evidence, counter_evidence, missing, next_action,
- confidence, engine_version, computed_at) VALUES (`+placeholders(12)+`)`,
-		v.Host, nullStr(v.DIMMUID), v.Slot, string(v.Grade), parts[0], parts[1], parts[2], parts[3], v.NextAction,
-		v.Confidence, v.EngineVersion, ts(v.ComputedAt))
+	next := ""
+	if v.NextAction.Code != "" || v.NextAction.Text != "" {
+		s, err := jsonText(v.NextAction)
+		if err != nil {
+			return fmt.Errorf("verdict: %w", err)
+		}
+		next = s
+	}
+	res, err := w.exec(`INSERT INTO verdict (host, dimm_uid, slot, gpu, grade, rules, evidence, counter_evidence, missing, next_action,
+ confidence, confidence_factors, engine_version, computed_at) VALUES (`+placeholders(14)+`)`,
+		v.Host, nullStr(v.DIMMUID), v.Slot, v.GPU, string(v.Grade), parts[0], parts[1], parts[2], parts[3], next,
+		v.Confidence, parts[4], v.EngineVersion, ts(v.ComputedAt))
 	if err != nil {
 		return fmt.Errorf("verdict: %w", err)
 	}
 	v.ID, err = res.LastInsertId()
+	return err
+}
+
+// SetMeta stores value under key, in the transaction of the Writer.
+func (w *Writer) SetMeta(key, value string) error {
+	_, err := w.exec(`INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`, key, value)
 	return err
 }
 
