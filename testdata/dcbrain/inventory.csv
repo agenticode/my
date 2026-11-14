@@ -1,0 +1,10 @@
+sid,server_manufacturer,DRAM_model,DIMM_number
+s0001,M1,A1,12
+s0002,M2,B1,24
+s0003,M2,B2,24
+s0004,M3,A2,24
+s0005,M1,C1,16
+s0006,M4,C2,12
+s0007,M2,B3,24
+s0008,M3,A1,8
+s0099,M1,A1,12
