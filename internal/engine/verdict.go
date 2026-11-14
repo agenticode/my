@@ -59,6 +59,29 @@ func stampText(micro int64) string {
 	return timeOf(micro).Format("2006-01-02 15:04") + " UTC"
 }
 
+// bootText writes a time that is only known as seconds since boot.
+func bootText(micro int64) string {
+	return fmt.Sprintf("boot+%ds", micro/int64(time.Second/time.Microsecond))
+}
+
+// actionWhen writes the day of an action, or its offset from boot when the
+// source recorded no date.
+func actionWhen(at time.Time, q model.TimeQuality) string {
+	if q == model.TimeRelative {
+		return bootText(at.UnixMicro())
+	}
+	return dateText(at.UnixMicro())
+}
+
+// faultDay writes a day in the life of a fault, or the offset from boot
+// when none of its records carries a date.
+func faultDay(f *Fault, t time.Time) string {
+	if f.Undated > 0 && f.Undated == int64(f.ErrorCount) {
+		return bootText(t.UnixMicro())
+	}
+	return dateText(t.UnixMicro())
+}
+
 func placeText(rank, dev, bg, bank model.Opt[int]) []string {
 	var parts []string
 	add := func(name string, o model.Opt[int]) {
@@ -308,10 +331,14 @@ func (j *judge) uncorrected(fs *findings) {
 			counted = counted && e.counter
 		}
 		refs, total := j.eventRefs(idx)
+		when := stampText(last.at)
+		if last.relative {
+			when = bootText(last.at)
+		}
 		if w := eventWhere(last); w != "" {
-			fs.add(rule, statement(located, "n", n, "when", stampText(last.at), "where", w), refs, total)
+			fs.add(rule, statement(located, "n", n, "when", when, "where", w), refs, total)
 		} else {
-			fs.add(rule, statement(unlocated, "n", n, "when", stampText(last.at)), refs, total)
+			fs.add(rule, statement(unlocated, "n", n, "when", when), refs, total)
 		}
 		if counted {
 			if fs.basis[rule] == nil {
@@ -342,9 +369,9 @@ func (j *judge) firmware(fs *findings) {
 			if repairKind(a.Kind) && a.Kind != model.ActionSparing {
 				refs := []model.RecordRef{actionRef(a.ID, a.RawRef)}
 				if w := actionWhere(a); w != "" {
-					fs.add(RuleRepairGone, statement("rep.failed", "kind", kindArg(a.Kind), "where", w, "when", dateText(a.At.UnixMicro())), refs, 1)
+					fs.add(RuleRepairGone, statement("rep.failed", "kind", kindArg(a.Kind), "where", w, "when", actionWhen(a.At, a.TimeQuality)), refs, 1)
 				} else {
-					fs.add(RuleRepairGone, statement("rep.failed_unlocated", "kind", kindArg(a.Kind), "when", dateText(a.At.UnixMicro())), refs, 1)
+					fs.add(RuleRepairGone, statement("rep.failed_unlocated", "kind", kindArg(a.Kind), "when", actionWhen(a.At, a.TimeQuality)), refs, 1)
 				}
 			}
 			continue
@@ -368,15 +395,15 @@ func (j *judge) firmware(fs *findings) {
 		}
 		refs := []model.RecordRef{actionRef(a.ID, a.RawRef)}
 		if a.Detail != "" {
-			fs.add(RuleFirmware, statement(code+"_detail", "who", who(a), "when", dateText(a.At.UnixMicro()), "detail", a.Detail), refs, 1)
+			fs.add(RuleFirmware, statement(code+"_detail", "who", who(a), "when", actionWhen(a.At, a.TimeQuality), "detail", a.Detail), refs, 1)
 		} else {
-			fs.add(RuleFirmware, statement(code, "who", who(a), "when", dateText(a.At.UnixMicro())), refs, 1)
+			fs.add(RuleFirmware, statement(code, "who", who(a), "when", actionWhen(a.At, a.TimeQuality)), refs, 1)
 		}
 	}
 	mark(disabled, "fw.disabled")
 	mark(failed, "fw.failed")
 	if sparing != nil {
-		fs.add(RuleRepairGone, statement("rep.sparing", "when", dateText(sparing.At.UnixMicro())), []model.RecordRef{actionRef(sparing.ID, sparing.RawRef)}, 1)
+		fs.add(RuleRepairGone, statement("rep.sparing", "when", actionWhen(sparing.At, sparing.TimeQuality)), []model.RecordRef{actionRef(sparing.ID, sparing.RawRef)}, 1)
 	}
 }
 
@@ -452,6 +479,9 @@ func (j *judge) growing(fs *findings) {
 // offline is R-OFF-02: pages keep being taken offline.
 func (j *judge) offline(fs *findings) {
 	o, cfg := fs.d.Features.Offline, j.cfg
+	if fs.d.clk.zero() {
+		return // no dated record: "recently" has no meaning
+	}
 	if o.Pages < cfg.OfflineMinPages || o.Days < cfg.OfflineMinDays || o.LastNew.IsZero() ||
 		fs.d.clk.asOf-o.LastNew.UnixMicro() > days(cfg.OfflineRecentDays) {
 		return
@@ -511,7 +541,7 @@ func (j *judge) repaired(fs *findings) {
 				}
 			}
 		}
-		if last == nil || !f.Recurring || last.FaultErrorsAfter != 0 {
+		if last == nil || !f.Recurring || last.FaultErrorsAfter != 0 || fs.d.clk.zero() {
 			continue
 		}
 		since := fs.d.clk.asOf - last.At.UnixMicro()
@@ -523,7 +553,7 @@ func (j *judge) repaired(fs *findings) {
 		refs, total := j.eventRefs(f.members)
 		refs = append([]model.RecordRef{actionRef(last.ActionID, last.RawRef)}, refs...)
 		fs.add(RuleQuiet, statement("quiet.after", "mode", modeArg(f), "where", j.where(f), "n", f.ErrorCount,
-			"last", dateText(f.LastSeen.UnixMicro()), "days", since/microPerDay, "kind", kindArg(last.Kind), "when", dateText(last.At.UnixMicro())), refs, total+1)
+			"last", faultDay(f, f.LastSeen), "days", since/microPerDay, "kind", kindArg(last.Kind), "when", dateText(last.At.UnixMicro())), refs, total+1)
 		fs.covered[f] = true
 		fs.note(RuleQuiet, f)
 	}
@@ -553,17 +583,20 @@ func (j *judge) soft(fs *findings) {
 		if f.CE == 0 || fs.covered[f] || f.Mode == model.ModeSystemIssue {
 			continue
 		}
-		first := dateText(f.FirstSeen.UnixMicro())
+		first := faultDay(f, f.FirstSeen)
 		var st model.Statement
 		switch {
 		case f.Mode == model.ModeSingleBit && !f.Recurring:
 			strays = append(strays, f.members...)
 			strayErrors += int64(f.ErrorCount)
 			strayPlaces++
-			if at := f.FirstSeen.UnixMicro(); from == 0 || at < from {
-				from = at
+			// Stray errors without a date take no part in the period.
+			if f.Undated != int64(f.ErrorCount) {
+				if at := f.FirstSeen.UnixMicro(); from == 0 || at < from {
+					from = at
+				}
+				to = max(to, f.LastSeen.UnixMicro())
 			}
-			to = max(to, f.LastSeen.UnixMicro())
 			fs.note(RuleSoft, f)
 			continue
 		case f.Mode == model.ModeUndetermined:
@@ -596,9 +629,12 @@ func (j *judge) soft(fs *findings) {
 	}
 	if strayPlaces > 0 {
 		refs, total := j.eventRefs(strays)
-		if dateText(from) == dateText(to) {
+		switch {
+		case from == 0:
+			fs.add(RuleSoft, statement("soft.stray_undated", "n", strayErrors, "places", strayPlaces), refs, total)
+		case dateText(from) == dateText(to):
 			fs.add(RuleSoft, statement("soft.stray_once", "n", strayErrors, "places", strayPlaces, "from", dateText(from)), refs, total)
-		} else {
+		default:
 			fs.add(RuleSoft, statement("soft.stray", "n", strayErrors, "places", strayPlaces, "from", dateText(from), "to", dateText(to)), refs, total)
 		}
 	}
