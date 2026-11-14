@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: make fmt-check
+      - name: go vet
+        run: make vet
+      - name: go mod tidy is clean
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+      - name: test
+        run: make test
+      - name: test with the race detector
+        run: make test-race
+
+  cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: build linux/amd64, linux/arm64, darwin/arm64
+        run: make cross
+      - name: linux binaries are statically linked
+        run: |
+          for f in dist/my-linux-amd64 dist/my-linux-arm64; do
+            file "$f"
+            file "$f" | grep -q 'statically linked'
+          done
+      - name: run the native binary
+        run: ./dist/my-linux-amd64 version

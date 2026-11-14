@@ -1,0 +1,55 @@
+# MemorY build targets. The product binary is pure Go and statically linked.
+
+GO      ?= go
+JOBS    ?= 4
+PKG     := github.com/agenticode/my
+BIN     := my
+DIST    := dist
+
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+COMMIT  ?= $(shell git rev-parse --short=12 HEAD 2>/dev/null || echo unknown)
+
+LDFLAGS := -s -w \
+	-X $(PKG)/internal/buildinfo.Version=$(VERSION) \
+	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT)
+BUILD   := -trimpath -p $(JOBS) -ldflags '$(LDFLAGS)'
+
+PLATFORMS := linux/amd64 linux/arm64 darwin/arm64
+
+export CGO_ENABLED := 0
+
+.PHONY: all build test test-race lint fmt fmt-check vet cross clean
+
+all: lint test build
+
+build:
+	$(GO) build $(BUILD) -o bin/$(BIN) ./cmd/my
+
+test:
+	$(GO) test -p $(JOBS) ./...
+
+# The race detector needs cgo; the product build stays CGO_ENABLED=0.
+test-race:
+	CGO_ENABLED=1 $(GO) test -race -p $(JOBS) ./...
+
+lint: fmt-check vet
+
+fmt:
+	gofmt -w cmd internal
+
+fmt-check:
+	@out="$$(gofmt -l cmd internal)"; \
+	if [ -n "$$out" ]; then echo "gofmt needed on:"; echo "$$out"; exit 1; fi
+
+vet:
+	$(GO) vet ./...
+
+cross:
+	@set -e; for p in $(PLATFORMS); do \
+		os=$${p%/*}; arch=$${p#*/}; \
+		echo "build $$os/$$arch"; \
+		GOOS=$$os GOARCH=$$arch $(GO) build $(BUILD) -o $(DIST)/$(BIN)-$$os-$$arch ./cmd/my; \
+	done
+
+clean:
+	rm -rf bin $(DIST)
