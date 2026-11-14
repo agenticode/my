@@ -278,7 +278,29 @@ func equalInts(a, b []int) bool {
 // the identity of the DIMM in each populated slot, and that the DIMM was in
 // that slot at the time of the scan.
 func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
-	names := slotNames(mods)
+	// A run may carry several inventory snapshots (one per source and
+	// time). Names are made unique within a snapshot: the same locator in
+	// two snapshots is the same slot.
+	names := make([]string, len(mods))
+	groups := map[string][]int{}
+	var order []string
+	for i, m := range mods {
+		key := m.Source + "|" + m.ObservedAt.UTC().Format("2006-01-02T15:04:05.000000")
+		if _, ok := groups[key]; !ok {
+			order = append(order, key)
+		}
+		groups[key] = append(groups[key], i)
+	}
+	for _, key := range order {
+		idx := groups[key]
+		snapshot := make([]*model.Module, len(idx))
+		for j, i := range idx {
+			snapshot[j] = mods[i]
+		}
+		for j, n := range slotNames(snapshot) {
+			names[idx[j]] = n
+		}
+	}
 	for i, m := range mods {
 		name := names[i]
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
@@ -524,6 +546,41 @@ func resolveEventSlots(ctx context.Context, s *store.Store, host string) error {
 				}
 			}
 			if err := w.SetEventSlot(host, k, name); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// resolveActionSlots ties actions that name their target by a label (a
+// repair reported for a slot) to a slot through the alias table. Page
+// offline actions without a label are tied by address later, when DIMMs
+// are attributed.
+func resolveActionSlots(ctx context.Context, s *store.Store, host string) error {
+	labels, err := s.ActionLabels(ctx, host)
+	if err != nil || len(labels) == 0 {
+		return err
+	}
+	aliases, err := s.SlotAliases(ctx, host)
+	if err != nil {
+		return err
+	}
+	return s.Update(ctx, func(w *store.Writer) error {
+		for _, label := range labels {
+			name, ok := aliases[aliasLabel(label)]
+			if !ok {
+				// A label no source has named before is a slot of its own.
+				name = strings.TrimSpace(label)
+				if err := w.UpsertSlot(&model.Slot{Host: host, Name: name}); err != nil {
+					return err
+				}
+				if err := w.SetSlotAlias(host, aliasLabel(label), name); err != nil {
+					return err
+				}
+				aliases[aliasLabel(label)] = name
+			}
+			if err := w.SetActionSlot(host, label, name); err != nil {
 				return err
 			}
 		}

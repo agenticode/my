@@ -25,6 +25,7 @@ func app() *cli.App {
 					return cli.ExitOK
 				},
 			},
+			synthCommand(),
 		},
 	}
 }
