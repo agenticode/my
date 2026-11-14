@@ -6,7 +6,7 @@ The command is `my`. It never offlines pages, triggers repairs or resets counter
 
 ## Status
 
-Early development. This tree holds the data model, the SQLite ledger, the input adapters, a synthetic data generator and the fault classifier. Findings per DIMM, terminal views, case bundles and the HTML report are not merged yet.
+Early development. This tree holds the data model, the SQLite ledger, the input adapters, a synthetic data generator and the analysis engine, which gives one finding per DIMM. Terminal views, case bundles and the HTML report are not merged yet.
 
 ## Layout
 
@@ -18,7 +18,8 @@ Early development. This tree holds the data model, the SQLite ledger, the input 
 | `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS and host facts |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
-| `internal/engine` | groups the errors of a DIMM into faults, gives each fault a mode (single bit, row, multi-row, column, bank, device, DIMM), and measures trend, spread and baselines |
+| `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 13 rules with fixed IDs to reach a finding per DIMM |
+| `internal/i18n` | message templates in English and Korean |
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
 | `testdata` | fixtures for every adapter |
 

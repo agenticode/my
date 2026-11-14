@@ -344,3 +344,221 @@ func TestOptionsDefaults(t *testing.T) {
 		t.Error("default adjacency is not logical")
 	}
 }
+
+// computedAt is the time findings of the tests are stamped with.
+var computedAt = time.Date(2026, 11, 15, 9, 0, 0, 0, time.UTC)
+
+// analyze runs the engine and fails the test on an error.
+func analyze(t testing.TB, in *Input, opts Options) *Result {
+	t.Helper()
+	if opts.Now.IsZero() {
+		opts.Now = computedAt
+	}
+	res, err := Analyze(in, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return res
+}
+
+// The helpers below build the surroundings of errors by hand: slots with
+// their channel, which DIMM sat where, actions, and what a scan read.
+
+// slot adds a populated slot of host h1 on the given channel of socket 0.
+func (b *builder) slot(name string, channel, position int) {
+	b.in.host("h1")
+	b.in.Slots = append(b.in.Slots, model.Slot{Host: "h1", Name: name, Locator: name, Socket: model.Some(0), Channel: model.Some(channel),
+		Position: model.Some(position), Populated: model.Some(true)})
+}
+
+// place records that DIMM uid was seen in the slot from first to last.
+func (b *builder) place(uid, slot string, first, last time.Time) {
+	b.in.host("h1")
+	known := false
+	for _, d := range b.in.DIMMs {
+		known = known || d.UID == uid
+	}
+	if !known {
+		b.in.DIMMs = append(b.in.DIMMs, model.DIMM{UID: uid, Identity: model.IdentitySerial, Manufacturer: "Example Memory",
+			PartNumber: "EXM64G48R2X4-A", Serial: "SN-" + uid, MemoryType: "DDR5"})
+	}
+	b.in.Placements = append(b.in.Placements, model.Placement{ID: int64(len(b.in.Placements) + 1), DIMMUID: uid, Host: "h1", Slot: slot,
+		FirstSeen: first, LastSeen: last})
+}
+
+// in adds a corrected error of DIMM uid in the given slot.
+func (b *builder) in1(uid, slot string, at time.Time, l loc) *model.Event {
+	e := b.event(uid, at, l)
+	e.Slot = slot
+	return e
+}
+
+// scatter adds n corrected errors of DIMM uid in a slot at unrelated
+// places of two ranks, evenly spaced from start to end. Such errors are
+// not confined to a cell, row, column or bank.
+func (b *builder) scatter(uid, slot string, n int, start, end time.Time) {
+	step := end.Sub(start) / time.Duration(n)
+	for k := range n {
+		// The record number goes into the place, so that every call
+		// reaches new places.
+		i := int(b.n) + 1
+		l := loc{i % 2, (i * 7) % 20, (i * 3) % 8, i % 4, 1000 + i*977, 8 * ((i * 13) % 250)}
+		b.add(b.in1(uid, slot, start.Add(time.Duration(k)*step+step/2), l))
+	}
+}
+
+// rowFault adds a row fault of DIMM uid in its slot "S-uid": the given
+// number of columns of row 0x1a2f, each failing `each` times, evenly spaced
+// from start to end.
+func (b *builder) rowFault(uid string, cols, each int, start, end time.Time) {
+	n := cols * each
+	step := end.Sub(start) / time.Duration(n)
+	for k := range n {
+		b.ce(uid, start.Add(time.Duration(k)*step+step/2), loc{0, 7, 0, 3, 0x1a2f, 64 * (1 + k%cols)})
+	}
+}
+
+// act adds an action on DIMM uid in its slot "S-uid".
+func (b *builder) act(uid string, kind model.ActionKind, at time.Time, mut func(*model.Action)) *model.Action {
+	id := int64(len(b.in.Actions) + 1)
+	a := model.Action{ID: id, Host: "h1", At: at, Kind: kind, Result: model.ResultOK, Slot: "S-" + uid, DIMMUID: uid,
+		Source: "test", RawRef: fmt.Sprintf("action#%d", id), TimeQuality: model.TimeExact}
+	if mut != nil {
+		mut(&a)
+	}
+	b.in.Actions = append(b.in.Actions, a)
+	return &b.in.Actions[len(b.in.Actions)-1]
+}
+
+// verdictOf analyses the input as of the given time and returns the
+// finding for a DIMM.
+func verdictOf(t testing.TB, b *builder, asOf time.Time, uid string) *model.Verdict {
+	t.Helper()
+	h := analyze(t, b.in, Options{AsOf: asOf}).Host("h1")
+	if h == nil {
+		t.Fatal("no result for host h1")
+	}
+	d := h.DIMM(uid)
+	if d == nil {
+		t.Fatalf("no result for DIMM %s", uid)
+	}
+	return d.Verdict
+}
+
+// codes returns the message codes of the evidence of a finding.
+func codes(v *model.Verdict) []string {
+	var out []string
+	for _, e := range v.Evidence {
+		out = append(out, e.Rule+" "+e.Code)
+	}
+	return out
+}
+
+// checkCodes returns the checks of a finding as "effect code".
+func checkCodes(v *model.Verdict) []string {
+	var out []string
+	for _, c := range v.CounterEvidence {
+		out = append(out, c.Effect+" "+c.Code)
+	}
+	return out
+}
+
+func missingCodes(v *model.Verdict) []string {
+	var out []string
+	for _, m := range v.Missing {
+		out = append(out, m.Code)
+	}
+	return out
+}
+
+func has(list []string, s string) bool {
+	for _, x := range list {
+		if x == s {
+			return true
+		}
+	}
+	return false
+}
+
+// wantVerdict checks grade and rules of a finding.
+func wantVerdict(t testing.TB, v *model.Verdict, grade model.VerdictGrade, rules ...string) {
+	t.Helper()
+	if v.Grade != grade || !equalStrings(v.Rules, rules) {
+		t.Errorf("finding = %s %v, want %s %v\n evidence: %q\n checks: %q", v.Grade, v.Rules, grade, rules, codes(v), checkCodes(v))
+	}
+	if v.Label != model.VerdictLabel || v.EngineVersion != Version || !v.ComputedAt.Equal(computedAt) || v.Confidence < 5 || v.Confidence > 95 {
+		t.Errorf("finding is incomplete: %+v", v)
+	}
+}
+
+func equalStrings(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// fullInput hands a data set to the engine with everything a ledger of it
+// would hold: slots with their channels, which DIMM sat where during each
+// boot, the boots and the actions. TestScenarioFindings compares the
+// findings with those from a ledger.
+func fullInput(ds *synth.Dataset) *Input {
+	in := inputOf(ds)
+	sc := ds.Scenario
+	host := sc.Host.Name
+	in.host(host)
+	last := len(ds.Boots) - 1
+	for _, s := range ds.Slots {
+		in.Slots = append(in.Slots, model.Slot{Host: host, Name: s.Name, Locator: s.Name, Socket: model.Some(s.Socket),
+			Channel: model.Some(s.IMC*sc.Host.ChannelsPerIMC + s.Channel), Position: model.Some(s.Position),
+			Populated: model.Some(ds.Occupancy[last][s.Index] >= 0)})
+		// The inventory is seen shortly after every boot and at the end.
+		var cur *model.Placement
+		for b, boot := range ds.Boots {
+			m := ds.Occupancy[b][s.Index]
+			if m < 0 {
+				cur = nil
+				continue
+			}
+			at := boot.StartedAt.Add(10 * time.Minute)
+			if cur == nil || cur.DIMMUID != ds.Modules[m].UID {
+				in.Placements = append(in.Placements, model.Placement{ID: int64(len(in.Placements) + 1), DIMMUID: ds.Modules[m].UID, Host: host, Slot: s.Name,
+					FirstSeen: at, LastSeen: at})
+				cur = &in.Placements[len(in.Placements)-1]
+			}
+			cur.LastSeen = at
+			if b == last {
+				cur.LastSeen = sc.End
+			}
+		}
+	}
+	in.Boots = append(in.Boots, ds.Boots...)
+	bootAt := func(t time.Time) int {
+		n := 0
+		for i, b := range ds.Boots {
+			if !b.StartedAt.After(t) {
+				n = i
+			}
+		}
+		return n
+	}
+	for i, a := range ds.Actions {
+		a.ID = int64(i + 1)
+		for _, s := range ds.Slots {
+			if s.Name == a.Slot {
+				if m := ds.Occupancy[bootAt(a.At)][s.Index]; m >= 0 {
+					a.DIMMUID = ds.Modules[m].UID
+				}
+			}
+		}
+		in.Actions = append(in.Actions, a)
+	}
+	in.Scans = []model.Scan{{ID: 1, Host: host, Kind: model.ScanSynthetic, StartedAt: sc.End, FinishedAt: sc.End}}
+	in.Sources = []model.Source{{ID: 1, ScanID: 1, Kind: "synth", Origin: "synth:" + sc.Name, Status: model.SourceOK}}
+	return in
+}

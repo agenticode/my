@@ -31,7 +31,7 @@ func (b *builder) spreadOver(l loc, n int, start, end time.Time) {
 
 func analyzeD1(t *testing.T, b *builder, asOf time.Time) *DIMMResult {
 	t.Helper()
-	res := Analyze(b.in, Options{AsOf: asOf})
+	res := analyze(t, b.in, Options{AsOf: asOf})
 	h := res.Host("h1")
 	if h == nil || !h.AsOf.Equal(asOf) {
 		t.Fatalf("host result = %+v", h)
@@ -210,7 +210,7 @@ func TestSpread(t *testing.T) {
 	}
 	cfg := DefaultConfig()
 	cfg.SpreadMinNew = 1
-	if got := Analyze(b.in, Options{AsOf: t0.Add(40*day + time.Minute), Config: &cfg}).Host("h1").DIMM("d1").Faults[0].Spread; !got.Spreading {
+	if got := analyze(t, b.in, Options{AsOf: t0.Add(40*day + time.Minute), Config: &cfg}).Host("h1").DIMM("d1").Faults[0].Spread; !got.Spreading {
 		t.Errorf("spread with SpreadMinNew = 1: %+v", got)
 	}
 
@@ -282,7 +282,7 @@ func TestStorm(t *testing.T) {
 	cfg.StormCount, cfg.StormMinutes = 40, 60
 	b = newBuilder()
 	b.spreadOver(cellA, 150, t0.Add(day), t0.Add(day+3*time.Hour))
-	if s := Analyze(b.in, Options{AsOf: asOf, Config: &cfg}).Host("h1").DIMM("d1").Features.Storm; !s.Storm {
+	if s := analyze(t, b.in, Options{AsOf: asOf, Config: &cfg}).Host("h1").DIMM("d1").Features.Storm; !s.Storm {
 		t.Errorf("with a threshold of 40: %+v", s)
 	}
 	if s := storm(newBuilderWith("d1")); s != (Storm{}) {
@@ -514,7 +514,7 @@ func TestRepetition(t *testing.T) {
 func TestFeaturesOfTheScenarios(t *testing.T) {
 	primary := func(name string) (*DIMMResult, *Fault) {
 		ds := generate(t, name, 1, noNoise)
-		res := Analyze(inputOf(ds), Options{AsOf: ds.Scenario.End})
+		res := analyze(t, inputOf(ds), Options{AsOf: ds.Scenario.End})
 		d := res.Hosts[0].DIMM(uidOf(ds.Truth[0].Serial))
 		if d == nil || len(d.Faults) == 0 {
 			t.Fatalf("%s: no result", name)
@@ -532,7 +532,7 @@ func TestFeaturesOfTheScenarios(t *testing.T) {
 		in.Actions[i].DIMMUID = uidOf(ds.Truth[0].Serial)
 	}
 	in.Boots = append(in.Boots, ds.Boots...)
-	res := Analyze(in, Options{AsOf: ds.Scenario.End})
+	res := analyze(t, in, Options{AsOf: ds.Scenario.End})
 	d := res.Hosts[0].DIMM(uidOf(ds.Truth[0].Serial))
 	f := d.Faults[0]
 	if f.Trend.Direction != TrendRising || !f.Spread.Spreading || f.Spread.NewColumns == 0 || f.Spread.NewRows != 1 {
@@ -593,7 +593,7 @@ func TestFeaturesOnPlatforms(t *testing.T) {
 	ds := generate(t, "demo", 1, nil)
 	uid := uidOf(ds.Truth[0].Serial)
 	for _, fl := range synth.Flavors {
-		res := Analyze(load(t, sharedLedger(t, "demo", 1, fl)), Options{})
+		res := analyze(t, load(t, sharedLedger(t, "demo", 1, fl)), Options{})
 		d := res.Hosts[0].DIMM(uid)
 		if d == nil || len(d.Faults) != 1 {
 			t.Fatalf("%s: no result", fl)

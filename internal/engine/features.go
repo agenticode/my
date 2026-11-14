@@ -129,6 +129,9 @@ type Mitigation struct {
 	RawRef   string             `json:"raw_ref,omitzero"`
 	// Row is the repaired row, for repairs that name one.
 	Row model.Opt[int] `json:"row,omitzero"`
+	// Where names the place of the step: the repaired row with its bank,
+	// or the page taken offline.
+	Where string `json:"where,omitzero"`
 	// ErrorsAfter counts the errors of the fault after the step at the
 	// place the step names: the repaired row, the page taken offline.
 	ErrorsAfter int64 `json:"errors_after"`
@@ -521,7 +524,7 @@ func (m *measurer) mitigations(f *Fault, actions []*model.Action) []Mitigation {
 		default:
 			continue
 		}
-		mt := Mitigation{ActionID: a.ID, Kind: a.Kind, Method: a.Method, Result: a.Result, At: a.At, RawRef: a.RawRef}
+		mt := Mitigation{ActionID: a.ID, Kind: a.Kind, Method: a.Method, Result: a.Result, At: a.At, RawRef: a.RawRef, Where: actionWhere(a)}
 		if repairKind(a.Kind) {
 			mt.Row = a.Row
 		}

@@ -75,7 +75,7 @@ func TestPeerBaseline(t *testing.T) {
 	b.ce("d2", t0.Add(day), cellA)                   // before the window: does not count
 	b.ce("e1", asOf.Add(-day), cellA)                // another part number
 	b.ce("x-slot-only", asOf.Add(-day), cellA)       // no part number at all
-	res := Analyze(b.in, Options{AsOf: asOf})
+	res := analyze(t, b.in, Options{AsOf: asOf})
 	h := res.Host("h1")
 	if len(h.DIMMs) != 9 {
 		t.Fatalf("%d DIMMs in the result, want 9", len(h.DIMMs))
@@ -102,7 +102,7 @@ func TestPeerBaseline(t *testing.T) {
 	// The threshold is configuration.
 	cfg := DefaultConfig()
 	cfg.MinPeers = 2
-	if p := Analyze(b.in, Options{AsOf: asOf, Config: &cfg}).Host("h1").DIMM("e1").Baseline.Peers; !p.Valid || p.Percentile != 75 {
+	if p := analyze(t, b.in, Options{AsOf: asOf, Config: &cfg}).Host("h1").DIMM("e1").Baseline.Peers; !p.Valid || p.Percentile != 75 {
 		t.Errorf("e1 with MinPeers 2: %+v", p)
 	}
 }
@@ -131,7 +131,7 @@ func TestVendorBaselineHook(t *testing.T) {
 	b.spreadOver(cellA, 50, asOf.Add(-20*day), asOf)
 	b.ce("d2", asOf.Add(-day), cellA)
 	ref := &reference{part: "PN-A"}
-	h := Analyze(b.in, Options{AsOf: asOf, PartBaseline: ref}).Host("h1")
+	h := analyze(t, b.in, Options{AsOf: asOf, PartBaseline: ref}).Host("h1")
 	if v := h.DIMM("d1").Baseline.Vendor; v != (VendorBaseline{Valid: true, Percentile: 100}) {
 		t.Errorf("d1: %+v", v)
 	}
@@ -145,7 +145,7 @@ func TestVendorBaselineHook(t *testing.T) {
 		t.Errorf("the hook was asked %v", ref.seen)
 	}
 	// Without a vendor analyzer the layer is empty.
-	if v := Analyze(b.in, Options{AsOf: asOf}).Host("h1").DIMM("d1").Baseline.Vendor; v.Valid {
+	if v := analyze(t, b.in, Options{AsOf: asOf}).Host("h1").DIMM("d1").Baseline.Vendor; v.Valid {
 		t.Errorf("no hook: %+v", v)
 	}
 }
@@ -153,7 +153,7 @@ func TestVendorBaselineHook(t *testing.T) {
 // TestSubjects: every DIMM of a host has a result, with or without errors.
 func TestSubjects(t *testing.T) {
 	ds := generate(t, "demo", 1, nil)
-	res := Analyze(load(t, sharedLedger(t, "demo", 1, "")), Options{})
+	res := analyze(t, load(t, sharedLedger(t, "demo", 1, "")), Options{})
 	if res.EngineVersion != Version || res.Config != DefaultConfig() || len(res.Hosts) != 1 {
 		t.Fatalf("result = %+v", res)
 	}
@@ -193,7 +193,7 @@ func TestSubjects(t *testing.T) {
 func TestSubjectPlaces(t *testing.T) {
 	// A DIMM that was moved is listed in its new slot, with all its errors.
 	ds := generate(t, "moved-dimm", 1, noNoise)
-	h := Analyze(load(t, sharedLedger(t, "moved-dimm", 1, "")), Options{}).Hosts[0]
+	h := analyze(t, load(t, sharedLedger(t, "moved-dimm", 1, "")), Options{}).Hosts[0]
 	d := h.DIMM(uidOf(ds.Truth[0].Serial))
 	if d == nil || d.Slot != "CPU0_D1" || !d.Present || h.InSlot("CPU0_D1") != d || d.Features.CE < 240 {
 		t.Fatalf("moved DIMM: %+v", d)
@@ -219,7 +219,7 @@ func TestSubjectPlaces(t *testing.T) {
 	e = b.event("s-placeholder", t0.Add(4*day), cellA)
 	e.Slot, e.DIMMLink = "mc0 0:1", model.LinkSlot
 	b.add(e)
-	h = Analyze(b.in, Options{}).Host("h1")
+	h = analyze(t, b.in, Options{}).Host("h1")
 	want := map[string]struct {
 		slot    string
 		present bool
@@ -242,7 +242,7 @@ func TestSubjectPlaces(t *testing.T) {
 	b = newBuilder()
 	b.in.host("h1")
 	b.in.Actions = []model.Action{{ID: 1, Host: "h1", Kind: model.ActionReplacement, At: t0, Slot: "CPU0_A1", DIMMUID: "acted"}}
-	if d := Analyze(b.in, Options{}).Host("h1").DIMM("acted"); d == nil || d.Slot != "CPU0_A1" || !d.Present {
+	if d := analyze(t, b.in, Options{}).Host("h1").DIMM("acted"); d == nil || d.Slot != "CPU0_A1" || !d.Present {
 		t.Errorf("DIMM known through an action: %+v", d)
 	}
 }
@@ -254,7 +254,7 @@ func TestReferenceTime(t *testing.T) {
 	in := load(t, sharedLedger(t, "demo", 1, ""))
 	uid := uidOf(ds.Truth[0].Serial)
 
-	now := Analyze(in, Options{}).Hosts[0]
+	now := analyze(t, in, Options{}).Hosts[0]
 	d := now.DIMM(uid)
 	if !now.AsOf.Equal(ds.Scenario.End) || d.Features.UE != 1 || d.Features.CE != 1231 || d.Features.Offline.Pages != 6 {
 		t.Fatalf("as of the end: %+v", d.Features)
@@ -263,7 +263,7 @@ func TestReferenceTime(t *testing.T) {
 	// 20 October: before the repair, the page offlines and the
 	// uncorrected error.
 	asOf := time.Date(2026, 10, 20, 0, 0, 0, 0, time.UTC)
-	then := Analyze(in, Options{AsOf: asOf}).Hosts[0]
+	then := analyze(t, in, Options{AsOf: asOf}).Hosts[0]
 	d = then.DIMM(uid)
 	if !then.AsOf.Equal(asOf) || len(then.DIMMs) != 16 {
 		t.Fatalf("as of %v: %d DIMMs, reference %v", asOf, len(then.DIMMs), then.AsOf)
@@ -297,12 +297,12 @@ func TestReferenceTime(t *testing.T) {
 	b.ce("d1", t0, cellA)
 	b.ce("d1", t0.Add(9*day), cellA)
 	b.in.Scans = []model.Scan{{ID: 1, Host: "h1", Kind: model.ScanImport, StartedAt: t0.Add(300 * day)}}
-	if h := Analyze(b.in, Options{}).Host("h1"); !h.AsOf.Equal(t0.Add(9*day)) || !h.ObservedFrom.Equal(t0) {
+	if h := analyze(t, b.in, Options{}).Host("h1"); !h.AsOf.Equal(t0.Add(9*day)) || !h.ObservedFrom.Equal(t0) {
 		t.Errorf("import: as of %v, observed from %v", h.AsOf, h.ObservedFrom)
 	}
 	// A live scan looked at the host when it ran.
 	b.in.Scans = append(b.in.Scans, model.Scan{ID: 2, Host: "h1", Kind: model.ScanLive, StartedAt: t0.Add(20 * day), FinishedAt: t0.Add(20*day + time.Minute)})
-	if h := Analyze(b.in, Options{}).Host("h1"); !h.AsOf.Equal(t0.Add(20*day + time.Minute)) {
+	if h := analyze(t, b.in, Options{}).Host("h1"); !h.AsOf.Equal(t0.Add(20*day + time.Minute)) {
 		t.Errorf("live scan: as of %v", h.AsOf)
 	}
 	// A host without any dated record has no reference time.
@@ -310,7 +310,7 @@ func TestReferenceTime(t *testing.T) {
 	e := b.event("d1", time.Unix(500, 0).UTC(), cellA)
 	e.TimeQuality = model.TimeRelative
 	b.add(e)
-	if h := Analyze(b.in, Options{}).Host("h1"); !h.AsOf.IsZero() || h.DIMM("d1").Features.Trend.Direction != TrendUnknown || h.DIMM("d1").Features.CE != 1 {
+	if h := analyze(t, b.in, Options{}).Host("h1"); !h.AsOf.IsZero() || h.DIMM("d1").Features.Trend.Direction != TrendUnknown || h.DIMM("d1").Features.CE != 1 {
 		t.Errorf("undated host: as of %v, %+v", h.AsOf, h.DIMM("d1").Features)
 	}
 }
@@ -341,7 +341,7 @@ func TestSeveralHosts(t *testing.T) {
 	e.Host, e.Slot, e.DIMMLink = "h2", "", ""
 	b.add(e)
 
-	res := Analyze(b.in, Options{})
+	res := analyze(t, b.in, Options{})
 	if len(res.Hosts) != 2 || res.Hosts[0].Host != "h1" || res.Hosts[1].Host != "h2" {
 		t.Fatalf("hosts = %+v", res.Hosts)
 	}
@@ -359,11 +359,11 @@ func TestSeveralHosts(t *testing.T) {
 	}
 	// Asking for one host returns that host; the DIMM keeps the history
 	// it has from the other.
-	only := Analyze(b.in, Options{Host: "h2"})
+	only := analyze(t, b.in, Options{Host: "h2"})
 	if len(only.Hosts) != 1 || only.Hosts[0].Host != "h2" || only.Hosts[0].DIMM("mover").Features.CE != 13 {
 		t.Errorf("host filter: %+v", only.Hosts)
 	}
-	if got := Analyze(b.in, Options{Host: "h9"}); len(got.Hosts) != 0 {
+	if got := analyze(t, b.in, Options{Host: "h9"}); len(got.Hosts) != 0 {
 		t.Errorf("unknown host: %+v", got.Hosts)
 	}
 }
@@ -403,7 +403,7 @@ func TestUntil(t *testing.T) {
 		t.Error("until changed the input")
 	}
 	// The reference time of the view is what was asked for.
-	if h := Analyze(b.in, Options{AsOf: cut}).Host("h1"); !h.AsOf.Equal(cut) || h.DIMM("d1").Features.CE != 2 || h.DIMM("d2") != nil {
+	if h := analyze(t, b.in, Options{AsOf: cut}).Host("h1"); !h.AsOf.Equal(cut) || h.DIMM("d1").Features.CE != 2 || h.DIMM("d2") != nil {
 		t.Errorf("analysis at day 10: %+v", h)
 	}
 }
