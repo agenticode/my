@@ -1,7 +1,18 @@
 // Package engine is the analysis engine of MemorY. It reads the event
-// ledger and answers, per DIMM: which faults do the errors form, what mode
-// does each fault have, is it growing, and how unusual is the DIMM compared
-// with its own past and with the DIMMs of its part number.
+// ledger and gives one finding per DIMM.
+//
+// Classify groups the errors of a DIMM into faults and gives each fault a
+// Level 1 mode, as far as the observation grade of its records allows.
+//
+// Analyze builds on that. It measures every fault and DIMM (trend, spread,
+// storms, failing data lines, what happened after repairs), ranks the DIMM
+// against its own past and against the DIMMs of its part number, and
+// applies the rules. A finding holds a grade, the IDs of the rules that
+// fired, the evidence with the ledger records behind it, checks against
+// other explanations, the data that was missing and the next step.
+//
+// Run does this for a ledger, and Result.Save stores faults and findings
+// in it.
 //
 // The engine uses rules only. Every step can be stated in one line and
 // traced to the ledger records it rests on. It reads; it never changes a

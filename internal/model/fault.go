@@ -44,7 +44,9 @@ type Fault struct {
 	Slot    string `json:"slot,omitzero"`
 
 	Mode FaultMode `json:"mode"`
-	// Estimated is set when the mode was inferred from grade B data.
+	// Estimated is set when the data does not fix the mode: it was inferred
+	// from physical addresses (grade B), or the platform does not report the
+	// device and the mode is the smallest extent the data allows.
 	Estimated bool  `json:"estimated,omitzero"`
 	Grade     Grade `json:"grade"`
 
