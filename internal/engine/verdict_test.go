@@ -740,3 +740,92 @@ func TestInvalidThresholds(t *testing.T) {
 		}
 	}
 }
+
+// TestRecordsWithoutDates: a kernel log without timestamps gives seconds
+// since boot. Such records count, and nothing is concluded from when they
+// happened: no period, no "after the repair", no date in a sentence.
+func TestRecordsWithoutDates(t *testing.T) {
+	boot := func(sec int) time.Time { return time.Unix(int64(sec), 0).UTC() }
+	undated := func(e *model.Event) *model.Event {
+		e.TimeQuality = model.TimeRelative
+		return e
+	}
+	b := newBuilder()
+	b.slot("A1", 0, 0)
+	b.slot("A2", 0, 1)
+	// d1: a row fault and an uncorrected error.
+	for k := range 20 {
+		b.add(undated(b.in1("d1", "A1", boot(1000+k*60), loc{0, 7, 0, 3, 0x1a2f, 64 * (1 + k%4)})))
+	}
+	b.add(undated(severity(b.in1("d1", "A1", boot(5000), loc{0, 7, 0, 3, 0x1a2f, 64}), model.SevUE, model.ScrubDemand)))
+	// d2: two stray errors. d3 and d4: unconfined errors on one channel.
+	b.add(undated(b.in1("d2", "S-d2", boot(300), cellA)))
+	b.add(undated(b.in1("d2", "S-d2", boot(900), loc{1, 2, 4, 1, 77, 8})))
+	for k := range 12 {
+		b.add(undated(b.in1("d3", "A1", boot(100+k), loc{k % 2, k, k % 8, k % 4, 100 + k*999, 8 * k})))
+		b.add(undated(b.in1("d4", "A2", boot(100+k), loc{k % 2, k + 3, k % 8, k % 4, 300 + k*999, 16 * k})))
+	}
+	rel := func(a *model.Action) { a.TimeQuality = model.TimeRelative }
+	b.act("d1", model.ActionHPPR, boot(40), func(a *model.Action) { rel(a); repairRow(a) })
+	b.act("d1", model.ActionDisable, boot(6000), func(a *model.Action) { rel(a); a.Method = "bios" })
+	for k := range 3 {
+		b.act("d1", model.ActionPageOffline, boot(2000+k), func(a *model.Action) { rel(a); a.OsPhysicalAddress = model.Some(uint64(0x7000 + k<<12)) })
+	}
+	b.act("d2", model.ActionReseat, boot(950), rel)
+
+	res := analyze(t, b.in, Options{})
+	h := res.Host("h1")
+	if !h.AsOf.IsZero() {
+		t.Errorf("reference time = %v, want none", h.AsOf)
+	}
+	seen := map[string]bool{}
+	checkStatements(t, "undated", res, seen)
+	res.verdicts(func(v *model.Verdict) {
+		for _, st := range statements(v) {
+			if strings.Contains(st.Text, "1970") {
+				t.Errorf("a date that is none: %q", st.Text)
+			}
+		}
+	})
+
+	d1 := h.DIMM("d1").Verdict
+	// The uncorrected error and the firmware mark are facts without a date.
+	// The repair cannot be placed before the errors, and three pages
+	// without a day are no growth.
+	wantVerdict(t, d1, model.VerdictReplaceNow, RuleUE, RuleFirmware)
+	if e := evidenceOf(t, d1, RuleUE); e.Text != "1 uncorrected error, the latest on boot+5000s at rank0 dev7 bg0 bank3 row 0x1a2f col 0x40" {
+		t.Errorf("text = %q", e.Text)
+	}
+	if e := evidenceOf(t, d1, RuleFirmware); e.Text != "the BIOS took the DIMM out of use on boot+6000s" {
+		t.Errorf("text = %q", e.Text)
+	}
+	d := h.DIMM("d1")
+	if d.Features.Offline.Pages != 3 || d.Features.Offline.Days != 0 || len(d.Faults[0].Mitigations) != 0 || d.Features.Undated != 21 {
+		t.Errorf("features = %+v, mitigations %+v", d.Features, d.Faults[0].Mitigations)
+	}
+	if !has(missingCodes(d1), "missing.dates") || has(missingCodes(d1), "missing.history") {
+		t.Errorf("missing = %q", missingCodes(d1))
+	}
+	// Stray errors without a date.
+	d2 := h.DIMM("d2").Verdict
+	wantVerdict(t, d2, model.VerdictObserve, RuleSoft)
+	if e := evidenceOf(t, d2, RuleSoft); e.Text != "2 corrected errors at 2 places, dated by seconds since boot only; no place is known to have failed again" {
+		t.Errorf("text = %q", e.Text)
+	}
+	// Errors of two DIMMs of a channel cannot be put into one period, and
+	// a reseat without a date has no before and after.
+	for _, uid := range []string{"d3", "d4", "d2"} {
+		if v := h.DIMM(uid).Verdict; v.Grade == model.VerdictHoldReplacement {
+			t.Errorf("%s: %s %v", uid, v.Grade, v.Rules)
+		}
+	}
+
+	// A dated history with a repair that has no date: errors cannot be
+	// said to have come back after it.
+	b = ruleBuilder()
+	b.rowFault("d1", 3, 20, t0.Add(day), asOf)
+	b.act("d1", model.ActionHPPR, boot(40), func(a *model.Action) { rel(a); repairRow(a) })
+	if v := verdictOf(t, b, asOf, "d1"); has(v.Rules, RuleRecurred) || has(v.Rules, RuleQuiet) {
+		t.Errorf("rules = %v", v.Rules)
+	}
+}

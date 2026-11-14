@@ -371,7 +371,8 @@ func (v *systemView) channels(j *judge) {
 		var active []string
 		for _, s := range slots {
 			a := v.activity(hostSlot{ck.host, s})
-			if a.loose >= int64(v.cfg.SystemMinErrors) {
+			// Errors without a date cannot be put into a period.
+			if a.loose >= int64(v.cfg.SystemMinErrors) && a.first != 0 {
 				acts[s] = a
 				active = append(active, s)
 			}
@@ -494,7 +495,7 @@ func (v *systemView) reseats(j *judge) {
 		// A reseat on record.
 		var reseat *model.Action
 		for _, a := range d.actions {
-			if a.Kind == model.ActionReseat && a.Result != model.ResultFailed {
+			if a.Kind == model.ActionReseat && a.Result != model.ResultFailed && a.TimeQuality != model.TimeRelative {
 				reseat = a
 			}
 		}

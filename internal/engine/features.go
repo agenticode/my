@@ -494,7 +494,9 @@ func (m *measurer) mitigations(f *Fault, actions []*model.Action) []Mitigation {
 	var out []Mitigation
 	for _, a := range actions {
 		at := a.At.UnixMicro()
-		if at > m.clk.asOf {
+		// An action without a date cannot be placed before or after an
+		// error.
+		if at > m.clk.asOf || a.TimeQuality == model.TimeRelative {
 			continue
 		}
 		var match func(e *event) bool
@@ -561,7 +563,7 @@ func (m *measurer) offline(actions []*model.Action) Offline {
 	}
 	first := map[page]int64{}
 	for _, a := range actions {
-		if a.Kind != model.ActionPageOffline || a.At.UnixMicro() > m.clk.asOf {
+		if a.Kind != model.ActionPageOffline || (a.At.UnixMicro() > m.clk.asOf && a.TimeQuality != model.TimeRelative) {
 			continue
 		}
 		if a.Result == model.ResultFailed {
@@ -572,7 +574,11 @@ func (m *measurer) offline(actions []*model.Action) Offline {
 			continue
 		}
 		k := page{a.Slot, a.OsPhysicalAddress.V >> 12}
-		if at := a.At.UnixMicro(); first[k] == 0 || at < first[k] {
+		at := a.At.UnixMicro()
+		if a.TimeQuality == model.TimeRelative {
+			at = -1 // the page counts; the day is unknown
+		}
+		if old, seen := first[k]; !seen || (at >= 0 && (old < 0 || at < old)) {
 			first[k] = at
 		}
 	}
@@ -580,6 +586,9 @@ func (m *measurer) offline(actions []*model.Action) Offline {
 	daySet := map[int64]bool{}
 	var last int64
 	for _, at := range first {
+		if at < 0 {
+			continue
+		}
 		daySet[at/microPerDay] = true
 		last = max(last, at)
 	}
