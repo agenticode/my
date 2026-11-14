@@ -27,6 +27,7 @@ func app() *cli.App {
 			},
 			synthCommand(),
 			analyzeCommand(),
+			evalCommand(),
 		},
 	}
 }

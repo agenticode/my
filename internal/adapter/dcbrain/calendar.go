@@ -32,6 +32,15 @@ const (
 
 const daySeconds = 24 * 60 * 60
 
+// MonthDays returns the number of days of a month (1 to 8) of the dataset
+// calendar, or 0 for a month it does not have.
+func MonthDays(month int) int {
+	if month < 1 || month > Months {
+		return 0
+	}
+	return monthDays[month-1]
+}
+
 // Stamp is a time on the dataset calendar: seconds since its first day.
 type Stamp int64
 
@@ -64,18 +73,29 @@ func StampOf(at, base time.Time) Stamp {
 	return Stamp(s)
 }
 
+// Date returns the month (1 to 8) and the day of the month (from 1) the
+// time lies in, or 0, 0 for a time outside the eight months.
+func (t Stamp) Date() (month, day int) {
+	d := t.Day()
+	if d < 0 || d >= SpanDays {
+		return 0, 0
+	}
+	m := 0
+	for m+1 < Months && d >= monthStart[m+1] {
+		m++
+	}
+	return m + 1, d - monthStart[m] + 1
+}
+
 // String writes the time the way the dataset does, "0001-02-30 13:05:00".
 // A time outside the eight months is written as a day offset.
 func (t Stamp) String() string {
-	day := t.Day()
-	if day < 0 || day >= SpanDays {
-		return fmt.Sprintf("day %+d %s", day, clock(int(int64(t)-int64(day)*daySeconds)))
+	month, day := t.Date()
+	if month == 0 {
+		d := t.Day()
+		return fmt.Sprintf("day %+d %s", d, clock(int(int64(t)-int64(d)*daySeconds)))
 	}
-	m := 0
-	for m+1 < Months && day >= monthStart[m+1] {
-		m++
-	}
-	return fmt.Sprintf("0001-%02d-%02d %s", m+1, day-monthStart[m]+1, clock(int(int64(t)%daySeconds)))
+	return fmt.Sprintf("0001-%02d-%02d %s", month, day, clock(int(int64(t)%daySeconds)))
 }
 
 func clock(sec int) string {
