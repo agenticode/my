@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
@@ -30,12 +31,27 @@ type HostResult struct {
 	// ObservedFrom is the earliest time the ledger knows something about
 	// the host. It bounds how much history a trend can rest on.
 	ObservedFrom time.Time `json:"observed_from,omitzero"`
+	// Grade is the finding for the host: the grade of its worst DIMM or
+	// GPU. Hold replacement outranks the other grades. DIMMs that are no
+	// longer in the host do not count.
+	Grade model.VerdictGrade `json:"grade"`
 	// DIMMs holds every DIMM whose latest known place is this host, with
-	// or without errors, ordered by error count and slot.
+	// or without errors, ordered by grade, error count and slot.
 	DIMMs []*DIMMResult `json:"dimms"`
+	// GPUs holds the findings about GPU memory. A GPU is listed when a
+	// rule fired for it.
+	GPUs []*GPUResult `json:"gpus,omitzero"`
 	// Unattributed counts errors of the host that could not be tied to a
 	// DIMM. They are in no fault.
 	Unattributed []Unattributed `json:"unattributed,omitzero"`
+}
+
+// GPUResult holds the finding about the memory of one GPU.
+type GPUResult struct {
+	// Key identifies the GPU: its serial number, or its UUID.
+	Key     string         `json:"gpu"`
+	Index   model.Opt[int] `json:"index,omitzero"`
+	Verdict *model.Verdict `json:"verdict"`
 }
 
 // DIMMResult holds the findings for one DIMM.
@@ -52,6 +68,8 @@ type DIMMResult struct {
 	// A DIMM that was replaced keeps its history and is not present.
 	Present bool `json:"present"`
 
+	// Verdict is the finding for the DIMM.
+	Verdict *model.Verdict `json:"verdict"`
 	// Faults are ordered by error count, largest first.
 	Faults   []*Fault `json:"faults,omitzero"`
 	Features Features `json:"features"`
@@ -177,13 +195,20 @@ func (in *Input) hostSpans() (latest, earliest map[string]int64) {
 }
 
 // Analyze runs the engine over the input: it groups the errors of every
-// DIMM into faults, measures the faults and the DIMMs, and ranks each DIMM
-// against its own past and its peers.
-func Analyze(in *Input, opts Options) *Result {
+// DIMM into faults, measures the faults and the DIMMs, ranks each DIMM
+// against its own past and its peers, and applies the rules. The result
+// holds one finding per DIMM.
+//
+// It returns an error when a threshold of the configuration is outside its
+// bounds.
+func Analyze(in *Input, opts Options) (*Result, error) {
+	cfg := opts.config()
+	if err := cfg.Validate(); err != nil {
+		return nil, fmt.Errorf("engine: thresholds: %w", err)
+	}
 	if !opts.AsOf.IsZero() {
 		in = in.until(opts.AsOf)
 	}
-	cfg := opts.config()
 	res := &Result{EngineVersion: Version, Config: *cfg, in: in}
 	cls := Classify(in, opts)
 
@@ -318,12 +343,35 @@ func Analyze(in *Input, opts Options) *Result {
 		h := host(u.Host)
 		h.Unattributed = append(h.Unattributed, u)
 	}
+
+	// Findings. The system rules look at several DIMMs at once and run
+	// first; they can turn faults into system issues.
+	now := opts.Now
+	if now.IsZero() {
+		now = time.Now()
+	}
+	jd := &judge{in: in, cfg: cfg, now: now.UTC().Truncate(time.Microsecond), extra: map[*DIMMResult]map[string][]model.RecordRef{}, hosts: map[string]*hostFacts{}}
+	for name, h := range hosts {
+		jd.hosts[name] = newHostFacts(in, name, h)
+	}
+	jd.sys = newSystemView(in, cfg, all)
+	jd.sys.run(jd)
+	for _, d := range all {
+		d.Verdict = jd.verdict(d)
+	}
+	for name, h := range hosts {
+		h.GPUs = jd.gpus(name)
+	}
+
 	for name, h := range hosts {
 		if opts.Host != "" && name != opts.Host {
 			continue
 		}
 		sort.SliceStable(h.DIMMs, func(i, j int) bool {
 			a, b := h.DIMMs[i], h.DIMMs[j]
+			if x, y := gradeRank(a.Verdict.Grade), gradeRank(b.Verdict.Grade); x != y {
+				return x > y
+			}
 			if x, y := a.Features.CE+a.Features.UE, b.Features.CE+b.Features.UE; x != y {
 				return x > y
 			}
@@ -332,10 +380,166 @@ func Analyze(in *Input, opts Options) *Result {
 			}
 			return a.UID < b.UID
 		})
+		h.Grade = model.VerdictOK
+		for _, d := range h.DIMMs {
+			if d.Present && worse(d.Verdict.Grade, h.Grade) {
+				h.Grade = d.Verdict.Grade
+			}
+		}
+		for _, g := range h.GPUs {
+			if worse(g.Verdict.Grade, h.Grade) {
+				h.Grade = g.Verdict.Grade
+			}
+		}
 		res.Hosts = append(res.Hosts, h)
 	}
 	sort.Slice(res.Hosts, func(i, j int) bool { return res.Hosts[i].Host < res.Hosts[j].Host })
-	return res
+	return res, nil
+}
+
+// newHostFacts collects what the findings of a host share.
+func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
+	hf := &hostFacts{ambiguous: map[string]int64{}}
+	var latest *model.Scan
+	scans := 0
+	ids := map[int64]bool{}
+	for i := range in.Scans {
+		sc := &in.Scans[i]
+		if sc.Host != name {
+			continue
+		}
+		scans++
+		ids[sc.ID] = true
+		if latest == nil || sc.StartedAt.After(latest.StartedAt) || (sc.StartedAt.Equal(latest.StartedAt) && sc.ID > latest.ID) {
+			latest = sc
+		}
+	}
+	for _, src := range in.Sources {
+		if !ids[src.ScanID] {
+			continue
+		}
+		if latest != nil && src.ScanID == latest.ID {
+			hf.sources = append(hf.sources, src)
+		}
+		if errorSourceKinds[src.Kind] {
+			switch src.Status {
+			case model.SourceOK, model.SourcePartial, model.SourceEmpty:
+				hf.errorSource = true
+			}
+		}
+	}
+	// Without a scan on record nothing is known about what was read, and
+	// errors in the ledger came from some source.
+	if scans == 0 {
+		hf.errorSource = true
+	}
+	for i := range in.events {
+		if in.hostNames[in.events[i].host] == name {
+			hf.errorSource = true
+			break
+		}
+	}
+	for _, sl := range in.Slots {
+		if sl.Host == name && (sl.Locator != "" || sl.SMBIOSHandle.Valid) {
+			hf.inventory = true
+		}
+	}
+	for _, p := range in.Placements {
+		if p.Host == name {
+			hf.inventory = true
+		}
+	}
+	for _, u := range h.Unattributed {
+		switch {
+		case u.Slot == "":
+			hf.unplaced += u.CE + u.UE
+		case u.Ambiguous:
+			hf.ambiguous[u.Slot] += u.CE + u.UE
+		}
+	}
+	for _, b := range in.Boots {
+		if b.Host == name && b.StartQuality != model.TimeRelative {
+			hf.boots = append(hf.boots, b)
+		}
+	}
+	sort.SliceStable(hf.boots, func(i, j int) bool { return hf.boots[i].StartedAt.Before(hf.boots[j].StartedAt) })
+	return hf
+}
+
+// gpus applies R-REP-01 to the GPUs of a host: a row remap that failed
+// leaves nothing to repair with.
+func (j *judge) gpus(host string) []*GPUResult {
+	type gpu struct {
+		key      string
+		index    model.Opt[int]
+		xid64    []*model.GPUMem
+		snapshot *model.GPUMem
+	}
+	by := map[string]*gpu{}
+	var keys []string
+	for i := range j.in.GPUs {
+		r := &j.in.GPUs[i]
+		if r.Host != host {
+			continue
+		}
+		key := r.GPUSerial
+		if key == "" {
+			key = r.GPUUUID
+		}
+		if key == "" && r.PCIBus != "" {
+			key = r.PCIBus
+		}
+		if key == "" && r.GPUIndex.Valid {
+			key = fmt.Sprintf("GPU %d", r.GPUIndex.V)
+		}
+		if key == "" {
+			continue
+		}
+		g := by[key]
+		if g == nil {
+			g = &gpu{key: key}
+			by[key] = g
+			keys = append(keys, key)
+		}
+		if r.GPUIndex.Valid {
+			g.index = r.GPUIndex
+		}
+		switch {
+		case r.Kind == model.GPUXID && r.XID.Valid && r.XID.V == 64:
+			g.xid64 = append(g.xid64, r)
+		case r.Kind == model.GPUSnapshot && (g.snapshot == nil || r.ObservedAt.After(g.snapshot.ObservedAt)):
+			g.snapshot = r
+		}
+	}
+	sort.Strings(keys)
+	var out []*GPUResult
+	for _, key := range keys {
+		g := by[key]
+		var ev []model.Evidence
+		if n := len(g.xid64); n > 0 {
+			last := g.xid64[n-1]
+			e := model.Evidence{Rule: RuleRepairGone, Statement: statement("gpu.xid64", "when", stampText(last.ObservedAt.UnixMicro())), Total: n}
+			for _, r := range g.xid64 {
+				if len(e.Records) < j.cfg.MaxEvidenceRecords {
+					e.Records = append(e.Records, model.RecordRef{Kind: model.RecordGPU, ID: r.ID, RawRef: r.RawRef})
+				}
+			}
+			ev = append(ev, e)
+		}
+		if s := g.snapshot; s != nil && s.RemapFailure.Valid && s.RemapFailure.V {
+			ev = append(ev, model.Evidence{Rule: RuleRepairGone, Statement: statement("gpu.remap_failure", "when", stampText(s.ObservedAt.UnixMicro())), Total: 1,
+				Records: []model.RecordRef{{Kind: model.RecordGPU, ID: s.ID, RawRef: s.RawRef}}})
+		}
+		if len(ev) == 0 {
+			continue
+		}
+		v := &model.Verdict{Host: host, GPU: key, Grade: model.VerdictReplaceNow, Label: model.VerdictLabel, Rules: []string{RuleRepairGone},
+			Evidence: ev, NextAction: statement("next.gpu_replace"), EngineVersion: Version, ComputedAt: j.now}
+		v.Confidence = baseConfidence[RuleRepairGone]
+		v.ConfidenceFactors = []model.Factor{{Statement: statement("conf.rule", "rule", RuleRepairGone), Delta: v.Confidence}}
+		out = append(out, &GPUResult{Key: key, Index: g.index, Verdict: v})
+	}
+	return out
 }
 
 // Host returns the result of the named host, or nil.

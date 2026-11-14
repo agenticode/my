@@ -26,6 +26,9 @@ type Input struct {
 	Scans      []model.Scan
 	Sources    []model.Source
 	GPUs       []model.GPUMem
+	// Places lists the names error records use for the place of an error,
+	// next to the slot the records were tied to.
+	Places []store.EventPlace
 
 	events []event
 
@@ -268,16 +271,6 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	for _, h := range in.Hosts {
 		in.host(h.Name)
-		slots, err := s.Slots(ctx, h.Name)
-		if err != nil {
-			return fail("slots", err)
-		}
-		in.Slots = append(in.Slots, slots...)
-		gpus, err := s.GPUMem(ctx, h.Name)
-		if err != nil {
-			return fail("GPU memory records", err)
-		}
-		in.GPUs = append(in.GPUs, gpus...)
 	}
 	if in.Placements, err = s.Placements(ctx, "", ""); err != nil {
 		return fail("placements", err)
@@ -294,11 +287,34 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	if in.Sources, err = s.Sources(ctx, 0); err != nil {
 		return fail("source inventory", err)
 	}
+	if in.Places, err = s.EventPlaces(ctx, ""); err != nil {
+		return fail("event places", err)
+	}
 	for e, err := range s.Events(ctx, store.EventFilter{}) {
 		if err != nil {
 			return fail("events", err)
 		}
 		in.Add(e)
+	}
+	// Slots and GPU records are kept per host. A host is known through its
+	// own record, or through the records that name it.
+	for _, p := range in.Placements {
+		in.host(p.Host)
+	}
+	for _, a := range in.Actions {
+		in.host(a.Host)
+	}
+	for _, name := range in.hostNames {
+		slots, err := s.Slots(ctx, name)
+		if err != nil {
+			return fail("slots", err)
+		}
+		in.Slots = append(in.Slots, slots...)
+		gpus, err := s.GPUMem(ctx, name)
+		if err != nil {
+			return fail("GPU memory records", err)
+		}
+		in.GPUs = append(in.GPUs, gpus...)
 	}
 	return in, nil
 }

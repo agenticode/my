@@ -37,6 +37,9 @@ type Options struct {
 	// The zero value uses, per host, the latest time the ledger knows
 	// something about the host.
 	AsOf time.Time
+	// Now is stored with findings as the time they were computed; the zero
+	// value means the current time. It does not change any finding.
+	Now time.Time
 }
 
 func (o Options) config() *Config {
