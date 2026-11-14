@@ -314,7 +314,7 @@ func quickMono(raw string) (time.Duration, bool) {
 		// /dev/kmsg: priority,sequence,microseconds,flags;message
 		f := strings.SplitN(s[:strings.IndexByte(s, ';')], ",", 4)
 		us, err := strconv.ParseInt(f[2], 10, 64)
-		if err != nil || us < 0 {
+		if err != nil || us < 0 || us > maxUptimeSeconds*1e6 {
 			return 0, false
 		}
 		return time.Duration(us) * time.Microsecond, true
@@ -339,7 +339,7 @@ func quickMono(raw string) (time.Duration, bool) {
 	}
 	sec, err1 := strconv.ParseInt(num[:dot], 10, 64)
 	usec, err2 := strconv.ParseInt(num[dot+1:], 10, 64)
-	if err1 != nil || err2 != nil || sec < 0 || sec > 1<<40 {
+	if err1 != nil || err2 != nil || sec < 0 || sec > maxUptimeSeconds {
 		return 0, false
 	}
 	return time.Duration(sec)*time.Second + time.Duration(usec)*time.Microsecond, true
@@ -683,6 +683,10 @@ func (p *parser) edacLine(l *line) error {
 		seg.pageShift = 16
 		p.bigPages = fmt.Sprintf("line %d has a page offset above 4 KiB: the kernel uses 64 KiB pages; addresses of EDAC lines before it in the same boot were computed for 4 KiB pages", l.n)
 	}
+	if rec.page>>(63-seg.pageShift) != 0 || rec.offset>>16 != 0 {
+		p.tally.Skip(p.ref(l), "EDAC line page or offset is out of range")
+		return nil
+	}
 	if rec.page != 0 || rec.offset != 0 {
 		e.OsPhysicalAddress = model.Some(rec.page<<seg.pageShift | rec.offset)
 	}
@@ -926,6 +930,16 @@ func (p *parser) emit(e *model.Event, a *model.Action, l *line) error {
 }
 
 func (p *parser) send(e *model.Event, a *model.Action, t time.Time, q model.TimeQuality, bootID string) error {
+	if y := t.UTC().Year(); y < 1970 || y > 9999 {
+		ref := ""
+		if e != nil {
+			ref = e.RawRef
+		} else {
+			ref = a.RawRef
+		}
+		p.tally.Skip(ref, "time is out of range")
+		return nil
+	}
 	switch q {
 	case model.TimeRelative:
 		p.relative++

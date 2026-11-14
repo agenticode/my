@@ -51,6 +51,10 @@ var isoLayouts = []string{
 	"2006-01-02T15:04:05.999999999",
 }
 
+// maxUptimeSeconds bounds a seconds-since-boot stamp. A larger number is
+// not an uptime, and would overflow a duration.
+const maxUptimeSeconds = 100 * 365 * 24 * 3600
+
 // framer turns input lines into kernel messages.
 type framer struct {
 	// loc is the zone of times that carry none (syslog, dmesg -T).
@@ -69,7 +73,7 @@ func stamp(s string) (rest string, mono time.Duration, ok bool) {
 		return s, 0, false
 	}
 	sec, err := strconv.ParseInt(m[1], 10, 64)
-	if err != nil || sec > 1<<40 {
+	if err != nil || sec > maxUptimeSeconds {
 		return s, 0, false
 	}
 	usec, _ := strconv.ParseInt(m[2], 10, 64)
@@ -125,7 +129,7 @@ func (f *framer) frame(n int, raw string) (l line, ok bool) {
 		}
 	}
 	if m := kmsgRE.FindStringSubmatch(s); m != nil {
-		if usec, err := strconv.ParseInt(m[3], 10, 64); err == nil {
+		if usec, err := strconv.ParseInt(m[3], 10, 64); err == nil && usec <= maxUptimeSeconds*1e6 {
 			l.msg, l.mono, l.hasMono = m[4], time.Duration(usec)*time.Microsecond, true
 			return l, true
 		}
@@ -234,10 +238,13 @@ func frameJSON(n int, raw string) (l line, err error) {
 	// The kernel's own stamp of the message is the source timestamp; the
 	// journal's monotonic time is when journald received it.
 	recv, rerr := strconv.ParseInt(e.Monotonic, 10, 64)
+	if rerr == nil && recv > maxUptimeSeconds*1e6 {
+		rerr = strconv.ErrRange
+	}
 	if rerr == nil && recv >= 0 && !l.wall.IsZero() {
 		l.bootStart = l.wall.Add(-time.Duration(recv) * time.Microsecond)
 	}
-	if us, err := strconv.ParseInt(e.SrcMono, 10, 64); err == nil && us >= 0 {
+	if us, err := strconv.ParseInt(e.SrcMono, 10, 64); err == nil && us >= 0 && us <= maxUptimeSeconds*1e6 {
 		l.mono, l.hasMono = time.Duration(us)*time.Microsecond, true
 	} else if rerr == nil && recv >= 0 {
 		l.mono, l.hasMono = time.Duration(recv)*time.Microsecond, true

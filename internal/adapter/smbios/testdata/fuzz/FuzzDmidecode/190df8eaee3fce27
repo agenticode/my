@@ -1,0 +1,2 @@
+go test fuzz v1
+string("Handle 0x0, DMI type 17, 0 bytes\n\tSize:8700000 TB")

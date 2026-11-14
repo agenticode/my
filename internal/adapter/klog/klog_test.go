@@ -547,6 +547,36 @@ func TestInputsThatAreNotKernelLogs(t *testing.T) {
 	})
 }
 
+func TestValuesOutOfRangeAreSkipped(t *testing.T) {
+	const tail = " EDAC MC0: 1 CE memory read error on DIMM_A1 (channel:0 slot:0 page:%s offset:0x40 grain:32 syndrome:0x0)\n"
+	tests := []struct {
+		name   string
+		in     string
+		events int
+		note   string
+	}{
+		{"a page number that is not an address", "[  100.000000]" + strings.Replace(tail, "%s", "0xffffffffffffffff", 1), 0, "page or offset is out of range"},
+		{"an offset beyond any page size", "[  100.000000] EDAC MC0: 1 CE on DIMM_A1 (channel:0 slot:0 page:0x1000 offset:0x123456 grain:32 syndrome:0x0)\n", 0, "page or offset is out of range"},
+		// A stamp of 300 years is not an uptime: the line is read as a bare
+		// message, without a time.
+		{"a stamp that is not an uptime", "[9999999999.000000]" + strings.Replace(tail, "%s", "0x1000", 1), 1, ""},
+		{"a journal time beyond year 9999", `{"MESSAGE":"EDAC MC0: 1 CE on DIMM_A1 (channel:0 slot:0 page:0x1000 offset:0x40 grain:32 syndrome:0x0)","_TRANSPORT":"kernel","__REALTIME_TIMESTAMP":"9223372036854775807"}` + "\n", 0, "time is out of range"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, rep := collectText(t, tt.in, Options{CapturedAt: utc(2026, 11, 13, 0, 0, 0)})
+			if len(c.Events) != tt.events || (tt.note != "" && !hasNote(rep, tt.note)) {
+				t.Errorf("%d events, notes %q; want %d events and a note with %q", len(c.Events), rep.Notes, tt.events, tt.note)
+			}
+			for _, e := range c.Events {
+				if y := e.ErrorDT.Year(); y < 1970 || y > 9999 {
+					t.Errorf("event time %v", e.ErrorDT)
+				}
+			}
+		})
+	}
+}
+
 type failingSink struct {
 	adapter.Collected
 	err error

@@ -227,7 +227,9 @@ type offline struct {
 // that do not report an offline attempt, such as "already poisoned".
 func parseOffline(msg string) (o offline, ok bool) {
 	pfn := func(s string) bool {
-		v, err := strconv.ParseUint(strings.TrimPrefix(s, "0x"), 16, 52)
+		// 44 bits of page number cover any physical address, with 4 KiB
+		// and with 64 KiB pages.
+		v, err := strconv.ParseUint(strings.TrimPrefix(s, "0x"), 16, 44)
 		o.pfn = v
 		return err == nil
 	}

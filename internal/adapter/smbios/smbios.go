@@ -312,6 +312,10 @@ func parseSize(s string) (bytes int64, populated, ok bool) {
 		return 0, false, false
 	}
 	shift := map[string]uint{"kB": 10, "KB": 10, "MB": 20, "GB": 30, "TB": 40}[m[2]]
+	// A size beyond 1 PiB is not a DIMM, and shifting it would overflow.
+	if n > (1<<50)>>shift {
+		return 0, false, false
+	}
 	return n << shift, true, true
 }
 

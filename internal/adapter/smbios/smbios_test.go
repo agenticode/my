@@ -112,6 +112,7 @@ func TestDmidecodeInputsWithoutMemoryDevices(t *testing.T) {
 			model.SourceUnreadable, "run it as root"},
 		{"other types only", "Handle 0x0000, DMI type 0, 24 bytes\nBIOS Information\n\tVendor: Example\n\n", model.SourceEmpty, "no memory device (type 17) records"},
 		{"header cut off", "Handle 0x1100, DMI type 17, 84 bytes\nMemory Device\n\tLocator: A1\n\tSize: 32", model.SourcePartial, ""},
+		{"a size that would overflow", "Handle 0x1100, DMI type 17, 84 bytes\nMemory Device\n\tLocator: A1\n\tSize: 8700000 TB\n", model.SourcePartial, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -148,7 +148,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 			if loc, err := a.text(dir, "dimm_location"); err == nil {
 				s.Location = edac.ParseLayers(loc).Key()
 			}
-			if mb, err := a.number(dir, "size"); err == nil {
+			if mb, err := a.number(dir, "size"); err == nil && mb < 1<<40 {
 				s.SizeMB = model.Some(int(mb))
 			}
 			s.MemType, _ = a.text(dir, "dimm_mem_type")
