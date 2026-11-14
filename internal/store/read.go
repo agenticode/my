@@ -406,6 +406,24 @@ func (s *Store) Slots(ctx context.Context, host string) ([]model.Slot, error) {
 	return out, rows.Err()
 }
 
+// SlotAliases returns the alias table of a host: alias to slot name.
+func (s *Store) SlotAliases(ctx context.Context, host string) (map[string]string, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT alias, slot FROM slot_alias WHERE host = ?`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]string{}
+	for rows.Next() {
+		var a, sl string
+		if err := rows.Scan(&a, &sl); err != nil {
+			return nil, err
+		}
+		out[a] = sl
+	}
+	return out, rows.Err()
+}
+
 // Placements returns placements in time order. Empty arguments do not restrict.
 func (s *Store) Placements(ctx context.Context, host, dimmUID string) ([]model.Placement, error) {
 	q := `SELECT id, dimm_uid, host, slot, first_seen, last_seen, source FROM placement`

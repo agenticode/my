@@ -131,8 +131,10 @@ type Slot struct {
 
 	Socket Opt[int] `json:"socket,omitzero"`
 	IMC    Opt[int] `json:"imc,omitzero"`
-	// Channel counts as the memory controller does; Position is the DIMM
-	// position on that channel.
+	// Channel counts within the memory controller when IMC is set, and
+	// within the socket otherwise. Position is the DIMM position on the
+	// channel. Sorting by socket, controller, channel and position gives
+	// the board order either way.
 	Channel  Opt[int] `json:"channel,omitzero"`
 	Position Opt[int] `json:"position,omitzero"`
 
