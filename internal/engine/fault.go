@@ -59,6 +59,26 @@ type Fault struct {
 	// DIMM that was moved has more than one.
 	Slots []string `json:"slots,omitzero"`
 
+	// The measurements below are filled in by Analyze; Classify leaves
+	// them empty.
+
+	// Trend compares the recent errors of the fault with the baseline
+	// window before them.
+	Trend Trend `json:"trend"`
+	// Spread says how many of the fault's places are new.
+	Spread Spread `json:"spread"`
+	// Storm is the densest burst of the fault's errors.
+	Storm Storm `json:"storm"`
+	// Lines summarises the failing data lines, where records name them.
+	Lines DataLines `json:"data_lines"`
+	// Scrub splits the errors by how they were found.
+	Scrub Scrub `json:"scrub"`
+	// Mitigations are the repairs and page offlines that name a place of
+	// the fault, oldest first.
+	Mitigations []Mitigation `json:"mitigations,omitzero"`
+	// Undated counts errors known by seconds since boot only.
+	Undated int64 `json:"undated,omitzero"`
+
 	// members are the indexes of the member records in Input.events, in
 	// time order.
 	members []int32
