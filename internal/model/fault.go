@@ -257,11 +257,33 @@ type GPUMem struct {
 	RetiredDBE     Opt[int]  `json:"retired_dbe,omitzero"`
 	RetiredPending Opt[bool] `json:"retired_pending,omitzero"`
 
-	BootID      string `json:"boot_id,omitzero"`
-	Source      string `json:"source"`
-	RawRef      string `json:"raw_ref"`
-	Raw         string `json:"raw,omitzero"`
-	Fingerprint string `json:"fingerprint"`
+	// ECCEnabled says whether ECC protects the memory of the GPU, on
+	// snapshots. Without ECC the counters below are not kept.
+	ECCEnabled Opt[bool] `json:"ecc_enabled,omitzero"`
+	// ECC error counts, set on snapshots: of the frame buffer memory (DRAM)
+	// and of the SRAM inside the GPU. The plain counts are kept in the GPU
+	// for its life; the volatile counts start when the driver is loaded.
+	DRAMCorrectable           Opt[int] `json:"dram_correctable,omitzero"`
+	DRAMUncorrectable         Opt[int] `json:"dram_uncorrectable,omitzero"`
+	DRAMCorrectableVolatile   Opt[int] `json:"dram_correctable_volatile,omitzero"`
+	DRAMUncorrectableVolatile Opt[int] `json:"dram_uncorrectable_volatile,omitzero"`
+	SRAMCorrectable           Opt[int] `json:"sram_correctable,omitzero"`
+	SRAMUncorrectable         Opt[int] `json:"sram_uncorrectable,omitzero"`
+	SRAMCorrectableVolatile   Opt[int] `json:"sram_correctable_volatile,omitzero"`
+	SRAMUncorrectableVolatile Opt[int] `json:"sram_uncorrectable_volatile,omitzero"`
+	// SRAMThresholdExceeded is the driver's flag that the uncorrectable
+	// SRAM errors of the GPU passed the vendor's limit.
+	SRAMThresholdExceeded Opt[bool] `json:"sram_threshold_exceeded,omitzero"`
+
+	// TimeQuality says how far ObservedAt can be trusted. An XID line of a
+	// kernel log without wall-clock times is only placed relative to boot.
+	TimeQuality TimeQuality `json:"time_quality,omitzero"`
+	BootID      string      `json:"boot_id,omitzero"`
+	Source      string      `json:"source"`
+	RawRef      string      `json:"raw_ref"`
+	Raw         string      `json:"raw,omitzero"`
+	Fingerprint string      `json:"fingerprint"`
+	ScanID      int64       `json:"scan_id,omitzero"`
 }
 
 // GPU memory record kinds.

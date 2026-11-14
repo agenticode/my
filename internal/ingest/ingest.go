@@ -4,8 +4,8 @@
 // One run reads the sources of one host. Every source gets an entry in the
 // source inventory, whether it could be read or not. After the sources are
 // in, the ledger passes run in a fixed order: slots and DIMM identities,
-// counter events, event slots, boots, DIMM attribution, duplicates, counter
-// coverage. Each pass recomputes its result from the ledger, so importing
+// counter events, the slots of events, actions and ECS readings, boots, DIMM
+// attribution, duplicates, counter coverage. Each pass recomputes its result from the ledger, so importing
 // sources in another order, or importing a source again, gives the same
 // ledger.
 package ingest
@@ -50,9 +50,11 @@ type Result struct {
 	// Sources is the source inventory of the run, one entry per adapter
 	// and one for the slot mapping.
 	Sources []model.Source
-	// Events and Actions count the records this run added to the ledger.
+	// Events, Actions and Samples count the records this run added to the
+	// ledger. Samples are GPU memory records and ECS readings.
 	Events  int
 	Actions int
+	Samples int
 	// Duplicates is the number of records of the host that are marked as
 	// duplicates of another record after the run.
 	Duplicates int
@@ -139,6 +141,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		}
 		res.Events += sk.newEvents
 		res.Actions += sk.newActions
+		res.Samples += sk.newSamples
 		modules = append(modules, sk.modules...)
 		if err := s.Update(ctx, func(w *store.Writer) error { return w.InsertSource(&src) }); err != nil {
 			return nil, fmt.Errorf("ingest: %w", err)
@@ -176,6 +179,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		{"counter events", func() error { return s.DeriveCounterEvents(ctx, host) }},
 		{"event slots", func() error { return resolveEventSlots(ctx, s, host) }},
 		{"action slots", func() error { return resolveActionSlots(ctx, s, host) }},
+		{"ECS slots", func() error { return resolveECSSlots(ctx, s, host) }},
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
 		{"DIMM attribution", func() error { return s.LinkDIMMs(ctx, host) }},
 		{"duplicates", func() (err error) {
@@ -217,6 +221,7 @@ type sink struct {
 	known      int
 	newEvents  int
 	newActions int
+	newSamples int
 	modules    []*model.Module
 }
 
@@ -284,6 +289,43 @@ func (k *sink) Action(a *model.Action) error {
 		k.known++
 	}
 	return nil
+}
+
+func (k *sink) GPU(g *model.GPUMem) error {
+	g.Host, g.ScanID = k.host, k.scanID
+	g.Fingerprint = model.Fingerprint(k.host, g.Fingerprint)
+	inserted, err := k.w.InsertGPUMem(g)
+	if err != nil {
+		return k.refuse(g.RawRef, err)
+	}
+	k.sample(g.ObservedAt, g.TimeQuality, inserted)
+	return nil
+}
+
+func (k *sink) ECS(e *model.ECSSample) error {
+	e.Host, e.ScanID = k.host, k.scanID
+	e.Fingerprint = model.Fingerprint(k.host, e.Fingerprint)
+	inserted, err := k.w.InsertECS(e)
+	if err != nil {
+		return k.refuse(e.RawRef, err)
+	}
+	k.sample(e.ObservedAt, e.TimeQuality, inserted)
+	return nil
+}
+
+// sample counts a GPU memory record or an ECS reading.
+func (k *sink) sample(t time.Time, q model.TimeQuality, inserted bool) {
+	k.src.Samples++
+	if q != model.TimeRelative {
+		// A time counted from the epoch says nothing about the period the
+		// source covers.
+		k.seen(t)
+	}
+	if inserted {
+		k.newSamples++
+	} else {
+		k.known++
+	}
 }
 
 func (k *sink) Boot(b *model.Boot) error {

@@ -84,3 +84,21 @@ func TestCollected(t *testing.T) {
 		t.Errorf("collected = %+v", c)
 	}
 }
+
+func TestCollectedKeepsEveryRecordKind(t *testing.T) {
+	var c Collected
+	var sink Sink = &c
+	steps := []error{
+		sink.Host(&model.Host{}), sink.Boot(&model.Boot{}), sink.Module(&model.Module{}), sink.Counter(&model.CounterSample{}),
+		sink.Event(&model.Event{}), sink.Action(&model.Action{}), sink.GPU(&model.GPUMem{}), sink.ECS(&model.ECSSample{}),
+	}
+	for i, err := range steps {
+		if err != nil {
+			t.Errorf("step %d: %v", i, err)
+		}
+	}
+	got := []int{len(c.Hosts), len(c.Boots), len(c.Modules), len(c.Counters), len(c.Events), len(c.Actions), len(c.GPUs), len(c.ECSs)}
+	if !reflect.DeepEqual(got, []int{1, 1, 1, 1, 1, 1, 1, 1}) {
+		t.Errorf("records kept per kind = %v", got)
+	}
+}

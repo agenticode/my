@@ -161,7 +161,16 @@ type Module struct {
 	Locator     string
 	BankLocator string
 	Handle      Opt[int]
-	Populated   bool
+	// Socket, Channel and Position are set by inventory sources that number
+	// the place of the slot themselves (a BMC, a firmware log): the socket,
+	// the channel within the socket and the position on the channel, in the
+	// source's own numbering. Error records of the same source family name
+	// the place by these numbers. Sources that only name the slot leave
+	// them unset.
+	Socket    Opt[int]
+	Channel   Opt[int]
+	Position  Opt[int]
+	Populated bool
 	// DIMM describes the module. UID and Identity are filled in by the
 	// ledger, which knows the host.
 	DIMM   DIMM
