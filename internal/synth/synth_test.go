@@ -346,6 +346,88 @@ func TestMovesAndRepairs(t *testing.T) {
 	})
 }
 
+// TestRuleScenarios: the scenarios that exist to make single rules fire
+// carry the actions those rules read.
+func TestRuleScenarios(t *testing.T) {
+	reboot := time.Date(2026, 10, 1, 3, 0, 0, 0, time.UTC)
+	kinds := func(ds *Dataset) map[model.ActionKind]int {
+		n := map[model.ActionKind]int{}
+		for _, a := range ds.Actions {
+			n[a.Kind]++
+			if a.Slot == "" || a.Label != a.Slot || a.BootID == "" || a.Fingerprint == "" {
+				t.Errorf("%s: incomplete action %+v", ds.Scenario.Name, a)
+			}
+		}
+		return n
+	}
+	lastEvent := func(ds *Dataset) time.Time {
+		return ds.Events[len(ds.Events)-1].ErrorDT
+	}
+
+	t.Run("reseated", func(t *testing.T) {
+		ds := generate(t, "reseated", 3, noNoise)
+		if n := kinds(ds); len(ds.Actions) != 1 || n[model.ActionReseat] != 1 || !ds.Actions[0].At.Equal(reboot) || ds.Actions[0].Slot != "CPU0_C1" {
+			t.Errorf("actions = %+v", ds.Actions)
+		}
+		// The errors end at the reseat.
+		if ds.Truth[0].CE != 120 || !lastEvent(ds).Before(reboot) {
+			t.Errorf("%d errors, the last at %v", ds.Truth[0].CE, lastEvent(ds))
+		}
+	})
+	t.Run("fw-disabled", func(t *testing.T) {
+		ds := generate(t, "fw-disabled", 3, noNoise)
+		a := ds.Actions[0]
+		if n := kinds(ds); len(ds.Actions) != 1 || n[model.ActionDisable] != 1 || a.Method != "bios" || a.Detail == "" || !a.At.After(reboot) || a.Slot != "CPU1_A1" {
+			t.Errorf("actions = %+v", ds.Actions)
+		}
+		if !lastEvent(ds).Before(reboot) {
+			t.Errorf("an error at %v, after the DIMM was taken out of use", lastEvent(ds))
+		}
+	})
+	t.Run("repair-failed", func(t *testing.T) {
+		ds := generate(t, "repair-failed", 3, noNoise)
+		a := ds.Actions[0]
+		if n := kinds(ds); len(ds.Actions) != 1 || n[model.ActionHPPR] != 1 || a.Result != model.ResultFailed || a.Row != ds.Truth[0].Row {
+			t.Errorf("actions = %+v", ds.Actions)
+		}
+		// The fault goes on after the failed repair.
+		if !lastEvent(ds).After(reboot.Add(30*24*time.Hour)) || ds.Truth[0].CE != 400 {
+			t.Errorf("%d errors, the last at %v", ds.Truth[0].CE, lastEvent(ds))
+		}
+	})
+	t.Run("offline-growing", func(t *testing.T) {
+		ds := generate(t, "offline-growing", 3, noNoise)
+		pages, days := map[uint64]bool{}, map[string]bool{}
+		for _, a := range ds.Actions {
+			if a.Kind != model.ActionPageOffline || a.Result != model.ResultOK || !a.OsPhysicalAddress.Valid {
+				t.Errorf("action %+v", a)
+			}
+			if pages[a.OsPhysicalAddress.V] {
+				t.Errorf("page %#x is taken offline twice", a.OsPhysicalAddress.V)
+			}
+			pages[a.OsPhysicalAddress.V] = true
+			days[a.At.Format("2006-01-02")] = true
+		}
+		if len(pages) != 6 || len(days) != 3 {
+			t.Errorf("%d pages on %d days, want 6 on 3", len(pages), len(days))
+		}
+	})
+	t.Run("sparing names a rank and a device, no row", func(t *testing.T) {
+		ds := generate(t, "device", 3, func(sc *Scenario) {
+			sc.Repairs = []Repair{{At: sc.Reboots[1].At, Kind: model.ActionSparing, Fault: 0}}
+		})
+		var sp *model.Action
+		for i := range ds.Actions {
+			if ds.Actions[i].Kind == model.ActionSparing {
+				sp = &ds.Actions[i]
+			}
+		}
+		if sp == nil || sp.Rank != ds.Truth[0].Rank || sp.DeviceId != ds.Truth[0].Device || sp.Row.Valid || sp.Bank.Valid {
+			t.Errorf("sparing action = %+v", sp)
+		}
+	})
+}
+
 func TestInvalidScenarios(t *testing.T) {
 	bad := map[string]func(*Scenario){
 		"no name":                  func(s *Scenario) { s.Name = "" },
@@ -361,10 +443,25 @@ func TestInvalidScenarios(t *testing.T) {
 			s.Faults[0].Mode = model.ModeBank
 			s.Repairs = []Repair{{At: s.Reboots[0].At, Kind: model.ActionHPPR, Fault: 0}}
 		},
-		"repair with a wrong kind": func(s *Scenario) { s.Repairs = []Repair{{At: s.Reboots[0].At, Kind: model.ActionReseat, Fault: 0}} },
-		"offline before any error": func(s *Scenario) { s.Offlines = []Offline{{At: s.Start, Fault: 0, Pages: 3}} },
-		"host without sockets":     func(s *Scenario) { s.Host.Sockets = 0 },
-		"geometry without rows":    func(s *Scenario) { s.Host.Geometry.Rows = 0 },
+		"repair with a wrong kind":  func(s *Scenario) { s.Repairs = []Repair{{At: s.Reboots[0].At, Kind: model.ActionReseat, Fault: 0}} },
+		"offline before any error":  func(s *Scenario) { s.Offlines = []Offline{{At: s.Start, Fault: 0, Pages: 3}} },
+		"reseat not at a reboot":    func(s *Scenario) { s.Reseats = []Reseat{{At: s.Start.Add(time.Hour), Slot: "CPU0_C1"}} },
+		"reseat of an unknown slot": func(s *Scenario) { s.Reseats = []Reseat{{At: s.Reboots[0].At, Slot: "DIMM_X"}} },
+		"mark with a wrong kind": func(s *Scenario) {
+			s.Marks = []Mark{{At: s.Reboots[0].At, Slot: "CPU0_C1", Kind: model.ActionPageOffline}}
+		},
+		"mark outside the span": func(s *Scenario) {
+			s.Marks = []Mark{{At: s.End.Add(time.Hour), Slot: "CPU0_C1", Kind: model.ActionDisable}}
+		},
+		"mark of an unknown slot": func(s *Scenario) {
+			s.Marks = []Mark{{At: s.Reboots[0].At, Slot: "DIMM_X", Kind: model.ActionMarkFailed}}
+		},
+		"sparing of a fault without a rank": func(s *Scenario) {
+			s.Faults[0].Mode = model.ModeDIMM
+			s.Repairs = []Repair{{At: s.Reboots[0].At, Kind: model.ActionSparing, Fault: 0}}
+		},
+		"host without sockets":  func(s *Scenario) { s.Host.Sockets = 0 },
+		"geometry without rows": func(s *Scenario) { s.Host.Geometry.Rows = 0 },
 	}
 	for name, mut := range bad {
 		sc, _ := Named("row", 1)

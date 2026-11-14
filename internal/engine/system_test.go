@@ -368,6 +368,10 @@ func TestRuleReseat(t *testing.T) {
 		if v.NextAction.Code != "next.contact" || !has(checkCodes(v), "open check.no_patrol") {
 			t.Errorf("next %q, checks %q", v.NextAction.Code, checkCodes(v))
 		}
+		// Errors that a contact explains are a system issue.
+		if got := modesOf(t, b, "d1"); len(got) != 1 || got[0] != model.ModeSystemIssue {
+			t.Errorf("modes = %v", got)
+		}
 	})
 
 	t.Run("errors that stop when the DIMM is moved fire it: a move reseats the DIMM", func(t *testing.T) {
@@ -399,16 +403,37 @@ func TestRuleReseat(t *testing.T) {
 		if !has(checkCodes(v), "weakens check.confined") {
 			t.Errorf("checks = %q", checkCodes(v))
 		}
+		// The row fault stays a row fault.
+		if got := modesOf(t, b, "d1"); len(got) != 1 || got[0] != model.ModeRow {
+			t.Errorf("modes = %v", got)
+		}
+	})
+
+	t.Run("a stray error after the reseat does not undo it", func(t *testing.T) {
+		b := ruleBuilder()
+		b.scatter("d1", "S-d1", 20, t0.Add(5*day), t0.Add(25*day))
+		b.act("d1", model.ActionReseat, t0.Add(30*day), nil)
+		b.ce("d1", t0.Add(40*day), cellA)
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictHoldReplacement, RuleReseat)
+		if e := evidenceOf(t, v, RuleReseat); e.Code != "sys.reseat_few" || e.Text != "20 errors before the reseat of 2026-10-31, 1 in the 30 days since" {
+			t.Errorf("evidence = %q (%s)", e.Text, e.Code)
+		}
 	})
 
 	for _, tt := range []struct {
 		name  string
 		build func(b *builder)
 	}{
-		{"errors after the reseat", func(b *builder) {
+		{"errors that go on after the reseat", func(b *builder) {
 			b.scatter("d1", "S-d1", 20, t0.Add(5*day), t0.Add(25*day))
 			b.act("d1", model.ActionReseat, t0.Add(30*day), nil)
-			b.ce("d1", t0.Add(40*day), cellA)
+			b.scatter("d1", "S-d1", 5, t0.Add(40*day), t0.Add(50*day))
+		}},
+		{"errors after the reseat that are no small part of those before", func(b *builder) {
+			b.scatter("d1", "S-d1", 20, t0.Add(5*day), t0.Add(25*day))
+			b.act("d1", model.ActionReseat, t0.Add(30*day), nil)
+			b.scatter("d1", "S-d1", 3, t0.Add(40*day), t0.Add(50*day))
 		}},
 		{"a reseat three days ago", func(b *builder) {
 			b.scatter("d1", "S-d1", 20, t0.Add(5*day), t0.Add(25*day))

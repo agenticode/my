@@ -19,20 +19,27 @@ func TestScenarioFindings(t *testing.T) {
 	type want struct {
 		grade model.VerdictGrade
 		rules []string
+		// also is another list of rules that is accepted: whether a fault
+		// reached new places in the last 30 days depends on the seed.
+		also []string
 	}
 	tests := map[string][]want{
-		"single-bit":     {{model.VerdictObserve, []string{RuleSoft}}},
-		"row":            {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"multi-row":      {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"column":         {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"bank":           {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"device":         {{model.VerdictReplaceNow, []string{RuleUE, RuleRow}}},
-		"dimm":           {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"moved-dimm":     {{model.VerdictConsiderReplacement, []string{RuleRow}}},
-		"repaired":       {{model.VerdictObserve, []string{RuleQuiet}}},
-		"system-channel": {{model.VerdictHoldReplacement, []string{RuleChannel}}, {model.VerdictHoldReplacement, []string{RuleChannel}}},
-		"system-slot":    {{model.VerdictHoldReplacement, []string{RuleSlot}}},
-		"demo":           {{model.VerdictReplaceNow, []string{RuleUE, RuleRow, RuleRecurred}}, {model.VerdictObserve, []string{RuleSoft}}},
+		"reseated":        {{grade: model.VerdictHoldReplacement, rules: []string{RuleReseat}}},
+		"fw-disabled":     {{grade: model.VerdictReplaceNow, rules: []string{RuleFirmware}}},
+		"repair-failed":   {{grade: model.VerdictReplaceNow, rules: []string{RuleRepairGone, RuleRow}}},
+		"offline-growing": {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow, RuleOffline}, also: []string{RuleOffline}}},
+		"single-bit":      {{grade: model.VerdictObserve, rules: []string{RuleSoft}}},
+		"row":             {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"multi-row":       {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"column":          {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"bank":            {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"device":          {{grade: model.VerdictReplaceNow, rules: []string{RuleUE, RuleRow}}},
+		"dimm":            {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"moved-dimm":      {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow}}},
+		"repaired":        {{grade: model.VerdictObserve, rules: []string{RuleQuiet}}},
+		"system-channel":  {{grade: model.VerdictHoldReplacement, rules: []string{RuleChannel}}, {grade: model.VerdictHoldReplacement, rules: []string{RuleChannel}}},
+		"system-slot":     {{grade: model.VerdictHoldReplacement, rules: []string{RuleSlot}}},
+		"demo":            {{grade: model.VerdictReplaceNow, rules: []string{RuleUE, RuleRow, RuleRecurred}}, {grade: model.VerdictObserve, rules: []string{RuleSoft}}},
 	}
 	for _, name := range synth.Names() {
 		wants, ok := tests[name]
@@ -58,7 +65,7 @@ func TestScenarioFindings(t *testing.T) {
 				if len(rules) == len(wants[i].rules)+1 && v.Grade == model.VerdictObserve {
 					rules = without(rules, RuleSoft)
 				}
-				if v.Grade != wants[i].grade || !equalStrings(rules, wants[i].rules) {
+				if v.Grade != wants[i].grade || (!equalStrings(rules, wants[i].rules) && (wants[i].also == nil || !equalStrings(rules, wants[i].also))) {
 					t.Errorf("%s/%d fault %d: finding = %s %v, want %s %v\n evidence: %q", name, seed, i, v.Grade, v.Rules, wants[i].grade, wants[i].rules, codes(v))
 				}
 				if worse(v.Grade, worst) {

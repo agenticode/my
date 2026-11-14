@@ -138,6 +138,19 @@ func (sc *Scenario) validate() error {
 			return fmt.Errorf("offline %d is incomplete", i)
 		}
 	}
+	for i, r := range sc.Reseats {
+		if !isReboot(r.At) {
+			return fmt.Errorf("reseat %d does not happen at a reboot", i)
+		}
+	}
+	for i, m := range sc.Marks {
+		if m.Kind != model.ActionDisable && m.Kind != model.ActionMarkFailed {
+			return fmt.Errorf("mark %d has kind %q", i, m.Kind)
+		}
+		if m.At.Before(sc.Start) || m.At.After(sc.End) {
+			return fmt.Errorf("mark %d is outside the scenario span", i)
+		}
+	}
 	for i, f := range sc.Faults {
 		if !f.Mode.Valid() || f.Mode == model.ModeUndetermined {
 			return fmt.Errorf("fault %d has mode %q", i, f.Mode)
@@ -602,7 +615,13 @@ func (g *generator) repairsAndOfflines() error {
 	sc := g.sc
 	for i, r := range sc.Repairs {
 		t := g.ds.Truth[r.Fault]
-		if !t.Row.Valid {
+		// A PPR repairs one row. Sparing replaces a rank or a device.
+		if r.Kind == model.ActionSparing {
+			if !t.Rank.Valid {
+				return fmt.Errorf("repair %d targets fault %d, whose mode %q has no single rank", i, r.Fault, t.Mode)
+			}
+			t.BankGroup, t.Bank, t.Row = model.Opt[int]{}, model.Opt[int]{}, model.Opt[int]{}
+		} else if !t.Row.Valid {
 			return fmt.Errorf("repair %d targets fault %d, whose mode %q has no single row", i, r.Fault, t.Mode)
 		}
 		boot := g.bootAt(r.At)
@@ -628,16 +647,23 @@ func (g *generator) repairsAndOfflines() error {
 			Slot: name, Label: name, Detail: "repair during memory initialisation",
 		})
 	}
-	for i, o := range sc.Offlines {
+	// Pages that are offline already are not taken offline again.
+	offlined := map[int]map[uint64]bool{}
+	offs := append([]Offline(nil), sc.Offlines...)
+	sort.SliceStable(offs, func(a, b int) bool { return offs[a].At.Before(offs[b].At) })
+	for i, o := range offs {
+		if offlined[o.Fault] == nil {
+			offlined[o.Fault] = map[uint64]bool{}
+		}
 		// The pages of the fault with the most corrected errors so far.
 		count := map[uint64]int{}
 		slotOf := map[uint64]string{}
 		for _, idx := range g.byFault[o.Fault] {
 			e := g.ds.Events[idx]
-			if e.ErrorDT.After(o.At) {
+			page := e.OsPhysicalAddress.V &^ 0xfff
+			if e.ErrorDT.After(o.At) || offlined[o.Fault][page] {
 				continue
 			}
-			page := e.OsPhysicalAddress.V &^ 0xfff
 			count[page]++
 			slotOf[page] = e.Slot
 		}
@@ -655,11 +681,25 @@ func (g *generator) repairsAndOfflines() error {
 			return fmt.Errorf("offline %d: fault %d has no errors before that time", i, o.Fault)
 		}
 		for j, p := range pages[:min(o.Pages, len(pages))] {
+			offlined[o.Fault][p] = true
 			g.action(model.Action{
 				At: o.At.Add(time.Duration(j) * 2 * time.Second), Kind: model.ActionPageOffline, Method: "soft", Result: model.ResultOK,
 				OsPhysicalAddress: model.Some(p), Slot: slotOf[p], Label: slotOf[p], Detail: "corrected error threshold",
 			})
 		}
+	}
+	for i, r := range sc.Reseats {
+		if g.slotIndex(r.Slot) < 0 {
+			return fmt.Errorf("reseat %d names slot %q, which the host does not have", i, r.Slot)
+		}
+		g.action(model.Action{At: r.At, Kind: model.ActionReseat, Method: "operator", Result: model.ResultOK, Slot: r.Slot, Label: r.Slot,
+			Detail: "DIMM reseated"})
+	}
+	for i, m := range sc.Marks {
+		if g.slotIndex(m.Slot) < 0 {
+			return fmt.Errorf("mark %d names slot %q, which the host does not have", i, m.Slot)
+		}
+		g.action(model.Action{At: m.At, Kind: m.Kind, Method: m.Method, Result: model.ResultOK, Slot: m.Slot, Label: m.Slot, Detail: m.Detail})
 	}
 	return nil
 }

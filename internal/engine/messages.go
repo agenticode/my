@@ -128,6 +128,8 @@ var Messages = i18n.Catalog{
 	"sys.stays":       {EN: "the errors stayed in slot {slot} when its DIMM was changed on {when}: {before} with DIMM {old} before, {after} with DIMM {new} after", KO: "{when} DIMM을 바꾼 뒤에도 슬롯 {slot}에 오류 지속: 바꾸기 전 {old} {before}건, 바꾼 뒤 {new} {after}건"},
 	"sys.left_quiet":  {EN: "since it left slot {slot}, DIMM {old} has had no errors in {now} for {days} days", KO: "슬롯 {slot} 이탈 뒤 DIMM {old}: {now}에서 {days}일 동안 0건"},
 	"sys.reseat":      {EN: "{n} errors before the reseat of {when}, none in the {days} days since", KO: "{when} reseat 전 {n}건, 이후 {days}일 동안 0건"},
+	"sys.reseat_few":  {EN: "{n} errors before the reseat of {when}, {after} in the {days} days since", KO: "{when} reseat 전 {n}건, 이후 {days}일 동안 {after}건"},
+	"sys.moved_few":   {EN: "{n} errors in {from} before the move to {to} on {when}, {after} in the {days} days since", KO: "{when} 슬롯 이동({from} → {to}) 전 {n}건, 이후 {days}일 동안 {after}건"},
 	"sys.moved_quiet": {EN: "{n} errors in {from} before the move to {to} on {when}, none in either slot in the {days} days since", KO: "{when} 슬롯 이동({from} → {to}) 전 {n}건, 이후 {days}일 동안 두 슬롯 모두 0건"},
 	"map.conflict":    {EN: "{n} error {n|record|records} tied to {slot} carry a {name} ({value}) that belongs to {other}", KO: "{slot}에 묶인 오류 기록 {n}건에 {other}의 {name}({value}) 포함"},
 

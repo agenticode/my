@@ -147,6 +147,22 @@ type Offline struct {
 	Pages int
 }
 
+// Reseat is a DIMM taken out of its slot and put back, at a reboot.
+type Reseat struct {
+	At   time.Time
+	Slot string
+}
+
+// Mark is what firmware says about the DIMM of a slot: that it took the
+// DIMM out of use, or that it reports the DIMM as failed.
+type Mark struct {
+	At     time.Time
+	Slot   string
+	Kind   model.ActionKind // ActionDisable or ActionMarkFailed
+	Method string           // who says so: "bios" or "bmc"
+	Detail string           // the wording of the source
+}
+
 // Scenario is a complete script for the generator.
 type Scenario struct {
 	Name  string
@@ -160,6 +176,8 @@ type Scenario struct {
 	Moves    []Move
 	Repairs  []Repair
 	Offlines []Offline
+	Reseats  []Reseat
+	Marks    []Mark
 	// NoisePerDIMMDay is the rate of unrelated single corrected errors per
 	// DIMM and day.
 	NoisePerDIMMDay float64
@@ -249,6 +267,42 @@ var builders = map[string]func(seed uint64) *Scenario{
 		s := base("repaired", seed)
 		s.Faults = []Fault{{Mode: model.ModeRow, Slot: "CPU0_C1", Start: day(2026, 8, 20), Events: 150, Trend: Flat, PatrolShare: 0.2, StopAfterRepair: true}}
 		s.Repairs = []Repair{{At: clock(2026, 10, 1, 3, 0), Kind: model.ActionHPPR, Fault: 0}}
+		return s
+	},
+	// Errors of a bad contact: scattered over the DIMM, gone after it was
+	// reseated at a reboot.
+	"reseated": func(seed uint64) *Scenario {
+		s := base("reseated", seed)
+		at := clock(2026, 10, 1, 3, 0)
+		s.Faults = []Fault{{Mode: model.ModeSystemIssue, Slot: "CPU0_C1", Start: day(2026, 8, 20), End: at, Events: 120, Trend: Flat, StaysWithSlot: true}}
+		s.Reseats = []Reseat{{At: at, Slot: "CPU0_C1"}}
+		return s
+	},
+	// A bank fault, after which the BIOS takes the DIMM out of use at a boot.
+	"fw-disabled": func(seed uint64) *Scenario {
+		s := base("fw-disabled", seed)
+		at := clock(2026, 10, 1, 3, 0)
+		s.Faults = []Fault{{Mode: model.ModeBank, Slot: "CPU1_A1", Start: day(2026, 9, 1), End: at, Events: 300, Trend: Rising, PatrolShare: 0.4}}
+		s.Marks = []Mark{{At: at.Add(20 * time.Second), Slot: "CPU1_A1", Kind: model.ActionDisable, Method: "bios", Detail: "DIMM disabled after memory test failure"}}
+		return s
+	},
+	// A row fault whose repair at a boot fails. The fault goes on.
+	"repair-failed": func(seed uint64) *Scenario {
+		s := base("repair-failed", seed)
+		s.Faults = []Fault{{Mode: model.ModeRow, Slot: "CPU0_C1", Start: day(2026, 9, 21), Events: 400, Trend: Rising, PatrolShare: 0.2}}
+		s.Repairs = []Repair{{At: clock(2026, 10, 1, 3, 0), Kind: model.ActionHPPR, Fault: 0, Failed: true}}
+		return s
+	},
+	// A column fault whose pages are taken offline a few at a time: on
+	// three days, and the fault has more rows left.
+	"offline-growing": func(seed uint64) *Scenario {
+		s := base("offline-growing", seed)
+		s.Faults = []Fault{{Mode: model.ModeColumn, Slot: "CPU0_E1", Start: day(2026, 8, 20), Events: 250, Trend: Flat, PatrolShare: 0.5}}
+		s.Offlines = []Offline{
+			{At: clock(2026, 11, 2, 9, 0), Fault: 0, Pages: 2},
+			{At: clock(2026, 11, 7, 9, 0), Fault: 0, Pages: 2},
+			{At: clock(2026, 11, 11, 9, 0), Fault: 0, Pages: 2},
+		}
 		return s
 	},
 	// The case of the design mockups: a row fault that grows, is repaired
