@@ -836,3 +836,48 @@ func TestGenerateIsStable(t *testing.T) {
 		}
 	}
 }
+
+func TestDetail(t *testing.T) {
+	var buf bytes.Buffer
+	fixtureRun(t, Options{Cutoffs: []int{71, 131, 207}, Leads: []time.Duration{time.Second, 24 * time.Hour}, Detail: &buf, Workers: 3})
+	lines := strings.Split(strings.TrimRight(buf.String(), "\n"), "\n")
+	if lines[0] != DetailHeader {
+		t.Fatalf("header = %q", lines[0])
+	}
+	// Eight servers at three cut-offs and over all records, and two lead
+	// times for each of the three servers with a ticket.
+	if want := 1 + 8*4 + 3*2; len(lines) != want {
+		t.Fatalf("%d lines, want %d:\n%s", len(lines), want, buf.String())
+	}
+	for _, want := range []string{
+		"s0001,cutoff,71,observe,R-SOFT-01,soft.cell,single-bit,1,no ticket,24,",
+		"s0002,cutoff,71,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
+		"s0002,cutoff,131,,,,,0,failed before,88,failure_type 1 at 0001-03-11 03:14:07",
+		"s0003,cutoff,71,,,,,0,first error later,40,",
+		"s0002,lead,86400,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
+		"s0006,cutoff,207,hold-replacement,R-SYS-01,sys.channel,system-issue,2,no ticket,30,",
+		"s0007,cutoff,207,observe,R-SOFT-01,soft.stray_once,single-bit,3,type 0,3,failure_type 0 at 0001-08-10 09:30:00",
+		"s0008,all,244,observe,R-SOFT-01,soft.cell,single-bit,1,,9,",
+	} {
+		found := false
+		for _, l := range lines {
+			found = found || l == want
+		}
+		if !found {
+			t.Errorf("no line %q in:\n%s", want, buf.String())
+		}
+	}
+	// Ordered by server, then cut-offs, lead times, all records.
+	if !strings.HasPrefix(lines[1], "s0001,cutoff,71,") || !strings.HasPrefix(lines[len(lines)-1], "s0008,all,") {
+		t.Errorf("first line %q, last line %q", lines[1], lines[len(lines)-1])
+	}
+	// A writer that fails is an error of the run.
+	ds, _ := dcbrain.Open(testutil.Testdata(t, "dcbrain"))
+	if _, err := Run(context.Background(), ds, Options{Detail: failWriter{}, Scratch: t.TempDir()}); err == nil || !strings.Contains(err.Error(), "detail") {
+		t.Errorf("failing detail writer: %v", err)
+	}
+}
+
+type failWriter struct{}
+
+func (failWriter) Write([]byte) (int, error) { return 0, os.ErrClosed }

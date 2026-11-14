@@ -1,8 +1,10 @@
 package eval
 
 import (
+	"bufio"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/agenticode/my/internal/adapter/dcbrain"
@@ -256,8 +258,93 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 	return res, nil
 }
 
+// detail is one line of the detail output: what the engine found for one
+// server at one time.
+type detail struct {
+	sid string
+	// kind is "cutoff", "lead" or "all"; at is the cut-off day, the lead
+	// time in seconds, or the last day.
+	kind string
+	at   int64
+	view view
+	// seen is false when the server had no error yet.
+	seen    bool
+	outcome string
+	errors  int64
+	ticket  string
+}
+
+// DetailHeader names the columns of the detail output.
+const DetailHeader = "sid,kind,at,finding,rules,statements,widest_mode,dimms_with_errors,outcome,errors_of_server,ticket"
+
+func (r *runner) keepDetail(res *serverResult) {
+	if r.opts.Detail == nil || res.dropped {
+		return
+	}
+	for i := range res.cuts {
+		o := &res.cuts[i]
+		d := detail{sid: res.note.SID, kind: "cutoff", at: int64(r.opts.Cutoffs[i]), errors: res.errors, ticket: res.note.Ticket}
+		switch o.state {
+		case cutFailed:
+			d.outcome = "failed before"
+		case cutNotYet:
+			d.outcome = "first error later"
+		default:
+			d.seen, d.view, d.outcome = true, o.view, o.outcome.String()
+		}
+		r.details = append(r.details, d)
+	}
+	for i := range res.leads {
+		d := detail{sid: res.note.SID, kind: "lead", at: int64(r.opts.Leads[i] / time.Second), errors: res.errors, ticket: res.note.Ticket,
+			seen: res.leads[i].seen, view: res.leads[i].view}
+		if res.ticket != nil {
+			d.outcome = outcomeOf(res.ticket.Type).String()
+		}
+		r.details = append(r.details, d)
+	}
+	if res.census != nil {
+		r.details = append(r.details, detail{sid: res.note.SID, kind: "all", at: dcbrain.SpanDays, errors: res.errors, ticket: res.note.Ticket,
+			seen: true, view: viewOf(res.census)})
+	}
+}
+
+// writeDetail writes the detail lines in a fixed order.
+func (r *runner) writeDetail() error {
+	w := r.opts.Detail
+	if w == nil {
+		return nil
+	}
+	rank := map[string]int{"cutoff": 0, "lead": 1, "all": 2}
+	sort.SliceStable(r.details, func(i, j int) bool {
+		a, b := &r.details[i], &r.details[j]
+		if a.sid != b.sid {
+			return a.sid < b.sid
+		}
+		if a.kind != b.kind {
+			return rank[a.kind] < rank[b.kind]
+		}
+		return a.at < b.at
+	})
+	bw := bufio.NewWriter(w)
+	bw.WriteString(DetailHeader + "\n")
+	for i := range r.details {
+		d := &r.details[i]
+		finding, mode, dimms := "", "", 0
+		if d.seen {
+			finding, mode = string(Grades[d.view.grade]), string(d.view.widest)
+			for _, n := range d.view.dimms {
+				dimms += n
+			}
+		}
+		fmt.Fprintf(bw, "%s,%s,%d,%s,%s,%s,%s,%d,%s,%d,%s\n", d.sid, d.kind, d.at, finding, strings.Join(d.view.rules, " "),
+			strings.Join(d.view.codes, " "), mode, dimms, d.outcome, d.errors, d.ticket)
+	}
+	return bw.Flush()
+}
+
 // merge adds the result of one server to the report.
 func (r *runner) merge(rep *Report, res *serverResult) {
+	r.keepDetail(res)
 	if res.dropped {
 		rep.Dropped = append(rep.Dropped, res.note)
 		return

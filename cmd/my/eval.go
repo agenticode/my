@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -35,7 +36,7 @@ func evalCommand() *cli.Command {
 
 const evalUsage = `Usage: my eval -data dir|zip [-format text|md|json] [-config file] [-set key=value]
                [-cutoffs days] [-horizon days] [-split day] [-leads times] [-degrade B|C]
-               [-server sid] [-spool dir] [-scratch dir] [-workers n] [-max-records n] [-quiet]
+               [-server sid] [-detail file] [-spool dir] [-scratch dir] [-workers n] [-max-records n] [-quiet]
        my eval -data dir|zip -extract sid -ledger file
        my eval -generate dir [-seed n] [-servers n]
 
@@ -64,6 +65,7 @@ func runEval(ctx context.Context, env *cli.Env, args []string) int {
 	workers := fl.Int("workers", 0, "servers analysed at a time (default 2)")
 	maxRecords := fl.Int("max-records", eval.DefaultMaxRecords, "largest number of records of one server that is analysed")
 	quiet := fl.Bool("quiet", false, "do not print progress to standard error")
+	detail := fl.String("detail", "", "also write one line per server and time into this `file` (comma-separated)")
 	extract := fl.String("extract", "", "import the server with this `sid` into the ledger given with -ledger")
 	ledger := fl.String("ledger", "", "ledger `file` for -extract")
 	generate := fl.String("generate", "", "write a made-up fleet in the format of the dataset into this `directory`")
@@ -180,7 +182,18 @@ func runEval(ctx context.Context, env *cli.Env, args []string) int {
 			fmt.Fprintf(env.Stderr, "my eval: "+format+"\n", a...)
 		}
 	}
+	var detailFile *os.File
+	if *detail != "" {
+		if detailFile, err = os.Create(*detail); err != nil {
+			return fail(err)
+		}
+		defer detailFile.Close()
+		opts.Detail = detailFile
+	}
 	rep, err := eval.Run(ctx, ds, opts)
+	if err == nil && detailFile != nil {
+		err = detailFile.Close()
+	}
 	if err != nil {
 		// Settings the harness refuses are usage errors like the ones above.
 		if strings.HasPrefix(err.Error(), "eval: cut-off") || strings.HasPrefix(err.Error(), "eval: lead time") {

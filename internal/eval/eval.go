@@ -17,6 +17,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"runtime"
 	"sort"
 	"sync"
@@ -86,6 +87,10 @@ type Options struct {
 	Scratch string
 	// Servers limits the run to these server IDs.
 	Servers []string
+	// Detail, when set, receives one line per server and time the engine
+	// was asked at: the finding, the rules and what followed. The lines
+	// are comma-separated under a header, ordered by server.
+	Detail io.Writer
 	// Progress receives lines about how far the run is; nil drops them.
 	Progress func(format string, args ...any)
 }
@@ -414,8 +419,16 @@ type Report struct {
 	Elapsed time.Duration `json:"-"`
 }
 
+// heavyRecords is the number of records from which a server is analysed
+// alone: the engine holds several copies of the records of a server, and
+// two large servers at a time would double the memory the run needs.
+const heavyRecords = 200_000
+
 // runner holds what a run shares between servers.
 type runner struct {
+	// heavy is held while a server with many records is analysed.
+	heavy   sync.Mutex
+	details []detail
 	opts    Options
 	cfg     engine.Config
 	base    time.Time
@@ -540,7 +553,13 @@ func Run(ctx context.Context, ds *dcbrain.Dataset, opts Options) (*Report, error
 					if len(only) > 0 && !only[sid] {
 						continue
 					}
+					if len(sr.recs) >= heavyRecords {
+						r.heavy.Lock()
+					}
 					res, err := r.server(sid, sr)
+					if len(sr.recs) >= heavyRecords {
+						r.heavy.Unlock()
+					}
 					if err != nil {
 						fail(fmt.Errorf("eval: server %s: %w", sid, err))
 						return
@@ -583,6 +602,9 @@ func Run(ctx context.Context, ds *dcbrain.Dataset, opts Options) (*Report, error
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
+	}
+	if err := r.writeDetail(); err != nil {
+		return nil, fmt.Errorf("eval: detail: %w", err)
 	}
 	sort.Slice(rep.Widened, func(i, j int) bool { return rep.Widened[i].SID < rep.Widened[j].SID })
 	sort.Slice(rep.Dropped, func(i, j int) bool { return rep.Dropped[i].SID < rep.Dropped[j].SID })
