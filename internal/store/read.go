@@ -484,12 +484,14 @@ func (s *Store) PruneOrphans(ctx context.Context, host string) error {
  AND NOT EXISTS (SELECT 1 FROM slot_alias a WHERE a.host = slot.host AND a.slot = slot.name)
  AND NOT EXISTS (SELECT 1 FROM event e WHERE e.host = slot.host AND e.slot = slot.name)
  AND NOT EXISTS (SELECT 1 FROM action x WHERE x.host = slot.host AND x.slot = slot.name)
+ AND NOT EXISTS (SELECT 1 FROM ecs_sample c WHERE c.host = slot.host AND c.slot = slot.name)
  AND NOT EXISTS (SELECT 1 FROM placement p WHERE p.host = slot.host AND p.slot = slot.name)`, host); err != nil {
 			return fmt.Errorf("prune slots: %w", err)
 		}
 		if _, err := w.exec(`DELETE FROM dimm WHERE identity = 'slot'
  AND NOT EXISTS (SELECT 1 FROM event e WHERE e.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM action x WHERE x.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM ecs_sample c WHERE c.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM placement p WHERE p.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM fault f WHERE f.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM verdict v WHERE v.dimm_uid = dimm.dimm_uid)`); err != nil {
@@ -641,7 +643,7 @@ func (s *Store) Scans(ctx context.Context) ([]model.Scan, error) {
 
 // Sources returns the source inventory of a scan; scanID 0 selects all scans.
 func (s *Store) Sources(ctx context.Context, scanID int64) ([]model.Source, error) {
-	q, args := `SELECT id, scan_id, kind, origin, status, detail, records, events, actions, skipped, grade_a, grade_b, grade_c, first_ts, last_ts, notes FROM source`, []any{}
+	q, args := `SELECT id, scan_id, kind, origin, status, detail, records, events, actions, skipped, samples, grade_a, grade_b, grade_c, first_ts, last_ts, notes FROM source`, []any{}
 	if scanID != 0 {
 		q, args = q+` WHERE scan_id = ?`, append(args, scanID)
 	}
@@ -656,7 +658,7 @@ func (s *Store) Sources(ctx context.Context, scanID int64) ([]model.Source, erro
 		var status, notes string
 		var first, last sql.NullString
 		if err := rows.Scan(&src.ID, &src.ScanID, &src.Kind, &src.Origin, &status, &src.Detail, &src.Records, &src.Events, &src.Actions,
-			&src.Skipped, &src.GradeA, &src.GradeB, &src.GradeC, &first, &last, &notes); err != nil {
+			&src.Skipped, &src.Samples, &src.GradeA, &src.GradeB, &src.GradeC, &first, &last, &notes); err != nil {
 			return nil, err
 		}
 		src.Status = model.SourceStatus(status)
@@ -858,9 +860,7 @@ func (s *Store) EventPlaces(ctx context.Context, host string) ([]EventPlace, err
 
 // GPUMem returns the GPU memory records of a host in time order.
 func (s *Store) GPUMem(ctx context.Context, host string) ([]model.GPUMem, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, host, observed_at, kind, gpu_serial, gpu_uuid, gpu_index, pci_bus, model, xid, xid_text,
- remap_correctable, remap_uncorrectable, remap_pending, remap_failure, bank_max, bank_high, bank_partial, bank_low, bank_none,
- retired_sbe, retired_dbe, retired_pending, boot_id, source, raw_ref, raw, fingerprint FROM gpu_mem WHERE host = ? ORDER BY observed_at, id`, host)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, `+gpuColumns+` FROM gpu_mem WHERE host = ? ORDER BY observed_at, id`, host)
 	if err != nil {
 		return nil, err
 	}
@@ -869,17 +869,168 @@ func (s *Store) GPUMem(ctx context.Context, host string) ([]model.GPUMem, error)
 	for rows.Next() {
 		var g model.GPUMem
 		var observed, bootID sql.NullString
+		var quality string
 		var idx, xid, rc, ru, rp, rf, bmax, bhigh, bpart, blow, bnone, sbe, dbe, rpend sql.NullInt64
-		if err := rows.Scan(&g.ID, &g.Host, &observed, &g.Kind, &g.GPUSerial, &g.GPUUUID, &idx, &g.PCIBus, &g.Model, &xid, &g.XIDText,
-			&rc, &ru, &rp, &rf, &bmax, &bhigh, &bpart, &blow, &bnone, &sbe, &dbe, &rpend, &bootID, &g.Source, &g.RawRef, &g.Raw, &g.Fingerprint); err != nil {
+		var ecc, dc, du, dcv, duv, sc, su, scv, suv, sth, scanID sql.NullInt64
+		if err := rows.Scan(&g.ID, &g.Host, &observed, &quality, &g.Kind, &g.GPUSerial, &g.GPUUUID, &idx, &g.PCIBus, &g.Model, &xid, &g.XIDText,
+			&rc, &ru, &rp, &rf, &bmax, &bhigh, &bpart, &blow, &bnone, &sbe, &dbe, &rpend,
+			&ecc, &dc, &du, &dcv, &duv, &sc, &su, &scv, &suv, &sth,
+			&bootID, &g.Source, &g.RawRef, &g.Raw, &g.Fingerprint, &scanID); err != nil {
 			return nil, err
 		}
-		g.ObservedAt, g.BootID = parseTS(observed), bootID.String
+		g.ObservedAt, g.BootID, g.TimeQuality, g.ScanID = parseTS(observed), bootID.String, model.TimeQuality(quality), scanID.Int64
 		g.GPUIndex, g.XID = toOptInt(idx), toOptInt(xid)
 		g.RemapCorrectable, g.RemapUncorrectable, g.RemapPending, g.RemapFailure = toOptInt(rc), toOptInt(ru), toOptBool(rp), toOptBool(rf)
 		g.BankMax, g.BankHigh, g.BankPartial, g.BankLow, g.BankNone = toOptInt(bmax), toOptInt(bhigh), toOptInt(bpart), toOptInt(blow), toOptInt(bnone)
 		g.RetiredSBE, g.RetiredDBE, g.RetiredPending = toOptInt(sbe), toOptInt(dbe), toOptBool(rpend)
+		g.ECCEnabled, g.SRAMThresholdExceeded = toOptBool(ecc), toOptBool(sth)
+		g.DRAMCorrectable, g.DRAMUncorrectable = toOptInt(dc), toOptInt(du)
+		g.DRAMCorrectableVolatile, g.DRAMUncorrectableVolatile = toOptInt(dcv), toOptInt(duv)
+		g.SRAMCorrectable, g.SRAMUncorrectable = toOptInt(sc), toOptInt(su)
+		g.SRAMCorrectableVolatile, g.SRAMUncorrectableVolatile = toOptInt(scv), toOptInt(suv)
 		out = append(out, g)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	completeGPUs(out)
+	return out, nil
+}
+
+// completeGPUs fills in the identity of GPU memory records that name their
+// GPU by less than other records of the host do. An XID line of the kernel
+// log names a GPU by its PCI address, and by its UUID only when the driver
+// printed it in the same boot; a snapshot names it by serial number, UUID
+// and PCI address. The rows in the ledger stay as the sources gave them:
+// the identity is completed on reading, so a snapshot imported later
+// completes records that were imported before it.
+//
+// A UUID is taken from a record with the same PCI address, of the same
+// boot when there is one and nearest in time otherwise. Serial number,
+// index and model follow the UUID, which does not change over the life of
+// a GPU.
+func completeGPUs(recs []model.GPUMem) {
+	byBus := map[string][]int{}
+	for i := range recs {
+		if r := &recs[i]; r.PCIBus != "" && r.GPUUUID != "" {
+			byBus[r.PCIBus] = append(byBus[r.PCIBus], i)
+		}
+	}
+	for i := range recs {
+		r := &recs[i]
+		if r.GPUUUID != "" || r.PCIBus == "" {
+			continue
+		}
+		best, bestDiff, sameBoot := -1, time.Duration(0), false
+		for _, j := range byBus[r.PCIBus] {
+			c := &recs[j]
+			boot := r.BootID != "" && c.BootID == r.BootID
+			if !boot && (r.TimeQuality == model.TimeRelative || c.TimeQuality == model.TimeRelative) {
+				continue // no common clock
+			}
+			d := c.ObservedAt.Sub(r.ObservedAt).Abs()
+			switch {
+			case best < 0, boot && !sameBoot, boot == sameBoot && d < bestDiff:
+				best, bestDiff, sameBoot = j, d, boot
+			}
+		}
+		if best >= 0 {
+			r.GPUUUID = recs[best].GPUUUID
+		}
+	}
+
+	// The latest record that knows more about a UUID describes its GPU.
+	type ident struct {
+		serial, model string
+		index         model.Opt[int]
+	}
+	byUUID := map[string]*ident{}
+	for i := range recs {
+		r := &recs[i]
+		if r.GPUUUID == "" {
+			continue
+		}
+		id := byUUID[r.GPUUUID]
+		if id == nil {
+			id = &ident{}
+			byUUID[r.GPUUUID] = id
+		}
+		if r.GPUSerial != "" {
+			id.serial = r.GPUSerial
+		}
+		if r.Model != "" {
+			id.model = r.Model
+		}
+		if r.GPUIndex.Valid {
+			id.index = r.GPUIndex
+		}
+	}
+	for i := range recs {
+		r := &recs[i]
+		id := byUUID[r.GPUUUID]
+		if id == nil {
+			continue
+		}
+		if r.GPUSerial == "" {
+			r.GPUSerial = id.serial
+		}
+		if r.Model == "" {
+			r.Model = id.model
+		}
+		if !r.GPUIndex.Valid {
+			r.GPUIndex = id.index
+		}
+	}
+}
+
+// ECSFilter selects ECS readings. Empty fields do not restrict.
+type ECSFilter struct {
+	Host    string
+	Slot    string
+	DIMMUID string
+}
+
+// ECS returns readings of the ECS registers in time order.
+func (s *Store) ECS(ctx context.Context, f ECSFilter) ([]model.ECSSample, error) {
+	var conds []string
+	var args []any
+	if f.Host != "" {
+		conds, args = append(conds, `host = ?`), append(args, f.Host)
+	}
+	if f.Slot != "" {
+		conds, args = append(conds, `slot = ?`), append(args, f.Slot)
+	}
+	if f.DIMMUID != "" {
+		conds, args = append(conds, `dimm_uid = ?`), append(args, f.DIMMUID)
+	}
+	q := `SELECT id, ` + ecsColumns + ` FROM ecs_sample`
+	if len(conds) > 0 {
+		q += ` WHERE ` + strings.Join(conds, ` AND `)
+	}
+	rows, err := s.db.QueryContext(ctx, q+` ORDER BY observed_at, id`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []model.ECSSample
+	for rows.Next() {
+		var e model.ECSSample
+		var observed, dimmUID, bootID sql.NullString
+		var quality string
+		var socket, ch, pos, sub, rank, dev, scanID sql.NullInt64
+		var mr [7]sql.NullInt64
+		if err := rows.Scan(&e.ID, &e.Host, &observed, &quality, &socket, &ch, &pos, &sub, &rank, &dev,
+			&e.Label, &e.Slot, &dimmUID, &mr[0], &mr[1], &mr[2], &mr[3], &mr[4], &mr[5], &mr[6],
+			&bootID, &e.Source, &e.RawRef, &e.Raw, &e.Fingerprint, &scanID); err != nil {
+			return nil, err
+		}
+		e.ObservedAt, e.TimeQuality = parseTS(observed), model.TimeQuality(quality)
+		e.SocketId, e.ChannelId, e.ChannelSlotId = toOptInt(socket), toOptInt(ch), toOptInt(pos)
+		e.SubChannel, e.Rank, e.DeviceId = toOptInt(sub), toOptInt(rank), toOptInt(dev)
+		e.DIMMUID, e.BootID, e.ScanID = dimmUID.String, bootID.String, scanID.Int64
+		e.MR14, e.MR15, e.MR16, e.MR17 = toOptInt(mr[0]), toOptInt(mr[1]), toOptInt(mr[2]), toOptInt(mr[3])
+		e.MR18, e.MR19, e.MR20 = toOptInt(mr[4]), toOptInt(mr[5]), toOptInt(mr[6])
+		out = append(out, e)
 	}
 	return out, rows.Err()
 }

@@ -17,10 +17,11 @@ import (
 // the outcome does not depend on the order in which sources were imported
 // and running a pass twice changes nothing.
 
-// LinkBoots sets the boot of every event and action of a host from its time:
-// a record belongs to the latest boot that started at or before it. Records
-// before the first known boot keep an empty boot. Records whose time is only
-// known relative to boot keep the boot their source gave them.
+// LinkBoots sets the boot of every event, action, GPU memory record and ECS
+// reading of a host from its time: a record belongs to the latest boot that
+// started at or before it. Records before the first known boot keep an
+// empty boot. Records whose time is only known relative to boot keep the
+// boot their source gave them.
 func (s *Store) LinkBoots(ctx context.Context, host string) error {
 	return s.Update(ctx, func(w *Writer) error {
 		for _, q := range []string{
@@ -32,6 +33,16 @@ func (s *Store) LinkBoots(ctx context.Context, host string) error {
 			`UPDATE action SET boot_id = (
    SELECT b.boot_id FROM boot b
    WHERE b.host = action.host AND b.start_quality != 'relative' AND b.started_at <= action.at
+   ORDER BY b.started_at DESC LIMIT 1)
+ WHERE host = ? AND time_quality != 'relative'`,
+			`UPDATE gpu_mem SET boot_id = (
+   SELECT b.boot_id FROM boot b
+   WHERE b.host = gpu_mem.host AND b.start_quality != 'relative' AND b.started_at <= gpu_mem.observed_at
+   ORDER BY b.started_at DESC LIMIT 1)
+ WHERE host = ? AND time_quality != 'relative'`,
+			`UPDATE ecs_sample SET boot_id = (
+   SELECT b.boot_id FROM boot b
+   WHERE b.host = ecs_sample.host AND b.start_quality != 'relative' AND b.started_at <= ecs_sample.observed_at
    ORDER BY b.started_at DESC LIMIT 1)
  WHERE host = ? AND time_quality != 'relative'`,
 		} {
@@ -93,6 +104,40 @@ func (w *Writer) SetEventSlot(host string, k LocationKey, slot string) error {
 	return err
 }
 
+// ECSLocations returns the distinct ways the ECS readings of a host name
+// the module they were read from. Only the label and the socket, channel
+// and slot numbers are set in the keys.
+func (s *Store) ECSLocations(ctx context.Context, host string) ([]LocationKey, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT label, "SocketId", "ChannelId", "ChannelSlotId", COUNT(*)
+ FROM ecs_sample WHERE host = ?
+ GROUP BY label, "SocketId", "ChannelId", "ChannelSlotId"
+ ORDER BY label, "SocketId", "ChannelId", "ChannelSlotId"`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []LocationKey
+	for rows.Next() {
+		var k LocationKey
+		var socket, ch, pos sql.NullInt64
+		if err := rows.Scan(&k.Label, &socket, &ch, &pos, &k.Records); err != nil {
+			return nil, err
+		}
+		k.SocketId, k.ChannelId, k.ChannelSlotId = toOptInt(socket), toOptInt(ch), toOptInt(pos)
+		out = append(out, k)
+	}
+	return out, rows.Err()
+}
+
+// SetECSSlot sets the slot of all ECS readings of a host that use the
+// location key.
+func (w *Writer) SetECSSlot(host string, k LocationKey, slot string) error {
+	_, err := w.exec(`UPDATE ecs_sample SET slot = ?
+ WHERE host = ? AND label = ? AND "SocketId" IS ? AND "ChannelId" IS ? AND "ChannelSlotId" IS ? AND slot != ?`,
+		slot, host, k.Label, optInt(k.SocketId), optInt(k.ChannelId), optInt(k.ChannelSlotId), slot)
+	return err
+}
+
 // ActionLabels returns the distinct labels the actions of a host name their
 // target by.
 func (s *Store) ActionLabels(ctx context.Context, host string) ([]string, error) {
@@ -119,9 +164,10 @@ func (w *Writer) SetActionSlot(host, label, slot string) error {
 	return err
 }
 
-// LinkDIMMs attributes the events and actions of a host to DIMM identities.
-// Events must have their slot set first (SetEventSlot) and boots must be
-// known for swaps to be placed in time.
+// LinkDIMMs attributes the events, actions and ECS readings of a host to
+// DIMM identities. Records must have their slot set first (SetEventSlot,
+// SetActionSlot, SetECSSlot) and boots must be known for swaps to be placed
+// in time.
 //
 // For each slot the placements say which DIMM was seen there and when:
 //   - an event inside a placement belongs to that DIMM ("observed");
@@ -164,6 +210,7 @@ func (s *Store) LinkDIMMs(ctx context.Context, host string) error {
 	for _, q := range []string{
 		`SELECT DISTINCT slot FROM event WHERE host = ? AND slot != ''`,
 		`SELECT DISTINCT slot FROM action WHERE host = ? AND slot != ''`,
+		`SELECT DISTINCT slot FROM ecs_sample WHERE host = ? AND slot != ''`,
 	} {
 		rows, err := s.db.QueryContext(ctx, q, host)
 		if err != nil {
@@ -223,6 +270,7 @@ func (s *Store) LinkDIMMs(ctx context.Context, host string) error {
 		for _, q := range []string{
 			`UPDATE event  SET dimm_uid = NULL, dimm_link = '' WHERE host = ? AND slot = '' AND (dimm_uid IS NOT NULL OR dimm_link != '')`,
 			`UPDATE action SET dimm_uid = NULL WHERE host = ? AND slot = '' AND dimm_uid IS NOT NULL`,
+			`UPDATE ecs_sample SET dimm_uid = NULL WHERE host = ? AND slot = '' AND dimm_uid IS NOT NULL`,
 		} {
 			if _, err := w.exec(q, host); err != nil {
 				return err
@@ -236,18 +284,24 @@ func (s *Store) LinkDIMMs(ctx context.Context, host string) error {
 			}
 			cond, args := ``, []any{u, link, host, slot}
 			acond, aargs := ``, []any{u, host, slot}
+			ccond, cargs := ``, []any{u, host, slot}
 			if !from.IsZero() {
 				cond, args = cond+` AND "ErrorDT" >= ?`, append(args, ts(from))
 				acond, aargs = acond+` AND at >= ?`, append(aargs, ts(from))
+				ccond, cargs = ccond+` AND observed_at >= ?`, append(cargs, ts(from))
 			}
 			if !to.IsZero() {
 				cond, args = cond+` AND "ErrorDT" < ?`, append(args, ts(to))
 				acond, aargs = acond+` AND at < ?`, append(aargs, ts(to))
+				ccond, cargs = ccond+` AND observed_at < ?`, append(cargs, ts(to))
 			}
 			if _, err := w.exec(`UPDATE event SET dimm_uid = ?, dimm_link = ? WHERE host = ? AND slot = ?`+cond, args...); err != nil {
 				return err
 			}
-			_, err := w.exec(`UPDATE action SET dimm_uid = ? WHERE host = ? AND slot = ?`+acond, aargs...)
+			if _, err := w.exec(`UPDATE action SET dimm_uid = ? WHERE host = ? AND slot = ?`+acond, aargs...); err != nil {
+				return err
+			}
+			_, err := w.exec(`UPDATE ecs_sample SET dimm_uid = ? WHERE host = ? AND slot = ?`+ccond, cargs...)
 			return err
 		}
 

@@ -241,7 +241,7 @@ func TestMigrationsAreContiguous(t *testing.T) {
 
 func TestSchemaHasDesignTables(t *testing.T) {
 	s := newStore(t)
-	for _, table := range []string{"event", "dimm", "placement", "boot", "action", "fault", "verdict", "gpu_mem"} {
+	for _, table := range []string{"event", "dimm", "placement", "boot", "action", "fault", "verdict", "gpu_mem", "ecs_sample"} {
 		var n int
 		if err := s.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?`, table).Scan(&n); err != nil || n != 1 {
 			t.Errorf("table %s: found %d, %v", table, n, err)

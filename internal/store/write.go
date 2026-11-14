@@ -308,6 +308,7 @@ func (w *Writer) UpsertBoot(b *model.Boot) (string, error) {
 				`UPDATE event   SET boot_id = ? WHERE host = ? AND boot_id = ?`,
 				`UPDATE action  SET boot_id = ? WHERE host = ? AND boot_id = ?`,
 				`UPDATE gpu_mem SET boot_id = ? WHERE host = ? AND boot_id = ?`,
+				`UPDATE ecs_sample SET boot_id = ? WHERE host = ? AND boot_id = ?`,
 			} {
 				if _, err := w.exec(q, id, b.Host, near.BootID); err != nil {
 					return "", fmt.Errorf("boot %s: %w", id, err)
@@ -655,9 +656,9 @@ func (w *Writer) InsertSource(src *model.Source) error {
 	if err != nil {
 		return err
 	}
-	res, err := w.exec(`INSERT INTO source (scan_id, kind, origin, status, detail, records, events, actions, skipped,
- grade_a, grade_b, grade_c, first_ts, last_ts, notes) VALUES (`+placeholders(15)+`)`,
-		src.ScanID, src.Kind, src.Origin, string(src.Status), src.Detail, src.Records, src.Events, src.Actions, src.Skipped,
+	res, err := w.exec(`INSERT INTO source (scan_id, kind, origin, status, detail, records, events, actions, skipped, samples,
+ grade_a, grade_b, grade_c, first_ts, last_ts, notes) VALUES (`+placeholders(16)+`)`,
+		src.ScanID, src.Kind, src.Origin, string(src.Status), src.Detail, src.Records, src.Events, src.Actions, src.Skipped, src.Samples,
 		src.GradeA, src.GradeB, src.GradeC, ts(src.FirstTS), ts(src.LastTS), string(nb))
 	if err != nil {
 		return fmt.Errorf("source %s %s: %w", src.Kind, src.Origin, err)
@@ -776,9 +777,22 @@ func (w *Writer) SetMeta(key, value string) error {
 	return err
 }
 
+// gpuColumns is the column order shared by GPU memory inserts and selects.
+const gpuColumns = `host, observed_at, time_quality, kind, gpu_serial, gpu_uuid, gpu_index, pci_bus, model, xid, xid_text,
+ remap_correctable, remap_uncorrectable, remap_pending, remap_failure, bank_max, bank_high, bank_partial, bank_low, bank_none,
+ retired_sbe, retired_dbe, retired_pending, ecc_enabled, dram_correctable, dram_uncorrectable, dram_correctable_volatile,
+ dram_uncorrectable_volatile, sram_correctable, sram_uncorrectable, sram_correctable_volatile, sram_uncorrectable_volatile,
+ sram_threshold_exceeded, boot_id, source, raw_ref, raw, fingerprint, scan_id`
+
+const gpuColumnCount = 39
+
 // InsertGPUMem stores a GPU memory record. A record whose fingerprint is
-// already present is not added again.
+// already present is not added again; inserted is then false and g.ID is
+// set to the existing row.
 func (w *Writer) InsertGPUMem(g *model.GPUMem) (inserted bool, err error) {
+	if g.TimeQuality == "" {
+		g.TimeQuality = model.TimeExact
+	}
 	switch {
 	case g.Host == "":
 		return false, invalid("gpu_mem: host is empty")
@@ -788,23 +802,88 @@ func (w *Writer) InsertGPUMem(g *model.GPUMem) (inserted bool, err error) {
 		return false, invalid("gpu_mem: source and fingerprint are required")
 	case !validTime(g.ObservedAt):
 		return false, invalid("gpu_mem: time %v is out of range", g.ObservedAt)
+	case qualityRank(g.TimeQuality) == 0:
+		return false, invalid("gpu_mem: unknown time quality %q", g.TimeQuality)
+	case g.Kind == model.GPUXID && !g.XID.Valid:
+		return false, invalid("gpu_mem: an xid record needs the XID number")
 	}
-	res, err := w.exec(`INSERT INTO gpu_mem (host, observed_at, kind, gpu_serial, gpu_uuid, gpu_index, pci_bus, model, xid, xid_text,
- remap_correctable, remap_uncorrectable, remap_pending, remap_failure, bank_max, bank_high, bank_partial, bank_low, bank_none,
- retired_sbe, retired_dbe, retired_pending, boot_id, source, raw_ref, raw, fingerprint)
- VALUES (`+placeholders(27)+`) ON CONFLICT(fingerprint) DO NOTHING`,
-		g.Host, ts(g.ObservedAt), g.Kind, g.GPUSerial, g.GPUUUID, optInt(g.GPUIndex), g.PCIBus, g.Model, optInt(g.XID), g.XIDText,
+	var scanID any
+	if g.ScanID != 0 {
+		scanID = g.ScanID
+	}
+	res, err := w.exec(`INSERT INTO gpu_mem (`+gpuColumns+`) VALUES (`+placeholders(gpuColumnCount)+`) ON CONFLICT(fingerprint) DO NOTHING`,
+		g.Host, ts(g.ObservedAt), string(g.TimeQuality), g.Kind, g.GPUSerial, g.GPUUUID, optInt(g.GPUIndex), g.PCIBus, g.Model, optInt(g.XID), g.XIDText,
 		optInt(g.RemapCorrectable), optInt(g.RemapUncorrectable), optBool(g.RemapPending), optBool(g.RemapFailure),
 		optInt(g.BankMax), optInt(g.BankHigh), optInt(g.BankPartial), optInt(g.BankLow), optInt(g.BankNone),
-		optInt(g.RetiredSBE), optInt(g.RetiredDBE), optBool(g.RetiredPending), nullStr(g.BootID),
-		g.Source, g.RawRef, g.Raw, g.Fingerprint)
+		optInt(g.RetiredSBE), optInt(g.RetiredDBE), optBool(g.RetiredPending), optBool(g.ECCEnabled),
+		optInt(g.DRAMCorrectable), optInt(g.DRAMUncorrectable), optInt(g.DRAMCorrectableVolatile), optInt(g.DRAMUncorrectableVolatile),
+		optInt(g.SRAMCorrectable), optInt(g.SRAMUncorrectable), optInt(g.SRAMCorrectableVolatile), optInt(g.SRAMUncorrectableVolatile),
+		optBool(g.SRAMThresholdExceeded), nullStr(g.BootID), g.Source, g.RawRef, g.Raw, g.Fingerprint, scanID)
 	if err != nil {
 		return false, fmt.Errorf("gpu_mem %s: %w", g.RawRef, err)
 	}
 	n, err := res.RowsAffected()
-	if err != nil || n == 0 {
+	if err != nil {
+		return false, err
+	}
+	if n == 0 {
+		err := w.queryRow(`SELECT id FROM gpu_mem WHERE fingerprint = ?`, g.Fingerprint).Scan(&g.ID)
 		return false, err
 	}
 	g.ID, err = res.LastInsertId()
+	return err == nil, err
+}
+
+// ecsColumns is the column order shared by ECS inserts and selects.
+const ecsColumns = `host, observed_at, time_quality, "SocketId", "ChannelId", "ChannelSlotId", "SubChannel", "Rank", "DeviceId",
+ label, slot, dimm_uid, mr14, mr15, mr16, mr17, mr18, mr19, mr20, boot_id, source, raw_ref, raw, fingerprint, scan_id`
+
+const ecsColumnCount = 25
+
+// InsertECS stores a reading of the ECS registers. A reading whose
+// fingerprint is already present is not added again; inserted is then
+// false and e.ID is set to the existing row.
+func (w *Writer) InsertECS(e *model.ECSSample) (inserted bool, err error) {
+	if e.TimeQuality == "" {
+		e.TimeQuality = model.TimeExact
+	}
+	switch {
+	case e.Host == "":
+		return false, invalid("ecs: host is empty")
+	case e.Fingerprint == "" || e.Source == "":
+		return false, invalid("ecs: source and fingerprint are required")
+	case !validTime(e.ObservedAt):
+		return false, invalid("ecs: time %v is out of range", e.ObservedAt)
+	case qualityRank(e.TimeQuality) == 0:
+		return false, invalid("ecs: unknown time quality %q", e.TimeQuality)
+	case e.Empty():
+		return false, invalid("ecs: no register was read")
+	}
+	for i, r := range e.Registers() {
+		if r.Valid && (r.V < 0 || r.V > 0xFF) {
+			return false, invalid("ecs: MR%d value %d is not a byte", 14+i, r.V)
+		}
+	}
+	var scanID any
+	if e.ScanID != 0 {
+		scanID = e.ScanID
+	}
+	res, err := w.exec(`INSERT INTO ecs_sample (`+ecsColumns+`) VALUES (`+placeholders(ecsColumnCount)+`) ON CONFLICT(fingerprint) DO NOTHING`,
+		e.Host, ts(e.ObservedAt), string(e.TimeQuality), optInt(e.SocketId), optInt(e.ChannelId), optInt(e.ChannelSlotId),
+		optInt(e.SubChannel), optInt(e.Rank), optInt(e.DeviceId), e.Label, e.Slot, nullStr(e.DIMMUID),
+		optInt(e.MR14), optInt(e.MR15), optInt(e.MR16), optInt(e.MR17), optInt(e.MR18), optInt(e.MR19), optInt(e.MR20),
+		nullStr(e.BootID), e.Source, e.RawRef, e.Raw, e.Fingerprint, scanID)
+	if err != nil {
+		return false, fmt.Errorf("ecs %s: %w", e.RawRef, err)
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if n == 0 {
+		err := w.queryRow(`SELECT id FROM ecs_sample WHERE fingerprint = ?`, e.Fingerprint).Scan(&e.ID)
+		return false, err
+	}
+	e.ID, err = res.LastInsertId()
 	return err == nil, err
 }

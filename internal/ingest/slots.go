@@ -37,6 +37,56 @@ func aliasTopo(socket, imc, channel, position int) string {
 	return fmt.Sprintf("topo:%d:%d:%d:%d", socket, imc, channel, position)
 }
 
+// aliasPlace is the alias of a place numbered without a memory controller:
+// socket, channel within the socket, and position on the channel. Firmware
+// records and BMC inventories name places this way. Only an inventory that
+// numbers its slots defines these aliases: two sources that both use bare
+// numbers do not have to mean the same slot by them, so the numbers of an
+// error record alone never name a slot.
+func aliasPlace(socket, channel, position int) string {
+	return fmt.Sprintf("place:%d:%d:%d", socket, channel, position)
+}
+
+// squash folds a label to its letters and digits, in upper case. Sources
+// that mean the same slot write "DIMM_A1", "DIMM A1" and "DIMM-A1".
+func squash(label string) string {
+	var b strings.Builder
+	for _, r := range strings.ToUpper(label) {
+		if r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// lookupLabel finds the slot a label names: the slot with that label, or
+// failing that the one slot whose label differs only in separators. A label
+// that fits several slots this way names none of them.
+func lookupLabel(aliases map[string]string, label string) (string, bool) {
+	if edac.PlaceholderLabel(label) {
+		return "", false
+	}
+	if name, ok := aliases[aliasLabel(label)]; ok {
+		return name, true
+	}
+	want := squash(label)
+	if want == "" {
+		return "", false
+	}
+	found := ""
+	for a, name := range aliases {
+		rest, ok := strings.CutPrefix(a, "label:")
+		if !ok || squash(rest) != want {
+			continue
+		}
+		if found != "" && found != name {
+			return "", false
+		}
+		found = name
+	}
+	return found, found != ""
+}
+
 var bankLocatorREs = []*regexp.Regexp{
 	// P0_Node0_Channel2_Dimm0, _Node0_Channel2_Dimm0
 	regexp.MustCompile(`(?i)^(?:P(\d+))?_?Node(\d+)_Channel(\d+)_Dimm(\d+)$`),
@@ -79,8 +129,8 @@ type boardSlot struct {
 	populated   bool
 	// sizeBytes is the size of the DIMM in the slot, 0 when unknown.
 	sizeBytes int64
-	// socket, channel and position as the bank locator spells them:
-	// channel counts within the socket.
+	// socket, channel and position as the bank locator spells them, or as
+	// the inventory source numbered them: channel counts within the socket.
 	socket, channel, position model.Opt[int]
 }
 
@@ -306,6 +356,15 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
 			Populated: model.Some(m.Populated)}
 		row.Socket, row.Channel, row.Position = bankLocatorTopology(m.BankLocator)
+		if m.Socket.Valid && m.Channel.Valid && m.Position.Valid {
+			// The source numbered the place itself.
+			if !row.Socket.Valid {
+				row.Socket, row.Channel, row.Position = m.Socket, m.Channel, m.Position
+			}
+			if err := w.SetSlotAlias(host, aliasPlace(m.Socket.V, m.Channel.V, m.Position.V), name); err != nil {
+				return err
+			}
+		}
 		if err := w.UpsertSlot(&row); err != nil {
 			return err
 		}
@@ -369,6 +428,19 @@ func remapSlots(ctx context.Context, s *store.Store, host string) (slotResult, e
 	if err != nil {
 		return res, err
 	}
+	// Places an inventory numbered itself. The alias table keeps them, the
+	// slot rows are rewritten below.
+	aliases, err := s.SlotAliases(ctx, host)
+	if err != nil {
+		return res, err
+	}
+	places := map[string][3]int{}
+	for a, name := range aliases {
+		var p [3]int
+		if n, _ := fmt.Sscanf(a, "place:%d:%d:%d", &p[0], &p[1], &p[2]); n == 3 {
+			places[name] = p
+		}
+	}
 
 	// The board as SMBIOS describes it.
 	var slots []boardSlot
@@ -379,6 +451,10 @@ func remapSlots(ctx context.Context, s *store.Store, host string) (slotResult, e
 		}
 		b := boardSlot{name: r.Name, locator: r.Locator, bankLocator: r.BankLocator, handle: r.SMBIOSHandle, populated: r.Populated.Or(false)}
 		b.socket, b.channel, b.position = bankLocatorTopology(r.BankLocator)
+		if p, ok := places[r.Name]; ok && !b.socket.Valid {
+			// The inventory source numbered the place itself.
+			b.socket, b.channel, b.position = model.Some(p[0]), model.Some(p[1]), model.Some(p[2])
+		}
 		if d, ok := occupants[r.Name]; ok && b.populated {
 			b.sizeBytes = d.SizeBytes
 		}
@@ -536,7 +612,7 @@ func resolveEventSlots(ctx context.Context, s *store.Store, host string) error {
 						return err
 					}
 					for _, a := range keyAliases(k) {
-						if _, taken := aliases[a]; !taken {
+						if _, taken := aliases[a]; !taken && !strings.HasPrefix(a, "place:") {
 							aliases[a] = name
 							if err := w.SetSlotAlias(host, a, name); err != nil {
 								return err
@@ -568,7 +644,7 @@ func resolveActionSlots(ctx context.Context, s *store.Store, host string) error 
 	}
 	return s.Update(ctx, func(w *store.Writer) error {
 		for _, label := range labels {
-			name, ok := aliases[aliasLabel(label)]
+			name, ok := lookupLabel(aliases, label)
 			if !ok {
 				// A label no source has named before is a slot of its own.
 				name = strings.TrimSpace(label)
@@ -581,6 +657,43 @@ func resolveActionSlots(ctx context.Context, s *store.Store, host string) error 
 				aliases[aliasLabel(label)] = name
 			}
 			if err := w.SetActionSlot(host, label, name); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// resolveECSSlots ties the ECS readings of a host to slots, the way events
+// are tied: through what their source called the module.
+func resolveECSSlots(ctx context.Context, s *store.Store, host string) error {
+	keys, err := s.ECSLocations(ctx, host)
+	if err != nil || len(keys) == 0 {
+		return err
+	}
+	aliases, err := s.SlotAliases(ctx, host)
+	if err != nil {
+		return err
+	}
+	return s.Update(ctx, func(w *store.Writer) error {
+		for _, k := range keys {
+			name, known := lookupSlot(aliases, k)
+			if !known {
+				if name = unknownSlotName(k); name != "" {
+					if err := w.UpsertSlot(&model.Slot{Host: host, Name: name, Socket: k.SocketId, Channel: k.ChannelId, Position: k.ChannelSlotId}); err != nil {
+						return err
+					}
+					for _, a := range keyAliases(k) {
+						if _, taken := aliases[a]; !taken && !strings.HasPrefix(a, "place:") {
+							aliases[a] = name
+							if err := w.SetSlotAlias(host, a, name); err != nil {
+								return err
+							}
+						}
+					}
+				}
+			}
+			if err := w.SetECSSlot(host, k, name); err != nil {
 				return err
 			}
 		}
@@ -601,8 +714,12 @@ func keyAliases(k store.LocationKey) []string {
 	if !edac.PlaceholderLabel(k.Label) {
 		out = append(out, aliasLabel(k.Label))
 	}
-	if k.SocketId.Valid && k.IMC.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid {
-		out = append(out, aliasTopo(k.SocketId.V, k.IMC.V, k.ChannelId.V, k.ChannelSlotId.V))
+	if k.SocketId.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid {
+		if k.IMC.Valid {
+			out = append(out, aliasTopo(k.SocketId.V, k.IMC.V, k.ChannelId.V, k.ChannelSlotId.V))
+		} else {
+			out = append(out, aliasPlace(k.SocketId.V, k.ChannelId.V, k.ChannelSlotId.V))
+		}
 	}
 	return out
 }
@@ -611,6 +728,12 @@ func lookupSlot(aliases map[string]string, k store.LocationKey) (string, bool) {
 	for _, a := range keyAliases(k) {
 		if name, ok := aliases[a]; ok {
 			return name, true
+		}
+		if strings.HasPrefix(a, "label:") {
+			// The same label written with other separators.
+			if name, ok := lookupLabel(aliases, k.Label); ok {
+				return name, true
+			}
 		}
 	}
 	return "", false
