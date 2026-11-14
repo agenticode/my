@@ -1,0 +1,121 @@
+# dmidecode 3.5
+Getting SMBIOS data from sysfs.
+SMBIOS 3.2.1 present.
+
+Handle 0x1100, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: 00CE00B300CE
+	Serial Number: 36B2F1A0
+	Asset Tag: 01211521
+	Part Number: M393A4K40DB3-CWE
+	Rank: 2
+	Configured Memory Speed: 2933 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: Not Specified
+	Module Manufacturer ID: Bank 1, Hex 0xCE
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 32 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x1101, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32768 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A2
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2933 MHz
+	Manufacturer: Micron Technology
+	Serial Number: 2C4A91D7
+	Asset Tag: 01211522
+	Part Number: 36ASF4G72PZ-2G9E2
+	Rank: 2
+	Configured Clock Speed: 2933 MHz
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1102, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: A3
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Memory Speed: Unknown
+
+Handle 0x1103, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: 2
+	Locator: B1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous LRDIMM
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: 00000000
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: 4
+	Configured Memory Speed: 2933 MT/s
+	Memory Technology: DRAM
+
+Handle 0x1104, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Form Factor: DIMM
+	Locator: B2
+	Type: DDR4
+
+Handle 0x1105, DMI type 17, 84 bytes
+Memory Device
+	Array Handle: 0x1000
+	Size: a lot
+	Locator: B3
+

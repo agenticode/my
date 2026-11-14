@@ -2,3 +2,5 @@
 *.db binary
 *.bin binary
 *.mycase binary
+testdata/**/DMI binary
+testdata/**/smbios_entry_point binary
