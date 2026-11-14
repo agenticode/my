@@ -47,7 +47,7 @@ const (
 type Source struct {
 	ID     int64  `json:"id,omitzero"`
 	ScanID int64  `json:"scan_id"`
-	Kind   string `json:"kind"`   // adapter name: rasdaemon, klog, edac-sysfs, smbios, hostinfo
+	Kind   string `json:"kind"`   // adapter name: rasdaemon, klog, edac-sysfs, smbios, hostinfo, ...
 	Origin string `json:"origin"` // path or description of what was read
 
 	Status SourceStatus `json:"status"`
@@ -59,6 +59,9 @@ type Source struct {
 	Events  int `json:"events"`  // events produced
 	Actions int `json:"actions"` // actions produced
 	Skipped int `json:"skipped"` // records that could not be used
+	// Samples counts the readings produced that are neither events nor
+	// actions: GPU memory records and ECS register readings.
+	Samples int `json:"samples,omitzero"`
 	// GradeA, GradeB and GradeC count the events produced per observation grade.
 	GradeA int `json:"grade_a"`
 	GradeB int `json:"grade_b"`

@@ -28,6 +28,11 @@ type Sink interface {
 	Counter(*model.CounterSample) error
 	Event(*model.Event) error
 	Action(*model.Action) error
+	// GPU takes a GPU memory record: a snapshot of the ECC and row
+	// remapping state of a GPU, or one XID event.
+	GPU(*model.GPUMem) error
+	// ECS takes a reading of the DDR5 error check and scrub registers.
+	ECS(*model.ECSSample) error
 }
 
 // Report says how reading a source went. Every adapter returns one, also
@@ -53,7 +58,8 @@ type Report struct {
 
 // Adapter reads one source.
 type Adapter interface {
-	// Kind names the adapter: "rasdaemon", "klog", "edac-sysfs", "smbios", "hostinfo".
+	// Kind names the adapter, for example "rasdaemon", "klog", "edac-sysfs",
+	// "smbios" or "hostinfo".
 	Kind() string
 	// Origin says what is read, usually a path.
 	Origin() string
@@ -134,6 +140,8 @@ type Collected struct {
 	Counters []*model.CounterSample
 	Events   []*model.Event
 	Actions  []*model.Action
+	GPUs     []*model.GPUMem
+	ECSs     []*model.ECSSample
 }
 
 func (c *Collected) Host(h *model.Host) error     { c.Hosts = append(c.Hosts, h); return nil }
@@ -145,3 +153,5 @@ func (c *Collected) Counter(s *model.CounterSample) error {
 }
 func (c *Collected) Event(e *model.Event) error   { c.Events = append(c.Events, e); return nil }
 func (c *Collected) Action(a *model.Action) error { c.Actions = append(c.Actions, a); return nil }
+func (c *Collected) GPU(g *model.GPUMem) error    { c.GPUs = append(c.GPUs, g); return nil }
+func (c *Collected) ECS(s *model.ECSSample) error { c.ECSs = append(c.ECSs, s); return nil }
