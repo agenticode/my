@@ -27,6 +27,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/smbios:FuzzTables \
 	./internal/adapter/smbios:FuzzDmidecode \
 	./internal/adapter/klog:FuzzCollect \
+	./internal/adapter/dcbrain:FuzzTables \
 	./internal/engine:FuzzConfigRead \
 	./internal/i18n:FuzzFormat
 
