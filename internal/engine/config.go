@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -334,6 +335,16 @@ func (c *Config) Validate() error {
 		}
 	}
 	return nil
+}
+
+// MarshalJSON writes the thresholds as an object from key to value, the
+// names a configuration file uses.
+func (c Config) MarshalJSON() ([]byte, error) {
+	m := make(map[string]float64, len(params))
+	for i := range params {
+		m[params[i].Key] = params[i].get(&c)
+	}
+	return json.Marshal(m)
 }
 
 // Changed returns the keys whose values differ from the defaults, with

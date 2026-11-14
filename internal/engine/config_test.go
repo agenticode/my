@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"encoding/json"
 	"flag"
 	"io"
 	"os"
@@ -188,6 +189,22 @@ func TestConfigFlags(t *testing.T) {
 		if _, err := parse(tt.args...); err == nil || !strings.Contains(err.Error(), tt.want) {
 			t.Errorf("%v: err = %v, want %q", tt.args, err, tt.want)
 		}
+	}
+}
+
+func TestConfigJSON(t *testing.T) {
+	c := DefaultConfig()
+	c.StormCount = 250
+	b, err := json.Marshal(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m map[string]float64
+	if err := json.Unmarshal(b, &m); err != nil {
+		t.Fatal(err)
+	}
+	if len(m) != len(Params()) || m["storm.count"] != 250 || m["cluster.line_chance"] != 0.01 || m["trend.recent_days"] != 7 {
+		t.Errorf("thresholds as JSON = %s", b)
 	}
 }
 
