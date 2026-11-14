@@ -51,7 +51,7 @@ func TestAnalyzeDemo(t *testing.T) {
 		"            [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28",
 		"  checks    open: no other DIMM on this channel: there is nothing to compare with",
 		"            open: no slot move or reseat on record: a cause in the board is not ruled out",
-		"            supports: the other 15 DIMMs of this host have no errors outside single confined places: a cause in the board is unlikely",
+		"            supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely",
 		"  missing   no ECS counters",
 		"  next      Replace the DIMM. Attach a case bundle of this DIMM to the return.",
 		"CPU1_D1  S/N 2AEB41  CE 53  UE 0  single-bit",

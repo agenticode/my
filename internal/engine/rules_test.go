@@ -374,6 +374,21 @@ func TestRuleGrowingFault(t *testing.T) {
 		}
 	})
 
+	t.Run("a storm on one cell is stated and stays at observe", func(t *testing.T) {
+		b := ruleBuilder()
+		b.spreadOver(cellA, 20, t0.Add(day), t0.Add(20*day))
+		b.spreadOver(cellA, 150, t0.Add(30*day), t0.Add(30*day+30*time.Minute))
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictObserve, RuleSoft)
+		if got := codes(v); !equalStrings(got, []string{"R-SOFT-01 soft.cell", "R-SOFT-01 soft.storm"}) {
+			t.Fatalf("evidence = %q", got)
+		}
+		if e := v.Evidence[1]; e.Text != "a burst of 150 errors within 60 minutes from 2026-10-31 00:00 UTC" ||
+			Text(i18n.KO, e.Statement) != "2026-10-31 00:00 UTC부터 60분 동안 150건 폭주" {
+			t.Errorf("storm = %q / %q", e.Text, Text(i18n.KO, e.Statement))
+		}
+	})
+
 	t.Run("a steady row fault without new places does not", func(t *testing.T) {
 		b := ruleBuilder()
 		b.rowFault("d1", 4, 15, t0.Add(day), asOf)

@@ -627,6 +627,11 @@ func (j *judge) soft(fs *findings) {
 	if moreFaults > 0 {
 		fs.add(RuleSoft, statement("soft.more", "faults", moreFaults, "n", moreErrors), nil, 0)
 	}
+	// A burst does not change the grade of errors that stay in one cell,
+	// but it is said: a storm of corrected errors costs the host time.
+	if st := d.Features.Storm; st.Storm && (stated > 0 || strayPlaces > 0) {
+		fs.add(RuleSoft, statement("soft.storm", "peak", st.Peak, "minutes", cfg.StormMinutes, "when", stampText(st.At.UnixMicro())), nil, 0)
+	}
 	if strayPlaces > 0 {
 		refs, total := j.eventRefs(strays)
 		switch {
