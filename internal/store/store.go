@@ -57,9 +57,10 @@ var (
 
 // Store is an open ledger.
 type Store struct {
-	db   *sql.DB
-	path string
-	mode Mode
+	db     *sql.DB
+	path   string
+	mode   Mode
+	closed bool
 }
 
 // Open opens the ledger at path.
@@ -252,12 +253,16 @@ func (s *Store) applyMigration(ctx context.Context, m migration, fresh bool) err
 // Close releases the ledger. A ledger opened for writing is checkpointed and
 // switched back to a rollback journal, so that the result is a single file
 // that opens read-only anywhere.
+//
+// Using a closed ledger returns an error from every call.
 func (s *Store) Close() error {
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
+	// The closed handle stays in place: database/sql answers every later
+	// call on it with an error.
 	err := s.db.Close()
-	s.db = nil
+	s.closed = true
 	if s.mode == ReadOnly || err != nil {
 		return err
 	}
