@@ -176,7 +176,8 @@ type GPUMem struct {
 	BankPartial Opt[int] `json:"bank_partial,omitzero"`
 	BankLow     Opt[int] `json:"bank_low,omitzero"`
 	BankNone    Opt[int] `json:"bank_none,omitzero"`
-	// Retired pages, on GPUs that use page retirement instead of row remapping.
+	// Retired pages, on GPU models whose driver retires pages and has no
+	// row remapping.
 	RetiredSBE     Opt[int]  `json:"retired_sbe,omitzero"`
 	RetiredDBE     Opt[int]  `json:"retired_dbe,omitzero"`
 	RetiredPending Opt[bool] `json:"retired_pending,omitzero"`

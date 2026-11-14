@@ -18,7 +18,17 @@ PLATFORMS := linux/amd64 linux/arm64 darwin/arm64
 
 export CGO_ENABLED := 0
 
-.PHONY: all build test test-race lint fmt fmt-check vet cross clean
+# Fuzz targets as "package:function". FUZZTIME is the run time of each.
+FUZZTIME ?= 10s
+FUZZ_TARGETS := \
+	./internal/decode/edac:FuzzParseDetail \
+	./internal/decode/cper:FuzzParseText \
+	./internal/decode/cper:FuzzParseBinary \
+	./internal/adapter/smbios:FuzzTables \
+	./internal/adapter/smbios:FuzzDmidecode \
+	./internal/adapter/klog:FuzzCollect
+
+.PHONY: all build test test-race fuzz lint fmt fmt-check vet cross clean
 
 all: lint test build
 
@@ -31,6 +41,13 @@ test:
 # The race detector needs cgo; the product build stays CGO_ENABLED=0.
 test-race:
 	CGO_ENABLED=1 $(GO) test -race -p $(JOBS) ./...
+
+fuzz:
+	@set -e; for t in $(FUZZ_TARGETS); do \
+		pkg=$${t%%:*}; fn=$${t##*:}; \
+		echo "fuzz $$fn ($(FUZZTIME))"; \
+		$(GO) test -run '^$$' -fuzz "^$$fn\$$" -fuzztime $(FUZZTIME) -parallel $(JOBS) $$pkg; \
+	done
 
 lint: fmt-check vet
 

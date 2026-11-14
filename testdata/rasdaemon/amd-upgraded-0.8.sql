@@ -1,8 +1,9 @@
 -- rasdaemon database of an AMD EPYC host (amd64_edac), created by rasdaemon
 -- 0.6.8 and later opened by 0.8.4. The upgrade added columns with
 -- ALTER TABLE ... ADD, so ppin and microcode sit at the end of mce_record
--- instead of where a fresh 0.8.4 database has them, and rows stored before
--- the upgrade hold NULL there. The CXL tables were created by 0.8.4.
+-- (a fresh 0.8.4 database has them after walltime and cpuvendor), and rows
+-- stored before the upgrade hold NULL there. The CXL tables were created by
+-- 0.8.4.
 
 CREATE TABLE IF NOT EXISTS mc_event (id INTEGER PRIMARY KEY, timestamp TEXT, err_count INTEGER, err_type TEXT, err_msg TEXT, label TEXT, mc INTEGER, top_layer INTEGER, middle_layer INTEGER, lower_layer INTEGER, address INTEGER, grain INTEGER, syndrome INTEGER, driver_detail TEXT);
 CREATE TABLE IF NOT EXISTS aer_event (id INTEGER PRIMARY KEY, timestamp TEXT, dev_name TEXT, err_type TEXT, err_msg TEXT);

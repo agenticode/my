@@ -211,6 +211,8 @@ func TestQuickMono(t *testing.T) {
 		{"Nov 12 03:14:07 host systemd[1]: Started", 0, false},
 		{"Nov 12 03:14:07 host app: took [ 12.345678] seconds", 0, false},
 		{"[ 12.34] x", 0, false},
+		{"[9999999999.000000] x", 0, false},
+		{"4,1,9999999999999999999,-;x", 0, false},
 		{"", 0, false},
 		{" SUBSYSTEM=edac", 0, false},
 		{"1,2;x", 0, false},

@@ -44,7 +44,8 @@ func (s *Store) LinkBoots(ctx context.Context, host string) error {
 }
 
 // LocationKey is one distinct way events of a host name the place of an
-// error. Slot resolution works on these keys instead of on single events.
+// error. A host has few of them, however many events it has, so slots are
+// resolved per key.
 type LocationKey struct {
 	EdacMC        model.Opt[int]
 	EdacLocation  string
