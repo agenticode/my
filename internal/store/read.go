@@ -727,31 +727,131 @@ func (s *Store) Faults(ctx context.Context, host string) ([]model.Fault, error) 
 
 // Verdicts returns the stored verdicts of a host.
 func (s *Store) Verdicts(ctx context.Context, host string) ([]model.Verdict, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, host, dimm_uid, slot, grade, rules, evidence, counter_evidence, missing, next_action,
- confidence, engine_version, computed_at FROM verdict WHERE host = ? ORDER BY slot, id`, host)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, host, dimm_uid, slot, gpu, grade, rules, evidence, counter_evidence, missing, next_action,
+ confidence, confidence_factors, engine_version, computed_at FROM verdict WHERE host = ? ORDER BY slot, gpu, id`, host)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	var out []model.Verdict
 	for rows.Next() {
-		var v model.Verdict
+		v := model.Verdict{Label: model.VerdictLabel}
 		var dimmUID, computed sql.NullString
-		var grade, rules, evidence, counter, missing string
-		if err := rows.Scan(&v.ID, &v.Host, &dimmUID, &v.Slot, &grade, &rules, &evidence, &counter, &missing, &v.NextAction,
-			&v.Confidence, &v.EngineVersion, &computed); err != nil {
+		var grade, rules, evidence, counter, missing, next, factors string
+		if err := rows.Scan(&v.ID, &v.Host, &dimmUID, &v.Slot, &v.GPU, &grade, &rules, &evidence, &counter, &missing, &next,
+			&v.Confidence, &factors, &v.EngineVersion, &computed); err != nil {
 			return nil, err
 		}
 		v.DIMMUID, v.Grade, v.ComputedAt = dimmUID.String, model.VerdictGrade(grade), parseTS(computed)
-		for _, p := range []struct {
+		parts := []struct {
 			text string
 			dst  any
-		}{{rules, &v.Rules}, {evidence, &v.Evidence}, {counter, &v.CounterEvidence}, {missing, &v.Missing}} {
+		}{{rules, &v.Rules}, {evidence, &v.Evidence}, {counter, &v.CounterEvidence}, {missing, &v.Missing}, {factors, &v.ConfidenceFactors}}
+		if next != "" {
+			parts = append(parts, struct {
+				text string
+				dst  any
+			}{next, &v.NextAction})
+		}
+		for _, p := range parts {
 			if err := json.Unmarshal([]byte(p.text), p.dst); err != nil {
 				return nil, fmt.Errorf("verdict %d: %w", v.ID, err)
 			}
 		}
+		// An empty list reads back as nil, whatever was stored.
+		if len(v.Rules) == 0 {
+			v.Rules = nil
+		}
+		if len(v.Evidence) == 0 {
+			v.Evidence = nil
+		}
+		if len(v.CounterEvidence) == 0 {
+			v.CounterEvidence = nil
+		}
+		if len(v.Missing) == 0 {
+			v.Missing = nil
+		}
+		if len(v.ConfidenceFactors) == 0 {
+			v.ConfidenceFactors = nil
+		}
 		out = append(out, v)
+	}
+	return out, rows.Err()
+}
+
+// EventRawRefs returns the raw_ref of the events with the given IDs: where
+// the original record of each can be found.
+func (s *Store) EventRawRefs(ctx context.Context, ids []int64) (map[int64]string, error) {
+	out := make(map[int64]string, len(ids))
+	const batch = 500
+	for start := 0; start < len(ids); start += batch {
+		chunk := ids[start:min(start+batch, len(ids))]
+		args := make([]any, len(chunk))
+		for i, id := range chunk {
+			args[i] = id
+		}
+		rows, err := s.db.QueryContext(ctx, `SELECT id, raw_ref FROM event WHERE id IN (`+placeholders(len(chunk))+`)`, args...)
+		if err != nil {
+			return nil, err
+		}
+		for rows.Next() {
+			var id int64
+			var ref string
+			if err := rows.Scan(&id, &ref); err != nil {
+				rows.Close()
+				return nil, err
+			}
+			out[id] = ref
+		}
+		rows.Close()
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+// EventPlace is one distinct way the events of a host name the place of an
+// error, together with the slot those events were resolved to. Comparing
+// the names with the slot shows records whose names point to different
+// slots.
+type EventPlace struct {
+	Host string
+	LocationKey
+	// Slot is the slot the events were tied to.
+	Slot string
+	// FirstID and LastID are the IDs of the first and the last event that
+	// use the names; LocationKey.Records says how many there are.
+	FirstID, LastID int64
+}
+
+// EventPlaces returns the distinct combinations of location names and
+// resolved slot among the error records of a host that count. An empty host
+// selects all hosts.
+func (s *Store) EventPlaces(ctx context.Context, host string) ([]EventPlace, error) {
+	q := `SELECT host, edac_mc, edac_location, smbios_handle, label, "SocketId", imc, "ChannelId", "ChannelSlotId", slot, COUNT(*), MIN(id), MAX(id)
+ FROM event WHERE dup_of IS NULL AND kind = 'error' AND slot != ''`
+	var args []any
+	if host != "" {
+		q, args = q+` AND host = ?`, append(args, host)
+	}
+	rows, err := s.db.QueryContext(ctx, q+`
+ GROUP BY host, edac_mc, edac_location, smbios_handle, label, "SocketId", imc, "ChannelId", "ChannelSlotId", slot
+ ORDER BY host, slot, edac_mc, edac_location, label, "SocketId", imc, "ChannelId", "ChannelSlotId"`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []EventPlace
+	for rows.Next() {
+		var p EventPlace
+		var mc, handle, socket, imc, ch, pos sql.NullInt64
+		if err := rows.Scan(&p.Host, &mc, &p.EdacLocation, &handle, &p.Label, &socket, &imc, &ch, &pos, &p.Slot, &p.Records, &p.FirstID, &p.LastID); err != nil {
+			return nil, err
+		}
+		p.EdacMC, p.SMBIOSHandle = toOptInt(mc), toOptInt(handle)
+		p.SocketId, p.IMC, p.ChannelId, p.ChannelSlotId = toOptInt(socket), toOptInt(imc), toOptInt(ch), toOptInt(pos)
+		out = append(out, p)
 	}
 	return out, rows.Err()
 }

@@ -1,6 +1,8 @@
 package store
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -426,17 +428,31 @@ func TestAnalysisRoundTrip(t *testing.T) {
 		AddressMin: model.Some(uint64(0x1000)), AddressMax: model.Some(uint64(0x1040)),
 		FirstSeen: at(0), LastSeen: at(time.Hour), EventCount: 2, ErrorCount: 2, Confidence: 90, EngineVersion: "t",
 		EventIDs: []int64{e1.ID, e2.ID}}
-	v := &model.Verdict{Host: "h1", DIMMUID: "dA", Slot: "CPU0_C1", Grade: model.VerdictReplaceNow,
-		Rules:           []string{"R-UE-01", "R-ROW-03"},
-		Evidence:        []model.Evidence{{Rule: "R-UE-01", Text: "1 UE", EventIDs: []int64{e2.ID}}},
-		CounterEvidence: []string{"no errors on neighbours of the channel"},
-		Missing:         []string{"ECS counters"}, NextAction: "attach the case bundle to the RMA",
-		Confidence: 85, EngineVersion: "t", ComputedAt: at(2 * time.Hour)}
+	st := func(code, text string, args map[string]any) model.Statement {
+		return model.Statement{Code: code, Args: args, Text: text}
+	}
+	v := &model.Verdict{Host: "h1", DIMMUID: "dA", Slot: "CPU0_C1", Grade: model.VerdictReplaceNow, Label: model.VerdictLabel,
+		Rules: []string{"R-UE-01", "R-ROW-03"},
+		Evidence: []model.Evidence{{Rule: "R-UE-01", Statement: st("ue.demand", "1 uncorrected error", map[string]any{"n": float64(1), "where": "rank 0 bank 3 row 0x1a2f"}),
+			Records: []model.RecordRef{{Kind: model.RecordEvent, ID: e2.ID, RawRef: "2"}}, Total: 1}},
+		CounterEvidence: []model.Check{{Statement: st("check.neighbors_clean", "no errors on the other DIMM of the channel", nil), Effect: model.EffectSupports}},
+		Missing:         []model.Statement{st("missing.ecs", "no ECS counters", nil)},
+		NextAction:      st("next.replace", "Replace the DIMM.", nil),
+		Confidence:      85,
+		ConfidenceFactors: []model.Factor{{Statement: st("conf.rule", "an uncorrected error is on record", map[string]any{"rule": "R-UE-01"}), Delta: 90},
+			{Statement: st("conf.assumed", "the DIMM was seen in the slot at another time", nil), Delta: -5}},
+		EngineVersion: "t", ComputedAt: at(2 * time.Hour)}
+	// A finding about GPU memory, with nothing but a grade.
+	g := &model.Verdict{Host: "h1", GPU: "1320921000412", Grade: model.VerdictObserve, Label: model.VerdictLabel,
+		EngineVersion: "t", ComputedAt: at(2 * time.Hour)}
 	mustUpdate(t, s, func(w *Writer) error {
 		if err := w.InsertFault(f); err != nil {
 			return err
 		}
-		return w.InsertVerdict(v)
+		if err := w.InsertVerdict(v); err != nil {
+			return err
+		}
+		return w.InsertVerdict(g)
 	})
 
 	faults, err := s.Faults(ctx, "h1")
@@ -447,11 +463,21 @@ func TestAnalysisRoundTrip(t *testing.T) {
 		t.Errorf("fault round trip\n got: %+v\nwant: %+v", faults[0], *f)
 	}
 	verdicts, err := s.Verdicts(ctx, "h1")
-	if err != nil || len(verdicts) != 1 {
+	if err != nil || len(verdicts) != 2 {
 		t.Fatalf("verdicts = %+v, %v", verdicts, err)
 	}
-	if !reflect.DeepEqual(&verdicts[0], v) {
-		t.Errorf("verdict round trip\n got: %+v\nwant: %+v", verdicts[0], *v)
+	// Ordered by slot: the GPU finding has none and comes first.
+	if !reflect.DeepEqual(&verdicts[1], v) {
+		t.Errorf("verdict round trip\n got: %+v\nwant: %+v", verdicts[1], *v)
+	}
+	if !reflect.DeepEqual(&verdicts[0], g) {
+		t.Errorf("GPU verdict round trip\n got: %+v\nwant: %+v", verdicts[0], *g)
+	}
+	// Lists are stored as JSON arrays, also when they are empty.
+	var counter, missing, next, factors string
+	if err := s.db.QueryRow(`SELECT counter_evidence, missing, next_action, confidence_factors FROM verdict WHERE gpu != ''`).Scan(&counter, &missing, &next, &factors); err != nil ||
+		counter != "[]" || missing != "[]" || next != "" || factors != "[]" {
+		t.Errorf("empty lists stored as %q %q %q %q, %v", counter, missing, next, factors, err)
 	}
 
 	// A new analysis run replaces the old result.
@@ -474,8 +500,72 @@ func TestAnalysisRoundTrip(t *testing.T) {
 	}
 	badV := *v
 	badV.Grade = "recommend-replace"
-	if err := s.Update(ctx, func(w *Writer) error { return w.InsertVerdict(&badV) }); err == nil {
-		t.Error("unknown verdict grade was accepted")
+	if err := s.Update(ctx, func(w *Writer) error { return w.InsertVerdict(&badV) }); !errors.Is(err, ErrInvalidRecord) {
+		t.Errorf("unknown verdict grade: err = %v", err)
+	}
+	both := *v
+	both.GPU = "1320921000412"
+	if err := s.Update(ctx, func(w *Writer) error { return w.InsertVerdict(&both) }); !errors.Is(err, ErrInvalidRecord) {
+		t.Errorf("a verdict about a DIMM and a GPU: err = %v", err)
+	}
+}
+
+// TestEventRawRefsAndPlaces covers the two lookups findings use: where the
+// original record of an event is, and how records name the place of an error.
+func TestEventRawRefsAndPlaces(t *testing.T) {
+	s := newStore(t)
+	var ids []int64
+	mustUpdate(t, s, func(w *Writer) error {
+		for i := range 1200 {
+			e := ev("rasdaemon/mc_event", fmt.Sprintf("mc_event/%d", i+1), at(time.Duration(i)*time.Minute), 0x1000)
+			e.EdacMC, e.EdacLocation = model.Some(1), "0:0"
+			if i%2 == 1 {
+				e.Label, e.Slot = "CPU0_E1", "CPU0_E1"
+				e.SocketId, e.IMC, e.ChannelId, e.ChannelSlotId = model.Some(0), model.Some(2), model.Some(0), model.Some(0)
+			}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+			ids = append(ids, e.ID)
+		}
+		// Records that do not count: a duplicate, a counter, an event without a slot.
+		dup := ev("klog/edac", "L1", at(0), 0x1000)
+		dup.DupOf = ids[0]
+		cnt := ev("edac-sysfs/counter", "c1", at(time.Hour), 0)
+		cnt.Kind = model.KindCounter
+		noSlot := ev("klog/mce", "L2", at(time.Hour), 0x2000)
+		noSlot.Slot, noSlot.Label = "", ""
+		for _, e := range []*model.Event{dup, cnt, noSlot} {
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	refs, err := s.EventRawRefs(ctx, append(ids, 999999))
+	if err != nil || len(refs) != 1200 || refs[ids[0]] != "mc_event/1" || refs[ids[1199]] != "mc_event/1200" {
+		t.Errorf("raw refs: %d entries, %v", len(refs), err)
+	}
+	if refs, err := s.EventRawRefs(ctx, nil); err != nil || len(refs) != 0 {
+		t.Errorf("raw refs of nothing: %v, %v", refs, err)
+	}
+	places, err := s.EventPlaces(ctx, "h1")
+	if err != nil || len(places) != 2 {
+		t.Fatalf("places = %+v, %v", places, err)
+	}
+	c1, e1 := places[0], places[1]
+	if c1.Slot != "CPU0_C1" || c1.Label != "CPU0_C1" || c1.Records != 600 || c1.FirstID != ids[0] || c1.LastID != ids[1198] ||
+		c1.EdacMC != model.Some(1) || c1.EdacLocation != "0:0" || c1.SocketId.Valid || c1.Host != "h1" {
+		t.Errorf("first place = %+v", c1)
+	}
+	if e1.Slot != "CPU0_E1" || e1.Records != 600 || e1.IMC != model.Some(2) || e1.ChannelSlotId != model.Some(0) || e1.FirstID != ids[1] {
+		t.Errorf("second place = %+v", e1)
+	}
+	if all, err := s.EventPlaces(ctx, ""); err != nil || len(all) != 2 {
+		t.Errorf("places of all hosts = %+v, %v", all, err)
+	}
+	if none, err := s.EventPlaces(ctx, "h9"); err != nil || len(none) != 0 {
+		t.Errorf("places of an unknown host = %+v, %v", none, err)
 	}
 }
 
@@ -556,5 +646,18 @@ func TestActionsRoundTripAndFilter(t *testing.T) {
 		return err
 	}); err == nil {
 		t.Error("unknown action kind was accepted")
+	}
+	// Marks that firmware puts on a module are actions too.
+	mustUpdate(t, s, func(w *Writer) error {
+		for i, k := range []model.ActionKind{model.ActionDisable, model.ActionMarkFailed, model.ActionReseat, model.ActionSparing} {
+			if _, err := w.InsertAction(&model.Action{Host: "h1", At: at(3 * time.Hour), Kind: k, Method: "bmc", Slot: "CPU0_C1",
+				Source: "test", RawRef: "sel/1", Fingerprint: fmt.Sprintf("fw%d", i)}); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if fw, _ := s.Actions(ctx, ActionFilter{Kinds: []model.ActionKind{model.ActionDisable, model.ActionMarkFailed}}); len(fw) != 2 {
+		t.Errorf("firmware marks = %+v", fw)
 	}
 }

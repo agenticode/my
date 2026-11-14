@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -297,5 +299,126 @@ func TestMeta(t *testing.T) {
 	}
 	if v, _ := s.Meta(ctx, "case"); v != "B" {
 		t.Errorf("case = %q, want B", v)
+	}
+}
+
+// TestMigrateVersion1 opens a ledger written with schema version 1 and
+// checks that what it held is still there afterwards.
+func TestMigrateVersion1(t *testing.T) {
+	migs, err := loadMigrations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := filepath.Join(t.TempDir(), "v1.db")
+	db, err := sql.Open("sqlite", p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A version 1 ledger: the first migration and nothing after it.
+	for _, q := range []string{
+		migs[0].sql,
+		`PRAGMA application_id = 1297697863`,
+		`PRAGMA user_version = 1`,
+		`INSERT INTO meta (key, value) VALUES ('ledger_id', '0123456789abcdef0123456789abcdef')`,
+		`INSERT INTO dimm (dimm_uid, identity, serial) VALUES ('dA', 'serial', '80A1C3')`,
+		`INSERT INTO event (host, "ErrorDT", "ErrorSeverity", source, raw_ref, grade, fingerprint) VALUES ('h1', '2026-11-01T00:00:00.000000Z', 'CE', 'klog/edac', 'L1', 'C', 'e1')`,
+		`INSERT INTO action (host, at, kind, method, result, "OsPhysicalAddress", "Rank", "DeviceId", "BankGroup", "Bank", "Row", label, slot, dimm_uid, count, boot_id, detail, source, raw_ref, raw, fingerprint)
+		 VALUES ('h1', '2026-11-01T01:00:00.000000Z', 'hppr', 'bios', 'ok', 4096, 0, 7, 0, 3, 6703, 'CPU0_C1', 'CPU0_C1', 'dA', 2, 'boot-1', 'repair at boot', 'synth', 'ppr/1', 'raw text', 'a1')`,
+		`INSERT INTO fault (host, dimm_uid, mode, grade, first_seen, last_seen) VALUES ('h1', 'dA', 'row', 'A', '2026-11-01T00:00:00.000000Z', '2026-11-01T00:00:00.000000Z')`,
+		`INSERT INTO fault_event (fault_id, event_id) VALUES (1, 1)`,
+		`INSERT INTO verdict (host, dimm_uid, grade, evidence, counter_evidence, next_action, computed_at)
+		 VALUES ('h1', 'dA', 'observe', '[{"rule":"R-UE-01","text":"1 UE"}]', '["plain text"]', 'plain text', '2026-11-01T02:00:00.000000Z')`,
+	} {
+		if _, err := db.Exec(q); err != nil {
+			t.Fatalf("build version 1 ledger: %v\n%s", err, q)
+		}
+	}
+	db.Close()
+
+	if _, err := Open(ctx, p, ReadOnly); !errors.Is(err, ErrNeedsMigration) {
+		t.Fatalf("read-only open of a version 1 ledger: err = %v, want ErrNeedsMigration", err)
+	}
+	s, err := Open(ctx, p, ReadWrite)
+	if err != nil {
+		t.Fatalf("open for writing: %v", err)
+	}
+	defer s.Close()
+	if v, _ := s.Version(ctx); v != SchemaVersion() || v < 2 {
+		t.Fatalf("version after migration = %d", v)
+	}
+	if id, _ := s.Meta(ctx, "ledger_id"); id != "0123456789abcdef0123456789abcdef" {
+		t.Errorf("ledger_id = %q", id)
+	}
+	if applied, _ := s.Meta(ctx, "migration.0002"); applied == "" {
+		t.Error("migration 0002 is not recorded in meta")
+	}
+	// The action is there with every column.
+	acts, err := s.Actions(ctx, ActionFilter{})
+	want := model.Action{ID: 1, Host: "h1", At: time.Date(2026, 11, 1, 1, 0, 0, 0, time.UTC), TimeQuality: model.TimeExact, Kind: model.ActionHPPR,
+		Method: "bios", Result: model.ResultOK, OsPhysicalAddress: model.Some(uint64(4096)), Rank: model.Some(0), DeviceId: model.Some(7),
+		BankGroup: model.Some(0), Bank: model.Some(3), Row: model.Some(6703), Label: "CPU0_C1", Slot: "CPU0_C1", DIMMUID: "dA", Count: 2,
+		BootID: "boot-1", Detail: "repair at boot", Source: "synth", RawRef: "ppr/1", Raw: "raw text", Fingerprint: "a1"}
+	if err != nil || len(acts) != 1 || !reflect.DeepEqual(acts[0], want) {
+		t.Errorf("actions after migration = %+v, %v\nwant %+v", acts, err, want)
+	}
+	// Its indexes and its fingerprint constraint were rebuilt with the table.
+	var idx int
+	s.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE type = 'index' AND tbl_name = 'action' AND name IN ('action_time', 'action_dimm')`).Scan(&idx)
+	if idx != 2 {
+		t.Errorf("%d of 2 action indexes after migration", idx)
+	}
+	var left int
+	s.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name = 'action_v2'`).Scan(&left)
+	if left != 0 {
+		t.Error("the temporary table of the migration is still there")
+	}
+	mustUpdate(t, s, func(w *Writer) error {
+		again, err := w.InsertAction(&model.Action{Host: "h1", At: at(0), Kind: model.ActionHPPR, Source: "synth", Fingerprint: "a1"})
+		if err != nil || again {
+			return fmt.Errorf("known fingerprint inserted again: %v, %v", again, err)
+		}
+		// The new kinds are accepted.
+		_, err = w.InsertAction(&model.Action{Host: "h1", At: at(0), Kind: model.ActionDisable, Method: "bios", Slot: "CPU0_C1", Source: "test", RawRef: "x", Fingerprint: "a2"})
+		return err
+	})
+	// Events stay; faults and findings of the earlier engine are dropped.
+	evs, _ := s.EventList(ctx, EventFilter{})
+	faults, _ := s.Faults(ctx, "h1")
+	verdicts, err := s.Verdicts(ctx, "h1")
+	if len(evs) != 1 || len(faults) != 0 || len(verdicts) != 0 || err != nil {
+		t.Errorf("%d events, %d faults, %d verdicts, %v; want 1, 0, 0", len(evs), len(faults), len(verdicts), err)
+	}
+	var members int
+	s.db.QueryRow(`SELECT count(*) FROM fault_event`).Scan(&members)
+	if members != 0 {
+		t.Errorf("%d fault_event rows left behind", members)
+	}
+	// A ledger that was migrated opens read-only from then on.
+	s.Close()
+	ro, err := Open(ctx, p, ReadOnly)
+	if err != nil {
+		t.Fatalf("read-only open after migration: %v", err)
+	}
+	ro.Close()
+}
+
+func TestWriterSetMeta(t *testing.T) {
+	s := newStore(t)
+	mustUpdate(t, s, func(w *Writer) error {
+		if err := w.SetMeta("analysis.h1", "first"); err != nil {
+			return err
+		}
+		return w.SetMeta("analysis.h1", "second")
+	})
+	if v, _ := s.Meta(ctx, "analysis.h1"); v != "second" {
+		t.Errorf("meta = %q", v)
+	}
+	// It is part of the transaction.
+	s.Update(ctx, func(w *Writer) error {
+		w.SetMeta("analysis.h1", "third")
+		return errors.New("roll back")
+	})
+	if v, _ := s.Meta(ctx, "analysis.h1"); v != "second" {
+		t.Errorf("meta after a rolled back update = %q", v)
 	}
 }

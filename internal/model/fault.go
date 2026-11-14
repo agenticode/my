@@ -113,36 +113,109 @@ func (g VerdictGrade) Valid() bool {
 	return false
 }
 
-// Evidence ties one statement of a verdict to the rule that produced it and
-// the events it rests on.
-type Evidence struct {
-	Rule     string  `json:"rule"`
-	Text     string  `json:"text"`
-	EventIDs []int64 `json:"event_ids,omitzero"`
+// VerdictLabel is what a verdict is called wherever it is shown: a finding.
+// The thresholds behind the grades have not been compared with failure
+// analysis results yet, so a grade is not a recommendation.
+const VerdictLabel = "finding"
+
+// Statement is one sentence of a finding. It is kept as a code with
+// arguments, so that it can be shown in the reader's language, and with
+// its English text for readers that do not have the message catalog.
+type Statement struct {
+	// Code names the sentence in the message catalog.
+	Code string `json:"code"`
+	// Args are the values the sentence mentions: numbers and strings.
+	Args map[string]any `json:"args,omitzero"`
+	// Text is the sentence in English.
+	Text string `json:"text"`
 }
 
-// Verdict is the finding for one DIMM: a grade, the rules that fired, and
-// what speaks for and against it.
+// Kinds of ledger record a RecordRef can point at.
+const (
+	RecordEvent  = "event"
+	RecordAction = "action"
+	RecordGPU    = "gpu"
+)
+
+// RecordRef points at a ledger record and at the original record behind it.
+type RecordRef struct {
+	Kind string `json:"kind"`
+	ID   int64  `json:"id"`
+	// RawRef is the raw_ref of the ledger record: file and row or line of
+	// the original record.
+	RawRef string `json:"raw_ref,omitzero"`
+}
+
+// Evidence is one statement of a finding with the rule that made it and the
+// records it rests on.
+type Evidence struct {
+	// Rule is the ID of the rule, for example "R-UE-01".
+	Rule string `json:"rule"`
+	Statement
+	// Records are the ledger records the statement rests on. When there
+	// are many, the first and the last of them are listed and Total says
+	// how many there are.
+	Records []RecordRef `json:"records,omitzero"`
+	Total   int         `json:"total,omitzero"`
+}
+
+// Effects of a check on a finding.
+const (
+	// EffectSupports: the check speaks for the finding.
+	EffectSupports = "supports"
+	// EffectWeakens: the check speaks against the finding.
+	EffectWeakens = "weakens"
+	// EffectOpen: the check could not be made. The statement says what
+	// would settle it.
+	EffectOpen = "open"
+)
+
+// Check is the outcome of one test of a finding against another
+// explanation: what speaks for it, what speaks against it, and what was
+// not tested and would overturn it.
+type Check struct {
+	Statement
+	Effect string `json:"effect"`
+}
+
+// Factor is one step in the confidence of a finding.
+type Factor struct {
+	Statement
+	// Delta is what the step adds to the confidence or takes from it. The
+	// first factor carries the starting value.
+	Delta int `json:"delta"`
+}
+
+// Verdict is the finding for one DIMM, or for the memory of one GPU: a
+// grade, the rules that fired, and what speaks for and against it.
 type Verdict struct {
 	ID      int64  `json:"id,omitzero"`
 	Host    string `json:"host"`
 	DIMMUID string `json:"dimm_uid,omitzero"`
 	Slot    string `json:"slot,omitzero"`
+	// GPU is set on findings about GPU memory: the serial number of the
+	// GPU, or its UUID when the serial number is unknown.
+	GPU string `json:"gpu,omitzero"`
 
 	Grade VerdictGrade `json:"grade"`
-	// Rules are the IDs of the rules that fired, for example "R-UE-01".
+	// Label is VerdictLabel.
+	Label string `json:"label"`
+	// Rules are the IDs of the rules that fired, the rules that set the
+	// grade first.
 	Rules    []string   `json:"rules"`
 	Evidence []Evidence `json:"evidence,omitzero"`
-	// CounterEvidence lists observations that weaken the finding or would
-	// overturn it.
-	CounterEvidence []string `json:"counter_evidence,omitzero"`
+	// CounterEvidence lists the checks of the finding against other
+	// explanations.
+	CounterEvidence []Check `json:"counter_evidence,omitzero"`
 	// Missing lists data the finding would need and did not have.
-	Missing    []string `json:"missing,omitzero"`
-	NextAction string   `json:"next_action,omitzero"`
-	// Confidence is a number from 0 to 100.
-	Confidence    int       `json:"confidence"`
-	EngineVersion string    `json:"engine_version"`
-	ComputedAt    time.Time `json:"computed_at"`
+	Missing    []Statement `json:"missing,omitzero"`
+	NextAction Statement   `json:"next_action,omitzero"`
+	// Confidence is a number from 0 to 100, and ConfidenceFactors the
+	// steps that led to it.
+	Confidence        int       `json:"confidence"`
+	ConfidenceFactors []Factor  `json:"confidence_factors,omitzero"`
+	EngineVersion     string    `json:"engine_version"`
+	ComputedAt        time.Time `json:"computed_at"`
 }
 
 // GPUMem is one observation of GPU memory health: a snapshot of the row
