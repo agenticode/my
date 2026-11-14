@@ -79,6 +79,17 @@ func TestCreateAndReopen(t *testing.T) {
 		t.Fatalf("close: %v", err)
 	}
 
+	// A closed ledger answers with errors and can be closed again.
+	if _, err := s.Hosts(ctx); err == nil {
+		t.Error("read on a closed ledger returned no error")
+	}
+	if err := s.Update(ctx, func(*Writer) error { return nil }); err == nil {
+		t.Error("write on a closed ledger returned no error")
+	}
+	if err := s.Close(); err != nil {
+		t.Errorf("second close: %v", err)
+	}
+
 	// A closed ledger is one plain file: no WAL sidecars.
 	entries, err := os.ReadDir(dir)
 	if err != nil {
