@@ -2,6 +2,8 @@
 
 `my serve --metrics` runs MemorY as a Prometheus exporter. It scans the host, serves what the scan found at `/metrics`, and scans again after a pause. It reads the sources `my` reads and changes nothing on the host. The same server answers `/api/dimm/<slot or serial>` with the finding for one DIMM as JSON.
 
+On the demo host its log starts like this:
+
 ```
 $ my serve --metrics
 2026-11-15T05:25:59Z listening on http://127.0.0.1:10163
@@ -16,7 +18,7 @@ $ my serve --metrics
 | `--root DIR` | scan a copy of a host's files below `DIR` instead of this host |
 | `--fleet KIND`, `--fleet-env FILE`, `--since TIME`, `--host NAME` | read the store of a fleet in place of this host: see "One exporter for a fleet" |
 | `--config FILE`, `--set KEY=VALUE` | thresholds of the engine, as for the other commands |
-| `--lang en\|ko` | language of the log |
+| `--lang en\|ko` | language of the log, and of the answers of the API when a request names none |
 
 The log goes to standard error. A scan is logged when it found something else than the scan before, and when it failed. SIGINT or SIGTERM stops the server with exit code 0. The exit code is 70 when the server cannot listen on its address.
 
