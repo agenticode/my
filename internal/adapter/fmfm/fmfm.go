@@ -235,6 +235,13 @@ type run struct {
 
 	records []record
 	badDocs []string
+	// parts counts the entries of the lists inside boot records (installed
+	// memory, training events): each is a record of its own in the count
+	// of the report. skipped holds the references of the records and
+	// entries that could not be used, each once, however many reasons
+	// were found for it.
+	parts   int
+	skipped map[string]bool
 
 	// host is the HostID whose records are read, as the log writes it;
 	// empty when no record names a host. asked says that the caller named
@@ -285,12 +292,14 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		r.now = time.Now().UTC()
 	}
 	docs := r.find(data)
-	rep.Records = len(r.records)
 	for _, bad := range r.badDocs {
-		r.tally.Skip(a.origin, bad)
+		r.skip(a.origin, bad)
 	}
+	// A document that cannot be read counts as a record that was looked
+	// at, like the records and the entries of their lists.
+	count := func() { rep.Records, rep.Skipped = len(r.records)+r.parts+len(r.badDocs), len(r.skipped) }
+	count()
 	if len(r.records) == 0 {
-		rep.Skipped = r.tally.Total()
 		rep.Notes = append(rep.Notes, r.tally.Notes()...)
 		switch {
 		case len(bytes.TrimSpace(data)) == 0:
@@ -319,7 +328,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if a.opts.HostID != "" {
 		rep.HostHint = a.opts.HostID
 	}
-	rep.Skipped = r.tally.Total()
+	count()
 	rep.Notes = append(rep.Notes, r.notes()...)
 	rep.Notes = append(rep.Notes, r.tally.Notes()...)
 	if rep.Skipped > 0 {
@@ -328,6 +337,17 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		rep.Status = model.SourceOK
 	}
 	return rep
+}
+
+// skip notes that the record or list entry at ref could not be used. The
+// reason goes into the notes of the report every time; the record counts
+// as skipped once.
+func (r *run) skip(ref, reason string) {
+	r.tally.Skip(ref, reason)
+	if r.skipped == nil {
+		r.skipped = map[string]bool{}
+	}
+	r.skipped[ref] = true
 }
 
 // stopped marks the end of a read because its context ended.

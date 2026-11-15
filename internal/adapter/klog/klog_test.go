@@ -3,6 +3,7 @@ package klog
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -285,8 +286,9 @@ func TestJournalJSONFromAMDHost(t *testing.T) {
 	c, rep, _ := collectFile(t, "amd.journal.json", Options{})
 	const bootA, bootB = "6f1c0a8e2b7d4f0e9a3b5c7d9e1f2a3b", "0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a"
 
-	if rep.Status != model.SourcePartial || rep.Records != 11 || rep.Skipped != 1 || rep.HostHint != "epyc-a17" {
-		t.Errorf("report = %+v, want partial, 11 records, 1 skipped, host epyc-a17", rep)
+	// Eleven records that were read and the entry that is no JSON.
+	if rep.Status != model.SourcePartial || rep.Records != 12 || rep.Skipped != 1 || rep.HostHint != "epyc-a17" {
+		t.Errorf("report = %+v, want partial, 12 records, 1 skipped, host epyc-a17", rep)
 	}
 	if !hasNote(rep, "#L20: journal entry is not valid JSON") || !hasNote(rep, "1 machine checks are not memory errors") {
 		t.Errorf("notes = %q", rep.Notes)
@@ -533,6 +535,21 @@ func TestInputsThatAreNotKernelLogs(t *testing.T) {
 			t.Errorf("report = %+v, %d events", rep, len(c.Events))
 		}
 	})
+	// What is skipped is part of what was looked at. A log whose only
+	// memory line could not be read said "0 records, 1 not usable" with
+	// the status of a log that holds nothing. Found by FuzzDetect of
+	// package scan.
+	t.Run("a log whose only memory line cannot be read", func(t *testing.T) {
+		for name, text := range map[string]string{
+			"journal entry that is no JSON": `{"MESSAGE":"EDAC MC0: 1 CE","_TRANSPORT":"kernel"` + "\n",
+			"line longer than 1 MiB":        "[    5.000000] EDAC MC0: 1 CE " + strings.Repeat("x", 2<<20) + "\n",
+		} {
+			c, rep := collectText(t, text, Options{})
+			if rep.Status != model.SourcePartial || rep.Records != 1 || rep.Skipped != 1 || len(c.Events) != 0 {
+				t.Errorf("%s: report = %+v, %d events", name, rep, len(c.Events))
+			}
+		}
+	})
 	t.Run("no line end at the end of the input", func(t *testing.T) {
 		c, _ := collectText(t, strings.TrimRight(shortDmesg, "\n"), Options{})
 		if len(c.Events) != 1 || len(c.Actions) != 1 {
@@ -574,6 +591,34 @@ func TestValuesOutOfRangeAreSkipped(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// A journal of a machine whose clock stood near 1970 while it had been up
+// for longer than that clock shows: the start of the boot, the time of a
+// line less its seconds since boot, falls before 1970. The ledger stores
+// no such time. The boot is left out and named; its records, which have
+// times of their own, are kept. Found by FuzzDetect of package scan.
+func TestBootThatWouldStartBefore1970(t *testing.T) {
+	entry := func(msg string, realtime, mono int64) string {
+		return fmt.Sprintf(`{"MESSAGE":%q,"_TRANSPORT":"kernel","_BOOT_ID":"6f1c0a8e2b7d4f0e9a3b5c7d9e1f2a3b","__REALTIME_TIMESTAMP":"%d","_SOURCE_MONOTONIC_TIMESTAMP":"%d"}`+"\n", msg, realtime, mono)
+	}
+	text := entry("Linux version 6.1.0 (builder@example) #1 SMP", 100_000_000, 400_000_000) +
+		entry("EDAC MC0: 1 CE memory read error on DIMM_A1 (channel:0 slot:0 page:0x1000 offset:0x40 grain:32 syndrome:0x0)", 160_000_000, 460_000_000)
+	c, rep := collectText(t, text, Options{})
+	if len(c.Boots) != 0 || len(c.Events) != 1 || rep.Status != model.SourcePartial || rep.Skipped != 1 || rep.Skipped > rep.Records ||
+		!hasNote(rep, "start of a boot is out of range") {
+		t.Fatalf("report = %+v, %d boots, %d events", rep, len(c.Boots), len(c.Events))
+	}
+	if e := c.Events[0]; !e.ErrorDT.Equal(time.Unix(160, 0)) {
+		t.Errorf("the record is dated %v", e.ErrorDT)
+	}
+	// The same lines with a clock that is set: the boot is there.
+	const day = 1_794_268_800_000_000
+	text = entry("Linux version 6.1.0 (builder@example) #1 SMP", day+100_000_000, 400_000_000) +
+		entry("EDAC MC0: 1 CE memory read error on DIMM_A1 (channel:0 slot:0 page:0x1000 offset:0x40 grain:32 syndrome:0x0)", day+160_000_000, 460_000_000)
+	if c, rep = collectText(t, text, Options{}); len(c.Boots) != 1 || len(c.Events) != 1 || rep.Status != model.SourceOK {
+		t.Errorf("clock that is set: report = %+v, %d boots, %d events", rep, len(c.Boots), len(c.Events))
 	}
 }
 

@@ -193,7 +193,7 @@ func (r *run) emit() error {
 			r.otherHosts[h]++
 			if !r.asked {
 				// Nobody asked for these records to be left out.
-				r.tally.Skip(rec.ref, "record of another host than "+r.host)
+				r.skip(rec.ref, "record of another host than "+r.host)
 			}
 			continue
 		}
@@ -217,7 +217,7 @@ func (r *run) emit() error {
 			}
 		}
 		if !used {
-			r.tally.Skip(rec.ref, "record of no known kind")
+			r.skip(rec.ref, "record of no known kind")
 		}
 	}
 	return r.modules()
@@ -239,7 +239,7 @@ func (r *run) runtime(rec *record) error {
 	flat := rec.flat
 	at, ok := parseTime(flat["errordt"], r.opts.Location)
 	if !ok {
-		r.tally.Skip(rec.ref, fmt.Sprintf("ErrorDT %q is missing or unreadable", text(flat["errordt"])))
+		r.skip(rec.ref, fmt.Sprintf("ErrorDT %q is missing or unreadable", text(flat["errordt"])))
 		return nil
 	}
 	loc := locate(flat)
@@ -261,13 +261,13 @@ func (r *run) runtime(rec *record) error {
 	ecs := rec.obj["ecsmoderegisters"]
 	hasECS := ecs != nil // a field that is null is not there
 	if !hasSeverity && !hasECS {
-		r.tally.Skip(rec.ref, "record has a time and neither an ErrorSeverity nor ECS registers")
+		r.skip(rec.ref, "record has a time and neither an ErrorSeverity nor ECS registers")
 		return nil
 	}
 	if hasSeverity {
 		sev, ok := severity(text(flat["errorseverity"]))
 		if !ok {
-			r.tally.Skip(rec.ref, fmt.Sprintf("unknown ErrorSeverity %q", text(flat["errorseverity"])))
+			r.skip(rec.ref, fmt.Sprintf("unknown ErrorSeverity %q", text(flat["errorseverity"])))
 		} else {
 			e := &model.Event{
 				Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: sev, ErrorScrubType: scrubType(text(flat["errorscrubtype"])),
@@ -302,7 +302,7 @@ func (r *run) runtime(rec *record) error {
 	if hasECS {
 		samples, ok := ecsReadings(ecs, loc.device)
 		if !ok || len(samples) == 0 {
-			r.tally.Skip(rec.ref, "EcsModeRegisters is in a form this reader does not know")
+			r.skip(rec.ref, "EcsModeRegisters is in a form this reader does not know")
 			return nil
 		}
 		for _, s := range samples {
@@ -496,7 +496,7 @@ func (r *run) boot(rec *record) error {
 	flat := rec.flat
 	at, hasTime := parseTime(flat["currentbootdt"], r.opts.Location)
 	if _, given := flat["currentbootdt"]; given && !hasTime {
-		r.tally.Skip(rec.ref, fmt.Sprintf("CurrentBootDT %q is unreadable", text(flat["currentbootdt"])))
+		r.skip(rec.ref, fmt.Sprintf("CurrentBootDT %q is unreadable", text(flat["currentbootdt"])))
 	}
 	for _, k := range []string{"systemmemoryconfig", "primordialbootdt", "pmicbooterrorlog", "dramoffsetregisters", "rcdcontrolwords", "databuffercontrolwords", "memorycontrollermetadata"} {
 		if rec.obj[k] != nil {
@@ -525,9 +525,10 @@ func (r *run) boot(rec *record) error {
 		// The entries of this record by place, as indexes into r.placed.
 		here := map[[3]int]int{}
 		for i, item := range list {
+			r.parts++
 			m, isObj := item.(map[string]any)
 			if !isObj {
-				r.tally.Skip(fmt.Sprintf("%s/InstalledMemory[%d]", rec.ref, i), "entry of the installed memory is not an object")
+				r.skip(fmt.Sprintf("%s/InstalledMemory[%d]", rec.ref, i), "entry of the installed memory is not an object")
 				continue
 			}
 			o := folded(m)
@@ -542,7 +543,7 @@ func (r *run) boot(rec *record) error {
 			p, placed := loc.place()
 			named := mod.Locator != ""
 			if !named && !placed {
-				r.tally.Skip(mod.RawRef, "entry of the installed memory names no slot: no locator and no socket, channel and slot numbers")
+				r.skip(mod.RawRef, "entry of the installed memory names no slot: no locator and no socket, channel and slot numbers")
 				continue
 			}
 			if !placed {
@@ -570,24 +571,25 @@ func (r *run) boot(rec *record) error {
 			r.placed = append(r.placed, lm)
 		}
 	} else if rec.obj["installedmemory"] != nil {
-		r.tally.Skip(rec.ref, "InstalledMemory is not a list")
+		r.skip(rec.ref, "InstalledMemory is not a list")
 	}
 
 	// A training failure names the step that failed and the module. It
 	// happened at the boot the record is about.
 	list, _ := rec.obj["trainingeventlogs"].([]any)
 	if rec.obj["trainingeventlogs"] != nil && list == nil {
-		r.tally.Skip(rec.ref, "TrainingEventLogs is not a list")
+		r.skip(rec.ref, "TrainingEventLogs is not a list")
 	}
 	for i, item := range list {
+		r.parts++
 		ref := fmt.Sprintf("%s/TrainingEventLogs[%d]", rec.ref, i)
 		if !hasTime {
-			r.tally.Skip(ref, "training event of a boot record without a readable CurrentBootDT")
+			r.skip(ref, "training event of a boot record without a readable CurrentBootDT")
 			continue
 		}
 		m, isObj := item.(map[string]any)
 		if !isObj {
-			r.tally.Skip(ref, "entry of the training events is not an object")
+			r.skip(ref, "entry of the training events is not an object")
 			continue
 		}
 		sub := map[string]any{}
@@ -644,7 +646,7 @@ func (r *run) crash(rec *record) error {
 		at, ok = parseTime(flat[field], r.opts.Location)
 	}
 	if !ok {
-		r.tally.Skip(rec.ref, "crash record has no readable time")
+		r.skip(rec.ref, "crash record has no readable time")
 		return nil
 	}
 	for _, k := range []string{"pmiccrashregisters", "uptime"} {
@@ -681,7 +683,7 @@ func (r *run) modules() error {
 		if lm.clash {
 			r.clashes++
 			if !lm.named {
-				r.tally.Skip(m.RawRef, "entry of the installed memory has the socket, channel and slot numbers of another entry and no slot name")
+				r.skip(m.RawRef, "entry of the installed memory has the socket, channel and slot numbers of another entry and no slot name")
 				continue
 			}
 			m.Socket, m.Channel, m.Position = model.Opt[int]{}, model.Opt[int]{}, model.Opt[int]{}
