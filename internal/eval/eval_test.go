@@ -928,14 +928,16 @@ func TestDetail(t *testing.T) {
 		t.Fatalf("%d lines, want %d:\n%s", len(lines), want, buf.String())
 	}
 	for _, want := range []string{
-		"s0001,cutoff,71,observe,R-SOFT-01,soft.cell,single-bit,1,no ticket,24,",
-		"s0002,cutoff,71,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0002,cutoff,131,,,,,0,failed before,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0003,cutoff,71,,,,,0,first error later,40,",
-		"s0002,lead,86400,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0006,cutoff,207,hold-replacement,R-SYS-01,sys.channel,system-issue,2,no ticket,30,",
-		"s0007,cutoff,207,observe,R-SOFT-01,soft.stray_once,single-bit,3,type 0,3,failure_type 0 at 0001-08-10 09:30:00",
-		"s0008,all,244,observe,R-SOFT-01,soft.cell,single-bit,1,,9,",
+		"s0001,cutoff,71,observe,R-SOFT-01,soft.cell,single-bit,1,no ticket,24,,24,0,7.349,",
+		"s0002,cutoff,71,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07,88,38,0.106,",
+		"s0002,cutoff,131,,,,,0,failed before,88,failure_type 1 at 0001-03-11 03:14:07,,,,",
+		"s0003,cutoff,71,,,,,0,first error later,40,,,,,",
+		"s0002,lead,86400,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07,82,36,0.417,",
+		"s0006,cutoff,207,hold-replacement,R-SYS-01,sys.channel,system-issue,2,no ticket,30,,30,30,1.106,",
+		"s0007,cutoff,207,observe,R-SOFT-01,soft.stray_once,single-bit,3,type 0,3,failure_type 0 at 0001-08-10 09:30:00,3,0,46.179,",
+		"s0008,all,244,observe,R-SOFT-01,soft.cell,single-bit,1,,9,,9,0,119.500,",
+		// s0005 had its burst of 150 errors about two hours before its ticket.
+		"s0005,lead,1,consider-replacement,R-ROW-03,row.rising row.spreading_area row.storm,device,1,correctable errors,210,failure_type 2 at 0001-06-31 05:00:00,210,184,0.090,0.090",
 	} {
 		found := false
 		for _, l := range lines {
