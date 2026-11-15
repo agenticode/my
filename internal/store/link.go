@@ -441,9 +441,11 @@ func gradeRank(g model.Grade) int {
 // decoded from it); those declarations are applied as given. Records from
 // different sources are matched here: same severity class, same cache line
 // address (or same slot when neither has an address), times within the
-// tolerance, and at most one record per source in a group. The CXL tables
-// of rasdaemon count as one source for this. The record with the best
-// observation grade stays; the others point at it through dup_of.
+// tolerance, and at most one record per source in a group. A record an
+// adapter declared to be a second report counts as the record of its
+// source in the group of the record it repeats. The CXL tables of
+// rasdaemon count as one source. The record with the best observation
+// grade stays; the others point at it through dup_of.
 //
 // A record of a BMC log is matched once more, because it has no address to
 // match on: it is a duplicate when the host's own logs hold a record of the
@@ -489,6 +491,42 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		members   []member
 		first     time.Time
 		estimated bool
+		// from holds the reporters the group has a record of: those of
+		// its members, and those of the records an adapter declared to
+		// be second reports of a member. Such a record is not a member,
+		// and it is its source's report of the error all the same.
+		from map[string]bool
+	}
+
+	// What the adapters declared: the sources of the second reports of
+	// each record.
+	declared := map[int64][]string{}
+	drows, err := s.db.QueryContext(ctx, `SELECT dup_of, source FROM event WHERE host = ? AND dup_of IS NOT NULL`, host)
+	if err != nil {
+		return 0, fmt.Errorf("mark duplicates: %w", err)
+	}
+	for drows.Next() {
+		var id int64
+		var source string
+		if err := drows.Scan(&id, &source); err != nil {
+			drows.Close()
+			return 0, err
+		}
+		declared[id] = append(declared[id], source)
+	}
+	drows.Close()
+	if err := drows.Err(); err != nil {
+		return 0, fmt.Errorf("mark duplicates: %w", err)
+	}
+	join := func(c *cluster, m member) {
+		c.members = append(c.members, m)
+		if c.from == nil {
+			c.from = map[string]bool{}
+		}
+		c.from[reporter(m.source)] = true
+		for _, src := range declared[m.id] {
+			c.from[reporter(src)] = true
+		}
 	}
 	open := map[string][]*cluster{}
 	updates := map[int64]int64{} // duplicate id -> primary id
@@ -591,23 +629,30 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 			if t.Sub(c.first) > limit {
 				continue
 			}
-			has := false
-			for _, m := range c.members {
-				if reporter(m.source) == reporter(source) {
-					has = true
+			if c.from[reporter(source)] {
+				continue
+			}
+			// A record that brings a second report of a source the group
+			// already has is another error as well.
+			clash := false
+			for _, src := range declared[id] {
+				if c.from[reporter(src)] {
+					clash = true
 					break
 				}
 			}
-			if has {
+			if clash {
 				continue
 			}
-			c.members = append(c.members, member{id, source, model.Grade(grade)})
+			join(c, member{id, source, model.Grade(grade)})
 			c.estimated = c.estimated || est
 			joined = true
 			break
 		}
 		if !joined {
-			keep = append(keep, &cluster{members: []member{{id, source, model.Grade(grade)}}, first: t, estimated: est})
+			c := &cluster{first: t, estimated: est}
+			join(c, member{id, source, model.Grade(grade)})
+			keep = append(keep, c)
 		}
 		open[key] = keep
 	}
