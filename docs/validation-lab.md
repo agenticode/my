@@ -26,7 +26,7 @@ QEMU builds the ACPI tables of its guests. For an aarch64 guest with `ras=on` th
 2. The result is an injection plan, `plan.yaml`: every injection with its time, its address, how many times, and what the kernel is expected to do with the page.
 3. `tools/lab/capture.sh` collects `dmesg`, `journalctl -k -o json`, the rasdaemon database, the EDAC tree, `dmidecode -t 17`, the files under `/proc` and `/sys` that name the host, and what `my scan` and `my bundle --anonymize` say on the host as root.
 4. `tools/lab/sanitize.py` replaces what names the lab and fails when a part of such a value is left anywhere, also inside the database and the bundle.
-5. `internal/labcase` reads every capture three ways: as a copy of the host's files (`my --root`), as loose files (`my import`), and through the bundle written on the host (`my open`). Each time `injection.Compare` looks up every injection of the plan in the ledger. An injection passes when the ledger holds it the planned number of times, counted once however many sources report it, with every field it reports equal to the plan. Records beyond the plan fail the test, except pages that an earlier boot of the same host took offline.
+5. `internal/labcase` reads every capture three ways: as a copy of the host's files (`my --root`), as loose files (`my import`), and through the bundle written on the host (`my open`). Each time `injection.Compare` looks up every injection of the plan in the ledger. An injection passes when the ledger holds it the planned number of times, counted once however many sources report it, with every field it reports equal to the plan. Records beyond the plan fail the test, except what an earlier boot of the same host left: pages it took offline, and in the bundle of `6.19.10-ghes-clock-step` the errors of the boot before, which the journal of the guest still held.
 
 The plan format and the comparison are in `internal/injection`.
 
@@ -44,6 +44,7 @@ The plan format and the comparison are in `internal/injection`.
 | `7.3.0-mce-rasdaemon-1.0` | as `7.3.0-mce` | as `7.3.0-mce` | rasdaemon 1.0.0: the same rows in a database of 39 tables, and 3 rows in `signal_event` | the same |
 | `7.3.0-cxl` | 9 DRAM event records, 3 general media event records, 1 memory module event record, 2 poison ranges of an emulated CXL device | nothing per record | rasdaemon 1.0.0: 9, 3, 1 and 2 rows in the CXL tables | CE 11, UE 1 on `cxl:mem0`, grade A 9 and B 3, a row fault, "replace now" |
 | `6.19.10-ghes` | 26 firmware error records on one DIMM: a row with 15 corrected errors, 2 in the row next to it, 6 at one cell within a second, 1 with the threshold flag, 2 uncorrected | 21 firmware blocks, 26 EDAC lines, 2 `Memory failure` lines | 26 rows in `mc_event`, none in `memory_failure_event` | CE 24, UE 2 on `DIMM 0`, grade A, a multi-row fault, "replace now" |
+| `6.19.10-ghes-clock-step` | 11 firmware error records in the next boot of that guest, after its clock was set back by 10 seconds while rasdaemon ran | 8 firmware blocks, 11 EDAC lines, 1 `Memory failure` line, dated by the kernel's clock | 11 rows in `mc_event`, 10 to 11 seconds ahead of the journal; no record that holds the kernel's time | CE 10, UE 1 on `DIMM 0`; the 11 rasdaemon records moved to the kernel's time |
 
 The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guest has the memory controller `ghes_edac` registers, with its one DIMM and its counters.
 
@@ -52,7 +53,7 @@ The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The erro
 Each of these was wrong or missing before the capture showed it.
 
 - `dmidecode` 3.7 prints `Size: 16 GiB`. The reader accepted `GB` only and saw no populated memory device in such an output.
-- rasdaemon dates a record by the uptime of its trace event plus an offset it measured when it started. chronyd set the clock of the lab host back by 6.7 to 10.8 seconds on seven boots, a few seconds after rasdaemon had started. The kernel log dates the same errors by the kernel's clock, and two records more than 5 seconds apart were not taken for one error: every error of such a boot counted twice. A machine check record is now dated by the time the kernel put into it, and the rows of other tables next to it move by the same amount. A database without machine check records, as on the aarch64 guest, is compared with the kernel log of the same boot: the difference in time that the errors in both agree on is the step.
+- rasdaemon dates a record by the uptime of its trace event plus an offset it measured when it started. chronyd set the clock of the lab host back by 6.7 to 10.8 seconds on seven boots, a few seconds after rasdaemon had started. The kernel log dates the same errors by the kernel's clock, and two records more than 5 seconds apart were not taken for one error: every error of such a boot counted twice. A machine check record is now dated by the time the kernel put into it, and the rows of other tables next to it move by the same amount. A database without machine check records, as on the aarch64 guest, is compared with the kernel log of the same boot: the difference in time that the errors in both agree on is the step. On that guest with its clock set back, the tool had said "CE 18, UE 2" for 10 and 1.
 - The journal files the first kernel messages of a boot, 1,318 of 1,486 on the lab host, under the host name `localhost`. An import of a journal export was stored under that name. The name now comes from the end of the file.
 - `journalctl -o short-monotonic` puts `host kernel:` between the stamp and the message. The boot banner was not recognised behind it.
 - The kernel announces a page that a program asked it to give up (`Injecting memory failure for pfn ...`). Such a page is now marked in the ledger and counted in the source report. A boot in which `mce-inject` or EINJ was set up is named.
@@ -77,6 +78,7 @@ Each of these was wrong or missing before the capture showed it.
 - An uncorrected error that needs no action (UCNA) costs its page like one that needs action.
 - `CPU0 BANK7 CMCI storm detected` and `... subsided` carry no `mce:` prefix. `MCE: Killing <program> due to hardware memory corruption fault at ...` is logged when a program touches a poisoned page.
 - The journal of one boot holds two machine IDs, the one of the initrd and the one of the installed system, and `_SOURCE_MONOTONIC_TIMESTAMP` is `0` for the first messages of a boot.
+- Three clocks date one error on the aarch64 guest, and they agree to a second or two at best. In `6.19.10-ghes`, where no clock was set, the rows of rasdaemon carry whole seconds that lie 0.7 to 2.2 seconds before the stamps of the journal. In `6.19.10-ghes-clock-step` the boot time in `/proc/stat` plus the stamp of a kernel log line gives a time 1.2 seconds after the journal's stamp of that line, 30 minutes into the boot. Records of one error up to 2 seconds apart are therefore left where they are.
 - systemd writes the UUID of the root file system into unit names as `1b2c3d4e\x2d5f60...`, with `\x2d` for each dash, and `/dev/kmsg` escapes the backslash once more. A search for the plain UUID finds neither.
 
 ## What the lab cannot exercise
@@ -110,6 +112,7 @@ $LAB/tools/mce.sh                # then: print-all, clock-step, fatal, rasdaemon
 $LAB/tools/cxl.sh                # needs rasdaemon with CXL support at $RASDAEMON
 $LAB/tools/ghes.sh image         # once, from a Fedora cloud image for aarch64 under $LAB/img
 $LAB/tools/ghes.sh boot && $LAB/tools/ghes.sh prepare && $LAB/tools/ghes.sh run
+$LAB/tools/ghes.sh clock-step    # in a boot of its own
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 
