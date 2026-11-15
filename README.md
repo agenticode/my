@@ -109,7 +109,7 @@ In the address map a horizontal line is a row fault, a vertical line a column fa
 | `my timeline [slot\|serial]` | errors per day with boots, repairs, page offlines, slot changes and uncorrected errors |
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
-| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, a copy of a host's files |
+| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, FMFM logs, a copy of a host's files |
 | `my help [command]` | flags of a command and how to read what it prints |
 
 A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
