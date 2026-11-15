@@ -4,3 +4,7 @@
 *.mycase binary
 testdata/**/DMI binary
 testdata/**/smbios_entry_point binary
+# Made by "make examples": kept out of the language statistics, and
+# folded in a diff.
+examples/demo-report.html linguist-generated=true
+examples/figures/*.svg linguist-generated=true

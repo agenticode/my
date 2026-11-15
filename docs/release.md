@@ -30,7 +30,7 @@ The same commit, built with the same Go version, gives the same archives byte fo
 - the version, the commit and the time of the commit are the only values stamped into it;
 - the archive is written by `tools/dist`: members in a fixed order, the time of the commit as their time, owner and group 0 without names, no file name and no time in the gzip header. GNU tar and BSD tar write different bytes for the same files, so neither is used.
 
-`make dist-check` builds the archives twice, once from the working tree and once from a copy of it in another directory with an empty build cache, and compares the checksums. CI runs it for every change.
+`make dist-check` builds the archives twice, once from the working tree and once from a copy of it in another directory with an empty build cache, and compares the checksums. CI runs it for every change. On 2026-11-15 one commit was also built on two machines with Go 1.26.0, a Linux x86-64 CI runner and a macOS arm64 machine: the three archives had the same checksums on both.
 
 To check a published release against its source:
 
