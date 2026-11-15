@@ -1,5 +1,5 @@
 #!/bin/bash
-# ghes.sh image|boot|prepare|run|stop
+# ghes.sh image|boot|prepare|run|clock-step|stop
 #
 # Firmware error records in an aarch64 guest. Firmware-first error handling
 # cannot be driven on the lab host: it has no EINJ table and its hypervisor
@@ -18,6 +18,8 @@
 #   boot      start the guest and wait until it answers
 #   prepare   once per disk: install rasdaemon, sqlite, dmidecode and a compiler
 #   run       inject (see below), capture into $LAB/cap/ghes
+#   clock-step  set the clock back by 10 seconds after rasdaemon started,
+#             inject fewer errors, capture into $LAB/cap/ghes-clock-step
 #   stop      power the guest off
 #
 # What "run" injects, all on the one DIMM of the guest:
@@ -30,6 +32,11 @@
 #             kernel takes the page offline soft, and nothing records that
 #   ue-1      1 uncorrected recoverable error (multi-bit ECC) on a page in use
 #   ue-2      1 uncorrected recoverable error found by the scrubber
+#
+# What "clock-step" injects: 6 corrected errors in the row, two of the
+# addresses twice; 4 at one cell within a second; 1 uncorrected recoverable
+# error on a page in use. This guest has no machine check records, so
+# nothing in the rasdaemon database carries the kernel's time.
 set -eu
 LAB=${LAB:-/root/my-lab}
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -37,10 +44,67 @@ A64=$LAB/a64
 PORT=${PORT:-2222}
 KEY=$A64/id_ed25519
 QMP=$A64/qmp.sock
-STEP=${1:?usage: ghes.sh image|boot|prepare|run|stop}
+STEP=${1:?usage: ghes.sh image|boot|prepare|run|clock-step|stop}
+WORK=$LAB/tmp
 
 guest() { ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20 -i "$KEY" -p "$PORT" root@127.0.0.1 "$@"; }
 push() { scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$KEY" -P "$PORT" "$@"; }
+
+# What the steps that inject share.
+ghes() { python3 "$HERE/ghes.py" --qmp "$QMP" "$@" | tee -a "$WORK/injected.jsonl"; }
+# Where the errors sit: the one DIMM, named by its SMBIOS handle.
+dimm=(--node 0 --card 0 --module 0 --handle 0x1100 --fru-text "DIMM 0" --label "DIMM 0")
+cell=(--rank 0 --device 7 --bank-group 1 --bank-address 2)
+addr() { printf '0x%x' $(($1 * 4096 + $2)); }
+
+# begin: an empty list of injections, and rasdaemon at work.
+begin() {
+	mkdir -p "$WORK"
+	: >"$WORK/injected.jsonl"
+	guest 'systemctl is-active rasdaemon; dmidecode -t 17 | grep -E "^Handle|Locator|Serial"'
+}
+
+# hold N: a process of the guest takes N pages in use and waits for a line
+# on a named pipe that a sleeping process keeps open. pfn[1..N] are the
+# page frames.
+hold() {
+	guest "cd /root/my-lab && rm -f tmp/hold.* && mkfifo tmp/hold.in &&
+		(nohup sh -c 'sleep 900 >tmp/hold.in' >/dev/null 2>&1 &) &&
+		(nohup sh -c './bin/hwpoison hold:$1 <tmp/hold.in >tmp/hold.out 2>tmp/hold.err' >/dev/null 2>&1 &)
+		sleep 4; cat tmp/hold.out" >"$WORK/hold.jsonl"
+	pfn=()
+	n=0
+	while read -r line; do
+		n=$((n + 1))
+		pfn[n]=$(sed 's/.*"pfn":"\(0x[0-9a-f]*\)".*/\1/' <<<"$line")
+	done <"$WORK/hold.jsonl"
+	[ "$n" = "$1" ] || { echo "ghes.sh: the guest holds $n pages, not $1" >&2; exit 1; }
+}
+
+# held: the holder reads its pages once more and says what became of them.
+held() {
+	guest 'cd /root/my-lab && echo >tmp/hold.in; sleep 3; grep held tmp/hold.out; pkill -f "sleep 900" || true' >"$WORK/held.jsonl" || true
+}
+
+# finish NAME SUMMARY [capture.sh options]: the plan, the capture in the
+# guest and its copy on the lab host.
+finish() {
+	name=$1
+	summary=$2
+	shift 2
+	python3 "$HERE/plan.py" --scenario "$name" --summary "$summary" \
+		--method "QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic hardware error source" \
+		--set "kernel=$(guest uname -r)" --set "rasdaemon=$(guest 'rasdaemon --version' | awk '{print $2; exit}')" \
+		--set "machine=QEMU $(qemu-system-aarch64 --version | awk '{print $4; exit}') virt, ras=on, emulated without hardware virtualization" \
+		<"$WORK/injected.jsonl" >"$WORK/plan.yaml"
+	guest "cd /root/my-lab && LAB=/root/my-lab MY_KEY=/root/my-lab/anon.key ./tools/capture.sh $name $* >tmp/capture.out 2>&1; tail -3 tmp/capture.out"
+	rm -rf "$LAB/cap/$name"
+	mkdir -p "$LAB/cap"
+	guest "cd /root/my-lab/cap && tar cf - $name" | tar xf - -C "$LAB/cap"
+	cp "$WORK/plan.yaml" "$LAB/cap/$name/plan.yaml"
+	cp "$WORK/injected.jsonl" "$WORK/held.jsonl" "$LAB/cap/$name/extra/"
+	echo "captured: $LAB/cap/$name"
+}
 
 case "$STEP" in
 image)
@@ -118,15 +182,7 @@ prepare)
 	;;
 
 run)
-	name=ghes
-	WORK=$LAB/tmp
-	mkdir -p "$WORK"
-	: >"$WORK/injected.jsonl"
-	guest 'systemctl is-active rasdaemon; dmidecode -t 17 | grep -E "^Handle|Locator|Serial"'
-	ghes() { python3 "$HERE/ghes.py" --qmp "$QMP" "$@" | tee -a "$WORK/injected.jsonl"; }
-	# Where the errors sit: the one DIMM, named by its SMBIOS handle.
-	dimm=(--node 0 --card 0 --module 0 --handle 0x1100 --fru-text "DIMM 0" --label "DIMM 0")
-	cell=(--rank 0 --device 7 --bank-group 1 --bank-address 2)
+	begin
 
 	# A row fault: one row, five columns, two bits of one device. The
 	# addresses are made up; nothing is done to their pages.
@@ -152,21 +208,7 @@ run)
 		--row 0x0456 --column 0x0c8 --bit 2 --address 0x180045640
 	sleep 6
 
-	# Three pages in use by a process of the guest. It waits for a line on
-	# a named pipe that a sleeping process keeps open.
-	guest 'cd /root/my-lab && rm -f tmp/hold.* && mkfifo tmp/hold.in &&
-		(nohup sh -c "sleep 900 >tmp/hold.in" >/dev/null 2>&1 &) &&
-		(nohup sh -c "./bin/hwpoison hold:3 <tmp/hold.in >tmp/hold.out 2>tmp/hold.err" >/dev/null 2>&1 &)
-		sleep 4; cat tmp/hold.out' >"$WORK/hold.jsonl"
-	pfn=()
-	n=0
-	while read -r line; do
-		n=$((n + 1))
-		pfn[n]=$(sed 's/.*"pfn":"\(0x[0-9a-f]*\)".*/\1/' <<<"$line")
-	done <"$WORK/hold.jsonl"
-	[ "$n" = 3 ] || { echo "ghes.sh: the guest holds $n pages, not 3" >&2; exit 1; }
-	addr() { printf '0x%x' $(($1 * 4096 + $2)); }
-
+	hold 3
 	ghes --id thr --severity corrected --threshold --type 2 "${dimm[@]}" --rank 0 --device 2 --bank-group 0 --bank-address 3 \
 		--row 0x0777 --column 0x040 --bit 1 --address "$(addr "${pfn[1]}" 0x100)" \
 		--note "the kernel moves the content of the page elsewhere and retires it, and leaves no record of that: no line in the kernel log, no trace event (extra/held.jsonl shows the page frame before and after)"
@@ -179,23 +221,42 @@ run)
 		--row 0x3ffe --column 0x008 --address "$(addr "${pfn[3]}" 0x300)"
 	printf '{"id":"ue-2-offline","inject":"page-offline","how":"hard","count":1,"address":"%s","note":"by the kernel after ue-2"}\n' "$(addr "${pfn[3]}" 0)" >>"$WORK/injected.jsonl"
 	sleep 5
+	held
 
-	# Let the holder read its pages once more and say what became of them.
-	guest 'cd /root/my-lab && echo >tmp/hold.in; sleep 3; grep held tmp/hold.out; pkill -f "sleep 900" || true' >"$WORK/held.jsonl" || true
+	finish ghes "firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM" --formats
+	;;
 
-	python3 "$HERE/plan.py" --scenario "$name" \
-		--summary "firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM" \
-		--method "QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic hardware error source" \
-		--set "kernel=$(guest uname -r)" --set "rasdaemon=$(guest 'rasdaemon --version' | awk '{print $2; exit}')" \
-		--set "machine=QEMU $(qemu-system-aarch64 --version | awk '{print $4; exit}') virt, ras=on, emulated without hardware virtualization" \
-		<"$WORK/injected.jsonl" >"$WORK/plan.yaml"
-	guest 'cd /root/my-lab && LAB=/root/my-lab MY_KEY=/root/my-lab/anon.key ./tools/capture.sh ghes --formats >tmp/capture.out 2>&1; tail -3 tmp/capture.out'
-	rm -rf "$LAB/cap/$name"
-	mkdir -p "$LAB/cap"
-	guest 'cd /root/my-lab/cap && tar cf - ghes' | tar xf - -C "$LAB/cap"
-	cp "$WORK/plan.yaml" "$LAB/cap/$name/plan.yaml"
-	cp "$WORK/injected.jsonl" "$WORK/held.jsonl" "$LAB/cap/$name/extra/"
-	echo "captured: $LAB/cap/$name"
+clock-step)
+	# rasdaemon starts with an empty database and measures once how far
+	# the wall clock is from the uptime. Then the clock is set back, as NTP
+	# does at boot when the hardware clock ran ahead. Nothing sets it again.
+	guest 'systemctl stop chronyd 2>/dev/null; systemctl stop rasdaemon; rm -f /var/lib/rasdaemon/ras-mc_event.db; systemctl start rasdaemon
+		for _ in $(seq 1 30); do [ -s /var/lib/rasdaemon/ras-mc_event.db ] && break; sleep 2; done; sleep 10'
+	begin
+	guest 'date -s "@$(($(date +%s) - 10))" >/dev/null; echo "clock set back by 10 seconds at $(date -u +%Y-%m-%dT%H:%M:%SZ)"' >"$WORK/clock-step.txt"
+	sleep 5
+
+	i=0
+	for spec in "0x010 5" "0x118 5" "0x238 6" "0x010 5" "0x2a0 5" "0x118 5"; do
+		set -- $spec
+		i=$((i + 1))
+		ghes --id "row-$i" --severity corrected --type 2 "${dimm[@]}" "${cell[@]}" --row 0x1a2f --column "$1" --bit "$2" \
+			--address "$(printf '0x%x' $((0x100000000 + $1 * 0x1000 + $2 * 0x40)))"
+		sleep 3
+	done
+	ghes --id burst --count 4 --gap 0.15 --severity corrected --type 2 "${dimm[@]}" --rank 1 --device 3 --bank-group 0 --bank-address 1 \
+		--row 0x0456 --column 0x0c8 --bit 2 --address 0x180045640
+	sleep 6
+
+	hold 1
+	ghes --id ue-1 --severity recoverable --type 3 "${dimm[@]}" --rank 0 --device 9 --bank-group 2 --bank-address 0 \
+		--row 0x2001 --column 0x1f0 --address "$(addr "${pfn[1]}" 0x200)"
+	printf '{"id":"ue-1-offline","inject":"page-offline","how":"hard","count":1,"address":"%s","note":"by the kernel after ue-1"}\n' "$(addr "${pfn[1]}" 0)" >>"$WORK/injected.jsonl"
+	sleep 5
+	held
+
+	finish ghes-clock-step "firmware error records in an aarch64 guest whose clock was set back after rasdaemon started: 10 corrected and 1 uncorrected memory error on one DIMM"
+	cp "$WORK/clock-step.txt" "$LAB/cap/ghes-clock-step/extra/"
 	;;
 
 stop)
@@ -203,7 +264,7 @@ stop)
 	;;
 
 *)
-	echo "usage: ghes.sh image|boot|prepare|run|stop" >&2
+	echo "usage: ghes.sh image|boot|prepare|run|clock-step|stop" >&2
 	exit 2
 	;;
 esac
