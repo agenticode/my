@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -771,6 +772,25 @@ func TestReportFormats(t *testing.T) {
 		if got := leadText(d); got != want {
 			t.Errorf("leadText(%s) = %q, want %q", d, got, want)
 		}
+	}
+	// The Wilson interval: known values, and the edges.
+	for _, c := range []struct {
+		part, total int64
+		lo, hi      float64
+	}{{20, 81, 0.1659, 0.3508}, {0, 10, 0, 0.2775}, {10, 10, 0.7225, 1}, {1, 1, 0.2065, 1}, {50, 100, 0.4038, 0.5962}} {
+		lo, hi := Interval(c.part, c.total)
+		if math.Abs(lo-c.lo) > 0.0005 || math.Abs(hi-c.hi) > 0.0005 {
+			t.Errorf("Interval(%d, %d) = %.4f to %.4f, want %.4f to %.4f", c.part, c.total, lo, hi, c.lo, c.hi)
+		}
+	}
+	if lo, hi := Interval(0, 0); lo != 0 || hi != 1 {
+		t.Errorf("Interval(0, 0) = %v to %v", lo, hi)
+	}
+	if got := share(20, 81); got != "24.69% (20 of 81, 95% interval 16.59% to 35.08%)" {
+		t.Errorf("share = %q", got)
+	}
+	if got := share(0, 0); got != "- (0 of 0)" {
+		t.Errorf("share = %q", got)
 	}
 	if num(1234567) != "1,234,567" || num(-1000) != "-1,000" || num(12) != "12" || pct(1, 3) != "33.33%" || pct(1, 0) != "-" {
 		t.Errorf("number formats: %s %s %s %s %s", num(1234567), num(-1000), num(12), pct(1, 3), pct(1, 0))

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -143,6 +144,30 @@ func pct(part, total int64) string {
 		return "-"
 	}
 	return strconv.FormatFloat(100*float64(part)/float64(total), 'f', 2, 64) + "%"
+}
+
+// Interval returns the 95% Wilson score interval of a share of part in
+// total, as fractions. With few servers a measured share says little; the
+// interval says how little.
+func Interval(part, total int64) (lo, hi float64) {
+	if total <= 0 {
+		return 0, 1
+	}
+	const z = 1.959964
+	n, p := float64(total), float64(part)/float64(total)
+	centre := p + z*z/(2*n)
+	half := z * math.Sqrt(p*(1-p)/n+z*z/(4*n*n))
+	denom := 1 + z*z/n
+	return math.Max(0, (centre-half)/denom), math.Min(1, (centre+half)/denom)
+}
+
+// share writes "p% (part of total, 95% interval lo% to hi%)".
+func share(part, total int64) string {
+	if total == 0 {
+		return "- (0 of 0)"
+	}
+	lo, hi := Interval(part, total)
+	return fmt.Sprintf("%s (%s of %s, 95%% interval %.2f%% to %.2f%%)", pct(part, total), num(part), num(total), 100*lo, 100*hi)
 }
 
 // leadText names a lead time.
@@ -505,8 +530,7 @@ func (r *Report) printCutoffs(p *printer) {
 					}
 					continue
 				}
-				p.line("%s, against %s: precision %s (%s of %s), recall %s (%s of %s)", gradeText(g), what,
-					pct(sc.Hit, sc.Flagged), num(sc.Hit), num(sc.Flagged), pct(sc.Hit, sc.Failures), num(sc.Hit), num(sc.Failures))
+				p.line("%s, against %s: precision %s; recall %s", gradeText(g), what, share(sc.Hit, sc.Flagged), share(sc.Hit, sc.Failures))
 			}
 		}
 		if n := s.Unseen.Total(); n > 0 {
