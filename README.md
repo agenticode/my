@@ -108,6 +108,7 @@ In the address map a horizontal line is a row fault, a vertical line a column fa
 | `my map <slot\|serial>` | the address map of one bank; `--bank`, `--rank`, `--device` choose it, `--rows A-B` zooms |
 | `my timeline [slot\|serial]` | errors per day with boots, repairs, page offlines, slot changes and uncorrected errors |
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
+| `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
 | `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, FMFM logs, a copy of a host's files |
 | `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>` ([docs/exporter.md](docs/exporter.md)) |
@@ -158,7 +159,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles and the Prometheus exporter. Not merged yet: the HTML report and the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
 
 ## Build
 
@@ -188,6 +189,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 13 rules with fixed IDs to reach a finding per DIMM |
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text: colour, glyph density, ASCII, width |
+| `internal/report` | the HTML report: one file with inline SVG figures, the records behind them, and nothing loaded from elsewhere |
 | `internal/bundle` | case bundles: format, checks, anonymizing |
 | `internal/exporter` | the Prometheus metrics of a host and their text format |
 | `internal/serve` | the HTTP server of `my serve`: scans on a schedule and answers from the latest scan |
