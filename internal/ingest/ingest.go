@@ -61,6 +61,9 @@ type Result struct {
 	// Aligned says what was done with boots whose records carry no exact
 	// time (see store.AlignTimes).
 	Aligned []store.Alignment
+	// Clocks says which rasdaemon records were given the kernel's time
+	// (see store.AlignClocks).
+	Clocks []store.ClockAlignment
 }
 
 // HostHinter is implemented by adapters that can name the host before any
@@ -73,8 +76,10 @@ type HostHinter interface {
 // were tied to SMBIOS slots.
 const SlotMapKind = "slot-map"
 
-// TimeAlignKind is the source inventory entry that reports how records
-// without a date were dated by the records of another source.
+// TimeAlignKind is the source inventory entry that reports what was done to
+// the times of records: records without a date that were dated by the
+// records of another source, and rasdaemon records that were given the
+// kernel's time.
 const TimeAlignKind = "time-align"
 
 // Run reads the adapters into the ledger. A source that cannot be read does
@@ -188,6 +193,13 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		{"action slots", func() error { return resolveActionSlots(ctx, s, host) }},
 		{"ECS slots", func() error { return resolveECSSlots(ctx, s, host) }},
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
+		{"clocks", func() (err error) {
+			// Before the records without a date are dated by the others.
+			if res.Clocks, err = s.AlignClocks(ctx, host); err != nil || len(res.Clocks) == 0 {
+				return err
+			}
+			return s.LinkBoots(ctx, host)
+		}},
 		{"times", func() (err error) {
 			if res.Aligned, err = s.AlignTimes(ctx, host); err != nil {
 				return err
@@ -212,10 +224,14 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		}
 	}
 
-	// What the time alignment did is part of the inventory: it changes how
-	// records without dates are counted.
-	if len(res.Aligned) > 0 {
+	// What was done to times is part of the inventory: it changes how
+	// records are counted.
+	if len(res.Aligned) > 0 || len(res.Clocks) > 0 {
 		src := model.Source{ScanID: res.Scan.ID, Kind: TimeAlignKind, Origin: host, Status: model.SourceOK}
+		for _, c := range res.Clocks {
+			src.Records += c.Records
+			src.Notes = append(src.Notes, clockNote(c))
+		}
 		for _, a := range res.Aligned {
 			src.Records += a.Records
 			if a.Aligned {
@@ -247,6 +263,16 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	}
 	res.Scan.FinishedAt = finished
 	return res, nil
+}
+
+// clockNote says in a sentence what store.AlignClocks did with a boot.
+func clockNote(c store.ClockAlignment) string {
+	side, by := "ahead of", -c.Offset
+	if c.Offset > 0 {
+		side, by = "behind", c.Offset
+	}
+	return fmt.Sprintf("rasdaemon stamped %d records of one boot %s %s the kernel's clock: they are dated by the kernel's time, which the kernel log gives for %d of the errors",
+		c.Records, by, side, c.Matched)
 }
 
 // sink writes the records of one adapter into the ledger.

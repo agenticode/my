@@ -694,3 +694,95 @@ func TestRasdaemonAMDWithCounters(t *testing.T) {
 		t.Errorf("corrected errors of P0_DIMM_B2 = %d, want 4 (2 located before the counting window, 2 counted in it)", ce)
 	}
 }
+
+// A host without machine check records whose clock was set back by ten
+// seconds after rasdaemon started: the database is ten seconds ahead of the
+// kernel log for the whole boot. Each scan gives the records it adds the
+// kernel's time.
+func TestRasdaemonClockAgainstTheKernelLog(t *testing.T) {
+	s := newStore(t)
+	t0 := time.Date(2026, 3, 1, 4, 0, 0, 0, time.UTC)
+	after := []time.Duration{2 * time.Minute, 5 * time.Minute, 40 * time.Minute, 3 * time.Hour, 3*time.Hour + 4*time.Second, 9 * time.Hour, 11 * time.Hour}
+	addr := []uint64{0x100010140, 0x100118140, 0x100010140, 0x100238180, 0x1002a0140, 0x100118140, 0x1003f0180}
+	adapters := func(n int) []adapter.Adapter {
+		klog := &fake{kind: "klog", fn: func(sink adapter.Sink) error {
+			for i := 0; i < n; i++ {
+				e := &model.Event{ErrorDT: t0.Add(after[i] + 321*time.Millisecond), ErrorSeverity: model.SevCE, Source: "klog/edac",
+					RawRef: fmt.Sprintf("L%d", i), OsPhysicalAddress: model.Some(addr[i]), Fingerprint: fmt.Sprintf("k-%d", i)}
+				if err := sink.Event(e); err != nil {
+					return err
+				}
+			}
+			return nil
+		}}
+		daemon := &fake{kind: "rasdaemon", fn: func(sink adapter.Sink) error {
+			for i := 0; i < n; i++ {
+				e := &model.Event{ErrorDT: t0.Add(after[i] + 10*time.Second), ErrorSeverity: model.SevCE, Source: "rasdaemon/mc_event",
+					RawRef: fmt.Sprintf("mc_event/%d", i+1), OsPhysicalAddress: model.Some(addr[i]), Fingerprint: fmt.Sprintf("mc-%d", i)}
+				if err := sink.Event(e); err != nil {
+					return err
+				}
+			}
+			// The kernel gave up a page after the fourth error.
+			return sink.Action(&model.Action{At: t0.Add(after[3] + 10*time.Second), Kind: model.ActionPageOffline, Method: "hard",
+				OsPhysicalAddress: model.Some(addr[3] &^ 0xfff), Source: "rasdaemon/memory_failure_event", RawRef: "memory_failure_event/1", Fingerprint: "mf-1"})
+		}}
+		return []adapter.Adapter{klog, daemon}
+	}
+	timeAlign := func(res *Result) *model.Source {
+		for i := range res.Sources {
+			if res.Sources[i].Kind == TimeAlignKind {
+				return &res.Sources[i]
+			}
+		}
+		return nil
+	}
+	ce := func() int64 {
+		var n int64
+		for _, st := range totals(t, s, "h1") {
+			n += st.CE
+		}
+		return n
+	}
+
+	res, err := Run(ctx, s, adapters(5), Options{Host: "h1", Now: t0.Add(4 * time.Hour)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Clocks) != 1 || res.Clocks[0].Offset != -10*time.Second || res.Clocks[0].Records != 6 || res.Clocks[0].Matched != 5 {
+		t.Fatalf("clocks = %+v", res.Clocks)
+	}
+	src := timeAlign(res)
+	want := "rasdaemon stamped 6 records of one boot 10s ahead of the kernel's clock: they are dated by the kernel's time, which the kernel log gives for 5 of the errors"
+	if src == nil || src.Status != model.SourceOK || src.Records != 6 || len(src.Notes) != 1 || src.Notes[0] != want {
+		t.Errorf("time-align entry = %+v\n want the note %q", src, want)
+	}
+	if res.Duplicates != 5 || ce() != 5 {
+		t.Errorf("%d duplicates, CE %d; want 5 and 5", res.Duplicates, ce())
+	}
+	actions, err := s.Actions(ctx, store.ActionFilter{Host: "h1"})
+	if err != nil || len(actions) != 1 || !actions[0].At.Equal(t0.Add(after[3])) {
+		t.Errorf("the page offline is dated %v, want %s (%v)", actions, t0.Add(after[3]), err)
+	}
+
+	// The next scan of the same boot finds two more errors.
+	res, err = Run(ctx, s, adapters(7), Options{Host: "h1", Now: t0.Add(12 * time.Hour)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Clocks) != 1 || res.Clocks[0].Offset != -10*time.Second || res.Clocks[0].Records != 2 || res.Clocks[0].Matched != 2 {
+		t.Errorf("second scan: clocks = %+v", res.Clocks)
+	}
+	if res.Duplicates != 7 || ce() != 7 {
+		t.Errorf("second scan: %d duplicates, CE %d; want 7 and 7", res.Duplicates, ce())
+	}
+
+	// A scan that adds nothing has nothing to say about times.
+	res, err = Run(ctx, s, adapters(7), Options{Host: "h1", Now: t0.Add(13 * time.Hour)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Clocks) != 0 || timeAlign(res) != nil || ce() != 7 {
+		t.Errorf("third scan: clocks = %+v, time-align entry %+v, CE %d", res.Clocks, timeAlign(res), ce())
+	}
+}
