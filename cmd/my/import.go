@@ -262,7 +262,8 @@ func importLine(w io.Writer, lang i18n.Lang, st term.Style, src model.Source) {
 		notes = append([]string{src.Detail}, notes...)
 	}
 	for _, n := range notes {
-		if src.Status == model.SourceOK && !strings.Contains(n, "skipped") && !strings.Contains(n, "seconds since boot") && !strings.Contains(n, "estimated") {
+		if src.Status == model.SourceOK && src.Kind != ingest.TimeAlignKind && !strings.Contains(n, "skipped") &&
+			!strings.Contains(n, "seconds since boot") && !strings.Contains(n, "estimated") {
 			continue
 		}
 		for _, l := range st.Wrap(n, 6) {

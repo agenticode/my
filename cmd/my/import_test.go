@@ -153,3 +153,45 @@ func TestImportMistakes(t *testing.T) {
 		t.Errorf("manifest = %+v, %v", m, err)
 	}
 }
+
+// TestImportDatesAKernelLogByTheDatabase imports the two files a host most
+// often yields: the rasdaemon database and a kernel log saved with dmesg.
+// The log has no dates. The errors both report must be counted once, and
+// the log takes its dates from the database.
+func TestImportDatesAKernelLogByTheDatabase(t *testing.T) {
+	root := hostTree(t)
+	db := filepath.Join(root, "var", "lib", "rasdaemon", "ras-mc_event.db")
+	dmesg := filepath.Join(root, "var", "log", "dmesg")
+	for _, tt := range []struct {
+		name  string
+		flags []string
+	}{
+		{"no dates at all", nil},
+		{"dated by the time of the file", []string{"--mtime"}},
+		{"dated by a capture time that is a week off", []string{"--captured-at", "2026-11-20T00:00:00Z"}},
+	} {
+		args := append([]string{"import", db, dmesg, "--host", "r12-n034"}, tt.flags...)
+		code, out, errOut := runEnv(fixed, args...)
+		if code != 3 || errOut != "" {
+			t.Errorf("%s: exit code %d, stderr %q", tt.name, code, errOut)
+			continue
+		}
+		flat := strings.Join(strings.Fields(out), " ")
+		for _, want := range []string{
+			"time-align: ok, 797 records",
+			"the times of 797 records were set by 797 errors another source reports with a date: their boot started 2026-10-28 01:",
+			"797 reported by more than one source and counted once",
+			"CE 1,284, UE 1 observation grade A",
+		} {
+			if !strings.Contains(flat, want) {
+				t.Errorf("%s: output lacks %q:\n%s", tt.name, want, out)
+			}
+		}
+	}
+	// The kernel log alone stays without dates, and says so.
+	code, out, _ := runEnv(fixed, "import", dmesg)
+	flat := strings.Join(strings.Fields(out), " ")
+	if code != 3 || strings.Contains(out, "time-align") || !strings.Contains(flat, "804 records have only seconds since boot") || !strings.Contains(out, "CE 796, UE 1") {
+		t.Errorf("the kernel log alone: exit code %d\n%s", code, out)
+	}
+}
