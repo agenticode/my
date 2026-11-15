@@ -32,9 +32,21 @@ const journalMatch = "_TRANSPORT=kernel"
 func (j *journal) Kind() string   { return klog.Kind }
 func (j *journal) Origin() string { return "journalctl -o json " + journalMatch }
 
-// deniedHint is what journalctl prints when the user may not read the
-// system journal.
-const deniedHint = "not seeing messages from other users"
+// journalctl says in two ways that the user may not read the system
+// journal: a hint when the user sees only their own messages, and an error
+// when no journal file could be opened at all.
+var deniedHints = []string{"not seeing messages from other users", "insufficient permissions"}
+
+// denied reports whether the error output of journalctl says that the
+// journal is closed to this user.
+func denied(stderr string) bool {
+	for _, h := range deniedHints {
+		if strings.Contains(stderr, h) {
+			return true
+		}
+	}
+	return false
+}
 
 const journalDenied = "the journal shows this user no kernel messages; they are readable as root or as a member of the group systemd-journal"
 
@@ -74,7 +86,7 @@ func (j *journal) probe(ctx context.Context) (model.SourceStatus, string) {
 	switch {
 	case entry:
 		return model.SourceOK, ""
-	case strings.Contains(stderr.buf.String(), deniedHint):
+	case denied(stderr.buf.String()):
 		return model.SourceUnreadable, journalDenied
 	case err != nil:
 		var ee *exec.ExitError
@@ -112,7 +124,7 @@ func (j *journal) pass(ctx context.Context, sink adapter.Sink, timeout time.Dura
 	case rep.SinkErr != nil, timedOut:
 	case werr != nil && rep.Records == 0:
 		rep.Status, rep.Detail = model.SourceError, "journalctl: "+firstLine(stderr.buf.String())
-		if strings.Contains(stderr.buf.String(), deniedHint) {
+		if denied(stderr.buf.String()) {
 			rep.Status, rep.Detail = model.SourceUnreadable, journalDenied
 		}
 	case werr != nil:
