@@ -58,25 +58,26 @@ func (a *Adapter) Origin() string { return a.path }
 
 // tableUse says what the adapter does with a rasdaemon table.
 var tableUse = map[string]string{
-	"mc_event":                "events",
-	"mce_record":              "events",
-	"extlog_event":            "events",
-	"cxl_dram_event":          "events",
-	"cxl_general_media_event": "events",
-	"memory_failure_event":    "actions",
+	"mc_event":                 "events",
+	"mce_record":               "events",
+	"extlog_event":             "events",
+	"cxl_dram_event":           "events",
+	"cxl_general_media_event":  "events",
+	"cxl_memory_module_event":  "events",
+	"cxl_poison_event":         "events",
+	"cxl_memory_sparing_event": "actions",
+	"cxl_overflow_event":       "events",
+	"memory_failure_event":     "actions",
 	// Known rasdaemon tables that do not describe memory errors.
-	"aer_event":               "PCIe errors",
-	"non_standard_event":      "vendor-specific records",
-	"arm_event":               "ARM processor errors",
-	"devlink_event":           "network device health",
-	"disk_errors":             "block device errors",
-	"signal_event":            "signals",
-	"cxl_poison_event":        "CXL poison list records",
-	"cxl_aer_ue_event":        "CXL link errors",
-	"cxl_aer_ce_event":        "CXL link errors",
-	"cxl_overflow_event":      "CXL event log overflow",
-	"cxl_generic_event":       "CXL generic records",
-	"cxl_memory_module_event": "CXL device health records",
+	"aer_event":          "PCIe errors",
+	"non_standard_event": "vendor-specific records",
+	"arm_event":          "ARM processor errors",
+	"devlink_event":      "network device health",
+	"disk_errors":        "block device errors",
+	"signal_event":       "signals",
+	"cxl_aer_ue_event":   "CXL link errors",
+	"cxl_aer_ce_event":   "CXL link errors",
+	"cxl_generic_event":  "CXL records of a vendor's own kind",
 }
 
 // Collect reads the database into sink.
@@ -162,6 +163,10 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		{"extlog_event", r.extlogEvent},
 		{"cxl_dram_event", r.cxlDRAM},
 		{"cxl_general_media_event", r.cxlGeneralMedia},
+		{"cxl_memory_module_event", r.cxlModule},
+		{"cxl_poison_event", r.cxlPoison},
+		{"cxl_memory_sparing_event", r.cxlSparing},
+		{"cxl_overflow_event", r.cxlOverflow},
 		{"memory_failure_event", r.memoryFailure},
 	}
 	has := map[string]bool{}
@@ -189,6 +194,11 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if r.badCPER > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("extlog_event: %d records have a CPER blob that could not be decoded; they were kept without location", r.badCPER))
 	}
+	if err := r.cxlDevices(); err != nil {
+		rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
+		return rep
+	}
+	rep.Notes = append(rep.Notes, r.cxlNotes...)
 	// Say what is in the database and was not interpreted.
 	for _, t := range tables {
 		use, ok := tableUse[t]
@@ -353,6 +363,15 @@ type reader struct {
 	// a machine check.
 	mcIndex []mcEntry
 	sorted  bool
+
+	// What the CXL tables say beyond their events: the devices they name,
+	// poison list entries already seen, and remarks for the report.
+	cxlDevs    map[string]*cxlDevice
+	cxlPoisons map[string]bool
+	cxlMarked  map[string]bool
+	cxlNotes   []string
+	cxlRepeats int
+	cxlQueries int
 }
 
 type mcEntry struct {
@@ -687,95 +706,6 @@ func (r *reader) extlogEvent(rw *row) error {
 	m.Apply(&e)
 	if fru := strings.TrimSpace(rw.str("fru_text")); fru != "" {
 		e.Label = fru
-	}
-	return r.emit(&e)
-}
-
-// cxlCommon fills what the two CXL media event tables share. Location
-// columns are only meaningful when the device marked them valid, and
-// rasdaemon stores zero otherwise without keeping the validity flags.
-func (r *reader) cxlCommon(rw *row, e *model.Event) bool {
-	if !r.base(rw, e) {
-		return false
-	}
-	e.Decoder = "cxl"
-	desc, _ := rw.int("descriptor")
-	typ, _ := rw.int("type")
-	trans, _ := rw.int("transaction_type")
-	e.ErrorSeverity = model.SevCE
-	if desc&1 != 0 {
-		e.ErrorSeverity = model.SevUE
-	}
-	switch {
-	case typ == 1 || trans == 5: // scrub media ECC error, internal media scrub
-		e.ErrorScrubType = model.ScrubPatrol
-	case trans == 1 || trans == 2: // host read, host write
-		e.ErrorScrubType = model.ScrubDemand
-	default:
-		e.ErrorScrubType = model.ScrubOther
-	}
-	switch typ {
-	case 0:
-		e.ErrorType = "media ECC error"
-	case 1:
-		e.ErrorType = "scrub media ECC error"
-	case 2:
-		e.ErrorType = "invalid address"
-	case 3:
-		e.ErrorType = "data path error"
-	}
-	// The host physical address is all ones when the device address is not
-	// mapped into a region.
-	if hpa, ok := rw.int("hpa"); ok && hpa > 0 {
-		e.OsPhysicalAddress = model.Some(uint64(hpa))
-	}
-	if dev := rw.str("memdev"); dev != "" {
-		e.Label = "cxl:" + dev
-	}
-	return true
-}
-
-func (r *reader) cxlDRAM(rw *row) error {
-	var e model.Event
-	if !r.cxlCommon(rw, &e) {
-		return nil
-	}
-	bg, _ := rw.int("bank_group")
-	bank, _ := rw.int("bank")
-	rowN, _ := rw.int("row")
-	col, _ := rw.int("column")
-	nibble, _ := rw.int("nibble_mask")
-	// A DRAM location of all zeros with no correction mask is taken as
-	// "not reported": the validity flags are not in the database.
-	if bg != 0 || bank != 0 || rowN != 0 || col != 0 || len(rw.blob("cor_mask")) > 0 {
-		e.BankGroup, e.Bank = optFromInt(bg, true), optFromInt(bank, true)
-		e.Row, e.Column = optFromInt(rowN, true), optFromInt(col, true)
-		if ch, ok := rw.int("channel"); ok {
-			e.ChannelId = optFromInt(ch, true)
-		}
-		if rk, ok := rw.int("rank"); ok {
-			e.Rank = optFromInt(rk, true)
-		}
-		if sc, ok := rw.int("sub_channel"); ok {
-			e.SubChannel = optFromInt(sc, true)
-		}
-		if nibble != 0 {
-			e.ErrorVector = fmt.Sprintf("nibble:0x%x", nibble)
-		}
-	}
-	return r.emit(&e)
-}
-
-func (r *reader) cxlGeneralMedia(rw *row) error {
-	var e model.Event
-	if !r.cxlCommon(rw, &e) {
-		return nil
-	}
-	ch, _ := rw.int("channel")
-	rk, _ := rw.int("rank")
-	dev, _ := rw.int("device")
-	if ch != 0 || rk != 0 || dev != 0 {
-		e.ChannelId, e.Rank, e.DeviceId = optFromInt(ch, true), optFromInt(rk, true), optFromInt(dev, true)
 	}
 	return r.emit(&e)
 }
