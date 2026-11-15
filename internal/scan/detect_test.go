@@ -70,6 +70,8 @@ func TestDetectFixtures(t *testing.T) {
 		{[]string{"nvidia", "nvidia-smi-q-legacy.txt"}, "nvidia-smi", WhatNvidiaSMI},
 		{[]string{"klog", "nvidia-xid.dmesg"}, "klog", WhatKernelLog},
 		{[]string{"klog", "nvidia-xid.messages"}, "klog", WhatKernelLog},
+		{[]string{"mcelog", "client-paper.txt"}, "mcelog", WhatMcelog},
+		{[]string{"mcelog", "client-x3850.txt"}, "mcelog", WhatMcelog},
 		{[]string{"fmfm", "runtime.json"}, "fmfm", WhatFMFM},
 		{[]string{"fmfm", "boot.json"}, "fmfm", WhatFMFM},
 		{[]string{"fmfm", "crash.json"}, "fmfm", WhatFMFM},
@@ -103,7 +105,7 @@ func TestDetectKnowsEveryFixture(t *testing.T) {
 	skip := func(rel string) bool {
 		return strings.HasPrefix(rel, "edac-sysfs/") || strings.HasPrefix(rel, "smbios/tables-") || strings.HasSuffix(rel, ".sql") ||
 			strings.HasSuffix(rel, ".hex") || strings.HasPrefix(rel, "redfish/bmc-tree/") || strings.HasPrefix(rel, "real/") ||
-			strings.HasPrefix(rel, "dcbrain/")
+			strings.HasPrefix(rel, "dcbrain/") || strings.HasSuffix(rel, "/README.md")
 	}
 	n := 0
 	err := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {

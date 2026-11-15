@@ -20,6 +20,7 @@ import (
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
+	"github.com/agenticode/my/internal/adapter/mcelog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
 	"github.com/agenticode/my/internal/adapter/redfish"
@@ -67,6 +68,7 @@ const (
 	WhatRedfish   = "Redfish dump"
 	WhatNvidiaSMI = "nvidia-smi -q output"
 	WhatFMFM      = "FMFM log"
+	WhatMcelog    = "mcelog --client output"
 )
 
 // ErrUnknownInput is returned by Detect, wrapped with what the input looks
@@ -87,8 +89,8 @@ const maxBinary = 16 << 20
 //     files and is read like a host;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
-//     output of dmidecode or of nvidia-smi -q, a BMC event log, a Redfish
-//     resource, or an FMFM boot, runtime or crash log.
+//     output of dmidecode, of nvidia-smi -q or of mcelog --client, a BMC
+//     event log, a Redfish resource, or an FMFM boot, runtime or crash log.
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -320,6 +322,16 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = sel.NewReader(stream(), path, sel.Options{Location: opts.Location})
 		} else {
 			a = sel.NewFile(path, sel.Options{Location: opts.Location})
+		}
+
+	case mcelog.Sniff(text):
+		// The answer of the daemon carries no time: it is read as of the
+		// import, or of the file when that was asked for.
+		what = WhatMcelog
+		if zipped {
+			a = mcelog.NewReader(stream(), path, mcelog.Options{Now: seen})
+		} else {
+			a = mcelog.NewFile(path, mcelog.Options{Now: seen})
 		}
 
 	case dmidecodeRE.Match(text):
