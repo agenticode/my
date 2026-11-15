@@ -250,6 +250,11 @@ func (doc *Document) summary() *node {
 			el("strong", host.GradeText), " ",
 			el("span", A{"class", "sub"}, doc.vsay("ov.host", "name", host.Name))))
 	verdict.add(doc.conclusion())
+	// What limits the reach of the records belongs next to the grade: on a
+	// virtual machine "ok" says little about the DIMMs of the machine.
+	for _, n := range doc.Overview.Notes {
+		verdict.add(el("p", A{"class", "reach"}, R(sentence(upperFirst(n.Text)))))
+	}
 	s.add(verdict)
 
 	facts := el("dl", A{"class", "facts"})
@@ -1165,6 +1170,10 @@ func (doc *Document) quality() *node {
 			ul.add(el("li", r.Text))
 		}
 		s.add(ul)
+	}
+	// What limits the reach of the records: a virtual machine.
+	for _, n := range doc.Overview.Notes {
+		s.add(el("p", A{"class", "reach"}, R(sentence(upperFirst(n.Text)))))
 	}
 
 	notes := el("ul", A{"class", "notes"})

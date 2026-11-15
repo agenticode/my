@@ -285,7 +285,7 @@ func (s *Store) Daily(ctx context.Context, f EventFilter, offsetSeconds int) ([]
 
 // Hosts returns the hosts in the ledger.
 func (s *Store) Hosts(ctx context.Context) ([]model.Host, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT name, arch, system_vendor, system_product, board, first_seen, last_seen FROM host ORDER BY name`)
+	rows, err := s.db.QueryContext(ctx, `SELECT name, arch, system_vendor, system_product, board, virtual, first_seen, last_seen FROM host ORDER BY name`)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func (s *Store) Hosts(ctx context.Context) ([]model.Host, error) {
 	for rows.Next() {
 		var h model.Host
 		var first, last sql.NullString
-		if err := rows.Scan(&h.Name, &h.Arch, &h.SystemVendor, &h.SystemProduct, &h.Board, &first, &last); err != nil {
+		if err := rows.Scan(&h.Name, &h.Arch, &h.SystemVendor, &h.SystemProduct, &h.Board, &h.Virtual, &first, &last); err != nil {
 			return nil, err
 		}
 		h.FirstSeen, h.LastSeen = parseTS(first), parseTS(last)

@@ -111,6 +111,7 @@ var words = i18n.Catalog{
 	"bundle.host":       {EN: "host {host}: {dimms} {dimms|DIMM|DIMMs}, CE {ce}, UE {ue}, finding: {grade}", KO: "호스트 {host}: DIMM {dimms}개, CE {ce}건, UE {ue}건, 소견: {grade}"},
 	"bundle.subject":    {EN: "subject of the case: {dimm}, finding: {grade}", KO: "케이스 대상: {dimm}, 소견: {grade}"},
 	"bundle.missing":    {EN: "not in the bundle: {what}", KO: "번들에 없음: {what}"},
+	"bundle.note":       {EN: "note: {what}", KO: "참고: {what}"},
 	"bundle.anonymized": {EN: "host names replaced, and {n} network {n|address|addresses}:", KO: "호스트 이름과 네트워크 주소 {n}개를 바꿈:"},
 	"bundle.anon_hosts": {EN: "host names replaced:", KO: "호스트 이름을 바꿈:"},
 	"bundle.keep_names": {EN: "Keep these lines: the bundle does not hold the names, and an answer about it will use the new ones.", KO: "이 줄을 보관하세요. 번들에는 원래 이름이 없고, 회신에는 바뀐 이름이 쓰입니다."},

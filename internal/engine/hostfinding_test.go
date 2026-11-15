@@ -291,3 +291,67 @@ func TestHostFindingIsSaved(t *testing.T) {
 		t.Errorf("%d host findings after a second save", n)
 	}
 }
+
+// On a virtual machine every finding says so: a guest is shown little of
+// the errors of the machine it runs on. The host finding does not send the
+// reader to an EDAC driver or a BMC, which a guest does not have, and
+// names the hypervisor host instead.
+func TestFindingsOfAVirtualMachine(t *testing.T) {
+	guest := func(virtual string) *builder {
+		b := ruleBuilder()
+		b.in.host("h1")
+		b.in.Hosts = append(b.in.Hosts, model.Host{Name: "h1", Virtual: virtual})
+		b.in.Scans = append(b.in.Scans, model.Scan{ID: 1, Host: "h1", Kind: model.ScanLive, StartedAt: t0.Add(30 * day)})
+		b.in.Sources = append(b.in.Sources,
+			model.Source{ID: 1, ScanID: 1, Kind: "klog", Status: model.SourceOK},
+			model.Source{ID: 2, ScanID: 1, Kind: "edac-sysfs", Status: model.SourceEmpty})
+		return b
+	}
+	b := guest("KVM")
+	b.place("d1", "S-d1", t0, asOf)
+	b.ce("d1", t0.Add(10*day), cellA)
+	b.add(b.loose(t0.Add(11*day), model.SevUE, 0))
+	h := hostOf(t, b)
+
+	v := h.Loose
+	if got := missingCodes(v); !has(got, "missing.virtual") || has(got, "missing.no_edac") || v.NextAction.Code != "next.host_ue_vm" {
+		t.Errorf("host finding: missing %v, next %q", got, v.NextAction.Code)
+	}
+	var said string
+	for _, m := range v.Missing {
+		if m.Code == "missing.virtual" {
+			said = m.Text
+		}
+	}
+	if said != "this host is a virtual machine (KVM): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory" {
+		t.Errorf("statement: %q", said)
+	}
+	if d := h.DIMM("d1").Verdict; !has(missingCodes(d), "missing.virtual") {
+		t.Errorf("the finding of a DIMM of the guest: missing %v", missingCodes(d))
+	}
+
+	// Corrected errors alone, on a guest whose hypervisor has no name.
+	b = guest("hypervisor")
+	b.add(b.loose(t0.Add(11*day), model.SevCE, 0))
+	v = hostOf(t, b).Loose
+	if v.NextAction.Code != "next.host_ce_vm" {
+		t.Errorf("next = %q", v.NextAction.Code)
+	}
+	for _, m := range v.Missing {
+		if m.Code != "missing.virtual" {
+			continue
+		}
+		if en, ko := Text(i18n.EN, m), Text(i18n.KO, m); !strings.HasPrefix(en, "this host is a virtual machine (the CPU reports a hypervisor): ") ||
+			!strings.HasPrefix(ko, "이 호스트는 가상 머신임(CPU가 하이퍼바이저를 보고함): ") {
+			t.Errorf("a hypervisor without a name: %q / %q", en, ko)
+		}
+	}
+
+	// A physical host is told about the EDAC driver, as before.
+	b = guest("")
+	b.add(b.loose(t0.Add(11*day), model.SevUE, 0))
+	v = hostOf(t, b).Loose
+	if got := missingCodes(v); has(got, "missing.virtual") || !has(got, "missing.no_edac") || v.NextAction.Code != "next.host_ue" {
+		t.Errorf("a physical host: missing %v, next %q", got, v.NextAction.Code)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/agenticode/my/internal/decode/virt"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -53,6 +54,9 @@ type hostFacts struct {
 	unplaced  int64
 	ambiguous map[string]int64
 	boots     []model.Boot
+	// virtual names the hypervisor of a host that is a virtual machine, or
+	// is empty.
+	virtual string
 }
 
 func (j *judge) asOf(d *DIMMResult) int64 { return d.clk.asOf }
@@ -919,6 +923,9 @@ func (j *judge) missing(fs *findings, grade model.VerdictGrade) []model.Statemen
 	if !hf.errorSource {
 		add("missing.no_errors")
 	}
+	if hf.virtual != "" {
+		out = append(out, VirtualStatement(hf.virtual))
+	}
 	switch {
 	case d.DIMM != nil && d.DIMM.Identity == model.IdentitySerial:
 	case !hf.inventory:
@@ -979,6 +986,16 @@ func (j *judge) missing(fs *findings, grade model.VerdictGrade) []model.Statemen
 		add("missing.temperature")
 	}
 	return out
+}
+
+// VirtualStatement says that a host is a virtual machine and what that
+// means for its records. virtual names the hypervisor, or is the word for
+// one that is known to be there and not known by name.
+func VirtualStatement(virtual string) model.Statement {
+	if virtual == virt.Unnamed {
+		return statement("missing.virtual", "what", "@word.hypervisor")
+	}
+	return statement("missing.virtual", "what", virtual)
 }
 
 func (c clock) zero() bool { return c.asOf == 0 }

@@ -378,6 +378,7 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 		t.Fatalf("scan: exit code %d, stderr %q", code, stderr)
 	}
 	wantLines(t, out, "  2026-11-15  CE 7, UE 3  observation grade B", "host finding: hold replacement",
+		" note     This host is a virtual machine (QEMU): a guest is not shown the corrected errors of the",
 		" tied to no DIMM  CE 7, UE 3, 5 pages offline  hold replacement  R-HOST-01 R-HOST-02",
 		"     3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340",
 		"     7 corrected errors tied to no DIMM on 2026-11-15",
@@ -421,7 +422,13 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 	}
 	wantLines(t, out, "host lab-guest  tied to no DIMM  CE 7, UE 3, 5 pages offline", "hold replacement (finding, confidence high, 85)",
 		"[R-HOST-01] 3 uncorrected errors tied to no DIMM", "open: 10 errors name no slot",
-		"no EDAC driver reports a memory controller on this host", "Do not pull a DIMM on these records")
+		"this host is a virtual machine (QEMU): a guest is not shown the corrected errors",
+		"Do not pull a DIMM on these records", "The DIMM is found by a scan of the hypervisor host.")
+	// The guest has no memory controller to have a driver for: the reader
+	// is not sent to one.
+	if strings.Contains(out, "EDAC driver") {
+		t.Errorf("the card of a guest names an EDAC driver:\n%s", out)
+	}
 	code, out, _ = run("why", "--oneline", "--root", root)
 	if code != hold || !strings.HasPrefix(out, "lab-guest: hold replacement (finding, confidence high; R-HOST-01, R-HOST-02). 3 uncorrected errors tied to no DIMM") {
 		t.Errorf("why --oneline: exit code %d, %q", code, out)
@@ -446,7 +453,8 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 	if code != cli.ExitOK || stderr != "" {
 		t.Fatalf("bundle: exit code %d, stderr %q", code, stderr)
 	}
-	wantLines(t, out, "  host lab-guest: 1 DIMM, CE 7, UE 3, finding: hold replacement")
+	wantLines(t, out, "  host lab-guest: 1 DIMM, CE 7, UE 3, finding: hold replacement",
+		"  note: this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the")
 	// The receiver of the bundle sees the same finding.
 	if code, out, _ = run("open", file, "why", "--oneline"); code != hold || !strings.Contains(out, "\nlab-guest: hold replacement (finding, confidence high; R-HOST-01, R-HOST-02).") {
 		t.Errorf("my open of the bundle: exit code %d, %q", code, out)

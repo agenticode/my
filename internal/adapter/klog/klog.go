@@ -24,6 +24,7 @@ import (
 	"github.com/agenticode/my/internal/decode/cper"
 	"github.com/agenticode/my/internal/decode/edac"
 	"github.com/agenticode/my/internal/decode/mce"
+	"github.com/agenticode/my/internal/decode/virt"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -443,6 +444,9 @@ type parser struct {
 	amd     *amdBlock
 	lastGH  *tie
 	hostDMI string
+	// hypervisor is what the kernel of the latest boot in the log says it
+	// runs under ("Hypervisor detected: KVM"), or "".
+	hypervisor string
 }
 
 // tie remembers a record a following line may be a second report of.
@@ -740,6 +744,9 @@ func (p *parser) dispatch(l *line) error {
 			}
 		}
 		seg.banner, seg.kernel = msg, m[1]
+		// What the kernel of an earlier boot ran under says nothing about
+		// this one: a disk can move from a virtual machine to a physical one.
+		p.hypervisor = ""
 		// What the GPU driver said before this boot about which GPU sits
 		// where does not carry over.
 		seg.gpus, seg.lastGPU = nil, ""
@@ -752,6 +759,10 @@ func (p *parser) dispatch(l *line) error {
 		}
 		p.records++
 		seg.records++
+		return nil
+	}
+	if v := virt.FromKernelLine(msg); v != "" {
+		p.hypervisor = v
 		return nil
 	}
 	if m := dmiRE.FindStringSubmatch(msg); m != nil {
@@ -1427,8 +1438,16 @@ func (p *parser) closeSegment(last bool) error {
 			return sinkError{err}
 		}
 	}
-	if last && p.hostDMI != "" {
-		if err := p.sink.Host(&model.Host{SystemProduct: p.hostDMI}); err != nil {
+	if last && (p.hostDMI != "" || p.hypervisor != "") {
+		// What the latest boot of the log says about the machine: its
+		// name, and whether it is a virtual machine. The kernel names the
+		// hypervisor itself on x86; elsewhere the name of the machine
+		// tells where it is that of a virtual one.
+		h := &model.Host{SystemProduct: p.hostDMI, Virtual: p.hypervisor}
+		if h.Virtual == "" {
+			h.Virtual = virt.FromName(p.hostDMI)
+		}
+		if err := p.sink.Host(h); err != nil {
 			return sinkError{err}
 		}
 	}

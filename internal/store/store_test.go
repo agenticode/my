@@ -495,6 +495,38 @@ func TestUpsertHostKeepsVendorAndProductApart(t *testing.T) {
 	}
 }
 
+// TestUpsertHostVirtual: what is known about the hypervisor of a host stays
+// when a later source knows nothing or less, and a name replaces the word
+// for a hypervisor that is not known by name.
+func TestUpsertHostVirtual(t *testing.T) {
+	s := newStore(t)
+	virtual := func() string {
+		t.Helper()
+		hosts, err := s.Hosts(ctx)
+		if err != nil || len(hosts) != 1 {
+			t.Fatalf("hosts = %+v, %v", hosts, err)
+		}
+		return hosts[0].Virtual
+	}
+	up := func(v string) {
+		t.Helper()
+		mustUpdate(t, s, func(w *Writer) error { return w.UpsertHost(&model.Host{Name: "h1", Virtual: v}) })
+	}
+	for _, step := range []struct{ set, want string }{
+		{"", ""},
+		{"hypervisor", "hypervisor"}, // the flag of the CPU
+		{"KVM", "KVM"},               // the kernel log names it
+		{"hypervisor", "KVM"},        // the flag again: the name stays
+		{"", "KVM"},                  // a source that says nothing
+		{"VMware", "VMware"},         // another name replaces it
+	} {
+		up(step.set)
+		if got := virtual(); got != step.want {
+			t.Errorf("after %q: Virtual = %q, want %q", step.set, got, step.want)
+		}
+	}
+}
+
 // TestSourceGrades checks the best grade per source name of the errors of
 // a host: counter records count, informational records and other hosts do
 // not.

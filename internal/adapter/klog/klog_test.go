@@ -846,3 +846,39 @@ func TestEqualLinesOfOneSecond(t *testing.T) {
 		})
 	}
 }
+
+// TestHypervisorOfTheBoot: the x86 kernel says what it runs under, once at
+// boot. Without that line the name of the machine tells where it is that
+// of a virtual one. What an earlier boot of the log ran under does not
+// carry over to the latest.
+func TestHypervisorOfTheBoot(t *testing.T) {
+	boot := func(lines ...string) string {
+		out := []string{"[    0.000000] Linux version 5.14.0-570.33.2.el9_6.x86_64 (mockbuild@build) (gcc 11.5.0) #1 SMP"}
+		return strings.Join(append(out, lines...), "\n") + "\n"
+	}
+	for _, tc := range []struct {
+		name, text string
+		want       string
+	}{
+		{"the kernel names it", boot("[    0.000000] DMI: ExampleCloud mi1-g3;MICRO/mi1-g3;MICRO, BIOS 1.16.0 04/01/2014", "[    0.000000] Hypervisor detected: KVM"), "KVM"},
+		{"the name of the machine tells", boot("[    0.000000] DMI: QEMU KVM Virtual Machine, BIOS 1.6.6 08/22/2023"), "KVM"},
+		{"the kernel's word stands before the name", boot("[    0.000000] DMI: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3 04/01/2014", "[    0.000000] Hypervisor detected: KVM"), "KVM"},
+		{"Hyper-V", boot("[    0.000000] Hypervisor detected: Microsoft Hyper-V"), "Hyper-V"},
+		{"a physical host", boot("[    0.000000] DMI: Example Systems R650/0PYXKY, BIOS 1.5.5 02/10/2022", "[    0.000000] Booting paravirtualized kernel on bare hardware"), ""},
+		{"a disk that moved from a guest to a physical host",
+			boot("[    0.000000] DMI: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3 04/01/2014", "[    0.000000] Hypervisor detected: KVM") +
+				boot("[    0.000000] DMI: Example Systems R650/0PYXKY, BIOS 1.5.5 02/10/2022"), ""},
+	} {
+		c, rep := collectText(t, tc.text, Options{BootTime: time.Date(2026, 11, 15, 4, 0, 0, 0, time.UTC)})
+		if rep.Status != model.SourceOK {
+			t.Errorf("%s: report %+v", tc.name, rep)
+		}
+		got := ""
+		for _, h := range c.Hosts {
+			got = h.Virtual
+		}
+		if got != tc.want {
+			t.Errorf("%s: Virtual = %q, want %q (hosts %+v)", tc.name, got, tc.want, c.Hosts)
+		}
+	}
+}

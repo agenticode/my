@@ -113,7 +113,7 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 
 	// What else the reader has to know about the host.
 	p.blank()
-	labels := []string{st.say("ov.sources"), st.say("card.missing")}
+	labels := []string{st.say("ov.sources"), st.say("card.missing"), st.say("ov.note")}
 	lw := 0
 	for _, l := range labels {
 		lw = max(lw, Width(l))
@@ -165,6 +165,12 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	}
 	if ov.Root != nil {
 		p.labelled(label, lw, ov.Root.Text, "")
+	}
+	// What limits the reach of the records, such as a virtual machine.
+	label = labels[2]
+	for _, n := range ov.Notes {
+		p.labelled(label, lw, upperFirst(n.Text), "")
+		label = ""
 	}
 
 	if len(hints) > 0 {

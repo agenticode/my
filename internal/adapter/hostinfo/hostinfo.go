@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/decode/virt"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -37,6 +39,10 @@ type Info struct {
 	SystemProduct string
 	Board         string
 	BIOS          string // vendor, version and date
+	// Virtual names the hypervisor the host runs under, is virt.Unnamed
+	// where the CPU reports one that the DMI strings do not name, and is
+	// empty for a host that is not known to be a virtual machine.
+	Virtual string
 }
 
 // Options control a reading.
@@ -146,7 +152,32 @@ func (a *Adapter) Read() (info Info, missing []string) {
 	info.SystemVendor, info.SystemProduct = dmi("sys_vendor"), dmi("product_name")
 	info.Board = strings.TrimSpace(dmi("board_vendor") + " " + dmi("board_name"))
 	info.BIOS = strings.Join(strings.Fields(dmi("bios_vendor")+" "+dmi("bios_version")+" "+dmi("bios_date")), " ")
+
+	// A virtual machine: named by the strings its hypervisor fills in, by
+	// the Xen directory of sysfs, or only known through the flag an x86
+	// CPU sets under a hypervisor.
+	switch {
+	case virt.FromDMI(info.SystemVendor, info.SystemProduct) != "":
+		info.Virtual = virt.FromDMI(info.SystemVendor, info.SystemProduct)
+	case strings.EqualFold(a.text("sys/hypervisor/type"), "xen"):
+		info.Virtual = "Xen"
+	case virt.FromCPUFlags(a.head("proc/cpuinfo", 64<<10)):
+		info.Virtual = virt.Unnamed
+	}
 	return info, missing
+}
+
+// head returns the first bytes of a file: enough of /proc/cpuinfo for the
+// flags of its first CPU, however many CPUs follow.
+func (a *Adapter) head(name string, limit int) string {
+	f, err := a.fsys.Open(name)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	buf := make([]byte, limit)
+	n, _ := io.ReadFull(f, buf)
+	return string(buf[:n])
 }
 
 func isHex(s string) bool {
@@ -187,7 +218,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 
 	rep.Records = 1
 	host := &model.Host{Arch: info.Arch, SystemVendor: info.SystemVendor, SystemProduct: info.SystemProduct, Board: info.Board,
-		FirstSeen: now.UTC(), LastSeen: now.UTC()}
+		Virtual: info.Virtual, FirstSeen: now.UTC(), LastSeen: now.UTC()}
 	if err := sink.Host(host); err != nil {
 		rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
 		return rep

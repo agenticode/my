@@ -42,6 +42,7 @@ var Messages = i18n.Catalog{
 	"word.firmware":     {EN: "firmware", KO: "펌웨어"},
 	"word.kernel":       {EN: "kernel", KO: "커널"},
 	"word.bios-version": {EN: "BIOS", KO: "BIOS"},
+	"word.hypervisor":   {EN: "the CPU reports a hypervisor", KO: "CPU가 하이퍼바이저를 보고함"},
 	"kind.page-offline": {EN: "page offline", KO: "page offline"},
 	"kind.sppr":         {EN: "soft PPR", KO: "sPPR"},
 	"kind.hppr":         {EN: "hard PPR", KO: "hPPR"},
@@ -187,6 +188,7 @@ var Messages = i18n.Catalog{
 	"missing.unplaced":      {EN: "{n} {n|error|errors} of this host {n|names|name} no slot and {n|is|are} counted for no DIMM", KO: "이 호스트의 오류 {n}건은 슬롯 정보 없음: 어느 DIMM에도 계산되지 않음"},
 	"missing.ambiguous":     {EN: "{n} {n|error|errors} in this slot {n|falls|fall} between two DIMMs whose swap time is unknown and {n|is|are} counted for neither", KO: "이 슬롯의 오류 {n}건은 교체 시점이 불명확한 두 DIMM 사이에 있음: 어느 쪽에도 계산되지 않음"},
 	"missing.no_edac":       {EN: "no EDAC driver reports a memory controller on this host: the kernel names no DIMM for an error", KO: "이 호스트에 메모리 컨트롤러를 보고하는 EDAC 드라이버 없음: 커널이 오류의 DIMM을 알려 주지 않음"},
+	"missing.virtual":       {EN: "this host is a virtual machine ({what}): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory", KO: "이 호스트는 가상 머신임({what}): 게스트에는 장비의 CE가 보이지 않고, UE도 게스트 메모리에 난 것까지만 보임"},
 	"missing.ecs":           {EN: "no ECS counters", KO: "ECS 카운터 없음"},
 	"missing.temperature":   {EN: "no DIMM temperature history", KO: "DIMM 온도 이력 없음"},
 
@@ -202,6 +204,8 @@ var Messages = i18n.Catalog{
 	"next.removed":     {EN: "The DIMM is no longer in the host. Keep this finding with the returned part.", KO: "DIMM이 이미 호스트에서 빠짐. 이 소견을 반품 DIMM과 함께 보관."},
 	"next.host_ue":     {EN: "Do not pull a DIMM on these records: none of them names one. Find the DIMM first, from the EDAC driver of the memory controller or the event log of the BMC, then scan again.", KO: "이 기록만으로 DIMM을 빼지 않음: DIMM을 지목한 기록이 없음. 메모리 컨트롤러의 EDAC 드라이버나 BMC 이벤트 로그로 DIMM부터 확인한 뒤 다시 스캔."},
 	"next.host_ce":     {EN: "No action on a DIMM. The EDAC driver of the memory controller or the event log of the BMC ties further errors to a DIMM.", KO: "DIMM 조치 없음. 메모리 컨트롤러의 EDAC 드라이버나 BMC 이벤트 로그가 있으면 이후 오류가 DIMM과 연결됨."},
+	"next.host_ue_vm":  {EN: "Do not pull a DIMM on these records: none of them names one, and a virtual machine has no DIMM of its own to name. The DIMM is found by a scan of the hypervisor host.", KO: "이 기록만으로 DIMM을 빼지 않음: DIMM을 지목한 기록이 없고, 가상 머신에는 지목할 실제 DIMM이 없음. DIMM은 하이퍼바이저 호스트를 스캔해 확인."},
+	"next.host_ce_vm":  {EN: "No action in the guest. The DIMM behind such records is found by a scan of the hypervisor host.", KO: "게스트에서 할 조치 없음. 이런 기록의 DIMM은 하이퍼바이저 호스트를 스캔해 확인."},
 	"next.gpu_replace": {EN: "Return the GPU for repair or replace it: its row remapping has failed.", KO: "GPU 수리 반품 또는 교체: row remapping 실패."},
 
 	// Steps of the confidence.

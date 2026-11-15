@@ -189,16 +189,25 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 			miss("missing.source", "kind", src.Kind, "status", "@status."+string(src.Status))
 		}
 	}
-	if edac {
+	switch {
+	case hf.virtual != "":
+		// A guest has no memory controller to have a driver for.
+		v.Missing = append(v.Missing, VirtualStatement(hf.virtual))
+	case edac:
 		miss("missing.no_edac")
 	}
 	if undated > 0 {
 		miss("missing.dates", "n", undated)
 	}
 
-	if v.Grade == model.VerdictHoldReplacement {
+	switch hold := v.Grade == model.VerdictHoldReplacement; {
+	case hold && hf.virtual != "":
+		v.NextAction = statement("next.host_ue_vm")
+	case hold:
 		v.NextAction = statement("next.host_ue")
-	} else {
+	case hf.virtual != "":
+		v.NextAction = statement("next.host_ce_vm")
+	default:
 		v.NextAction = statement("next.host_ce")
 	}
 
