@@ -36,6 +36,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/smbios:FuzzDmidecode \
 	./internal/adapter/klog:FuzzCollect \
 	./internal/adapter/rasdaemon:FuzzRows \
+	./internal/adapter/rasdaemon:FuzzStoreSettings \
 	./internal/decode/ipmi:FuzzParseRecord \
 	./internal/adapter/sel:FuzzCollect \
 	./internal/adapter/redfish:FuzzCollect \

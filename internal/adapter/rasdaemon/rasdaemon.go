@@ -137,6 +137,14 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if err != nil {
 		return fail(err)
 	}
+	r := &reader{ctx: ctx, db: db, sink: sink, path: a.path, rep: &rep}
+	return r.run(tables)
+}
+
+// run reads the tables of a database into the sink and completes the
+// report. tables are the names of the tables the database holds.
+func (r *reader) run(tables []string) adapter.Report {
+	rep := r.rep
 	known := 0
 	for _, t := range tables {
 		if _, ok := tableUse[t]; ok {
@@ -149,15 +157,14 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		if len(tables) > 0 {
 			rep.Detail += " (tables present: " + strings.Join(tables, ", ") + ")"
 		}
-		return rep
+		return *rep
 	}
 
-	r := &reader{ctx: ctx, db: db, sink: sink, path: a.path, rep: &rep}
 	if has := tableSet(tables); has["mce_record"] {
 		if err := r.loadClock(); err != nil {
 			rep.Status = model.SourceError
 			rep.Detail = fmt.Sprintf("table mce_record: %v", err)
-			return rep
+			return *rep
 		}
 	}
 	// mc_event first: machine check records are matched against it.
@@ -185,11 +192,11 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 			var se sinkError
 			if errors.As(err, &se) {
 				rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+se.err.Error(), se.err
-				return rep
+				return *rep
 			}
 			rep.Status = model.SourceError
 			rep.Detail = fmt.Sprintf("table %s: %v", step.table, err)
-			return rep
+			return *rep
 		}
 	}
 	if r.notMemory > 0 {
@@ -203,7 +210,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	if err := r.cxlDevices(); err != nil {
 		rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
-		return rep
+		return *rep
 	}
 	rep.Notes = append(rep.Notes, r.cxlNotes...)
 	// Say what is in the database and was not interpreted.
@@ -212,8 +219,8 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		if ok && (use == "events" || use == "actions") {
 			continue
 		}
-		var n int
-		if err := db.QueryRowContext(ctx, `SELECT count(*) FROM "`+strings.ReplaceAll(t, `"`, `""`)+`"`).Scan(&n); err != nil || n == 0 {
+		n, err := r.count(t)
+		if err != nil || n == 0 {
 			continue
 		}
 		if ok {
@@ -233,7 +240,83 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	default:
 		rep.Status = model.SourceOK
 	}
-	return rep
+	return *rep
+}
+
+// querier is what the reader needs of a database: a connection pool, or
+// one transaction.
+type querier interface {
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+}
+
+// rows opens the rows of a table in the order they were stored: every row
+// of a SQLite file, or the rows of one host in a store on a server.
+func (r *reader) rows(table string) (*sql.Rows, error) {
+	if r.remote != nil {
+		return r.remote.rows(r.ctx, r.db, table)
+	}
+	return r.db.QueryContext(r.ctx, `SELECT * FROM "`+strings.ReplaceAll(table, `"`, `""`)+`" ORDER BY rowid`)
+}
+
+// count returns the number of rows of a table that rows would give.
+func (r *reader) count(table string) (int, error) {
+	if r.remote != nil {
+		return r.remote.count(r.ctx, r.db, table)
+	}
+	var n int
+	err := r.db.QueryRowContext(r.ctx, `SELECT count(*) FROM "`+strings.ReplaceAll(table, `"`, `""`)+`"`).Scan(&n)
+	return n, err
+}
+
+// errStop ends each without an error.
+var errStop = errors.New("stop")
+
+// each calls fn for every row of a table. The row is reused: fn must not
+// keep it.
+func (r *reader) each(table string, fn func(*row) error) error {
+	rows, err := r.rows(table)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	names, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+	var kinds []columnKind
+	if r.remote != nil {
+		if kinds, err = columnKinds(rows); err != nil {
+			return err
+		}
+	}
+	rw := &row{table: table, names: names, index: make(map[string]int, len(names))}
+	for i, n := range names {
+		rw.index[n] = i
+	}
+	ptrs := make([]any, len(names))
+	for rows.Next() {
+		if err := r.ctx.Err(); err != nil {
+			return err
+		}
+		rw.vals = make([]any, len(names))
+		for i := range rw.vals {
+			ptrs[i] = &rw.vals[i]
+		}
+		if err := rows.Scan(ptrs...); err != nil {
+			return err
+		}
+		if kinds != nil {
+			settle(rw.vals, kinds)
+		}
+		if err := fn(rw); err != nil {
+			if err == errStop {
+				return nil
+			}
+			return err
+		}
+	}
+	return rows.Err()
 }
 
 func listTables(ctx context.Context, db *sql.DB) ([]string, error) {
@@ -296,39 +379,19 @@ const (
 // dates the same errors with the kernel's time, so a record that keeps
 // rasdaemon's time is not recognised as the same error there.
 func (r *reader) loadClock() error {
-	rows, err := r.db.QueryContext(r.ctx, `SELECT * FROM "mce_record" ORDER BY rowid`)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	names, err := rows.Columns()
-	if err != nil {
-		return err
-	}
-	rw := &row{table: "mce_record", names: names, index: make(map[string]int, len(names))}
-	for i, n := range names {
-		rw.index[n] = i
-	}
-	if _, ok := rw.index["walltime"]; !ok {
-		return nil
-	}
-	ptrs := make([]any, len(names))
-	for rows.Next() {
-		rw.vals = make([]any, len(names))
-		for i := range rw.vals {
-			ptrs[i] = &rw.vals[i]
-		}
-		if err := rows.Scan(ptrs...); err != nil {
-			return err
+	err := r.each("mce_record", func(rw *row) error {
+		if _, ok := rw.index["walltime"]; !ok {
+			return errStop
 		}
 		t, _, ok := parseTimestamp(rw.str("timestamp"))
 		wall, wok := rw.int("walltime")
 		if !ok || !wok || wall < minWalltime {
-			continue
+			return nil
 		}
 		r.clock = append(r.clock, clockSample{at: t.Unix(), ahead: t.Unix() - wall})
-	}
-	if err := rows.Err(); err != nil {
+		return nil
+	})
+	if err != nil {
 		return err
 	}
 	sort.SliceStable(r.clock, func(i, j int) bool { return r.clock[i].at < r.clock[j].at })
@@ -507,10 +570,14 @@ func (r *row) raw() string {
 // reader carries the state of one Collect call.
 type reader struct {
 	ctx  context.Context
-	db   *sql.DB
+	db   querier
 	sink adapter.Sink
+	// path names the database in the references to its rows: the path of a
+	// SQLite file, or the address of a store on a server.
 	path string
 	rep  *adapter.Report
+	// remote is set when the rows come from a store on a database server.
+	remote *remote
 
 	tally     adapter.Tally
 	notMemory int
@@ -547,37 +614,10 @@ type mcEntry struct {
 }
 
 func (r *reader) scan(table string, fn func(*row) error) error {
-	rows, err := r.db.QueryContext(r.ctx, `SELECT * FROM "`+table+`" ORDER BY rowid`)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	names, err := rows.Columns()
-	if err != nil {
-		return err
-	}
-	rw := &row{table: table, names: names, index: make(map[string]int, len(names))}
-	for i, n := range names {
-		rw.index[n] = i
-	}
-	ptrs := make([]any, len(names))
-	for rows.Next() {
-		if err := r.ctx.Err(); err != nil {
-			return err
-		}
-		rw.vals = make([]any, len(names))
-		for i := range rw.vals {
-			ptrs[i] = &rw.vals[i]
-		}
-		if err := rows.Scan(ptrs...); err != nil {
-			return err
-		}
+	return r.each(table, func(rw *row) error {
 		r.rep.Records++
-		if err := fn(rw); err != nil {
-			return err
-		}
-	}
-	return rows.Err()
+		return fn(rw)
+	})
 }
 
 func (r *reader) ref(rw *row) (string, int64) {
