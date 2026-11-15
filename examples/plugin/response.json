@@ -1,0 +1,113 @@
+{
+ "Contract": "my-analyzer/1",
+ "Analyzer": {
+  "Name": "example-analyzer",
+  "Version": "1.0",
+  "Vendor": "Example Memory",
+  "PreviousLogs": 1000
+ },
+ "Dimms": [
+  {
+   "DimmId": "d6abde8014f7764becd7",
+   "Level2": {
+    "Lines": [
+     {
+      "Label": "records analysed",
+      "Value": "3 of 53"
+     },
+     {
+      "Label": "rows with most errors",
+      "Value": "row 0xa4e9: 3"
+     },
+     {
+      "Label": "row pairs involved",
+      "Value": "1"
+     },
+     {
+      "Label": "data lines",
+      "Value": "dq:0x2: 3"
+     }
+    ],
+    "Notes": [
+     "Example values: this analyzer knows no real device and counts what the records say."
+    ]
+   },
+   "AdjacentRows": [
+    {
+     "Row": 42217,
+     "Neighbors": [
+      42216
+     ],
+     "Rank": 0,
+     "DeviceId": 17,
+     "BankGroup": 5,
+     "Bank": 3
+    },
+    {
+     "Row": 42216,
+     "Neighbors": [
+      42217
+     ],
+     "Rank": 0,
+     "DeviceId": 17,
+     "BankGroup": 5,
+     "Bank": 3
+    }
+   ],
+   "Baseline": {
+    "Percentile": 80.0
+   }
+  },
+  {
+   "DimmId": "d878e1a15b6e30a44057",
+   "Level2": {
+    "Lines": [
+     {
+      "Label": "records analysed",
+      "Value": "3 of 1232"
+     },
+     {
+      "Label": "rows with most errors",
+      "Value": "row 0x1a2f: 3"
+     },
+     {
+      "Label": "row pairs involved",
+      "Value": "1"
+     },
+     {
+      "Label": "data lines",
+      "Value": "dq:0xc: 3"
+     }
+    ],
+    "Notes": [
+     "Example values: this analyzer knows no real device and counts what the records say."
+    ]
+   },
+   "AdjacentRows": [
+    {
+     "Row": 6703,
+     "Neighbors": [
+      6702
+     ],
+     "Rank": 0,
+     "DeviceId": 7,
+     "BankGroup": 0,
+     "Bank": 3
+    },
+    {
+     "Row": 6702,
+     "Neighbors": [
+      6703
+     ],
+     "Rank": 0,
+     "DeviceId": 7,
+     "BankGroup": 0,
+     "Bank": 3
+    }
+   ],
+   "Baseline": {
+    "Percentile": 99.0
+   }
+  }
+ ]
+}

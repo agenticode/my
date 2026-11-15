@@ -28,7 +28,12 @@ type Document struct {
 	FormatVersion int      `json:"format_version"`
 	OutputDT      string   `json:"OutputDT"`
 	Analyzer      Analyzer `json:"Analyzer"`
-	HostID        string   `json:"HostID"`
+	// VendorAnalyzer names the vendor analyzer that took part in the run:
+	// the rows it named neighbours can change which errors count as one
+	// fault. What it said beyond the public classification is not in this
+	// log.
+	VendorAnalyzer *VendorAnalyzer `json:"vendor_analyzer,omitempty"`
+	HostID         string          `json:"HostID"`
 	// ActionDescriptors says in the document itself what it does not hold:
 	// it is always "none". Findings and suggestions are for a person.
 	ActionDescriptors string     `json:"action_descriptors"`
@@ -36,6 +41,13 @@ type Document struct {
 	// RuntimeLog holds the error records of the host with the field names
 	// of the runtime error log, each counted once.
 	RuntimeLog []Runtime `json:"RuntimeLog,omitempty"`
+}
+
+// VendorAnalyzer names a vendor analyzer.
+type VendorAnalyzer struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Vendor  string `json:"vendor,omitempty"`
 }
 
 // BuildOptions choose what a document holds.
@@ -50,6 +62,8 @@ type BuildOptions struct {
 	All bool
 	// Records adds the runtime log.
 	Records bool
+	// VendorAnalyzer names the vendor analyzer that took part, if one did.
+	VendorAnalyzer *VendorAnalyzer
 }
 
 // Build writes the analysis log of a host from its findings.
@@ -63,6 +77,7 @@ func Build(ctx context.Context, s *store.Store, h *engine.HostResult, opts Build
 		Analyzer:          Analyzer{Name: opts.Tool, Version: opts.Version, EngineVersion: engine.Version, Level: 1},
 		ActionDescriptors: "none",
 		AnalysisLog:       []Analysis{},
+		VendorAnalyzer:    opts.VendorAnalyzer,
 	}
 	slots, err := s.Slots(ctx, h.Host)
 	if err != nil {
