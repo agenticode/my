@@ -334,6 +334,7 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 	// time). Names are made unique within a snapshot: the same locator in
 	// two snapshots is the same slot.
 	names := make([]string, len(mods))
+	snapshots := make([]string, len(mods))
 	groups := map[string][]int{}
 	var order []string
 	for i, m := range mods {
@@ -342,6 +343,7 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 			order = append(order, key)
 		}
 		groups[key] = append(groups[key], i)
+		snapshots[i] = key
 	}
 	for _, key := range order {
 		idx := groups[key]
@@ -353,12 +355,40 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 			names[idx[j]] = n
 		}
 	}
+	// Within one snapshot a place is one slot. Numbers that two slots of a
+	// snapshot share (a source that counts channels per memory controller
+	// and leaves the controller out) say nothing about which slot a record
+	// means, and are not used.
+	type claim struct {
+		snapshot string
+		place    [3]int
+	}
+	claimOf := func(i int) (claim, bool) {
+		m := mods[i]
+		if !m.Socket.Valid || !m.Channel.Valid || !m.Position.Valid {
+			return claim{}, false
+		}
+		return claim{snapshots[i], [3]int{m.Socket.V, m.Channel.V, m.Position.V}}, true
+	}
+	claimed := map[claim]string{}
+	shared := map[claim]bool{}
+	for i := range mods {
+		c, ok := claimOf(i)
+		if !ok {
+			continue
+		}
+		if first, taken := claimed[c]; !taken {
+			claimed[c] = names[i]
+		} else if first != names[i] {
+			shared[c] = true
+		}
+	}
 	for i, m := range mods {
 		name := names[i]
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
 			Populated: model.Some(m.Populated)}
 		row.Socket, row.Channel, row.Position = bankLocatorTopology(m.BankLocator)
-		if m.Socket.Valid && m.Channel.Valid && m.Position.Valid {
+		if c, ok := claimOf(i); ok && !shared[c] {
 			// The source numbered the place itself.
 			if !row.Socket.Valid {
 				row.Socket, row.Channel, row.Position = m.Socket, m.Channel, m.Position

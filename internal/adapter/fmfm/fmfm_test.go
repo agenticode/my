@@ -218,6 +218,109 @@ func TestBootLog(t *testing.T) {
 	}
 }
 
+// What a boot record holds and the reader cannot use is reported, never
+// dropped.
+func TestBootRecordsReadInPart(t *testing.T) {
+	read := func(doc string) (*adapter.Collected, adapter.Report) {
+		var c adapter.Collected
+		rep := NewReader(strings.NewReader(doc), "boot.json", Options{Now: now}).Collect(ctx, &c)
+		return &c, rep
+	}
+	// Without a boot time the installed memory is still read, as seen at
+	// the time of the import. A training failure has no time then.
+	c, rep := read(`{"InstalledMemory": [{"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DimmSerialNumber": "S1"}],
+ "TrainingEventLogs": [{"FailureTrainingStep": "read leveling", "SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0}]}`)
+	if rep.Status != model.SourcePartial || rep.Skipped != 1 || len(c.Boots) != 0 || len(c.Events) != 0 ||
+		len(c.Modules) != 1 || !c.Modules[0].ObservedAt.Equal(now) || c.Modules[0].DIMM.Serial != "S1" {
+		t.Errorf("no boot time: report %+v, %d boots, %d events, modules %+v", rep, len(c.Boots), len(c.Events), c.Modules)
+	}
+	wantNotes(t, rep, "boot.json#document 1/TrainingEventLogs[0]: training event of a boot record without a readable CurrentBootDT")
+
+	c, rep = read(`{"CurrentBootDT": "2026:11:09:22:00:00:000", "InstalledMemory": {"SocketId": 0},
+ "TrainingEventLogs": ["write leveling", {"FailureTrainingStep": "write leveling"}]}`)
+	if rep.Status != model.SourcePartial || rep.Skipped != 2 || len(c.Boots) != 1 || len(c.Events) != 1 || len(c.Modules) != 0 {
+		t.Errorf("odd lists: report %+v, %d boots, %d events, %d modules", rep, len(c.Boots), len(c.Events), len(c.Modules))
+	}
+	wantNotes(t, rep, "InstalledMemory is not a list", "TrainingEventLogs[0]: entry of the training events is not an object")
+
+	_, rep = read(`{"CurrentBootDT": "2026:11:09:22:00:00:000", "TrainingEventLogs": "none"}`)
+	if rep.Status != model.SourcePartial || rep.Skipped != 1 {
+		t.Errorf("training events as text: report %+v", rep)
+	}
+	wantNotes(t, rep, "TrainingEventLogs is not a list")
+
+	// A field that is null is a field that is not there.
+	if _, rep = read(`{"CurrentBootDT": "2026:11:09:22:00:00:000", "InstalledMemory": null, "TrainingEventLogs": null}`); rep.Status != model.SourceOK {
+		t.Errorf("null lists: report %+v", rep)
+	}
+
+	_, rep = read(`{"CurrentBootDT": "soon", "InstalledFirmware": "2.4.1"}`)
+	if rep.Status != model.SourcePartial || rep.Skipped != 1 {
+		t.Errorf("unreadable boot time: report %+v", rep)
+	}
+	wantNotes(t, rep, `CurrentBootDT "soon" is unreadable`)
+}
+
+// A log with a record per boot lists the memory once per boot. Every
+// listing is kept with its boot time, so a module that was replaced between
+// two boots is seen in the slot from its first boot on.
+func TestInstalledMemoryPerBoot(t *testing.T) {
+	doc := `[
+ {"CurrentBootDT": "2026:10:01:08:00:00:000", "InstalledMemory": [
+   {"SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "DeviceLocator": "A1", "DimmSerialNumber": "OLD"},
+   {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DeviceLocator": "B1", "DimmSerialNumber": "KEPT"}]},
+ {"CurrentBootDT": "2026:11:01:08:00:00:000", "InstalledMemory": [
+   {"SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "DeviceLocator": "A1", "DimmSerialNumber": "NEW"},
+   {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DeviceLocator": "B1", "DimmSerialNumber": "KEPT"}]},
+ {"ErrorDT": "2026-11-02T00:00:00Z", "SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "EcsModeRegisters": [32, 3, 0, 0, 0, 0, 1]}
+]`
+	var c adapter.Collected
+	rep := NewReader(strings.NewReader(doc), "boots.json", Options{Now: now}).Collect(ctx, &c)
+	if rep.Status != model.SourceOK || len(c.Boots) != 2 {
+		t.Fatalf("report %+v, %d boots", rep, len(c.Boots))
+	}
+	var got []string
+	for _, m := range c.Modules {
+		got = append(got, m.ObservedAt.Format("01-02")+" "+m.Locator+" "+m.DIMM.Serial+" "+m.DIMM.MemoryType)
+	}
+	// ECS registers were read from the place of A1: what sits there is DDR5.
+	want := []string{"10-01 A1 OLD DDR5", "10-01 B1 KEPT ", "11-01 A1 NEW DDR5", "11-01 B1 KEPT "}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("modules = %q\nwant %q", got, want)
+	}
+}
+
+// Two entries of one boot record with the same socket, channel and slot
+// numbers: the numbers do not say which module a record means, so they are
+// left off both. An entry with no other name cannot be kept.
+func TestInstalledMemoryWithSharedNumbers(t *testing.T) {
+	doc := `{"CurrentBootDT": "2026:11:01:08:00:00:000", "InstalledMemory": [
+ {"SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "DeviceLocator": "A1", "DimmSerialNumber": "S1"},
+ {"SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "DeviceLocator": "D1", "DimmSerialNumber": "S2"},
+ {"SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0, "DimmSerialNumber": "S3"},
+ {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DeviceLocator": "B1", "DimmSerialNumber": "S4"},
+ {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DeviceLocator": "B1", "DimmSerialNumber": "S4"}]}`
+	var c adapter.Collected
+	rep := NewReader(strings.NewReader(doc), "boot.json", Options{Now: now}).Collect(ctx, &c)
+	if rep.Status != model.SourcePartial || rep.Skipped != 1 {
+		t.Errorf("report = %+v", rep)
+	}
+	wantNotes(t, rep,
+		"entries of the installed memory that have the socket, channel and slot numbers of another entry of their boot record: 3; these numbers place no records",
+		"InstalledMemory[2]: entry of the installed memory has the socket, channel and slot numbers of another entry and no slot name",
+	)
+	var got []string
+	for _, m := range c.Modules {
+		got = append(got, m.Locator+" "+m.DIMM.Serial+" "+m.Socket.String()+"/"+m.Channel.String()+"/"+m.Position.String())
+	}
+	// B1 is listed twice with the same content: it is one module.
+	none := model.Opt[int]{}.String()
+	want := []string{"A1 S1 " + none + "/" + none + "/" + none, "D1 S2 " + none + "/" + none + "/" + none, "B1 S4 0/1/0"}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("modules = %q\nwant %q", got, want)
+	}
+}
+
 func TestCrashLog(t *testing.T) {
 	c, rep := collect(t, "crash.json", Options{})
 	if rep.Status != model.SourcePartial || rep.Records != 3 || rep.Skipped != 1 {

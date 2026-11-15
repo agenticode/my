@@ -27,10 +27,39 @@ Every input gets an entry in the source inventory of a scan, also when it is abs
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
 | `NVSMI LOG` text or an `nvidia_smi_log` XML document | `nvidia-smi -q` output |
+| JSON with `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` or `OsCrashDT` among its field names | FMFM log |
 
 A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
 
-Three things a file cannot say about itself are options of the import: the time zone of times that carry none (syslog files, `dmesg -T`, the text forms of a BMC event log, the timestamp of `nvidia-smi` output), the time a kernel log with seconds since boot only was captured, and whether the modification time of a file may stand for the time it was saved.
+What a file cannot say about itself is an option of the import:
+
+| Option | `my import` | Applies to |
+| --- | --- | --- |
+| time zone of times that carry none | `--tz` | syslog files, `dmesg -T`, the text forms of a BMC event log, the timestamp of `nvidia-smi` output, times of an FMFM log written without a zone |
+| capture time | `--captured-at` | a kernel log that has seconds since boot only |
+| modification time of the file as its capture time | `--mtime` | the same log, and inventories that carry no time: dmidecode output, the memory resources of a Redfish dump, an FMFM boot record without a boot time |
+| host | `--host` | a log that holds the records of several hosts (an FMFM log) |
+
+## Which slot a record belongs to
+
+Sources name the place of an error in their own way: an EDAC position, an SMBIOS handle, a label, or the numbers of socket, channel and slot. The ledger keeps every name a source used and ties each record to a slot through it.
+
+An inventory defines the slots of a host and their names: the SMBIOS tables, the memory resources of a Redfish dump, the installed memory of an FMFM boot log. Redfish and FMFM also list each slot by its socket, channel and slot numbers; SMBIOS does not.
+
+| A record names | It is tied to |
+| --- | --- |
+| a label | the slot with that name, ignoring case and separators: `DIMM A1` is the slot `DIMM_A1` |
+| socket, channel and slot numbers | the slot an inventory lists at those numbers |
+| a label or numbers no inventory knows | a slot of its own: the label as printed, or `socket0 channel2 dimm0` for numbers |
+| no place | no slot; the record is counted for the host |
+
+A record with a label and numbers is tied by the label when a slot has that name, and by the numbers otherwise.
+
+A slot made from numbers lasts until an inventory lists the place. Its records then move to the slot of the inventory, so a runtime log imported before the inventory ends up in the same slots as one imported after it.
+
+Numbers from two sources are taken to mean one place. Firmware logs and BMC inventories count channels within a socket. A source that counts them another way would be tied to the wrong slot; no input read today does so without also giving the memory controller.
+
+EDAC positions carry the memory controller and are tied to SMBIOS slots on evidence only: equal labels, or socket, channel and position numbers that agree for every populated slot. The `slot-map` entry of the source inventory says what was tied and how.
 
 ## BMC event log (SEL)
 
@@ -189,7 +218,7 @@ C for most entries: they name a module at best. An OpenBMC registry entry that c
 
 1. `Links.OriginOfCondition`, when it points at a memory resource. The label is the `DeviceLocator` of that resource if the dump holds it, and the last segment of the URI otherwise.
 2. A DIMM name in the message or its arguments.
-3. Socket, channel and DIMM numbers of an OpenBMC registry entry. They are matched with the `MemoryLocation` of the memory resources of the same dump; the numbers are also kept on the event.
+3. Socket, channel and DIMM numbers of an OpenBMC registry entry. They are matched with the `MemoryLocation` of the memory resources of the same dump. The numbers are also kept on the event, and name its slot when no inventory lists the place.
 4. For SEL entries, event data 3 when the event bytes mark it as the module number.
 
 ### Times
@@ -207,6 +236,7 @@ A `ComputerSystem` resource gives the host name (`HostName`), the system vendor 
 - Message registries of other vendors are not known. Their entries about memory are kept as informational events and listed in the report by message ID, so a missing class is visible.
 - `MEM0008` ("is spare memory") is read as a spare taking over, like the IPMI state it follows.
 - The mark on a module has the time of the dump, which is later than the time the BMC set it.
+- `MemoryLocation.MemoryController` is not read. A BMC that counts channels per memory controller gives two slots the same socket, channel and slot numbers. Such numbers are left off both slots and the report counts them; a log entry that names its module by these numbers then has a slot named by the numbers.
 - A `disable` in a log is withdrawn by a later deasserted entry for the same module only within one dump.
 
 ## NVIDIA GPU memory
@@ -317,3 +347,174 @@ The kernel's name of the device is the slot (`cxl:mem0`). The serial number in t
 - Post package repair of a CXL device has no table in rasdaemon and is not seen.
 - The error check scrub log of a CXL device and the scrub controls the kernel shows under `/sys/bus/edac/devices` are not read.
 - CXL event records inside Redfish log entries are not decoded.
+
+## FMFM logs
+
+Adapter `fmfm`, package `internal/adapter/fmfm`. The Fleet Memory Fault Management framework of the Open Compute Project asks an operator to keep three logs per host: a boot log, a runtime error log and a crash log. The error event of the ledger uses the field names of the runtime log, so a runtime record goes in field by field.
+
+### Accepted forms
+
+The framework names the fields of each log and leaves open how they are written as JSON. The adapter finds records by their field names:
+
+- A record is a JSON object that has one of the marking fields in the table below.
+- It may be the whole document, an element of a list, or sit under any key of an enclosing object. A file may hold several documents one after the other, one per line for example.
+- A field may be in the record itself or in an object nested in it, such as `MemoryErrorLocation` in the second example.
+- Field names are compared without case, spaces, underscores and dashes.
+
+| Log | Marking fields |
+| --- | --- |
+| runtime | `ErrorDT`, `EcsModeRegisters` |
+| boot | `CurrentBootDT`, `InstalledMemory`, `InstalledFirmware`, `SystemMemoryConfig`, `PrimordialBootDT`, `TrainingEventLogs` |
+| crash | `SystemCrashDT`, `OsCrashDT` |
+
+```json
+{"ErrorDT": "2026:11:10:08:00:00:123", "ErrorSeverity": "CE", "ErrorScrubType": "Demand", "HostID": "r12-n034",
+ "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0, "SubChannel": 1, "Rank": 0, "DeviceId": 7,
+ "BankGroup": 0, "Bank": 3, "Row": "0x1a2f", "Column": 568, "ErrorVector": "dq:0x000c", "OsPhysicalAddress": "0x1f8bd19c0"}
+{"ErrorDT": "2026-11-10T09:00:00.500Z", "ErrorSeverity": "CE", "ErrorScrubType": "Patrol scrub error",
+ "MemoryErrorLocation": {"HostID": "r12-n034", "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0, "Rank": 0}}
+```
+
+A number may be a JSON number or text, decimal or with the prefix `0x`. A field that is `null` counts as absent. One file may be up to 256 MiB.
+
+For the import to recognise a file, one of `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` and `OsCrashDT` has to be in its first 256 KiB, spelled as here.
+
+### Runtime records
+
+| Field | Use |
+| --- | --- |
+| `ErrorDT` | time of the error; a record without a readable time is skipped |
+| `ErrorSeverity` | `Informational`, `CE`, `Recoverable`, `UE` or `Fatal`; another word is reported and the record gives no event |
+| `ErrorScrubType` | text that starts with `Demand` is a demand error, with `Patrol` a scrub find, anything else is kept as other |
+| `SocketId`, `ChannelId`, `ChannelSlotId` | the module |
+| `SubChannel`, `Rank`, `DeviceId`, `BankGroup`, `Bank`, `Row`, `Column` | the place in the module |
+| `ErrorVector` | kept as written; a number is stored in hexadecimal |
+| `OsPhysicalAddress` | physical address |
+| `EcsModeRegisters` | ECS readings, see the next section |
+| `HostID` | the host of the record |
+| `DimmTemp` | stays in the raw record; the report says how many records have one |
+| `ProcessorMetadata`, `PmicRuntimeRegisters` | not read; the report names them |
+
+A record with `EcsModeRegisters` and no `ErrorSeverity` gives readings and no event. The framework names a module by numbers. A slot name is also read when a record has one, from `DeviceLocator`, `Locator`, `SlotLabel`, `DimmLabel` or `Label`.
+
+### Boot records
+
+| Field | Use |
+| --- | --- |
+| `CurrentBootDT` | a boot of the host that started then |
+| `InstalledFirmware` | the firmware version of that boot: the text, or the field of the object whose name ends in `Version` |
+| `InstalledMemory` | one module per entry, as seen at the boot time: socket, channel and slot numbers, a slot name if the entry has one, and the fields whose names end in `Supplier`, `PartNumber` and `SerialNumber` |
+| `TrainingEventLogs` | one informational event per entry at the boot time, with the step that failed and the module the entry names |
+| `SystemMemoryConfig`, `PrimordialBootDT`, `PmicBootErrorLog`, `DramOffsetRegisters`, `RcdControlWords`, `DataBufferControlWords`, `MemoryControllerMetadata` | not read; the report names them |
+
+A log with one record per boot lists the memory once per boot. Every listing is kept with its boot time, so a module that was replaced between two boots is in its slot from the first boot that lists it.
+
+A record without a readable `CurrentBootDT` still gives its modules, as seen at the time of the import. Its training events have no time and are reported as skipped.
+
+A module in a place ECS registers were read from is recorded as DDR5.
+
+Two entries of one record with the same socket, channel and slot numbers do not say which module a runtime record means. The numbers are left off both, and an entry without a slot name of its own is skipped. The report counts such entries.
+
+### Crash records
+
+| Field | Use |
+| --- | --- |
+| `OsCrashDT`, `SystemCrashDT` | time of the crash; the time of the operating system is used when the record has both |
+| `FatalError` | set: a fatal error at the crash time, at the place the record names, with a text value kept as the error type. Not set: an informational event "system crash" |
+| `PmicCrashRegisters`, `Uptime` | not read; the report names them |
+
+`FatalError` is set when it is `true`, a number other than zero, or text other than `0`, `no`, `false`, `none` and `n/a`.
+
+### Grade
+
+A for a record with row, column and bank or bank group. B for a record with a physical address or a rank. C otherwise: crash records and training failures name a module at best.
+
+### Which module
+
+By the socket, channel and slot numbers, as described under "Which slot a record belongs to". The boot log lists the installed memory by the same numbers, so a runtime log imported with the boot log of its host has the errors under the serial numbers of the modules. Without a boot log or another inventory that lists slots by numbers, the slot is named by the numbers.
+
+### Times
+
+| Form | Example |
+| --- | --- |
+| the form the framework recommends | `2026:11:10:08:00:00:123`, with or without the milliseconds |
+| RFC 3339 | `2026-11-10T08:00:00.123Z` |
+| date and time with a space or slashes | `2026-11-10 08:00:00`, `2026/11/10 08:00:00` |
+| a number | seconds since 1970; a number above 100000000000 is milliseconds |
+
+A time without a zone is read as UTC unless a zone is given (`fmfm.Options.Location`).
+
+### Host
+
+A log may hold the records of several hosts. One import reads one host: the host that is asked for (`fmfm.Options.HostID`) when the log names it, and the host of the first record that names one otherwise. Host names are compared without case.
+
+Records of the other hosts are left out, and the report names those hosts. When the host was not asked for, the records left out count as skipped and the source is marked as partly read.
+
+A name the log does not use is taken as the name of the case, and the first host of the log is read into it.
+
+### Reading a log again
+
+The logs give their records no number. A record is identified by its content, and records with equal content by their order in the file. Reading a file again adds nothing, and a log that has grown can be read again for the new records. Two records that are equal in every field stay two errors.
+
+An error that is also in the host's own logs is counted once when both records name the same cache line within 5 seconds, or the same slot when neither has an address.
+
+### Known gaps
+
+- The reader was written from the framework document and tested on files made for it. No log of a production fleet has been read yet.
+- A log that uses other field names than the framework is not recognised.
+- `DimmTemp` is not stored as a series, so a finding still lists the temperature history as missing.
+- PMIC registers, RCD and data buffer control words, DRAM offset registers, the memory controller and processor metadata, the system memory configuration, the first boot time and the uptime are not read.
+- `InstalledFirmware` gives one version. Versions of other firmware in the same field are not stored.
+- Capacity, speed and type of a module are not read from the boot log.
+- The same record exported twice with its time written in two forms is counted twice.
+- A crash record gives the time and the fatal flag. What the registers of the record say about the crash is not decoded.
+
+## ECS registers
+
+A DDR5 device corrects single-bit errors in its own cells and counts them during its error check and scrub (ECS) passes. These errors do not reach the memory controller, so no error record exists for them. The counts are in the mode registers MR14 to MR20 of each device.
+
+The ledger keeps the readings of these registers as a series of their own, in the table `ecs_sample`, apart from the error events. One reading is the registers of one device at one time. A reading counts in no total.
+
+### Where readings come from
+
+The field `EcsModeRegisters` of an FMFM runtime record, in one of these forms:
+
+| Form | Example |
+| --- | --- |
+| registers by name | `{"MR14": 32, "MR15": "0x03", "MR19": 16, "MR20": 4}` |
+| MR14 to MR20 in order | `[32, 3, 47, 26, 12, 16, 4]`, with `null` for a register that was not read |
+| the seven bytes as hexadecimal text | `"20032f1a0c1004"`, also with spaces, commas or colons between the bytes |
+| a list with one entry per device | `[{"DeviceId": 7, "MR14": 32, "MR20": 4}, {"DeviceId": 8, "MR14": 32, "MR20": 0}]` |
+| an object keyed by device number | `{"3": {"MR20": 0}, "Device11": {"MR20": 1}}` |
+
+In the first three forms the device is the `DeviceId` of the record. A list entry without a `DeviceId` takes its position in the list as the device number.
+
+A register value is a number, or text: decimal, or hexadecimal with the prefix `0x`. Text that is no decimal number is read as hexadecimal, so `"2f"` is 47 and `"10"` is 10.
+
+The time, the module and the rank of a reading are those of its record. A reading is tied to a slot and a DIMM the way an error event is.
+
+### What the registers say
+
+The registers are stored as read. `model.ECSSample` decodes them:
+
+| Register | Value |
+| --- | --- |
+| MR14 | bit 5: the counter counts rows with errors, or code words with errors |
+| MR15 | bits 2 to 0: the count per gigabit of cells from which the device reports, one of 4, 16, 64, 256, 1024 and 4096 |
+| MR16, MR17, MR18 | the address of the row with the most errors in the last pass: row, bank and bank group |
+| MR19 | the least number of errors that row had: bit n stands for 4 times 2^n or more |
+| MR20 | the least number of rows or code words with errors per gigabit: bit n stands for the MR15 count times 2^n or more |
+
+A register that was not read leaves the values that depend on it unset.
+
+### Use
+
+A finding that asks for more than watching lists the ECS counts of a DDR5 DIMM as missing data. It no longer does when the ledger holds readings of that DIMM.
+
+`store.ECS` returns the readings of a host, a slot or a DIMM in time order.
+
+### Known gaps
+
+- The FMFM runtime log is the only input. The ECS controls the kernel shows under `/sys/bus/edac/devices` and the ECS log of a CXL device are not read.
+- No rule of the engine reads the counts, and no command draws the series yet. The readings are in the ledger and in case bundles.
+- The other bits of MR14 and MR15 (mode, counter reset, chip ID) are not decoded.

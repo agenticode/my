@@ -63,7 +63,9 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		return o.usageError(env, lang, "%s", say(lang, "err.anonymize_out"))
 	}
 	now := clock(env)
-	dopts := scan.DetectOptions{Now: now, ModTime: *mtime}
+	// A log that holds the records of several hosts is read for the host
+	// the case is about.
+	dopts := scan.DetectOptions{Now: now, ModTime: *mtime, Host: o.host}
 	if *capturedAt != "" {
 		t, err := parseTime(*capturedAt)
 		if err != nil {

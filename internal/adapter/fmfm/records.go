@@ -233,16 +233,6 @@ func (r *run) fingerprint(kind string, parts ...string) string {
 	return model.Fingerprint(append([]string{Kind, kind, strconv.Itoa(n)}, parts...)...)
 }
 
-// listed returns the module a boot record of this log lists at the place
-// a record names by number, or nil.
-func (r *run) listed(l location) *place {
-	p, ok := l.place()
-	if !ok {
-		return nil
-	}
-	return r.places[p]
-}
-
 // runtime turns a record of the runtime error log into an event, and its
 // ECS registers into readings.
 func (r *run) runtime(rec *record) error {
@@ -254,7 +244,7 @@ func (r *run) runtime(rec *record) error {
 	}
 	loc := locate(flat)
 	for _, k := range []string{"processormetadata", "pmicruntimeregisters"} {
-		if _, has := rec.obj[k]; has {
+		if rec.obj[k] != nil {
 			r.unread[fieldNames[k]]++
 		}
 	}
@@ -268,7 +258,8 @@ func (r *run) runtime(rec *record) error {
 	}()
 
 	_, hasSeverity := flat["errorseverity"]
-	ecs, hasECS := rec.obj["ecsmoderegisters"]
+	ecs := rec.obj["ecsmoderegisters"]
+	hasECS := ecs != nil // a field that is null is not there
 	if !hasSeverity && !hasECS {
 		r.tally.Skip(rec.ref, "record has a time and neither an ErrorSeverity nor ECS registers")
 		return nil
@@ -331,8 +322,8 @@ func (r *run) runtime(rec *record) error {
 			}
 			stored = true
 		}
-		if pl := r.listed(loc); pl != nil {
-			pl.ecs = true
+		if p, ok := loc.place(); ok {
+			r.ecsPlaces[p] = true
 		}
 	}
 	return nil
@@ -508,7 +499,7 @@ func (r *run) boot(rec *record) error {
 		r.tally.Skip(rec.ref, fmt.Sprintf("CurrentBootDT %q is unreadable", text(flat["currentbootdt"])))
 	}
 	for _, k := range []string{"systemmemoryconfig", "primordialbootdt", "pmicbooterrorlog", "dramoffsetregisters", "rcdcontrolwords", "databuffercontrolwords", "memorycontrollermetadata"} {
-		if _, has := rec.obj[k]; has {
+		if rec.obj[k] != nil {
 			r.unread[fieldNames[k]]++
 		}
 	}
@@ -531,6 +522,8 @@ func (r *run) boot(rec *record) error {
 	}
 
 	if list, ok := rec.obj["installedmemory"].([]any); ok {
+		// The entries of this record by place, as indexes into r.placed.
+		here := map[[3]int]int{}
 		for i, item := range list {
 			m, isObj := item.(map[string]any)
 			if !isObj {
@@ -547,54 +540,70 @@ func (r *run) boot(rec *record) error {
 			mod.DIMM.PartNumber = suffixField(object(sub), "partnumber")
 			mod.DIMM.Serial = suffixField(object(sub), "serialnumber", "serial")
 			p, placed := loc.place()
-			if placed {
-				mod.Socket, mod.Channel, mod.Position = loc.socket, loc.channel, loc.slot
-				if mod.Locator == "" {
-					// The name the ledger gives a place that error
-					// records name by numbers.
-					mod.Locator = model.PlaceName(p[0], p[1], p[2])
-				}
-			}
-			if mod.Locator == "" {
+			named := mod.Locator != ""
+			if !named && !placed {
 				r.tally.Skip(mod.RawRef, "entry of the installed memory names no slot: no locator and no socket, channel and slot numbers")
 				continue
 			}
-			if placed {
-				// Reported at the end, when it is known what else the log
-				// says about the module.
-				r.places[p] = &place{module: mod}
+			if !placed {
+				if err := r.sink.Module(&mod); err != nil {
+					return err
+				}
 				continue
 			}
-			if err := r.sink.Module(&mod); err != nil {
-				return err
+			mod.Socket, mod.Channel, mod.Position = loc.socket, loc.channel, loc.slot
+			if !named {
+				// The name the ledger gives a place that error records
+				// name by numbers.
+				mod.Locator = model.PlaceName(p[0], p[1], p[2])
 			}
+			lm := listedModule{place: p, module: mod, named: named}
+			if j, taken := here[p]; taken {
+				first := &r.placed[j]
+				if first.module.Locator == mod.Locator && first.module.DIMM == mod.DIMM {
+					continue // the same module listed twice
+				}
+				first.clash, lm.clash = true, true
+			} else {
+				here[p] = len(r.placed)
+			}
+			r.placed = append(r.placed, lm)
 		}
-	} else if _, has := rec.obj["installedmemory"]; has {
+	} else if rec.obj["installedmemory"] != nil {
 		r.tally.Skip(rec.ref, "InstalledMemory is not a list")
 	}
 
-	// A training failure names the step that failed and the module.
-	if list, ok := rec.obj["trainingeventlogs"].([]any); ok && hasTime {
-		for i, item := range list {
-			m, isObj := item.(map[string]any)
-			if !isObj {
-				continue
-			}
-			sub := map[string]any{}
-			flatten(folded(m), sub, 0)
-			loc := locate(sub)
-			step := suffixField(object(sub), "step", "failure", "event", "description", "message")
-			e := &model.Event{
-				Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: model.SevInformational,
-				ErrorType: strings.TrimSpace("memory training failure at boot: " + step),
-				SocketId:  loc.socket, ChannelId: loc.channel, ChannelSlotId: loc.slot, SubChannel: loc.sub, DeviceId: loc.device, Label: loc.label,
-				Count: 1, Source: Kind + "/boot", Decoder: "fmfm", RawRef: fmt.Sprintf("%s/TrainingEventLogs[%d]", rec.ref, i), Raw: rec.raw,
-			}
-			e.Grade = e.ComputeGrade()
-			e.Fingerprint = r.fingerprint("training", text(flat["currentbootdt"]), step, loc.socket.String(), loc.channel.String(), loc.slot.String(), loc.label)
-			if err := r.sink.Event(e); err != nil {
-				return err
-			}
+	// A training failure names the step that failed and the module. It
+	// happened at the boot the record is about.
+	list, _ := rec.obj["trainingeventlogs"].([]any)
+	if rec.obj["trainingeventlogs"] != nil && list == nil {
+		r.tally.Skip(rec.ref, "TrainingEventLogs is not a list")
+	}
+	for i, item := range list {
+		ref := fmt.Sprintf("%s/TrainingEventLogs[%d]", rec.ref, i)
+		if !hasTime {
+			r.tally.Skip(ref, "training event of a boot record without a readable CurrentBootDT")
+			continue
+		}
+		m, isObj := item.(map[string]any)
+		if !isObj {
+			r.tally.Skip(ref, "entry of the training events is not an object")
+			continue
+		}
+		sub := map[string]any{}
+		flatten(folded(m), sub, 0)
+		loc := locate(sub)
+		step := suffixField(object(sub), "step", "failure", "event", "description", "message")
+		e := &model.Event{
+			Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: model.SevInformational,
+			ErrorType: strings.TrimSpace("memory training failure at boot: " + step),
+			SocketId:  loc.socket, ChannelId: loc.channel, ChannelSlotId: loc.slot, SubChannel: loc.sub, DeviceId: loc.device, Label: loc.label,
+			Count: 1, Source: Kind + "/boot", Decoder: "fmfm", RawRef: ref, Raw: rec.raw,
+		}
+		e.Grade = e.ComputeGrade()
+		e.Fingerprint = r.fingerprint("training", text(flat["currentbootdt"]), step, loc.socket.String(), loc.channel.String(), loc.slot.String(), loc.label)
+		if err := r.sink.Event(e); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -639,7 +648,7 @@ func (r *run) crash(rec *record) error {
 		return nil
 	}
 	for _, k := range []string{"pmiccrashregisters", "uptime"} {
-		if _, has := rec.obj[k]; has {
+		if rec.obj[k] != nil {
 			r.unread[fieldNames[k]]++
 		}
 	}
@@ -663,27 +672,21 @@ func (r *run) crash(rec *record) error {
 }
 
 // modules reports the modules the boot records of the log list by socket,
-// channel and slot number. A module ECS registers were read from is a DDR5
-// module: no other kind has them.
+// channel and slot number. A module in a place ECS registers were read from
+// is a DDR5 module: no other kind has them.
 func (r *run) modules() error {
-	keys := make([][3]int, 0, len(r.places))
-	for p := range r.places {
-		keys = append(keys, p)
-	}
-	sort.Slice(keys, func(i, j int) bool {
-		a, b := keys[i], keys[j]
-		if a[0] != b[0] {
-			return a[0] < b[0]
+	for i := range r.placed {
+		lm := &r.placed[i]
+		m := lm.module
+		if lm.clash {
+			r.clashes++
+			if !lm.named {
+				r.tally.Skip(m.RawRef, "entry of the installed memory has the socket, channel and slot numbers of another entry and no slot name")
+				continue
+			}
+			m.Socket, m.Channel, m.Position = model.Opt[int]{}, model.Opt[int]{}, model.Opt[int]{}
 		}
-		if a[1] != b[1] {
-			return a[1] < b[1]
-		}
-		return a[2] < b[2]
-	})
-	for _, p := range keys {
-		pl := r.places[p]
-		m := pl.module
-		if pl.ecs {
+		if r.ecsPlaces[lm.place] {
 			m.DIMM.MemoryType = "DDR5"
 		}
 		if err := r.sink.Module(&m); err != nil {

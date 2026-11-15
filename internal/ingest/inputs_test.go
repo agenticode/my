@@ -283,6 +283,52 @@ func TestPlaceNamedByNumbers(t *testing.T) {
 // Records that are all second reports of records with a better name do
 // not make a slot of their own: a machine check next to the EDAC record
 // decoded from it.
+// An inventory that gives two slots the same socket, channel and slot
+// numbers (channels counted per memory controller, the controller left out)
+// does not say which slot a record with those numbers means. The record
+// keeps a slot named by the numbers, and neither DIMM is blamed.
+func TestSharedPlaceNumbersNameNoSlot(t *testing.T) {
+	s := newStore(t)
+	t0 := time.Date(2026, 11, 10, 0, 0, 0, 0, time.UTC)
+	mods := bmcModules(t0)
+	// DIMM_C1 gets the numbers of DIMM_A1 and a module of its own.
+	mods[2].Channel, mods[2].Populated = model.Some(0), true
+	mods[2].DIMM = model.DIMM{Manufacturer: "Example Memory", PartNumber: "EXM64G48R2X4-A", Serial: "S-C1", SizeBytes: 64 << 30}
+	ev := func(ref string, channel int) *model.Event {
+		return &model.Event{ErrorDT: t0.Add(time.Hour), ErrorSeverity: model.SevCE, Source: "redfish/log", RawRef: ref, Fingerprint: ref,
+			SocketId: model.Some(0), ChannelId: model.Some(channel), ChannelSlotId: model.Some(0)}
+	}
+	dump := &fake{kind: "redfish", fn: func(sink adapter.Sink) error {
+		if err := emitModules(sink, mods); err != nil {
+			return err
+		}
+		if err := sink.Event(ev("shared", 0)); err != nil {
+			return err
+		}
+		return sink.Event(ev("unique", 1))
+	}}
+	if _, err := Run(ctx, s, []adapter.Adapter{dump}, Options{Host: "h1", Now: t0.Add(2 * time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	events, err := s.EventList(ctx, store.EventFilter{Host: "h1"})
+	if err != nil || len(events) != 2 {
+		t.Fatalf("%d events, %v", len(events), err)
+	}
+	got := map[string]string{}
+	for _, e := range events {
+		d, _ := s.DIMM(ctx, e.DIMMUID)
+		serial := ""
+		if d != nil {
+			serial = d.Serial
+		}
+		got[e.RawRef] = e.Slot + "/" + serial
+	}
+	want := map[string]string{"shared": "socket0 channel0 dimm0/", "unique": "DIMM_B1/S-B1"}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("events = %v\nwant %v", got, want)
+	}
+}
+
 func TestSecondReportsNameNoSlot(t *testing.T) {
 	s := newStore(t)
 	t0 := time.Date(2026, 11, 10, 0, 0, 0, 0, time.UTC)

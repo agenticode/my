@@ -244,17 +244,26 @@ type run struct {
 	otherHosts map[string]int
 	seen       map[string]int // content of a record -> how often it was seen
 
-	// places are the modules the boot records of the log list by socket,
-	// channel and slot number.
-	places map[[3]int]*place
-	temps  int
-	unread map[string]int
+	// placed are the modules the boot records of the log list by socket,
+	// channel and slot number, in the order of the log. They are reported
+	// at the end, when it is known what else the log says about them.
+	placed []listedModule
+	// ecsPlaces are the places ECS registers were read from.
+	ecsPlaces map[[3]int]bool
+	clashes   int
+	temps     int
+	unread    map[string]int
 }
 
-// place is a module a boot record lists.
-type place struct {
+// listedModule is a module a boot record lists by numbers.
+type listedModule struct {
+	place  [3]int
 	module model.Module
-	ecs    bool // ECS registers were read from it
+	// named: the entry has a slot name of its own.
+	named bool
+	// clash: another entry of the same boot record has the same numbers,
+	// so the numbers do not say which of the two a record means.
+	clash bool
 }
 
 // Collect reads the log into sink.
@@ -270,7 +279,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		return rep
 	}
 	r := &run{ctx: ctx, origin: a.origin, opts: a.opts, rep: &rep, sink: sink,
-		otherHosts: map[string]int{}, seen: map[string]int{}, places: map[[3]int]*place{}, unread: map[string]int{}}
+		otherHosts: map[string]int{}, seen: map[string]int{}, ecsPlaces: map[[3]int]bool{}, unread: map[string]int{}}
 	r.now = a.opts.Now.UTC()
 	if a.opts.Now.IsZero() {
 		r.now = time.Now().UTC()
@@ -453,6 +462,9 @@ func (r *run) notes() []string {
 			which += ", the first host the log names"
 		}
 		add("records of other hosts left out: %d (%s); this run read the records of %s", total, strings.Join(names, ", "), which)
+	}
+	if r.clashes > 0 {
+		add("entries of the installed memory that have the socket, channel and slot numbers of another entry of their boot record: %d; these numbers place no records", r.clashes)
 	}
 	if r.temps > 0 {
 		add("records with a DIMM temperature: %d; the temperature is kept in the raw record and not stored as a series", r.temps)
