@@ -24,7 +24,6 @@ The same fault shows more or less of itself depending on who handles the error a
 | Errors handled by firmware first (GHES), on x86 and ARM | rasdaemon database, kernel log | A to C | as much as the firmware put into the error record |
 | CXL memory device | rasdaemon database | A | DRAM event records carry bank, row and column |
 | Fleet with FMFM logging | FMFM logs | A to C | as much as the logging fills in |
-| Fleet whose rasdaemons write to a MySQL or PostgreSQL server | rasdaemon store, read with `--fleet` | as the hosts' own databases | the rows are those each host would keep in its SQLite file, without serial numbers |
 | Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
 | No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
 | NVIDIA GPU memory | Xid lines, `nvidia-smi -q` | C | the driver reports no location |
@@ -169,7 +168,7 @@ The reader is tested against MySQL 8.4, MariaDB 11.4 and PostgreSQL 17, on table
 
 - Rows that rasdaemon itself wrote to a MySQL or PostgreSQL server have not been read yet. The layout is taken from the source of rasdaemon 1.0.0.
 - A database without machine check records (ARM servers, firmware-first error handling) gives no way to see that rasdaemon's clock was off. Its records keep rasdaemon's time.
-- The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right.
+- The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right. rasdaemon 1.0.0 names the type as the kernel does.
 - The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.
 - rasdaemon stores what it traced while it ran. Errors from before it was started, and from a boot in which it did not run, are in the kernel log only.
 - A database that fails the SQLite integrity check is refused.

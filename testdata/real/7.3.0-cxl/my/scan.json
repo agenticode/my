@@ -1,0 +1,163 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-guest",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": {
+      "name": "lab-guest",
+      "system": "QEMU Standard PC (Q35 + ICH9, 2009)",
+      "from": "2026-11-15T11:05:20Z",
+      "to": "2026-11-15T11:07:10.845833Z",
+      "ce": 11,
+      "ue": 1,
+      "records": 12,
+      "grade_a": 9,
+      "grade_b": 3,
+      "grade_c": 0,
+      "grade": "replace-now",
+      "grade_text": "replace now",
+      "boots": 1,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-15T11:07:09.077724Z",
+        "privileged": true,
+        "tool_version": "c19c5b8"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "DIMM 0",
+                  "label": "DIMM 0",
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "cxl:mem0",
+                  "label": "cxl:mem0",
+                  "state": "replace-now",
+                  "serial": "0x4c41420001",
+                  "ce": 11,
+                  "ue": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 2,
+      "populated": 2
+    },
+    "ranking": [
+      {
+        "n": 1,
+        "slot": "cxl:mem0",
+        "dimm": {
+          "dimm_uid": "def94f37372f100e117e",
+          "serial": "0x4c41420001",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 11,
+        "ue": 1,
+        "mode": "row",
+        "mode_text": "row",
+        "faults": 2,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          12
+        ],
+        "direction": "unknown",
+        "grade": "replace-now",
+        "grade_text": "replace now",
+        "rules": [
+          "R-UE-01",
+          "R-FW-01"
+        ],
+        "confidence": 91
+      }
+    ],
+    "quiet": 1,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 15,
+        "events": 15,
+        "actions": 1,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-15T11:06:13Z",
+        "last": "2026-11-15T11:06:31Z"
+      },
+      {
+        "kind": "klog",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "627 lines read"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 1,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.8",
+          "1 memory slots, 1 populated"
+        ]
+      }
+    ]
+  }
+}

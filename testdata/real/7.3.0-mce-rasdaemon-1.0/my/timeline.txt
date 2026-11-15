@@ -1,0 +1,9 @@
+host lab-guest  2026-11-15 to 2026-11-15  1 day
+
+
+ no DIMM   █  peak 7/day
+ events    OU
+           │└ 3 UE, 2026-11-15 to 2026-11-15
+           └─ 5 pages offline, 2026-11-15 to 2026-11-15
+
+ 7 corrected and 3 uncorrected errors from 2026-11-15 to 2026-11-15

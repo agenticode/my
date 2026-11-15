@@ -3,7 +3,6 @@ package exporter
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"math"
 	"os"
@@ -597,102 +596,6 @@ func TestDocsListEveryMetric(t *testing.T) {
 	for _, name := range regexp.MustCompile(`my_[a-z0-9_]+`).FindAllString(doc, -1) {
 		if !known[name] {
 			t.Errorf("docs/exporter.md names %s, which is not a metric", name)
-		}
-	}
-}
-
-// TestContribNamesRealMetrics keeps the files under contrib/ in step with
-// the exporter: every metric a rule or a dashboard query names exists, and
-// every label it uses is a label of the metrics or of a scrape.
-func TestContribNamesRealMetrics(t *testing.T) {
-	root := testutil.RepoRoot(t)
-	known := map[string]bool{}
-	labels := map[string]bool{"instance": true, "job": true}
-	for _, d := range Descs {
-		known[d.Name] = true
-		for _, l := range d.Labels {
-			labels[l] = true
-		}
-	}
-	metric := regexp.MustCompile(`my_[a-z0-9_]+`)
-	check := func(file, text string) {
-		t.Helper()
-		for _, name := range metric.FindAllString(text, -1) {
-			// my_reader is the account of the example settings; the others
-			// are file names.
-			if !known[name] && name != "my_reader" && !strings.HasPrefix(name, "my_exporter.") && !strings.HasPrefix(name, "my_findings.") {
-				t.Errorf("%s names %s, which is not a metric", file, name)
-			}
-		}
-	}
-	for _, rel := range []string{"prometheus/my-findings.rules.yml", "prometheus/my-findings.rules.test.yml", "prometheus/my-exporter.rules.yml",
-		"prometheus/my-exporter.rules.test.yml", "prometheus/scrape.yml", "alertmanager/alertmanager.yml", "README.md"} {
-		b, err := os.ReadFile(filepath.Join(root, "contrib", filepath.FromSlash(rel)))
-		if err != nil {
-			t.Fatal(err)
-		}
-		check("contrib/"+rel, string(b))
-	}
-
-	b, err := os.ReadFile(filepath.Join(root, "contrib", "grafana", "my-memory-findings.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var dash struct {
-		Title  string `json:"title"`
-		UID    string `json:"uid"`
-		Panels []struct {
-			Title       string `json:"title"`
-			Description string `json:"description"`
-			Type        string `json:"type"`
-			Targets     []struct {
-				Expr   string `json:"expr"`
-				Legend string `json:"legendFormat"`
-			} `json:"targets"`
-		} `json:"panels"`
-	}
-	if err := json.Unmarshal(b, &dash); err != nil {
-		t.Fatalf("contrib/grafana/my-memory-findings.json: %v", err)
-	}
-	if dash.UID == "" || len(dash.Panels) == 0 {
-		t.Fatalf("dashboard %q has uid %q and %d panels", dash.Title, dash.UID, len(dash.Panels))
-	}
-	used := map[string]bool{}
-	grouping := regexp.MustCompile(`\b(?:by|on|without|ignoring)\s*\(([^)]*)\)`)
-	matcher := regexp.MustCompile(`[{,]\s*([a-z_]+)\s*(?:=~|!~|!=|=)`)
-	legend := regexp.MustCompile(`\{\{\s*([a-z_]+)\s*\}\}`)
-	for _, p := range dash.Panels {
-		if p.Title == "" || p.Description == "" || len(p.Targets) == 0 {
-			t.Errorf("panel %q (%s): a panel needs a title, a description and a query", p.Title, p.Type)
-		}
-		for _, tg := range p.Targets {
-			check("panel "+p.Title, tg.Expr)
-			for _, name := range metric.FindAllString(tg.Expr, -1) {
-				used[name] = true
-			}
-			var names []string
-			for _, m := range grouping.FindAllStringSubmatch(tg.Expr, -1) {
-				for _, l := range strings.Split(m[1], ",") {
-					names = append(names, strings.TrimSpace(l))
-				}
-			}
-			for _, m := range matcher.FindAllStringSubmatch(tg.Expr, -1) {
-				names = append(names, m[1])
-			}
-			for _, m := range legend.FindAllStringSubmatch(tg.Legend, -1) {
-				names = append(names, m[1])
-			}
-			for _, l := range names {
-				if l != "" && !labels[l] {
-					t.Errorf("panel %q uses the label %q, which no metric has: %s", p.Title, l, tg.Expr)
-				}
-			}
-		}
-	}
-	// The dashboard shows every metric about memory.
-	for _, d := range []*Desc{DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs, GPURemapBanks, GPURemapFailure, SourceGrade} {
-		if !used[d.Name] {
-			t.Errorf("no panel of the dashboard shows %s", d.Name)
 		}
 	}
 }

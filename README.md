@@ -145,7 +145,7 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
 | `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, FMFM logs, a copy of a host's files |
-| `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>`; with `--fleet`, one exporter for every host of a rasdaemon store ([docs/exporter.md](docs/exporter.md), [contrib/](contrib/README.md)) |
+| `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>` ([docs/exporter.md](docs/exporter.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
 
 A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
@@ -195,7 +195,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines and machine checks, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines, machine checks, firmware error records and CXL event records, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
 
 ## Build
 
@@ -237,7 +237,6 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
 | `tools/dist` | builds the release archives and their checksums, the same bytes for the same commit |
 | `testdata` | fixtures for every adapter; `testdata/real` holds the captures of real hosts with their injection plans |
-| `contrib` | for the exporter: systemd units, Prometheus alert rules with their tests, Alertmanager routes, a Grafana dashboard |
 | `tools/lab` | the scripts that inject errors on a lab host and capture what it recorded |
 
 Three development commands are left out of the command list: `my synth` generates synthetic hosts (`my synth -list` names the scenarios), `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).

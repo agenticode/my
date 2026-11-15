@@ -10,8 +10,9 @@
 # It only reads. Run it as root: the SMBIOS tables, the kernel log and the
 # rasdaemon database are closed to other users on most hosts.
 #
-#   LAB   where captures go (default /root/my-lab); the capture is $LAB/cap/NAME
-#   MY    the my binary to run (default $LAB/bin/my); "-" leaves its output out
+#   LAB        where captures go (default /root/my-lab); the capture is $LAB/cap/NAME
+#   MY         the my binary to run (default $LAB/bin/my); "-" leaves its output out
+#   RASDAEMON  the rasdaemon program that is recording, when it is not the one in the path
 #
 # --formats adds the kernel log in every form dmesg, /dev/kmsg and journalctl
 # print it, under formats/.
@@ -134,8 +135,13 @@ grep -E 'HardwareCorrupted|MemTotal' /proc/meminfo >extra/meminfo.txt 2>/dev/nul
 	echo "kernel=$(uname -r)"
 	echo "arch=$(uname -m)"
 	echo "uptime_seconds=$(cut -d' ' -f1 /proc/uptime)"
-	have rasdaemon && echo "rasdaemon=$(rasdaemon --version 2>/dev/null | head -1)"
-	have rpm && rpm -q rasdaemon >/dev/null 2>&1 && echo "rasdaemon_package=$(rpm -q rasdaemon)"
+	if [ -n "${RASDAEMON:-}" ] && [ "$RASDAEMON" != rasdaemon ]; then
+		echo "rasdaemon=$("$RASDAEMON" --version 2>/dev/null | head -1)"
+		echo "rasdaemon_package=built from source"
+	else
+		have rasdaemon && echo "rasdaemon=$(rasdaemon --version 2>/dev/null | head -1)"
+		have rpm && rpm -q rasdaemon >/dev/null 2>&1 && echo "rasdaemon_package=$(rpm -q rasdaemon)"
+	fi
 	have sqlite3 && echo "sqlite=$(sqlite3 --version | cut -d' ' -f1)"
 	have dmidecode && echo "dmidecode=$(dmidecode --version)"
 	have journalctl && echo "systemd=$(journalctl --version | head -1 | cut -d' ' -f2)"

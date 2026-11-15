@@ -1,0 +1,19 @@
+host lab-guest  QEMU Standard PC (Q35 + ICH9, 2009)  2026-11-15 to 2026-11-15  CE 11, UE 1
+observation grade A 9, B 3
+host finding: replace now
+
+    DIMM 0     cxl:mem0
+    ░░         ██
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
+ 2 slots, 2 DIMMs
+
+ #  SLOT      SERIAL    CE  UE  MODE  TREND 30D     FINDING      RULES
+ 1  cxl:mem0  ..420001  11   1  row   ▁▁▁▁▁▁▁▁▁█ ?  replace now  R-UE-01 R-FW-01
+
+ 1 DIMM without errors
+ sources  hostinfo 2 records, rasdaemon 15 records, klog 4 records, edac-sysfs without records,
+          smbios 1 record
+
+ my dimm cxl:mem0: examination of this DIMM   my why cxl:mem0: what the finding rests on
+ my bundle -o case.mycase: write a case bundle   my help: how to read the figures

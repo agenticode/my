@@ -1,0 +1,3 @@
+{"id":"hold-1","kind":"held","pfn":"0x11b47b","pfn_after":"0x10f215","content":"intact","time":"2026-11-15T11:11:07.200Z"}
+{"id":"hold-2","kind":"held","pfn":"0x1207dd","pfn_after":"0x0","content":"lost","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","time":"2026-11-15T11:11:07.217Z"}
+{"id":"hold-3","kind":"held","pfn":"0x110781","pfn_after":"0x0","content":"lost","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","time":"2026-11-15T11:11:07.221Z"}

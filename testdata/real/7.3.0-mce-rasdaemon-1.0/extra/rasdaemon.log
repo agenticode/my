@@ -1,0 +1,146 @@
+rasdaemon: Failed to open config file /usr/local/etc/sysconfig/rasdaemon: No such file or directory
+rasdaemon: Cpu fault isolation is disabled
+rasdaemon: module ipmi_bmc init failed: -19
+rasdaemon: Improper PAGE_CE_ACTION, set to default soft
+rasdaemon: Page offline choice on Corrected Errors is soft
+rasdaemon: Improper PAGE_CE_THRESHOLD, set to default 50.
+rasdaemon: Improper PAGE_CE_REFRESH_CYCLE, set to default 86400s.
+rasdaemon: Threshold of memory Corrected Errors is 50 / 86400s
+rasdaemon: Improper ROW_CE_ACTION, set to default off
+rasdaemon: Row offline choice on Corrected Errors is off
+rasdaemon: Enabling DB backend: sqlite3
+rasdaemon: block:block_rq_error event enabled
+rasdaemon: Enabled event block:block_rq_error
+rasdaemon: cxl:cxl_aer_correctable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_correctable_error
+rasdaemon: cxl:cxl_aer_uncorrectable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_uncorrectable_error
+rasdaemon: cxl:cxl_dram event enabled
+rasdaemon: Enabled event cxl:cxl_dram
+rasdaemon: cxl:cxl_general_media event enabled
+rasdaemon: Enabled event cxl:cxl_general_media
+rasdaemon: cxl:cxl_generic_event event enabled
+rasdaemon: Enabled event cxl:cxl_generic_event
+rasdaemon: cxl:cxl_memory_module event enabled
+rasdaemon: Enabled event cxl:cxl_memory_module
+rasdaemon: cxl:cxl_memory_sparing event enabled
+rasdaemon: Enabled event cxl:cxl_memory_sparing
+rasdaemon: cxl:cxl_overflow event enabled
+rasdaemon: Enabled event cxl:cxl_overflow
+rasdaemon: cxl:cxl_poison event enabled
+rasdaemon: Enabled event cxl:cxl_poison
+rasdaemon: mce:mce_record event enabled
+rasdaemon: Enabled event mce:mce_record
+rasdaemon: net:net_dev_xmit_timeout event enabled
+rasdaemon: Enabled event net:net_dev_xmit_timeout
+rasdaemon: ras:aer_event event enabled
+rasdaemon: Enabled event ras:aer_event
+rasdaemon: 	 no AER_CE_TRIGGER ((nil))
+rasdaemon: ras:arm_event event enabled
+rasdaemon: Enabled event ras:arm_event
+rasdaemon: ras:extlog_mem_event event not exist
+rasdaemon: Can't get traces from ras:extlog_mem_event
+rasdaemon: ras:mc_event event enabled
+rasdaemon: Enabled event ras:mc_event
+rasdaemon: ras:memory_failure_event event enabled
+rasdaemon: Enabled event ras:memory_failure_event
+rasdaemon: ras:non_standard_event event enabled
+rasdaemon: Enabled event ras:non_standard_event
+rasdaemon: ras:reri_event event not exist
+rasdaemon: Can't get traces from ras:reri_event
+rasdaemon: signal:signal_generate event enabled
+rasdaemon: Enabled event signal:signal_generate
+rasdaemon: devlink:devlink_health_report event not exist
+rasdaemon: Can't get traces from devlink:devlink_health_report
+rasdaemon: Recording aer_event events
+rasdaemon: Recording arm_event events
+rasdaemon: Recording cxl_poison_event events
+rasdaemon: Recording cxl_aer_ue_event events
+rasdaemon: Recording cxl_aer_ce_event events
+rasdaemon: Recording cxl_overflow_event events
+rasdaemon: Recording cxl_generic_event events
+rasdaemon: Recording cxl_general_media_event events
+rasdaemon: Recording cxl_dram_event events
+rasdaemon: Recording cxl_memory_module_event events
+rasdaemon: Recording cxl_memory_sparing_event events
+rasdaemon: Recording devlink_event events
+rasdaemon: Recording disk_errors events
+rasdaemon: Recording extlog_event events
+rasdaemon: Recording mc_event events
+rasdaemon: Recording memory_failure_event events
+rasdaemon: Recording non_standard_event events
+rasdaemon: Recording reri_event events
+rasdaemon: Recording signal_event events
+rasdaemon: Recording mce_record events
+rasdaemon: Recording amp_payload0_event events
+rasdaemon: Recording amp_payload1_event events
+rasdaemon: Recording amp_payload2_event events
+rasdaemon: Recording amp_payload3_event events
+rasdaemon: Recording ampereone_payload0_event events
+rasdaemon: Recording ampereone_payload1_event events
+rasdaemon: Recording ampereone_payload2_event events
+rasdaemon: Recording ampereone_payload3_event events
+rasdaemon: Recording ampereone_payload4_event events
+rasdaemon: Recording ampereone_payload5_event events
+rasdaemon: Recording ampereone_payload6_event events
+rasdaemon: Recording hip08_oem_type1_event_v2 events
+rasdaemon: Recording hip08_oem_type2_event_v2 events
+rasdaemon: Recording hip08_pcie_local_event_v2 events
+rasdaemon: Recording hisi_common_section_v2 events
+rasdaemon: Recording jm_payload0_event events
+rasdaemon: Recording nvidia_ns_event events
+rasdaemon: Recording nvidia_vera_ns_event events
+rasdaemon: Recording yitian_ddr_reg_dump_event events
+rasdaemon: Database backend started: sqlite3.
+rasdaemon: Listening to events for cpus 0 to 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000005 mce_record [ERROR] 2026-11-15 11:08:43 +0000 bank=7, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 104399040, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000005 mce_record [ERROR] 2026-11-15 11:08:45 +0000 bank=7, status= 9c00004000010091, MEMORY CONTROLLER RD_CHANNEL1_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 104357980, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [ERROR] 2026-11-15 11:08:47 +0000 bank=8, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10438e100, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [ERROR] 2026-11-15 11:08:48 +0000 bank=8, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10438e100, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [ERROR] 2026-11-15 11:08:50 +0000 bank=7, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10438ffc0, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [ERROR] 2026-11-15 11:08:51 +0000 bank=7, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10438ffc0, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [ERROR] 2026-11-15 11:08:52 +0000 bank=7, status= 9c00004000010090, MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mci=Corrected_error Error_enabled, mca=M2M: , n_errors=1, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10438ffc0, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 mce_record [CRIT] 2026-11-15 11:08:54 +0000 bank=7, status= bc000000000100c0, MEMORY CONTROLLER MS_CHANNEL0_ERR Transaction: Memory scrubbing error MscodDataRdErr, mci=Uncorrected_error Error_enabled, mca=M2M: , n_errors=0, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 10439f200, mcgstatus=0, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: Poison page statistics exceeded threshold: 12 kB (threshold: 0 kB)
+rasdaemon: memory_failure_event store: 0x34edf628
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000006 memory_failure_event [ALERT] 2026-11-15 11:08:54 +0000 pfn=0x10439f page_type=dirty LRU page action_result=Recovered 
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000007 mce_record [CRIT] 2026-11-15 11:08:56 +0000 bank=7, status= bd000000000100c0, MEMORY CONTROLLER MS_CHANNEL0_ERR Transaction: Memory scrubbing error MscodDataRdErr, mci=Uncorrected_error Error_enabled SRAO, mca=M2M: , n_errors=0, cpu_type= Skylake server, cpu= 0, socketid= 0, misc= 86, addr= 104dbe400, mcgstatus=5 RIPV MCIP, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: Poison page statistics exceeded threshold: 16 kB (threshold: 0 kB)
+rasdaemon: memory_failure_event store: 0x34edf628
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000007 memory_failure_event [ALERT] 2026-11-15 11:08:56 +0000 pfn=0x104dbe page_type=dirty LRU page action_result=Recovered 
+rasdaemon: mce_record store: 0x34eee588
+rasdaemon: register inserted at db
+           <...>-9     [000] .....     0.000007 mce_record [CRIT] 2026-11-15 11:08:57 +0000 bank=1, status= bd80000000100134, Data CACHE Level-0 Data-Read Error, mci=Uncorrected_error Error_enabled SRAR, mca=Data CACHE Level-0 Data-Read Error, cpu_type= Skylake server, cpu= 0, socketid= 0, ip= 401000, cs= 33, misc= 86, addr= 104dbc340, mcgstatus=7 RIPV EIPV MCIP, mcgcap= 100010a, apicid= 0, microcode= 1
+rasdaemon: Poison page statistics exceeded threshold: 20 kB (threshold: 0 kB)
+rasdaemon: memory_failure_event store: 0x34edf628
+rasdaemon: register inserted at db
+           <...>-303   [000] .....     0.000007 memory_failure_event [ALERT] 2026-11-15 11:08:57 +0000 pfn=0x104dbc page_type=dirty LRU page action_result=Recovered 
+rasdaemon: signal_event store: 0x34ee5ed8
+rasdaemon: register inserted at db
+           <...>-228   [000] d..1.     0.000007 signal_generate 2026-11-15 11:09:01 +0000 signal: Bus error, errorno: 0, code: BUS_MCEERR_AR, comm: hwpoison, pid: 228, grp: 0, res: Delivered, msg: Hardware memory error consumed: action required
+rasdaemon: signal_event store: 0x34ee5ed8
+rasdaemon: register inserted at db
+           <...>-228   [000] d..1.     0.000007 signal_generate 2026-11-15 11:09:01 +0000 signal: Bus error, errorno: 0, code: BUS_MCEERR_AR, comm: hwpoison, pid: 228, grp: 0, res: Delivered, msg: Hardware memory error consumed: action required
+rasdaemon: signal_event store: 0x34ee5ed8
+rasdaemon: register inserted at db
+           <...>-228   [000] d..1.     0.000007 signal_generate 2026-11-15 11:09:01 +0000 signal: Bus error, errorno: 0, code: BUS_MCEERR_AR, comm: hwpoison, pid: 228, grp: 0, res: Delivered, msg: Hardware memory error consumed: action required
