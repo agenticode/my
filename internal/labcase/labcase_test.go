@@ -52,6 +52,9 @@ type capture struct {
 	// on a host without machine check records whose clock was set after
 	// rasdaemon started. The other captures must be left as they are.
 	clock time.Duration
+	// before is what the journal of the host still held of the boot before
+	// the capture: the host's own scan and its bundle count it on top.
+	before state
 	// reports are the sources that hold the injections of the plan, in a
 	// scan of the copy.
 	reports []string
@@ -166,6 +169,21 @@ var captures = []capture{
 		finding: model.VerdictReplaceNow,
 		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeMultiRow, rules: []string{"R-UE-01", "R-SCRUB-01"}},
 		forms:   &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64", idle: 40 * time.Second},
+	},
+	{
+		// The next boot of that guest. Its clock was set back by 10
+		// seconds after rasdaemon started, and its database has no machine
+		// check record that holds the kernel's time: the ledger learns
+		// the step from the errors that the kernel log holds too. The
+		// journal of the guest still had the boot before.
+		dir: "6.19.10-ghes-clock-step", host: "lab-arm", journal: true, ce: 10, ue: 1, gradeA: 11, hard: 1,
+		clock:   -10 * time.Second,
+		before:  state{ce: 24, ue: 2, gradeA: 26, hard: 2},
+		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		finding: model.VerdictReplaceNow,
+		notes:   []string{"time-align: rasdaemon stamped 11 records of one boot 10s ahead of the kernel's clock"},
+		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeRow, rules: []string{"R-UE-01"}},
 	},
 }
 
@@ -288,6 +306,13 @@ func (c capture) want() state {
 // It returns the sources that hold the injections.
 func compare(t *testing.T, c capture, s *store.Store, host string, earlier int) []string {
 	t.Helper()
+	return compareBeyond(t, c, s, host, 0, earlier)
+}
+
+// compareBeyond is compare for a ledger that holds more than the capture:
+// errors and pages offline of an earlier boot.
+func compareBeyond(t *testing.T, c capture, s *store.Store, host string, errors int64, earlier int) []string {
+	t.Helper()
 	res, err := injection.Compare(ctx, s, host, plan(t, c))
 	if err != nil {
 		t.Fatal(err)
@@ -306,8 +331,8 @@ func compare(t *testing.T, c capture, s *store.Store, host string, earlier int) 
 	for _, ch := range res.Failed() {
 		t.Errorf("injection %s: found %d of %d, sources %v, differences %v", ch.Injection.ID, ch.Found, ch.Injection.Count, ch.Sources, ch.Differences)
 	}
-	if res.UnplannedErrors != 0 || res.UnplannedOfflines != earlier {
-		t.Errorf("beyond the plan: %d errors, %d pages offline (want 0 and %d): %v", res.UnplannedErrors, res.UnplannedOfflines, earlier, res.Unplanned)
+	if int64(res.UnplannedErrors) != errors || res.UnplannedOfflines != earlier {
+		t.Errorf("beyond the plan: %d errors, %d pages offline (want %d and %d): %v", res.UnplannedErrors, res.UnplannedOfflines, errors, earlier, res.Unplanned)
 	}
 	return reports
 }
@@ -652,9 +677,10 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 			if live.Host != c.host || live.Data.Host.Scan.Kind != "live" || !live.Data.Host.Scan.Privileged {
 				t.Errorf("scan: host %q, kind %q, privileged %v", live.Host, live.Data.Host.Scan.Kind, live.Data.Host.Scan.Privileged)
 			}
-			if live.Data.Host.CE != c.ce || live.Data.Host.UE != c.ue || live.Data.Host.Grade != string(c.finding) || live.ExitCode != c.finding.ExitCode() {
+			ce, ue := c.ce+c.before.ce, c.ue+c.before.ue
+			if live.Data.Host.CE != ce || live.Data.Host.UE != ue || live.Data.Host.Grade != string(c.finding) || live.ExitCode != c.finding.ExitCode() {
 				t.Errorf("live: CE %d, UE %d, finding %s, exit code %d; want %d, %d, %s", live.Data.Host.CE, live.Data.Host.UE,
-					live.Data.Host.Grade, live.ExitCode, c.ce, c.ue, c.finding)
+					live.Data.Host.Grade, live.ExitCode, ce, ue, c.finding)
 			}
 			var got []string
 			for _, s := range live.Data.Sources {
@@ -688,8 +714,12 @@ func TestBundleWrittenOnTheHost(t *testing.T) {
 			if !m.Anonymized || len(m.Hosts) != 1 || !strings.HasPrefix(m.Hosts[0].Name, "host-") {
 				t.Fatalf("manifest: anonymized %v, hosts %+v", m.Anonymized, m.Hosts)
 			}
-			if m.Hosts[0].CE != c.ce || m.Hosts[0].UE != c.ue {
-				t.Errorf("manifest: CE %d, UE %d; want %d, %d", m.Hosts[0].CE, m.Hosts[0].UE, c.ce, c.ue)
+			want := c.want()
+			want.ce, want.ue = want.ce+c.before.ce, want.ue+c.before.ue
+			want.gradeA, want.gradeB, want.gradeC = want.gradeA+c.before.gradeA, want.gradeB+c.before.gradeB, want.gradeC+c.before.gradeC
+			want.hard, want.soft = want.hard+c.before.hard, want.soft+c.before.soft
+			if m.Hosts[0].CE != want.ce || m.Hosts[0].UE != want.ue {
+				t.Errorf("manifest: CE %d, UE %d; want %d, %d", m.Hosts[0].CE, m.Hosts[0].UE, want.ce, want.ue)
 			}
 			s, err := store.Open(ctx, b.Ledger, store.ReadOnly)
 			if err != nil {
@@ -698,10 +728,10 @@ func TestBundleWrittenOnTheHost(t *testing.T) {
 			defer s.Close()
 			// On the host the journal of every boot was read, so the pages
 			// of an earlier boot are in the bundle through both sources.
-			if got := stateOf(t, s, m.Hosts[0].Name); got != c.want() {
-				t.Errorf("ledger of the bundle: %+v\n               want: %+v", got, c.want())
+			if got := stateOf(t, s, m.Hosts[0].Name); got != want {
+				t.Errorf("ledger of the bundle: %+v\n               want: %+v", got, want)
 			}
-			compare(t, c, s, m.Hosts[0].Name, c.earlier)
+			compareBeyond(t, c, s, m.Hosts[0].Name, c.before.ce+c.before.ue, c.earlier+c.before.hard+c.before.soft)
 			// Nothing in it names the host. The SMBIOS product name is
 			// kept by design, and the aarch64 guest was given its host
 			// name as product name: there the name is looked for in the

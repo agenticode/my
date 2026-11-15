@@ -1,0 +1,15 @@
+Memory controller events summary:
+	Corrected on DIMM Label(s): 'BANK 0 DIMM 0' location: 0:0:-1:-1 errors: 10
+	Uncorrected on DIMM Label(s): 'BANK 0 DIMM 0' location: 0:0:-1:-1 errors: 1
+
+No PCIe AER errors.
+
+No ARM processor errors.
+
+No Extlog errors.
+
+No devlink errors.
+No disk errors.
+No Memory failure errors.
+
+No MCE errors.

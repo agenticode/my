@@ -1,0 +1,158 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: ghes-clock-step
+summary: "firmware error records in an aarch64 guest whose clock was set back after rasdaemon started: 10 corrected and 1 uncorrected memory error on one DIMM"
+method: "QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic hardware error source"
+kernel: 6.19.10-300.fc44.aarch64
+rasdaemon: 0.8.0
+machine: "QEMU 10.2.2 virt, ras=on, emulated without hardware virtualization"
+injections:
+  - id: row-1
+    time: 2026-11-15T12:20:40.957Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x100010140
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x10
+    bit: 5
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: row-2
+    time: 2026-11-15T12:20:44.183Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x100118140
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x118
+    bit: 5
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: row-3
+    time: 2026-11-15T12:20:47.259Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x100238180
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x238
+    bit: 6
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: row-4
+    time: 2026-11-15T12:20:50.340Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x100010140
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x10
+    bit: 5
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: row-5
+    time: 2026-11-15T12:20:53.433Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x1002a0140
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x2a0
+    bit: 5
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: row-6
+    time: 2026-11-15T12:20:56.525Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x100118140
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 7
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x118
+    bit: 5
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: burst
+    time: 2026-11-15T12:20:59.647Z
+    inject: error
+    severity: CE
+    count: 4
+    address: 0x180045640
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 1
+    device: 3
+    bank_group: 0
+    bank: 1
+    row: 0x456
+    column: 0xc8
+    bit: 2
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: ue-1
+    time: 2026-11-15T12:21:32.136Z
+    inject: error
+    severity: Recoverable
+    count: 1
+    address: 0x23d689200
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 9
+    bank_group: 2
+    bank: 0
+    row: 0x2001
+    column: 0x1f0
+    label: "DIMM 0"
+    note: "firmware error record (CPER), memory error section, type 3 (multi-bit ECC)"
+  - id: ue-1-offline
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x23d689000
+    note: "by the kernel after ue-1"
