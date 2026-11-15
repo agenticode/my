@@ -152,6 +152,34 @@ tests:
         alertname: MemoryFindingWorse
         exp_alerts: []
 
+  - name: errors that name no DIMM alert as the host finding
+    interval: 1m
+    input_series:
+      # A host without an EDAC driver logs uncorrected machine checks. They
+      # name no DIMM: the host finding, the series without a slot, goes to
+      # hold replacement. The one DIMM SMBIOS lists stays at ok.
+      - series: 'my_dimm_verdict{host="vm-3", slot="", serial=""}'
+        values: '_x60 4x100'
+      - series: 'my_dimm_verdict{host="vm-3", slot="DIMM 0", serial=""}'
+        values: '0x160'
+    alert_rule_test:
+      - eval_time: 59m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 60m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: vm-3
+              finding: hold-replacement
+              severity: warning
+            exp_annotations:
+              summary: 'vm-3, records tied to no DIMM: the finding is now hold replacement'
+              description: 'Errors or page offlines of host vm-3 that the records tie to no DIMM. Uncorrected errors are among them: find the DIMM before one is pulled. "my why" on the host shows what the finding rests on.'
+      - eval_time: 71m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+
   - name: a gap in the scrapes does not alert again
     interval: 1m
     input_series:

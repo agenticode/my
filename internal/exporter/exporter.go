@@ -37,7 +37,7 @@ type Desc struct {
 // exporter that reads the records of a fleet tells the machines apart by it.
 var (
 	DIMMVerdict = &Desc{Name: "my_dimm_verdict", Type: Gauge, Labels: []string{"host", "slot", "serial"},
-		Help: "Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement."}
+		Help: "Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. An empty slot and serial carry the host finding, about errors and page offlines that are tied to no DIMM."}
 	DIMMCorrected = &Desc{Name: "my_dimm_ce_total", Type: Counter, Labels: []string{"host", "slot", "serial"},
 		Help: "Corrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM."}
 	DIMMUncorrected = &Desc{Name: "my_dimm_ue_total", Type: Counter, Labels: []string{"host", "slot", "serial"},
@@ -45,7 +45,7 @@ var (
 	DIMMFaults = &Desc{Name: "my_dimm_faults", Type: Gauge, Labels: []string{"host", "slot", "mode"},
 		Help: "Faults of the DIMM in the slot by fault mode. A fault is a group of errors with one cause."}
 	DIMMOfflinedPages = &Desc{Name: "my_dimm_offlined_pages", Type: Gauge, Labels: []string{"host", "slot"},
-		Help: "Pages of the DIMM in the slot that were taken offline."}
+		Help: "Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM."}
 	DIMMRepairs = &Desc{Name: "my_dimm_repairs_total", Type: Counter, Labels: []string{"host", "slot", "type"},
 		Help: "Repairs on record for the DIMM in the slot by type: sppr, hppr, sparing, row-remap. Attempts that failed count too."}
 	GPURemapBanks = &Desc{Name: "my_gpu_remap_banks", Type: Gauge, Labels: []string{"host", "gpu", "bucket"},

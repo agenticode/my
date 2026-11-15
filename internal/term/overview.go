@@ -101,11 +101,7 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	for _, line := range flow(st.headerFields(&ov.Host), "  ", st.width()) {
 		p.add(line)
 	}
-	// The grade speaks of the DIMMs and GPUs the records name. Errors that
-	// name none are in no finding, and the line of the finding is where a
-	// reader must learn that.
-	grade := view.GradeWithLoose(st.lang(), st.paint(gradeColor(string(ov.Host.Grade)), ov.Host.GradeText),
-		ov.Unattributed-ov.UnattributedUE, ov.UnattributedUE)
+	grade := st.paint(gradeColor(string(ov.Host.Grade)), ov.Host.GradeText)
 	for _, line := range wrap(st.say("ov.finding", "grade", grade), st.width()) {
 		p.add(line)
 	}
@@ -134,14 +130,20 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 			}
 		}
 	}
-	if ov.Unattributed > 0 {
-		for _, line := range wrap(st.say("ov.loose", "n", ov.Unattributed), st.width()-1) {
+	// What the records tie to no DIMM has a finding of its own.
+	if c := ov.HostFinding; c != nil {
+		fields := []string{st.bold(st.say("ov.host_finding")), st.looseCounts(c),
+			st.paint(gradeColor(string(c.Grade)), c.GradeText), strings.Join(c.Rules, " ")}
+		for i, line := range flow(fields, "  ", st.width()-1) {
+			if i > 0 {
+				line = "    " + line
+			}
 			p.add(" " + line)
 		}
-	}
-	if ov.LoosePages > 0 {
-		for _, line := range wrap(st.say("ov.loose_pages", "n", ov.LoosePages), st.width()-1) {
-			p.add(" " + line)
+		for _, e := range c.Evidence {
+			for _, l := range wrap(e.Text.Text, st.width()-5) {
+				p.add("     " + l)
+			}
 		}
 	}
 	var read []string
@@ -176,6 +178,19 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		}
 	}
 	return p.writeTo(w)
+}
+
+// looseCounts writes how much the host finding is about: the errors and
+// the pages taken offline that are tied to no DIMM.
+func (st Style) looseCounts(c *view.Card) string {
+	var parts []string
+	if c.CE+c.UE > 0 {
+		parts = append(parts, fmt.Sprintf("CE %s, UE %s", i18n.Thousands(c.CE), i18n.Thousands(c.UE)))
+	}
+	if c.Pages > 0 {
+		parts = append(parts, st.say("ov.host_pages", "n", c.Pages))
+	}
+	return strings.Join(parts, ", ")
 }
 
 // sourceName is what a source is called in a line: its name, or its kind

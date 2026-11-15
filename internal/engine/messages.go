@@ -75,6 +75,8 @@ var Messages = i18n.Catalog{
 	"rule.R-SYS-02":   {EN: "the DIMM was moved and the errors stayed in the slot", KO: "DIMM을 옮겼는데 오류가 슬롯에 남음"},
 	"rule.R-SYS-03":   {EN: "the errors stopped after a reseat", KO: "reseat 뒤 오류 소멸"},
 	"rule.R-MAP-01":   {EN: "the slot names of EDAC, SMBIOS and the BMC disagree", KO: "EDAC 라벨, SMBIOS, BMC FRU의 슬롯 매핑이 서로 다름"},
+	"rule.R-HOST-01":  {EN: "uncorrected errors of the host that no record ties to a DIMM", KO: "어느 DIMM의 것인지 기록에 없는 UE가 호스트에 있음"},
+	"rule.R-HOST-02":  {EN: "corrected errors or page offlines of the host that no record ties to a DIMM", KO: "어느 DIMM의 것인지 기록에 없는 CE나 페이지 offline이 호스트에 있음"},
 
 	// R-UE-01 and R-SCRUB-01.
 	"ue.located":      {EN: "{n} uncorrected {n|error|errors}, the latest on {when} at {where}", KO: "UE {n}건, 최근 {when}, {where}"},
@@ -92,8 +94,16 @@ var Messages = i18n.Catalog{
 	"rep.failed":           {EN: "the {kind} of {where} failed on {when}", KO: "{when} {where} {kind} 실패"},
 	"rep.failed_unlocated": {EN: "a {kind} failed on {when}", KO: "{when} {kind} 실패"},
 	"rep.sparing":          {EN: "sparing has been in use since {when}: the spare is taken", KO: "{when}부터 sparing 발동: 예비 자원 사용됨"},
-	"gpu.xid64":            {EN: "row remapping failed: XID 64 on {when}", KO: "row remapping 실패: {when} XID 64"},
-	"gpu.remap_failure":    {EN: "the driver reports a row remapping failure as of {when}", KO: "{when} 기준 드라이버가 row remapping 실패를 보고"},
+	"host.ue_located":      {EN: "{n} uncorrected {n|error|errors} tied to no DIMM, the latest on {when} at {where}", KO: "DIMM 미확인 UE {n}건, 최근 {when}, {where}"},
+	"host.ue":              {EN: "{n} uncorrected {n|error|errors} tied to no DIMM, the latest on {when}", KO: "DIMM 미확인 UE {n}건, 최근 {when}"},
+	"host.ce":              {EN: "{n} corrected {n|error|errors} tied to no DIMM between {from} and {to}", KO: "DIMM 미확인 CE {n}건, {from}부터 {to}까지"},
+	"host.ce_day":          {EN: "{n} corrected {n|error|errors} tied to no DIMM on {from}", KO: "DIMM 미확인 CE {n}건, {from}"},
+	"host.ce_undated":      {EN: "{n} corrected {n|error|errors} tied to no DIMM, dated by seconds since boot only", KO: "DIMM 미확인 CE {n}건, 부팅 후 경과 시간만 기록됨"},
+	"host.pages":           {EN: "{pages} {pages|page|pages} taken offline and tied to no DIMM, the last on {when}", KO: "DIMM 미확인 페이지 offline {pages}개, 최근 {when}"},
+	"host.pages_undated":   {EN: "{pages} {pages|page|pages} taken offline and tied to no DIMM", KO: "DIMM 미확인 페이지 offline {pages}개"},
+
+	"gpu.xid64":         {EN: "row remapping failed: XID 64 on {when}", KO: "row remapping 실패: {when} XID 64"},
+	"gpu.remap_failure": {EN: "the driver reports a row remapping failure as of {when}", KO: "{when} 기준 드라이버가 row remapping 실패를 보고"},
 
 	// R-ROW-03.
 	"row.rising":         {EN: "{mode} fault at {where}: {recent} errors in the last {days} days, {ratio} times the daily rate of the {base} days before", KO: "{mode} 고장({where}): 최근 {days}일 {recent}건, 그 앞 {base}일 일평균의 {ratio}배"},
@@ -155,6 +165,9 @@ var Messages = i18n.Catalog{
 	"check.sppr_volatile":      {EN: "the repair was a soft PPR and the host rebooted on {when} before the errors came back: a soft PPR is lost at power off", KO: "리페어가 sPPR이고 재발 전 {when}에 재부팅: sPPR은 전원이 꺼지면 사라짐"},
 	"check.repair_unlocated":   {EN: "{n} {n|repair names|repairs name} no place: whether errors came back at the repaired place is unknown", KO: "위치 정보 없는 리페어 기록 {n}건: 리페어한 위치의 재발 여부 확인 불가"},
 	"check.named_by_other":     {EN: "{n} error {n|record|records} tied to {slot} carry a {name} of this slot: some errors of {slot} may belong here", KO: "{slot}에 묶인 오류 기록 {n}건에 이 슬롯의 {name} 포함: {slot}의 오류 일부가 이 슬롯 것일 가능성"},
+	"check.host_no_place":      {EN: "{n} {n|error names|errors name} no socket, channel or slot: what recorded {n|it|them} decodes no DIMM", KO: "오류 {n}건에 소켓, 채널, 슬롯 정보 없음: 기록한 쪽이 DIMM을 해석하지 않음"},
+	"check.host_ambiguous":     {EN: "{n} {n|error|errors} in slot {slot} {n|falls|fall} between two DIMMs: the slot held another module before and after, and the time of the swap is not on record", KO: "슬롯 {slot}의 오류 {n}건은 두 DIMM 사이에 있음: 앞뒤로 다른 모듈이 꽂혀 있었고 교체 시점 기록이 없음"},
+	"check.host_asked":         {EN: "{n} of the pages {n|was|were} taken offline because a program asked the kernel to, as a test of that path does: no error of the hardware is behind {n|it|them}", KO: "페이지 {n}개는 프로그램이 커널에 요청해 offline됨(이 경로를 시험할 때 쓰는 방식): 하드웨어 오류에서 나온 것이 아님"},
 
 	// Data a finding did not have.
 	"missing.source":        {EN: "{kind}: {status}", KO: "{kind}: {status}"},
@@ -172,6 +185,7 @@ var Messages = i18n.Catalog{
 	"missing.dates":         {EN: "{n} {n|error carries|errors carry} seconds since boot and no date: left out of every trend", KO: "오류 {n}건은 부팅 후 경과 시간만 있음: 추세에서 제외"},
 	"missing.unplaced":      {EN: "{n} {n|error|errors} of this host {n|names|name} no slot and {n|is|are} counted for no DIMM", KO: "이 호스트의 오류 {n}건은 슬롯 정보 없음: 어느 DIMM에도 계산되지 않음"},
 	"missing.ambiguous":     {EN: "{n} {n|error|errors} in this slot {n|falls|fall} between two DIMMs whose swap time is unknown and {n|is|are} counted for neither", KO: "이 슬롯의 오류 {n}건은 교체 시점이 불명확한 두 DIMM 사이에 있음: 어느 쪽에도 계산되지 않음"},
+	"missing.no_edac":       {EN: "no EDAC driver reports a memory controller on this host: the kernel names no DIMM for an error", KO: "이 호스트에 메모리 컨트롤러를 보고하는 EDAC 드라이버 없음: 커널이 오류의 DIMM을 알려 주지 않음"},
 	"missing.ecs":           {EN: "no ECS counters", KO: "ECS 카운터 없음"},
 	"missing.temperature":   {EN: "no DIMM temperature history", KO: "DIMM 온도 이력 없음"},
 
@@ -185,6 +199,8 @@ var Messages = i18n.Catalog{
 	"next.contact":     {EN: "Keep the DIMM in service and watch it: the contact may have been the cause.", KO: "DIMM을 계속 사용하며 관찰. 접촉 문제였을 가능성."},
 	"next.mapping":     {EN: "Before pulling a DIMM, confirm which physical slot the errors belong to: compare the board print, the EDAC label and the SMBIOS locator.", KO: "DIMM을 빼기 전에 오류가 속한 물리 슬롯 확인: 보드 인쇄, EDAC 라벨, SMBIOS 로케이터 대조."},
 	"next.removed":     {EN: "The DIMM is no longer in the host. Keep this finding with the returned part.", KO: "DIMM이 이미 호스트에서 빠짐. 이 소견을 반품 DIMM과 함께 보관."},
+	"next.host_ue":     {EN: "Do not pull a DIMM on these records: none of them names one. Find the DIMM first, from the EDAC driver of the memory controller or the event log of the BMC, then scan again.", KO: "이 기록만으로 DIMM을 빼지 않음: DIMM을 지목한 기록이 없음. 메모리 컨트롤러의 EDAC 드라이버나 BMC 이벤트 로그로 DIMM부터 확인한 뒤 다시 스캔."},
+	"next.host_ce":     {EN: "No action on a DIMM. The EDAC driver of the memory controller or the event log of the BMC ties further errors to a DIMM.", KO: "DIMM 조치 없음. 메모리 컨트롤러의 EDAC 드라이버나 BMC 이벤트 로그가 있으면 이후 오류가 DIMM과 연결됨."},
 	"next.gpu_replace": {EN: "Return the GPU for repair or replace it: its row remapping has failed.", KO: "GPU 수리 반품 또는 교체: row remapping 실패."},
 
 	// Steps of the confidence.

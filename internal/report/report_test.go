@@ -1543,14 +1543,15 @@ func TestFigures(t *testing.T) {
 	}
 }
 
-// TestSummarySaysWhatNoFindingCovers: the grade of a host is the grade of
-// its worst DIMM or GPU. Errors and page offlines that are tied to no DIMM
-// are in no finding, and the summary is where a reader must learn that.
-// The first case is a real one: a guest without a memory controller driver
-// that logged 7 corrected and 3 uncorrected machine checks, for which the
-// report used to say "ok" and "No DIMM of this host has errors on record"
-// and nothing more.
-func TestSummarySaysWhatNoFindingCovers(t *testing.T) {
+// TestReportHasTheHostFinding: errors and page offlines that are tied to no
+// DIMM have a finding of their own, the host finding, and the report shows
+// it: as the lead of the summary when it sets the grade, as a card in the
+// findings, as a line under the ranking, and with its records in the
+// appendix. The first case is a real one: a guest without a memory
+// controller driver that logged 7 corrected and 3 uncorrected machine
+// checks, for which the report once said "ok" and "No DIMM of this host has
+// errors on record" and nothing more.
+func TestReportHasTheHostFinding(t *testing.T) {
 	capture := func(dir string, files ...string) *store.Store {
 		t.Helper()
 		var as []adapter.Adapter
@@ -1571,95 +1572,169 @@ func TestSummarySaysWhatNoFindingCovers(t *testing.T) {
 		}
 		return s
 	}
-	summary := func(doc *Document) (*elem, string) {
+	// byID returns the elements with the given id.
+	byID := func(root *elem, tag, id string) []*elem {
+		var out []*elem
+		for _, x := range root.find(tag) {
+			if x.attrs["id"] == id {
+				out = append(out, x)
+			}
+		}
+		return out
+	}
+	parts := func(doc *Document) (root, verdict *elem, text string) {
 		t.Helper()
 		raw, root := render(t, doc)
 		for _, bad := range checkHTML(root, raw) {
 			t.Error(bad)
 		}
 		v := root.find("section.sec")[0].find("div.verdict")[0]
-		return v, v.content()
+		return root, v, v.content()
 	}
 
-	// Machine checks without a DIMM, and nothing else: they lead.
+	// Machine checks without a DIMM, and nothing else: the host finding
+	// leads, with the grade of the host.
 	mce := capture("7.3.0-mce", "var/lib/rasdaemon/ras-mc_event.db", "dmesg")
 	doc := buildFrom(t, mce, options(i18n.EN, Customer))
-	if ov := doc.Overview; ov.Unattributed != 10 || ov.UnattributedUE != 3 || ov.LoosePages != 5 || len(doc.DIMMs) != 0 {
-		t.Fatalf("capture: %d errors and %d page offlines tied to no DIMM, %d uncorrected, %d DIMMs described", ov.Unattributed, ov.LoosePages, ov.UnattributedUE, len(doc.DIMMs))
+	if c := doc.Host; c == nil || c.CE != 7 || c.UE != 3 || c.Pages != 5 || c.Grade != model.VerdictHoldReplacement || len(doc.DIMMs) != 0 ||
+		doc.Overview.Host.Grade != model.VerdictHoldReplacement {
+		t.Fatalf("capture: host finding %+v, %d DIMMs described, grade %s", doc.Host, len(doc.DIMMs), doc.Overview.Host.Grade)
 	}
-	v, text := summary(doc)
-	lead := "10 errors of this host (CE 7, UE 3) are tied to no DIMM, and no finding covers them. 5 page offlines of this host are tied to no DIMM. Section 7 lists what each source reports."
+	root, v, text := parts(doc)
+	lead := "Records tied to no DIMM: hold replacement (finding, confidence high). 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340. " +
+		"Do not pull a DIMM on these records: none of them names one. Find the DIMM first, from the EDAC driver of the memory controller or the event log of the BMC, then scan again."
 	if !strings.Contains(text, lead+" No DIMM of this host has errors on record.") {
 		t.Errorf("summary:\n%s", text)
 	}
-	p := v.find("p.uncovered")
-	if len(p) != 1 || !p[0].hasClass("conclusion") || len(p[0].find("rect.ue")) != 1 || len(p[0].find("path.uex")) != 1 {
-		t.Fatalf("the sentence about the errors does not lead, or lacks the mark of an uncorrected error: %s", text)
+	if p := v.find("p.conclusion"); len(p) != 1 || len(p[0].find("a")) != 1 || p[0].find("a")[0].attrs["href"] != "#"+hostAnchor {
+		t.Errorf("the summary does not lead with the host finding, or does not link to its card:\n%s", text)
 	}
-	if a := p[0].find("a"); len(a) != 1 || a[0].attrs["href"] != "#s7" {
-		t.Errorf("the sentence does not lead to the data quality section")
+	// The card, in the findings.
+	cards := byID(root, "article", hostAnchor)
+	if len(cards) != 1 {
+		t.Fatalf("%d cards of the host finding", len(cards))
 	}
-	if all := v.find("p.conclusion"); len(all) != 1 {
-		t.Errorf("%d leading paragraphs", len(all))
+	card := cards[0].content()
+	for _, want := range []string{
+		"host lab-guest; CE 7, UE 3, 5 pages offline",
+		"R-HOST-01 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340 3 records",
+		"R-HOST-02 7 corrected errors tied to no DIMM on 2026-11-15 7 records",
+		"R-HOST-02 5 pages taken offline and tied to no DIMM, the last on 2026-11-15",
+		"open 10 errors name no socket, channel or slot",
+		"Do not pull a DIMM on these records",
+	} {
+		if !strings.Contains(card, want) {
+			t.Errorf("the card lacks %q:\n%s", want, card)
+		}
+	}
+	// Every statement of the card leads to records in the appendix.
+	links := cards[0].find("a.recs")
+	if len(links) != 3 {
+		t.Errorf("%d statements of the card lead to records, want 3", len(links))
+	}
+	for _, a := range links {
+		for _, key := range strings.Fields(a.attrs["data-rec"]) {
+			if len(byID(root, "tbody", "rec-"+key)) != 1 {
+				t.Errorf("record %s of the host finding is not in the appendix", key)
+			}
+		}
+	}
+	// The rules it names are explained, and the line under the ranking
+	// leads to the card.
+	whole := root.content()
+	for _, want := range []string{
+		"R-HOST-01 hold replacement uncorrected errors of the host that no record ties to a DIMM",
+		"R-HOST-02 observe corrected errors or page offlines of the host that no record ties to a DIMM",
+		"Records tied to no DIMM: CE 7, UE 3, 5 pages offline hold replacement R-HOST-01 R-HOST-02",
+		"Tied to no DIMM: CE 7, UE 3, 5 pages offline. No slot, serial number or fault mode is known for these records.",
+	} {
+		if !strings.Contains(whole, want) {
+			t.Errorf("the report lacks %q", want)
+		}
+	}
+	if line := root.find("p.hostline"); len(line) != 1 || len(line[0].find("a")) != 1 || line[0].find("a")[0].attrs["href"] != "#"+hostAnchor {
+		t.Error("the line under the ranking does not lead to the card")
 	}
 	// The capture covers one day, and the report names it once.
-	_, root := render(t, doc)
 	if text := root.find("section.sec")[0].content(); !strings.Contains(text, "Period on record 2026-11-15, 1 boot") {
 		t.Errorf("the period of one day:\n%s", text)
 	}
-	_, text = summary(buildFrom(t, mce, options(i18n.KO, FA)))
-	if want := "이 호스트의 오류 10건(CE 7건, UE 3건)은 어느 DIMM에도 묶이지 않아 어느 소견에도 들어가지 않습니다. 이 호스트의 page offline 5건은 어느 DIMM에도 묶이지 않습니다. 소스별 기록은 7절에 있습니다."; !strings.Contains(strings.ReplaceAll(text, " ", " "), want) {
+	// In Korean, for failure analysis: the steps of the confidence too.
+	kroot, _, text := parts(buildFrom(t, mce, options(i18n.KO, FA)))
+	if want := "DIMM 미확인 기록: 교체 보류 (소견, 신뢰도 높음). DIMM 미확인 UE 3건, 최근 2026-11-15 10:36 UTC, address 0x1060c4340."; !strings.Contains(strings.ReplaceAll(text, "\u00a0", " "), want) {
 		t.Errorf("Korean summary:\n%s", text)
 	}
+	if kc := byID(kroot, "article", hostAnchor); len(kc) != 1 || len(kc[0].find("ul.factors")) != 1 || len(kc[0].find("ul.factors")[0].find("li")) == 0 {
+		t.Error("the Korean FA report lacks the card of the host finding or the steps of its confidence")
+	}
 
-	// Page offlines alone: "no DIMM has errors" is true and stays first.
+	// Page offlines alone: the host finding is "observe" and leads.
 	soft := capture("7.3.0-soft-offline", "var/lib/rasdaemon/ras-mc_event.db", "dmesg")
 	doc = buildFrom(t, soft, options(i18n.EN, Customer))
-	v, text = summary(doc)
-	if n := doc.Overview.LoosePages; n == 0 || doc.Overview.Unattributed != 0 ||
-		!strings.Contains(text, fmt.Sprintf("No DIMM of this host has errors on record. %d page offlines of this host are tied to no DIMM. Section 7", n)) {
-		t.Errorf("page offlines alone (%d):\n%s", n, text)
-	}
-	if p := v.find("p.uncovered"); len(p) != 1 || p[0].hasClass("conclusion") || len(p[0].find("svg")) != 0 {
-		t.Errorf("page offlines alone: the paragraph leads or carries a mark")
+	_, _, text = parts(doc)
+	if c := doc.Host; c == nil || c.Pages == 0 || c.CE+c.UE != 0 || c.Grade != model.VerdictObserve ||
+		!strings.Contains(text, fmt.Sprintf("Records tied to no DIMM: observe (finding, confidence medium). %d pages taken offline and tied to no DIMM", c.Pages)) ||
+		!strings.Contains(text, "No DIMM of this host has errors on record.") {
+		t.Errorf("page offlines alone: %+v\n%s", doc.Host, text)
 	}
 
-	// A host with a finding: the finding leads, and what it leaves out
-	// follows. Corrected errors alone carry no mark of an uncorrected one.
-	path := copyLedger(t, "demo")
-	s, err := store.Open(ctx, path, store.ReadWrite)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer s.Close()
+	// A host with a DIMM to replace: the DIMM leads, and the host finding
+	// is named among the others.
 	at := time.Date(2026, 11, 10, 8, 0, 0, 0, time.UTC)
-	err = s.Update(ctx, func(w *store.Writer) error {
-		for i := range 2 {
-			e := &model.Event{Host: "r12-n034", Kind: model.KindError, ErrorDT: at.Add(time.Duration(i) * time.Minute), ErrorSeverity: model.SevCE, Count: 1,
-				OsPhysicalAddress: model.Some(uint64(0x7f000000 + 0x1000*i)), Source: "test", RawRef: fmt.Sprintf("loose#%d", i),
-				Grade: model.GradeB, TimeQuality: model.TimeExact, Fingerprint: model.Fingerprint("loose", fmt.Sprint(i))}
-			if _, err := w.InsertEvent(e); err != nil {
-				return err
-			}
+	// withLoose returns a copy of the demo ledger with n more errors of
+	// each given severity that name no DIMM.
+	withLoose := func(n int, sevs ...model.Severity) *store.Store {
+		t.Helper()
+		s, err := store.Open(ctx, copyLedger(t, "demo"), store.ReadWrite)
+		if err != nil {
+			t.Fatal(err)
 		}
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
+		t.Cleanup(func() { s.Close() })
+		for _, sev := range sevs {
+			loose(t, s, at, n, sev)
+		}
+		return s
 	}
-	v, text = summary(buildFrom(t, s, options(i18n.EN, Customer)))
-	if !strings.HasSuffix(strings.TrimSpace(text), "1 more with errors or a finding: CPU1_D1 observe. 2 errors of this host (CE 2, UE 0) are tied to no DIMM, and no finding covers them. Section 7 lists what each source reports.") ||
-		!strings.Contains(text, "CPU0_C1 S/N 3B9C56: replace now") {
+	doc = buildFrom(t, withLoose(2, model.SevCE), options(i18n.EN, Customer))
+	_, _, text = parts(doc)
+	if !strings.HasSuffix(strings.TrimSpace(text), "2 more with errors or a finding: CPU1_D1 observe, records tied to no DIMM observe.") ||
+		!strings.Contains(text, "CPU0_C1 S/N 3B9C56: replace now") || doc.Overview.Host.Grade != model.VerdictReplaceNow {
 		t.Errorf("a host with a finding:\n%s", text)
 	}
-	if p := v.find("p.uncovered"); len(p) != 1 || p[0].hasClass("conclusion") || len(p[0].find("svg.ic")) != 1 || len(p[0].find("rect.ue")) != 0 {
-		t.Errorf("a host with a finding: the paragraph leads, or its mark is wrong")
+	// Uncorrected errors that name no DIMM hold, and the DIMM that is to
+	// be replaced on its own records still leads, as in the grade.
+	doc = buildFrom(t, withLoose(1, model.SevCE, model.SevUE), options(i18n.EN, Customer))
+	_, _, text = parts(doc)
+	if !strings.Contains(text, "CPU0_C1 S/N 3B9C56: replace now") || !strings.Contains(text, "records tied to no DIMM hold replacement") ||
+		doc.Overview.Host.Grade != model.VerdictReplaceNow || doc.Host.Grade != model.VerdictHoldReplacement {
+		t.Errorf("a DIMM to replace and loose uncorrected errors:\n%s", text)
 	}
 
 	// Nothing loose, nothing said.
-	_, root = render(t, build(t, "demo", "", i18n.EN, Customer))
-	if len(root.find("p.uncovered")) != 0 {
+	root, _, _ = parts(build(t, "demo", "", i18n.EN, Customer))
+	if len(byID(root, "article", hostAnchor)) != 0 || len(root.find("p.hostline")) != 0 || strings.Contains(root.content(), "tied to no DIMM") {
 		t.Error("the demo report speaks of records without a DIMM")
+	}
+}
+
+// loose adds n errors of host r12-n034 that name no DIMM to a ledger.
+func loose(t *testing.T, s *store.Store, at time.Time, n int, sev model.Severity) {
+	t.Helper()
+	{
+		err := s.Update(ctx, func(w *store.Writer) error {
+			for i := range n {
+				e := &model.Event{Host: "r12-n034", Kind: model.KindError, ErrorDT: at.Add(time.Duration(i) * time.Minute), ErrorSeverity: sev, Count: 1,
+					OsPhysicalAddress: model.Some(uint64(0x7f000000 + 0x1000*i)), Source: "test", RawRef: fmt.Sprintf("loose-%s#%d", sev, i),
+					Grade: model.GradeB, TimeQuality: model.TimeExact, Fingerprint: model.Fingerprint("loose", string(sev), fmt.Sprint(i))}
+				if _, err := w.InsertEvent(e); err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 

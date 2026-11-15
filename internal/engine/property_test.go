@@ -311,6 +311,35 @@ func TestAnyInputGivesAConsistentResult(t *testing.T) {
 					worst = g.Verdict.Grade
 				}
 			}
+			// The host finding: about what names no DIMM, and only then.
+			var loose int64
+			for _, u := range h.Unattributed {
+				loose += u.CE + u.UE
+			}
+			if l := h.Loose; l != nil {
+				grades[l.Grade]++
+				sum := 0
+				for _, f := range l.ConfidenceFactors {
+					sum += f.Delta
+				}
+				if l.DIMMUID != "" || l.GPU != "" || l.Slot != "" || l.Host != h.Host || len(l.Evidence) == 0 || len(l.Rules) == 0 ||
+					l.Grade == model.VerdictOK || l.NextAction.Code == "" || l.Confidence != min(max(sum, 5), 95) {
+					t.Errorf("%s: host finding %+v", name, l)
+				}
+				for _, r := range l.Rules {
+					if !HostRule(r) {
+						t.Errorf("%s: host finding with rule %s", name, r)
+					}
+				}
+				switch {
+				case l.Grade == model.VerdictHoldReplacement && worst == model.VerdictReplaceNow:
+					// A DIMM to replace on its own records stands first.
+				case worse(l.Grade, worst):
+					worst = l.Grade
+				}
+			} else if loose > 0 {
+				t.Errorf("%s: %d errors tied to no DIMM and no host finding", name, loose)
+			}
 			if h.Grade != worst {
 				t.Errorf("%s: host grade %s, worst finding %s", name, h.Grade, worst)
 			}

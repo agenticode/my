@@ -45,7 +45,7 @@ Which series exist:
 - A DIMM that is in the host has `my_dimm_verdict`, both totals and `my_dimm_offlined_pages`, also when nothing is on record about it. A counter that starts at 0 lets `increase()` see the first error.
 - A DIMM that was replaced has no series.
 - `my_dimm_faults` and `my_dimm_repairs_total` have one series per mode or type that occurs.
-- Errors that the records tie to a slot and to no DIMM are counted under an empty `serial`. Errors that name no place are counted under an empty `slot` as well. They belong to no finding.
+- Errors that the records tie to a slot and to no DIMM are counted under an empty `serial`. Errors that name no place are counted under an empty `slot` as well, and so are the pages that were taken offline and are tied to no DIMM. The host finding speaks about them: it is the series of `my_dimm_verdict` with an empty `slot` and an empty `serial`, 4 (hold replacement) when uncorrected errors are among them and 1 (observe) otherwise. A host without such records has no such series.
 - A GPU has `my_gpu_remap_failure` when its remapping state is known: from an `nvidia-smi` state or from XID 64. A GPU that only logged other XIDs has none.
 - `serial` is empty when the scan could not read the SMBIOS tables, which need root. `gpu` is the serial number of the GPU, or its UUID, PCI address or index when the serial number is unknown.
 

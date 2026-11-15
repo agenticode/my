@@ -102,6 +102,9 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 		out = append(out,
 			term.Hint{Command: s.prefix + " dimm " + slot, Text: say(s.lang, "hint.dimm")},
 			term.Hint{Command: s.prefix + " why " + slot, Text: say(s.lang, "hint.why")})
+	} else if ov.HostFinding != nil {
+		// No DIMM to point at: the finding of the host is what to read.
+		out = append(out, term.Hint{Command: s.prefix + " why", Text: say(s.lang, "hint.why")})
 	}
 	if s.src == nil {
 		bundle := "my bundle -o case.mycase"

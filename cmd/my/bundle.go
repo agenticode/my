@@ -18,12 +18,9 @@ import (
 	"github.com/agenticode/my/internal/view"
 )
 
-// findingText names the finding for a host in a line of text: its grade
-// and, where errors of the host are tied to no DIMM, that no finding
-// covers them.
+// findingText names the finding for a host in a line of text: its grade.
 func findingText(lang i18n.Lang, h *engine.HostResult) string {
-	ce, ue := view.Loose(h)
-	return view.GradeWithLoose(lang, engine.GradeText(lang, h.Grade), ce, ue)
+	return engine.GradeText(lang, h.Grade)
 }
 
 // toolName is how this binary names itself in what it writes: its version
