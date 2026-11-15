@@ -43,6 +43,17 @@ var words = i18n.Catalog{
 	"err.time":          {EN: "{flag} {value}: want a date (2026-11-12) or a time (2026-11-12T03:14:00Z)", KO: "{flag} {value}: 날짜(2026-11-12) 또는 시각(2026-11-12T03:14:00Z)이어야 함"},
 	"err.tz":            {EN: "--tz {value}: want a time zone name such as Asia/Seoul or UTC", KO: "--tz {value}: Asia/Seoul이나 UTC 같은 시간대 이름이어야 함"},
 
+	"err.listen":   {EN: "--listen {value}: want an address such as 127.0.0.1:10163 or :10163", KO: "--listen {value}: 127.0.0.1:10163이나 :10163 같은 주소여야 함"},
+	"err.interval": {EN: "--interval {value}: want a time of at least 1s, such as 30s or 5m", KO: "--interval {value}: 30s나 5m처럼 1s 이상의 시간이어야 함"},
+
+	// What "my serve" writes to its log.
+	"serve.listening":   {EN: "listening on {url}", KO: "{url}에서 요청을 받음"},
+	"serve.no_metrics":  {EN: "/metrics is off; start with --metrics to serve Prometheus metrics", KO: "/metrics 꺼짐. Prometheus 지표를 내려면 --metrics로 시작"},
+	"serve.scan":        {EN: "scan took {took}: {found}", KO: "스캔 {took}: {found}"},
+	"serve.found":       {EN: "host {host}, finding {grade}, {dimms} {dimms|DIMM|DIMMs}, {listed} with errors or a finding", KO: "호스트 {host}, 소견 {grade}, DIMM {dimms}개, 오류나 소견이 있는 DIMM {listed}개"},
+	"serve.scan_failed": {EN: "scan failed, the state of the scan before stays: {err}", KO: "스캔 실패, 직전 스캔의 상태 유지: {err}"},
+	"serve.stopped":     {EN: "stopped", KO: "종료"},
+
 	// What "my import" says.
 	"import.records": {EN: "{n} {n|record|records}", KO: "기록 {n}건"},
 	"import.events":  {EN: "{n} error {n|record|records} (grade {grade})", KO: "오류 기록 {n}건({grade} 등급)"},
@@ -195,6 +206,34 @@ var words = i18n.Catalog{
 			"--all               개요에 모든 DIMM을 나열",
 	},
 
+	"help.serve.usage": {EN: "my serve --metrics [--listen ADDR] [--interval TIME] [flags]", KO: "my serve --metrics [--listen ADDR] [--interval TIME] [옵션]"},
+	"help.serve.text": {
+		EN: "Runs until it is stopped and answers HTTP requests about this host. It scans the host at start and again after every pause of --interval, each time into a new temporary ledger, and answers from the latest scan. It changes nothing on the host. " +
+			"With --metrics, /metrics gives the Prometheus text format: per DIMM the finding, the error totals, the faults by mode, the pages taken offline and the repairs; per GPU the row remapping state; per source the observation grade. No metric has an address as a label. " +
+			"When a scan fails, the metrics of the scan before stay and my_exporter_scan_failures_total counts it. /-/healthy answers 200 while the process runs, /-/ready once the first scan has finished. " +
+			"The server listens on 127.0.0.1 unless --listen says otherwise and has no authentication. SIGINT or SIGTERM stops it; the exit code is then 0.",
+		KO: "중지할 때까지 실행되며 HTTP 요청에 이 호스트의 상태로 답합니다. 시작할 때 호스트를 스캔하고 --interval만큼 쉰 뒤 다시 스캔합니다. 스캔마다 새 임시 원장을 쓰고 가장 최근 스캔으로 답합니다. 호스트의 어떤 것도 바꾸지 않습니다. " +
+			"--metrics를 주면 /metrics가 Prometheus 텍스트 형식으로 나옵니다. DIMM별 소견, 오류 누적, 모드별 고장 수, offline된 page 수, 리페어 횟수, GPU별 row remap 상태, 소스별 관측 등급입니다. 주소를 라벨로 쓰는 지표는 없습니다. " +
+			"스캔이 실패하면 직전 스캔의 지표가 남고 my_exporter_scan_failures_total이 늘어납니다. /-/healthy는 프로세스가 도는 동안, /-/ready는 첫 스캔이 끝난 뒤부터 200으로 답합니다. " +
+			"--listen을 주지 않으면 127.0.0.1에서만 받으며 인증 기능은 없습니다. SIGINT나 SIGTERM을 받으면 멈추고 종료 코드는 0입니다.",
+	},
+	"help.serve.flags": {
+		EN: "--metrics         serve /metrics for Prometheus\n" +
+			"--listen ADDR     where to listen (default 127.0.0.1:10163); :10163 listens on every interface\n" +
+			"--interval TIME   pause between two scans, such as 30s or 5m (default 5m)\n" +
+			"--root DIR        scan a copy of a host's files below DIR instead of this host\n" +
+			"--lang en|ko      language of the log (default: from the locale, English otherwise)\n" +
+			"--config FILE     read thresholds from FILE (key = value lines)\n" +
+			"--set KEY=VALUE   change one threshold; \"my help thresholds\" lists them",
+		KO: "--metrics         Prometheus용 /metrics 제공\n" +
+			"--listen ADDR     받을 주소 (기본 127.0.0.1:10163). :10163은 모든 인터페이스에서 받음\n" +
+			"--interval TIME   스캔 사이에 쉬는 시간. 30s, 5m 등 (기본 5m)\n" +
+			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 스캔\n" +
+			"--lang en|ko      로그 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
+			"--config FILE     임계값 파일 (key = value 줄)\n" +
+			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"",
+	},
+
 	"help.rules.title":      {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
 	"help.thresholds.title": {EN: "Thresholds, with their defaults. Change one with --set KEY=VALUE or a --config file.", KO: "임계값과 기본값. --set KEY=VALUE 또는 --config 파일로 바꿉니다."},
 	"help.topics":           {EN: "More: my help reading (every figure), my help rules, my help thresholds.", KO: "더 보기: my help reading (모든 그림), my help rules, my help thresholds."},
@@ -242,6 +281,8 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 	case "import":
 		// An import has no host to scan, and names its host itself.
 		blocks = append(blocks, "help.output")
+	case "serve":
+		// A server draws no figure: it lists every flag it takes itself.
 	default:
 		blocks = append(blocks, "help.scan", "help.common")
 	}
@@ -253,13 +294,13 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" {
+	if topic != "bundle" && topic != "import" && topic != "serve" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)
 		}
 	}
-	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" {
+	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
 			fmt.Fprintln(w, line)

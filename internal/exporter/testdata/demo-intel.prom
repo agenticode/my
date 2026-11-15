@@ -1,0 +1,84 @@
+# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement.
+# TYPE my_dimm_verdict gauge
+my_dimm_verdict{host="r12-n034",slot="CPU0_A1",serial="5C331B"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_B1",serial="DE7FF0"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_C1",serial="3B9C56"} 3
+my_dimm_verdict{host="r12-n034",slot="CPU0_D1",serial="80D01E"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_E1",serial="E2CD51"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_F1",serial="2B6332"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_G1",serial="382A8A"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU0_H1",serial="4B3B31"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_A1",serial="2C9305"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_B1",serial="DBC9CE"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_C1",serial="99B7F7"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_D1",serial="2AEB41"} 1
+my_dimm_verdict{host="r12-n034",slot="CPU1_E1",serial="02AC34"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_F1",serial="848BE3"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_G1",serial="D7A399"} 0
+my_dimm_verdict{host="r12-n034",slot="CPU1_H1",serial="55C12A"} 0
+# HELP my_dimm_ce_total Corrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ce_total counter
+my_dimm_ce_total{host="r12-n034",slot="CPU0_A1",serial="5C331B"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_B1",serial="DE7FF0"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_C1",serial="3B9C56"} 1231
+my_dimm_ce_total{host="r12-n034",slot="CPU0_D1",serial="80D01E"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_E1",serial="E2CD51"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_F1",serial="2B6332"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_G1",serial="382A8A"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU0_H1",serial="4B3B31"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_A1",serial="2C9305"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_B1",serial="DBC9CE"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_C1",serial="99B7F7"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_D1",serial="2AEB41"} 53
+my_dimm_ce_total{host="r12-n034",slot="CPU1_E1",serial="02AC34"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_F1",serial="848BE3"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_G1",serial="D7A399"} 0
+my_dimm_ce_total{host="r12-n034",slot="CPU1_H1",serial="55C12A"} 0
+# HELP my_dimm_ue_total Uncorrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ue_total counter
+my_dimm_ue_total{host="r12-n034",slot="CPU0_A1",serial="5C331B"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_B1",serial="DE7FF0"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_C1",serial="3B9C56"} 1
+my_dimm_ue_total{host="r12-n034",slot="CPU0_D1",serial="80D01E"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_E1",serial="E2CD51"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_F1",serial="2B6332"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_G1",serial="382A8A"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU0_H1",serial="4B3B31"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_A1",serial="2C9305"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_B1",serial="DBC9CE"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_C1",serial="99B7F7"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_D1",serial="2AEB41"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_E1",serial="02AC34"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_F1",serial="848BE3"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_G1",serial="D7A399"} 0
+my_dimm_ue_total{host="r12-n034",slot="CPU1_H1",serial="55C12A"} 0
+# HELP my_dimm_faults Faults of the DIMM in the slot by fault mode. A fault is a group of errors with one cause.
+# TYPE my_dimm_faults gauge
+my_dimm_faults{host="r12-n034",slot="CPU0_C1",mode="row"} 1
+my_dimm_faults{host="r12-n034",slot="CPU1_D1",mode="single-bit"} 1
+# HELP my_dimm_offlined_pages Pages of the DIMM in the slot that were taken offline.
+# TYPE my_dimm_offlined_pages gauge
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_A1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_B1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_C1"} 6
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_D1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_E1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_F1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_G1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU0_H1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_A1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_B1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_C1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_D1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_E1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_F1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_G1"} 0
+my_dimm_offlined_pages{host="r12-n034",slot="CPU1_H1"} 0
+# HELP my_source_grade Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went.
+# TYPE my_source_grade gauge
+my_source_grade{host="r12-n034",source="edac-sysfs",status="ok"} 1
+my_source_grade{host="r12-n034",source="hostinfo",status="ok"} 0
+my_source_grade{host="r12-n034",source="klog",status="ok"} 3
+my_source_grade{host="r12-n034",source="rasdaemon",status="ok"} 3
+my_source_grade{host="r12-n034",source="slot-map",status="ok"} 0
+my_source_grade{host="r12-n034",source="smbios",status="ok"} 0
