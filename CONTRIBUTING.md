@@ -85,5 +85,6 @@ Documentation and help texts state what the tool does, with the command, the num
 | `contrib` | for the exporter: systemd units, alert rules with their tests, Alertmanager routes, a Grafana dashboard |
 | `tools/dist` | builds the release archives, the same bytes for the same commit |
 | `tools/lab` | scripts that inject errors on a lab host and capture what it recorded |
+| `tools/perf` | makes large synthetic inputs and measures time and peak memory of the commands on them ([docs/performance.md](docs/performance.md)) |
 | `tools/validate` | runs the binary against the host it is on ([docs/validation.md](docs/validation.md)) |
 | `docs` | the pages listed in the README |

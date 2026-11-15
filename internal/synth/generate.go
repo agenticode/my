@@ -252,9 +252,13 @@ func (g *generator) occupancy() error {
 		if s.Position > 0 && !sc.Host.PopulateAll {
 			continue
 		}
-		serial := g.hex(6)
+		digits := sc.Host.SerialDigits
+		if digits <= 0 {
+			digits = 6
+		}
+		serial := g.hex(digits)
 		for seen[serial] || !model.UsableSerial(serial) {
-			serial = g.hex(6)
+			serial = g.hex(digits)
 		}
 		seen[serial] = true
 		d := model.DIMM{
