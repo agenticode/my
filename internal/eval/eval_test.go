@@ -409,8 +409,12 @@ func TestFixtureFindings(t *testing.T) {
 	// s0007 on 1, 8 and 17, which are one pair on one socket and two pairs
 	// across sockets.
 	l := rep.Dataset.Layout
-	if l.MultiDIMM != 2 || l.Pairs != 4 || l.SameChannel != 1 || l.SameSocket != 1 {
+	if l.All != (Pairs{Servers: 2, Pairs: 4, SameChannel: 1, SameSocket: 1}) {
 		t.Errorf("layout = %+v", l)
+	}
+	// Of the two, s0007 is listed with 24 DIMMs and s0006 with 12.
+	if l.Full != (Pairs{Servers: 1, Pairs: 3, SameChannel: 0, SameSocket: 1}) {
+		t.Errorf("layout of servers with 24 DIMMs = %+v", l.Full)
 	}
 	// By size of the server: s0001 (12 DIMMs, memoryid 3) and s0006 (12
 	// DIMMs, memoryid 4 and 5) give one DIMM at position 0 and two at 1.
@@ -636,7 +640,7 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Errorf("dropped = %+v", rep.Dropped)
 	}
 	c := &rep.Census
-	if c.Servers != 2 || c.Errors != 320 || c.Records != 25 || rep.Dataset.Rows != 720 || rep.Dataset.Servers != 3 || rep.Dataset.DIMMs != 2 {
+	if c.Servers != 2 || c.Errors != 320 || c.Records != 25 || rep.Dataset.Rows != 720 || rep.Dataset.Servers != 3 || rep.Dataset.DIMMs != 3 || c.DIMMs != 2 {
 		t.Errorf("census: %d servers, %d errors, %d records; dataset: %d rows, %d servers, %d DIMMs",
 			c.Servers, c.Errors, c.Records, rep.Dataset.Rows, rep.Dataset.Servers, rep.Dataset.DIMMs)
 	}

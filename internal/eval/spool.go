@@ -21,7 +21,7 @@ import (
 // fixed 20 bytes. One bucket fits in memory; the table does not have to.
 
 const (
-	spoolVersion = 2
+	spoolVersion = 3
 	spoolBuckets = 64
 	spoolRecSize = 20
 	spoolMeta    = "spool.json"
@@ -55,9 +55,11 @@ type spoolInfo struct {
 	MaxRow      int `json:"max_row"`
 	MaxCol      int `json:"max_col"`
 	// Servers lists the server IDs in the order they first occur; a row
-	// refers to its server by position. ServerRows counts rows per server.
-	Servers    []string `json:"servers"`
-	ServerRows []int64  `json:"server_rows"`
+	// refers to its server by position. ServerRows counts rows per server,
+	// and ServerDIMMs has a bit set for every memoryid a server has rows of.
+	Servers     []string `json:"servers"`
+	ServerRows  []int64  `json:"server_rows"`
+	ServerDIMMs []uint32 `json:"server_dimms"`
 }
 
 // spool is an open spool directory.
@@ -115,7 +117,8 @@ func openSpool(ctx context.Context, ds *dcbrain.Dataset, keep, scratch string, p
 		if b, err := os.ReadFile(filepath.Join(keep, spoolMeta)); err == nil {
 			var info spoolInfo
 			if json.Unmarshal(b, &info) == nil && info.Version == spoolVersion && info.Source == name &&
-				info.SourceSize == size && info.SourceTime == mtime && len(info.Servers) == len(info.ServerRows) {
+				info.SourceSize == size && info.SourceTime == mtime && len(info.Servers) == len(info.ServerRows) &&
+				len(info.Servers) == len(info.ServerDIMMs) {
 				progress("using the spool in %s (%d rows of %d servers)", keep, info.Rows, len(info.Servers))
 				return &spool{dir: keep, info: info}, nil
 			}
@@ -200,8 +203,10 @@ func (s *spool) write(ctx context.Context, ds *dcbrain.Dataset, progress func(st
 			index[r.SID] = i
 			info.Servers = append(info.Servers, r.SID)
 			info.ServerRows = append(info.ServerRows, 0)
+			info.ServerDIMMs = append(info.ServerDIMMs, 0)
 		}
 		info.ServerRows[i]++
+		info.ServerDIMMs[i] |= 1 << uint(r.MemoryID)
 		info.Rows++
 		info.ByType[r.Type]++
 		at := int64(r.At)

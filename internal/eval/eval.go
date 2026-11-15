@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/bits"
 	"runtime"
 	"sort"
 	"sync"
@@ -369,7 +370,7 @@ type DatasetInfo struct {
 	// ByType counts rows by error_type 1, 2 and 3 (index 0 is unused).
 	ByType [4]int64 `json:"by_type"`
 	// Servers is the number of servers with rows, and DIMMs the number of
-	// different DIMMs (server and memoryid) among the analysed servers.
+	// different DIMMs (server and memoryid) with rows.
 	Servers int64 `json:"servers"`
 	DIMMs   int64 `json:"dimms"`
 	// First and Last are the earliest and the latest error time on the
@@ -408,19 +409,29 @@ type DatasetInfo struct {
 // a channel more often than chance puts them there, and servers with one
 // DIMM per channel should use one position only.
 type Layout struct {
-	// MultiDIMM is the number of servers with errors on two or more
-	// DIMMs, and Pairs the number of pairs of DIMMs with errors on one
-	// server.
-	MultiDIMM int64 `json:"multi_dimm_servers"`
-	Pairs     int64 `json:"pairs"`
-	// SameChannel and SameSocket count the pairs the layout puts on one
-	// channel, and on one socket but different channels.
-	SameChannel int64 `json:"pairs_same_channel"`
-	SameSocket  int64 `json:"pairs_same_socket"`
+	// All counts the pairs of DIMMs with errors on one server, over all
+	// servers. Full counts them on the servers the inventory lists with
+	// 24 DIMMs: there every slot is filled, and chance puts 12 of the 276
+	// pairs of slots on one channel and 120 on one socket but different
+	// channels.
+	All  Pairs `json:"all"`
+	Full Pairs `json:"full"`
 	// ByDIMMs counts the DIMMs with errors by the number of DIMMs of their
 	// server (from the inventory; 0 when unknown) and by the position on
 	// the channel the layout gives them (0 or 1).
 	ByDIMMs map[int][2]int64 `json:"by_dimm_count"`
+}
+
+// Pairs counts pairs of DIMMs with errors on one server.
+type Pairs struct {
+	// Servers is the number of servers with errors on two or more DIMMs,
+	// and Pairs the number of pairs of such DIMMs.
+	Servers int64 `json:"servers"`
+	Pairs   int64 `json:"pairs"`
+	// SameChannel and SameSocket count the pairs the layout puts on one
+	// channel, and on one socket but different channels.
+	SameChannel int64 `json:"same_channel"`
+	SameSocket  int64 `json:"same_socket"`
 }
 
 // Report is the result of a run.
@@ -530,11 +541,13 @@ func Run(ctx context.Context, ds *dcbrain.Dataset, opts Options) (*Report, error
 	}
 
 	withRows := map[string]bool{}
-	for _, sid := range info.Servers {
+	for i, sid := range info.Servers {
 		withRows[sid] = true
 		if inventory != nil && !inventory[sid] {
 			d.NotInInventory++
 		}
+		d.DIMMs += int64(bits.OnesCount32(info.ServerDIMMs[i]))
+		d.Layout.add(info.ServerDIMMs[i], r.dimmCount[sid])
 	}
 	for sid, t := range r.tickets {
 		if withRows[sid] {
@@ -714,5 +727,46 @@ func (r *runner) window(at dcbrain.Stamp) int {
 func (r *runner) unseen(rep *Report, t dcbrain.Ticket) {
 	if i := r.window(t.At); i >= 0 {
 		rep.ByCut[i].Unseen[outcomeOf(t.Type)]++
+	}
+}
+
+// add counts the DIMMs with errors of one server: memory has a bit set for
+// every memoryid with errors, and dimms is the number of DIMMs the
+// inventory gives the server.
+func (l *Layout) add(memory uint32, dimms int) {
+	var ids []int
+	for id := 0; id < 32; id++ {
+		if memory&(1<<id) != 0 {
+			ids = append(ids, id)
+		}
+	}
+	by := l.ByDIMMs[dimms]
+	for _, id := range ids {
+		_, _, position := dcbrain.Topology(id)
+		by[position]++
+	}
+	l.ByDIMMs[dimms] = by
+	if len(ids) < 2 {
+		return
+	}
+	count := func(p *Pairs) {
+		p.Servers++
+		for i, a := range ids {
+			for _, b := range ids[i+1:] {
+				p.Pairs++
+				sa, ca, _ := dcbrain.Topology(a)
+				sb, cb, _ := dcbrain.Topology(b)
+				switch {
+				case sa == sb && ca == cb:
+					p.SameChannel++
+				case sa == sb:
+					p.SameSocket++
+				}
+			}
+		}
+	}
+	count(&l.All)
+	if dimms == 24 {
+		count(&l.Full)
 	}
 }

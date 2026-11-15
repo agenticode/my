@@ -124,8 +124,6 @@ type serverResult struct {
 	note    ServerNote
 	dropped bool
 	dimms   int
-	// memory has a bit set for every memoryid with errors.
-	memory  uint32
 	records int
 	errors  int64
 	ticket  *dcbrain.Ticket
@@ -285,9 +283,6 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 		if id := recs[i].MemoryID; !seenDIMM[id] {
 			seenDIMM[id] = true
 			res.dimms++
-			if id < 32 {
-				res.memory |= 1 << id
-			}
 		}
 		res.errors += int64(recs[i].Count)
 	}
@@ -458,8 +453,6 @@ func (r *runner) merge(rep *Report, res *serverResult) {
 	if res.note.BucketSeconds > 1 {
 		rep.Widened = append(rep.Widened, res.note)
 	}
-	rep.Dataset.DIMMs += int64(res.dimms)
-	r.layout(&rep.Dataset.Layout, res)
 
 	for i := range res.cuts {
 		o, st := &res.cuts[i], &rep.ByCut[i]
@@ -570,39 +563,6 @@ func (r *runner) merge(rep *Report, res *serverResult) {
 		}
 		if !device {
 			c.NoDevice += n
-		}
-	}
-}
-
-// layout adds the DIMMs with errors of one server to the layout counts.
-func (r *runner) layout(l *Layout, res *serverResult) {
-	var ids []int
-	for id := 0; id < 32; id++ {
-		if res.memory&(1<<id) != 0 {
-			ids = append(ids, id)
-		}
-	}
-	by := l.ByDIMMs[r.dimmCount[res.note.SID]]
-	for _, id := range ids {
-		_, _, position := dcbrain.Topology(id)
-		by[position]++
-	}
-	l.ByDIMMs[r.dimmCount[res.note.SID]] = by
-	if len(ids) < 2 {
-		return
-	}
-	l.MultiDIMM++
-	for i, a := range ids {
-		for _, b := range ids[i+1:] {
-			l.Pairs++
-			sa, ca, _ := dcbrain.Topology(a)
-			sb, cb, _ := dcbrain.Topology(b)
-			switch {
-			case sa == sb && ca == cb:
-				l.SameChannel++
-			case sa == sb:
-				l.SameSocket++
-			}
 		}
 	}
 }

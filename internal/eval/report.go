@@ -423,11 +423,15 @@ func (r *Report) printDataset(p *printer) {
 		p.line("%s tickets are a second or later ticket of a server and are not used", num(d.ExtraTickets))
 	}
 	p.line("records after merging rows that are equal in every column: %s", num(r.Census.Records))
-	if l := &d.Layout; l.Pairs > 0 {
-		// Among 24 slots, 12 of the 276 pairs share a channel and 120
-		// share a socket without sharing a channel.
-		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
-			num(l.MultiDIMM), num(l.Pairs), share0(l.SameChannel, l.Pairs), share0(l.SameSocket, l.Pairs))
+	// Among 24 slots, 12 of the 276 pairs share a channel and 120 share a
+	// socket without sharing a channel.
+	if l := &d.Layout; l.All.Pairs > 0 {
+		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel and %s on one socket but different channels",
+			num(l.All.Servers), num(l.All.Pairs), share0(l.All.SameChannel, l.All.Pairs), share0(l.All.SameSocket, l.All.Pairs))
+	}
+	if l := &d.Layout; l.Full.Pairs > 0 {
+		p.line("of them on servers with 24 DIMMs, where every slot is filled: %s servers with %s pairs; %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
+			num(l.Full.Servers), num(l.Full.Pairs), share0(l.Full.SameChannel, l.Full.Pairs), share0(l.Full.SameSocket, l.Full.Pairs))
 	}
 	if l := &d.Layout; len(l.ByDIMMs) > 0 {
 		counts := make([]int, 0, len(l.ByDIMMs))
@@ -619,7 +623,11 @@ func (r *Report) printLeads(p *printer) {
 			head = append(head, gradeText(g))
 		}
 		head = append(head, "consider or replace now")
-		p.table(fmt.Sprintf("Servers with a ticket of failure type %d (%s):", failureType(out), out), head, rows)
+		what := out.String()
+		if out == FailedUnspecified {
+			what = "not defined in the description of the dataset"
+		}
+		p.table(fmt.Sprintf("Servers with a ticket of failure type %d (%s):", failureType(out), what), head, rows)
 	}
 }
 
