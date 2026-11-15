@@ -1,0 +1,12 @@
+No Memory errors.
+
+No PCIe AER errors.
+
+No Extlog errors.
+
+No devlink errors.
+No disk errors.
+Memory failure events summary:
+	Recovered errors: 4
+
+No MCE errors.

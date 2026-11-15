@@ -25,7 +25,6 @@ var viewCommands = map[string]viewFunc{
 	"map":      runMap,
 	"timeline": runTimeline,
 	"bundle":   runBundle,
-	"report":   runReport,
 }
 
 func live(fn viewFunc) func(context.Context, *cli.Env, []string) int {

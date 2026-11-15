@@ -1,0 +1,120 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-guest",
+  "grade": "ok",
+  "exit_code": 0,
+  "data": {
+    "host": {
+      "name": "lab-guest",
+      "system": "QEMU Standard PC (Q35 + ICH9, 2009)",
+      "from": "2026-11-15T10:38:29Z",
+      "to": "2026-11-15T10:40:25.933244Z",
+      "ce": 7,
+      "ue": 3,
+      "records": 10,
+      "grade_a": 0,
+      "grade_b": 10,
+      "grade_c": 0,
+      "grade": "ok",
+      "grade_text": "ok",
+      "boots": 2,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-15T10:40:24.070972Z",
+        "privileged": true,
+        "tool_version": "e4bc2d4"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "DIMM 0",
+                  "label": "DIMM 0",
+                  "state": "ok"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 1,
+      "populated": 1
+    },
+    "ranking": [],
+    "quiet": 1,
+    "unattributed": 10,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 13,
+        "events": 10,
+        "actions": 3,
+        "skipped": 0,
+        "grade": "B",
+        "first": "2026-11-15T10:39:21Z",
+        "last": "2026-11-15T10:39:35Z"
+      },
+      {
+        "kind": "klog",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 19,
+        "events": 10,
+        "actions": 5,
+        "skipped": 0,
+        "grade": "B",
+        "first": "2026-11-15T10:39:21Z",
+        "last": "2026-11-15T10:39:36Z",
+        "notes": [
+          "594 lines read",
+          "the machine check injector (mce-inject) was set up in a boot of this log: records of that boot may come from a test"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 1,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.8",
+          "1 memory slots, 1 populated"
+        ]
+      }
+    ]
+  }
+}

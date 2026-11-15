@@ -1,0 +1,112 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: mce-print-all
+summary: "machine checks in a nested guest: 7 corrected and 3 uncorrected memory errors"
+method: "mce-inject module, records handed to the machine check poller and exception handler"
+kernel: 7.3.0-ras
+rasdaemon: 0.8.0
+cpu: "Skylake-SP (family 6 model 85) emulated by QEMU without hardware virtualization"
+injections:
+  - id: ce-1
+    time: 2026-11-15T10:39:21.553Z
+    inject: error
+    severity: CE
+    scrub: Demand
+    count: 1
+    address: 0x104db3040
+    socket: 0
+    channel: 0
+    note: "machine check bank 7, status 0x9c00004000010090 (corrected memory read error, channel 0)"
+  - id: ce-2
+    time: 2026-11-15T10:39:23.304Z
+    inject: error
+    severity: CE
+    scrub: Demand
+    count: 1
+    address: 0x104db6980
+    socket: 0
+    channel: 1
+    note: "machine check bank 7, status 0x9c00004000010091 (corrected memory read error, channel 1)"
+  - id: ce-3
+    time: 2026-11-15T10:39:24.992Z
+    inject: error
+    severity: CE
+    scrub: Demand
+    count: 2
+    address: 0x104f22100
+    socket: 0
+    channel: 0
+    note: "machine check bank 8, status 0x9c00004000010090, twice on one page"
+  - id: ce-3-offline
+    time: 2026-11-15T10:39:24.992Z
+    inject: page-offline
+    how: soft
+    count: 1
+    address: 0x104f22000
+    note: "by the corrected error collector at the second error of ce-3"
+  - id: ce-4
+    time: 2026-11-15T10:39:28.136Z
+    inject: error
+    severity: CE
+    scrub: Demand
+    count: 3
+    address: 0x104f24fc0
+    socket: 0
+    channel: 0
+    note: "machine check bank 7, status 0x9c00004000010090, three times on one page"
+  - id: ce-4-offline
+    time: 2026-11-15T10:39:28.136Z
+    inject: page-offline
+    how: soft
+    count: 1
+    address: 0x104f24000
+    note: "by the corrected error collector at the second error of ce-4"
+  - id: ue-1
+    time: 2026-11-15T10:39:32.622Z
+    inject: error
+    severity: Recoverable
+    scrub: Patrol
+    count: 1
+    address: 0x104f25200
+    socket: 0
+    channel: 0
+    note: "machine check bank 7, status 0xbc000000000100c0 (uncorrected, no action required, memory scrubbing error)"
+  - id: ue-1-offline
+    time: 2026-11-15T10:39:32.622Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x104f25000
+    note: "by the kernel after ue-1: an uncorrected error with a usable address costs its page even when no action is required"
+  - id: ue-2
+    time: 2026-11-15T10:39:34.342Z
+    inject: error
+    severity: Recoverable
+    scrub: Patrol
+    count: 1
+    address: 0x104f26400
+    socket: 0
+    channel: 0
+    note: "machine check exception, bank 7, status 0xbd000000000100c0 (uncorrected, action optional, memory scrubbing error)"
+  - id: ue-2-offline
+    time: 2026-11-15T10:39:34.342Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x104f26000
+    note: "by the kernel after ue-2"
+  - id: ue-3
+    time: 2026-11-15T10:39:36.084Z
+    inject: error
+    severity: Recoverable
+    count: 1
+    address: 0x104f27340
+    socket: 0
+    note: "machine check exception in user context, bank 1, status 0xbd80000000100134 (uncorrected, action required, data load)"
+  - id: ue-3-offline
+    time: 2026-11-15T10:39:36.084Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x104f27000
+    note: "by the kernel after ue-3"

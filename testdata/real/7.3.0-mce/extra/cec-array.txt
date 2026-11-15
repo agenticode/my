@@ -1,0 +1,12 @@
+{ n: 3
+   0: [00000000001060bc|11|001]
+   1: [00000000001060bf|11|001]
+   2: [00000000001060c1|11|001]
+}
+Stats:
+CEs: 7
+offlined pages: 2
+Flags: 0x0
+Decay interval: 86400 seconds
+Decays: 0
+Action threshold: 2

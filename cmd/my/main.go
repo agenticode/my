@@ -58,12 +58,6 @@ func app() *cli.App {
 				Run:       live(runBundle),
 			},
 			{
-				Name:      "report",
-				Summary:   "write the findings of a case as one HTML file that prints to PDF",
-				SummaryKO: "케이스의 소견을 HTML 파일 하나로 저장 (인쇄하면 PDF)",
-				Run:       live(runReport),
-			},
-			{
 				Name:      "open",
 				Summary:   "show a stored case (a .mycase bundle or a ledger) with the same commands",
 				SummaryKO: "저장된 케이스(.mycase 번들 또는 원장)를 같은 명령으로 보기",

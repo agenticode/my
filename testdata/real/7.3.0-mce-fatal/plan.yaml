@@ -1,0 +1,18 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: mce-fatal
+summary: "a fatal machine check in a nested guest: the kernel panics"
+method: "mce-inject module, records handed to the machine check poller and exception handler"
+kernel: 7.3.0-ras
+rasdaemon: 0.8.0
+cpu: "Skylake-SP (family 6 model 85) emulated by QEMU without hardware virtualization"
+injections:
+  - id: fatal-1
+    time: 2026-11-15T10:44:56.896Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x12345040
+    socket: 0
+    channel: 0
+    note: "machine check exception, bank 7, status 0xbe00000000010090 (uncorrected memory read error, processor context corrupt); the kernel panics"

@@ -90,11 +90,8 @@ type MarkerGroup struct {
 	// Days are the days the events fall on, as offsets from Timeline.From,
 	// in order and without repeats.
 	Days []int `json:"days"`
-	// Count is what the events of the group add up to: boots, uncorrected
-	// errors, pages taken offline, repairs. Events is the number of
-	// events; an event can stand for several pages or errors.
-	Count  int `json:"count"`
-	Events int `json:"events"`
+	// Count is the number of events: boots, errors, pages, repairs.
+	Count int `json:"count"`
 	// Text describes the group in one line.
 	Text Text `json:"text"`
 	// Marks are the events of the group one by one, the oldest first.
@@ -457,7 +454,6 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	}
 	for _, kind := range kinds {
 		g := groups[kind]
-		g.Events = events[kind]
 		if events[kind] > 1 {
 			a, b := when(first[kind]), when(last[kind])
 			switch kind {

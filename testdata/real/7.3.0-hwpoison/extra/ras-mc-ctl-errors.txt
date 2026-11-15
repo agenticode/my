@@ -1,0 +1,18 @@
+No Memory errors.
+
+No PCIe AER errors.
+
+No Extlog errors.
+
+No devlink errors.
+
+No disk errors.
+
+Memory failure events:
+1 2026-11-15 10:27:03 +0000 error: pfn=0x117d97, page_type=dirty unevictable LRU page, action_result=Recovered
+2 2026-11-15 10:27:03 +0000 error: pfn=0x10f2aa, page_type=dirty unevictable LRU page, action_result=Recovered
+3 2026-11-15 10:27:03 +0000 error: pfn=0x11414f, page_type=dirty unevictable LRU page, action_result=Recovered
+4 2026-11-15 10:27:04 +0000 error: pfn=0x114144, page_type=clean unevictable LRU page, action_result=Recovered
+
+No MCE errors.
+

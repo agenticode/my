@@ -106,13 +106,14 @@ A for a record with row, column and bank. B for a record with an address or a ra
 
 ### Times
 
-rasdaemon dates a record by the uptime of its trace event plus the difference between wall clock and uptime that it measured when it started. When the clock is set after that, as NTP does at boot on a host whose hardware clock was off, every later record is wrong by the step until rasdaemon starts again. On the lab host the step was 6.7 and 10.5 seconds on two boots. The kernel log dates the same errors by the kernel's clock, so the two would not be recognised as one error.
+rasdaemon dates a record by the uptime of its trace event plus the difference between wall clock and uptime that it measured when it started. When the clock is set after that, as NTP does at boot on a host whose hardware clock was off, every later record is wrong by the step until rasdaemon starts again. On the lab host the step was between 6.7 and 10.8 seconds on seven boots. The kernel log dates the same errors by the kernel's clock, so the two would not be recognised as one error.
 
 A machine check record also holds the time the kernel gave the error (`walltime`). Where the two times differ by more than a second, the record is dated by the kernel's time. Rows of other tables within ten minutes of such a record are moved by the same amount: the EDAC report of the same error, the page the kernel gave up after it. The source report says how far rasdaemon's clock was off and how many records were corrected.
 
 ### Known gaps
 
 - A database without machine check records (ARM servers, firmware-first error handling) gives no way to see that rasdaemon's clock was off. Its records keep rasdaemon's time.
+- The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right.
 - The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.
 - rasdaemon stores what it traced while it ran. Errors from before it was started, and from a boot in which it did not run, are in the kernel log only.
 - A database that fails the SQLite integrity check is refused.
