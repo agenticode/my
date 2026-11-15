@@ -98,6 +98,26 @@ in this slot since 2026-07-31  0 slot changes
 
 In the address map a horizontal line is a row fault, a vertical line a column fault, one cell that repeats a single-bit fault, and a cloud over the bank a bank fault. `my help reading` explains every figure.
 
+## Install
+
+`my` is one statically linked binary. A release holds an archive per platform (linux/amd64, linux/arm64, darwin/arm64) and a `SHA256SUMS` file:
+
+```
+curl -LO https://github.com/agenticode/my/releases/download/<version>/my_<version>_linux_amd64.tar.gz
+curl -LO https://github.com/agenticode/my/releases/download/<version>/SHA256SUMS
+sha256sum -c --ignore-missing SHA256SUMS
+tar -xzf my_<version>_linux_amd64.tar.gz
+./my_<version>_linux_amd64/my version
+```
+
+On macOS the checksum command is `shasum -a 256 -c --ignore-missing SHA256SUMS`. No version has been tagged yet (see Status); until then, and on other platforms, install from source with Go 1.26 or newer:
+
+```
+go install github.com/agenticode/my/cmd/my@latest
+```
+
+The archives are reproducible: the same commit built with the same Go version gives the same bytes. [docs/release.md](docs/release.md) says how to check that and how a release is made.
+
 ## Commands
 
 | Command | What it does |
@@ -159,7 +179,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet. No version has been tagged yet, so there is no release to download.
 
 ## Build
 
@@ -171,9 +191,10 @@ make test
 make golden   # rewrite the golden files of the figures after an intended change
 make fuzz     # each fuzz target for 10 s (FUZZTIME=1m for longer)
 make cross    # dist/my-linux-amd64, dist/my-linux-arm64, dist/my-darwin-arm64
+make dist     # the release archives and SHA256SUMS in dist/
 ```
 
-The binary is pure Go and statically linked (`CGO_ENABLED=0`).
+The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prints the version, the commit and the Go version it was built with.
 
 ## Layout
 
@@ -196,6 +217,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `internal/eval` | replays the dcbrain DRAM error dataset through the engine and compares the findings with the failure tickets that followed |
 | `internal/i18n` | message templates in English and Korean |
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
+| `tools/dist` | builds the release archives and their checksums, the same bytes for the same commit |
 | `testdata` | fixtures for every adapter |
 
 Three development commands are left out of the command list: `my synth` generates synthetic hosts (`my synth -list` names the scenarios), `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).

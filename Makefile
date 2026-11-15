@@ -6,15 +6,23 @@ PKG     := github.com/agenticode/my
 BIN     := my
 DIST    := dist
 
+# What a build is stamped with: the version (the tag of a release, else what
+# git describe says), the commit and the time of that commit.
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 COMMIT  ?= $(shell git rev-parse --short=12 HEAD 2>/dev/null || echo unknown)
+DATE    ?= $(shell git log -1 --format=%cI 2>/dev/null)
 
 LDFLAGS := -s -w \
 	-X $(PKG)/internal/buildinfo.Version=$(VERSION) \
-	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT)
+	-X $(PKG)/internal/buildinfo.Commit=$(COMMIT) \
+	-X $(PKG)/internal/buildinfo.Date=$(DATE)
 BUILD   := -trimpath -p $(JOBS) -ldflags '$(LDFLAGS)'
 
 PLATFORMS := linux/amd64 linux/arm64 darwin/arm64
+empty :=
+space := $(empty) $(empty)
+comma := ,
+DIST_ARGS := -version $(VERSION) -commit $(COMMIT) -date $(DATE) -platforms $(subst $(space),$(comma),$(PLATFORMS))
 
 export CGO_ENABLED := 0
 
@@ -39,7 +47,7 @@ FUZZ_TARGETS := \
 	./internal/bundle:FuzzText \
 	./internal/bundle:FuzzReadManifest
 
-.PHONY: all build test test-race golden fuzz lint fmt fmt-check vet cross clean
+.PHONY: all build test test-race golden fuzz lint fmt fmt-check vet cross dist dist-check clean
 
 all: lint test build
 
@@ -68,10 +76,10 @@ fuzz:
 lint: fmt-check vet
 
 fmt:
-	gofmt -w cmd internal
+	gofmt -w cmd internal tools
 
 fmt-check:
-	@out="$$(gofmt -l cmd internal)"; \
+	@out="$$(gofmt -l cmd internal tools)"; \
 	if [ -n "$$out" ]; then echo "gofmt needed on:"; echo "$$out"; exit 1; fi
 
 vet:
@@ -83,6 +91,28 @@ cross:
 		echo "build $$os/$$arch"; \
 		GOOS=$$os GOARCH=$$arch $(GO) build $(BUILD) -o $(DIST)/$(BIN)-$$os-$$arch ./cmd/my; \
 	done
+
+# Release archives: $(DIST)/my_<version>_<os>_<arch>.tar.gz, one per
+# platform, and $(DIST)/SHA256SUMS. The same commit built with the same Go
+# toolchain gives the same bytes on any machine (see tools/dist).
+dist:
+	$(GO) run ./tools/dist $(DIST_ARGS) -out $(DIST)
+
+# Builds the archives twice and compares the checksums: once from this
+# tree, once from a copy of it in another directory with an empty build
+# cache. A path of the build machine or a time of day in the output would
+# make the two differ.
+dist-check:
+	@set -e; tmp="$$(mktemp -d)"; trap 'chmod -R u+w "$$tmp"; rm -rf "$$tmp"' EXIT; \
+	mkdir "$$tmp/src"; \
+	tar -c --exclude ./.git --exclude ./$(DIST) --exclude ./bin . | tar -x -C "$$tmp/src"; \
+	$(GO) run ./tools/dist $(DIST_ARGS) -out "$$tmp/a" > /dev/null; \
+	GOCACHE="$$tmp/cache" $(GO) run ./tools/dist $(DIST_ARGS) -root "$$tmp/src" -out "$$tmp/b" > /dev/null; \
+	if cmp -s "$$tmp/a/SHA256SUMS" "$$tmp/b/SHA256SUMS"; then \
+		echo "two builds, the same archives:"; cat "$$tmp/a/SHA256SUMS"; \
+	else \
+		echo "two builds of one commit differ:"; diff "$$tmp/a/SHA256SUMS" "$$tmp/b/SHA256SUMS"; exit 1; \
+	fi
 
 clean:
 	rm -rf bin $(DIST)

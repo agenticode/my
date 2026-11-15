@@ -58,3 +58,23 @@ jobs:
         run: .github/scripts/live-serve.sh ./dist/my-linux-amd64
       - name: run the exporter on this machine as root
         run: sudo .github/scripts/live-serve.sh ./dist/my-linux-amd64
+
+  release-archives:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: two builds give the same archives
+        run: make dist-check VERSION=v0.0.0-ci
+      - name: build the archives and try them
+        run: .github/scripts/check-dist.sh v0.0.0-ci
+      - uses: actions/upload-artifact@v7
+        with:
+          name: my-v0.0.0-ci
+          path: |
+            dist/my_v0.0.0-ci_*.tar.gz
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 3

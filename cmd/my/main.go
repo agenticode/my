@@ -3,12 +3,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/agenticode/my/internal/buildinfo"
 	"github.com/agenticode/my/internal/cli"
 )
 
@@ -85,10 +83,7 @@ func app() *cli.App {
 				Name:      "version",
 				Summary:   "print version and build information",
 				SummaryKO: "버전과 빌드 정보",
-				Run: func(_ context.Context, env *cli.Env, _ []string) int {
-					fmt.Fprintln(env.Stdout, buildinfo.String())
-					return cli.ExitOK
-				},
+				Run:       runVersion,
 			},
 			topicCommand("reading", printReading),
 			topicCommand("rules", printRuleList),
