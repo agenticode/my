@@ -6,10 +6,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -1538,5 +1540,292 @@ func TestFigures(t *testing.T) {
 	// A long note is broken between words.
 	if lines := wrapText("one two three four five six", 10, 80); len(lines) < 2 || strings.Join(lines, " ") != "one two three four five six" {
 		t.Errorf("wrapText: %q", lines)
+	}
+}
+
+// TestSummarySaysWhatNoFindingCovers: the grade of a host is the grade of
+// its worst DIMM or GPU. Errors and page offlines that are tied to no DIMM
+// are in no finding, and the summary is where a reader must learn that.
+// The first case is a real one: a guest without a memory controller driver
+// that logged 7 corrected and 3 uncorrected machine checks, for which the
+// report used to say "ok" and "No DIMM of this host has errors on record"
+// and nothing more.
+func TestSummarySaysWhatNoFindingCovers(t *testing.T) {
+	capture := func(dir string, files ...string) *store.Store {
+		t.Helper()
+		var as []adapter.Adapter
+		for _, f := range files {
+			a, _, err := scan.Detect(ctx, filepath.Join(testutil.Testdata(t), "real", dir, filepath.FromSlash(f)), scan.DetectOptions{Now: now, TempDir: t.TempDir()})
+			if err != nil {
+				t.Fatal(err)
+			}
+			as = append(as, a...)
+		}
+		s, err := store.Open(ctx, filepath.Join(t.TempDir(), "capture.db"), store.Create)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { s.Close() })
+		if _, err := ingest.Run(ctx, s, as, ingest.Options{Kind: model.ScanImport, Now: now, Host: "lab-guest"}); err != nil {
+			t.Fatal(err)
+		}
+		return s
+	}
+	summary := func(doc *Document) (*elem, string) {
+		t.Helper()
+		raw, root := render(t, doc)
+		for _, bad := range checkHTML(root, raw) {
+			t.Error(bad)
+		}
+		v := root.find("section.sec")[0].find("div.verdict")[0]
+		return v, v.content()
+	}
+
+	// Machine checks without a DIMM, and nothing else: they lead.
+	mce := capture("7.3.0-mce", "var/lib/rasdaemon/ras-mc_event.db", "dmesg")
+	doc := buildFrom(t, mce, options(i18n.EN, Customer))
+	if ov := doc.Overview; ov.Unattributed != 10 || ov.UnattributedUE != 3 || ov.LoosePages != 5 || len(doc.DIMMs) != 0 {
+		t.Fatalf("capture: %d errors and %d page offlines tied to no DIMM, %d uncorrected, %d DIMMs described", ov.Unattributed, ov.LoosePages, ov.UnattributedUE, len(doc.DIMMs))
+	}
+	v, text := summary(doc)
+	lead := "10 errors of this host (CE 7, UE 3) are tied to no DIMM, and no finding covers them. 5 page offlines of this host are tied to no DIMM. Section 7 lists what each source reports."
+	if !strings.Contains(text, lead+" No DIMM of this host has errors on record.") {
+		t.Errorf("summary:\n%s", text)
+	}
+	p := v.find("p.uncovered")
+	if len(p) != 1 || !p[0].hasClass("conclusion") || len(p[0].find("rect.ue")) != 1 || len(p[0].find("path.uex")) != 1 {
+		t.Fatalf("the sentence about the errors does not lead, or lacks the mark of an uncorrected error: %s", text)
+	}
+	if a := p[0].find("a"); len(a) != 1 || a[0].attrs["href"] != "#s7" {
+		t.Errorf("the sentence does not lead to the data quality section")
+	}
+	if all := v.find("p.conclusion"); len(all) != 1 {
+		t.Errorf("%d leading paragraphs", len(all))
+	}
+	// The capture covers one day, and the report names it once.
+	_, root := render(t, doc)
+	if text := root.find("section.sec")[0].content(); !strings.Contains(text, "Period on record 2026-11-15, 1 boot") {
+		t.Errorf("the period of one day:\n%s", text)
+	}
+	_, text = summary(buildFrom(t, mce, options(i18n.KO, FA)))
+	if want := "이 호스트의 오류 10건(CE 7건, UE 3건)은 어느 DIMM에도 묶이지 않아 어느 소견에도 들어가지 않습니다. 이 호스트의 page offline 5건은 어느 DIMM에도 묶이지 않습니다. 소스별 기록은 7절에 있습니다."; !strings.Contains(strings.ReplaceAll(text, " ", " "), want) {
+		t.Errorf("Korean summary:\n%s", text)
+	}
+
+	// Page offlines alone: "no DIMM has errors" is true and stays first.
+	soft := capture("7.3.0-soft-offline", "var/lib/rasdaemon/ras-mc_event.db", "dmesg")
+	doc = buildFrom(t, soft, options(i18n.EN, Customer))
+	v, text = summary(doc)
+	if n := doc.Overview.LoosePages; n == 0 || doc.Overview.Unattributed != 0 ||
+		!strings.Contains(text, fmt.Sprintf("No DIMM of this host has errors on record. %d page offlines of this host are tied to no DIMM. Section 7", n)) {
+		t.Errorf("page offlines alone (%d):\n%s", n, text)
+	}
+	if p := v.find("p.uncovered"); len(p) != 1 || p[0].hasClass("conclusion") || len(p[0].find("svg")) != 0 {
+		t.Errorf("page offlines alone: the paragraph leads or carries a mark")
+	}
+
+	// A host with a finding: the finding leads, and what it leaves out
+	// follows. Corrected errors alone carry no mark of an uncorrected one.
+	path := copyLedger(t, "demo")
+	s, err := store.Open(ctx, path, store.ReadWrite)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	at := time.Date(2026, 11, 10, 8, 0, 0, 0, time.UTC)
+	err = s.Update(ctx, func(w *store.Writer) error {
+		for i := range 2 {
+			e := &model.Event{Host: "r12-n034", Kind: model.KindError, ErrorDT: at.Add(time.Duration(i) * time.Minute), ErrorSeverity: model.SevCE, Count: 1,
+				OsPhysicalAddress: model.Some(uint64(0x7f000000 + 0x1000*i)), Source: "test", RawRef: fmt.Sprintf("loose#%d", i),
+				Grade: model.GradeB, TimeQuality: model.TimeExact, Fingerprint: model.Fingerprint("loose", fmt.Sprint(i))}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, text = summary(buildFrom(t, s, options(i18n.EN, Customer)))
+	if !strings.HasSuffix(strings.TrimSpace(text), "1 more with errors or a finding: CPU1_D1 observe. 2 errors of this host (CE 2, UE 0) are tied to no DIMM, and no finding covers them. Section 7 lists what each source reports.") ||
+		!strings.Contains(text, "CPU0_C1 S/N 3B9C56: replace now") {
+		t.Errorf("a host with a finding:\n%s", text)
+	}
+	if p := v.find("p.uncovered"); len(p) != 1 || p[0].hasClass("conclusion") || len(p[0].find("svg.ic")) != 1 || len(p[0].find("rect.ue")) != 0 {
+		t.Errorf("a host with a finding: the paragraph leads, or its mark is wrong")
+	}
+
+	// Nothing loose, nothing said.
+	_, root = render(t, build(t, "demo", "", i18n.EN, Customer))
+	if len(root.find("p.uncovered")) != 0 {
+		t.Error("the demo report speaks of records without a DIMM")
+	}
+}
+
+// TestTimelineOfAFewDays: a history of one day is what a host gives on the
+// day its errors begin, and what every capture of a lab host gives. Its
+// bars stay thin and stand in the middle of their days, and every day has
+// its date; a long history keeps one bar per column and dates at the ends.
+func TestTimelineOfAFewDays(t *testing.T) {
+	doc := build(t, "demo", "", i18n.EN, Customer)
+	draw := func(days int) *elem {
+		t.Helper()
+		from := time.Date(2026, 11, 15, 0, 0, 0, 0, time.UTC).AddDate(0, 0, -(days - 1))
+		tl := &view.Timeline{Host: "h", From: from, To: from.AddDate(0, 0, days-1), Days: days,
+			Series: []view.Series{{Label: "DIMM 0", CE: make([]int64, days)}}}
+		sr := &tl.Series[0]
+		for i := range sr.CE {
+			sr.CE[i] = int64(3 + i%5)
+			sr.Total += sr.CE[i]
+			sr.Peak = max(sr.Peak, sr.CE[i])
+		}
+		tl.CE = sr.Total
+		var b strings.Builder
+		fig := doc.timelineFigure(tl, "DIMM 0")
+		fig.set("xmlns", "http://www.w3.org/2000/svg")
+		if err := fig.write(&b, true); err != nil {
+			t.Fatal(err)
+		}
+		root, err := parseXML([]byte(b.String()), "svg")
+		if err != nil {
+			t.Fatalf("%d days: %v", days, err)
+		}
+		return root
+	}
+	// The figure of one day names the day once.
+	if one, two := draw(1).attrs["aria-label"], draw(2).attrs["aria-label"]; one != "Timeline of DIMM 0, 2026-11-15" || two != "Timeline of DIMM 0, 2026-11-14 to 2026-11-15" {
+		t.Errorf("names of the figures: %q, %q", one, two)
+	}
+	number := func(e *elem, name string) float64 {
+		v, err := strconv.ParseFloat(e.attrs[name], 64)
+		if err != nil {
+			t.Fatalf("%s=%q", name, e.attrs[name])
+		}
+		return v
+	}
+	for _, days := range []int{1, 2, 3, 7, 12, 30, 120, 900} {
+		root := draw(days)
+		bars := root.find("g.bars")[0].find("rect")
+		var ticks []*elem
+		for _, e := range root.find("text.tick") {
+			// The dates of the time axis, not the numbers of the count axis.
+			if strings.Contains(e.content(), "-") {
+				ticks = append(ticks, e)
+			}
+		}
+		if len(bars) == 0 || len(bars) > days {
+			t.Fatalf("%d days: %d bars", days, len(bars))
+		}
+		prev := -1.0
+		for _, b := range bars {
+			x, w := number(b, "x"), number(b, "width")
+			// Coordinates are written with one decimal.
+			if w > maxDayBar || w <= 0 || x < prev-0.11 {
+				t.Errorf("%d days: a bar at %v is %v wide (after one that ends at %v)", days, x, w, prev)
+			}
+			prev = x + w
+		}
+		switch {
+		case days <= 12:
+			// One date per day, in the middle of the bar of that day.
+			if len(ticks) != days || len(bars) != days {
+				t.Errorf("%d days: %d dates, %d bars", days, len(ticks), len(bars))
+				continue
+			}
+			for i, tk := range ticks {
+				mid := number(bars[i], "x") + number(bars[i], "width")/2
+				if tk.attrs["text-anchor"] != "middle" || math.Abs(number(tk, "x")-mid) > 0.6 {
+					t.Errorf("%d days: the date %s stands at %s, its bar at %.1f", days, tk.content(), tk.attrs["x"], mid)
+				}
+			}
+			if got := ticks[days-1].content(); got != "11-15" {
+				t.Errorf("%d days: the last date is %s", days, got)
+			}
+		default:
+			if ticks[0].attrs["text-anchor"] != "start" || len(ticks) < 2 || len(ticks) > 12 {
+				t.Errorf("%d days: %d dates, the first anchored at its %s", days, len(ticks), ticks[0].attrs["text-anchor"])
+			}
+		}
+	}
+}
+
+// TestSlotMapOfALongRow: a virtual machine lists 64 slots in a row, and a
+// board whose sockets the ledger does not know is one row. Such a row runs
+// over several lines; no slot is drawn past the edge of the figure, where
+// a browser would scroll and a printer would cut it off.
+func TestSlotMapOfALongRow(t *testing.T) {
+	doc := build(t, "demo", "", i18n.EN, Customer)
+	row := func(label string, channels, perChannel int) view.SlotRow {
+		r := view.SlotRow{Label: label}
+		n := 0
+		for range channels {
+			ch := view.SlotChannel{}
+			for range perChannel {
+				ch.Slots = append(ch.Slots, view.SlotCell{Slot: fmt.Sprintf("%s %d", label, n), Label: strconv.Itoa(n), State: view.SlotEmpty})
+				n++
+			}
+			r.Channels = append(r.Channels, ch)
+		}
+		return r
+	}
+	type cellAt struct{ x, y, w float64 }
+	draw := func(sm *view.SlotMap) (cells []cellAt, lines int, h float64) {
+		t.Helper()
+		var b strings.Builder
+		fig := doc.slotMapFigure(sm, nil, "")
+		fig.set("xmlns", "http://www.w3.org/2000/svg")
+		if err := fig.write(&b, true); err != nil {
+			t.Fatal(err)
+		}
+		root, err := parseXML([]byte(b.String()), "svg")
+		if err != nil {
+			t.Fatal(err)
+		}
+		ys := map[string]bool{}
+		for _, r := range root.find("rect.cell") {
+			var c cellAt
+			for name, to := range map[string]*float64{"x": &c.x, "y": &c.y, "width": &c.w} {
+				v, err := strconv.ParseFloat(r.attrs[name], 64)
+				if err != nil {
+					t.Fatalf("%s=%q", name, r.attrs[name])
+				}
+				*to = v
+			}
+			ys[r.attrs["y"]] = true
+			cells = append(cells, c)
+		}
+		h, _ = strconv.ParseFloat(root.attrs["height"], 64)
+		return cells, len(ys), h
+	}
+	for _, c := range []struct {
+		name          string
+		rows          []view.SlotRow
+		slots, lines  int
+		wholeChannels int // slots per channel that must share a line, or 0
+	}{
+		{"the demo board", []view.SlotRow{row("CPU0", 8, 2), row("CPU1", 8, 2)}, 32, 2, 2},
+		{"twelve channels of two", []view.SlotRow{row("CPU0", 12, 2)}, 24, 1, 2},
+		{"a virtual machine", []view.SlotRow{row("NVD", 1, 64), row("RAM slot", 1, 64)}, 128, 4, 0},
+		{"a board without sockets", []view.SlotRow{row("DIMM", 48, 2)}, 96, 2, 2},
+		{"channels of three", []view.SlotRow{row("P", 40, 3)}, 120, 3, 3},
+		{"one very long channel", []view.SlotRow{row("S", 1, 300)}, 300, 5, 0},
+	} {
+		sm := &view.SlotMap{Rows: c.rows, Slots: c.slots}
+		cells, lines, h := draw(sm)
+		if len(cells) != c.slots || lines != c.lines {
+			t.Errorf("%s: %d cells on %d lines, want %d on %d", c.name, len(cells), lines, c.slots, c.lines)
+			continue
+		}
+		for i, cell := range cells {
+			if cell.x+cell.w > figW+0.05 || cell.w < minStick-0.05 || cell.y+34 > h {
+				t.Errorf("%s: slot %d at x %.1f, %.1f wide, y %.1f in a figure of %v by %.1f", c.name, i, cell.x, cell.w, cell.y, figW, h)
+				break
+			}
+			if n := c.wholeChannels; n > 0 && i%n != 0 && cell.y != cells[i-1].y {
+				t.Errorf("%s: slot %d is on another line than the rest of its channel", c.name, i)
+				break
+			}
+		}
 	}
 }

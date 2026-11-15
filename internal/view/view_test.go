@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -1247,5 +1248,181 @@ func TestTimelineNamesOneDayAsOneDay(t *testing.T) {
 		if m.EN == "" || m.KO == "" || strings.Contains(m.EN, "{last}") || strings.Contains(m.KO, "{last}") {
 			t.Errorf("%s: %+v", code, m)
 		}
+	}
+}
+
+// TestOverviewCountsWhatNoFindingCovers: errors and page offlines that are
+// tied to no DIMM are in no finding, and the grade of the host says
+// nothing about them. The overview counts them, the uncorrected errors
+// apart, and a page offline that two sources report once.
+func TestOverviewCountsWhatNoFindingCovers(t *testing.T) {
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "loose.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	day := time.Date(2026, 10, 1, 8, 0, 0, 0, time.UTC)
+	err = s.Update(ctx, func(w *store.Writer) error {
+		if err := w.UpsertHost(&model.Host{Name: "h"}); err != nil {
+			return err
+		}
+		// Machine checks of a host without a memory controller driver: an
+		// address and no slot. 7 corrected, 3 uncorrected.
+		for i := range 10 {
+			at := day.Add(time.Duration(i) * time.Minute)
+			sev := model.SevCE
+			if i >= 7 {
+				sev = model.SevUE
+			}
+			e := &model.Event{Host: "h", Kind: model.KindError, ErrorDT: at, ErrorSeverity: sev, Count: 1,
+				OsPhysicalAddress: model.Some(uint64(0x100000 + 0x1000*i)), Source: "test", RawRef: "e#" + at.Format(time.RFC3339),
+				Grade: model.GradeB, TimeQuality: model.TimeExact, Fingerprint: model.Fingerprint("event", at.String())}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		// Three pages taken offline. The first is in the kernel log and in
+		// the database of the daemon, a second apart.
+		for i, page := range []uint64{0x107000, 0x107000, 0x108000, 0x109000} {
+			at := day.Add(time.Hour + time.Duration(i)*time.Second)
+			a := &model.Action{Host: "h", At: at, TimeQuality: model.TimeExact, Kind: model.ActionPageOffline, Method: "hard", Result: model.ResultOK,
+				OsPhysicalAddress: model.Some(page), Source: "test", RawRef: "a#" + at.Format(time.RFC3339),
+				Fingerprint: model.Fingerprint("page", at.String())}
+			if _, err := w.InsertAction(a); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := Open(ctx, s, i18n.EN, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h, err := c.Host("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ov, err := c.Overview(ctx, h, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ov.Host.CE != 7 || ov.Host.UE != 3 || ov.Unattributed != 10 || ov.UnattributedUE != 3 || ov.LoosePages != 3 {
+		t.Errorf("CE %d, UE %d; tied to no DIMM: %d errors, %d of them uncorrected, %d page offlines; want 7, 3; 10, 3, 3",
+			ov.Host.CE, ov.Host.UE, ov.Unattributed, ov.UnattributedUE, ov.LoosePages)
+	}
+	// The timeline of the host counts the same events.
+	tl, err := c.Timeline(ctx, h, nil, TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, g := range tl.Markers {
+		if g.Kind == string(model.ActionPageOffline) && g.Count != ov.LoosePages {
+			t.Errorf("the timeline counts %d page offlines, the overview %d", g.Count, ov.LoosePages)
+		}
+	}
+	// The JSON of an overview names both counts.
+	b, err := json.Marshal(ov)
+	if err != nil || !strings.Contains(string(b), `"unattributed_ue":3`) || !strings.Contains(string(b), `"loose_pages":3`) {
+		t.Errorf("JSON: %v\n%s", err, b)
+	}
+
+	// Errors and offlines of a DIMM are not among them.
+	demo, hd := open(t, "demo", "", i18n.EN)
+	ov, err = demo.Overview(ctx, hd, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ov.Unattributed != 0 || ov.UnattributedUE != 0 || ov.LoosePages != 0 {
+		t.Errorf("demo: %d errors, %d uncorrected, %d page offlines tied to no DIMM", ov.Unattributed, ov.UnattributedUE, ov.LoosePages)
+	}
+	// A line that names the grade of such a host says what it leaves out.
+	if ce, ue := Loose(h); ce != 7 || ue != 3 || GradeWithLoose(i18n.EN, "ok", ce, ue) != "ok; CE 7, UE 3 tied to no DIMM are in no finding" ||
+		GradeWithLoose(i18n.KO, "정상", ce, ue) != "정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음" {
+		t.Errorf("CE %d, UE %d: %q", ce, ue, GradeWithLoose(i18n.EN, "ok", ce, ue))
+	}
+	if ce, ue := Loose(hd); ce+ue != 0 || GradeWithLoose(i18n.EN, "replace now", ce, ue) != "replace now" {
+		t.Errorf("demo: CE %d, UE %d tied to no DIMM", ce, ue)
+	}
+	// Every message about them has both languages.
+	for _, code := range []string{"ov.grade_loose", "ov.loose", "ov.loose_pages"} {
+		if m := Messages[code]; m.EN == "" || m.KO == "" {
+			t.Errorf("%s: %+v", code, m)
+		}
+	}
+}
+
+// TestOneDayIsNamedOnce: a history of one day is what a host has on the
+// day its errors begin. Its period is that day, not "from the day to the
+// same day".
+func TestOneDayIsNamedOnce(t *testing.T) {
+	if got := Span(i18n.EN, "2026-10-01", "2026-10-01"); got != "2026-10-01" {
+		t.Errorf("one day: %q", got)
+	}
+	if en, ko := Span(i18n.EN, "2026-10-01", "2026-10-03"), Span(i18n.KO, "2026-10-01", "2026-10-03"); en != "2026-10-01 to 2026-10-03" || ko != "2026-10-01 ~ 2026-10-03" {
+		t.Errorf("three days: %q, %q", en, ko)
+	}
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "oneday.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	day := time.Date(2026, 10, 1, 8, 0, 0, 0, time.UTC)
+	err = s.Update(ctx, func(w *store.Writer) error {
+		if err := w.UpsertHost(&model.Host{Name: "h"}); err != nil {
+			return err
+		}
+		for i := range 4 {
+			at := day.Add(time.Duration(i) * time.Minute)
+			e := &model.Event{Host: "h", Kind: model.KindError, ErrorDT: at, ErrorSeverity: model.SevCE, Slot: "A1", Count: 1,
+				Source: "test", RawRef: "e#" + at.Format(time.RFC3339), Grade: model.GradeC, TimeQuality: model.TimeExact,
+				Fingerprint: model.Fingerprint("event", at.String())}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for lang, want := range map[i18n.Lang]string{
+		i18n.EN: "4 corrected and 0 uncorrected errors on 2026-10-01",
+		i18n.KO: "2026-10-01: CE 4건, UE 0건",
+	} {
+		c, err := Open(ctx, s, lang, engine.Options{Now: day.Add(6 * time.Hour)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		h, err := c.Host("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		tl, err := c.Timeline(ctx, h, nil, TimelineOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var notes []string
+		for _, n := range tl.Notes {
+			notes = append(notes, n.Text)
+		}
+		if tl.Days != 1 || !slices.Contains(notes, want) {
+			t.Errorf("%s: %d days, notes %q; want %q", lang, tl.Days, notes, want)
+		}
+	}
+	// A longer history keeps both days.
+	c, h := open(t, "demo", "", i18n.EN)
+	tl, err := c.Timeline(ctx, h, nil, TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, n := range tl.Notes {
+		found = found || strings.Contains(n.Text, "from 2026-07-31 to 2026-11-12")
+	}
+	if !found {
+		t.Errorf("demo: %v", tl.Notes)
 	}
 }

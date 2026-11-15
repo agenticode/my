@@ -144,29 +144,30 @@ func (doc *Document) slotMapFigure(sm *view.SlotMap, anchors map[string]string, 
 	}
 	labelW := 0.0
 	maxCell := 0.0
-	units := 0.0 // widest row, in sticks and gaps
 	for i := range sm.Rows {
 		r := &sm.Rows[i]
 		labelW = max(labelW, textWidth(rowLabel(r), labelSize))
-		u := 0.0
-		for c, ch := range r.Channels {
-			if c > 0 {
-				u += 0.55 // gap between channels
-			}
-			u += float64(len(ch.Slots)) + 0.18*float64(len(ch.Slots)-1)
+		for _, ch := range r.Channels {
 			for _, sl := range ch.Slots {
 				maxCell = max(maxCell, monoWidth(sl.Label, cellSize))
 			}
 		}
-		units = max(units, u)
 	}
 	if labelW > 0 {
 		labelW += 14
 	}
+	// A row is one line, unless its sticks would get thinner than
+	// minStick: then it runs over several lines of about equal length,
+	// each holding whole channels where a channel fits a line.
+	lines := slotLines(sm, func(r *view.SlotRow) string { return rowLabel(r) }, (figW-labelW)/minStick)
+	units := 0.0 // widest line, in sticks and gaps
+	for _, ln := range lines {
+		units = max(units, ln.units())
+	}
 	// A stick is as wide as the room allows, between 9 and 24 pixels.
 	stick := 24.0
 	if units > 0 {
-		stick = min(max((figW-labelW)/units, 9), 24)
+		stick = min(max((figW-labelW)/units, minStick), 24)
 	}
 	gapIn, gapCh := stick*0.18, stick*0.55
 	// Slot names stand below the sticks; names wider than a stick stand
@@ -177,22 +178,20 @@ func (doc *Document) slotMapFigure(sm *view.SlotMap, anchors map[string]string, 
 		band = maxCell + 8
 	}
 	rowH := stickH + band + 12
-	h := float64(len(sm.Rows))*rowH + 2
+	h := float64(len(lines))*rowH + 2
 	s := svg("fig slotmap", figW, h, doc.say("fig.slotmap", "host", doc.Overview.Host.Name))
 
-	for i := range sm.Rows {
-		r := &sm.Rows[i]
+	for i, ln := range lines {
 		y := float64(i)*rowH + 10
-		if l := rowLabel(r); l != "" {
-			s.add(el("text", A{"class", "rowlabel", "x", "0", "y", num(y + stickH/2 + 4)}, l))
+		if ln.label != "" {
+			s.add(el("text", A{"class", "rowlabel", "x", "0", "y", num(y + stickH/2 + 4)}, ln.label))
 		}
 		x := labelW
-		for c, ch := range r.Channels {
+		for c, group := range ln.groups {
 			if c > 0 {
 				x += gapCh
 			}
-			for k := range ch.Slots {
-				cell := &ch.Slots[k]
+			for k, cell := range group {
 				if k > 0 {
 					x += gapIn
 				}
@@ -240,6 +239,96 @@ func (doc *Document) slotMapFigure(sm *view.SlotMap, anchors map[string]string, 
 		}
 	}
 	return s
+}
+
+// minStick is the narrowest a slot of the slot map is drawn, in pixels.
+const minStick = 9.0
+
+// slotLine is one line of the slot map: the slots of a socket, or a part
+// of them when they do not fit one line.
+type slotLine struct {
+	// label names the row; the lines a row continues on have none.
+	label string
+	// groups are the channels of the line.
+	groups [][]*view.SlotCell
+}
+
+// units is the width of the line in sticks: a slot is one, the gap
+// between two slots of a channel 0.18, the gap between two channels 0.55.
+func (ln *slotLine) units() float64 {
+	u := 0.0
+	for c, g := range ln.groups {
+		if c > 0 {
+			u += 0.55
+		}
+		u += float64(len(g)) + 0.18*float64(len(g)-1)
+	}
+	return u
+}
+
+// slotLines lays the rows of a slot map out in lines of at most room
+// units. A row that fits is one line. A longer row, as a board without a
+// known topology or a virtual machine with a hundred slots gives, runs
+// over as few lines as hold it, of about equal length; a channel stays on
+// one line unless it is longer than a line itself.
+func slotLines(sm *view.SlotMap, label func(*view.SlotRow) string, room float64) []*slotLine {
+	// The most slots of one channel a line holds.
+	longest := max(int((room+0.18)/1.18), 1)
+	var out []*slotLine
+	for i := range sm.Rows {
+		r := &sm.Rows[i]
+		whole := &slotLine{label: label(r)}
+		for c := range r.Channels {
+			var g []*view.SlotCell
+			for k := range r.Channels[c].Slots {
+				g = append(g, &r.Channels[c].Slots[k])
+			}
+			// A channel longer than a line is cut into equal parts.
+			parts := (len(g) + longest - 1) / longest
+			for ; parts > 1; parts-- {
+				n := (len(g) + parts - 1) / parts
+				whole.groups = append(whole.groups, g[:n])
+				g = g[n:]
+			}
+			if len(g) > 0 {
+				whole.groups = append(whole.groups, g)
+			}
+		}
+		total := whole.units()
+		if total <= room {
+			out = append(out, whole)
+			continue
+		}
+		// Fill line after line up to a limit. The limit starts at the
+		// length the lines would have if they were equal and grows until
+		// the row fits the number of lines; one line more when it cannot.
+		pack := func(limit float64) []*slotLine {
+			lines := []*slotLine{{label: whole.label}}
+			for _, g := range whole.groups {
+				cur := lines[len(lines)-1]
+				cur.groups = append(cur.groups, g)
+				if len(cur.groups) > 1 && cur.units() > limit {
+					cur.groups = cur.groups[:len(cur.groups)-1]
+					lines = append(lines, &slotLine{groups: [][]*view.SlotCell{g}})
+				}
+			}
+			return lines
+		}
+		var lines []*slotLine
+		for n := int(math.Ceil(total / room)); lines == nil; n++ {
+			for limit := total / float64(n); limit <= room; limit += 0.5 {
+				if l := pack(limit); len(l) <= n {
+					lines = l
+					break
+				}
+			}
+			if n > len(whole.groups) {
+				lines = pack(room)
+			}
+		}
+		out = append(out, lines...)
+	}
+	return out
 }
 
 // pointerIcon is the mark that points at the subject of a case, as a
@@ -662,6 +751,9 @@ func (doc *Document) laneLabel(kind string) string {
 	return doc.kindText(kind)
 }
 
+// maxDayBar is the widest a bar of the timeline gets, in pixels.
+const maxDayBar = 18.0
+
 // timelineFigure draws errors per day with the events of the period in
 // lanes below. A timeline with one row gets an axis of counts; a timeline
 // with several rows draws each on its own scale and prints its peak.
@@ -696,6 +788,9 @@ func (doc *Document) timelineFigure(tl *view.Timeline, what string) *node {
 	if pitch >= 3 {
 		barW = pitch - 1
 	}
+	// A history of a few days has wide columns. Its bars stay thin and
+	// stand in the middle of their days, under the marks of those days.
+	barW = min(barW, maxDayBar)
 	xOf := func(day int) float64 { return labelW + (float64(day/per)+0.5)*pitch }
 
 	rowH := 26.0
@@ -707,7 +802,7 @@ func (doc *Document) timelineFigure(tl *view.Timeline, what string) *node {
 	plotH := float64(rows) * rowH
 	lanesY := top + plotH + axisH
 	h := lanesY + float64(len(tl.Markers))*laneH + 4
-	s := svg("fig tline", figW, h, doc.say("fig.timeline", "what", what, "from", day(tl.From), "to", day(tl.To)))
+	s := svg("fig tline", figW, h, doc.say("fig.timeline", "what", what, "span", view.Span(doc.Lang, day(tl.From), day(tl.To))))
 
 	bins := func(sr *view.Series) []float64 {
 		out := make([]float64, cols)
@@ -791,6 +886,9 @@ func (doc *Document) timelineFigure(tl *view.Timeline, what string) *node {
 			}
 			bh := max(v/axisTop*area, 1.5)
 			x := labelW + float64(c)*pitch
+			if barW == maxDayBar {
+				x += (pitch - barW) / 2
+			}
 			g.add(el("rect", A{"x", num(x), "y", num(base - bh), "width", num(barW), "height", num(bh)}, el("title", binTitle(sr, c, v))))
 		}
 		s.add(g)
@@ -828,11 +926,19 @@ func (doc *Document) timelineFigure(tl *view.Timeline, what string) *node {
 	if tl.Days > 366 {
 		first, lastDay = day(tl.From), day(tl.To)
 	}
-	ticks = append(ticks, tick{labelW, first, "start"})
-	if x := labelW + plotW; !taken(x-monoWidth(lastDay, size), x) {
-		ticks = append(ticks, tick{x, lastDay, "end"})
+	// Columns wide enough for a date carry one each, in their middle.
+	everyDay := per == 1 && pitch >= monoWidth(first, size)+12
+	if everyDay {
+		for c := range cols {
+			ticks = append(ticks, tick{xOf(c), tl.From.AddDate(0, 0, c).Format(layout), "middle"})
+		}
+	} else {
+		ticks = append(ticks, tick{labelW, first, "start"})
+		if x := labelW + plotW; !taken(x-monoWidth(lastDay, size), x) {
+			ticks = append(ticks, tick{x, lastDay, "end"})
+		}
 	}
-	for d := tl.From.AddDate(0, 0, 1); !d.After(tl.To); d = d.AddDate(0, 0, 1) {
+	for d := tl.From.AddDate(0, 0, 1); !everyDay && !d.After(tl.To); d = d.AddDate(0, 0, 1) {
 		if d.Day() != 1 || (tl.Days > 366 && d.Month() != time.January && d.Month() != time.July) {
 			continue
 		}

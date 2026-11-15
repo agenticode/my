@@ -226,7 +226,7 @@ func (doc *Document) Figures() ([]Figure, error) {
 		return tl != nil && tl.Days > 0 && (len(tl.Series) > 0 || len(tl.Markers) > 0)
 	}
 	if tl := doc.Timeline; drawn(tl) {
-		if err := add("timeline", doc.say("tl.host", "host", host)+", "+doc.vsay("span", "from", day(tl.From), "to", day(tl.To)), nil,
+		if err := add("timeline", doc.say("tl.host", "host", host)+", "+view.Span(doc.Lang, day(tl.From), day(tl.To)), nil,
 			doc.timelineFigure(tl, doc.vsay("ov.host", "name", host)), timelineNotes(tl)); err != nil {
 			return nil, err
 		}
@@ -266,7 +266,7 @@ func (doc *Document) Figures() ([]Figure, error) {
 			}
 		}
 		if tl := d.Timeline; drawn(tl) {
-			if err := add(base+"-timeline", who+": "+doc.vsay("tl.title")+", "+doc.vsay("span", "from", day(tl.From), "to", day(tl.To)), nil,
+			if err := add(base+"-timeline", who+": "+doc.vsay("tl.title")+", "+view.Span(doc.Lang, day(tl.From), day(tl.To)), nil,
 				doc.timelineFigure(tl, c.Slot), timelineNotes(tl)); err != nil {
 				return nil, err
 			}

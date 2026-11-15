@@ -18,6 +18,7 @@ import (
 	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/synth"
 	"github.com/agenticode/my/internal/testledger"
+	"github.com/agenticode/my/internal/testutil"
 )
 
 func TestReportCommand(t *testing.T) {
@@ -354,4 +355,70 @@ func TestReportFigures(t *testing.T) {
 	if code, _, stderr = run("report", ledger); code != cli.ExitUsage || !strings.Contains(stderr, "name the file to write with -o") {
 		t.Errorf("nothing to write: exit code %d, stderr %q", code, stderr)
 	}
+}
+
+// TestErrorsThatNameNoDIMM runs the commands on a capture of a real guest
+// without a memory controller driver: 7 corrected and 3 uncorrected machine
+// checks that name no DIMM. No finding covers them, the grade of the host
+// stays "ok", and every line that names that grade says what it leaves out:
+// the overview, the line of a bundle (which read "CE 0, UE 0, finding: ok"
+// on the lab host) and the line and the summary of a report.
+func TestErrorsThatNameNoDIMM(t *testing.T) {
+	root := filepath.Join(testutil.Testdata(t), "real", "7.3.0-mce")
+	const loose = "CE 7, UE 3 tied to no DIMM are in no finding"
+
+	code, out, stderr := run("--root", root, "--color", "never")
+	if code != cli.ExitOK || stderr != "" {
+		t.Fatalf("scan: exit code %d, stderr %q", code, stderr)
+	}
+	wantLines(t, out, "  2026-11-15  CE 7, UE 3  observation grade B", "host finding: ok; "+loose,
+		" 10 errors of this host are tied to no DIMM", " 5 page offlines of this host are tied to no DIMM")
+
+	code, out, _ = run("--root", root, "--json")
+	var scan struct {
+		Grade    string `json:"grade"`
+		ExitCode int    `json:"exit_code"`
+		Data     struct {
+			Unattributed   int64 `json:"unattributed"`
+			UnattributedUE int64 `json:"unattributed_ue"`
+			LoosePages     int   `json:"loose_pages"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal([]byte(out), &scan); err != nil || code != cli.ExitOK {
+		t.Fatalf("scan --json: exit code %d, %v", code, err)
+	}
+	if scan.Grade != "ok" || scan.ExitCode != 0 || scan.Data.Unattributed != 10 || scan.Data.UnattributedUE != 3 || scan.Data.LoosePages != 5 {
+		t.Errorf("scan --json: %+v", scan)
+	}
+
+	dir := t.TempDir()
+	file := filepath.Join(dir, "case.mycase")
+	code, out, stderr = run("bundle", "--root", root, "-o", file)
+	if code != cli.ExitOK || stderr != "" {
+		t.Fatalf("bundle: exit code %d, stderr %q", code, stderr)
+	}
+	wantLines(t, out, "  host lab-guest: 1 DIMM, CE 7, UE 3, finding: ok; "+loose)
+
+	page := filepath.Join(dir, "r.html")
+	code, out, stderr = run("report", file, "-o", page)
+	if code != cli.ExitOK || stderr != "" {
+		t.Fatalf("report: exit code %d, stderr %q", code, stderr)
+	}
+	wantLines(t, out, "  host lab-guest, finding: ok; "+loose)
+	b, err := os.ReadFile(page)
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := strings.Join(strings.Fields(textOf(b)), " ")
+	wantLines(t, text, "10 errors of this host (CE 7, UE 3) are tied to no DIMM, and no finding covers them. 5 page offlines of this host are tied to no DIMM.",
+		"No DIMM of this host has errors on record.", "2026-11-15, 1 boot", "7 corrected and 3 uncorrected errors on 2026-11-15")
+	if strings.Contains(text, "2026-11-15 to 2026-11-15, 1 boot") {
+		t.Error("the report names a period of one day by two days")
+	}
+
+	code, out, _ = run("report", file, "-o", page, "--force", "--lang", "ko")
+	if code != cli.ExitOK {
+		t.Fatalf("report --lang ko: exit code %d", code)
+	}
+	wantLines(t, out, "  호스트 lab-guest, 소견: 정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음")
 }

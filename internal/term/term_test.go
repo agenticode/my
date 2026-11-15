@@ -11,6 +11,7 @@ import (
 
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/synth"
 	"github.com/agenticode/my/internal/testledger"
 	"github.com/agenticode/my/internal/testutil"
@@ -296,12 +297,12 @@ func TestTimeline(t *testing.T) {
 func TestTimelineOfAQuietHost(t *testing.T) {
 	// A host nothing is on record about: one day, no errors, no events.
 	tl := &view.Timeline{Host: "h", From: now, To: now, Days: 1, Series: []view.Series{}, Markers: []view.MarkerGroup{},
-		Notes: []view.Text{{Text: "0 corrected and 0 uncorrected errors from 2026-11-13 to 2026-11-13"}}}
+		Notes: []view.Text{{Text: "0 corrected and 0 uncorrected errors on 2026-11-13"}}}
 	var b bytes.Buffer
 	if err := Timeline(&b, tl, en.st); err != nil {
 		t.Fatal(err)
 	}
-	if got, want := b.String(), "host h  2026-11-13 to 2026-11-13  1 day\n\n no errors and no events in this period\n"; got != want {
+	if got, want := b.String(), "host h  2026-11-13  1 day\n\n no errors and no events in this period\n"; got != want {
 		t.Errorf("timeline of a quiet host:\n%q\nwant\n%q", got, want)
 	}
 }
@@ -320,13 +321,13 @@ func TestTimelineWithMoreEventsThanDays(t *testing.T) {
 			group("page-offline", "O", "5 pages offline, 2026-11-13", 0),
 			group(view.MarkBoot, "B", "2026-11-13 reboot", 0),
 		},
-		Notes: []view.Text{{Text: "7 corrected and 3 uncorrected errors from 2026-11-13 to 2026-11-13"}}}
+		Notes: []view.Text{{Text: "7 corrected and 3 uncorrected errors on 2026-11-13"}}}
 	var b bytes.Buffer
 	if err := Timeline(&b, day, en.st); err != nil {
 		t.Fatal(err)
 	}
 	got := b.String()
-	want := `host h  2026-11-13 to 2026-11-13  1 day
+	want := `host h  2026-11-13  1 day
 
 
  no DIMM   █  peak 7/day
@@ -335,7 +336,7 @@ func TestTimelineWithMoreEventsThanDays(t *testing.T) {
            └─┼ 3 UE, 2026-11-13
              └ 2026-11-13 reboot
 
- 7 corrected and 3 uncorrected errors from 2026-11-13 to 2026-11-13
+ 7 corrected and 3 uncorrected errors on 2026-11-13
 `
 	if got != want {
 		t.Errorf("one day, three kinds of events:\n%s\nwant\n%s", got, want)
@@ -630,5 +631,67 @@ func TestEveryScenarioDraws(t *testing.T) {
 				t.Errorf("scenario %s has no DIMM with a finding", name)
 			}
 		}
+	}
+}
+
+// TestOverviewSaysWhatNoFindingCovers: the grade of a host is the grade of
+// its worst DIMM. Where errors are tied to no DIMM, the line of the finding
+// says so, uncorrected errors by their number: "host finding: ok" alone
+// would be read as "no errors".
+func TestOverviewSaysWhatNoFindingCovers(t *testing.T) {
+	ov := &view.Overview{
+		Host:         view.Header{Name: "h", CE: 7, UE: 3, GradeB: 10, Grade: model.VerdictOK, GradeText: "ok"},
+		Ranking:      []view.Rank{},
+		Unattributed: 10, UnattributedUE: 3, LoosePages: 5,
+	}
+	draw := func(st Style) string {
+		var b strings.Builder
+		if err := Overview(&b, ov, st, nil); err != nil {
+			t.Fatal(err)
+		}
+		return b.String()
+	}
+	got := draw(Style{Lang: i18n.EN})
+	for _, want := range []string{
+		"host finding: ok; CE 7, UE 3 tied to no DIMM are in no finding\n",
+		" 10 errors of this host are tied to no DIMM\n",
+		" 5 page offlines of this host are tied to no DIMM\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("the overview lacks %q:\n%s", want, got)
+		}
+	}
+	ov.Host.GradeText = "정상"
+	if got := draw(Style{Lang: i18n.KO}); !strings.Contains(got, "호스트 소견: 정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음\n") ||
+		!strings.Contains(got, " 이 호스트의 page offline 5건은 어느 DIMM에도 묶이지 않음\n") {
+		t.Errorf("Korean:\n%s", got)
+	}
+	// A narrow terminal wraps the line of the finding, and the colour of
+	// the grade does not count as width.
+	for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
+		narrow := draw(Style{Lang: lang, Width: 60, Color: true})
+		if !strings.Contains(narrow, "\x1b[") || !strings.Contains(strings.Join(strings.Fields(narrow), " "), "UE 3") {
+			t.Errorf("%s, 60 columns:\n%s", lang, narrow)
+		}
+		for _, line := range strings.Split(narrow, "\n") {
+			if Width(line) > 60 {
+				t.Errorf("%s: %d columns: %q", lang, Width(line), line)
+			}
+		}
+	}
+	// One page, and no errors: the plain line of the finding.
+	ov.Unattributed, ov.UnattributedUE, ov.LoosePages, ov.Host.GradeText = 0, 0, 1, "ok"
+	if got := draw(Style{Lang: i18n.EN}); !strings.Contains(got, "host finding: ok\n") || !strings.Contains(got, " 1 page offline of this host is tied to no DIMM\n") {
+		t.Errorf("one page:\n%s", got)
+	}
+	// A host on record for one day names the day once.
+	day := time.Date(2026, 11, 15, 0, 0, 0, 0, time.UTC)
+	ov.Host.From, ov.Host.To = day.Add(10*time.Hour), day.Add(11*time.Hour)
+	if got := draw(Style{Lang: i18n.EN}); !strings.Contains(got, "host h  2026-11-15  CE 7, UE 3") {
+		t.Errorf("one day:\n%s", got)
+	}
+	ov.Host.To = day.AddDate(0, 0, 2)
+	if got := draw(Style{Lang: i18n.KO}); !strings.Contains(got, "호스트 h  2026-11-15 ~ 2026-11-17  CE 7건, UE 3건") {
+		t.Errorf("three days:\n%s", got)
 	}
 }
