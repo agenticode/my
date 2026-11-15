@@ -1,0 +1,12 @@
+# Records of "ipmitool sel writeraw", one per line, as hexadecimal. The test
+# turns them into the binary file the command writes.
+# id   type time        gen   rev stype snum dir/type data
+0100 02 ff 2e f5 6a 33 00 04 0c 53 6f 30 ff 03
+0200 02 01 2f f5 6a 33 00 04 0c 53 6f a1 ff ff
+0300 02 60 30 f5 6a 01 00 04 0c 53 6f 34 ff 02
+0400 c1 61 30 f5 6a 57 01 00 0a 1b 2c 3d 4e 5f
+0500 02 2a 00 00 00 33 00 04 0c 53 6f 30 ff 03
+0600 02 ff ff ff ff 33 00 04 0c 53 6f 30 ff 03
+0700 e0 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d
+0800 02 8c 31 f5 6a 20 00 04 01 30 01 59 5f 5a
+0900 02 10 35 f5 6a 33 00 04 0c 53 ef 34 ff 02

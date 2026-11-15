@@ -1,0 +1,4 @@
+   1 | 11/08/2026 | 20:42:15 | Memory | Correctable ECC (@DIMMB1(CPU1)) | Asserted
+   2 | 11/08/2026 | 23:10:02 | Memory | Correctable ECC (@DIMMB1(CPU1)) | Asserted
+   3 | 11/09/2026 | 04:55:37 | Memory | Uncorrectable ECC (@DIMME2(CPU2)) | Asserted
+   4 | 11/09/2026 | 05:01:00 | OS Boot | C: boot completed | Asserted

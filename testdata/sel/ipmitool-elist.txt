@@ -1,0 +1,20 @@
+   1 | 10/27/2026 | 09:00:00 | Event Logging Disabled SEL | Log area reset/cleared | Asserted
+   2 | 10/28/2026 | 01:31:40 | Memory DIMM_C1 | Correctable ECC | Asserted
+   3 | 11/02/2026 | 14:07:55 | Memory DIMM_C1 | Correctable ECC | Asserted
+   4 | 11/09/2026 | 22:41:03 | Memory DIMM_C1 | Correctable ECC logging limit reached | Asserted
+   5 | 11/11/2026 | 08:15:20 | Temperature CPU0 Temp | Upper Critical going high | Asserted | Reading 96 > Threshold 95 degrees C
+   6 | 11/12/2026 | 03:14:07 | Memory DIMM_C1 | Uncorrectable ECC | Asserted
+   7 | 11/12/2026 | 03:14:09 | Critical Interrupt #0x91 | Bus Uncorrectable error | Asserted
+   8 | 11/12/2026 | 03:19:44 | Memory DIMM_C1 | Memory Device Disabled | Asserted
+   9 | 11/12/2026 | 03:19:44 | Memory DIMM_D1 | Presence Detected | Asserted
+   a | 11/12/2026 | 03:19:45 | Memory DIMM_E1_Status | Configuration Error | Asserted
+   b | 11/13/2026 | 10:02:31 | Memory DIMM_F1 | Spare | Asserted
+   c | 11/13/2026 | 10:05:00 | Memory DIMM_C1 | Correctable ECC | Deasserted
+   d | 11/13/2026 | 11:00:00 | Memory Mem ECC Warning | Correctable ECC | Asserted
+   e | 11/13/2026 | 11:30:00 | OEM record c1 | 000157 | 0a1b2c3d4e5f
+   f |  Pre-Init  |0000000042| Memory DIMM_A1 | Correctable ECC | Asserted
+  10 | 11/13/2026 | 12:00:00 | Memory DIMM_B1 | Predictive Failure Asserted | Asserted
+  11 | OEM record e0 | 0102030405060708090a0b0c0d
+  12 | Linux kernel panic: Fatal excep
+  13 | 11/14/2026 | 02:00:00 | Memory DIMM_G1 | Memory Device Disabled | Asserted
+  14 | 11/14/2026 | 02:45:00 | Memory DIMM_G1 | Memory Device Disabled | Deasserted

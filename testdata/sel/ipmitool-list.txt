@@ -1,0 +1,5 @@
+   1 | 11/10/2026 | 06:20:11 | Memory #0x53 | Correctable ECC | Asserted
+   2 | 11/10/2026 | 06:20:12 | Memory | Uncorrectable ECC | Asserted | CPU 1 DIMM 3
+   3 | 11/10/2026 | 06:21:00 | Power Supply #0x64 | Presence detected | Asserted
+   4 | 11/10/2026 | 06:22:30 | Memory | Memory Device Disabled | Asserted | CPU 1 DIMM 3
+   5 | 11/10/2026 | 06:25:00 | Event Logging Disabled #0x72 | Correctable memory error logging disabled | Asserted

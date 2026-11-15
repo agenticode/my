@@ -1,0 +1,12 @@
+{
+  "host": "r12-n034",
+  "entries": [
+    {"id": 1, "timestamp": "2026-11-12T03:14:07Z", "sensor_type": "Memory", "sensor": "DIMM_C1", "event": "Correctable ECC", "direction": "Asserted"},
+    {"record_id": "0x0002", "timestamp": 1794453249, "sensor_type": "Memory", "sensor_number": "0x53", "event_data": "0x6f31ff04", "generator_id": "0x0001"},
+    {"Id": "3", "Date": "11/12/2026", "Time": "03:20:00", "SensorType": "Memory", "SensorName": "DIMM_C1", "Description": "Memory Device Disabled", "Asserted": true},
+    {"id": 4, "raw": "0400 02 37 e0 f6 6a 20 00 04 0c 53 6f 08 ff ff"},
+    {"id": 5, "timestamp": "2026-11-12T03:30:00+09:00", "sensor_type": "Fan", "sensor": "FAN1", "event": "Lower Critical going low", "direction": "Asserted"},
+    {"id": 6, "sensor_type": "Memory", "sensor": "DIMM_C1", "event": "Correctable ECC"},
+    "not an entry"
+  ]
+}

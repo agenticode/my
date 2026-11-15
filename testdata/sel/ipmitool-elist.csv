@@ -1,0 +1,4 @@
+1,11/12/2026,03:14:07,Memory DIMM_C1,Correctable ECC,Asserted
+2,11/12/2026,03:14:09,Memory #0x01,Uncorrectable ECC ( DIMMA1,DIMMA2),Asserted
+3,11/12/2026,03:15:00,Temperature CPU0 Temp,Upper Critical going high,Asserted,Reading 96 > Threshold 95 degrees C
+4, Pre-Init ,0000000042,Memory DIMM_C1,Correctable ECC,Asserted
