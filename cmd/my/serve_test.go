@@ -399,7 +399,8 @@ func TestServeHelp(t *testing.T) {
 			}
 			flat := strings.Join(strings.Fields(out), " ")
 			if lang == i18n.EN {
-				wantLines(t, flat, "Usage: my serve [--metrics] [--listen ADDR] [--interval TIME] [flags]", "It changes nothing on the host.",
+				wantLines(t, flat, "Usage: my serve [--metrics] [--fleet KIND] [--listen ADDR] [--interval TIME] [flags]", "It changes nothing on the host.",
+					"one server for every host", "/api/dimm takes the host as ?host=NAME",
 					`/api/dimm/<slot|serial> answers with the JSON that "my why <slot|serial> --json" prints`,
 					"No metric has an address as a label.", "default 127.0.0.1:10163", "has no authentication", "the exit code is then 0")
 			} else if !strings.Contains(out, "사용법:") || !strings.Contains(out, "옵션:") || !strings.Contains(flat, "주소를 라벨로 쓰는 지표는 없습니다") {

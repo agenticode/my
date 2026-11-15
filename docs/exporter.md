@@ -14,6 +14,7 @@ $ my serve --metrics
 | `--listen ADDR` | where to listen. The default is `127.0.0.1:10163`; `:10163` listens on every interface |
 | `--interval TIME` | pause between the end of one scan and the start of the next, such as `30s` or `5m`. The default is `5m`, the minimum `1s` |
 | `--root DIR` | scan a copy of a host's files below `DIR` instead of this host |
+| `--fleet KIND`, `--fleet-env FILE`, `--since TIME`, `--host NAME` | read the store of a fleet in place of this host: see "One exporter for a fleet" |
 | `--config FILE`, `--set KEY=VALUE` | thresholds of the engine, as for the other commands |
 | `--lang en\|ko` | language of the log |
 
@@ -92,6 +93,26 @@ $ curl -s http://127.0.0.1:10163/api/dimm/CPU0_C1 | head -n 8
 
 An error is a JSON object with one field, `error`, that holds the sentence the command would print. The API is served with and without `--metrics`.
 
+## One exporter for a fleet
+
+`my serve --metrics --fleet mysql` (or `--fleet postgresql`) reads the store the rasdaemons of a fleet write to, in place of the host it runs on. One exporter then serves the findings of every host that has a row in the store, and the `host` label tells the hosts apart. [compatibility.md](compatibility.md#store-on-a-database-server) describes the store and its settings; `--fleet-env FILE` names a file with them.
+
+The log line of a scan names the store and counts its hosts by finding. This one is from the store the tests use, three hosts on a stand-in for the server:
+
+```
+scan took 61ms: postgresql://db.example:5432/rasdaemon?schema=rasdaemon, 3 hosts: 2 replace now, 1 consider replacement
+```
+
+- The first scan reads every host. A later scan asks the store which hosts have rows above the row numbers it has seen and reads those hosts. Every twelfth scan lists all hosts again: that finds a host whose rows were removed, and a row the shorter listing did not show.
+- A host without new rows is read again when its findings are six hours old. A finding is as of the time it is made: a fault that was rising is quiet a week later. These reads are spread over the scans.
+- A host is read into a ledger in the temporary directory, which is removed when the findings are made. Between scans the exporter keeps the metrics of each host.
+- `/api/dimm/<slot>?host=NAME` reads the rows of that host when it is asked, so the answer is as of the request. Without `host` the answer is 400 and names the hosts, unless the store holds one host.
+- `--host NAME` serves one host of the store. `--since 30d` reads rows from then on, counted back from each scan.
+- A host appears with its first record. A store has no SMBIOS tables, so `serial` is empty and a DIMM has series once it has a record.
+- Rows without a host name belong to no host and are not read.
+
+When a host cannot be read the scan fails and is counted; the host is read by the next scan and the findings for the other hosts stay.
+
 ## How a scan runs
 
 Each scan reads the sources of the host into a new ledger in the temporary directory and removes the ledger of the scan before. The exporter keeps no file between scans or across a restart.
@@ -105,7 +126,7 @@ The exporter reads what its user may read. As root it reads every source that is
 | Path | Answer |
 | --- | --- |
 | `/metrics` | the metrics, when `--metrics` is given. The body is gzip when the client accepts it |
-| `/api/dimm/<slot or serial>`, `/api/dimm` | the finding for one DIMM, or for every DIMM with errors or a finding, as JSON |
+| `/api/dimm/<slot or serial>`, `/api/dimm` | the finding for one DIMM, or for every DIMM with errors or a finding, as JSON. With `--fleet`: `?host=NAME` |
 | `/-/healthy` | 200 while the process runs |
 | `/-/ready` | 200 once the first scan has succeeded, 503 before |
 | `/` | the list of these paths |
