@@ -1,10 +1,13 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
+	"unicode"
 
 	"github.com/agenticode/my/internal/testutil"
 )
@@ -170,5 +173,130 @@ func TestGuidesShowRealOutput(t *testing.T) {
 				t.Errorf("%s quotes %d commands, want %d: %q", page, len(ran), n, ran)
 			}
 		})
+	}
+}
+
+// anchor returns the name GitHub gives the heading of a Markdown page:
+// lower case, spaces as hyphens, punctuation dropped.
+func anchor(heading string) string {
+	var b strings.Builder
+	for _, r := range strings.ToLower(strings.TrimSpace(heading)) {
+		switch {
+		case r == ' ':
+			b.WriteByte('-')
+		case r == '-' || r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r):
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// anchors returns the names of the headings of a Markdown page. Lines
+// inside a fenced block are no headings.
+func anchors(page string) map[string]bool {
+	out := map[string]bool{}
+	fenced := false
+	for _, line := range strings.Split(page, "\n") {
+		if strings.HasPrefix(line, "```") {
+			fenced = !fenced
+			continue
+		}
+		if fenced || !strings.HasPrefix(line, "#") {
+			continue
+		}
+		text := strings.TrimLeft(line, "#")
+		if !strings.HasPrefix(text, " ") {
+			continue
+		}
+		// Code marks are no part of the name.
+		out[anchor(strings.ReplaceAll(text, "`", ""))] = true
+	}
+	return out
+}
+
+var linkRE = regexp.MustCompile(`\]\(([^)\s]+)\)`)
+
+// TestLinksOfThePages follows every link between the Markdown pages of
+// the repository: the file a link names exists, and so does the heading
+// it points at.
+func TestLinksOfThePages(t *testing.T) {
+	root := testutil.RepoRoot(t)
+	var pages []string
+	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			switch d.Name() {
+			case ".git", "dist", "bin", "node_modules":
+				return filepath.SkipDir
+			}
+			// Copies of hosts and captures hold files of other origin.
+			if rel, _ := filepath.Rel(root, path); strings.HasPrefix(filepath.ToSlash(rel), "testdata/") && strings.Count(filepath.ToSlash(rel), "/") >= 2 {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if strings.HasSuffix(d.Name(), ".md") {
+			pages = append(pages, path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(pages) < 10 {
+		t.Fatalf("found %d Markdown pages below %s", len(pages), root)
+	}
+	text := map[string]string{}
+	read := func(path string) (string, bool) {
+		if s, ok := text[path]; ok {
+			return s, true
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
+			return "", false
+		}
+		text[path] = string(b)
+		return string(b), true
+	}
+	links := 0
+	for _, page := range pages {
+		body, _ := read(page)
+		rel, _ := filepath.Rel(root, page)
+		fenced := false
+		for n, line := range strings.Split(body, "\n") {
+			if strings.HasPrefix(line, "```") {
+				fenced = !fenced
+			}
+			if fenced {
+				continue
+			}
+			for _, m := range linkRE.FindAllStringSubmatch(line, -1) {
+				target := m[1]
+				if strings.Contains(target, "://") || strings.HasPrefix(target, "mailto:") {
+					continue
+				}
+				links++
+				file, frag, _ := strings.Cut(target, "#")
+				dest := page
+				if file != "" {
+					dest = filepath.Join(filepath.Dir(page), filepath.FromSlash(file))
+					if _, err := os.Stat(dest); err != nil {
+						t.Errorf("%s:%d: the link to %s leads nowhere", rel, n+1, target)
+						continue
+					}
+				}
+				if frag == "" || !strings.HasSuffix(dest, ".md") {
+					continue
+				}
+				if s, ok := read(dest); !ok || !anchors(s)[frag] {
+					t.Errorf("%s:%d: the link to %s names a heading that is not there", rel, n+1, target)
+				}
+			}
+		}
+	}
+	if links < 40 {
+		t.Errorf("followed %d links; the pages hold more", links)
 	}
 }

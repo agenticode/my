@@ -1,6 +1,6 @@
 # Reading guide
 
-MemorY answers with figures. This page says how to read each of them, on a terminal and in a report. The examples are the case in this repository, [examples/demo.mycase](../examples/README.md): a host with a row fault in `CPU0_C1` and one repeating cell in `CPU1_D1`. `my help reading` prints a short form of this page.
+This page says how to read each figure MemorY draws, on a terminal and in a report. The examples are the case in this repository, [examples/demo.mycase](../examples/README.md): a host with a row fault in `CPU0_C1` and one repeating cell in `CPU1_D1`. `my help reading` prints a short form of this page.
 
 Every figure has one question it answers:
 
@@ -107,7 +107,7 @@ in this slot since 2026-07-31  0 slot changes
 | confidence | the steps that led to the number |
 | faults | the groups of errors the engine made out, with mode, place, counts, period and trend |
 
-A grade is a finding. [rules.md](rules.md) lists the rules, their conditions and the thresholds. `my why <slot> --oneline` gives the finding as one line for a ticket, and `my why` without a slot shows every finding of the host.
+A grade is a finding: the thresholds behind it are defaults. [rules.md](rules.md) lists the rules, their conditions and the thresholds. `my why <slot> --oneline` gives the finding as one line for a ticket, and `my why` without a slot shows every finding of the host.
 
 ## Topology bars
 
