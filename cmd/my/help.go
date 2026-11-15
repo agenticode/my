@@ -45,6 +45,9 @@ var words = i18n.Catalog{
 	"plugin.used":        {EN: "vendor analyzer {name}: analyses of {dimms} {dimms|DIMM|DIMMs}", KO: "벤더 분석기 {name}: DIMM {dimms}개 분석"},
 	"plugin.note":        {EN: "analyzer: {note}", KO: "분석기: {note}"},
 	"plugin.failed":      {EN: "Nothing was analysed. Without --plugin the findings are those of the open core.", KO: "분석하지 않았습니다. --plugin 없이 실행하면 공개 코어의 소견이 나옵니다."},
+	"err.diff_files":     {EN: "name two cases, the earlier one first: my diff before.mycase after.mycase", KO: "케이스 둘을 앞선 것부터 지정해야 함: my diff before.mycase after.mycase"},
+	"err.diff_order":     {EN: "{second} ({second_at}) is older than {first} ({first_at}): name the earlier case first", KO: "{second}({second_at})이 {first}({first_at})보다 앞선 케이스임: 앞선 케이스를 먼저 지정해야 함"},
+	"err.diff_at":        {EN: "--at {value}: want a time after the earlier case ({first_at}) and up to the later one ({second_at})", KO: "--at {value}: 앞 케이스({first_at}) 뒤이고 뒤 케이스({second_at})까지인 시각이어야 함"},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
 	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, verify, export, 또는 생략하면 개요)"},
 
@@ -265,6 +268,17 @@ var words = i18n.Catalog{
 			"--force           FILE이 있으면 덮어씀",
 	},
 
+	"help.diff.usage": {EN: "my diff BEFORE AFTER [--at TIME] [--all] [flags]", KO: "my diff BEFORE AFTER [--at TIME] [--all] [옵션]"},
+	"help.diff.text":  {EN: "Sets two cases of one host side by side: BEFORE is the host before something was done to it (a DIMM reseated, two DIMMs swapped between slots, a DIMM replaced, the BIOS updated), AFTER the same host some time later. Each is a case bundle (.mycase) or a ledger file. The command lists what differs between the two: DIMMs that moved, left or came, BIOS, BMC and kernel versions, restarts, and the repairs and page offlines the later case recorded. For every DIMM it then counts the errors before and after, and says what the counts show: the errors moved with the DIMM, stayed with the slot, go on, or stopped. As after it counts the errors since the last restart before the later case was taken, because the hardware cannot have changed after that. Each case is analysed on its own; no file is changed and this host is not scanned. The exit code is the grade of the host in the later case.", KO: "한 호스트의 케이스 둘을 나란히 놓습니다. BEFORE는 조치(DIMM reseat, 두 슬롯의 DIMM 맞교환, DIMM 교체, BIOS 업데이트) 전의 호스트이고 AFTER는 얼마 뒤의 같은 호스트입니다. 둘 다 케이스 번들(.mycase)이나 원장 파일입니다. 명령은 둘 사이에 달라진 것을 나열합니다: 옮기거나 빠지거나 새로 들어온 DIMM, BIOS와 BMC와 커널 버전, 재시작, 뒤 케이스가 기록한 리페어와 page offline. 이어서 DIMM마다 전후 오류를 세고 그 수가 무엇을 보이는지 적습니다: 오류가 DIMM을 따라갔는지, 슬롯에 남았는지, 지속되는지, 멈췄는지. 이후로 세는 것은 뒤 케이스 직전의 마지막 재시작부터의 오류입니다. 그 뒤로는 하드웨어가 바뀔 수 없기 때문입니다. 케이스는 각각 따로 분석하며, 파일을 바꾸지 않고 이 호스트를 스캔하지 않습니다. 종료 코드는 뒤 케이스의 호스트 등급입니다."},
+	"help.diff.flags": {
+		EN: "--at TIME         when the change was made (2026-10-01, or 2026-10-01T03:00:00Z): errors\n" +
+			"                  from then on count as after. It replaces the last restart as the start\n" +
+			"--all             list every DIMM, also those in the same slot and without errors",
+		KO: "--at TIME         변경한 시각 (2026-10-01 또는 2026-10-01T03:00:00Z). 그때부터의 오류를\n" +
+			"                  이후로 셈. 마지막 재시작 대신 이 시각이 시작점이 됨\n" +
+			"--all             슬롯이 그대로이고 오류가 없는 DIMM도 모두 나열",
+	},
+
 	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [옵션]"},
 	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
@@ -393,6 +407,7 @@ var guides = map[string][]string{
 	"timeline": {"guide.timeline"},
 	"gpu":      {"guide.gpu"},
 	"verify":   {"guide.verify"},
+	"diff":     {"guide.diff", "guide.grades"},
 	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
 	"bundle":   nil,
 	"report":   nil,
@@ -425,7 +440,8 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 	fmt.Fprintf(w, "\n%s\n", say(lang, "help.flags"))
 	blocks := []string{"help." + topic + ".flags"}
 	switch topic {
-	case "open":
+	case "open", "diff":
+		// A stored case is read as it is: nothing is scanned.
 		blocks = append(blocks, "help.common")
 	case "import":
 		// An import has no host to scan, and names its host itself.
@@ -449,7 +465,7 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, line)
 		}
 	}
-	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "export" {
+	if topic != "open" && topic != "diff" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "export" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
 			fmt.Fprintln(w, line)

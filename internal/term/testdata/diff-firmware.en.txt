@@ -1,0 +1,22 @@
+host synth-column  before.mycase 2026-09-28 12:00 UTC  → after.mycase 2026-11-13 00:00 UTC
+45 days apart  host finding: consider replacement
+After counts from 2026-10-01 03:00 UTC, the last restart before the later case was taken: 42 days.
+
+ changes  BIOS     Example BIOS Inc. 2.4.4 03/11/2026 → Example BIOS Inc. 2.6.1 09/18/2026
+          kernel   5.14.0-570.12.1.el9_6.x86_64 → 5.14.0-611.5.1.el9_7.x86_64
+          restart  1 after the earlier case: 2026-10-01 03:00 UTC
+
+ DIMM        SLOT     BEFORE  LAST 42D  BETWEEN  AFTER 42D  FINDING
+ S/N 34C15C  CPU0_E1  120 CE    120 CE     6 CE     124 CE  consider replacement
+ S/N A7C1DA  CPU0_B1    1 CE      1 CE        0          0  observe
+ S/N E7A387  CPU0_D1    1 CE      1 CE        0          0  observe
+ S/N FF0C3B  CPU0_G1       0         0     1 CE          0  ok → observe
+ S/N B31D2C  CPU1_E1    1 CE      1 CE        0          0  observe
+ 11 DIMMs in the same slot and without errors in both cases are not listed; --all lists them
+
+ reading  S/N 34C15C in CPU0_E1: the errors go on. 120 in the 42 days before, 124 in the 42 days
+          after.
+
+ notes    7 errors lie after the earlier case and before 2026-10-01 03:00 UTC (CPU0_E1 6, CPU0_G1
+          1), in neither window. Until then the DIMMs were where the earlier case has them, so they
+          are counted apart for the DIMMs of that case.

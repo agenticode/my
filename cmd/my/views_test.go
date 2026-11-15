@@ -448,6 +448,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"help", "verify"}, "verify", []string{"Usage: my verify --expect PLAN [flags]", "--expect PLAN", "The command injects nothing and changes nothing", "The exit code is 0 when every injection was found as planned and 1 when one was not", "Verification. A plan lists what a test injected"}},
 		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm [-o FILE] [--records] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
+		{[]string{"diff", "--help"}, "diff", []string{"Usage: my diff BEFORE AFTER [--at TIME] [--all] [flags]", "--at TIME", "--all", "no file is changed and this host is not scanned", "The exit code is the grade of the host in the later case", "Comparison. Two cases of one host", "Grades and exit codes."}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
 		{[]string{"report", "--help"}, "report", []string{"Usage: my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR]", "--audience WHO", "--figures DIR", "nothing is loaded from elsewhere", "Printing it from a browser gives a PDF", "The exit code is 0"}},
@@ -521,7 +522,7 @@ func TestHelp(t *testing.T) {
 // sourceFor returns the source a help topic is about: "open" works on a
 // case, the others on the host.
 func sourceFor(topic string) *source {
-	if topic == "open" || topic == "import" {
+	if topic == "open" || topic == "import" || topic == "diff" {
 		return &source{}
 	}
 	return nil
@@ -545,6 +546,9 @@ func registerFlags(o *options, topic string) {
 		o.fs.Int("days", 0, "")
 	case "verify":
 		o.fs.String("expect", "", "")
+	case "diff":
+		o.fs.String("at", "", "")
+		o.fs.Bool("all", false, "")
 	case "export":
 		o.fs.Bool("records", false, "")
 		o.fs.Bool("all", false, "")

@@ -1,0 +1,28 @@
+host [1msynth-moved-dimm[0m  before.mycase 2026-09-28 12:00 UTC  → after.mycase 2026-11-13 00:00 UTC
+45 days apart  host finding: [33mconsider replacement[0m
+[2mAfter counts from 2026-10-01 03:00 UTC, the last restart before the later case was taken: 42 days.[0m
+
+ [2mchanges[0m  moved    S/N 880018, CPU0_C1 → CPU0_D1
+ [2m       [0m  moved    S/N E7A387, CPU0_D1 → CPU0_C1
+ [2m       [0m  restart  1 after the earlier case: 2026-10-01 03:00 UTC
+
+[2m DIMM        SLOT               BEFORE  LAST 41D  BETWEEN  AFTER 42D  FINDING[0m
+ S/N 880018  CPU0_C1 → CPU0_D1  114 CE    114 CE     5 CE     121 CE  [33mconsider replacement[0m
+ S/N E7A387  CPU0_D1 → CPU0_C1       0         0        0          0  [36mok → observe[0m
+ S/N 01EAE2  CPU1_A1              1 CE      1 CE        0          0  [36mobserve[0m
+ S/N D51D2B  CPU1_B1              1 CE      1 CE        0          0  [36mobserve[0m
+ S/N 332238  CPU1_C1                 0         0        0       1 CE  [36mok → observe[0m
+ S/N A8A64B  CPU1_D1              1 CE      1 CE        0          0  [36mobserve[0m
+ S/N 3056DB  CPU1_F1              1 CE      1 CE        0          0  [36mobserve[0m
+[2m 9 DIMMs in the same slot and without errors in both cases are not listed; --all lists them[0m
+
+ [2mreading[0m  S/N 880018: the errors moved with the DIMM. 114 in CPU0_C1 in the 41 days before, 121 in
+          CPU0_D1 in the 42 days after; CPU0_C1 has 0 with S/N E7A387 in it.
+
+ [2mnotes  [0m  [2m5 errors lie after the earlier case and before 2026-10-01 03:00 UTC (CPU0_C1 5), in[0m
+          [2mneither window. Until then the DIMMs were where the earlier case has them, so they are[0m
+          [2mcounted apart for the DIMMs of that case.[0m
+ [2m       [0m  [2mCPU0_C1: the later case counts 114 errors from before the earlier case was taken as errors[0m
+          [2mof S/N E7A387, the only DIMM it has seen in that slot. The earlier case has S/N 880018[0m
+          [2mthere. The finding of the later case for S/N E7A387 (observe) rests on them too.[0m
+ [2m       [0m  [2mThe earlier case covers 41 days before it was taken, less than the 42 days after.[0m

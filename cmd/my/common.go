@@ -517,9 +517,7 @@ func (s *session) emitCode(name string, grade model.VerdictGrade, code int, data
 		}
 		e := newEnvelope(name, s.lang, host, grade, data)
 		e.ExitCode = code
-		if a := s.analyzer; a != nil {
-			e.Analyzer = &analyzerInfo{Name: a.Analyzer.Name, Version: a.Analyzer.Version, Vendor: a.Analyzer.Vendor, Notes: a.Notes}
-		}
+		e.Analyzer = s.analyzerInfo()
 		if s.src != nil && s.src.manifest != nil {
 			m := s.src.manifest
 			e.Case = &caseInfo{CreatedAt: m.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"), Tool: m.Tool, Anonymized: m.Anonymized, Subject: m.Subject}
@@ -539,18 +537,7 @@ func (s *session) emitCode(name string, grade model.VerdictGrade, code int, data
 				}
 			}
 		}
-		// A vendor analyzer can change which rows count as one fault: a
-		// screen says when one took part.
-		if a := s.analyzer; a != nil {
-			for _, line := range s.st.Wrap(analyzerLine(s.lang, a), 0) {
-				fmt.Fprintln(s.env.Stdout, line)
-			}
-			for _, n := range a.Notes {
-				for _, line := range s.st.Wrap(say(s.lang, "plugin.note", "note", n), 2) {
-					fmt.Fprintln(s.env.Stdout, line)
-				}
-			}
-		}
+		s.analyzerLines(s.env.Stdout)
 		err = draw(s.env.Stdout)
 	}
 	if err != nil {

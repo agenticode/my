@@ -262,10 +262,15 @@ func (ds *Dataset) WriteHostTree(root string, fl Flavor) error {
 	last := len(ds.Boots) - 1
 	boot := ds.Boots[last]
 
-	// Host and boot identification.
+	// Host and boot identification. The BIOS is the one the running boot
+	// came up with: a scenario can change it at a reboot.
 	id := boot.BootID
-	bios := strings.Fields(h.BIOS)
-	biosVendor, biosVersion, biosDate := h.BIOS, "", ""
+	biosText := h.BIOS
+	if boot.BIOS != "" {
+		biosText = boot.BIOS
+	}
+	bios := strings.Fields(biosText)
+	biosVendor, biosVersion, biosDate := biosText, "", ""
 	if len(bios) >= 3 {
 		biosVendor, biosVersion, biosDate = strings.Join(bios[:len(bios)-2], " "), bios[len(bios)-2], bios[len(bios)-1]
 	}
