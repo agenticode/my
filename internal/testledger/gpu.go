@@ -1,6 +1,7 @@
 package testledger
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"path/filepath"
@@ -72,8 +73,11 @@ func GPUPath(tb testing.TB) string {
 		tb.Fatal(err)
 	}
 	_, err = ingest.Run(ctx, s, []adapter.Adapter{
-		klog.NewFile(testutil.Testdata(tb, "klog", "nvidia-xid.messages"), klog.Options{}),
-		nvidia.NewFile(testutil.Testdata(tb, "nvidia", "nvidia-smi-q.xml"), nvidia.Options{}),
+		// The fixtures are read under their names in the repository: a
+		// record refers to where it was read from, and the path of one
+		// checkout in a golden file fails the test in every other.
+		klog.NewReader(bytes.NewReader(testutil.ReadTestdata(tb, "klog", "nvidia-xid.messages")), "testdata/klog/nvidia-xid.messages", klog.Options{}),
+		nvidia.NewReader(bytes.NewReader(testutil.ReadTestdata(tb, "nvidia", "nvidia-smi-q.xml")), "testdata/nvidia/nvidia-smi-q.xml", nvidia.Options{}),
 		nvidia.NewReader(strings.NewReader(gpuQuery), "query-gpu.csv", nvidia.Options{}),
 		nvidia.NewReader(strings.NewReader(gpuQueryLater), "query-gpu-later.csv", nvidia.Options{}),
 	}, ingest.Options{Host: GPUHost, Kind: model.ScanImport, Now: GPUNow})
