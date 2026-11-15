@@ -1,0 +1,28 @@
+# Prometheus configuration for the exporter (my serve --metrics). An
+# example: take the parts into your own prometheus.yml.
+
+rule_files:
+  - my-findings.rules.yml
+  - my-exporter.rules.yml
+
+scrape_configs:
+  # One exporter on every host, listening on port 10163. The findings
+  # change once per scan at most (every five minutes by default), so a
+  # scrape every minute is ample.
+  - job_name: memory
+    scrape_interval: 1m
+    static_configs:
+      - targets:
+          - r12-n034:10163
+          - r12-n035:10163
+
+  # Or one exporter for the fleet, started with --fleet: it reads the store
+  # the rasdaemons of all hosts write to. Its page holds every host, so it
+  # gets time to answer. honor_labels is not needed: the exporter sets no
+  # instance or job label, only host.
+  - job_name: memory-fleet
+    scrape_interval: 1m
+    scrape_timeout: 30s
+    static_configs:
+      - targets:
+          - ras-store-reader:10163
