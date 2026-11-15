@@ -1,0 +1,46 @@
+host [1mgpu-01[0m  8 GPUs with memory records  Xid records of the 30 days to 2026-11-14
+GPU finding: [1;31mreplace now[0m
+
+[2m GPU  SERIAL    XID 30D         REMAP CE/UE  PENDING  FAILED  STATE           FINDING[0m
+   0  ..000412  48x1 63x1 64x1  0 / 2        no       [1;31myes[0m     [1;31mrepair failed[0m   [1;31mreplace now R-REP-01[0m
+   1  ..000977  -               0 / 1        [33myes[0m      [1;31myes[0m     [1;31mrepair failed[0m   [1;31mreplace now R-REP-01[0m
+   2  ..001201  -               0 / 3        [33myes[0m      no      [33mrepair pending[0m  -
+   3  ..001302  -               1 / 9        no       no      [33mlittle room[0m     -
+   4  ..001403  -               2 / 0        no       no      [36mrepaired[0m        -
+   7  ..000716  -               3 / 1 pages  -        -       [36mrepaired[0m        -
+   5  ..001504  -               0 / 0        no       no      [36merrors[0m          -
+   6  ..001605  -               0 / 0        no       no      [32mno errors[0m       -
+
+ spare rows per bank (width = share of the banks of the GPU)
+ GPU 0  |[2mmax 638 ·····························································[0m|[36mhigh 2 ░[0m|[2m  640 banks[0m
+ GPU 1  |[2mmax 640 ·······································································[0m|[2m  640 banks[0m
+ GPU 2  |[2mmax 636 ·········································[0m|[36mhigh 1 ░[0m|[32mpartial 2 ▒[0m|[33mlow 1 ▓[0m|[2m  640 banks[0m
+ GPU 3  |[2mmax 637 ·········································[0m|[32mpartial 1 ▒[0m|[33mlow 1 ▓[0m|[31mnone 1 █[0m|[2m  640 banks[0m
+ GPU 4  |[2mmax 640 ·······································································[0m|[2m  640 banks[0m
+ GPU 5  |[2mmax 640 ·······································································[0m|[2m  640 banks[0m
+ GPU 6  |[2mmax 640 ·······································································[0m|[2m  640 banks[0m
+ [2m[2m·[0m max   [36m░[0m high   [32m▒[0m partial   [33m▓[0m low   [31m█[0m none[0m
+
+ [1mGPU 0[0m  S/N 1650000000412  Example GPU 80GB  PCI 0000:3b:00.0  read 2026-11-13 09:30 UTC
+ [2m  state   [0m  [1;31mrepair failed[0m
+ [2m  finding [0m  [1;31mreplace now R-REP-01[0m
+ [2m  evidence[0m  [R-REP-01] row remapping failed: XID 64 on 2026-11-12 09:30 UTC
+ [2m  next    [0m  Return the GPU for repair or replace it: its row remapping has failed.
+
+ [1mGPU 1[0m  S/N 1650000000977  Example GPU 80GB  PCI 0000:86:00.0  read 2026-11-13 09:30 UTC
+ [2m  state   [0m  [1;31mrepair failed[0m
+ [2m  finding [0m  [1;31mreplace now R-REP-01[0m
+ [2m  evidence[0m  [R-REP-01] the driver reports a row remapping failure as of 2026-11-13 09:30 UTC
+ [2m  next    [0m  Return the GPU for repair or replace it: its row remapping has failed.
+ [2m  note    [0m  the driver reports that the uncorrectable SRAM errors passed the vendor's limit (SRAM
+             Threshold Exceeded); no rule grades this flag
+
+ [1mGPU 2[0m  S/N 1650000001201  Example GPU 80GB  PCI 0000:af:00.0  read 2026-11-14 08:00 UTC
+ [2m  state   [0m  [33mrepair pending[0m
+ [2m  next    [0m  Reset the GPU, or reboot the host: the pending remapping takes effect then.
+ [2m  note    [0m  the latest reading (2026-11-14) does not carry every value; from earlier readings:
+             remapped rows of 2026-11-13, bank histogram of 2026-11-13
+
+ [1mGPU 3[0m  S/N 1650000001302  Example GPU 80GB  PCI 0000:d8:00.0  read 2026-11-13 09:30 UTC
+ [2m  state   [0m  [33mlittle room[0m
+ [2m  next    [0m  Plan a replacement: a bank without a spare row cannot take another uncorrectable error.

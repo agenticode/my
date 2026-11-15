@@ -473,6 +473,10 @@ func TestGPUMetrics(t *testing.T) {
 		{Kind: model.GPUXID, GPUUUID: "GPU-u4", ObservedAt: at(2), XID: model.Some(48)},
 		// A GPU model without row remapping reports neither flag nor banks.
 		{Kind: model.GPUSnapshot, PCIBus: "0000:5e:00.0", ObservedAt: at(3), RetiredDBE: model.Some(1)},
+		// A later reading made with a query that asked for less: the flag
+		// and the banks of the reading before it stand.
+		{Kind: model.GPUSnapshot, GPUSerial: "S5", ObservedAt: at(0), RemapFailure: yes, BankMax: model.Some(630), BankNone: model.Some(2)},
+		{Kind: model.GPUSnapshot, GPUSerial: "S5", ObservedAt: at(8), RemapCorrectable: model.Some(4)},
 		// A record that names no GPU at all cannot be a series.
 		{Kind: model.GPUSnapshot, ObservedAt: at(4), RemapFailure: yes},
 		{Kind: model.GPUXID, GPUIndex: model.Some(7), ObservedAt: at(6), XID: model.Some(64)},
@@ -488,6 +492,9 @@ func TestGPUMetrics(t *testing.T) {
 		`my_gpu_remap_failure{host="h",gpu="S1"}`:             0,
 		`my_gpu_remap_failure{host="h",gpu="S2"}`:             0,
 		`my_gpu_remap_failure{host="h",gpu="S3"}`:             1,
+		`my_gpu_remap_failure{host="h",gpu="S5"}`:             1,
+		`my_gpu_remap_banks{host="h",gpu="S5",bucket="max"}`:  630,
+		`my_gpu_remap_banks{host="h",gpu="S5",bucket="none"}`: 2,
 		`my_gpu_remap_failure{host="h",gpu="GPU 7"}`:          1,
 	}
 	if len(x.Series) != len(want) {

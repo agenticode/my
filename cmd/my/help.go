@@ -32,8 +32,9 @@ var words = i18n.Catalog{
 	"err.empty_slot":    {EN: "slot {slot} holds no DIMM", KO: "슬롯 {slot}에 DIMM 없음"},
 	"err.no_dimm":       {EN: "no slot or DIMM \"{ref}\" in host {host}.", KO: "호스트 {host}에 \"{ref}\" 슬롯이나 DIMM 없음."},
 	"err.with_findings": {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
+	"err.no_gpu":        {EN: "no GPU \"{ref}\" with memory records in host {host}; name a GPU by its index, its serial number, its UUID or its PCI address", KO: "호스트 {host}에 메모리 기록이 있는 GPU \"{ref}\" 없음. GPU는 인덱스, 시리얼, UUID, PCI 주소로 지정"},
 	"err.open_file":     {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, 또는 생략하면 개요)"},
+	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -210,7 +211,11 @@ var words = i18n.Catalog{
 	"help.timeline.text":  {EN: "Errors per day with boots, repairs, pages taken offline, slot changes and uncorrected errors, for one DIMM or, without one, for every DIMM of the host that has errors.", KO: "일별 오류에 부팅, 리페어, page offline, 슬롯 이동, UE를 표시합니다. DIMM을 지정하지 않으면 오류가 있는 모든 DIMM을 줄마다 그립니다."},
 	"help.timeline.flags": {EN: "--days N          draw the last N days only", KO: "--days N          최근 N일만 그림"},
 
-	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline ...] [flags]", KO: "my open FILE [dimm|why|map|timeline ...] [옵션]"},
+	"help.gpu.usage": {EN: "my gpu [index|serial|uuid|pci-address] [--days N] [flags]", KO: "my gpu [인덱스|시리얼|uuid|pci-주소] [--days N] [옵션]"},
+	"help.gpu.text":  {EN: "The memory of the GPUs of this host as a repair budget. A GPU does not report where in its memory an error was; it reports how many rows were remapped, whether a remapping is pending or failed, and how many banks still have how many spare rows. The command reads the Xid lines of the kernel log and what nvidia-smi prints, and lists every GPU with memory records, the one with the least room first. Naming one GPU adds the counts behind its budget and its latest Xid records. The exit code is 3 when a row remapping failed on a GPU that is shown (rule R-REP-01) and 0 otherwise: no rule grades the other states.", KO: "이 호스트의 GPU 메모리를 리페어 예산으로 보여줍니다. GPU는 메모리의 어느 위치에서 오류가 났는지 보고하지 않습니다. 보고하는 것은 remap된 row 수, remap의 대기와 실패 여부, bank별로 남은 spare row입니다. 커널 로그의 Xid 줄과 nvidia-smi 출력을 읽어, 메모리 기록이 있는 GPU를 여유가 적은 순서로 나열합니다. GPU 하나를 지정하면 예산 뒤의 카운트와 최근 Xid 기록을 더합니다. 표시한 GPU 중 row remap이 실패한 것이 있으면 종료 코드는 3(규칙 R-REP-01)이고, 그 밖에는 0입니다. 다른 상태에 등급을 매기는 규칙은 없습니다."},
+	"help.gpu.flags": {EN: "--days N          count the Xid records of the last N days (default 30)", KO: "--days N          최근 N일의 Xid 기록을 셈 (기본 30)"},
+
+	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu ...] [옵션]"},
 	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
 	"help.bundle.usage": {EN: "my bundle [slot|serial] -o FILE [--anonymize] [flags]", KO: "my bundle [슬롯|시리얼] -o FILE [--anonymize] [옵션]"},
@@ -336,11 +341,12 @@ var guides = map[string][]string{
 	"why":      {"guide.card", "guide.grades", "guide.obs"},
 	"map":      {"guide.map", "guide.obs"},
 	"timeline": {"guide.timeline"},
+	"gpu":      {"guide.gpu"},
 	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
 	"bundle":   nil,
 	"report":   nil,
 	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
-	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades", "guide.obs"},
+	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.gpu", "guide.grades", "guide.obs"},
 }
 
 // printGuides writes reading guides, each as a paragraph.

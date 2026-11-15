@@ -120,8 +120,11 @@ const xidRemapFailure = 64
 // failure series, because its state is not known.
 func gpuMetrics(set *Set, host string, recs []model.GPUMem) {
 	type state struct {
-		snapshot *model.GPUMem
-		failed   bool
+		// snapshot is the latest snapshot with a bank histogram, flag the
+		// latest one that says whether a remapping failed. A reading made
+		// with a query that asked for less takes neither back.
+		snapshot, flag *model.GPUMem
+		failed         bool
 	}
 	by := map[string]*state{}
 	var keys []string
@@ -140,8 +143,13 @@ func gpuMetrics(set *Set, host string, recs []model.GPUMem) {
 		switch {
 		case r.Kind == model.GPUXID && r.XID.Valid && r.XID.V == xidRemapFailure:
 			g.failed = true
-		case r.Kind == model.GPUSnapshot && (g.snapshot == nil || !r.ObservedAt.Before(g.snapshot.ObservedAt)):
-			g.snapshot = r
+		case r.Kind == model.GPUSnapshot:
+			if hasBanks(r) && (g.snapshot == nil || !r.ObservedAt.Before(g.snapshot.ObservedAt)) {
+				g.snapshot = r
+			}
+			if r.RemapFailure.Valid && (g.flag == nil || !r.ObservedAt.Before(g.flag.ObservedAt)) {
+				g.flag = r
+			}
 		}
 	}
 	for _, key := range keys {
@@ -156,10 +164,10 @@ func gpuMetrics(set *Set, host string, recs []model.GPUMem) {
 					set.Add(GPURemapBanks, float64(b.n.V), host, key, b.name)
 				}
 			}
-			if sn.RemapFailure.Valid {
-				known = true
-				g.failed = g.failed || sn.RemapFailure.V
-			}
+		}
+		if g.flag != nil {
+			known = true
+			g.failed = g.failed || g.flag.RemapFailure.V
 		}
 		if !known {
 			continue
@@ -170,6 +178,11 @@ func gpuMetrics(set *Set, host string, recs []model.GPUMem) {
 		}
 		set.Add(GPURemapFailure, v, host, key)
 	}
+}
+
+// hasBanks reports whether a snapshot carries the bank histogram.
+func hasBanks(r *model.GPUMem) bool {
+	return r.BankMax.Valid || r.BankHigh.Valid || r.BankPartial.Valid || r.BankLow.Valid || r.BankNone.Valid
 }
 
 // sourceMetrics adds the source inventory of the latest scan of a host.

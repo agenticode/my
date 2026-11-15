@@ -1,0 +1,24 @@
+host gpu-01  1 GPU with memory records  Xid records of the 30 days to 2026-11-14
+GPU finding: replace now
+
+ GPU  SERIAL    XID 30D         REMAP CE/UE  PENDING  FAILED  STATE          FINDING
+   0  ..000412  48x1 63x1 64x1  0 / 2        no       yes     repair failed  replace now R-REP-01
+
+ spare rows per bank (width = share of the banks of the GPU)
+ GPU 0  |max 638 ·····························································|high 2 ░|  640 banks
+ · max   ░ high   ▒ partial   ▓ low   █ none
+
+ GPU 0  S/N 1650000000412  GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7  Example GPU 80GB
+ PCI 0000:3b:00.0  read 2026-11-13 09:30 UTC
+   state     repair failed
+   finding   replace now R-REP-01
+   evidence  [R-REP-01] row remapping failed: XID 64 on 2026-11-12 09:30 UTC
+   rows      0 remapped after correctable errors, 2 after uncorrectable errors
+   ECC       frame buffer memory: 31 corrected and 2 uncorrected errors in the life of the GPU, 0
+             and 2 since the driver was loaded
+   Xid       2026-11-12 09:30 UTC 64
+             2026-11-12 03:14 UTC 63 Row Remapper: New row marked for remapping, reset gpu to
+             activate.
+             2026-11-12 03:14 UTC 48 An uncorrectable double bit error (DBE) has been detected on
+             GPU in the framebuffer at partition 5, subpartition 0.
+   next      Return the GPU for repair or replace it: its row remapping has failed.
