@@ -70,6 +70,12 @@ func app() *cli.App {
 				Run:       runImport,
 			},
 			{
+				Name:      "serve",
+				Summary:   "run as an exporter: Prometheus metrics of this host over HTTP",
+				SummaryKO: "exporter로 실행: 이 호스트의 Prometheus 지표를 HTTP로 제공",
+				Run:       runServe,
+			},
+			{
 				Name:      "version",
 				Summary:   "print version and build information",
 				SummaryKO: "버전과 빌드 정보",

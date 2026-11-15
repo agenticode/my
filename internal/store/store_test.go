@@ -494,3 +494,35 @@ func TestUpsertHostKeepsVendorAndProductApart(t *testing.T) {
 		t.Errorf("host = %+v", h)
 	}
 }
+
+// TestSourceGrades checks the best grade per source name of the errors of
+// a host: counter records count, informational records and other hosts do
+// not.
+func TestSourceGrades(t *testing.T) {
+	s := newStore(t)
+	a := ev("rasdaemon/mc_event", "r1", at(0), 0x1000)
+	a.Grade = model.GradeA
+	b := ev("rasdaemon/mc_event", "r2", at(time.Minute), 0x2000)
+	b.Grade = model.GradeB
+	k := ev("klog/edac", "k1", at(2*time.Minute), 0x3000)
+	k.Grade = model.GradeB
+	c := &model.Event{Host: "h1", Kind: model.KindCounter, ErrorDT: at(time.Hour), WindowStart: at(0), ErrorSeverity: model.SevCE,
+		Source: "edac-sysfs/counter", RawRef: "c1", Count: 4, Grade: model.GradeC, Slot: "CPU0_C1", Fingerprint: model.Fingerprint("c1")}
+	info := ev("sel/list", "i1", at(3*time.Minute), 0)
+	info.ErrorSeverity, info.Grade, info.OsPhysicalAddress = model.SevInformational, model.GradeA, model.Opt[uint64]{}
+	other := ev("fmfm/runtime", "o1", at(4*time.Minute), 0x4000)
+	other.Host, other.Grade = "h2", model.GradeA
+	insert(t, s, a, b, k, c, info, other)
+
+	got, err := s.SourceGrades(ctx, "h1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]model.Grade{"rasdaemon/mc_event": model.GradeA, "klog/edac": model.GradeB, "edac-sysfs/counter": model.GradeC}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("SourceGrades = %v, want %v", got, want)
+	}
+	if got, err := s.SourceGrades(ctx, "h9"); err != nil || len(got) != 0 {
+		t.Errorf("unknown host: %v, %v", got, err)
+	}
+}

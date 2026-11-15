@@ -110,6 +110,7 @@ In the address map a horizontal line is a row fault, a vertical line a column fa
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
 | `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, FMFM logs, a copy of a host's files |
+| `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP ([docs/exporter.md](docs/exporter.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
 
 A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
@@ -157,7 +158,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, and case bundles. Not merged yet: the HTML report, the Prometheus exporter and the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles and the Prometheus exporter. Not merged yet: the HTML report and the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
 
 ## Build
 
@@ -188,6 +189,8 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text: colour, glyph density, ASCII, width |
 | `internal/bundle` | case bundles: format, checks, anonymizing |
+| `internal/exporter` | the Prometheus metrics of a host and their text format |
+| `internal/serve` | the HTTP server of `my serve`: scans on a schedule and answers from the latest scan |
 | `internal/eval` | replays the dcbrain DRAM error dataset through the engine and compares the findings with the failure tickets that followed |
 | `internal/i18n` | message templates in English and Korean |
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
