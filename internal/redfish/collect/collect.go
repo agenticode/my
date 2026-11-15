@@ -89,8 +89,8 @@ type Options struct {
 	// MaxLogEntries bounds the entries read of one log. Zero means
 	// DefaultMaxLogEntries; a negative number reads no logs.
 	MaxLogEntries int
-	// Logs, when not empty, names the logs to read by the Id of their log
-	// service, whatever the list of logs that are skipped says.
+	// Logs names logs to read besides the ones a run reads anyway, by the
+	// Id of their log service: logs that are skipped otherwise.
 	Logs []string
 	// MaxTotalBytes bounds what one run writes. Zero means
 	// DefaultMaxTotalBytes.
@@ -485,11 +485,8 @@ func (r *run) skipLog(svc object) string {
 	switch {
 	case r.opts.MaxLogEntries < 0:
 		return "the run was asked to read no logs"
-	case len(r.logs) > 0:
-		if !r.logs[id] {
-			return "not among the logs named for this run"
-		}
-		return ""
+	case r.logs[id]:
+		return "" // named for this run
 	}
 	if what, ok := skippedLogs[id]; ok {
 		return "holds " + what + ", no hardware events; name it with --log to read it"
