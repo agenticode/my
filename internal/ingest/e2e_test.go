@@ -8,10 +8,12 @@ import (
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
+	"github.com/agenticode/my/internal/adapter/rasdaemon"
 	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/testutil"
 )
 
@@ -166,5 +168,59 @@ func TestGPUInputsReachTheRules(t *testing.T) {
 	}
 	if len(got) != 2 {
 		t.Errorf("findings for GPUs %v, want the two serial numbers", got)
+	}
+}
+
+// TestCXLDeviceReachesTheRules reads a rasdaemon database with CXL tables:
+// the device that asks to be replaced and had an uncorrected error comes
+// out with the rules about firmware marks and uncorrected errors, under
+// its serial number.
+func TestCXLDeviceReachesTheRules(t *testing.T) {
+	s := newStore(t)
+	now := time.Date(2026, 11, 14, 12, 0, 0, 0, time.UTC)
+	db := testutil.BuildSQLite(t, testutil.Testdata(t, "rasdaemon", "cxl-1.0.sql"), "ras-mc_event.db")
+	run, err := Run(ctx, s, []adapter.Adapter{rasdaemon.New(db, rasdaemon.Options{Direct: true})}, Options{Host: "cxl-01", Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if src := run.Sources[0]; src.Events != 11 || src.Actions != 3 || src.GradeA != 1 {
+		t.Errorf("source inventory entry = %+v", src)
+	}
+	res, err := engine.Run(ctx, s, engine.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := findings(t, res, "cxl-01")
+	mem1 := got["cxl:mem1"]
+	if mem1 == nil {
+		t.Fatalf("no finding for cxl:mem1; slots: %v", got)
+	}
+	// Its uncorrected error was found by the device's own scrub.
+	for _, rule := range []string{engine.RuleFirmware, engine.RuleScrub} {
+		if !slices.Contains(mem1.Rules, rule) {
+			t.Errorf("cxl:mem1: rules %v lack %s", mem1.Rules, rule)
+		}
+	}
+	d, err := s.DIMM(ctx, mem1.DIMMUID)
+	if err != nil || d == nil || d.Serial != "0x5678" || d.Identity != model.IdentitySerial || d.Technology != "CXL" {
+		t.Errorf("identity of cxl:mem1 = %+v, %v", d, err)
+	}
+	// mem0 had one corrected error and a row spared for good: the spare is
+	// taken. No firmware mark, no uncorrected error.
+	mem0 := got["cxl:mem0"]
+	if mem0 == nil || !slices.Contains(mem0.Rules, engine.RuleRepairGone) || slices.Contains(mem0.Rules, engine.RuleFirmware) || slices.Contains(mem0.Rules, engine.RuleUE) {
+		t.Errorf("cxl:mem0 = %+v", mem0)
+	}
+	// Informational records are in the ledger and in no total.
+	totals, err := s.Totals(ctx, store.EventFilter{Host: "cxl-01"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ce, ue int64
+	for _, x := range totals {
+		ce, ue = ce+x.CE, ue+x.UE
+	}
+	if ce != 1 || ue != 1 {
+		t.Errorf("totals: %d corrected, %d uncorrected; want 1 and 1", ce, ue)
 	}
 }

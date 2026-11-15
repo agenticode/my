@@ -279,3 +279,41 @@ A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in
 - The default table of `nvidia-smi` (without `-q`) and the files of `nvidia-bug-report.sh` are not read.
 - A GPU that was replaced in the same slot between two readings is told apart by its UUID; an Xid record with a PCI address only, between the two readings, goes to the nearer one.
 - GPUs of other vendors are not read.
+
+## CXL memory devices
+
+Read by the rasdaemon adapter from the `cxl_*` tables of a rasdaemon database, which hold the event records of CXL memory devices as the kernel traces them.
+
+| Table | Ledger record |
+| --- | --- |
+| `cxl_dram_event` | error event with channel, sub-channel, rank, bank group, bank, row, column and nibble mask |
+| `cxl_general_media_event` | error event with channel, rank and device |
+| `cxl_memory_module_event` | informational event with the health flags, media status, life used, temperature and corrected error count; and an action `mark-failed` (method `device`) when the device says it needs to be replaced, once per device |
+| `cxl_memory_sparing_event` | action `sparing`: cacheline, row, bank or rank, `hard` or `soft`, with rank, bank group, bank and row where the record marks them valid |
+| `cxl_poison_event` | informational event per poisoned range, and per injection and clearing |
+| `cxl_overflow_event` | a note in the report: how many records the device lost, and when |
+| `cxl_generic_event`, `cxl_aer_ue_event`, `cxl_aer_ce_event` | counted in the report, not read |
+
+The two media records number their event types differently, and each table is read with its own numbers. A media ECC error, a scrub media ECC error, a data path error and the expiry of the corrected error counter are errors: uncorrected when the descriptor says so, corrected otherwise. An invalid address, a TE state violation and a CKID violation are kept as informational events, because no memory cell failed.
+
+How an error was found comes from the transaction type: a host read or write is a demand error; host scan media, the internal media scrub and the internal error check scrub are scrub finds.
+
+A sparing record that only answers a query for spare resources is no repair and is left out. A result code other than zero is stored as a failed operation with the code in the detail.
+
+The poison list is read out on request, so the same range comes back with every reading. Each range is kept once, at its first listing. Poison is the trace of an uncorrected error whose record is in the media tables, so an entry of the list is counted in no total.
+
+### Grade
+
+A for a DRAM event with its location, B for a DRAM event without one and for a general media event with a host address or a rank, C otherwise.
+
+### Which device
+
+The kernel's name of the device is the slot (`cxl:mem0`). The serial number in the tables is the DIMM identity: the history of a device follows its serial number, as it does for a DIMM. A device is recorded as present from its first to its last record in the database.
+
+### Known gaps
+
+- rasdaemon does not store the validity flags of the two media tables. A DRAM location of all zeros without a correction mask is taken as "not reported"; a real error at bank group 0, bank 0, row 0, column 0 would lose its location.
+- The corrected error counts in the media records (`cme_count`, `cvme_count`) are kept in the raw record and not used.
+- Post package repair of a CXL device has no table in rasdaemon and is not seen.
+- The error check scrub log of a CXL device and the scrub controls the kernel shows under `/sys/bus/edac/devices` are not read.
+- CXL event records inside Redfish log entries are not decoded.
