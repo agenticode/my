@@ -1,0 +1,17 @@
+host synth-system-channel  2026-07-31 to 2026-11-12  105 days
+
+           07-31     09-01     10-01     11-12
+ CPU0_B1   ▁▁▁▁▁▁▁▁▁▁▁▁▆▆▅▅█▄█▇▅▆█▇▄▅▅▃▄▇▅▆▇▃▆  peak 9/day
+ CPU0_B2   ▁▁▁▁▁▁▁▁▁▁▁▁▄▄█▅▆▆▃▆▅▄▄▅█▆▄▆▇▃▃▆▅▇▅  peak 6/day
+ CPU0_E1   ▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  peak 1/day
+ CPU0_F1   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁  peak 1/day
+ CPU0_F2   ▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  peak 1/day
+ CPU0_G1   ▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  peak 1/day
+ CPU0_H2   ▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  peak 1/day
+ CPU1_A1   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁  peak 1/day
+ 6 more    ▁██▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁▁▁█▁▁▁▁█▁▁▁▁▁▁▁  peak 1/day
+ events              B         B
+                     └─────────┴ 2 reboots
+
+ 353 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
+ 210 of them since the boot of 2026-10-01: a counter that restarts at every boot shows only those

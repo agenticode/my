@@ -32,8 +32,11 @@ var Messages = i18n.Catalog{
 	"card.factors":       {EN: "confidence", KO: "신뢰도"},
 	"card.start":         {EN: "start", KO: "시작"},
 	"card.faults":        {EN: "faults", KO: "고장"},
-	"card.fault":         {EN: "{mode} fault at {where}", KO: "{mode} 고장({where})"},
-	"card.fault_nowhere": {EN: "{mode} fault", KO: "{mode} 고장"},
+	"card.fault":         {EN: "{fault} at {where}", KO: "{fault}({where})"},
+	"fault.name":         {EN: "{mode} fault", KO: "{mode} 고장"},
+	"fault.estimated":    {EN: "{mode} fault (estimated)", KO: "{mode} 고장(추정)"},
+	"fault.system":       {EN: "system issue", KO: "system issue"},
+	"fault.undetermined": {EN: "fault of undetermined mode", KO: "모드 판정 불가 고장"},
 	"card.none":          {EN: "nothing on record", KO: "기록 없음"},
 	"effect.supports":    {EN: "supports", KO: "뒷받침"},
 	"effect.weakens":     {EN: "weakens", KO: "약화"},
@@ -43,9 +46,9 @@ var Messages = i18n.Catalog{
 	"base.vendor":        {EN: "vendor reference for the part number: percentile {pct}", KO: "벤더의 부품번호 기준: {pct} 백분위"},
 
 	// Address map.
-	"map.fault":          {EN: "{mode} fault at {where}: {n} {n|error|errors}, {columns} {columns|column|columns} in {rows} {rows|row|rows}, first {first}, latest {last}", KO: "{mode} 고장({where}): {n}건, row {rows}개에 column {columns}개, 첫 발생 {first}, 최근 {last}"},
-	"map.fault_dq":       {EN: "{mode} fault at {where}: {n} {n|error|errors}, {columns} {columns|column|columns} in {rows} {rows|row|rows}, data lines {dq}, first {first}, latest {last}", KO: "{mode} 고장({where}): {n}건, row {rows}개에 column {columns}개, {dq}, 첫 발생 {first}, 최근 {last}"},
-	"map.note.fault":     {EN: "{mode} fault", KO: "{mode} 고장"},
+	"map.fault":          {EN: "{fault} at {where}: {n} {n|error|errors}, {columns} {columns|column|columns} in {rows} {rows|row|rows}, first {first}, latest {last}", KO: "{fault}({where}): {n}건, row {rows}개에 column {columns}개, 첫 발생 {first}, 최근 {last}"},
+	"map.fault_dq":       {EN: "{fault} at {where}: {n} {n|error|errors}, {columns} {columns|column|columns} in {rows} {rows|row|rows}, data lines {dq}, first {first}, latest {last}", KO: "{fault}({where}): {n}건, row {rows}개에 column {columns}개, {dq}, 첫 발생 {first}, 최근 {last}"},
+	"map.note.fault":     {EN: "{fault}", KO: "{fault}"},
 	"map.note.neighbour": {EN: "same fault", KO: "같은 고장"},
 
 	"map.none":      {EN: "no error of this DIMM carries a row and a column: there is no address map to draw", KO: "row와 column이 있는 오류 기록 없음: 주소 맵을 그릴 수 없음"},

@@ -1,0 +1,1 @@
+r12-n034 CPU0_C1 S/N 3B9C56: 즉시 교체 (소견, 신뢰도 높음; R-UE-01, R-ROW-03, R-REP-02). UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.

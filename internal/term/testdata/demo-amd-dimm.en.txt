@@ -1,0 +1,46 @@
+CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
+in this slot since 2026-11-13  0 slot changes
+
+ finding   replace now (finding, confidence medium)                                 R-UE-01 R-ROW-03
+ evidence  [R-UE-01] 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 address
+           0x41c68bd1c0
+           [R-ROW-03] row fault at rank0 address 0x41c68bcec0-0x41c68c1c80: 421 errors in the last 7
+           days, 2.3 times the daily rate of the 30 days before
+           [R-ROW-03] row fault at rank0 address 0x41c68bcec0-0x41c68c1c80: 13 new places in the
+           last 30 days, 15 in total
+ checks    open: no other DIMM on this channel: there is nothing to compare with
+           open: no slot move or reseat on record: a cause in the board is not ruled out
+           supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board
+           is unlikely
+           open: 1,232 errors fall at times when no inventory shows which DIMM was in the slot; they
+           are taken to be this DIMM's
+           weakens: the row is inferred from addresses that lie close together; the platform reports
+           no rows and columns
+ missing   1,232 errors are known by physical address only (grade B): no row or column
+           the records do not say whether an error was found by the patrol scrubber or on access
+           no ECS counters
+           no DIMM temperature history
+ baseline  own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before
+           same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of
+           them with errors
+ next      Replace the DIMM. Attach a case bundle of this DIMM to the return.
+
+ where the errors sit (width = share of the errors of this DIMM)
+ rank    |rank0 ██████████████████████████████████████████████████████████████████████████████ 100%|
+ device  |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+ bank    |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+ row     |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
+
+ no error of this DIMM carries a row and a column: there is no address map to draw
+ 1,232 errors of this DIMM carry no row and column and are not drawn
+
+ errors per day and events
+           08-03    09-01     10-01     11-12
+ CPU0_C1   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▃▃▃▃▄▄▄▅▅▆▆▇█  peak 73/day
+ events                                B   OU
+                                       │   │└ 2026-11-12 UE
+                                       │   └─ 8 pages offline, 2026-11-11 to 2026-11-12
+                                       └───── 2026-10-28 reboot
+
+ 1,231 corrected and 1 uncorrected error from 2026-08-03 to 2026-11-12
+ 790 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those

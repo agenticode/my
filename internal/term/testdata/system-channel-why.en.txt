@@ -1,0 +1,17 @@
+CPU0_B1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 880018
+in this slot since 2026-07-31  0 slot changes
+
+ finding     hold replacement (finding, confidence medium, 65)                              R-SYS-01
+ evidence    [R-SYS-01] CPU0_B1 and CPU0_B2 share one channel (socket 0 channel 1) and both have
+             errors that are not confined to one place: 181 here, 160 there, between 2026-09-05 and
+             2026-11-12
+             181 records: first synth:system-channel#event6, last synth:system-channel#event353
+ missing     no ECS counters
+             no DIMM temperature history
+ baseline    own history: 1.9 errors a day over the last 7 days, percentile 37 of the 30 days before
+             same part number (EXM64G48R2X4-A): percentile 98 among the 32 DIMMs in this ledger, 5
+             of them with errors
+ next        Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another
+             channel and see whether the errors follow it.
+ confidence  65 the grade rests on R-SYS-01
+ faults      system issue: CE 181, UE 0, 2026-09-05 to 2026-11-12, steady
