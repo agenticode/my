@@ -170,6 +170,11 @@ func share(part, total int64) string {
 	return fmt.Sprintf("%s (%s of %s, 95%% interval %.2f%% to %.2f%%)", pct(part, total), num(part), num(total), 100*lo, 100*hi)
 }
 
+// share0 writes "part (p%)".
+func share0(part, total int64) string {
+	return fmt.Sprintf("%s (%s)", num(part), pct(part, total))
+}
+
 // leadText names a lead time.
 func leadText(d time.Duration) string {
 	switch {
@@ -418,6 +423,30 @@ func (r *Report) printDataset(p *printer) {
 		p.line("%s tickets are a second or later ticket of a server and are not used", num(d.ExtraTickets))
 	}
 	p.line("records after merging rows that are equal in every column: %s", num(r.Census.Records))
+	if l := &d.Layout; l.Pairs > 0 {
+		// Among 24 slots, 12 of the 276 pairs share a channel and 120
+		// share a socket without sharing a channel.
+		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
+			num(l.MultiDIMM), num(l.Pairs), share0(l.SameChannel, l.Pairs), share0(l.SameSocket, l.Pairs))
+	}
+	if l := &d.Layout; len(l.ByDIMMs) > 0 {
+		counts := make([]int, 0, len(l.ByDIMMs))
+		for n := range l.ByDIMMs {
+			counts = append(counts, n)
+		}
+		sort.Ints(counts)
+		var rows [][]string
+		for _, n := range counts {
+			name := strconv.Itoa(n)
+			if n == 0 {
+				name = "not in the inventory"
+			}
+			by := l.ByDIMMs[n]
+			rows = append(rows, []string{name, num(by[0]), num(by[1])})
+		}
+		p.table("DIMMs with errors by the size of their server and the position on the channel the assumed layout gives them:",
+			[]string{"DIMMs of the server", "position 0", "position 1"}, rows)
+	}
 	for _, n := range r.Widened {
 		p.line("server %s: %s rows merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), n.BucketSeconds, num(int64(n.Records)))
 	}

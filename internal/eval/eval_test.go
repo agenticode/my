@@ -405,6 +405,19 @@ func TestFixtureFindings(t *testing.T) {
 		t.Errorf("dataset: by type %v, month ends %v", rep.Dataset.ByType, rep.Dataset.MonthLastDay)
 	}
 
+	// The layout counts: s0006 has errors on memoryid 4 and 5, one channel;
+	// s0007 on 1, 8 and 17, which are one pair on one socket and two pairs
+	// across sockets.
+	l := rep.Dataset.Layout
+	if l.MultiDIMM != 2 || l.Pairs != 4 || l.SameChannel != 1 || l.SameSocket != 1 {
+		t.Errorf("layout = %+v", l)
+	}
+	// By size of the server: s0001 (12 DIMMs, memoryid 3) and s0006 (12
+	// DIMMs, memoryid 4 and 5) give one DIMM at position 0 and two at 1.
+	if l.ByDIMMs[12] != [2]int64{1, 2} || l.ByDIMMs[8] != [2]int64{1, 0} {
+		t.Errorf("layout by size = %v", l.ByDIMMs)
+	}
+
 	// One server only.
 	rep = fixtureRun(t, Options{Cutoffs: []int{71}, Servers: []string{"s0002"}})
 	if rep.Census.Servers != 1 || rep.ByCut[0].Servers != 1 || rep.ByCut[0].Unseen.Total() != 0 {
