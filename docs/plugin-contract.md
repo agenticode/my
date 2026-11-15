@@ -134,15 +134,15 @@ The core trusts a response no further than it can check it.
 | --- | --- |
 | form | it is no single JSON document, is not UTF-8, or a field has another type than the contract gives it |
 | contract | `Contract` is not `my-analyzer/1` |
-| analyzer | `Name` or `Version` is empty, longer than 120 bytes, or holds a control character |
+| analyzer | `Name` or `Version` is empty, longer than 120 bytes, or holds a character the last paragraph of this section lists |
 | DIMMs | a `DimmId` is not one of the request, or stands twice |
-| Level 2 | more than 64 lines or 16 notes for one DIMM; a label that is empty or longer than 80 bytes; a value longer than 400, a note longer than 600; a control character or a line break in any of them |
+| Level 2 | more than 64 lines or 16 notes for one DIMM; a label that is empty or longer than 80 bytes; a value longer than 400, a note longer than 600; in any of them a character the last paragraph of this section lists |
 | rows | more than 20,000 rows for one DIMM or 16 neighbours for one row; a negative number; a row that is its own neighbour, stands twice, or names a neighbour twice; two entries that disagree |
 | baseline | a percentile outside 0 to 100 |
 
-Fields the contract does not know are allowed, as the FMFM framework allows vendors fields of their own. They are not read, and the run names them, so that a misspelt field does not vanish without a word.
+Fields the contract does not know are allowed, as the FMFM framework allows vendors fields of their own. They are not read, and the run names up to eight of them, each cut to 40 characters, so that a misspelt field does not vanish without a word.
 
-Texts of an analyzer end up on a terminal and in an HTML file. Control characters are refused for that reason, and the report escapes every text.
+Texts of an analyzer end up on a terminal and in an HTML file. A text is refused when it holds a control character (a line break is one), the line or paragraph separator U+2028 or U+2029, or a character that overrides the writing direction (U+202A to U+202E, U+2066 to U+2069). In the name of an unknown field and in the reason of a refusal such a character is shown as a question mark. The report escapes every text.
 
 ## When it fails
 
