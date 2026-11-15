@@ -674,6 +674,31 @@ func (s *Store) Sources(ctx context.Context, scanID int64) ([]model.Source, erro
 	return out, rows.Err()
 }
 
+// SourceGrades returns the best observation grade among the errors of a
+// host, per source name of their records ("rasdaemon/mc_event",
+// "edac-sysfs/counter"). Informational records are no errors and are left
+// out. The source inventory counts what an adapter produced; this counts
+// what is in the ledger, which includes the errors that were derived from
+// counter readings.
+func (s *Store) SourceGrades(ctx context.Context, host string) (map[string]model.Grade, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT source, MAX(CASE grade WHEN 'A' THEN 3 WHEN 'B' THEN 2 ELSE 1 END)
+ FROM event WHERE host = ? AND "ErrorSeverity" != 'Informational' GROUP BY source`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := map[string]model.Grade{}
+	for rows.Next() {
+		var source string
+		var rank int
+		if err := rows.Scan(&source, &rank); err != nil {
+			return nil, err
+		}
+		out[source] = []model.Grade{model.GradeC, model.GradeC, model.GradeB, model.GradeA}[min(max(rank, 0), 3)]
+	}
+	return out, rows.Err()
+}
+
 // Faults returns the stored faults of a host with their member event IDs.
 func (s *Store) Faults(ctx context.Context, host string) ([]model.Fault, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, host, dimm_uid, slot, mode, estimated, grade, "Rank", "DeviceId", "BankGroup", "Bank",
