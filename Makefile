@@ -48,7 +48,10 @@ FUZZ_TARGETS := \
 	./internal/engine:FuzzConfigRead \
 	./internal/i18n:FuzzFormat \
 	./internal/bundle:FuzzText \
-	./internal/bundle:FuzzReadManifest
+	./internal/bundle:FuzzReadManifest \
+	./internal/redfish/client:FuzzParseTarget \
+	./internal/redfish/client:FuzzResolve \
+	./internal/redfish/client:FuzzScrub
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 
