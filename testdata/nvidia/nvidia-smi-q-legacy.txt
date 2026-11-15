@@ -1,0 +1,98 @@
+
+==============NVSMI LOG==============
+
+Timestamp                           : Thu Nov 12 03:14:07 2026
+Driver Version                      : 418.67
+CUDA Version                        : 10.1
+
+Attached GPUs                       : 2
+GPU 00000000:AF:00.0
+    Product Name                    : Example GPU 16GB
+    Product Brand                   : Example
+    Serial Number                   : 0320000000042
+    GPU UUID                        : GPU-0d6f0b4a-7a0c-11ea-bc55-0242ac130003
+    Minor Number                    : 0
+    PCI
+        Bus                         : 0xAF
+        Device                      : 0x00
+        Domain                      : 0x0000
+        Bus Id                      : 00000000:AF:00.0
+    Ecc Mode
+        Current                     : Enabled
+        Pending                     : Enabled
+    Ecc Errors
+        Volatile
+            Single Bit            
+                Device Memory       : 3
+                Register File       : 0
+                L1 Cache            : 0
+                L2 Cache            : 1
+                Texture Memory      : 0
+                Texture Shader      : N/A
+                CBU                 : N/A
+                Total               : 4
+            Double Bit            
+                Device Memory       : 0
+                Register File       : 0
+                L1 Cache            : 0
+                L2 Cache            : 0
+                Texture Memory      : 0
+                Texture Shader      : N/A
+                CBU                 : N/A
+                Total               : 0
+        Aggregate
+            Single Bit            
+                Device Memory       : 57
+                Register File       : 0
+                L1 Cache            : 0
+                L2 Cache            : 2
+                Texture Memory      : 0
+                Texture Shader      : N/A
+                CBU                 : N/A
+                Total               : 59
+            Double Bit            
+                Device Memory       : 2
+                Register File       : 0
+                L1 Cache            : 0
+                L2 Cache            : 0
+                Texture Memory      : 0
+                Texture Shader      : N/A
+                CBU                 : N/A
+                Total               : 2
+    Retired Pages
+        Single Bit ECC              : 3
+        Double Bit ECC              : 2
+        Pending                     : Yes
+    Temperature
+        GPU Current Temp            : 41 C
+
+GPU 00000000:D8:00.0
+    Product Name                    : Example Desktop GPU
+    Serial Number                   : N/A
+    GPU UUID                        : GPU-7c2a9f10-0c3b-4e58-9a6d-51b2c3d4e5f6
+    Minor Number                    : 1
+    PCI
+        Bus Id                      : 00000000:D8:00.0
+    Ecc Mode
+        Current                     : N/A
+        Pending                     : N/A
+    Ecc Errors
+        Volatile
+            Single Bit            
+                Device Memory       : N/A
+                Total               : N/A
+            Double Bit            
+                Device Memory       : N/A
+                Total               : N/A
+        Aggregate
+            Single Bit            
+                Device Memory       : N/A
+                Total               : N/A
+            Double Bit            
+                Device Memory       : N/A
+                Total               : N/A
+    Retired Pages
+        Single Bit ECC              : N/A
+        Double Bit ECC              : N/A
+        Pending                     : N/A
+

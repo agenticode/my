@@ -1,0 +1,7 @@
+2026-11-12T03:14:05.100000+00:00 gpu-01 kernel: NVRM: GPU at PCI:0000:3b:00: GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7
+2026-11-12T03:14:05.100100+00:00 gpu-01 kernel: NVRM: GPU Board Serial Number: 1650000000412
+2026-11-12T03:14:05.100200+00:00 gpu-01 kernel: NVRM: Xid (PCI:0000:3b:00): 48, pid=7062, name=python3, An uncorrectable double bit error (DBE) has been detected on GPU in the framebuffer at partition 5, subpartition 0.
+2026-11-12T03:14:05.200000+00:00 gpu-01 nvidia-persistenced[1203]: device 0000:3b:00.0 - registered
+2026-11-12T03:14:06.000000+00:00 gpu-01 kernel: NVRM: Xid (PCI:0000:3b:00): 63, pid='<unknown>', name=<unknown>, Row Remapper: New row marked for remapping, reset gpu to activate.
+2026-11-12T09:00:00.000000+00:00 gpu-01 kernel: Linux version 6.8.0-45-generic (buildd@build.example.org) (x86_64-linux-gnu-gcc-13 (Ubuntu 13.2.0-23ubuntu4) 13.2.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #45-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug 30 12:02:04 UTC 2024
+2026-11-12T09:30:00.000000+00:00 gpu-01 kernel: NVRM: Xid (PCI:0000:3b:00): 64, pid='<unknown>', name=<unknown>
