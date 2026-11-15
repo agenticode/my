@@ -50,6 +50,49 @@ func serialKey(serial string) string {
 	return strings.TrimPrefix(b.String(), "0X")
 }
 
+// boardSerials returns the serial numbers of the DIMMs SMBIOS has listed
+// for a host, folded for comparison.
+func boardSerials(ctx context.Context, s *store.Store, host string) (map[string]bool, error) {
+	out := map[string]bool{}
+	placements, err := s.Placements(ctx, host, "")
+	if err != nil || len(placements) == 0 {
+		return out, err
+	}
+	dimms, err := s.PlacedDIMMs(ctx, host)
+	if err != nil {
+		return nil, err
+	}
+	for _, p := range placements {
+		if d := dimms[p.DIMMUID]; p.Source == smbiosSource && d.Identity == model.IdentitySerial {
+			if k := serialKey(d.Serial); k != "" {
+				out[k] = true
+			}
+		}
+	}
+	return out, nil
+}
+
+// otherMachine checks an inventory of a whole board against the serial
+// numbers SMBIOS lists for the host. It returns the number of serial
+// numbers the inventory lists when none of them is among those of SMBIOS,
+// and 0 when at least one is, or when one of the two sides has none to
+// compare.
+func otherMachine(mods []*model.Module, board map[string]bool) int {
+	if len(board) == 0 {
+		return 0
+	}
+	listed := map[string]bool{}
+	for _, m := range mods {
+		if k := serialKey(m.DIMM.Serial); k != "" && m.Populated && !m.Handle.Valid {
+			if board[k] {
+				return 0
+			}
+			listed[k] = true
+		}
+	}
+	return len(listed)
+}
+
 // joinResult says what joining the inventories of a host did.
 type joinResult struct {
 	// dimms counts DIMM identities another inventory made for DIMMs SMBIOS

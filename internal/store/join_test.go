@@ -226,3 +226,46 @@ func TestDropSlot(t *testing.T) {
 		t.Errorf("slots = %+v, aliases = %v", slots, aliases)
 	}
 }
+
+// FillHost adds what is not known about a host and keeps what is.
+func TestFillHost(t *testing.T) {
+	s := newStore(t)
+	mustUpdate(t, s, func(w *Writer) error {
+		// A host the kernel log named in one string, and one SMBIOS described.
+		if err := w.UpsertHost(&model.Host{Name: "h1", SystemProduct: "Example Systems R650/0PYXKY", FirstSeen: at(time.Hour), LastSeen: at(time.Hour)}); err != nil {
+			return err
+		}
+		if err := w.UpsertHost(&model.Host{Name: "h2", SystemVendor: "Example Systems", SystemProduct: "R760", Arch: "x86_64"}); err != nil {
+			return err
+		}
+		for _, name := range []string{"h1", "h2", "h3"} {
+			if err := w.FillHost(&model.Host{Name: name, SystemVendor: "Example", SystemProduct: "EX-2000", Board: "B1", FirstSeen: at(0), LastSeen: at(2 * time.Hour)}); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	hosts, err := s.Hosts(ctx)
+	if err != nil || len(hosts) != 3 {
+		t.Fatalf("hosts = %+v, %v", hosts, err)
+	}
+	got := map[string]string{}
+	for _, h := range hosts {
+		got[h.Name] = h.SystemVendor + " | " + h.SystemProduct + " | " + h.Board + " | " + h.Arch
+	}
+	want := map[string]string{
+		// Vendor and product apart are better than one string for both.
+		"h1": "Example | EX-2000 | B1 | ",
+		"h2": "Example Systems | R760 | B1 | x86_64",
+		"h3": "Example | EX-2000 | B1 | ",
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("hosts = %v\n  want %v", got, want)
+	}
+	if !hosts[0].FirstSeen.Equal(at(0)) || !hosts[0].LastSeen.Equal(at(2*time.Hour)) {
+		t.Errorf("seen %s to %s", hosts[0].FirstSeen, hosts[0].LastSeen)
+	}
+	if err := s.Update(ctx, func(w *Writer) error { return w.FillHost(&model.Host{}) }); !errors.Is(err, ErrInvalidRecord) {
+		t.Errorf("a host without a name: err = %v", err)
+	}
+}

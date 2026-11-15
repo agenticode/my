@@ -91,6 +91,10 @@ type Options struct {
 	Location *time.Location
 	// Note is free text stored with the scan.
 	Note string
+	// Extra are sources read after those of the host, into the same run:
+	// what the BMC of the host answered, when the caller asked it. A scan
+	// finds no such source by itself.
+	Extra []adapter.Adapter
 }
 
 // DefaultJournalTimeout bounds how long a scan reads the journal.
@@ -454,7 +458,7 @@ func Run(ctx context.Context, s *store.Store, opts Options) (*ingest.Result, err
 	if opts.Now.IsZero() && !opts.Live {
 		opts.Now = treeTime(&opts)
 	}
-	return ingest.Run(ctx, s, Sources(ctx, opts), ingest.Options{
+	return ingest.Run(ctx, s, append(Sources(ctx, opts), opts.Extra...), ingest.Options{
 		Host: opts.Host, Kind: kind, Now: opts.Now, Privileged: opts.Privileged, Note: opts.Note,
 	})
 }

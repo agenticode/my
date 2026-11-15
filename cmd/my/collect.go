@@ -67,6 +67,9 @@ type bmcFlags struct {
 	insecure     bool
 	timeout      string
 	retries      int
+	// deadline bounds the collection in a command that scans the host;
+	// "my collect" has a flag of its own for it.
+	deadline string
 }
 
 func (b *bmcFlags) register(fs *flag.FlagSet) {
@@ -199,12 +202,12 @@ func passwordFromFile(path string) (pw string, loose bool, err error) {
 	return strings.TrimRight(line, "\r"), fi.Mode().Perm()&0o077 != 0, nil
 }
 
-// credentials fills in the account of every target: its own user and
+// bmcCredentials fills in the account of every target: its own user and
 // password file, else the user of the command line or of the environment
 // with the password from --password-file, the environment, or the
-// terminal.
-func (o *collectOptions) credentials(ctx context.Context, env *cli.Env, lang i18n.Lang, targets []target) error {
-	user := o.bf.user
+// terminal. name is the command, for what it says on the standard error.
+func bmcCredentials(ctx context.Context, env *cli.Env, lang i18n.Lang, name string, bf *bmcFlags, targets []target) error {
+	user := bf.user
 	if user == "" {
 		user = env.Getenv(envRedfishUser)
 	}
@@ -217,7 +220,7 @@ func (o *collectOptions) credentials(ctx context.Context, env *cli.Env, lang i18
 		}
 		if loose && !warned[path] {
 			warned[path] = true
-			fmt.Fprintln(env.Stderr, "my collect: "+say(lang, "collect.loose_file", "file", path))
+			fmt.Fprintln(env.Stderr, name+": "+say(lang, "collect.loose_file", "file", path))
 		}
 		return pw, nil
 	}
@@ -242,8 +245,8 @@ func (o *collectOptions) credentials(ctx context.Context, env *cli.Env, lang i18
 		}
 		if !haveShared {
 			switch {
-			case o.bf.passwordFile != "":
-				pw, err := fromFile(o.bf.passwordFile)
+			case bf.passwordFile != "":
+				pw, err := fromFile(bf.passwordFile)
 				if err != nil {
 					return err
 				}
@@ -261,7 +264,7 @@ func (o *collectOptions) credentials(ctx context.Context, env *cli.Env, lang i18
 		}
 		t.password = shared
 	}
-	if user == "" && (o.bf.passwordFile != "" || env.Getenv(envRedfishPassword) != "") {
+	if user == "" && (bf.passwordFile != "" || env.Getenv(envRedfishPassword) != "") {
 		for _, t := range targets {
 			if t.user == "" {
 				return errors.New(say(lang, "err.collect_no_user"))
@@ -406,7 +409,7 @@ func (o *collectOptions) redfish(ctx context.Context, env *cli.Env, lang i18n.La
 	} else if err := newDirectory(o.out); err != nil {
 		return o.usageError(env, lang, "%s", say(lang, "err.collect_dir", "dir", o.out, "why", err.Error()))
 	}
-	if err := o.credentials(ctx, env, lang, targets); err != nil {
+	if err := bmcCredentials(ctx, env, lang, o.name, &o.bf, targets); err != nil {
 		return o.usageError(env, lang, "%v", err)
 	}
 	if o.bf.insecure {
@@ -683,7 +686,7 @@ func (o *collectOptions) writeCase(ctx context.Context, env *cli.Env, lang i18n.
 		}
 		// The records name the BMC they came from, and not the directory
 		// they passed through on this machine.
-		a := redfish.NewFS(os.DirFS(r.Dir), "bmc:"+r.Manifest.BMC.Address, redfish.Options{Now: r.Manifest.StartedAt})
+		a := redfish.NewFS(os.DirFS(r.Dir), bmcOrigin+r.Manifest.BMC.Address, redfish.Options{Now: r.Manifest.StartedAt})
 		host := strings.TrimSpace(a.HostHint())
 		if host == "" || taken[strings.ToLower(host)] {
 			host = r.Name

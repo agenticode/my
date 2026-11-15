@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
@@ -57,6 +59,8 @@ type options struct {
 	root   string
 	// sf points a scan at the store of a fleet instead of at this host.
 	sf fleetFlags
+	// bmc names the BMC of the host, to be asked in the same run.
+	bmc bmcFlags
 	// pf names a vendor analyzer to run before the engine.
 	pf   pluginFlags
 	cf   engine.ConfigFlags
@@ -78,6 +82,7 @@ func newOptions(env *cli.Env, name string, src *source) *options {
 		o.fs.StringVar(&o.ledger, "ledger", "", "")
 		o.fs.StringVar(&o.root, "root", "", "")
 		o.sf.register(o.fs)
+		o.bmc.registerScan(o.fs)
 	}
 	o.cf.Register(o.fs)
 	o.pf.register(o)
@@ -342,19 +347,31 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	if o.ledger != "" {
 		path = o.ledger
 	}
+	if flag := o.bmc.alone(); flag != "" {
+		return nil, "", usage{say(s.lang, "err.bmc_alone", "flag", flag)}
+	}
 	if o.sf.set() {
+		if o.bmc.bmc != "" {
+			return nil, "", usage{say(s.lang, "err.bmc_fleet")}
+		}
 		return o.scanFleet(ctx, env, s.lang, path, now)
 	}
 	if o.sf.since != "" {
 		return nil, "", usage{say(s.lang, "err.since_alone")}
 	}
-	return scanInto(ctx, s.lang, path, o.root, tmp, now)
+	var bmc func() (adapter.Adapter, error)
+	if o.bmc.bmc != "" {
+		bmc = func() (adapter.Adapter, error) { return o.readBMC(ctx, env, s.lang, tmp, now) }
+	}
+	return scanInto(ctx, s.lang, path, o.root, tmp, now, bmc)
 }
 
 // scanInto scans the host, or the copy of a host's files below root, into
 // the ledger at path, which is created when it is not there. It returns
-// the ledger and the name of the host.
-func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time) (*store.Store, string, error) {
+// the ledger and the name of the host. bmc, when it is not nil, asks the
+// BMC of the host; it is called once the host is known to be worth
+// scanning, and what it returns is read in the same run.
+func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time, bmc func() (adapter.Adapter, error)) (*store.Store, string, error) {
 	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp}
 	if root != "" && filepath.Clean(root) != "/" {
 		// A copy of a host's files: only files are read.
@@ -385,6 +402,13 @@ func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now t
 		}
 		return nil, "", errors.New(blindText(lang, &opts, res.Sources))
 	}
+	if bmc != nil {
+		a, err := bmc()
+		if err != nil {
+			return nil, "", err
+		}
+		opts.Extra = append(opts.Extra, a)
+	}
 	_, statErr := os.Stat(path)
 	made := errors.Is(statErr, fs.ErrNotExist)
 	ledger, err := store.Open(ctx, path, store.Create)
@@ -395,6 +419,21 @@ func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now t
 	if err != nil {
 		ledger.Close()
 		return nil, "", err
+	}
+	for _, src := range res.Sources {
+		// The answers of the BMC were refused: they are those of another
+		// machine, or they could not be read. The reader asked for them,
+		// so the command ends here and says why. What the host itself
+		// gave stays in a ledger that is kept.
+		if bmc != nil && src.Kind == redfish.Kind && strings.HasPrefix(src.Origin, bmcOrigin) && src.Status == model.SourceError {
+			ledger.Close()
+			if made {
+				for _, suffix := range []string{"", "-wal", "-shm", "-journal"} {
+					os.Remove(path + suffix)
+				}
+			}
+			return nil, "", errors.New(say(lang, "err.bmc_refused", "bmc", strings.TrimPrefix(src.Origin, bmcOrigin), "why", src.Detail))
+		}
 	}
 	if scan.Blind(res.Sources) {
 		// Nothing that could have shown an error was read. The scan ends
