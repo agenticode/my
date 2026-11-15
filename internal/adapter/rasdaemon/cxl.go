@@ -366,7 +366,7 @@ func (r *reader) cxlSparing(rw *row) error {
 	result, _ := rw.int("result")
 	valid, _ := rw.int("validity_flags")
 	sub, hasSub := rw.int("hdr_maint_op_sub_class")
-	a := &model.Action{At: t, TimeQuality: model.TimeExact, Kind: model.ActionSparing, Method: "soft", Result: model.ResultOK,
+	a := &model.Action{At: r.kernelTime(t), TimeQuality: model.TimeExact, Kind: model.ActionSparing, Method: "soft", Result: model.ResultOK,
 		Source: Kind + "/" + rw.table, RawRef: ref, Raw: rw.raw(), Fingerprint: fingerprint(rw.table, id, t)}
 	if flags&cxlSparingHard != 0 {
 		a.Method = "hard"
