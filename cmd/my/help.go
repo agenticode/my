@@ -436,8 +436,9 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 	case "import":
 		// An import has no host to scan, and names its host itself.
 		blocks = append(blocks, "help.output")
-	case "serve":
-		// A server draws no figure: it lists every flag it takes itself.
+	case "serve", "collect":
+		// A server and a collection draw no figure: they list every flag
+		// they take themselves.
 	default:
 		blocks = append(blocks, "help.scan", "help.common")
 	}
@@ -449,13 +450,13 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" {
+	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" && topic != "collect" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)
 		}
 	}
-	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "export" {
+	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "export" && topic != "collect" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
 			fmt.Fprintln(w, line)
