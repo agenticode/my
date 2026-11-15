@@ -1,0 +1,249 @@
+# MemorY memory RAS settings profile.
+#
+# The profile says which BIOS attribute of which server vendor is which
+# memory RAS setting, and what each value of the attribute means. "my bios"
+# reads the BIOS settings a BMC reports over Redfish and checks them
+# against it.
+#
+# Every mapping names the public document it was read from. A setting a
+# vendor has no publicly documented attribute for is listed under
+# "unmapped" and is reported as not mapped. Nothing here is taken from a
+# machine or from a document that is not public, and no attribute name is
+# made up.
+#
+# Settings and the states a value can mean:
+#
+#   patrol-scrub      on, off
+#   adddc             on, off
+#   memory-mode       independent, advanced-ecc, adddc, rank-sparing,
+#                     mirroring, fault-resilient
+#   ce-logging        on, off     corrected errors are logged to the BMC
+#   ce-threshold      on, off     the event of a corrected error threshold
+#                                 is logged
+#   leaky-bucket      on, off
+#   ppr               on, off     post package repair
+#   memory-frequency  auto, limited
+#   refresh-rate      1x, 2x
+#
+# To check against other expectations, or to map the BIOS of another
+# vendor, copy this file ("my bios --print-profile"), change it, and name
+# it with "my bios --profile FILE".
+#
+# The file is YAML in a small form: keys with values, lists with one item
+# per line, two spaces of indentation. A value that starts with "*" or
+# holds ": " goes in quotes.
+format: 1
+name: built-in
+
+# What each setting is expected to be. A setting that is left out has no
+# expectation: its value is reported and not judged.
+expect:
+  patrol-scrub: on
+  ce-logging: on
+
+vendors:
+  - id: dell
+    name: Dell
+    manufacturer:
+      - dell
+    sources:
+      registry:
+        title: "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00"
+        url: https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf
+    settings:
+      # BIOS.SysProfileSettings.MemPatrolScrub
+      - setting: patrol-scrub
+        attribute: MemPatrolScrub
+        source: registry
+        values:
+          - value: Standard
+            means: on
+            note: the whole memory is scrubbed once in 24 hours
+            note_ko: 전체 메모리를 24시간에 한 번 스크럽
+          - value: Extended
+            means: on
+            note: the whole memory is scrubbed more often than in Standard
+            note_ko: Standard보다 자주 전체 메모리를 스크럽
+          - value: Disabled
+            means: off
+      # BIOS.MemSettings.AdddcSetting
+      - setting: adddc
+        attribute: AdddcSetting
+        source: registry
+        values:
+          - value: Enabled
+            means: on
+          - value: Disabled
+            means: off
+      # BIOS.MemSettings.MemOpMode
+      - setting: memory-mode
+        attribute: MemOpMode
+        source: registry
+        values:
+          - value: OptimizerMode
+            means: independent
+          - value: SingleRankSpareMode
+            means: rank-sparing
+          - value: MultiRankSpareMode
+            means: rank-sparing
+          - value: SpareMode
+            means: rank-sparing
+          - value: MirrorMode
+            means: mirroring
+          - value: AdvEccMode
+            means: advanced-ecc
+          - value: SpareWithAdvEccMode
+            means: rank-sparing
+            note: a spare rank in each channel, with Advanced ECC
+            note_ko: 채널마다 예비 rank를 두고 Advanced ECC로 동작
+          - value: FaultResilientMode
+            means: fault-resilient
+      # BIOS.MemSettings.CorrEccSmi
+      - setting: ce-logging
+        attribute: CorrEccSmi
+        source: registry
+        values:
+          - value: Enabled
+            means: on
+          - value: Disabled
+            means: off
+      # BIOS.MemSettings.CECriticalSEL
+      - setting: ce-threshold
+        attribute: CECriticalSEL
+        source: registry
+        values:
+          - value: Enabled
+            means: on
+          - value: Disabled
+            means: off
+      # BIOS.DebugMenuSetting.PostPackageRepair. The registry lists the
+      # attribute and its values and does not describe them.
+      - setting: ppr
+        attribute: PostPackageRepair
+        source: registry
+        values:
+          - value: HardPPR
+            means: on
+            note: hard post package repair
+            note_ko: hard PPR
+          - value: SoftPPR
+            means: on
+            note: soft post package repair
+            note_ko: soft PPR
+          - value: SystemPPR
+            means: on
+          - value: Disabled
+            means: off
+      # BIOS.SysProfileSettings.MemFrequency
+      - setting: memory-frequency
+        attribute: MemFrequency
+        source: registry
+        values:
+          - value: MaxPerf
+            means: auto
+          - value: MaxReliability
+            means: limited
+          - value: "*MHz"
+            means: limited
+      # BIOS.SysProfileSettings.MemRefreshRate
+      - setting: refresh-rate
+        attribute: MemRefreshRate
+        source: registry
+        values:
+          - value: 1x
+            means: 1x
+          - value: 2x
+            means: 2x
+    unmapped:
+      leaky-bucket: not-documented
+
+  - id: hpe
+    name: HPE
+    manufacturer:
+      - hpe
+      - hewlett
+    sources:
+      bios:
+        title: "Bios resource definitions of iLO 5 v3.09"
+        url: https://servermanagementportal.ext.hpe.com/docs/redfishservices/ilos/ilo5/ilo5_309/ilo5_bios_resourcedefns309
+    settings:
+      - setting: patrol-scrub
+        attribute: MemPatrolScrubbing
+        source: bios
+        values:
+          - value: Enabled
+            means: on
+          - value: Disabled
+            means: off
+      # One attribute holds the memory mode, and ADDDC is one of its values.
+      - setting: adddc
+        attribute: AdvancedMemProtection
+        source: bios
+        values:
+          - value: FastFaultTolerantADDDC
+            means: on
+          - value: AdvancedEcc
+            means: off
+          - value: OnlineSpareAdvancedEcc
+            means: off
+          - value: MirroredAdvancedEcc
+            means: off
+      - setting: memory-mode
+        attribute: AdvancedMemProtection
+        source: bios
+        values:
+          - value: FastFaultTolerantADDDC
+            means: adddc
+          - value: AdvancedEcc
+            means: advanced-ecc
+          - value: OnlineSpareAdvancedEcc
+            means: rank-sparing
+          - value: MirroredAdvancedEcc
+            means: mirroring
+      - setting: memory-frequency
+        attribute: MaxMemBusFreqMHz
+        source: bios
+        values:
+          - value: Auto
+            means: auto
+          - value: "MaxMemBusFreq*"
+            means: limited
+      - setting: refresh-rate
+        attribute: MemRefreshRate
+        source: bios
+        values:
+          - value: Refreshx1
+            means: 1x
+          - value: Refreshx2
+            means: 2x
+    unmapped:
+      ce-logging: not-documented
+      ce-threshold: not-documented
+      leaky-bucket: not-documented
+      ppr: not-documented
+
+  - id: lenovo
+    name: Lenovo
+    manufacturer:
+      - lenovo
+    sources:
+      restapi:
+        title: "Lenovo XClarity Controller 2 REST API reference, GET - The pending BIOS settings"
+        url: https://pubs.lenovo.com/xcc2-restapi/pending_bios_settings_get
+    settings:
+      # The guide shows this attribute with this one value.
+      - setting: memory-frequency
+        attribute: Memory_MemorySpeed
+        source: restapi
+        values:
+          - value: MaxPerformance
+            means: auto
+    unmapped:
+      patrol-scrub: not-documented
+      adddc: not-documented
+      memory-mode: not-documented
+      ce-logging: not-documented
+      ce-threshold: not-documented
+      leaky-bucket: not-documented
+      ppr: not-documented
+      refresh-rate: not-documented

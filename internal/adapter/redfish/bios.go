@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/memras"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -38,9 +39,9 @@ const (
 )
 
 // ExtraAttributes names attributes that are kept whatever their name is:
-// the attributes a settings profile maps. The value is consulted for every
-// attribute of a Bios resource.
-var ExtraAttributes func(name string) bool
+// the attributes the built-in settings profile maps for some vendor. It is
+// consulted for every attribute of a Bios resource.
+var ExtraAttributes = memras.Mapped
 
 // registryEntry is what an attribute registry says about one attribute.
 type registryEntry struct {
