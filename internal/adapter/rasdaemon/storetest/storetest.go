@@ -210,6 +210,31 @@ func (s *Server) Add(table string, host *string, vals map[string]any) int64 {
 	return id
 }
 
+// Remove takes the rows of a host out of every table, as a job that keeps
+// the store small does.
+func (s *Server) Remove(host string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, t := range s.tables {
+		at := -1
+		for i, c := range t.cols {
+			if c.Name == "hostname" {
+				at = i
+			}
+		}
+		if at < 0 {
+			continue
+		}
+		kept := t.rows[:0:0]
+		for _, r := range t.rows {
+			if r[at] != host {
+				kept = append(kept, r)
+			}
+		}
+		t.rows = kept
+	}
+}
+
 // Load puts the rows of a SQLite fixture of testdata/rasdaemon into the
 // server as the rows of one host: the tables get the hostname column after
 // their first column, times become time values, and every value takes the
@@ -542,7 +567,7 @@ func (c *conn) QueryContext(_ context.Context, query string, named []driver.Name
 			var order []*group
 			for _, r := range t.rows {
 				id := r[idCol].(int64)
-				if id <= mark {
+				if bounded && id <= mark {
 					continue
 				}
 				g := by[r[hostCol]]
