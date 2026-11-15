@@ -27,10 +27,15 @@ type elem struct {
 
 // parseHTML reads a report with the XML parser.
 func parseHTML(doc []byte) (*elem, error) {
-	s := string(doc)
-	if !strings.HasPrefix(s, "<!DOCTYPE html>\n<html") {
+	if !strings.HasPrefix(string(doc), "<!DOCTYPE html>\n<html") {
 		return nil, fmt.Errorf("the document does not start with the HTML doctype")
 	}
+	return parseXML(doc, "html")
+}
+
+// parseXML reads a document whose root element has the given name.
+func parseXML(doc []byte, rootTag string) (*elem, error) {
+	s := string(doc)
 	dec := xml.NewDecoder(strings.NewReader(s))
 	dec.Strict = true
 	root := &elem{tag: "#root", attrs: map[string]string{}}
@@ -46,13 +51,18 @@ func parseHTML(doc []byte) (*elem, error) {
 		switch t := tok.(type) {
 		case xml.StartElement:
 			e := &elem{tag: t.Name.Local, attrs: map[string]string{}, parent: cur, svg: cur.svg || t.Name.Local == "svg"}
-			if t.Name.Space != "" {
+			// A figure on its own declares the SVG namespace; a report
+			// declares none.
+			if t.Name.Space != "" && !(rootTag == "svg" && t.Name.Space == "http://www.w3.org/2000/svg") {
 				return nil, fmt.Errorf("<%s> carries a namespace: %s", t.Name.Local, t.Name.Space)
 			}
 			for _, a := range t.Attr {
 				name := a.Name.Local
 				if a.Name.Space != "" {
 					name = a.Name.Space + ":" + name
+				}
+				if name == "xmlns" && rootTag == "svg" {
+					name = "xmlns"
 				}
 				if _, dup := e.attrs[name]; dup {
 					return nil, fmt.Errorf("<%s> has the attribute %s twice", e.tag, name)
@@ -77,11 +87,11 @@ func parseHTML(doc []byte) (*elem, error) {
 		return nil, fmt.Errorf("empty document")
 	}
 	for _, k := range root.kids {
-		if k.tag == "html" {
+		if k.tag == rootTag {
 			return k, nil
 		}
 	}
-	return nil, fmt.Errorf("no html element")
+	return nil, fmt.Errorf("no %s element", rootTag)
 }
 
 // walk calls fn for every element below e, e included, parents first.
