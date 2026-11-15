@@ -490,9 +490,13 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 // leaves nothing to repair with.
 func (j *judge) gpus(host string) []*GPUResult {
 	type gpu struct {
-		key      string
-		index    model.Opt[int]
-		xid64    []*model.GPUMem
+		key   string
+		index model.Opt[int]
+		xid64 []*model.GPUMem
+		// snapshot is the latest snapshot that says whether a remapping
+		// failed. The flag stands for the life of the GPU; a later reading
+		// that does not carry it (a query without that column) takes
+		// nothing back.
 		snapshot *model.GPUMem
 	}
 	by := map[string]*gpu{}
@@ -527,7 +531,7 @@ func (j *judge) gpus(host string) []*GPUResult {
 		switch {
 		case r.Kind == model.GPUXID && r.XID.Valid && r.XID.V == 64:
 			g.xid64 = append(g.xid64, r)
-		case r.Kind == model.GPUSnapshot && (g.snapshot == nil || r.ObservedAt.After(g.snapshot.ObservedAt)):
+		case r.Kind == model.GPUSnapshot && r.RemapFailure.Valid && (g.snapshot == nil || r.ObservedAt.After(g.snapshot.ObservedAt)):
 			g.snapshot = r
 		}
 	}
@@ -546,7 +550,7 @@ func (j *judge) gpus(host string) []*GPUResult {
 			}
 			ev = append(ev, e)
 		}
-		if s := g.snapshot; s != nil && s.RemapFailure.Valid && s.RemapFailure.V {
+		if s := g.snapshot; s != nil && s.RemapFailure.V {
 			ev = append(ev, model.Evidence{Rule: RuleRepairGone, Statement: statement("gpu.remap_failure", "when", stampText(s.ObservedAt.UnixMicro())), Total: 1,
 				Records: []model.RecordRef{{Kind: model.RecordGPU, ID: s.ID, RawRef: s.RawRef}}})
 		}
