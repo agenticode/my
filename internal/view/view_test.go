@@ -1000,8 +1000,8 @@ func TestRecordReferences(t *testing.T) {
 				}
 			}
 		}
-		if n != g.Count || len(days) != len(g.Days) {
-			t.Errorf("%s: marks add up to %d on %d days, the group says %d on %d", g.Kind, n, len(days), g.Count, len(g.Days))
+		if n != g.Count || len(days) != len(g.Days) || g.Events != len(g.Marks) {
+			t.Errorf("%s: %d marks add up to %d on %d days, the group says %d events, %d on %d", g.Kind, len(g.Marks), n, len(days), g.Events, g.Count, len(g.Days))
 		}
 	}
 
@@ -1094,7 +1094,7 @@ func TestTimelineKeepsTheLatestMarks(t *testing.T) {
 			g = &tl.Markers[i]
 		}
 	}
-	if g == nil || g.Count != pages || len(g.Marks) != MaxMarks {
+	if g == nil || g.Count != pages || g.Events != pages || len(g.Marks) != MaxMarks {
 		t.Fatalf("page offlines: %+v", g)
 	}
 	last := start.Add((pages - 1) * time.Hour)
