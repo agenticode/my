@@ -326,10 +326,37 @@ func equalInts(a, b []int) bool {
 	return true
 }
 
-// recordInventory stores what a scan saw in SMBIOS: the slots of the board,
-// the identity of the DIMM in each populated slot, and that the DIMM was in
-// that slot at the time of the scan.
-func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
+// inventoryLabels returns the labels of the slots an inventory describes:
+// the label aliases of the ledger that name a slot with a locator or an
+// SMBIOS handle. A second name a source has for a slot does not take such a
+// label away from the slot it names.
+func inventoryLabels(ctx context.Context, s *store.Store, host string) (map[string]string, error) {
+	aliases, err := s.SlotAliases(ctx, host)
+	if err != nil || len(aliases) == 0 {
+		return nil, err
+	}
+	rows, err := s.Slots(ctx, host)
+	if err != nil {
+		return nil, err
+	}
+	described := map[string]bool{}
+	for _, r := range rows {
+		described[r.Name] = r.Locator != "" || r.SMBIOSHandle.Valid
+	}
+	out := map[string]string{}
+	for a, slot := range aliases {
+		if strings.HasPrefix(a, "label:") && described[slot] {
+			out[a] = slot
+		}
+	}
+	return out, nil
+}
+
+// recordInventory stores what a run saw of the board: the slots, the
+// identity of the DIMM in each populated slot, and that the DIMM was in
+// that slot at the time. taken holds the labels of slots the ledger already
+// has from an inventory.
+func recordInventory(w *store.Writer, host string, mods []*model.Module, taken map[string]string) error {
 	// A run may carry several inventory snapshots (one per source and
 	// time). Names are made unique within a snapshot: the same locator in
 	// two snapshots is the same slot.
@@ -383,6 +410,39 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 			shared[c] = true
 		}
 	}
+	// Second names a source has for a slot: the service label of a BMC next
+	// to its device locator. A name that is the name of another slot, or
+	// that two slots claim, is the name of neither.
+	named := map[string]string{}
+	for i, m := range mods {
+		for _, n := range []string{names[i], m.Locator, strings.TrimSpace(m.BankLocator + " " + m.Locator)} {
+			if k := model.NormalizeLabel(n); k != "" {
+				if _, ok := named[k]; !ok {
+					named[k] = names[i]
+				}
+			}
+		}
+	}
+	second := map[string]string{}
+	contested := map[string]bool{}
+	for i, m := range mods {
+		for _, a := range m.Aliases {
+			k := model.NormalizeLabel(a)
+			if k == "" {
+				continue
+			}
+			if o, ok := named[k]; ok && o != names[i] {
+				contested[k] = true
+			}
+			if o, ok := second[k]; ok && o != names[i] {
+				contested[k] = true
+			}
+			if o, ok := taken[aliasLabel(a)]; ok && o != names[i] {
+				contested[k] = true
+			}
+			second[k] = names[i]
+		}
+	}
 	for i, m := range mods {
 		name := names[i]
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
@@ -403,6 +463,13 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 		for _, n := range []string{name, m.Locator, strings.TrimSpace(m.BankLocator + " " + m.Locator)} {
 			if strings.TrimSpace(n) != "" {
 				if err := w.SetSlotAlias(host, aliasLabel(n), name); err != nil {
+					return err
+				}
+			}
+		}
+		for _, a := range m.Aliases {
+			if k := model.NormalizeLabel(a); k != "" && !contested[k] {
+				if err := w.SetSlotAlias(host, aliasLabel(a), name); err != nil {
 					return err
 				}
 			}
