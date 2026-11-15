@@ -110,7 +110,7 @@ The report of the demo host is [examples/demo-report.html](examples/demo-report.
 
 ![Timeline of CPU0_C1: corrected errors per day rising from late September, with reboots, a hard PPR, page offlines and an uncorrected error marked below](examples/figures/CPU0_C1-timeline.svg)
 
-`--audience fa` adds the steps of the confidence and the faults one by one, for failure analysis. `--lang ko` writes the report in Korean. `--figures DIR` writes each figure as an SVG file of its own, as the three above.
+`--audience fa` adds the steps of the confidence and the faults one by one, for failure analysis, and the Level 2 output of a [vendor analyzer](#vendor-analyzers) when one took part. `--lang ko` writes the report in Korean. `--figures DIR` writes each figure as an SVG file of its own, as the three above.
 
 ## Install
 
@@ -200,9 +200,20 @@ look at it: my open case.mycase
 
 A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksum of the ledger), `sources.json` (every source that was looked for and what it yielded), `ledger.db` (the SQLite ledger) and `README.txt`. It holds records about memory errors and never the contents of memory. `--anonymize` replaces host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line (`root=UUID=...`) by words made from a keyed hash; DIMM serial numbers stay, because a return is about them.
 
+## Vendor analyzers
+
+The engine classifies faults with public knowledge: the Level 1 fault modes of the OCP FMFM framework. What only the maker of a DRAM device knows (which rows are neighbours inside the device, what error rate is usual for a part number, what a pattern of failing data lines means) comes from a vendor analyzer, a separate program in any language and under its own license:
+
+```
+my dimm CPU0_C1 --plugin /opt/vendor/analyzer
+my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
+```
+
+The program gets the error records of each DIMM in FMFM field names on its standard input and writes its analysis to its standard output. It keeps no state: the ledger supplies the newest record and the records before it on every run. Its answer about neighbouring rows goes into the fault classification, its percentile into the baseline of a finding, and its Level 2 output into the report for failure analysis and nowhere else. A response is bounded in time and size and checked field by field; a command that asked for an analyzer and cannot have its answer stops and says why. [docs/plugin-contract.md](docs/plugin-contract.md) is the reference, and [examples/plugin](examples/plugin) holds a small analyzer with a request and its response.
+
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines, machine checks, firmware error records and CXL event records, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report, the Prometheus exporter and the vendor analyzer contract. No analyzer of a memory vendor has been run against that contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines, machine checks, firmware error records and CXL event records, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
 
 ## Build
 
@@ -235,6 +246,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `internal/term` | draws the figures as text: colour, glyph density, ASCII, width |
 | `internal/report` | the HTML report: one file with inline SVG figures, the records behind them, and nothing loaded from elsewhere |
 | `internal/fmfmlog` | error records and findings in the forms of the FMFM framework: runtime error log and analysis log |
+| `internal/plugin` | the vendor analyzer contract: request and response, the run of the program, the checks of what it answers |
 | `internal/bundle` | case bundles: format, checks, anonymizing |
 | `internal/outfile` | writes the files the tool hands over: whole or not at all, and never in place of a device |
 | `internal/exporter` | the Prometheus metrics of a host and their text format |

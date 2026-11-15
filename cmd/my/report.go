@@ -75,7 +75,9 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	if code, ok := s.needHost(); !ok {
 		return code
 	}
-	opts := report.Options{Lang: lang, Audience: aud, Now: clock(env), Tool: toolName(), AllFigures: *all}
+	// What a vendor analyzer said beyond the public fault modes. The
+	// report shows it to the failure analysis audience only.
+	opts := report.Options{Lang: lang, Audience: aud, Now: clock(env), Tool: toolName(), AllFigures: *all, Level2: level2(s.analyzer)}
 	if src != nil && src.manifest != nil {
 		m := src.manifest
 		info := &report.CaseInfo{ID: m.Ledger.SHA256, Bundle: true, Created: m.CreatedAt, Tool: m.Tool, Anonymized: m.Anonymized}
