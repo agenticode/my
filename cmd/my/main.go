@@ -141,7 +141,10 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	env := cli.OSEnv()
 	safeStreams(env, isTerminal)
+	setMemoryLimit(rootFS(), os.Getenv)
+	profiles := startProfiles(os.Getenv, os.Stderr)
 	code := app().Run(ctx, env, os.Args[1:])
+	profiles()
 	stop()
 	os.Exit(code)
 }
