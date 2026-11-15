@@ -1,0 +1,11 @@
+{
+  "@odata.id": "/redfish/v1/Registries",
+  "@odata.type": "#MessageRegistryFileCollection.MessageRegistryFileCollection",
+  "Name": "MessageRegistryFileCollection",
+  "Members@odata.count": 1,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Registries/BiosAttributeRegistryU30.v1_2_68"
+    }
+  ]
+}

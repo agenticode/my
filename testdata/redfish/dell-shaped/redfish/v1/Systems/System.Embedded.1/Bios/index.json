@@ -1,0 +1,42 @@
+{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios",
+  "@odata.type": "#Bios.v1_1_0.Bios",
+  "Id": "Bios",
+  "Name": "BIOS Configuration Current Settings",
+  "AttributeRegistry": "BiosAttributeRegistry.v1_0_0",
+  "Attributes": {
+    "AdddcSetting": "Enabled",
+    "AssetTag": "RACK12-U07",
+    "BootMode": "Uefi",
+    "CECriticalSEL": "Enabled",
+    "CorrEccSmi": "Enabled",
+    "MemFrequency": "2666MHz",
+    "MemOpMode": "OptimizerMode",
+    "MemPatrolScrub": "Standard",
+    "MemRefreshRate": "1x",
+    "MemTest": "Disabled",
+    "NodeInterleave": "Disabled",
+    "PersistentMemPassphrase": "",
+    "ProcVirtualization": "Enabled",
+    "SetupPassword": null,
+    "SysMemSize": "128 GB",
+    "SysMemSpeed": "2666 Mhz",
+    "SysMfrContactInfo": "ops@example.com",
+    "SysProfile": "Custom",
+    "VideoMem": "16 MB"
+  },
+  "@Redfish.Settings": {
+    "@odata.type": "#Settings.v1_3_0.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios/Settings"
+    },
+    "SupportedApplyTimes": [
+      "OnReset"
+    ]
+  },
+  "Actions": {
+    "#Bios.ResetBios": {
+      "target": "/redfish/v1/Systems/System.Embedded.1/Bios/Actions/Bios.ResetBios"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "@odata.id": "/redfish/v1/Registries/BiosAttributeRegistryU30.v1_2_68",
+  "@odata.type": "#MessageRegistryFile.v1_0_4.MessageRegistryFile",
+  "Id": "BiosAttributeRegistryU30.v1_2_68",
+  "Name": "BiosAttributeRegistryU30.v1_2_68 Message Registry File",
+  "Description": "Registry Definition File for BiosAttributeRegistryU30.v1_2_68",
+  "Registry": "BiosAttributeRegistryU30.v1_2_68",
+  "Languages": [
+    "en"
+  ],
+  "Location": [
+    {
+      "Language": "en",
+      "Uri": "/redfish/v1/registrystore/registries/en/biosattributeregistryu30.v1_2_68"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Memory/DIMM.Socket.B2",
+  "@odata.type": "#Memory.v1_10_0.Memory",
+  "Id": "DIMM.Socket.B2",
+  "Name": "DIMM.Socket.B2",
+  "DeviceLocator": "B2",
+  "CapacityMiB": 32768,
+  "RankCount": 2,
+  "DataWidthBits": 64,
+  "BusWidthBits": 72,
+  "ErrorCorrection": "MultiBitECC",
+  "MemoryType": "DRAM",
+  "MemoryDeviceType": "DDR4",
+  "BaseModuleType": "RDIMM",
+  "Manufacturer": "Example Memory",
+  "PartNumber": "EXM32G29R2X4-B",
+  "SerialNumber": "D0B20004",
+  "OperatingSpeedMhz": 2666,
+  "AllowedSpeedsMHz": [
+    2933
+  ],
+  "MemoryLocation": {
+    "Socket": 2,
+    "MemoryController": 0,
+    "Channel": 1,
+    "Slot": 0
+  },
+  "Status": {
+    "State": "Enabled",
+    "Health": "OK"
+  },
+  "Location": {
+    "PartLocation": {
+      "ServiceLabel": "DIMM B2",
+      "LocationType": "Slot"
+    }
+  }
+}

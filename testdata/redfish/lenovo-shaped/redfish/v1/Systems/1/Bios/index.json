@@ -1,0 +1,26 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/Bios",
+  "@odata.type": "#Bios.v1_2_0.Bios",
+  "Id": "Bios",
+  "Name": "Bios",
+  "Description": "System Bios",
+  "AttributeRegistry": "BiosAttributeRegistry.1.0.0",
+  "Attributes": {
+    "DevicesandIOPorts_Device_Slot6": "Enable",
+    "Memory_AdvMemTestOptions": 0,
+    "Memory_MemorySpeed": "MaxPerformance",
+    "Memory_MemoryTest": "Enabled",
+    "Processors_CPUPstateControl": "Autonomous",
+    "Processors_CStates": "Disable",
+    "SystemRecovery_POSTWatchdogTimer": "Disabled"
+  },
+  "@Redfish.Settings": {
+    "@odata.type": "#Settings.v1_2_1.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/1/Bios/Pending"
+    },
+    "SupportedApplyTimes": [
+      "OnReset"
+    ]
+  }
+}

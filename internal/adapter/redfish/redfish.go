@@ -1,11 +1,17 @@
 // Package redfish reads what a BMC serves over Redfish, from files: log
-// entries (LogEntry), memory modules (Memory) and the system they belong to
-// (ComputerSystem). It takes one JSON file, or a directory tree of them as
-// a mockup recorder or a crawl of the service leaves it.
+// entries (LogEntry), memory modules (Memory) with their error counts
+// (MemoryMetrics), the settings of the system firmware (Bios, its pending
+// settings and the attribute registry that explains them) and the system
+// they belong to (ComputerSystem). It takes one JSON file, or a directory
+// tree of them as a mockup recorder, a crawl of the service or "my collect
+// redfish" leaves it.
 //
 // Log entries become error events and actions. Memory resources become the
 // inventory: the slots of the board, the identity of the DIMM in each, and
-// the mark the BMC puts on a module it reports as failed or disabled.
+// the mark the BMC puts on a module it reports as failed or disabled. What
+// the BMC says beyond that is kept as it is said: each module as the BMC
+// describes it with the BMC's own error counts, the BIOS settings that
+// bear on memory, and what the BMC is and how completely it was read.
 // Vendor extensions (Oem) are not interpreted; the whole resource is kept
 // as the raw record.
 //
@@ -322,7 +328,7 @@ func odataType(o object) string {
 // resource has, because some tools strip the type when they save a log.
 func kindOf(o object) string {
 	switch t := odataType(o); t {
-	case "LogEntry", "Memory", "ComputerSystem", "MemoryMetrics":
+	case "LogEntry", "Memory", "ComputerSystem", "MemoryMetrics", "Bios", "AttributeRegistry", "ServiceRoot", "Manager", "LogService":
 		return t
 	case "":
 		_, hasEntryType := o["EntryType"]
@@ -337,6 +343,16 @@ func kindOf(o object) string {
 		_, hasType := o["MemoryDeviceType"]
 		if (hasLocator || hasLocation) && (hasCapacity || hasType) {
 			return "Memory"
+		}
+		if _, ok := o["Attributes"].(object); ok {
+			if _, named := o["AttributeRegistry"]; named {
+				return "Bios"
+			}
+		}
+		if entries := child(o, "RegistryEntries"); entries != nil {
+			if _, ok := entries["Attributes"].([]any); ok {
+				return "AttributeRegistry"
+			}
 		}
 	}
 	return ""
@@ -354,8 +370,25 @@ type run struct {
 	entries []resource
 	modules []resource
 	systems []resource
-	metrics int
 	badDocs int
+	// What the BMC says beyond events and the inventory.
+	bios       []resource
+	registries []resource
+	roots      []resource
+	managers   []resource
+	logSvcs    []resource
+	// metrics are the MemoryMetrics resources by their URI.
+	metrics map[string]*resource
+	// counts is what collections say about how many members they have,
+	// by the URI of the collection.
+	counts map[string]int64
+	// manifest is what "my collect redfish" wrote about its run, when the
+	// dump is one of its collections.
+	manifest *manifest
+	// coverage is what was read of each log.
+	coverage map[string]*model.BMCLog
+	// lastReset is when the system was last reset, as the BMC says.
+	lastReset time.Time
 
 	// locators maps the URI of a memory resource to the name of its slot,
 	// places the socket, channel and slot numbers of one to that name.
@@ -379,16 +412,8 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		return rep
 	}
 	rep.Notes = append(rep.Notes, notes...)
-	r := &run{ctx: ctx, origin: a.origin, rep: &rep, seen: map[string]bool{}, locators: map[string]string{}, places: map[[3]int]string{}}
-	switch {
-	case !a.opts.Now.IsZero():
-		r.now = a.opts.Now.UTC()
-	case a.opts.ModTimeAsObserved && !modTime.IsZero():
-		r.now = modTime.UTC()
-	default:
-		r.now = time.Now().UTC()
-	}
-
+	r := &run{ctx: ctx, origin: a.origin, rep: &rep, seen: map[string]bool{}, locators: map[string]string{}, places: map[[3]int]string{},
+		metrics: map[string]*resource{}, counts: map[string]int64{}, coverage: map[string]*model.BMCLog{}}
 	for i := range docs {
 		if err := ctx.Err(); err != nil {
 			rep.Status, rep.Detail = model.SourceError, err.Error()
@@ -396,10 +421,22 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		}
 		r.scan(&docs[i])
 	}
+	// The time of the dump: what the caller says, else what the collection
+	// itself says, else the age of the files, else now.
+	switch {
+	case !a.opts.Now.IsZero():
+		r.now = a.opts.Now.UTC()
+	case r.manifest != nil && !r.manifest.StartedAt.IsZero():
+		r.now = r.manifest.StartedAt.UTC()
+	case a.opts.ModTimeAsObserved && !modTime.IsZero():
+		r.now = modTime.UTC()
+	default:
+		r.now = time.Now().UTC()
+	}
 	if len(docs) > 1 || r.badDocs > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("%d JSON files read", len(docs)))
 	}
-	rep.Records = len(r.entries) + len(r.modules) + len(r.systems)
+	rep.Records = len(r.entries) + len(r.modules) + len(r.systems) + len(r.bios) + len(r.metrics)
 
 	err = r.emit(sink)
 	if err != nil {
@@ -419,7 +456,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	case rep.Records == 0 && r.badDocs == len(docs):
 		rep.Status, rep.Detail = model.SourceError, "no file could be read as JSON"
 	case rep.Records == 0:
-		rep.Status, rep.Detail = model.SourceEmpty, "no log entries, memory resources or systems found"
+		rep.Status, rep.Detail = model.SourceEmpty, "no log entries, memory resources, BIOS settings or systems found"
 	case rep.Skipped > 0:
 		rep.Status = model.SourcePartial
 	default:
@@ -438,6 +475,18 @@ func (r *run) scan(d *document) {
 	name := r.origin
 	if d.name != "" {
 		name = r.origin + "/" + d.name
+	}
+	// The manifest of a collection is about the run, not a resource.
+	if path.Base(d.name) == manifestName && bytes.Contains(d.data, []byte(manifestFormat)) {
+		m, note := parseManifest(d.data)
+		if m != nil {
+			r.manifest = m
+			return
+		}
+		if note != "" {
+			r.rep.Notes = append(r.rep.Notes, note)
+			return
+		}
 	}
 	dec := json.NewDecoder(bytes.NewReader(bytes.TrimPrefix(d.data, []byte("\xef\xbb\xbf"))))
 	dec.UseNumber()
@@ -470,19 +519,21 @@ func (r *run) walk(v any, name, file, pos string, depth int) {
 			r.walk(item, name, file, fmt.Sprintf("%s[%d]", pos, i), depth+1)
 		}
 	case object:
+		// A collection says how many members it has, which may be more
+		// than it lists.
+		if _, isColl := x["Members"].([]any); isColl {
+			if id := strings.TrimRight(str(x, "@odata.id"), "/"); id != "" {
+				if n, ok := integer(x, "Members@odata.count"); ok && n >= 0 {
+					r.counts[id] = n
+				}
+			}
+		}
 		if kind := kindOf(x); kind != "" {
 			id := str(x, "@odata.id")
 			key := kind + " " + id
 			if id == "" {
 				id = pos
 				key = kind + " " + name + " " + pos
-			}
-			if kind == "MemoryMetrics" {
-				if !r.seen[key] {
-					r.seen[key] = true
-					r.metrics++
-				}
-				return
 			}
 			if !r.seen[key] {
 				r.seen[key] = true
@@ -494,6 +545,18 @@ func (r *run) walk(v any, name, file, pos string, depth int) {
 					r.modules = append(r.modules, res)
 				case "ComputerSystem":
 					r.systems = append(r.systems, res)
+				case "MemoryMetrics":
+					r.metrics[strings.TrimRight(id, "/")] = &res
+				case "Bios":
+					r.bios = append(r.bios, res)
+				case "AttributeRegistry":
+					r.registries = append(r.registries, res)
+				case "ServiceRoot":
+					r.roots = append(r.roots, res)
+				case "Manager":
+					r.managers = append(r.managers, res)
+				case "LogService":
+					r.logSvcs = append(r.logSvcs, res)
 				}
 			}
 			if kind != "ComputerSystem" {
@@ -572,6 +635,7 @@ func (r *run) emit(sink adapter.Sink) error {
 	}
 	populated := 0
 	marks := map[string]int{}
+	var counted readings
 	for i := range r.modules {
 		ok, err := r.module(sink, &r.modules[i], marks)
 		if err != nil {
@@ -579,6 +643,10 @@ func (r *run) emit(sink adapter.Sink) error {
 		}
 		if ok {
 			populated++
+			// The same module as the BMC describes it, with its counts.
+			if err := r.reading(sink, &r.modules[i], &counted); err != nil {
+				return err
+			}
 		}
 	}
 	if n := len(r.modules); n > 0 {
@@ -589,10 +657,14 @@ func (r *run) emit(sink adapter.Sink) error {
 			r.rep.Notes = append(r.rep.Notes, fmt.Sprintf("%d modules are reported as %s by the BMC", n, k))
 		}
 	}
-	if r.metrics > 0 {
-		r.rep.Notes = append(r.rep.Notes, fmt.Sprintf("%d MemoryMetrics resources were not read: their error counts are not in the ledger", r.metrics))
+	counted.notes(r)
+	if err := r.settings(sink); err != nil {
+		return err
 	}
-	return r.logs(sink)
+	if err := r.logs(sink); err != nil {
+		return err
+	}
+	return r.controller(sink)
 }
 
 // system records the identity of the machine.
@@ -600,6 +672,9 @@ func (r *run) system(sink adapter.Sink, res *resource) error {
 	o := res.obj
 	if h := str(o, "HostName"); h != "" && r.rep.HostHint == "" {
 		r.rep.HostHint = h
+	}
+	if t, ok := parseTime(str(o, "LastResetTime")); ok && r.lastReset.IsZero() && !t.After(r.now) {
+		r.lastReset = t
 	}
 	host := model.Host{SystemVendor: str(o, "Manufacturer"), SystemProduct: str(o, "Model"), FirstSeen: r.now, LastSeen: r.now}
 	if host.SystemVendor == "" && host.SystemProduct == "" {

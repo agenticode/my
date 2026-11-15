@@ -1,0 +1,22 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/Bios/Settings",
+  "@odata.type": "#Bios.v1_0_0.Bios",
+  "Id": "Settings",
+  "Name": "BIOS Pending Settings",
+  "AttributeRegistry": "BiosAttributeRegistryU30.v1_2_68",
+  "Attributes": {
+    "AdminName": "",
+    "AdminPhone": "",
+    "AdvancedMemProtection": "AdvancedEcc",
+    "BootMode": "Uefi",
+    "ExtendedMemTest": "Disabled",
+    "MaxMemBusFreqMHz": "Auto",
+    "MemFastTraining": "Enabled",
+    "MemMirrorMode": "Full",
+    "MemPatrolScrubbing": "Enabled",
+    "MemRefreshRate": "Refreshx1",
+    "OpportunisticSelfRefresh": "Disabled",
+    "ServerName": "node-h",
+    "WorkloadProfile": "GeneralPowerEfficientCompute"
+  }
+}

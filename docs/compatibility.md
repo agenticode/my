@@ -454,14 +454,14 @@ Redfish log entries of type SEL are read by the Redfish adapter.
 
 ## Redfish
 
-Adapter `redfish`, package `internal/adapter/redfish`. It reads what a BMC serves over Redfish from files and does not talk to a BMC.
+Adapter `redfish`, package `internal/adapter/redfish`. It reads what a BMC serves over Redfish from files and does not talk to a BMC. `my collect redfish` writes such files from a BMC.
 
 ### Accepted forms
 
 - One JSON file: a resource, a collection with its members expanded, an array of resources, or several JSON documents one after the other.
-- A directory tree, as a mockup recorder or a crawl of the service leaves it. Every file that holds JSON is read, whatever its name. A resource that is in the tree twice is read once.
+- A directory tree, as a mockup recorder, a crawl of the service or `my collect redfish` leaves it. Every file that holds JSON is read, whatever its name. A resource that is in the tree twice is read once.
 
-Three kinds of resource are read, recognised by `@odata.type`: `LogEntry`, `Memory` and `ComputerSystem`. A log entry or memory resource saved without its type is recognised by its properties. Vendor extensions under `Oem` are not interpreted. The whole resource, `Oem` included, is kept as the raw record of what was made from it.
+These resources are read, recognised by `@odata.type`: `LogEntry`, `Memory`, `MemoryMetrics`, `Bios` (the settings in effect and the pending ones), `AttributeRegistry`, `ComputerSystem`, `Manager`, `LogService` and `ServiceRoot`. A log entry, a memory resource, a Bios resource or an attribute registry saved without its type is recognised by its properties. Vendor extensions under `Oem` are not interpreted. The whole resource, `Oem` included, is kept as the raw record of what was made from it.
 
 ### Memory resources
 
@@ -485,7 +485,56 @@ The mark a BMC puts on a module is the fact rule R-FW-01 reads:
 | `Health` is `Critical` | action `mark-failed`, method `bmc` |
 | `Health` is `Warning` | informational event |
 
-A memory resource carries no time. The mark is recorded at the time of the dump (`redfish.Options.Now`, or the modification time of the files with `ModTimeAsObserved`), once per DIMM: reading the same state again adds nothing.
+A memory resource carries no time. The mark is recorded at the time of the dump, once per DIMM: reading the same state again adds nothing. The time of the dump is `redfish.Options.Now`, else the start time in the manifest of a collection, else the modification time of the files with `ModTimeAsObserved`, else the time of the import.
+
+### The module as the BMC describes it
+
+Each populated `Memory` resource also becomes one row of the ledger table `bmc_memory`, apart from the inventory: what the BMC itself says about the module at the time of the dump.
+
+| Property | Use |
+| --- | --- |
+| `DeviceLocator`, `Location.PartLocation.ServiceLabel`, `Id` | the names the BMC has for the slot, each kept |
+| `Status.State`, `Status.Health` | state and health |
+| `ErrorCorrection` | the scheme the BMC names: `NoECC`, `SingleBitECC`, `MultiBitECC`, `AddressParity` |
+| `OperatingSpeedMhz`, `AllowedSpeedsMHz` | the speed in use and the speeds the module supports |
+| `IsRankSpareEnabled`, `IsSpareDeviceEnabled` | sparing in use |
+| `Metrics` | the link to the error counts |
+
+The `MemoryMetrics` resource a module links gives the BMC's own error counts:
+
+| Property | Use |
+| --- | --- |
+| `CurrentPeriod.CorrectableECCErrorCount`, `CurrentPeriod.UncorrectableECCErrorCount` | counts since the last reset of the system or of the counters |
+| `LifeTime.CorrectableECCErrorCount`, `LifeTime.UncorrectableECCErrorCount` | counts for the life of the module |
+| `HealthData.AlarmTrips.CorrectableECCError`, `.UncorrectableECCError` | the module crossed a threshold of the BMC |
+
+The schema defines the current period as the time since the last system reset or `ClearCurrentPeriod` action, and gives no time for either. `LastResetTime` of the system, when the dump has it, is kept as the earliest start of the current period.
+
+These counts are readings. They are not turned into events, and no total of the ledger includes them: the lifetime count has no period, and the host's own records may hold the same errors.
+
+For each module the ledger says what became of its counts: read; `not offered` when the module links no metrics, which is a BMC that keeps no counts per module; and for a collection, why they did not come back (`unsupported`, `denied`, `timeout`, `error`).
+
+Redfish has no property for the width of the DRAM devices (x4, x8). `DataWidthBits` and `BusWidthBits` are the widths of the module. The width is known when the EDAC driver of the host reports it.
+
+### BIOS settings
+
+The `Bios` resource of a system lists every attribute of the system firmware. The settings that bear on memory are kept, in the ledger table `bios_setting`; the rest is not, because a ledger travels in a case bundle and a bundle holds no network configuration and no accounts.
+
+An attribute is kept when its name, its display name or its menu path holds a word of memory (`mem`, `dimm`, `ddr`, `ecc`, `scrub`, `ppr`, `adddc`, `sddc`, `spar`, `mirror`, `refresh`, `rank`, `correctable`, `uncorr`, `leaky`, `bucket`, `rowhammer`). It is never kept when its type is `Password` or its name holds `password`, `passphrase`, `secret`, `token`, `credential`, `key` or `pin`. At most 400 attributes are kept, and a value longer than 200 characters is left out.
+
+| Source | Use |
+| --- | --- |
+| `Bios.Attributes` | the value in effect |
+| the resource `@Redfish.Settings.SettingsObject` points to, else a Bios resource named `Settings`, `Pending` or `SD` below it | the pending value, kept when it differs: it takes effect after a reboot |
+| the `AttributeRegistry` named by `Bios.AttributeRegistry` | display name, menu path, type, `ReadOnly`, `ResetRequired`, the allowed values, bounds and default |
+
+Without the registry the kind of a value is what the JSON says, and whether a setting can be changed is not known. Without a pending resource a change that waits for a reboot does not show. The report of the source says which of the two the dump lacks.
+
+### The BMC
+
+One row of the ledger table `bmc` per dump: the firmware version and model of the first `Manager` that names its firmware, `BiosVersion` and `LastResetTime` of the system, `RedfishVersion` of the service root, the attribute registry the BIOS settings refer to, and for every log the number of entries read, how many of them are about memory, the times of the oldest and the newest entry of any kind, how many entries the log says it holds, and `OverWritePolicy` and `MaxNumberOfRecords` of its `LogService`.
+
+A collection made by `my collect redfish` has a `manifest.json`. From it come the address of the BMC, how its certificate was checked, the authentication, the clock of the BMC against the collector's, whether the run was complete, and what became of each class of resources. A dump without a manifest says for each class only whether resources of it are in the dump.
 
 ### Log entries
 
@@ -525,7 +574,10 @@ A `ComputerSystem` resource gives the host name (`HostName`), the system vendor 
 
 ### Known gaps
 
-- `MemoryMetrics` resources (error counts per module) are counted in the report and not read.
+- The error counts of a BMC are readings beside the ledger's events. They are not compared with the host's records yet.
+- `MemoryMetrics` properties other than the four counts and the two alarm flags are not read. A `MemoryMetrics` resource that no module of the dump links is counted in the report and not read.
+- Of several systems behind one BMC, the BIOS settings of the first are read.
+- A BIOS setting about memory whose name, display name and menu say nothing of memory is not kept.
 - The diagnostic data of an entry (`DiagnosticData`, CPER records) and the event record in an entry of type `CXL` are not decoded.
 - Message registries of other vendors are not known. Their entries about memory are kept as informational events and listed in the report by message ID, so a missing class is visible.
 - `MEM0008` ("is spare memory") is read as a spare taking over, like the IPMI state it follows.
