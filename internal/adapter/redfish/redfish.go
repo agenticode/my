@@ -436,7 +436,10 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if len(docs) > 1 || r.badDocs > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("%d JSON files read", len(docs)))
 	}
-	rep.Records = len(r.entries) + len(r.modules) + len(r.systems) + len(r.bios) + len(r.metrics)
+	// A file that cannot be read as JSON was looked at and skipped: it is
+	// part of the count, like the resources that were found.
+	found := len(r.entries) + len(r.modules) + len(r.systems) + len(r.bios) + len(r.metrics)
+	rep.Records = found + r.badDocs
 
 	err = r.emit(sink)
 	if err != nil {
@@ -453,9 +456,9 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	switch {
 	case len(docs) == 0:
 		rep.Status, rep.Detail = model.SourceEmpty, "no JSON files"
-	case rep.Records == 0 && r.badDocs == len(docs):
+	case found == 0 && r.badDocs == len(docs):
 		rep.Status, rep.Detail = model.SourceError, "no file could be read as JSON"
-	case rep.Records == 0:
+	case found == 0:
 		rep.Status, rep.Detail = model.SourceEmpty, "no log entries, memory resources, BIOS settings or systems found"
 	case rep.Skipped > 0:
 		rep.Status = model.SourcePartial

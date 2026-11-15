@@ -72,20 +72,46 @@ func NewRoot(root string, opts Options) *Adapter {
 func (a *Adapter) Kind() string   { return Kind }
 func (a *Adapter) Origin() string { return a.origin }
 
+// Bounds of a reading.
+const (
+	// maxAttr bounds what is read of one file: the files of /proc and
+	// sysfs that are read here hold a line, at most a page.
+	maxAttr = 64 << 10
+	// maxHostname bounds a host name. The kernel keeps 64 bytes, a name
+	// of the DNS has at most 253.
+	maxHostname = 253
+	// maxBootTime is the first second the ledger cannot store: the start
+	// of the year 10000.
+	maxBootTime = 253402300800
+)
+
+// text returns the content of a small file, or "" when it cannot be read
+// or holds more than such a file does.
 func (a *Adapter) text(name string) string {
-	b, err := fs.ReadFile(a.fsys, name)
+	b, err := adapter.ReadFile(a.fsys, name, maxAttr)
 	if err != nil {
 		return ""
 	}
 	return strings.TrimSpace(strings.TrimRight(string(b), "\x00"))
 }
 
+// hostname returns the host name a file holds: its first line. Text that
+// cannot be a host name is taken as no name.
+func (a *Adapter) hostname(name string) string {
+	s, _, _ := strings.Cut(a.text(name), "\n")
+	s = strings.TrimSpace(s)
+	if len(s) > maxHostname || strings.ContainsRune(s, 0) {
+		return ""
+	}
+	return s
+}
+
 // Read collects the host facts. missing lists the pieces that could not be
 // read.
 func (a *Adapter) Read() (info Info, missing []string) {
-	info.Hostname = a.text("proc/sys/kernel/hostname")
+	info.Hostname = a.hostname("proc/sys/kernel/hostname")
 	if info.Hostname == "" {
-		info.Hostname = a.text("etc/hostname")
+		info.Hostname = a.hostname("etc/hostname")
 	}
 	if info.Hostname == "" {
 		missing = append(missing, "host name")
@@ -129,7 +155,7 @@ func (a *Adapter) Read() (info Info, missing []string) {
 		sc.Buffer(make([]byte, 64<<10), 4<<20)
 		for sc.Scan() {
 			if rest, ok := strings.CutPrefix(sc.Text(), "btime "); ok {
-				if unix, err := strconv.ParseInt(strings.TrimSpace(rest), 10, 64); err == nil && unix > 0 {
+				if unix, err := strconv.ParseInt(strings.TrimSpace(rest), 10, 64); err == nil && unix > 0 && unix < maxBootTime {
 					info.BootTime = time.Unix(unix, 0).UTC()
 				}
 				break

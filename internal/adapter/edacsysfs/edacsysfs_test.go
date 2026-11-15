@@ -152,6 +152,59 @@ func TestDamagedAndPartialTrees(t *testing.T) {
 	}
 }
 
+// A copy of a host's files holds whatever was put there. A file far
+// larger than an attribute of sysfs is not read into memory. A value the
+// kernel never writes is left out here, with the name of its file: a
+// count beyond 63 bits went on to the ledger, which refused the sample,
+// and a running time of the counters that is no time gave a reset time
+// computed with an overflow. Found by FuzzCollect.
+func TestValuesTheKernelNeverWrites(t *testing.T) {
+	fsys := fstest.MapFS{
+		"mc/mc0/mc_name":             file("test controller"),
+		"mc/mc0/seconds_since_reset": file("18446744073709551615"),
+		"mc/mc0/ce_noinfo_count":     file("18446744073709551615"),
+		"mc/mc0/ue_noinfo_count":     file("0"),
+		// A count that does not fit into 63 bits.
+		"mc/mc0/dimm0/dimm_ce_count": file("9223372036854775808"),
+		"mc/mc0/dimm0/dimm_ue_count": file("0"),
+		// The largest count that does.
+		"mc/mc0/dimm1/dimm_ce_count": file("9223372036854775807"),
+		"mc/mc0/dimm1/dimm_ue_count": file("0"),
+		// A label file of a megabyte.
+		"mc/mc0/dimm2/dimm_ce_count": file("1"),
+		"mc/mc0/dimm2/dimm_ue_count": file("0"),
+		"mc/mc0/dimm2/dimm_label":    file(strings.Repeat("A", 1<<20)),
+		// A counter file of a megabyte.
+		"mc/mc0/dimm3/dimm_ce_count": file(strings.Repeat("1", 1<<20)),
+		"mc/mc0/dimm3/dimm_ue_count": file("0"),
+		// Directories whose numbers are none, or another spelling of one.
+		"mc/mc0/dimm99999999999999999999/dimm_ce_count": file("1"),
+		"mc/mc99999999999999999999/dimm0/dimm_ce_count": file("1"),
+		"mc/mc00/dimm0/dimm_ce_count":                   file("5"),
+		"mc/mc00/dimm0/dimm_ue_count":                   file("5"),
+	}
+	var c adapter.Collected
+	rep := New(fsys, "mc", "sysfs", Options{Now: now}).Collect(ctx, &c)
+	if rep.Status != model.SourcePartial || rep.SinkErr != nil || rep.Records != 4 || rep.Skipped != 2 || len(c.Counters) != 2 {
+		t.Fatalf("report = %+v, %d samples; want partial, 4 records, 2 skipped, 2 samples", rep, len(c.Counters))
+	}
+	notes := strings.Join(rep.Notes, "\n")
+	for _, want := range []string{
+		"sysfs/mc0/dimm0: error counters are unreadable: dimm_ce_count holds 9223372036854775808, more than a counter can count",
+		"sysfs/mc0/dimm3: error counters are unreadable: mc/mc0/dimm3/dimm_ce_count is larger than 65536 bytes",
+	} {
+		if !strings.Contains(notes, want) {
+			t.Errorf("notes lack %q:\n%s", want, notes)
+		}
+	}
+	if s := c.Counters[0]; s.DIMMIndex != 1 || s.CE != 1<<63-1 || s.SecondsSinceReset.Valid {
+		t.Errorf("dimm1: %+v", *s)
+	}
+	if s := c.Counters[1]; s.DIMMIndex != 2 || s.CE != 1 || s.Label != "" {
+		t.Errorf("dimm2: %+v", *s)
+	}
+}
+
 type failingSink struct {
 	adapter.Collected
 	err error

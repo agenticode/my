@@ -28,6 +28,28 @@ func FuzzTables(f *testing.F) {
 	})
 }
 
+// The entry point says which version of the specification the table
+// follows. It is read for a remark only, and must not keep a table from
+// being read whatever it holds.
+func FuzzEntryPoint(f *testing.F) {
+	f.Add(EntryPoint64(3, 7, 4096))
+	f.Add(append([]byte("_SM_"), make([]byte, 27)...))
+	f.Add([]byte("_SM3_"))
+	f.Add([]byte{})
+	table := ddr5Table()
+	f.Fuzz(func(t *testing.T, ep []byte) {
+		e, err := ParseEntryPoint(ep)
+		if err == nil && (e.Bits != 32 && e.Bits != 64 || e.Major < 0 || e.Major > 255 || e.Minor < 0 || e.Minor > 255) {
+			t.Errorf("entry point %+v from %x", e, ep)
+		}
+		var c adapter.Collected
+		rep := NewTables(fstest.MapFS{"DMI": {Data: table}, "smbios_entry_point": {Data: ep}}, ".", "fuzz", Options{}).Collect(context.Background(), &c)
+		if rep.Status != "ok" || len(c.Modules) != 3 || len(rep.Notes) > 2 {
+			t.Errorf("the table was read with %+v, %d modules", rep, len(c.Modules))
+		}
+	})
+}
+
 func FuzzDmidecode(f *testing.F) {
 	f.Add("Handle 0x1100, DMI type 17, 84 bytes\nMemory Device\n\tSize: 32 GB\n\tLocator: A1\n\tSerial Number: 36B2F1A0\n\n")
 	f.Add("Handle 0x1100, DMI type 17, 84 bytes\n\tSize: 99999999999999999999 TB\n")

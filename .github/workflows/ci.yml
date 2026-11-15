@@ -172,3 +172,17 @@ jobs:
         run: make build
       - name: check contrib with promtool, amtool, systemd, Prometheus and Grafana
         run: .github/scripts/contrib-check.sh ./bin/my
+
+  # Every fuzz target for a short run: the seeds, the inputs kept under
+  # testdata/fuzz, and 20,000 new inputs, which is a second for the
+  # fastest target and half a minute for the slowest. Long runs are made
+  # by hand (docs/fuzzing.md).
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: fuzz every target with 20,000 inputs
+        run: make fuzz FUZZTIME=20000x

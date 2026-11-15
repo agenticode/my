@@ -33,6 +33,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // Defaults of a Config.
@@ -371,11 +372,15 @@ func ParseTarget(s string) (*url.URL, error) {
 	return &url.URL{Scheme: u.Scheme, Host: strings.ToLower(u.Host)}, nil
 }
 
+// clip cuts a text to at most n bytes, at the start of a character.
 func clip(s string, n int) string {
-	if len(s) > n {
-		return s[:n] + "..."
+	if len(s) <= n {
+		return s
 	}
-	return s
+	for n > 0 && !utf8.RuneStart(s[n]) {
+		n--
+	}
+	return s[:n] + "..."
 }
 
 // origin is scheme, host and port of a URL in one form, so that two URLs of
@@ -668,7 +673,9 @@ func (c *Client) classify(ctx, rctx context.Context, err error, e *Error) {
 		e.Detail = "no answer within " + c.cfg.Timeout.String()
 	default:
 		e.Unreachable = true
-		e.Detail = c.scrubText(plainError(err))
+		// The cause can quote what the BMC sent, a Location header for
+		// one: it is kept to one line of bounded length.
+		e.Detail = clip(oneLine(c.scrubText(plainError(err))), 300)
 	}
 }
 

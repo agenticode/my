@@ -548,3 +548,43 @@ func TestCounterSampleBounds(t *testing.T) {
 		t.Errorf("a count beyond the range: err = %v, want ErrInvalidRecord", err)
 	}
 }
+
+// The time the counters started is the time of the reading less the
+// seconds they have been running. A number of seconds that is no running
+// time (it came from a file of a copied host tree) overflowed as a
+// duration and gave a reset time that was never the case: such a reading
+// has no reset time.
+func TestRunningTimeThatIsNone(t *testing.T) {
+	s := newStore(t)
+	sample := func(index int, since int64) *model.CounterSample {
+		return &model.CounterSample{ObservedAt: at(10 * time.Hour), MC: 0, DIMMIndex: index, CE: 1,
+			SecondsSinceReset: model.Some(since), Source: "edac-sysfs", RawRef: fmt.Sprintf("mc0/dimm%d", index)}
+	}
+	mustUpdate(t, s, func(w *Writer) error {
+		for i, since := range []int64{36000, 100 * 365 * 24 * 3600, 100*365*24*3600 + 1, 1 << 62, -5} {
+			if _, err := w.InsertCounterSample("h1", sample(i, since)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	rows, err := s.db.QueryContext(ctx, `SELECT dimm_index, reset_at FROM counter_sample ORDER BY dimm_index`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	var got []string
+	for rows.Next() {
+		var index int
+		var reset sql.NullString
+		if err := rows.Scan(&index, &reset); err != nil {
+			t.Fatal(err)
+		}
+		got = append(got, reset.String)
+	}
+	century := at(10 * time.Hour).Add(-100 * 365 * 24 * time.Hour).UTC().Format(timeLayout)
+	want := []string{at(0).UTC().Format(timeLayout), century, "", "", ""}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("reset times %q, want %q", got, want)
+	}
+}

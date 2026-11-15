@@ -474,6 +474,9 @@ func (p *parser) run(r io.Reader) error {
 				p.lastRaw = raw
 			}
 			if tooLong {
+				// A line that is not read is counted like a record that
+				// was looked at: what is skipped is part of the count.
+				p.records++
 				p.tally.Skip(fmt.Sprintf("%s#L%d", p.origin, p.lineNo), "line is longer than 1 MiB")
 			} else if herr := p.handle(raw); herr != nil {
 				return herr
@@ -592,6 +595,7 @@ func (p *parser) handle(raw string) error {
 		}
 		l, err := frameJSON(p.lineNo, raw)
 		if err != nil {
+			p.records++
 			p.tally.Skip(p.ref(&l), "journal entry is not valid JSON")
 			return nil
 		}
@@ -1425,7 +1429,14 @@ func (p *parser) closeSegment(last bool) error {
 	}
 	p.pend = nil
 
-	if seg.records > 0 || seg.banner != "" {
+	if y := seg.start.UTC().Year(); (seg.records > 0 || seg.banner != "") && (y < 1970 || y > 9999) {
+		// Stamps since boot that do not fit the dates of the log put the
+		// start of the boot before 1970 or after 9999. The ledger stores
+		// no such time: the boot is left out, its records keep the times
+		// they have.
+		p.records++
+		p.tally.Skip(p.origin, "start of a boot is out of range: the seconds since boot of its lines do not fit their dates")
+	} else if seg.records > 0 || seg.banner != "" {
 		b := &model.Boot{
 			BootID: bootID, Derived: derived || bootID == "", StartedAt: seg.start, StartQuality: seg.startQuality,
 			Kernel: seg.kernel, BIOS: seg.bios, Cmdline: seg.cmdline, Source: Kind, RawRef: p.origin,

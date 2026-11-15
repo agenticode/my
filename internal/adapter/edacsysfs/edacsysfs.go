@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -32,6 +33,18 @@ const Kind = "edac-sysfs"
 
 // Dir is the location of the counters below the file system root.
 const Dir = "sys/devices/system/edac/mc"
+
+// Bounds of a reading.
+const (
+	// maxAttr bounds what is read of one file. An attribute of sysfs is at
+	// most one page, and a page is at most 64 KiB.
+	maxAttr = 64 << 10
+	// maxText bounds a text of a sample.
+	maxText = maxAttr
+	// maxSinceReset bounds the time the counters are said to run: 100
+	// years in seconds. A larger number is taken as no number.
+	maxSinceReset = 100 * 365 * 24 * 3600
+)
 
 // Options control a reading.
 type Options struct {
@@ -88,8 +101,12 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	var mcs []int
 	for _, e := range entries {
 		if m := mcDirRE.FindStringSubmatch(e.Name()); m != nil && e.IsDir() {
-			n, _ := strconv.Atoi(m[1])
-			mcs = append(mcs, n)
+			// The kernel numbers its controllers mc0, mc1 and so on. A
+			// name that is another spelling of a number, or a number that
+			// is none, is not one of them.
+			if n, err := strconv.Atoi(m[1]); err == nil && e.Name() == fmt.Sprintf("mc%d", n) {
+				mcs = append(mcs, n)
+			}
 		}
 	}
 	sort.Ints(mcs)
@@ -110,7 +127,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		mcRef := fmt.Sprintf("%s/mc%d", a.origin, mc)
 		name, _ := a.text(mcDir, "mc_name")
 		var since model.Opt[int64]
-		if v, err := a.number(mcDir, "seconds_since_reset"); err == nil {
+		if v, err := a.number(mcDir, "seconds_since_reset"); err == nil && v <= maxSinceReset {
 			since = model.Some(int64(v))
 		}
 
@@ -129,13 +146,16 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 				}
 				continue
 			}
+			idx, err := strconv.Atoi(m[2])
+			if err != nil {
+				continue
+			}
 			found++
 			rep.Records++
-			idx, _ := strconv.Atoi(m[2])
 			dir := path.Join(mcDir, d.Name())
 			ref := mcRef + "/" + d.Name()
-			ce, errCE := a.number(dir, "dimm_ce_count")
-			ue, errUE := a.number(dir, "dimm_ue_count")
+			ce, errCE := a.count(dir, "dimm_ce_count")
+			ue, errUE := a.count(dir, "dimm_ue_count")
 			if errCE != nil || errUE != nil {
 				tally.Skip(ref, "error counters are unreadable: "+reason(errors.Join(errCE, errUE)))
 				continue
@@ -164,8 +184,8 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		}
 
 		// Errors the driver could not tie to a DIMM are counted on the controller.
-		ce, errCE := a.number(mcDir, "ce_noinfo_count")
-		ue, errUE := a.number(mcDir, "ue_noinfo_count")
+		ce, errCE := a.count(mcDir, "ce_noinfo_count")
+		ue, errUE := a.count(mcDir, "ue_noinfo_count")
 		if errCE == nil && errUE == nil {
 			rep.Records++
 			s := &model.CounterSample{
@@ -207,11 +227,21 @@ func reason(err error) string {
 }
 
 func (a *Adapter) text(dir, name string) (string, error) {
-	b, err := fs.ReadFile(a.fsys, path.Join(dir, name))
+	b, err := adapter.ReadFile(a.fsys, path.Join(dir, name), maxAttr)
 	if err != nil {
 		return "", err
 	}
 	return strings.TrimSpace(string(b)), nil
+}
+
+// count reads an error counter. The kernel keeps it in 32 bits; the ledger
+// takes what fits into 63.
+func (a *Adapter) count(dir, name string) (uint64, error) {
+	v, err := a.number(dir, name)
+	if err == nil && v > math.MaxInt64 {
+		return 0, fmt.Errorf("%s holds %d, more than a counter can count", name, v)
+	}
+	return v, err
 }
 
 func (a *Adapter) number(dir, name string) (uint64, error) {

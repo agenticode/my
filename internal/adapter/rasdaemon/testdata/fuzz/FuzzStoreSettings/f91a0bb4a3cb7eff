@@ -1,0 +1,2 @@
+go test fuzz v1
+string("RASDAEMON_DB_BACKEND=postgresql\nT=\nRAS_PG_PASSWORD='esql'")

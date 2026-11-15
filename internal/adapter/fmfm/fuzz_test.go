@@ -27,6 +27,9 @@ func FuzzCollect(f *testing.F) {
 		if rep.Status == "" || rep.Kind != Kind {
 			t.Fatalf("report without status or kind: %+v", rep)
 		}
+		if rep.Skipped > rep.Records {
+			t.Errorf("%d of %d records skipped", rep.Skipped, rep.Records)
+		}
 		usable := rep.Status == model.SourceOK || rep.Status == model.SourcePartial
 		if n := len(c.Events) + len(c.ECSs) + len(c.Modules) + len(c.Boots); n > 0 && !usable {
 			t.Errorf("%d records from a source with status %s", n, rep.Status)

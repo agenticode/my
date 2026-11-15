@@ -11,6 +11,7 @@ package smbios
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -66,11 +67,23 @@ func (a *Adapter) now() time.Time {
 	return a.opts.Now.UTC()
 }
 
+// Bounds of the raw tables. The table of a large server with every slot
+// populated is some tens of kilobytes; the entry point is 24 or 31 bytes.
+const (
+	maxTable      = 16 << 20
+	maxEntryPoint = 4 << 10
+)
+
 // NewTables returns an adapter for the raw SMBIOS tables in directory dir
 // of fsys: the files DMI and smbios_entry_point.
 func NewTables(fsys fs.FS, dir, origin string, opts Options) *Adapter {
 	return &Adapter{origin: origin, opts: opts, read: func(ctx context.Context, a *Adapter, sink adapter.Sink, rep *adapter.Report) {
-		table, err := fs.ReadFile(fsys, path.Join(dir, "DMI"))
+		table, err := adapter.ReadFile(fsys, path.Join(dir, "DMI"), maxTable)
+		var large *adapter.TooLargeError
+		if errors.As(err, &large) {
+			rep.Status, rep.Detail = model.SourceError, fmt.Sprintf("the file DMI holds more than %d bytes: not the SMBIOS table of a machine", int64(maxTable))
+			return
+		}
 		if err != nil {
 			rep.Status, rep.Detail = adapter.StatusForError(err)
 			switch rep.Status {
@@ -81,7 +94,7 @@ func NewTables(fsys fs.FS, dir, origin string, opts Options) *Adapter {
 			}
 			return
 		}
-		if ep, err := fs.ReadFile(fsys, path.Join(dir, "smbios_entry_point")); err == nil {
+		if ep, err := adapter.ReadFile(fsys, path.Join(dir, "smbios_entry_point"), maxEntryPoint); err == nil {
 			if e, err := ParseEntryPoint(ep); err == nil {
 				rep.Notes = append(rep.Notes, fmt.Sprintf("SMBIOS %d.%d", e.Major, e.Minor))
 			}
