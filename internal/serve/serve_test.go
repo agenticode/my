@@ -23,6 +23,32 @@ import (
 type state struct {
 	ce     float64
 	closed atomic.Int32
+	// asked records the queries to /api/dimm; hold, when set, makes an
+	// answer wait until the test lets it go.
+	mu    sync.Mutex
+	asked []Query
+	hold  chan struct{}
+}
+
+func (s *state) DIMM(_ context.Context, q Query) (any, error) {
+	s.mu.Lock()
+	s.asked = append(s.asked, q)
+	hold := s.hold
+	s.mu.Unlock()
+	if hold != nil {
+		<-hold
+	}
+	switch q.Ref {
+	case "nope":
+		return nil, &Error{Status: http.StatusNotFound, Message: `no slot or DIMM "nope" in host h1.`}
+	case "9C":
+		return nil, &Error{Status: http.StatusBadRequest, Message: "more than one DIMM matches"}
+	case "broken":
+		return nil, errors.New("ledger: database is locked")
+	case "unprintable":
+		return func() {}, nil
+	}
+	return map[string]any{"view": "why", "host": "h1", "ref": q.Ref, "ce": s.ce}, nil
 }
 
 func (s *state) Metrics() *exporter.Set {
@@ -418,5 +444,133 @@ func TestRunStopsDuringAScan(t *testing.T) {
 	}
 	if late.closed.Load() != 1 {
 		t.Errorf("the state of the scan that ended late was closed %d times", late.closed.Load())
+	}
+}
+
+func TestDIMMAPI(t *testing.T) {
+	st := &state{ce: 12}
+	s, _ := newServer(&source{queue: []any{st}}, nil)
+	h := s.Handler()
+
+	// Before the first scan there is nothing to answer from.
+	code, hd, body := get(t, h, "GET", "/api/dimm/CPU0_C1")
+	if code != http.StatusServiceUnavailable || hd.Get("Content-Type") != "application/json; charset=utf-8" ||
+		body != "{\n  \"error\": \"the first scan has not finished\"\n}\n" {
+		t.Errorf("before a scan: %d %v %q", code, hd, body)
+	}
+	s.ScanOnce(ctx)
+
+	code, hd, body = get(t, h, "GET", "/api/dimm/CPU0_C1")
+	want := "{\n  \"ce\": 12,\n  \"host\": \"h1\",\n  \"ref\": \"CPU0_C1\",\n  \"view\": \"why\"\n}\n"
+	if code != http.StatusOK || body != want || hd.Get("Content-Type") != "application/json; charset=utf-8" ||
+		hd.Get("Content-Length") != fmt.Sprint(len(want)) || hd.Get("Cache-Control") != "no-store" {
+		t.Errorf("GET /api/dimm/CPU0_C1 = %d %v\n%s", code, hd, body)
+	}
+
+	// What the request names reaches the state as it was meant: the path
+	// unescaped, the parameters as sent.
+	for path, want := range map[string]Query{
+		"/api/dimm":                              {},
+		"/api/dimm/":                             {},
+		"/api/dimm?all=1":                        {All: true},
+		"/api/dimm?all=0":                        {},
+		"/api/dimm/DIMM%20A1":                    {Ref: "DIMM A1"},
+		"/api/dimm/P1%2FDIMM1":                   {Ref: "P1/DIMM1"},
+		"/api/dimm/CPU0/C1":                      {Ref: "CPU0/C1"},
+		"/api/dimm/3B9C56?lang=ko&host=r12-n034": {Ref: "3B9C56", Lang: "ko", Host: "r12-n034"},
+		"/api/dimm/%EC%8A%AC%EB%A1%AF?all=true":  {Ref: "슬롯", All: true},
+	} {
+		st.mu.Lock()
+		st.asked = nil
+		st.mu.Unlock()
+		if code, _, body := get(t, h, "GET", path); code != http.StatusOK {
+			t.Errorf("GET %s = %d %s", path, code, body)
+			continue
+		}
+		if len(st.asked) != 1 || st.asked[0] != want {
+			t.Errorf("GET %s asked %+v, want %+v", path, st.asked, want)
+		}
+	}
+
+	// What the reader got wrong, and what the server could not do.
+	for path, want := range map[string]struct {
+		code int
+		body string
+	}{
+		"/api/dimm/nope":        {http.StatusNotFound, `no slot or DIMM \"nope\" in host h1.`},
+		"/api/dimm/9C":          {http.StatusBadRequest, "more than one DIMM matches"},
+		"/api/dimm/broken":      {http.StatusInternalServerError, "ledger: database is locked"},
+		"/api/dimm/unprintable": {http.StatusInternalServerError, "json: unsupported type"},
+	} {
+		code, hd, body := get(t, h, "GET", path)
+		if code != want.code || !strings.HasPrefix(body, "{\n  \"error\": \""+want.body) || !strings.HasSuffix(body, "\n}\n") ||
+			hd.Get("Content-Type") != "application/json; charset=utf-8" {
+			t.Errorf("GET %s = %d %q", path, code, body)
+		}
+	}
+	if code, hd, _ := get(t, h, "POST", "/api/dimm/CPU0_C1"); code != http.StatusMethodNotAllowed || hd.Get("Allow") != "GET, HEAD" {
+		t.Errorf("POST /api/dimm/CPU0_C1 = %d", code)
+	}
+	if _, _, body := get(t, h, "GET", "/"); !strings.Contains(body, "/api/dimm/<slot or serial>") {
+		t.Errorf("the index does not name the API:\n%s", body)
+	}
+}
+
+// TestAStateIsNotClosedUnderARequest: a scan ends while a request reads
+// the state before. The old state is closed after the request is done.
+func TestAStateIsNotClosedUnderARequest(t *testing.T) {
+	old, fresh := &state{ce: 1, hold: make(chan struct{})}, &state{ce: 2}
+	s, _ := newServer(&source{queue: []any{old, fresh}}, nil)
+	h := s.Handler()
+	s.ScanOnce(ctx)
+
+	answered := make(chan string, 1)
+	go func() {
+		req := httptest.NewRequest("GET", "/api/dimm/CPU0_C1", nil)
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		answered <- rec.Body.String()
+	}()
+	// Wait until the request is inside the state.
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		old.mu.Lock()
+		n := len(old.asked)
+		old.mu.Unlock()
+		if n == 1 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("the request did not reach the state")
+		}
+		time.Sleep(time.Millisecond)
+	}
+	swapped := make(chan struct{})
+	go func() {
+		s.ScanOnce(ctx)
+		close(swapped)
+	}()
+	select {
+	case <-swapped:
+		t.Fatal("the scan took the state over while a request was reading it")
+	case <-time.After(100 * time.Millisecond):
+	}
+	if old.closed.Load() != 0 {
+		t.Fatal("the state was closed under a request")
+	}
+	close(old.hold)
+	if body := <-answered; !strings.Contains(body, `"ce": 1`) {
+		t.Errorf("the request was answered from another state: %s", body)
+	}
+	select {
+	case <-swapped:
+	case <-time.After(5 * time.Second):
+		t.Fatal("the scan did not take over after the request ended")
+	}
+	if old.closed.Load() != 1 {
+		t.Errorf("the old state was closed %d times", old.closed.Load())
+	}
+	if _, _, body := get(t, h, "GET", "/api/dimm/CPU0_C1"); !strings.Contains(body, `"ce": 2`) {
+		t.Errorf("after the scan: %s", body)
 	}
 }

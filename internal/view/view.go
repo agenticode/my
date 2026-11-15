@@ -54,6 +54,18 @@ func Open(ctx context.Context, s *store.Store, lang i18n.Lang, opts engine.Optio
 // Store returns the ledger of the case.
 func (c *Case) Store() *store.Store { return c.store }
 
+// In returns the case with its sentences in another language. The two
+// share the ledger and the result of the engine, which holds codes and
+// arguments and no sentence: the engine does not run again.
+func (c *Case) In(lang i18n.Lang) *Case {
+	if lang == "" || lang == c.Lang {
+		return c
+	}
+	other := *c
+	other.Lang = lang
+	return &other
+}
+
 // Text is a sentence ready to be shown, with the code and the arguments it
 // was made from. A program reads the code; a person reads the text.
 type Text struct {

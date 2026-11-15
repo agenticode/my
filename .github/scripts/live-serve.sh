@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the exporter against the machine it is on: starts "my serve", waits
-# for the first scan, reads /metrics, lets promtool check the page, and
-# stops the server the way a service manager does.
+# for the first scan, reads /metrics, lets promtool check the page, asks
+# the API, and stops the server the way a service manager does.
 #
 # promtool runs from its container image, or from the program PROMTOOL
 # names.
@@ -84,6 +84,27 @@ for _ in $(seq 150); do
   sleep 0.2
 done
 [ "$again" != "$first" ] || fail "no second scan"
+
+# The API: the DIMMs of this host as JSON, one of them by its slot, and
+# an answer a client can act on for a name that fits nothing.
+curl -s -f "$url/api/dimm?all=1" > "$tmp/api.json" || fail "/api/dimm"
+slot=$(python3 - "$tmp/api.json" "$host" <<'EOF'
+import json, sys, urllib.parse
+d = json.load(open(sys.argv[1]))
+if d["view"] != "why" or d["host"] != sys.argv[2] or d["version"] != 1:
+    sys.exit("unexpected document: %r" % {k: d.get(k) for k in ("view", "host", "version")})
+print("api: host", d["host"], "grade", d["grade"], len(d["data"]), "DIMMs", file=sys.stderr)
+print(urllib.parse.quote(d["data"][0]["slot"], safe="") if d["data"] else "")
+EOF
+) || fail "/api/dimm is not the document of my why --json"
+if [ -n "$slot" ]; then
+  code=$(curl -s -o "$tmp/one.json" -w '%{http_code}' "$url/api/dimm/$slot")
+  [ "$code" = 200 ] || fail "/api/dimm/$slot answers $code"
+  python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); sys.exit(0 if len(d["data"]) == 1 else 1)' "$tmp/one.json" || fail "/api/dimm/$slot is not one DIMM"
+  echo "api: /api/dimm/$slot is one DIMM"
+fi
+code=$(curl -s -o "$tmp/none.json" -w '%{http_code}' "$url/api/dimm/no-such-slot")
+{ [ "$code" = 404 ] && grep -q '"error"' "$tmp/none.json"; } || fail "/api/dimm/no-such-slot answers $code"
 
 # Anything but GET and HEAD is refused.
 code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$url/metrics")

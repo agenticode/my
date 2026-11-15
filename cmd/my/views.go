@@ -159,28 +159,16 @@ func runWhy(ctx context.Context, env *cli.Env, args []string, src *source) int {
 	}
 
 	grade := s.h.Grade
-	cards := []*view.Card{}
+	var d *engine.DIMMResult
 	if len(pos) == 1 {
-		d, code := s.find(pos[0])
-		if d == nil {
+		if d, code = s.find(pos[0]); d == nil {
 			return code
 		}
-		card, err := s.c.Card(ctx, s.h, d)
-		if err != nil {
-			return o.failure(env, err)
-		}
-		cards, grade = append(cards, card), d.Verdict.Grade
-	} else {
-		for _, d := range s.h.DIMMs {
-			if !*all && !view.Listed(d) {
-				continue
-			}
-			card, err := s.c.Card(ctx, s.h, d)
-			if err != nil {
-				return o.failure(env, err)
-			}
-			cards = append(cards, card)
-		}
+		grade = d.Verdict.Grade
+	}
+	cards, err := whyCards(ctx, s.c, s.h, d, *all)
+	if err != nil {
+		return o.failure(env, err)
 	}
 	return s.emit("why", grade, cards, func(w io.Writer) error {
 		if !*oneline {

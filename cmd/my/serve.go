@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -163,7 +165,7 @@ func (h *hostSource) Scan(ctx context.Context) (serve.State, error) {
 	if err != nil {
 		return nil, err
 	}
-	st := &hostState{tmp: tmp}
+	st := &hostState{tmp: tmp, lang: h.lang}
 	ok := false
 	defer func() {
 		if !ok {
@@ -190,6 +192,7 @@ func (h *hostSource) Scan(ctx context.Context) (serve.State, error) {
 // hostState is one scan of the host: its ledger and what the engine found.
 type hostState struct {
 	tmp    string
+	lang   i18n.Lang
 	ledger *store.Store
 	c      *view.Case
 	h      *engine.HostResult
@@ -197,6 +200,50 @@ type hostState struct {
 }
 
 func (s *hostState) Metrics() *exporter.Set { return s.set }
+
+// DIMM answers /api/dimm with what "my why --json" prints for the same
+// DIMM: the same data in the same envelope.
+func (s *hostState) DIMM(ctx context.Context, q serve.Query) (any, error) {
+	lang := s.lang
+	if q.Lang != "" {
+		l, err := i18n.ParseLang(q.Lang)
+		if err != nil {
+			return nil, &serve.Error{Status: http.StatusBadRequest, Message: err.Error()}
+		}
+		lang = l
+	}
+	return whyDocument(ctx, s.c.In(lang), s.h, lang, q)
+}
+
+// whyDocument builds the answer to /api/dimm for one host.
+func whyDocument(ctx context.Context, c *view.Case, h *engine.HostResult, lang i18n.Lang, q serve.Query) (any, error) {
+	if q.Host != "" && !strings.EqualFold(q.Host, h.Host) {
+		return nil, &serve.Error{Status: http.StatusNotFound, Message: say(lang, "err.no_host", "host", q.Host, "hosts", h.Host)}
+	}
+	grade := h.Grade
+	var d *engine.DIMMResult
+	if q.Ref != "" {
+		var msg string
+		var err error
+		d, msg, err = findDIMM(ctx, c, h, lang, q.Ref)
+		switch {
+		case d != nil:
+		case msg == "":
+			return nil, err
+		case errors.Is(err, view.ErrAmbiguousDIMM):
+			// The name fits several DIMMs: the request has to say more.
+			return nil, &serve.Error{Status: http.StatusBadRequest, Message: msg}
+		default:
+			return nil, &serve.Error{Status: http.StatusNotFound, Message: msg}
+		}
+		grade = d.Verdict.Grade
+	}
+	cards, err := whyCards(ctx, c, h, d, q.All)
+	if err != nil {
+		return nil, err
+	}
+	return newEnvelope("why", lang, h.Host, grade, cards), nil
+}
 
 func (s *hostState) Close() {
 	if s.ledger != nil {
