@@ -38,7 +38,7 @@ One entry per DIMM that has error records. Errors tied to no DIMM are not sent.
 ```json
 {
   "Contract": "my-analyzer/1",
-  "Core": { "Name": "MemorY", "Version": "1.0.0", "EngineVersion": "3" },
+  "Core": { "Name": "MemorY", "Version": "...", "EngineVersion": "..." },
   "RequestDT": "2026-11-13T09:30:00.000Z",
   "PreviousLogs": 1000,
   "Dimms": [
