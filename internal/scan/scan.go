@@ -365,7 +365,7 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 			loc = time.Local
 		}
 	}
-	kopts := klog.Options{BootTime: info.BootTime, BootID: info.BootID, Location: loc}
+	kopts := klog.Options{BootTime: info.BootTime, BootID: info.BootID, Location: loc, TempDir: opts.TempDir}
 	var out []adapter.Adapter
 
 	if opts.Live {
