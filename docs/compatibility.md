@@ -12,6 +12,24 @@ The observation grade of a record says how much of the place of an error its sou
 
 Every input gets an entry in the source inventory of a scan, also when it is absent or unreadable. The entry carries the status, the number of records read and skipped, and notes such as "3 records of other sensors were left out".
 
+## What a platform gives
+
+The same fault shows more or less of itself depending on who handles the error and which driver reports it.
+
+| Environment | Inputs | Grade | Why |
+| --- | --- | --- | --- |
+| Intel Xeon from Skylake on, errors handled by the kernel | rasdaemon database, kernel log | A | `skx_edac` and `i10nm_edac` print rank, bank, row and column |
+| Intel Xeon, Sandy Bridge to Broadwell | rasdaemon database, kernel log | B | `sb_edac` prints the rank and the address |
+| AMD EPYC | rasdaemon database, kernel log | B | `amd64_edac` and the machine check give chip select, channel and address |
+| Errors handled by firmware first (GHES), on x86 and ARM | rasdaemon database, kernel log | A to C | as much as the firmware put into the error record |
+| CXL memory device | rasdaemon database | A | DRAM event records carry bank, row and column |
+| Fleet with FMFM logging | FMFM logs | A to C | as much as the logging fills in |
+| Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
+| No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
+| NVIDIA GPU memory | Xid lines, `nvidia-smi -q` | C | the driver reports no location |
+
+These grades are what the adapters and decoders give on the fixtures and test cases of this repository. They have not been confirmed on real hosts of each kind.
+
 ## How a file is recognised
 
 `scan.Detect` picks the adapter for a file or a directory by its content. File names play no part.
@@ -60,6 +78,129 @@ A slot made from numbers lasts until an inventory lists the place. Its records t
 Numbers from two sources are taken to mean one place. Firmware logs and BMC inventories count channels within a socket. A source that counts them another way would be tied to the wrong slot; no input read today does so without also giving the memory controller.
 
 EDAC positions carry the memory controller and are tied to SMBIOS slots on evidence only: equal labels, or socket, channel and position numbers that agree for every populated slot. The `slot-map` entry of the source inventory says what was tied and how.
+
+## rasdaemon database
+
+Adapter `rasdaemon`, package `internal/adapter/rasdaemon`. It reads the SQLite file rasdaemon keeps, `ras-mc_event.db`, with the tables of rasdaemon 0.6 to 1.0. Columns are read by name, because a database that was upgraded in place has its newer columns in another order than a fresh one.
+
+A scan looks for the file at `/var/lib/rasdaemon/ras-mc_event.db` and `/usr/local/var/lib/rasdaemon/ras-mc_event.db`. On a live host it reads a private copy, so it takes no lock on a file rasdaemon is writing to. An imported file is read in place.
+
+| Table | Ledger record |
+| --- | --- |
+| `mc_event` | error event from the EDAC report: severity, count, address, syndrome, the EDAC position and label, and what the driver detail carries |
+| `mce_record` | error event from a machine check that reports a memory error; other machine checks are counted and left out |
+| `extlog_event` | error event from a firmware error record (CPER), with the location fields the record marks valid |
+| `memory_failure_event` | action `page-offline`, method `hard`, with the result the kernel reports |
+| `cxl_*` | see "CXL memory devices" |
+| `aer_event`, `non_standard_event`, `arm_event`, `devlink_event`, `disk_errors`, `signal_event` | not about memory cells; the report says how many rows each holds |
+
+The driver detail of `mc_event` is read in the dialect of its driver, chosen from the keys in the text before any number is read: `skx_edac` and `i10nm_edac` print row and column in hexadecimal, `ghes_edac` prints them in decimal under the same names. Text in no known dialect is kept and not decoded.
+
+A machine check and the EDAC report decoded from it are one error. The machine check is marked as a second report of the `mc_event` row within a second of it that names the same cache line, or the same chip select and channel, and the error is counted once.
+
+### Grade
+
+A for a record with row, column and bank. B for a record with an address or a rank. C otherwise.
+
+### Known gaps
+
+- The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.
+- rasdaemon stores what it traced while it ran. Errors from before it was started, and from a boot in which it did not run, are in the kernel log only.
+- A database that fails the SQLite integrity check is refused.
+
+## Kernel log
+
+Adapter `klog`, package `internal/adapter/klog`. The kernel log is a lossy source: the ring buffer wraps and some messages are rate limited. A scan reads it in addition to the rasdaemon database, and an error both report is counted once.
+
+### Accepted forms
+
+| Form | Times |
+| --- | --- |
+| `journalctl -k -o json`, also for several boots | exact |
+| syslog files (`/var/log/messages`, `kern.log`, `syslog`), with or without ISO dates | exact; the zone has to be given when the lines have none |
+| `dmesg -T` | taken as printed; `dmesg` computes them from the uptime, so they are off after a suspend |
+| `/dev/kmsg` records, `dmesg` with seconds since boot | see "Times" below |
+
+A scan of a live host reads the journal of every boot on record, as far as the current user may, for two minutes at most. When that is not enough, the running boot is read in full and older boots in part, and the source inventory says so. Where the journal cannot be read, the scan reads the ring buffer of the running boot from `/dev/kmsg`, and where that fails the first of `/var/log/kern.log`, `messages`, `syslog` and `dmesg`. One of them is read, because the same line from two of them would count twice.
+
+### What is read
+
+| Lines | Ledger record |
+| --- | --- |
+| `EDAC MC0: 1 CE ...` | error event with the EDAC position, label, page, offset, syndrome and the driver detail |
+| `{1}[Hardware Error]: ...` blocks of GHES | error event per memory error section, with the fields the firmware filled |
+| `mce: [Hardware Error]: CPU 3: Machine Check: ...` with its `ADDR`, `MISC` and `TIME` lines, and the decode `mce_amd` prints | error event when the machine check reports a memory error |
+| `Memory failure: 0x...: recovery action for ...`, soft offline messages | action `page-offline`, method `hard` or `soft`, with the result |
+| `NVRM: Xid ...` | see "NVIDIA GPU memory" |
+| `Linux version ...`, `DMI: ...`, the command line | a boot, with kernel, board and BIOS |
+
+A line read from `dmesg` and the same line read from the journal are one record: a record is identified by the kernel's own stamp and its text.
+
+### Grade
+
+As for the rasdaemon database: A with row, column and bank, B with an address or a rank, C otherwise.
+
+### Times
+
+A syslog date has no year. It gets the latest year that does not put the line after the capture time, or after the time of the import when no capture time is given.
+
+A capture with seconds since boot only says when an error happened relative to the boot. The start of the boot is taken from the first of these that is known:
+
+1. On a live host, the boot time in `/proc/stat`. Times are exact.
+2. A machine check record in the log, which carries its own wall-clock time. Times are exact.
+3. A capture time (`--captured-at`, or `--mtime` for the modification time of the file): the boot started at that time minus the last stamp. Times are marked as estimated.
+4. The line in which the kernel sets the system clock from the hardware clock. Times are marked as estimated.
+
+With none of them the records stay relative to their boot. They are then dated by the records of another source that reports the same errors with a date, when there is one; the `time-align` entry of the source inventory says what was done.
+
+### Known gaps
+
+- Records that were overwritten in the ring buffer or dropped by the rate limit are missing. The EDAC counters show how many errors are known as a count only.
+- A log file that starts in the middle of a boot has no boot banner for that boot.
+- Machine check decoding covers the memory errors of Intel and AMD processors. Other machine checks, and firmware error sections that are not about memory, are counted in the report and left out.
+
+## EDAC counters
+
+Adapter `edacsysfs`, package `internal/adapter/edacsysfs`. It takes one reading of the counters under `/sys/devices/system/edac/mc`: `dimm_ce_count` and `dimm_ue_count` of every DIMM with its label, position, size and type, and the counts the driver could not tie to a DIMM (`ce_noinfo_count`, `ue_noinfo_count`).
+
+The counters say how many errors a DIMM had since the driver was loaded and nothing about where in the DIMM. They start at zero with every boot.
+
+Each reading becomes a counter event with the growth since the reading before it, or since the counter started. The ledger then sets how many of these errors the located records of the same slot and time window already account for. Totals count the remainder, so a host with a rasdaemon database and EDAC counters is not counted twice, and errors that only the counter saw are still counted.
+
+### Grade
+
+C.
+
+### Known gaps
+
+- A host without an EDAC driver for its platform has no counters, which is usual in virtual machines. The entry in the source inventory says so.
+- A memory controller that only has the `csrow` directories of kernels before 3.6 is reported and not read.
+- The counters cannot tell two errors in one cell from two errors in two cells.
+
+## SMBIOS
+
+Adapter `smbios`, package `internal/adapter/smbios`. It reads the memory device records (type 17): the slots of the board, and manufacturer, part number, serial number, size, type, speed and rank count of the DIMM in each. The system and board names come from types 1 and 2.
+
+| Form | Remark |
+| --- | --- |
+| raw tables under `/sys/firmware/dmi/tables` | readable by root on most systems |
+| `dmidecode` output, all types or `-t 17` or `-t memory` | for an import, and in a copy of a host's files |
+
+The locator of a slot is its name in every finding. Where two slots have the same locator, the bank locator is added.
+
+SMBIOS gives no error records and no grade.
+
+### Known gaps
+
+- Without the raw tables or `dmidecode` output a scan has no serial numbers. DIMMs are then told apart by slot, and a replaced DIMM cannot be told from its predecessor.
+- Serial numbers that are placeholders (`NO DIMM`, `Unknown`, all zeros and the like) are not taken as identities.
+- SMBIOS does not say which EDAC position a slot is. The two are tied on evidence only, see "Which slot a record belongs to".
+
+## Host facts
+
+Adapter `hostinfo`, package `internal/adapter/hostinfo`. It reads what a running Linux host says about itself from files any user may read: the host name, the kernel release, the architecture, the boot ID and boot time, the kernel command line, and the system, board and BIOS names under `/sys/class/dmi/id`.
+
+The boot time dates kernel log lines that carry seconds since boot. The host name is the name of the case unless one is given.
 
 ## BMC event log (SEL)
 
