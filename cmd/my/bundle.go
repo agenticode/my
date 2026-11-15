@@ -89,10 +89,17 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 			return o.usageError(env, lang, "--key-file %s: %v", *keyFile, err)
 		}
 	}
-	if !*force {
-		if _, err := os.Stat(*out); err == nil {
-			return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", *out))
+	// "-o -" sends the bundle to the standard output, for a pipe or for a
+	// command run over ssh; what is said about it then goes to the
+	// standard error.
+	toStdout := *out == "-"
+	if toStdout {
+		if code, is := o.binaryToTerminal(env, lang); is {
+			return code
 		}
+	}
+	if code, ok := o.checkTarget(env, lang, *out, *force); !ok {
+		return code
 	}
 
 	s, code := o.start(ctx, env, lang, src)
@@ -121,13 +128,23 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 			return o.failure(env, err)
 		}
 	}
-	w, err := bundle.Write(ctx, s.c.Store(), *out, opts)
+	var w *bundle.Written
+	var err error
+	says := env.Stdout
+	if toStdout {
+		says = env.Stderr
+		if w, err = bundle.WriteTo(ctx, s.c.Store(), env.Stdout, opts); err == nil {
+			w.Path = "-"
+		}
+	} else {
+		w, err = bundle.Write(ctx, s.c.Store(), *out, opts)
+	}
 	if err != nil {
-		return o.failure(env, err)
+		return o.failure(env, errors.New(targetText(lang, err)))
 	}
 
 	if o.asJSON {
-		enc := json.NewEncoder(env.Stdout)
+		enc := json.NewEncoder(says)
 		enc.SetIndent("", "  ")
 		if err := enc.Encode(struct {
 			Path     string            `json:"path"`
@@ -139,8 +156,12 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 		}
 		return cli.ExitOK
 	}
-	p := func(format string, a ...any) { fmt.Fprintf(env.Stdout, format+"\n", a...) }
-	p("%s", say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
+	p := func(format string, a ...any) { fmt.Fprintf(says, format+"\n", a...) }
+	if toStdout {
+		p("%s", say(lang, "bundle.sent", "size", sizeText(w.Bytes)))
+	} else {
+		p("%s", say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
+	}
 	for _, h := range s.c.Result.Hosts {
 		name := h.Host
 		if n, ok := w.Names[name]; ok {
@@ -201,8 +222,17 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 			p("%s", line)
 		}
 	}
-	p("%s", say(lang, "bundle.open", "file", w.Path))
+	if regularFile(w.Path) {
+		p("%s", say(lang, "bundle.open", "file", w.Path))
+	}
 	return cli.ExitOK
+}
+
+// regularFile reports whether path is a file that can be opened again
+// later: a bundle sent to a pipe or a device is gone.
+func regularFile(path string) bool {
+	fi, err := os.Stat(path)
+	return err == nil && fi.Mode().IsRegular()
 }
 
 // caseInfo says what a bundle is, at the top of what "my open" prints.

@@ -17,6 +17,7 @@ import (
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/outfile"
 	"github.com/agenticode/my/internal/scan"
 	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/term"
@@ -168,7 +169,62 @@ func (o *options) parse(env *cli.Env, args []string) (pos []string, lang i18n.La
 	if o.width < 0 {
 		return nil, lang, o.usageError(env, lang, "%s", say(lang, "err.width", "value", o.width)), true
 	}
+	if o.ledger != "" {
+		// Before anything is read: a ledger that is kept is a database
+		// file, and a device or a missing directory cannot hold one.
+		if err := outfile.CheckLedger(o.ledger); err != nil {
+			return nil, lang, o.usageError(env, lang, "--ledger %s", targetText(lang, err)), true
+		}
+	}
 	return pos, lang, 0, false
+}
+
+// targetText says in the reader's language why a file cannot be written.
+func targetText(lang i18n.Lang, err error) string {
+	var pe *outfile.PathError
+	if !errors.As(err, &pe) {
+		return err.Error()
+	}
+	for _, m := range []struct {
+		err  error
+		code string
+	}{
+		{outfile.ErrExists, "err.exists"},
+		{outfile.ErrNoDir, "err.no_dir"},
+		{outfile.ErrIsDir, "err.is_dir"},
+		{outfile.ErrNotFile, "err.not_file"},
+		{outfile.ErrDenied, "err.dir_denied"},
+		{outfile.ErrDangling, "err.dangling"},
+	} {
+		if errors.Is(pe.Err, m.err) {
+			return say(lang, m.code, "file", pe.Path)
+		}
+	}
+	return err.Error()
+}
+
+// checkTarget ends a command whose output file cannot be written, before
+// the host is scanned for it: a name that is taken, a directory that is
+// not there. "-" is the standard output and needs no check.
+func (o *options) checkTarget(env *cli.Env, lang i18n.Lang, path string, force bool) (code int, ok bool) {
+	if path == "" || path == "-" {
+		return 0, true
+	}
+	if err := outfile.Check(path, force); err != nil {
+		return o.usageError(env, lang, "%s", targetText(lang, err)), false
+	}
+	return 0, true
+}
+
+// binaryToTerminal ends a command that was asked to write a file to the
+// standard output while that is a terminal.
+func (o *options) binaryToTerminal(env *cli.Env, lang i18n.Lang) (code int, is bool) {
+	if f, ok := env.Stdout.(*os.File); ok {
+		if _, terminal := term.Size(f); terminal {
+			return o.usageError(env, lang, "%s", say(lang, "err.terminal")), true
+		}
+	}
+	return 0, false
 }
 
 // style works out how to draw for this run.
@@ -282,19 +338,18 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 // the ledger at path, which is created when it is not there. It returns
 // the ledger and the name of the host.
 func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time) (*store.Store, string, error) {
-	ledger, err := store.Open(ctx, path, store.Create)
-	if err != nil {
-		return nil, "", err
-	}
 	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp}
 	if root != "" && filepath.Clean(root) != "/" {
 		// A copy of a host's files: only files are read.
 		if fi, err := os.Stat(root); err != nil || !fi.IsDir() {
-			ledger.Close()
-			return nil, "", fmt.Errorf("--root %s: %s", root, say(lang, "err.not_dir"))
+			return nil, "", usage{fmt.Sprintf("--root %s: %s", root, say(lang, "err.not_dir"))}
 		}
 		// The copy says when it was made; the clock of this run does not.
 		opts.Root, opts.Live, opts.Now = root, false, time.Time{}
+	}
+	ledger, err := store.Open(ctx, path, store.Create)
+	if err != nil {
+		return nil, "", err
 	}
 	res, err := scan.Run(ctx, ledger, opts)
 	if err != nil {

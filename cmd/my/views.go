@@ -58,6 +58,11 @@ func runOverview(ctx context.Context, env *cli.Env, args []string, src *source) 
 		return printHelp(env, lang, o.style(env, lang), "overview", src)
 	}
 	if len(pos) > 0 {
+		// "my --root DIR why": the flags were read as those of a scan, and
+		// the command stands where no argument belongs.
+		if src == nil && app().Lookup(pos[0]) != nil {
+			return o.usageError(env, lang, "%s", say(lang, "err.command_first", "cmd", pos[0]))
+		}
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[0]))
 	}
 	s, code := o.start(ctx, env, lang, src)

@@ -42,6 +42,7 @@ import (
 	_ "modernc.org/sqlite" // the ledger inside a bundle is a SQLite file
 
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/outfile"
 	"github.com/agenticode/my/internal/store"
 )
 
@@ -215,13 +216,60 @@ type Written struct {
 	Names map[string]string
 }
 
-// Write writes the ledger as a bundle to path.
+// Write writes the ledger as a bundle to path. The file is written beside
+// its target and moved into place, so a bundle found under the name is
+// whole; a device or a pipe under the name is written to as it is.
 func Write(ctx context.Context, s *store.Store, path string, opts Options) (*Written, error) {
-	if !opts.Force {
-		if _, err := os.Stat(path); err == nil {
-			return nil, fmt.Errorf("%s exists", path)
-		}
+	// Before the ledger is copied: a name that is taken, or a directory
+	// that is not there, needs no work to find out.
+	if err := outfile.Check(path, opts.Force); err != nil {
+		return nil, err
 	}
+	w, emit, cleanup, err := prepare(ctx, s, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup()
+	n, err := outfile.Write(path, opts.Force, emit)
+	if err != nil {
+		return nil, err
+	}
+	w.Path, w.Bytes = path, n
+	return w, nil
+}
+
+// WriteTo writes the ledger as a bundle to out: a pipe to another host, or
+// the standard output of a command run over ssh.
+func WriteTo(ctx context.Context, s *store.Store, out io.Writer, opts Options) (*Written, error) {
+	w, emit, cleanup, err := prepare(ctx, s, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup()
+	c := &countWriter{w: out}
+	if err := emit(c); err != nil {
+		return nil, err
+	}
+	w.Bytes = c.n
+	return w, nil
+}
+
+// countWriter counts what passes through it.
+type countWriter struct {
+	w io.Writer
+	n int64
+}
+
+func (c *countWriter) Write(p []byte) (int, error) {
+	n, err := c.w.Write(p)
+	c.n += int64(n)
+	return n, err
+}
+
+// prepare makes the content of a bundle: a copy of the ledger, anonymized
+// when asked, and what describes it. emit writes the archive; cleanup
+// removes the copy.
+func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emit func(io.Writer) error, cleanup func(), err error) {
 	now := opts.Now
 	if now.IsZero() {
 		now = time.Now()
@@ -230,15 +278,20 @@ func Write(ctx context.Context, s *store.Store, path string, opts Options) (*Wri
 
 	tmp, err := os.MkdirTemp(opts.TempDir, "my-bundle-")
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	defer os.RemoveAll(tmp)
+	cleanup = func() { os.RemoveAll(tmp) }
+	defer func() {
+		if err != nil {
+			cleanup()
+		}
+	}()
 	ledger := filepath.Join(tmp, ledgerName)
-	if err := s.Snapshot(ctx, ledger); err != nil {
-		return nil, err
+	if err = s.Snapshot(ctx, ledger); err != nil {
+		return nil, nil, nil, err
 	}
 
-	w := &Written{Path: path}
+	w = &Written{}
 	m := &w.Manifest
 	m.Format, m.FormatVersion, m.CreatedAt, m.Tool = Format, Version, now, opts.Tool
 	m.NotCollected = NotCollected
@@ -247,12 +300,12 @@ func Write(ctx context.Context, s *store.Store, path string, opts Options) (*Wri
 		m.Subject = &sub
 	}
 	if opts.Anonymize {
-		a, err := newAnonymizer(opts.Key)
-		if err != nil {
-			return nil, err
+		a, aerr := newAnonymizer(opts.Key)
+		if aerr != nil {
+			return nil, nil, nil, aerr
 		}
-		if err := a.run(ctx, ledger); err != nil {
-			return nil, fmt.Errorf("anonymize: %w", err)
+		if aerr := a.run(ctx, ledger); aerr != nil {
+			return nil, nil, nil, fmt.Errorf("anonymize: %w", aerr)
 		}
 		m.Anonymized = true
 		m.Anonymization = &Anonymization{Hosts: len(a.names), Addresses: len(a.addresses), Keyed: len(opts.Key) > 0}
@@ -265,7 +318,7 @@ func Write(ctx context.Context, s *store.Store, path string, opts Options) (*Wri
 	// Describe the copy: it is what the bundle holds.
 	c, err := store.Open(ctx, ledger, store.ReadOnly)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 	src, err := describe(ctx, c, m)
 	cerr := c.Close()
@@ -273,78 +326,51 @@ func Write(ctx context.Context, s *store.Store, path string, opts Options) (*Wri
 		err = cerr
 	}
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 	sum, size, err := checksum(ledger)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 	m.Ledger = LedgerInfo{File: ledgerName, SchemaVersion: m.Ledger.SchemaVersion, Bytes: size, SHA256: sum}
 
 	manifest, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 	sources, err := json.MarshalIndent(src, "", "  ")
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
+	text := readme(m)
 
-	// Write beside the target and move into place, so that a bundle that
-	// exists is whole.
-	out, err := os.CreateTemp(filepath.Dir(path), ".my-bundle-*")
-	if err != nil {
-		return nil, err
-	}
-	partial := out.Name()
-	defer os.Remove(partial)
-	zw := zip.NewWriter(out)
-	add := func(name string, r io.Reader) error {
-		f, err := zw.CreateHeader(&zip.FileHeader{Name: name, Method: zip.Deflate, Modified: now})
+	emit = func(out io.Writer) error {
+		lf, err := os.Open(ledger)
 		if err != nil {
 			return err
 		}
-		_, err = io.Copy(f, r)
-		return err
-	}
-	lf, err := os.Open(ledger)
-	if err == nil {
 		defer lf.Close()
+		zw := zip.NewWriter(out)
 		for _, member := range []struct {
 			name string
 			r    io.Reader
 		}{
 			{manifestName, bytes.NewReader(append(manifest, '\n'))},
 			{sourcesName, bytes.NewReader(append(sources, '\n'))},
-			{readmeName, strings.NewReader(readme(m))},
+			{readmeName, strings.NewReader(text)},
 			{ledgerName, lf},
 		} {
-			if err = add(member.name, member.r); err != nil {
-				break
+			f, err := zw.CreateHeader(&zip.FileHeader{Name: member.name, Method: zip.Deflate, Modified: now})
+			if err != nil {
+				return err
+			}
+			if _, err := io.Copy(f, member.r); err != nil {
+				return err
 			}
 		}
+		return zw.Close()
 	}
-	if err == nil {
-		err = zw.Close()
-	}
-	if cerr := out.Close(); err == nil {
-		err = cerr
-	}
-	if err != nil {
-		return nil, err
-	}
-	if err := os.Chmod(partial, 0o644); err != nil {
-		return nil, err
-	}
-	if err := os.Rename(partial, path); err != nil {
-		return nil, err
-	}
-	fi, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-	w.Bytes = fi.Size()
-	return w, nil
+	return w, emit, cleanup, nil
 }
 
 // describe fills the manifest from the ledger and returns the source

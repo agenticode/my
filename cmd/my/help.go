@@ -18,6 +18,7 @@ var words = i18n.Catalog{
 	// Errors in the command line.
 	"err.see_help":      {EN: "run \"{cmd}\" for usage", KO: "사용법은 \"{cmd}\""},
 	"err.extra":         {EN: "unexpected argument \"{arg}\"", KO: "불필요한 인자 \"{arg}\""},
+	"err.command_first": {EN: "the command comes before its flags: my {cmd} [flags]", KO: "명령을 옵션 앞에 써야 함: my {cmd} [옵션]"},
 	"err.one_dimm":      {EN: "name one DIMM by its slot or serial number", KO: "DIMM 하나를 슬롯 이름이나 시리얼로 지정해야 함"},
 	"err.color":         {EN: "--color {value}: want auto, always or never", KO: "--color {value}: auto, always, never 중 하나여야 함"},
 	"err.width":         {EN: "--width {value}: want a number of columns", KO: "--width {value}: 칸 수여야 함"},
@@ -37,11 +38,18 @@ var words = i18n.Catalog{
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
 	"err.exists":      {EN: "{file} exists; --force replaces it", KO: "{file}이 이미 있음. --force를 주면 덮어씀"},
+	"err.no_dir":      {EN: "the directory {file} does not exist", KO: "{file} 디렉터리가 없음"},
+	"err.is_dir":      {EN: "{file} is a directory; name a file", KO: "{file}은 디렉터리임. 파일 이름을 지정해야 함"},
+	"err.not_file":    {EN: "{file} is not a regular file: a ledger that is kept needs one", KO: "{file}은 일반 파일이 아님. 보관하는 원장은 일반 파일이어야 함"},
+	"err.dir_denied":  {EN: "the directory {file} is not writable for this user", KO: "이 사용자는 {file} 디렉터리에 쓸 수 없음"},
+	"err.dangling":    {EN: "{file} is a symbolic link that leads nowhere", KO: "{file}은 대상이 없는 심볼릭 링크임"},
+	"err.terminal":    {EN: "-o - writes the bundle to the standard output, which is a terminal here: send it to a file or a pipe", KO: "-o -는 번들을 표준 출력으로 보내는데 지금은 터미널임. 파일이나 파이프로 받아야 함"},
 
-	"err.report_out":  {EN: "name the file to write with -o, for example -o report.html", KO: "저장할 파일을 -o로 지정해야 함 (예: -o report.html)"},
-	"report.figures":  {EN: "figures written: {dir} ({n} SVG {n|file|files})", KO: "그림 저장: {dir} (SVG 파일 {n}개)"},
-	"err.report_scan": {EN: "--root and --ledger go with a scan of the host; a case file is read as it is", KO: "--root와 --ledger는 호스트 스캔에 쓰는 옵션임. 케이스 파일은 그대로 읽음"},
-	"err.audience":    {EN: "--audience {value}: want customer or fa", KO: "--audience {value}: customer 또는 fa여야 함"},
+	"err.report_out":    {EN: "name the file to write with -o, for example -o report.html", KO: "저장할 파일을 -o로 지정해야 함 (예: -o report.html)"},
+	"report.figures":    {EN: "figures written: {dir} ({n} SVG {n|file|files})", KO: "그림 저장: {dir} (SVG 파일 {n}개)"},
+	"report.no_figures": {EN: "no figure written: this host has no slots and no errors on record to draw", KO: "저장한 그림 없음: 이 호스트에는 그릴 슬롯도 오류 기록도 없음"},
+	"err.report_scan":   {EN: "--root and --ledger go with a scan of the host; a case file is read as it is", KO: "--root와 --ledger는 호스트 스캔에 쓰는 옵션임. 케이스 파일은 그대로 읽음"},
+	"err.audience":      {EN: "--audience {value}: want customer or fa", KO: "--audience {value}: customer 또는 fa여야 함"},
 
 	"err.import_files":  {EN: "name the files to import", KO: "가져올 파일을 지정해야 함"},
 	"err.anonymize_out": {EN: "--anonymize goes with -o: it applies to the bundle that is written", KO: "--anonymize는 -o와 함께 써야 함: 저장하는 번들에 적용됨"},
@@ -81,6 +89,7 @@ var words = i18n.Catalog{
 
 	// What "my bundle" says.
 	"bundle.written":    {EN: "case bundle written: {file} ({size})", KO: "케이스 번들 저장: {file} ({size})"},
+	"bundle.sent":       {EN: "case bundle written to the standard output ({size})", KO: "케이스 번들을 표준 출력으로 보냄 ({size})"},
 	"bundle.host":       {EN: "host {host}: {dimms} {dimms|DIMM|DIMMs}, CE {ce}, UE {ue}, finding: {grade}", KO: "호스트 {host}: DIMM {dimms}개, CE {ce}건, UE {ue}건, 소견: {grade}"},
 	"bundle.subject":    {EN: "subject of the case: {dimm}, finding: {grade}", KO: "케이스 대상: {dimm}, 소견: {grade}"},
 	"bundle.missing":    {EN: "not in the bundle: {what}", KO: "번들에 없음: {what}"},
@@ -207,11 +216,13 @@ var words = i18n.Catalog{
 	"help.bundle.usage": {EN: "my bundle [slot|serial] -o FILE [--anonymize] [flags]", KO: "my bundle [슬롯|시리얼] -o FILE [--anonymize] [옵션]"},
 	"help.bundle.text":  {EN: "Scans this host and writes what it found as one file, a case bundle: the ledger with the error records, DIMM identities, boots and actions, the findings of this run, a manifest of what was collected, and the source inventory. A bundle holds records about memory errors and never the contents of memory. Naming a DIMM makes it the subject of the case; the bundle still holds the whole host, because a finding about one DIMM rests on its neighbours too. The file is a ZIP archive: \"unzip -l\" lists it. The exit code is 0 when the bundle was written.", KO: "이 호스트를 스캔해 찾은 것을 파일 하나(케이스 번들)로 저장합니다. 오류 기록, DIMM 신원, 부팅과 조치 이력이 든 원장, 이번 실행의 소견, 수집 항목 목록, 소스 인벤토리가 들어갑니다. 번들에는 메모리 오류 기록만 들어가며 메모리 내용은 들어가지 않습니다. DIMM을 지정하면 그 DIMM이 케이스 대상이 됩니다. 그래도 번들에는 호스트 전체가 들어갑니다. DIMM 하나의 소견이 이웃 DIMM에도 기대기 때문입니다. 파일은 ZIP 형식이라 \"unzip -l\"로 목록을 볼 수 있습니다. 번들을 저장하면 종료 코드는 0입니다."},
 	"help.bundle.flags": {
-		EN: "-o FILE           the bundle to write (case.mycase)\n" +
+		EN: "-o FILE           the bundle to write (case.mycase); \"-\" writes it to standard output,\n" +
+			"                  as in: ssh HOST sudo my bundle -o - > case.mycase\n" +
 			"--anonymize       replace host names, IP addresses and MAC addresses; DIMM serial numbers stay\n" +
 			"--key-file FILE   with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force           replace FILE when it exists",
-		KO: "-o FILE           저장할 번들 (case.mycase)\n" +
+		KO: "-o FILE           저장할 번들 (case.mycase). \"-\"는 표준 출력\n" +
+			"                  예: ssh HOST sudo my bundle -o - > case.mycase\n" +
 			"--anonymize       호스트 이름, IP 주소, MAC 주소를 바꿈. DIMM 시리얼은 그대로 둠\n" +
 			"--key-file FILE   --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
 			"--force           FILE이 있으면 덮어씀",
@@ -220,7 +231,7 @@ var words = i18n.Catalog{
 	"help.import.usage": {EN: "my import <file|directory>... [-o FILE] [flags]", KO: "my import <파일|디렉터리>... [-o FILE] [옵션]"},
 	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, nvidia-smi output (-q, or a query in CSV form), the answer of the mcelog daemon to its client, an FMFM log, or a directory that is a copy of a host's files. An input that is not recognised stops the import. All inputs are taken to be one host. From a log that holds the records of several hosts, the records of the host named with --host are read. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, nvidia-smi 출력(-q 또는 CSV 형식 쿼리), mcelog 데몬이 클라이언트에 답한 출력, FMFM 로그, 호스트 파일 사본 디렉터리. 알아보지 못한 입력이 있으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. 여러 호스트의 기록이 든 로그에서는 --host로 지정한 호스트의 기록을 읽습니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
 	"help.import.flags": {
-		EN: "-o FILE             write the case as a bundle (case.mycase)\n" +
+		EN: "-o FILE             write the case as a bundle (case.mycase); \"-\" writes it to standard output\n" +
 			"--host NAME         the host the files come from, when they do not say\n" +
 			"--captured-at TIME  when a kernel log without dates was captured (2026-11-12T03:14:00Z)\n" +
 			"--mtime             take the modification time of such a file as its capture time\n" +
@@ -232,7 +243,7 @@ var words = i18n.Catalog{
 			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force             replace FILE when it exists\n" +
 			"--all               in the overview, list every DIMM",
-		KO: "-o FILE             케이스를 번들로 저장 (case.mycase)\n" +
+		KO: "-o FILE             케이스를 번들로 저장 (case.mycase). \"-\"는 표준 출력\n" +
 			"--host NAME         파일에 호스트 이름이 없을 때 쓸 이름\n" +
 			"--captured-at TIME  날짜 없는 커널 로그를 받은 시각 (2026-11-12T03:14:00Z)\n" +
 			"--mtime             그런 파일의 수정 시각을 받은 시각으로 사용\n" +
