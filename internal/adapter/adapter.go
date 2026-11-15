@@ -33,6 +33,15 @@ type Sink interface {
 	GPU(*model.GPUMem) error
 	// ECS takes a reading of the DDR5 error check and scrub registers.
 	ECS(*model.ECSSample) error
+	// BMC takes a reading of a management controller: what it is, what it
+	// runs, and how complete the reading was.
+	BMC(*model.BMC) error
+	// BIOSSetting takes a setting of the system firmware as a BMC reports
+	// it.
+	BIOSSetting(*model.BIOSSetting) error
+	// BMCMemory takes a memory module as a BMC describes it, with the
+	// error counts the BMC keeps for it.
+	BMCMemory(*model.BMCMemory) error
 }
 
 // Report says how reading a source went. Every adapter returns one, also
@@ -142,6 +151,9 @@ type Collected struct {
 	Actions  []*model.Action
 	GPUs     []*model.GPUMem
 	ECSs     []*model.ECSSample
+	BMCs     []*model.BMC
+	Settings []*model.BIOSSetting
+	Memory   []*model.BMCMemory
 }
 
 func (c *Collected) Host(h *model.Host) error     { c.Hosts = append(c.Hosts, h); return nil }
@@ -155,3 +167,12 @@ func (c *Collected) Event(e *model.Event) error   { c.Events = append(c.Events, 
 func (c *Collected) Action(a *model.Action) error { c.Actions = append(c.Actions, a); return nil }
 func (c *Collected) GPU(g *model.GPUMem) error    { c.GPUs = append(c.GPUs, g); return nil }
 func (c *Collected) ECS(s *model.ECSSample) error { c.ECSs = append(c.ECSs, s); return nil }
+func (c *Collected) BMC(b *model.BMC) error       { c.BMCs = append(c.BMCs, b); return nil }
+func (c *Collected) BIOSSetting(s *model.BIOSSetting) error {
+	c.Settings = append(c.Settings, s)
+	return nil
+}
+func (c *Collected) BMCMemory(m *model.BMCMemory) error {
+	c.Memory = append(c.Memory, m)
+	return nil
+}
