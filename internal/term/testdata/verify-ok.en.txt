@@ -1,0 +1,36 @@
+host lab-arm  plan ghes
+all 23 injections were found as planned
+firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM
+
+  #  ID            INJECTED            PLANNED  FOUND  RESULT
+  1  row-1         CE                        1      1  as planned
+  2  row-2         CE                        1      1  as planned
+  3  row-3         CE                        1      1  as planned
+  4  row-4         CE                        1      1  as planned
+  5  row-5         CE                        1      1  as planned
+  6  row-6         CE                        1      1  as planned
+  7  row-7         CE                        1      1  as planned
+  8  row-8         CE Patrol                 1      1  as planned
+  9  row-9         CE                        1      1  as planned
+ 10  row-10        CE Patrol                 1      1  as planned
+ 11  row-11        CE                        1      1  as planned
+ 12  row-12        CE                        1      1  as planned
+ 13  row-13        CE                        1      1  as planned
+ 14  row-14        CE Patrol                 1      1  as planned
+ 15  row-15        CE                        1      1  as planned
+ 16  row-16        CE                        1      1  as planned
+ 17  row-17        CE                        1      1  as planned
+ 18  burst         CE                        6      6  as planned
+ 19  thr           CE                        1      1  as planned
+ 20  ue-1          Recoverable               1      1  as planned
+ 21  ue-1-offline  page offline hard         1      1  as planned
+ 22  ue-2          Recoverable Patrol        1      1  as planned
+ 23  ue-2-offline  page offline hard         1      1  as planned
+
+ records       klog/edac 26, klog/ghes 21, klog/offline 2, rasdaemon/mc_event 26
+               records that match an injection, by source; an error several sources report is found
+               once
+
+ method        QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic
+               hardware error source; kernel 6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt,
+               ras=on, emulated without hardware virtualization; rasdaemon 0.8.0

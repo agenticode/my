@@ -28,7 +28,7 @@ QEMU builds the ACPI tables of its guests. For an aarch64 guest with `ras=on` th
 4. `tools/lab/sanitize.py` replaces what names the lab and fails when a part of such a value is left anywhere, also inside the database and the bundle.
 5. `internal/labcase` reads every capture three ways: as a copy of the host's files (`my --root`), as loose files (`my import`), and through the bundle written on the host (`my open`). Each time `injection.Compare` looks up every injection of the plan in the ledger. An injection passes when the ledger holds it the planned number of times, counted once however many sources report it, with every field it reports equal to the plan. Records beyond the plan fail the test, except what an earlier boot of the same host left: pages it took offline, and in the bundle of `6.19.10-ghes-clock-step` the errors of the boot before, which the journal of the guest still held.
 
-The plan format and the comparison are in `internal/injection`.
+The plan format and the comparison are in `internal/injection`. `my verify --expect plan.yaml` makes the same comparison from the command line ([verify.md](verify.md)).
 
 ## What was injected and what each source recorded
 

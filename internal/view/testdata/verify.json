@@ -1,0 +1,730 @@
+{
+  "host": "lab-arm",
+  "plan": {
+    "scenario": "ghes",
+    "summary": "firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM",
+    "method": "QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic hardware error source",
+    "meta": {
+      "kernel": "6.19.10-300.fc44.aarch64",
+      "machine": "QEMU 10.2.2 virt, ras=on, emulated without hardware virtualization",
+      "rasdaemon": "0.8.0"
+    },
+    "injections": 25
+  },
+  "ok": false,
+  "passed": 21,
+  "failed": 4,
+  "checks": [
+    {
+      "n": 1,
+      "id": "row-1",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100010140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x10",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 10
+    },
+    {
+      "n": 2,
+      "id": "row-2",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100118140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a30 col 0x119",
+      "planned": 1,
+      "found": 1,
+      "result": "decode",
+      "result_text": "decoded differently",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "differences": [
+        {
+          "field": "row",
+          "want": "0x1a30",
+          "got": "0x1a2f",
+          "records": [
+            "rasdaemon/mc_event ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2",
+            "klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650",
+            "klog/edac ../../testdata/real/6.19.10-ghes/dmesg#L651"
+          ],
+          "text": "row: injected 0x1a30, recorded 0x1a2f in 3 records (rasdaemon/mc_event ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2; klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac ../../testdata/real/6.19.10-ghes/dmesg#L651)"
+        },
+        {
+          "field": "column",
+          "want": "0x119",
+          "got": "0x118",
+          "records": [
+            "rasdaemon/mc_event ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2",
+            "klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650",
+            "klog/edac ../../testdata/real/6.19.10-ghes/dmesg#L651"
+          ],
+          "text": "column: injected 0x119, recorded 0x118 in 3 records (rasdaemon/mc_event ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2; klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac ../../testdata/real/6.19.10-ghes/dmesg#L651)"
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 28
+    },
+    {
+      "n": 3,
+      "id": "row-3",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x238",
+      "planned": 3,
+      "found": 3,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 3
+        },
+        {
+          "source": "klog/ghes",
+          "records": 3
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 3
+        }
+      ],
+      "grades": {
+        "A": 9
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 46
+    },
+    {
+      "n": 4,
+      "id": "row-4",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x1002a0140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x2a0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 64
+    },
+    {
+      "n": 5,
+      "id": "row-5",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x1003f0180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x3f0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 82
+    },
+    {
+      "n": 6,
+      "id": "row-6",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100118140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x118",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 100
+    },
+    {
+      "n": 7,
+      "id": "row-7",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x238",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 118
+    },
+    {
+      "n": 8,
+      "id": "row-8",
+      "inject": "error",
+      "what": "CE Patrol",
+      "where": "0x100010140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x10",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 13 (scrub corrected error)",
+      "line": 136
+    },
+    {
+      "n": 9,
+      "id": "row-9",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x1002a0140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x2a0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 155
+    },
+    {
+      "n": 10,
+      "id": "row-10",
+      "inject": "error",
+      "what": "CE Patrol",
+      "where": "0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x238",
+      "planned": 1,
+      "found": 0,
+      "result": "missing",
+      "result_text": "not found",
+      "note": "firmware error record (CPER), memory error section, type 13 (scrub corrected error)",
+      "line": 173
+    },
+    {
+      "n": 11,
+      "id": "row-11",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x1003f0180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x3f0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 192
+    },
+    {
+      "n": 12,
+      "id": "row-12",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100118140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x118",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 210
+    },
+    {
+      "n": 13,
+      "id": "row-13",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x238",
+      "planned": 1,
+      "found": 0,
+      "result": "missing",
+      "result_text": "not found",
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 228
+    },
+    {
+      "n": 14,
+      "id": "row-14",
+      "inject": "error",
+      "what": "CE Patrol",
+      "where": "0x100010140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x10",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 13 (scrub corrected error)",
+      "line": 246
+    },
+    {
+      "n": 15,
+      "id": "row-15",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x1002a0140 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a2f col 0x2a0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 265
+    },
+    {
+      "n": 16,
+      "id": "row-16",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100518000 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a30 col 0x118",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 283
+    },
+    {
+      "n": 17,
+      "id": "row-17",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x100638000 DIMM 0 rank0 dev7 bg1 bank2 row 0x1a30 col 0x238",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 301
+    },
+    {
+      "n": 18,
+      "id": "burst",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x180045640 DIMM 0 rank1 dev3 bg0 bank1 row 0x456 col 0xc8",
+      "planned": 6,
+      "found": 6,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 6
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 6
+        }
+      ],
+      "grades": {
+        "A": 13
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC)",
+      "line": 319
+    },
+    {
+      "n": 19,
+      "id": "thr",
+      "inject": "error",
+      "what": "CE",
+      "where": "0x11b47b100 DIMM 0 rank0 dev2 bg0 bank3 row 0x777 col 0x40",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 2 (single-bit ECC), flag \"error threshold exceeded\"; the kernel moves the content of the page elsewhere and retires it, and leaves no record of that: no line in the kernel log, no trace event (extra/held.jsonl shows the page frame before and after)",
+      "line": 337
+    },
+    {
+      "n": 20,
+      "id": "ue-1",
+      "inject": "error",
+      "what": "Recoverable",
+      "where": "0x1207dd200 DIMM 0 rank0 dev9 bg2 bank0 row 0x2001 col 0x1f0",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 3 (multi-bit ECC)",
+      "line": 355
+    },
+    {
+      "n": 21,
+      "id": "ue-1-offline",
+      "inject": "page-offline",
+      "what": "page offline hard",
+      "where": "0x1207dd000",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/offline",
+          "records": 1
+        }
+      ],
+      "note": "by the kernel after ue-1",
+      "line": 372
+    },
+    {
+      "n": 22,
+      "id": "ue-2",
+      "inject": "error",
+      "what": "Recoverable Patrol",
+      "where": "0x110781300 DIMM 0 rank1 dev11 bg3 bank1 row 0x3ffe col 0x8",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/edac",
+          "records": 1
+        },
+        {
+          "source": "klog/ghes",
+          "records": 1
+        },
+        {
+          "source": "rasdaemon/mc_event",
+          "records": 1
+        }
+      ],
+      "grades": {
+        "A": 3
+      },
+      "note": "firmware error record (CPER), memory error section, type 14 (scrub uncorrected error)",
+      "line": 378
+    },
+    {
+      "n": 23,
+      "id": "ue-2-offline",
+      "inject": "page-offline",
+      "what": "page offline hard",
+      "where": "0x110781000",
+      "planned": 1,
+      "found": 1,
+      "result": "ok",
+      "result_text": "as planned",
+      "sources": [
+        {
+          "source": "klog/offline",
+          "records": 1
+        }
+      ],
+      "note": "by the kernel after ue-2",
+      "line": 396
+    },
+    {
+      "n": 24,
+      "id": "ghost-1",
+      "inject": "error",
+      "what": "UE",
+      "where": "0x1ffff0000 DIMM 0",
+      "planned": 1,
+      "found": 0,
+      "result": "missing",
+      "result_text": "not found",
+      "note": "never injected",
+      "line": 402
+    },
+    {
+      "n": 25,
+      "id": "stay-1",
+      "inject": "page-offline",
+      "what": "page offline hard",
+      "where": "0x1ffff1000",
+      "planned": 0,
+      "found": 0,
+      "result": "ok",
+      "result_text": "as planned",
+      "line": 410
+    }
+  ],
+  "sources": [
+    {
+      "source": "klog/edac",
+      "records": 26
+    },
+    {
+      "source": "klog/ghes",
+      "records": 21
+    },
+    {
+      "source": "klog/offline",
+      "records": 2
+    },
+    {
+      "source": "rasdaemon/mc_event",
+      "records": 26
+    }
+  ],
+  "unplanned_errors": 0,
+  "unplanned_offlines": 0,
+  "summary": {
+    "code": "vf.summary.failed",
+    "args": {
+      "failed": 4,
+      "n": 25
+    },
+    "text": "4 of 25 injections were not found as planned"
+  }
+}
