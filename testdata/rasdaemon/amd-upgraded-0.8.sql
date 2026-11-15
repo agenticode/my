@@ -36,9 +36,9 @@ INSERT INTO mce_record (id, timestamp, mcgcap, mcgstatus, status, addr, misc, ip
 -- Stored after the upgrade. A DRAM error with no EDAC record at the same time, and an interface
 -- error of the memory controller, which is not an error of the memory cells.
 INSERT INTO mce_record (id, timestamp, mcgcap, mcgstatus, status, addr, misc, ip, tsc, walltime, cpu, cpuid, apicid, socketid, cs, bank, cpuvendor, bank_name, error_msg, mcgstatus_msg, mcistatus_msg, mcastatus_msg, user_action, mc_location, ppin, microcode)
-  VALUES (3, '2024-06-12 06:30:00 -0500', 0x117, 0, 0x9c2040000000011b, 0x2e40080, 0xd01a000101000000, 0, 0, 1717673400, 2, 0xa00f11, 4, 0, 0, 18, 2, 'Unified Memory Controller (bank=18)', 'Corrected error, no action required.', '', '', 'DRAM ECC error.', '', 'memory_channel=3,csrow=1', 0x2b4c1a00f1d2e3, 0xa0011d1);
+  VALUES (3, '2024-06-12 06:30:00 -0500', 0x117, 0, 0x9c2040000000011b, 0x2e40080, 0xd01a000101000000, 0, 0, 1718191800, 2, 0xa00f11, 4, 0, 0, 18, 2, 'Unified Memory Controller (bank=18)', 'Corrected error, no action required.', '', '', 'DRAM ECC error.', '', 'memory_channel=3,csrow=1', 0x2b4c1a00f1d2e3, 0xa0011d1);
 INSERT INTO mce_record (id, timestamp, mcgcap, mcgstatus, status, addr, misc, ip, tsc, walltime, cpu, cpuid, apicid, socketid, cs, bank, cpuvendor, bank_name, error_msg, mcgstatus_msg, mcistatus_msg, mcastatus_msg, user_action, mc_location, ppin, microcode)
-  VALUES (4, '2024-06-12 06:31:00 -0500', 0x117, 0, 0xb00000000002010b, 0, 0, 0, 0, 1717673460, 2, 0xa00f11, 4, 0, 0, 18, 2, 'Unified Memory Controller (bank=18)', 'Uncorrected, software restartable error.', '', '', 'Write data parity error.', '', '', 0x2b4c1a00f1d2e3, 0xa0011d1);
+  VALUES (4, '2024-06-12 06:31:00 -0500', 0x117, 0, 0xb00000000002010b, 0, 0, 0, 0, 1718191860, 2, 0xa00f11, 4, 0, 0, 18, 2, 'Unified Memory Controller (bank=18)', 'Uncorrected, software restartable error.', '', '', 'Write data parity error.', '', '', 0x2b4c1a00f1d2e3, 0xa0011d1);
 
 -- Pages the kernel took offline after uncorrected errors, and one row with an unreadable page number.
 INSERT INTO memory_failure_event VALUES (1, '2024-06-10 13:45:00 -0500', '0x7f5d2c', 'dirty LRU page', 'Recovered');

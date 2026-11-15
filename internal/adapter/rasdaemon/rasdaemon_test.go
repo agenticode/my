@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -309,6 +310,175 @@ func TestFirmwareFirstFromRasdaemon10(t *testing.T) {
 		t.Errorf("action: %+v", *a)
 	}
 }
+
+// The database of a host whose clock was set back by 10 seconds after
+// rasdaemon had started. rasdaemon's times are 9 to 10 seconds ahead of the
+// times the kernel gave the same machine checks; the kernel log dates the
+// errors by the kernel's clock. Read with rasdaemon's times, every error of
+// such a boot is counted twice next to its kernel log line.
+func TestRecordsCarryTheKernelsTime(t *testing.T) {
+	c, rep, _ := collect(t, "clock-step-0.8.sql")
+	if rep.Status != model.SourceOK || rep.Records != 13 || len(c.Events) != 10 || len(c.Actions) != 3 {
+		t.Fatalf("report = %+v, %d events, %d actions; want ok, 13 records, 10 events, 3 actions", rep, len(c.Events), len(c.Actions))
+	}
+	if !hasNote(rep, "rasdaemon stamped its records 9 to 10 s ahead of the kernel's clock") || !hasNote(rep, "13 records are dated by the kernel's time") {
+		t.Errorf("notes = %q", rep.Notes)
+	}
+	// walltime of the rows: 1794720280 is 2026-11-15 05:24:40 UTC.
+	wall := []int64{1794720280, 1794720281, 1794720283, 1794720284, 1794720286, 1794720287, 1794720288, 1794720290, 1794720292, 1794720293}
+	stamp := []time.Time{utc(2026, 11, 15, 5, 24, 50), utc(2026, 11, 15, 5, 24, 51), utc(2026, 11, 15, 5, 24, 53), utc(2026, 11, 15, 5, 24, 54),
+		utc(2026, 11, 15, 5, 24, 56), utc(2026, 11, 15, 5, 24, 57), utc(2026, 11, 15, 5, 24, 58), utc(2026, 11, 15, 5, 25, 0),
+		utc(2026, 11, 15, 5, 25, 1), utc(2026, 11, 15, 5, 25, 3)}
+	for i, e := range c.Events {
+		if !e.ErrorDT.Equal(time.Unix(wall[i], 0)) || e.TimeQuality != model.TimeExact {
+			t.Errorf("event %d is dated %s (%s), want the kernel's %s", i+1, e.ErrorDT, e.TimeQuality, time.Unix(wall[i], 0).UTC())
+		}
+		// The fingerprint names the row by rasdaemon's time, as before.
+		if want := fingerprint("mce_record", int64(i+1), stamp[i]); e.Fingerprint != want {
+			t.Errorf("event %d: fingerprint changed", i+1)
+		}
+	}
+	if e := c.Events[0]; e.ErrorSeverity != model.SevCE || e.OsPhysicalAddress != addr(0x104161040) || e.ChannelId != some(0) ||
+		e.ErrorScrubType != model.ScrubDemand || e.Grade != model.GradeB {
+		t.Errorf("first corrected error: %+v", *e)
+	}
+	if e := c.Events[7]; e.ErrorSeverity != model.SevRecoverable || e.ErrorScrubType != model.ScrubPatrol {
+		t.Errorf("scrub error: %+v", *e)
+	}
+	if e := c.Events[9]; e.ErrorSeverity != model.SevRecoverable || e.OsPhysicalAddress != addr(0x103a33340) {
+		t.Errorf("data load error: %+v", *e)
+	}
+	// The pages the kernel gave up follow the machine check next to them.
+	for i, want := range []time.Time{utc(2026, 11, 15, 5, 24, 50), utc(2026, 11, 15, 5, 24, 52), utc(2026, 11, 15, 5, 24, 53)} {
+		if a := c.Actions[i]; !a.At.Equal(want) || a.Kind != model.ActionPageOffline || a.Result != model.ResultOK {
+			t.Errorf("action %d: %+v, want at %s", i+1, *a, want)
+		}
+	}
+}
+
+// What the correction leaves alone, and how far it reaches.
+func TestClockCorrectionLimits(t *testing.T) {
+	const schema = `
+CREATE TABLE mc_event (id INTEGER PRIMARY KEY, timestamp TEXT, err_count INTEGER, err_type TEXT, err_msg TEXT, label TEXT, mc INTEGER, top_layer INTEGER, middle_layer INTEGER, lower_layer INTEGER, address INTEGER, grain INTEGER, syndrome INTEGER, driver_detail TEXT);
+CREATE TABLE mce_record (id INTEGER PRIMARY KEY, timestamp TEXT, mcgcap INTEGER, mcgstatus INTEGER, status INTEGER, addr INTEGER, misc INTEGER, ip INTEGER, tsc INTEGER, walltime INTEGER, cpu INTEGER, cpuid INTEGER, apicid INTEGER, socketid INTEGER, cs INTEGER, bank INTEGER, cpuvendor INTEGER, bank_name TEXT, error_msg TEXT, mcgstatus_msg TEXT, mcistatus_msg TEXT, mcastatus_msg TEXT, user_action TEXT, mc_location TEXT);
+CREATE TABLE memory_failure_event (id INTEGER PRIMARY KEY, timestamp TEXT, pfn TEXT, page_type TEXT, action_result TEXT);
+`
+	// 1794720000 is 2026-11-15 05:20:00 UTC.
+	mce := func(id int, stamp string, wall int64) string {
+		return "INSERT INTO mce_record (id, timestamp, status, addr, misc, walltime, bank, cpuvendor, socketid) VALUES (" +
+			strings.Join([]string{itoa(id), "'" + stamp + "'", "0x9c00004000010090", "0x12345" + itoa(id) + "40", "0x86", itoa64(wall), "7", "0", "0"}, ", ") + ");\n"
+	}
+	mc := func(id int, stamp string, address string) string {
+		return "INSERT INTO mc_event (id, timestamp, err_count, err_type, err_msg, label, mc, top_layer, middle_layer, lower_layer, address, grain, syndrome, driver_detail) VALUES (" +
+			itoa(id) + ", '" + stamp + "', 1, 'Corrected', 'memory read error', 'CPU_SrcID#0_MC#0_Chan#0_DIMM#0', 0, 0, 0, -1, " + address + ", 32, 0, '');\n"
+	}
+	tests := []struct {
+		name   string
+		rows   string
+		events map[string]time.Time // raw_ref suffix -> wanted time
+		note   string               // "" = no note about the clock
+	}{
+		{
+			name: "one second apart is how rasdaemon rounds, not a clock that is off",
+			rows: mce(1, "2026-11-15 05:20:10 +0000", 1794720011) + mc(1, "2026-11-15 05:20:10 +0000", "0x12345140"),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 10), "mc_event/1": utc(2026, 11, 15, 5, 20, 10),
+			},
+		},
+		{
+			name: "the EDAC record of a machine check moves with it",
+			rows: mce(1, "2026-11-15 05:20:10 +0000", 1794720000) + mc(1, "2026-11-15 05:20:10 +0000", "0x12345140"),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 0), "mc_event/1": utc(2026, 11, 15, 5, 20, 0),
+			},
+			note: "10 s ahead of the kernel's clock",
+		},
+		{
+			name: "a clock that ran behind",
+			rows: mce(1, "2026-11-15 05:19:15 +0000", 1794720000) + mc(1, "2026-11-15 05:19:16 +0000", "0x12345140"),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 0), "mc_event/1": utc(2026, 11, 15, 5, 20, 1),
+			},
+			note: "45 s behind the kernel's clock",
+		},
+		{
+			name: "a record ten minutes from any machine check keeps rasdaemon's time",
+			rows: mce(1, "2026-11-15 05:20:10 +0000", 1794720000) + mc(1, "2026-11-15 05:30:11 +0000", "0x99999000") +
+				mc(2, "2026-11-15 05:30:10 +0000", "0x88888000"),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 0), "mc_event/1": utc(2026, 11, 15, 5, 30, 11), "mc_event/2": utc(2026, 11, 15, 5, 30, 0),
+			},
+			note: "2 records are dated by the kernel's time",
+		},
+		{
+			name: "a kernel time before 2000 is a clock that was never set",
+			rows: mce(1, "2026-11-15 05:20:10 +0000", 86400) + mce(2, "2026-11-15 05:20:20 +0000", 0),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 10), "mce_record/2": utc(2026, 11, 15, 5, 20, 20),
+			},
+		},
+		{
+			name: "rasdaemon restarted with the right clock: each record follows the machine check nearest to it",
+			rows: mce(1, "2026-11-15 05:20:10 +0000", 1794720000) + mce(2, "2026-11-15 05:24:00 +0000", 1794720240) +
+				mc(1, "2026-11-15 05:20:40 +0000", "0x77777000") + mc(2, "2026-11-15 05:23:30 +0000", "0x66666000"),
+			events: map[string]time.Time{
+				"mce_record/1": utc(2026, 11, 15, 5, 20, 0), "mce_record/2": utc(2026, 11, 15, 5, 24, 0),
+				"mc_event/1": utc(2026, 11, 15, 5, 20, 30), "mc_event/2": utc(2026, 11, 15, 5, 23, 30),
+			},
+			note: "10 s ahead of the kernel's clock",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			script := filepath.Join(t.TempDir(), "db.sql")
+			if err := os.WriteFile(script, []byte(schema+tt.rows), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			var c adapter.Collected
+			rep := New(testutil.BuildSQLite(t, script, "ras-mc_event.db"), Options{Direct: true}).Collect(ctx, &c)
+			if rep.Status != model.SourceOK || len(c.Events) != len(tt.events) {
+				t.Fatalf("report = %+v, %d events; want ok and %d events", rep, len(c.Events), len(tt.events))
+			}
+			for ref, want := range tt.events {
+				if e := find(t, &c, ref); !e.ErrorDT.Equal(want) {
+					t.Errorf("%s is dated %s, want %s", ref, e.ErrorDT.UTC().Format(time.RFC3339), want.Format(time.RFC3339))
+				}
+			}
+			switch {
+			case tt.note == "" && hasNote(rep, "the kernel's clock"):
+				t.Errorf("unexpected note about the clock: %q", rep.Notes)
+			case tt.note != "" && !hasNote(rep, tt.note):
+				t.Errorf("notes = %q, want one with %q", rep.Notes, tt.note)
+			}
+		})
+	}
+
+	// A machine check and its EDAC record stay one error: they are matched
+	// by the time rasdaemon gave both.
+	script := filepath.Join(t.TempDir(), "db.sql")
+	rows := mce(1, "2026-11-15 05:20:10 +0000", 1794720000) + mc(1, "2026-11-15 05:20:10 +0000", "0x12345140")
+	if err := os.WriteFile(script, []byte(schema+rows), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	var c adapter.Collected
+	New(testutil.BuildSQLite(t, script, "ras-mc_event.db"), Options{Direct: true}).Collect(ctx, &c)
+	if m, e := find(t, &c, "mce_record/1"), find(t, &c, "mc_event/1"); m.DupOfFingerprint != e.Fingerprint || e.Fingerprint == "" {
+		t.Errorf("the machine check record does not name its EDAC record: %q vs %q", m.DupOfFingerprint, e.Fingerprint)
+	}
+
+	for _, tt := range []struct {
+		lo, hi int64
+		want   string
+	}{{10, 10, "10 s ahead of"}, {9, 10, "9 to 10 s ahead of"}, {-45, -45, "45 s behind"}, {-45, -40, "40 to 45 s behind"},
+		{-5, 10, "between 5 s behind and 10 s ahead of"}} {
+		if got := clockSpan(tt.lo, tt.hi); got != tt.want {
+			t.Errorf("clockSpan(%d, %d) = %q, want %q", tt.lo, tt.hi, got, tt.want)
+		}
+	}
+}
+
+func itoa(v int) string     { return itoa64(int64(v)) }
+func itoa64(v int64) string { return strconv.FormatInt(v, 10) }
 
 func TestSnapshotLeavesTheSourceAlone(t *testing.T) {
 	path := testutil.BuildSQLite(t, testutil.Testdata(t, "rasdaemon", "intel-skx-0.6.sql"), "ras-mc_event.db")
