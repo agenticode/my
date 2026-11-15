@@ -22,6 +22,10 @@ var collectWords = i18n.Catalog{
 	"err.collect_no_user":     {EN: "a password is given and no user: name the account with --user or MY_REDFISH_USER", KO: "암호는 있는데 사용자가 없음: --user 또는 MY_REDFISH_USER로 계정을 지정"},
 	"err.collect_password":    {EN: "no password for user {user}: set MY_REDFISH_PASSWORD, name a file with --password-file, or run the command on a terminal to be asked", KO: "사용자 {user}의 암호가 없음: MY_REDFISH_PASSWORD를 설정하거나, --password-file로 파일을 지정하거나, 터미널에서 실행해 입력"},
 	"err.collect_support":     {EN: "name the collections to compare: directories written by \"my collect redfish -o DIR\"", KO: "비교할 수집 결과를 지정해야 함: \"my collect redfish -o DIR\"로 만든 디렉터리"},
+	"err.bmc_alone":           {EN: "{flag} says how a BMC is reached: name the BMC with --bmc ADDRESS", KO: "{flag}: BMC 접속 방법을 정하는 옵션이므로 --bmc ADDRESS로 BMC를 지정해야 함"},
+	"err.bmc_fleet":           {EN: "--bmc asks the BMC of the one host that is scanned, and --fleet reads the store of many hosts: give one of the two. \"my collect redfish --targets FILE\" collects from several BMCs", KO: "--bmc는 스캔하는 호스트 한 대의 BMC에 요청하고 --fleet은 여러 호스트의 저장소를 읽음: 둘 중 하나만 지정. 여러 BMC는 \"my collect redfish --targets FILE\"로 수집"},
+	"err.bmc_nothing":         {EN: "the BMC at {bmc} gave nothing about the system: see the lines above. The host was not scanned; without --bmc it is scanned alone", KO: "{bmc}의 BMC에서 시스템 정보를 받지 못함(위 줄 참고). 호스트는 스캔하지 않았으며, --bmc 없이 실행하면 호스트만 스캔"},
+	"err.bmc_refused":         {EN: "the answers of the BMC at {bmc} were not added: {why}", KO: "{bmc}의 BMC 응답을 추가하지 않음: {why}"},
 
 	"collect.prompt":       {EN: "Password for {user} on the BMC: ", KO: "BMC 사용자 {user}의 암호: "},
 	"collect.loose_file":   {EN: "warning: other users of this machine can read the password file {file}", KO: "경고: 이 기기의 다른 사용자가 암호 파일 {file}을 읽을 수 있음"},

@@ -206,18 +206,30 @@ var words = i18n.Catalog{
 			"                  instead of this host. Without --host the overview lists every host\n" +
 			"--fleet-env FILE  settings of that store: the environment file rasdaemon is started with\n" +
 			"                  (RAS_MYSQL_*, RAS_PG_*). Without it they come from the environment\n" +
-			"--since TIME      with --fleet: read rows from then on (2026-10-01, or 30d for 30 days back)",
+			"--since TIME      with --fleet: read rows from then on (2026-10-01, or 30d for 30 days back)\n" +
+			"--bmc ADDRESS     also ask the BMC of this host over Redfish. It only reads: the memory\n" +
+			"                  modules and their error counts, the BIOS settings, the event logs\n" +
+			"--user NAME       with --bmc: the account (or MY_REDFISH_USER). The password comes from\n" +
+			"                  MY_REDFISH_PASSWORD, from --password-file FILE, or from the terminal\n" +
+			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
+			"                  with --bmc: as in \"my help collect\"; the deadline is 5m by default",
 		KO: "--ledger FILE     스캔을 원장 FILE에 남기고 실행할 때마다 누적\n" +
 			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음\n" +
 			"--fleet KIND      플릿의 rasdaemon이 함께 쓰는 저장소(mysql 또는 postgresql)를 읽음.\n" +
 			"                  이 호스트는 스캔하지 않음. --host가 없으면 개요에 모든 호스트를 나열\n" +
 			"--fleet-env FILE  그 저장소의 접속 설정: rasdaemon을 띄울 때 쓰는 환경 파일.\n" +
 			"                  없으면 환경 변수(RAS_MYSQL_*, RAS_PG_*)에서 읽음\n" +
-			"--since TIME      --fleet과 함께: 그 시각 이후의 행만 읽음 (2026-10-01, 최근 30일은 30d)",
+			"--since TIME      --fleet과 함께: 그 시각 이후의 행만 읽음 (2026-10-01, 최근 30일은 30d)\n" +
+			"--bmc ADDRESS     이 호스트의 BMC에도 Redfish로 요청함. 읽기만 하며 메모리 모듈과\n" +
+			"                  오류 카운트, BIOS 설정, 이벤트 로그를 읽음\n" +
+			"--user NAME       --bmc와 함께: 계정 (또는 MY_REDFISH_USER). 암호는 MY_REDFISH_PASSWORD,\n" +
+			"                  --password-file FILE, 터미널 입력 중 하나로 받음\n" +
+			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
+			"                  --bmc와 함께: \"my help collect\"와 같음. 제한 시간 기본값은 5m",
 	},
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
-	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. Sources it may not read as this user are named on the \"missing\" line with what root would add. A scan that can read no source of error records at all ends with exit code 70 and names what it looked for: it does not answer \"no errors on record\".", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다. 오류 기록 소스를 하나도 읽지 못하면 \"오류 기록 없음\"이라고 답하지 않고, 찾아본 소스를 적은 뒤 종료 코드 70으로 끝납니다."},
+	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. With --bmc ADDRESS it also asks the BMC of the host over Redfish, with requests that only read, and joins what the BMC and the host say about each DIMM. Sources it may not read as this user are named on the \"missing\" line with what root would add. A scan that can read no source of error records at all ends with exit code 70 and names what it looked for: it does not answer \"no errors on record\".", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. --bmc ADDRESS를 주면 호스트의 BMC에도 Redfish로 읽기 요청만 보내고, BMC와 호스트가 DIMM마다 알려 준 내용을 합칩니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다. 오류 기록 소스를 하나도 읽지 못하면 \"오류 기록 없음\"이라고 답하지 않고, 찾아본 소스를 적은 뒤 종료 코드 70으로 끝납니다."},
 	"help.overview.flags": {EN: "--all             list every DIMM, also those without errors", KO: "--all             오류 없는 DIMM도 모두 나열"},
 
 	"help.dimm.usage": {EN: "my dimm <slot|serial> [flags]", KO: "my dimm <슬롯|시리얼> [옵션]"},

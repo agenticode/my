@@ -167,3 +167,28 @@ func (w *Writer) DropSlot(host, name string) (bool, error) {
 	}
 	return true, nil
 }
+
+// FillHost records the facts about a host that the ledger does not have
+// yet and leaves the ones it has. What a BMC says about the machine does
+// not replace what the host says about itself. Vendor and product are
+// taken together when the vendor is not known.
+func (w *Writer) FillHost(h *model.Host) error {
+	if h.Name == "" {
+		return invalid("host: name is empty")
+	}
+	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, virtual, first_seen, last_seen)
+ VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ ON CONFLICT(name) DO UPDATE SET
+  arch           = CASE WHEN arch = '' THEN excluded.arch ELSE arch END,
+  system_vendor  = CASE WHEN system_vendor = '' THEN excluded.system_vendor ELSE system_vendor END,
+  system_product = CASE
+    WHEN system_product = '' THEN excluded.system_product
+    WHEN system_vendor = '' AND excluded.system_vendor != '' AND excluded.system_product != '' THEN excluded.system_product
+    ELSE system_product END,
+  board          = CASE WHEN board = '' THEN excluded.board ELSE board END,
+  virtual        = CASE WHEN virtual = '' THEN excluded.virtual ELSE virtual END,
+  first_seen = MIN(COALESCE(first_seen, excluded.first_seen), COALESCE(excluded.first_seen, first_seen)),
+  last_seen  = MAX(COALESCE(last_seen, excluded.last_seen), COALESCE(excluded.last_seen, last_seen))`,
+		h.Name, h.Arch, h.SystemVendor, h.SystemProduct, h.Board, h.Virtual, ts(h.FirstSeen), ts(h.LastSeen))
+	return err
+}

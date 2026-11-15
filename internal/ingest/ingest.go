@@ -72,6 +72,18 @@ type HostHinter interface {
 	HostHint() string
 }
 
+// BoardInventory is implemented by adapters whose modules are an inventory
+// of the whole board, the way the SMBIOS tables are: the memory resources
+// of a BMC. Such a source is checked against SMBIOS before it is taken. The
+// BMC of another machine would add the slots, the DIMMs and the errors of
+// that machine to this host.
+type BoardInventory interface {
+	BoardInventory() bool
+}
+
+// errOtherMachine rolls back a source that describes another machine.
+var errOtherMachine = errors.New("the source describes another machine")
+
 // SlotMapKind is the source inventory entry that reports how EDAC positions
 // were tied to SMBIOS slots.
 const SlotMapKind = "slot-map"
@@ -122,23 +134,62 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		return nil, fmt.Errorf("ingest: %w", err)
 	}
 
+	// The serial numbers of the DIMMs SMBIOS lists for the host: those the
+	// ledger has, and those of this run as they are read. They are what an
+	// inventory of the whole board is checked against.
+	var board map[string]bool
+	for _, a := range adapters {
+		if b, ok := a.(BoardInventory); ok && b.BoardInventory() {
+			if board, err = boardSerials(ctx, s, host); err != nil {
+				return nil, fmt.Errorf("ingest: %w", err)
+			}
+			break
+		}
+	}
+
 	var modules []*model.Module
 	for _, a := range adapters {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		src := model.Source{ScanID: res.Scan.ID, Kind: a.Kind(), Origin: a.Origin()}
-		sk := &sink{host: host, scanID: res.Scan.ID, src: &src}
+		whole, _ := a.(BoardInventory)
+		// What a BMC says about the machine fills what the host does not
+		// say about itself.
+		sk := &sink{host: host, scanID: res.Scan.ID, src: &src, fill: whole != nil && whole.BoardInventory()}
 		var rep adapter.Report
+		listed := 0
 		err := s.Update(ctx, func(w *store.Writer) error {
 			sk.w = w
 			rep = a.Collect(ctx, sk)
 			// A record the ledger could not take rolls back the whole
 			// source: half a source would look like a complete one.
-			return rep.SinkErr
+			if rep.SinkErr != nil {
+				return rep.SinkErr
+			}
+			if sk.fill {
+				if listed = otherMachine(sk.modules, board); listed > 0 {
+					return errOtherMachine
+				}
+			}
+			return nil
 		})
+		if errors.Is(err, errOtherMachine) {
+			// Nothing of it is in the ledger. The inventory says why.
+			src = model.Source{ScanID: res.Scan.ID, Kind: a.Kind(), Origin: a.Origin()}
+			sk = &sink{host: host, scanID: res.Scan.ID, src: &src}
+			rep = adapter.Report{Status: model.SourceError, Detail: fmt.Sprintf(
+				"describes another machine: none of the %d DIMM serial numbers it lists is among the %d SMBIOS lists for this host. Nothing of it was added",
+				listed, len(board))}
+			err = nil
+		}
 		if err != nil {
 			return nil, fmt.Errorf("ingest %s %s: %w", a.Kind(), a.Origin(), err)
+		}
+		for _, m := range sk.modules {
+			if k := serialKey(m.DIMM.Serial); k != "" && m.Handle.Valid && m.Populated && board != nil {
+				board[k] = true
+			}
 		}
 		src.Status, src.Detail = rep.Status, rep.Detail
 		src.Records = rep.Records
@@ -296,6 +347,10 @@ type sink struct {
 	src    *model.Source
 	tally  adapter.Tally
 
+	// fill says that the facts of the source about the host only fill
+	// what is not known.
+	fill bool
+
 	known      int
 	newEvents  int
 	newActions int
@@ -449,6 +504,9 @@ func (k *sink) Boot(b *model.Boot) error {
 
 func (k *sink) Host(h *model.Host) error {
 	h.Name = k.host
+	if k.fill {
+		return k.refuse(k.src.Origin, k.w.FillHost(h))
+	}
 	return k.refuse(k.src.Origin, k.w.UpsertHost(h))
 }
 
