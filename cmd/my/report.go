@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/agenticode/my/internal/cli"
-	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/report"
 )
@@ -179,7 +178,7 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	if len(figs) > 0 {
 		p("%s", say(lang, "report.figures", "dir", *figures, "n", len(figs)))
 	}
-	p("  %s", say(lang, "import.finding", "host", s.h.Host, "grade", engine.GradeText(lang, s.h.Grade)))
+	p("  %s", say(lang, "import.finding", "host", s.h.Host, "grade", findingText(lang, s.h)))
 	if *out == "" {
 		return cli.ExitOK
 	}

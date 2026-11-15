@@ -140,7 +140,19 @@ func (doc *Document) conclusion() []*node {
 		p.add(el("strong", "GPU "+gpu.Key), ": "+gpu.GradeText+". ")
 		finish(gpu.Evidence, gpu.Next)
 	default:
-		return []*node{el("p", A{"class", "conclusion"}, doc.say("sum.none"))}
+		loose := doc.uncovered()
+		if loose == nil || doc.Overview.Unattributed == 0 {
+			out = append(out, el("p", A{"class", "conclusion"}, doc.say("sum.none")))
+			if loose != nil {
+				out = append(out, loose)
+			}
+			return out
+		}
+		// Nothing has a finding and there are errors that are tied to no
+		// DIMM. They lead: "no DIMM has errors" alone would read as "no
+		// errors".
+		loose.set("class", "conclusion uncovered")
+		return []*node{loose, el("p", doc.say("sum.none"))}
 	}
 	var others []string
 	for _, o := range doc.DIMMs {
@@ -156,7 +168,35 @@ func (doc *Document) conclusion() []*node {
 	if len(others) > 0 {
 		out = append(out, el("p", doc.say("sum.others", "n", len(others), "list", strings.Join(others, ", "))))
 	}
+	if loose := doc.uncovered(); loose != nil {
+		out = append(out, loose)
+	}
 	return out
+}
+
+// uncovered says what the findings leave out: the errors and the page
+// offlines of the host that are tied to no DIMM. The grade of the host is
+// the grade of its worst DIMM or GPU and says nothing about them, so the
+// summary has to. It returns nil when every record is tied to a DIMM.
+func (doc *Document) uncovered() *node {
+	ov := doc.Overview
+	if ov.Unattributed == 0 && ov.LoosePages == 0 {
+		return nil
+	}
+	p := el("p", A{"class", "uncovered"})
+	if ov.Unattributed > 0 {
+		// The mark of an uncorrected error, when one is among them.
+		mark := swatch("ht2", false)
+		if ov.UnattributedUE > 0 {
+			mark = swatch("ue", true)
+		}
+		p.add(mark, " "+doc.say("sum.loose", "n", ov.Unattributed, "ce", ov.Unattributed-ov.UnattributedUE, "ue", ov.UnattributedUE)+" ")
+	}
+	if ov.LoosePages > 0 {
+		p.add(doc.say("sum.loose_pages", "n", ov.LoosePages) + " ")
+	}
+	p.add(el("a", A{"href", "#s7"}, doc.say("sum.loose_see")))
+	return p
 }
 
 // dimmName names a DIMM by its slot and serial number.
@@ -216,7 +256,7 @@ func (doc *Document) summary() *node {
 		fact("fact.system", host.System)
 	}
 	if !host.To.IsZero() {
-		fact("fact.period", R(doc.say("val.period", "from", day(host.From), "to", day(host.To), "boots", host.Boots)))
+		fact("fact.period", R(doc.say("val.period", "span", view.Span(doc.Lang, day(host.From), day(host.To)), "boots", host.Boots)))
 	}
 	if host.CE+host.UE > 0 {
 		fact("fact.errors", doc.vsay("ov.errors", "ce", host.CE, "ue", host.UE))
@@ -1065,6 +1105,9 @@ func (doc *Document) quality() *node {
 	if n := doc.Overview.Unattributed; n > 0 {
 		notes.add(el("li", doc.say("q.loose", "n", n)))
 	}
+	if n := doc.Overview.LoosePages; n > 0 {
+		notes.add(el("li", doc.say("sum.loose_pages", "n", n)))
+	}
 	if doc.NoSerial > 0 {
 		notes.add(el("li", doc.say("q.no_serial", "n", doc.NoSerial)))
 	}
@@ -1112,7 +1155,7 @@ func (doc *Document) recordRows(r *Record) *node {
 	return el("tbody", A{"id", "rec-" + r.Key, "class", classes("rec", r.Class, map[bool]string{true: "cited"}[r.Cited])},
 		el("tr",
 			el("td", A{"class", "id"}, el("a", A{"class", "recid", "href", "#rec-" + r.Key}, r.Key)),
-			timeCell, what.add(A{"class", "nw"}), el("td", A{"class", "id"}, orDash(r.Slot)), el("td", A{"class", "mono"}, orDash(r.Where)),
+			timeCell, what.add(A{"class", "nw"}), el("td", A{"class", "id"}, orDash(r.Slot)), el("td", A{"class", "mono place"}, orDash(r.Where)),
 			numCell(int64(r.Count)), el("td", grade),
 			el("td", A{"class", "mono"}, r.Source, el("br"), r.RawRef)),
 		el("tr", A{"class", "raw"}, rawCell))

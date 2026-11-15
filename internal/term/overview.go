@@ -55,9 +55,10 @@ func (p *page) labelled(label string, labelW int, text string, color string) {
 	}
 }
 
-// span writes a period of days in the words of the language.
+// span writes a period of days in the words of the language; a period of
+// one day is that day.
 func (st Style) span(from, to string) string {
-	return st.say("span", "from", from, "to", to)
+	return view.Span(st.lang(), from, to)
 }
 
 // headerFields returns the fields of the first line of a host screen.
@@ -100,7 +101,14 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	for _, line := range flow(st.headerFields(&ov.Host), "  ", st.width()) {
 		p.add(line)
 	}
-	p.add(st.say("ov.finding", "grade", st.paint(gradeColor(string(ov.Host.Grade)), ov.Host.GradeText)))
+	// The grade speaks of the DIMMs and GPUs the records name. Errors that
+	// name none are in no finding, and the line of the finding is where a
+	// reader must learn that.
+	grade := view.GradeWithLoose(st.lang(), st.paint(gradeColor(string(ov.Host.Grade)), ov.Host.GradeText),
+		ov.Unattributed-ov.UnattributedUE, ov.UnattributedUE)
+	for _, line := range wrap(st.say("ov.finding", "grade", grade), st.width()) {
+		p.add(line)
+	}
 	p.blank()
 
 	st.slotMap(p, &ov.SlotMap)
@@ -127,7 +135,14 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		}
 	}
 	if ov.Unattributed > 0 {
-		p.add(" " + st.say("ov.loose", "n", ov.Unattributed))
+		for _, line := range wrap(st.say("ov.loose", "n", ov.Unattributed), st.width()-1) {
+			p.add(" " + line)
+		}
+	}
+	if ov.LoosePages > 0 {
+		for _, line := range wrap(st.say("ov.loose_pages", "n", ov.LoosePages), st.width()-1) {
+			p.add(" " + line)
+		}
 	}
 	var read []string
 	for _, s := range ov.Sources {
@@ -167,7 +182,9 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 // per channel, and a band of lines per position on the channel.
 func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	if len(sm.Rows) == 0 {
-		p.add(" " + st.say("ov.no_slots"))
+		for _, line := range wrap(st.say("ov.no_slots"), st.width()-1) {
+			p.add(" " + line)
+		}
 		return
 	}
 	type bandRow struct {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
 )
@@ -359,27 +360,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	if err != nil {
 		return nil, err
 	}
-	// One page offline that two sources report (the kernel log and the
-	// rasdaemon database) is one event: the same page, the same outcome,
-	// within two minutes. The same page taken offline again later, after a
-	// reboot for example, is another event.
-	type pageKey struct {
-		page   uint64
-		failed bool
-	}
-	lastOffline := map[pageKey]time.Time{}
-	for _, a := range actions {
-		if a.TimeQuality == model.TimeRelative {
-			continue
-		}
-		if a.Kind == model.ActionPageOffline && a.OsPhysicalAddress.Valid {
-			k := pageKey{a.OsPhysicalAddress.V >> 12, a.Result == model.ResultFailed}
-			last, seen := lastOffline[k]
-			lastOffline[k] = a.At
-			if seen && a.At.Sub(last).Abs() <= 2*time.Minute {
-				continue
-			}
-		}
+	for _, a := range actionEvents(actions) {
 		n := max(a.Count, 1)
 		kind := c.kindText(string(a.Kind))
 		var t Text
@@ -483,7 +464,11 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	}
 
 	// What the period adds up to.
-	tl.Notes = append(tl.Notes, c.say("tl.total", "ce", tl.CE, "ue", tl.UE, "from", when(tl.From), "to", when(tl.To)))
+	total := "tl.total"
+	if tl.Days == 1 {
+		total = "tl.total.day"
+	}
+	tl.Notes = append(tl.Notes, c.say(total, "ce", tl.CE, "ue", tl.UE, "from", when(tl.From), "to", when(tl.To)))
 	if !latest.IsZero() && latest.After(h.ObservedFrom) && tl.CE+tl.UE > 0 {
 		sf := filter
 		sf.From = latest
@@ -501,6 +486,45 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	}
 	undated()
 	return tl, nil
+}
+
+// Span names a period by its first and its last day, as "2006-01-02". A
+// period of one day is that day: "from a day to the same day" is none.
+func Span(lang i18n.Lang, from, to string) string {
+	if from == to {
+		return from
+	}
+	return Messages.Text(lang, "span", map[string]any{"from": from, "to": to})
+}
+
+// actionEvents returns the actions that are events of a timeline, in the
+// order given: those with a time of day, and a page offline that two
+// sources report (the kernel log and the rasdaemon database) once. Two
+// records are one event when they name the same page and the same outcome
+// within two minutes. The same page taken offline again later, after a
+// reboot for example, is another event.
+func actionEvents(actions []model.Action) []model.Action {
+	type pageKey struct {
+		page   uint64
+		failed bool
+	}
+	lastOffline := map[pageKey]time.Time{}
+	var out []model.Action
+	for _, a := range actions {
+		if a.TimeQuality == model.TimeRelative {
+			continue
+		}
+		if a.Kind == model.ActionPageOffline && a.OsPhysicalAddress.Valid {
+			k := pageKey{a.OsPhysicalAddress.V >> 12, a.Result == model.ResultFailed}
+			last, seen := lastOffline[k]
+			lastOffline[k] = a.At
+			if seen && a.At.Sub(last).Abs() <= 2*time.Minute {
+				continue
+			}
+		}
+		out = append(out, a)
+	}
+	return out
 }
 
 // kindText names an action kind on the timeline. What firmware did to a

@@ -322,7 +322,10 @@ func TestFleetBundleAndLedger(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "db-07.mycase")
 	code, out, errOut := runEnv(fixed, "bundle", "-o", file, "--fleet", "postgresql", "--host", "db-07")
-	if code != cli.ExitOK || errOut != "" || !strings.Contains(out, "host db-07: 2 DIMMs, CE 4, UE 3, finding: replace now") {
+	// The store holds 3 corrected errors of db-07 that name no DIMM. The
+	// line counts them with the errors of the host and says that no
+	// finding covers them.
+	if code != cli.ExitOK || errOut != "" || !strings.Contains(out, "host db-07: 2 DIMMs, CE 7, UE 3, finding: replace now; CE 3, UE 0 tied to no DIMM are in no finding") {
 		t.Fatalf("bundle: exit code %d, stderr %q\n%s", code, errOut, out)
 	}
 	code, out, _ = runEnv(fixed, "open", file)
