@@ -65,6 +65,11 @@ var memIDEvents = map[string]ipmi.MemoryEvent{
 // memIDCleared are MEMnnnn messages that say a module is fine again.
 var memIDCleared = map[string]bool{"0016": true, "0700": true}
 
+// crossLogWindow is how far apart the entries of two logs of one BMC may
+// be stamped and still report one error. The firmware writes both while it
+// handles the error.
+const crossLogWindow = 5 * time.Second
+
 // decoded is what a log entry says once its vocabulary is read.
 type decoded struct {
 	ev       ipmi.MemoryEvent
@@ -331,6 +336,8 @@ func (r *run) logs(sink adapter.Sink) error {
 	type out struct {
 		ev  *model.Event
 		act *model.Action
+		// log is the log the entry stands in.
+		log string
 	}
 	var outs []out
 	var notMemory, cxl, cleared, presence, withdrawn, multi, unnamed int
@@ -446,7 +453,7 @@ func (r *run) logs(sink adapter.Sink) error {
 			if d.ev == ipmi.MemLogLimit {
 				logLimit = append(logLimit, at)
 			}
-			outs = append(outs, out{ev: e})
+			outs = append(outs, out{ev: e, log: logPath(res)})
 		case ipmi.ClassAction:
 			targets := d.labels
 			if len(targets) == 0 {
@@ -463,6 +470,54 @@ func (r *run) logs(sink adapter.Sink) error {
 					Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}})
 			}
 		}
+	}
+
+	// A BMC can keep one error in two of its logs: the system event log and
+	// the log of the manager. The entry of the second log is declared a
+	// second report of the first, so the error is counted once. Two
+	// entries are one error when they stand in different logs, name the
+	// same module, are of the same severity and lie within crossLogWindow
+	// of each other; an entry stands for at most one entry of each other
+	// log.
+	type errorKey struct {
+		where    string
+		severity model.Severity
+	}
+	type first struct {
+		at   time.Time
+		fp   string
+		logs map[string]bool
+	}
+	firsts := map[errorKey][]*first{}
+	twice := 0
+	for _, o := range outs {
+		e := o.ev
+		if e == nil || o.log == "" || e.ErrorSeverity.Class() == "" {
+			continue
+		}
+		k := errorKey{severity: e.ErrorSeverity}
+		switch {
+		case e.Label != "":
+			k.where = "label:" + model.NormalizeLabel(e.Label)
+		case e.SocketId.Valid && e.ChannelId.Valid && e.ChannelSlotId.Valid:
+			k.where = fmt.Sprintf("place:%d:%d:%d", e.SocketId.V, e.ChannelId.V, e.ChannelSlotId.V)
+		default:
+			continue // names no module: nothing says it is the same error
+		}
+		var same *first
+		for _, f := range firsts[k] {
+			if !f.logs[o.log] && e.ErrorDT.Sub(f.at).Abs() <= crossLogWindow {
+				same = f
+				break
+			}
+		}
+		if same == nil {
+			firsts[k] = append(firsts[k], &first{at: e.ErrorDT, fp: e.Fingerprint, logs: map[string]bool{o.log: true}})
+			continue
+		}
+		same.logs[o.log] = true
+		e.DupOfFingerprint = same.fp
+		twice++
 	}
 
 	for _, o := range outs {
@@ -511,6 +566,9 @@ func (r *run) logs(sink adapter.Sink) error {
 	}
 	if multi > 0 {
 		add("%d error entries name more than one module; they are counted once and tied to none of them", multi)
+	}
+	if twice > 0 {
+		add("%d error entries repeat an entry of another log of the same BMC: each such error is counted once", twice)
 	}
 	if unnamed > 0 {
 		add("%d memory entries do not name a module", unnamed)

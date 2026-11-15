@@ -62,6 +62,12 @@ func app() *cli.App {
 				Run:       live(runBIOS),
 			},
 			{
+				Name:      "inventory",
+				Summary:   "one line per DIMM: slot names, module, speed, RAS settings, corrected errors of OS and BMC",
+				SummaryKO: "DIMM당 한 줄: 슬롯 이름, 모듈, 속도, RAS 설정, 운영체제와 BMC의 CE",
+				Run:       live(runInventory),
+			},
+			{
 				Name:      "bundle",
 				Summary:   "write the records of this host as one case file to send or attach",
 				SummaryKO: "이 호스트의 기록을 보내거나 첨부할 케이스 파일 하나로 저장",

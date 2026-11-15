@@ -54,7 +54,7 @@ var words = i18n.Catalog{
 	"err.diff_order":     {EN: "{second} ({second_at}) is older than {first} ({first_at}): name the earlier case first", KO: "{second}({second_at})의 시점이 {first}({first_at}) 이전임: 앞선 케이스를 먼저 지정해야 함"},
 	"err.diff_at":        {EN: "--at {value}: want a time after the earlier case ({first_at}) and up to the later one ({second_at})", KO: "--at {value}: 앞 케이스({first_at}) 뒤이고 뒤 케이스({second_at})까지인 시각이어야 함"},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, bios, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, bios, verify, export, 또는 생략하면 개요)"},
+	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, bios, inventory, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, bios, inventory, verify, export, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -481,7 +481,7 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" && topic != "collect" && topic != "bios" {
+	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" && topic != "collect" && topic != "bios" && topic != "inventory" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)

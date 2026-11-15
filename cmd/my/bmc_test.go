@@ -59,7 +59,15 @@ func bmcOf(t *testing.T, host overviewDoc) *bmctest.Server {
 			`"Location":{"PartLocation":{"ServiceLabel":"DIMM A%d","LocationType":"Slot"}},"CapacityMiB":65536,"Manufacturer":"Another Name Ltd.",`+
 			`"SerialNumber":"0x%s","RankCount":2,"Status":{"State":"Enabled","Health":"OK"},"Metrics":{"@odata.id":"%s/MemoryMetrics"}}`,
 			p, i+1, i+1, i+1, i+1, strings.ToLower(d.DIMM.Serial), p)
+		if i >= 3 {
+			// The BMC has counted nothing for most modules.
+			overlay[p+"/MemoryMetrics"] = fmt.Sprintf(`{"@odata.id":"%s/MemoryMetrics","@odata.type":"#MemoryMetrics.v1_7_0.MemoryMetrics","Id":"MemoryMetrics",`+
+				`"CurrentPeriod":{"CorrectableECCErrorCount":0,"UncorrectableECCErrorCount":0},"LifeTime":{"CorrectableECCErrorCount":0,"UncorrectableECCErrorCount":0}}`, p)
+		}
 	}
+	// The system says when it was last reset, which is when the current
+	// counts of the BMC began.
+	overlay["/redfish/v1/Systems/1"] = strings.Replace(overlay["/redfish/v1/Systems/1"], `"HostName":"node-a",`, `"HostName":"node-a","LastResetTime":"2026-11-10T00:00:00Z",`, 1)
 	return bmctest.New(t, fstest.MapFS{}, bmctest.Options{Overlay: overlay, User: bmcUser, Password: bmcPassword})
 }
 
@@ -89,11 +97,11 @@ func TestScanWithBMC(t *testing.T) {
 		if want[d.Slot] != d.DIMM.Serial+" "+d.DIMM.Manufacturer {
 			t.Errorf("slot %s holds %q %q, the host alone says %q", d.Slot, d.DIMM.Serial, d.DIMM.Manufacturer, want[d.Slot])
 		}
-		// Eight entries of two logs of the BMC name the first module. One
-		// of them reports an error rasdaemon recorded in the same minutes,
-		// and is counted once.
-		if d.Slot == first.Slot && d.CE != first.CE+7 {
-			t.Errorf("%s: CE %d, want the %d of the host and 7 of the logs of the BMC", d.Slot, d.CE, first.CE)
+		// Eight entries of two logs of the BMC name the first module. Two
+		// of them stand in both logs, which leaves six errors, and one of
+		// those is an error rasdaemon recorded in the same minutes.
+		if d.Slot == first.Slot && d.CE != first.CE+5 {
+			t.Errorf("%s: CE %d, want the %d of the host and 5 more from the logs of the BMC", d.Slot, d.CE, first.CE)
 		}
 	}
 	var redfish, slotMap []string
