@@ -111,6 +111,9 @@ type LedgerInfo struct {
 type Anonymization struct {
 	Hosts     int `json:"hosts"`
 	Addresses int `json:"addresses"`
+	// Users counts the names of home directories that were replaced in
+	// the paths of the files that were read.
+	Users int `json:"users,omitzero"`
 	// Keyed is set when the sender gave a key: bundles made with the same
 	// key replace a name by the same word.
 	Keyed bool `json:"keyed"`
@@ -311,7 +314,7 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 			return nil, nil, nil, fmt.Errorf("anonymize: %w", aerr)
 		}
 		m.Anonymized = true
-		m.Anonymization = &Anonymization{Hosts: len(a.names), Addresses: len(a.addresses), Keyed: len(opts.Key) > 0}
+		m.Anonymization = &Anonymization{Hosts: len(a.names), Addresses: len(a.addresses), Users: len(a.users), Keyed: len(opts.Key) > 0}
 		w.Names = a.names
 		if m.Subject != nil {
 			m.Subject.Host = a.host(m.Subject.Host)

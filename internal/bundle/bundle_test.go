@@ -324,7 +324,9 @@ func TestOpenRejects(t *testing.T) {
 func identifying(t *testing.T) *store.Store {
 	t.Helper()
 	ds := testledger.Generate(t, "demo", 1, nil)
-	root := filepath.Join(t.TempDir(), "root")
+	// The copy of the host lies below a home directory, as the files of an
+	// import often do: its paths carry the name of an account.
+	root := filepath.Join(t.TempDir(), "home", "alice", "root")
 	if err := ds.WriteHostTree(root, synth.FlavorIntel); err != nil {
 		t.Fatal(err)
 	}
@@ -417,7 +419,7 @@ func allText(t *testing.T, path string) map[string][]string {
 func TestAnonymize(t *testing.T) {
 	src := identifying(t)
 	secrets := []string{"r12-n034", "example.com", "dc1.example", "10.20.30.40", "10.20.30.1", "192.168.7.9", "2001:db8::53", "fe80::1", "aa-bb-cc-dd-ee-ff", "00:1B:44:11:3A:B7", "00:1b:44:11:3a:b7",
-		"6b1f0c2a-7d3e-4c5b-9a80-1e2f3a4b5c6d", "0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9"}
+		"6b1f0c2a-7d3e-4c5b-9a80-1e2f3a4b5c6d", "0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9", "/home/alice"}
 
 	// The ledger does hold what is to be removed: the test is not vacuous.
 	plain := write(t, src, Options{})
@@ -449,7 +451,7 @@ func TestAnonymize(t *testing.T) {
 	w := write(t, src, Options{Anonymize: true, Subject: &Subject{Host: "r12-n034.dc1.example.com", Slot: "CPU0_C1"}})
 	m := w.Manifest
 	word := w.Names["r12-n034.dc1.example.com"]
-	if !m.Anonymized || m.Anonymization == nil || m.Anonymization.Hosts != 1 || m.Anonymization.Addresses < 5 || m.Anonymization.Keyed {
+	if !m.Anonymized || m.Anonymization == nil || m.Anonymization.Hosts != 1 || m.Anonymization.Addresses < 5 || m.Anonymization.Users < 1 || m.Anonymization.Keyed {
 		t.Errorf("anonymization = %+v", m.Anonymization)
 	}
 	if len(w.Names) != 1 || !strings.HasPrefix(word, "host-") || len(word) != 13 {
@@ -495,7 +497,7 @@ func TestAnonymize(t *testing.T) {
 				t.Errorf("%s still holds %q", name, s)
 			}
 		}
-		if name == readmeName && !strings.Contains(string(b), "Host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line\nwere replaced") {
+		if name == readmeName && !strings.Contains(string(b), "Host names, IP addresses, MAC addresses, the disk identifiers of the kernel command line\nand the names of home directories in file paths were replaced") {
 			t.Errorf("the README does not say that names were replaced")
 		}
 	}
@@ -604,6 +606,13 @@ func TestTextAnonymizing(t *testing.T) {
 		{"ifname=bootnet:00:1b:44:11:3a:b7", "ifname=bootnet:" + a.word("mac-", "00:1b:44:11:3a:b7", 8)},
 		{"GUID 00:11:22:33:44:55:66:77", "GUID " + a.word("mac-", "00:11:22:33:44:55:66:77", 8)},
 		{"uuid 6f1c0a8e-2b7d-4f0e-9a3b-5c7d9e1f2a3b and 2026-11-12 03:14:07", "uuid 6f1c0a8e-2b7d-4f0e-9a3b-5c7d9e1f2a3b and 2026-11-12 03:14:07"},
+		// The name of a home directory in a path, and what is no such name.
+		{"/home/alice/cases/dmesg.txt#L533", "/home/" + a.word("user-", "alice", 8) + "/cases/dmesg.txt#L533"},
+		{`{"origin":"/Users/Bob Lee/x","root":"/export/home/alice"}`, `{"origin":"/Users/` + a.word("user-", "Bob", 8) + ` Lee/x","root":"/export/home/` + a.word("user-", "alice", 8) + `"}`},
+		{"/Users/Shared/cases and /home/lost+found", "/Users/Shared/cases and /home/lost+found"},
+		{"/home/" + a.word("user-", "alice", 8) + "/x is anonymized already", "/home/" + a.word("user-", "alice", 8) + "/x is anonymized already"},
+		{"/var/lib/rasdaemon/ras-mc_event.db#mc_event/7 and /homework/a", "/var/lib/rasdaemon/ras-mc_event." + a.names["db"] + "#mc_event/7 and /homework/a"},
+		{"/home/ and /home", "/home/ and /home"},
 		// Identifiers derived from the host name.
 		{`{"old":"s0123456789abcdef012"}`, `{"old":"` + a.word("s", "s0123456789abcdef012", 19) + `"}`},
 		{"boot derived-0123456789abcdef.", "boot " + a.word("derived-", "0123456789abcdef", 16) + "."},

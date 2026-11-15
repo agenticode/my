@@ -15,9 +15,11 @@ import (
 )
 
 // Anonymizing replaces what names a host on a network: host names, IP
-// addresses and MAC addresses. Everything an analysis needs stays: times,
-// locations, counts, slot names, and the serial numbers of the DIMMs, which
-// are what a return is about.
+// addresses and MAC addresses. It also replaces the name of a home
+// directory in a path, which is the name of an account: an import records
+// the paths of the files it read as they were given. Everything an analysis
+// needs stays: times, locations, counts, slot names, and the serial numbers
+// of the DIMMs, which are what a return is about.
 //
 // A name is replaced by a word made from a keyed hash of it ("host-" and
 // eight hexadecimal digits), the same word wherever the name occurs, so
@@ -142,6 +144,8 @@ type anonymizer struct {
 	tokens []token
 	// addresses collects the addresses that were replaced, for the count.
 	addresses map[string]string
+	// users collects the names of home directories that were replaced.
+	users map[string]string
 }
 
 type token struct {
@@ -156,7 +160,7 @@ func newAnonymizer(key []byte) (*anonymizer, error) {
 			return nil, err
 		}
 	}
-	return &anonymizer{key: key, names: map[string]string{}, addresses: map[string]string{}}, nil
+	return &anonymizer{key: key, names: map[string]string{}, addresses: map[string]string{}, users: map[string]string{}}, nil
 }
 
 // word returns prefix and n hexadecimal digits of the keyed hash of value.
@@ -296,7 +300,16 @@ var (
 	// quoted inside text.
 	slotUIDRE = regexp.MustCompile(`\bs[0-9a-f]{19}\b`)
 	derivedRE = regexp.MustCompile(`\bderived-[0-9a-f]{16}\b`)
+	// The name of a home directory in a path: what follows "/home/" or
+	// "/Users/" up to the end of that part of the path.
+	homeRE = regexp.MustCompile(`(/home/|/Users/)([^/\\\s"'<>|:;,(){}\[\]]+)`)
+	// userWordRE is the word a home directory name is replaced by.
+	userWordRE = regexp.MustCompile(`^user-[0-9a-f]{8}$`)
 )
+
+// sharedHomes are directories beside the home directories that belong to
+// no account.
+var sharedHomes = map[string]bool{"Shared": true, "shared": true, "lost+found": true}
 
 // replaceGroup replaces the second group of every match of re.
 func replaceGroup(re *regexp.Regexp, s string, fn func(string) (string, bool)) string {
@@ -332,11 +345,39 @@ func (a *anonymizer) address(prefix, addr string) string {
 	return w
 }
 
-// text replaces host names and addresses in free text.
+// user returns the word for the name of a home directory.
+func (a *anonymizer) user(name string) string {
+	if w, ok := a.users[name]; ok {
+		return w
+	}
+	w := a.word("user-", name, 8)
+	a.users[name] = w
+	return w
+}
+
+// homes replaces the names of home directories in the paths of a text. A
+// name that is already such a word stays, so that a text keeps its form
+// when it is anonymized again with another key.
+func (a *anonymizer) homes(s string) string {
+	if !strings.Contains(s, "/home/") && !strings.Contains(s, "/Users/") {
+		return s
+	}
+	return homeRE.ReplaceAllStringFunc(s, func(m string) string {
+		sub := homeRE.FindStringSubmatch(m)
+		if sharedHomes[sub[2]] || userWordRE.MatchString(sub[2]) {
+			return m
+		}
+		return sub[1] + a.user(sub[2])
+	})
+}
+
+// text replaces host names, addresses and the names of home directories
+// in free text.
 func (a *anonymizer) text(s string) string {
 	if s == "" {
 		return s
 	}
+	s = a.homes(s)
 	s = a.hosts(s)
 	if strings.ContainsAny(s, ".:-") {
 		s = a.mac(s)

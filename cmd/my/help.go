@@ -117,6 +117,7 @@ var words = i18n.Catalog{
 	"bundle.note":       {EN: "note: {what}", KO: "참고: {what}"},
 	"bundle.anonymized": {EN: "host names replaced, and {n} network {n|address|addresses}:", KO: "호스트 이름과 네트워크 주소 {n}개를 바꿈:"},
 	"bundle.anon_hosts": {EN: "host names replaced:", KO: "호스트 이름을 바꿈:"},
+	"bundle.anon_users": {EN: "{n} {n|name of a home directory|names of home directories} replaced in the paths of the files that were read", KO: "읽은 파일 경로에서 홈 디렉터리 이름 {n}개를 바꿈"},
 	"bundle.keep_names": {EN: "Keep these lines: the bundle does not hold the names, and an answer about it will use the new ones.", KO: "이 줄을 보관하세요. 번들에는 원래 이름이 없고, 회신에는 바뀐 이름이 쓰입니다."},
 	"bundle.open":       {EN: "look at it: my open {file}", KO: "열어 보기: my open {file}"},
 	"case.bundle":       {EN: "case bundle of {when}, written by {tool}", KO: "{when} 케이스 번들, 작성 도구 {tool}"},
@@ -293,12 +294,14 @@ var words = i18n.Catalog{
 	"help.bundle.flags": {
 		EN: "-o FILE           the bundle to write (case.mycase); \"-\" writes it to standard output,\n" +
 			"                  as in: ssh HOST sudo my bundle -o - > case.mycase\n" +
-			"--anonymize       replace host names, IP addresses and MAC addresses; DIMM serial numbers stay\n" +
+			"--anonymize       replace host names, IP and MAC addresses, and the names of home\n" +
+			"                  directories in file paths; DIMM serial numbers stay\n" +
 			"--key-file FILE   with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force           replace FILE when it exists",
 		KO: "-o FILE           저장할 번들 (case.mycase). \"-\"는 표준 출력\n" +
 			"                  예: ssh HOST sudo my bundle -o - > case.mycase\n" +
-			"--anonymize       호스트 이름, IP 주소, MAC 주소를 바꿈. DIMM 시리얼은 그대로 둠\n" +
+			"--anonymize       호스트 이름, IP 주소, MAC 주소, 파일 경로의 홈 디렉터리 이름을 바꿈.\n" +
+			"                  DIMM 시리얼은 그대로 둠\n" +
 			"--key-file FILE   --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
 			"--force           FILE이 있으면 덮어씀",
 	},

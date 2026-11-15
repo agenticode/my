@@ -210,6 +210,9 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 		}
 	}
 	if w.Manifest.Anonymized {
+		if n := w.Manifest.Anonymization.Users; n > 0 {
+			p("  %s", say(lang, "bundle.anon_users", "n", n))
+		}
 		if n := w.Manifest.Anonymization.Addresses; n > 0 {
 			p("  %s", say(lang, "bundle.anonymized", "n", n))
 		} else {
