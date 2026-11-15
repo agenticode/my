@@ -598,3 +598,90 @@ func TestJournalAndRingBufferAreReadTogether(t *testing.T) {
 		}
 	}
 }
+
+// A scan is blind when nothing it read could have shown an error.
+func TestBlind(t *testing.T) {
+	src := func(kind string, status model.SourceStatus) model.Source {
+		return model.Source{Kind: kind, Status: status}
+	}
+	for _, tc := range []struct {
+		name    string
+		sources []model.Source
+		blind   bool
+	}{
+		{"nothing at all", nil, true},
+		{"a system that is not Linux", []model.Source{src("hostinfo", model.SourceAbsent), src("rasdaemon", model.SourceAbsent), src("klog", model.SourceAbsent),
+			src("edac-sysfs", model.SourceAbsent), src("smbios", model.SourceAbsent)}, true},
+		{"a user who may read nothing on a virtual machine", []model.Source{src("hostinfo", model.SourceOK), src("rasdaemon", model.SourceAbsent),
+			src("klog", model.SourceUnreadable), src("klog", model.SourceUnreadable), src("edac-sysfs", model.SourceEmpty), src("smbios", model.SourceUnreadable)}, true},
+		{"host facts and SMBIOS alone say nothing about errors", []model.Source{src("hostinfo", model.SourceOK), src("smbios", model.SourceOK),
+			src("slot-map", model.SourceOK), src("time-align", model.SourceOK)}, true},
+		{"a kernel log without a record was read", []model.Source{src("hostinfo", model.SourceOK), src("rasdaemon", model.SourceAbsent), src("klog", model.SourceEmpty)}, false},
+		{"the ring buffer where the journal is closed", []model.Source{src("klog", model.SourceUnreadable), src("klog", model.SourceOK)}, false},
+		{"EDAC counters of a registered controller", []model.Source{src("klog", model.SourceUnreadable), src("edac-sysfs", model.SourceOK)}, false},
+		{"an EDAC tree without a controller counts nothing", []model.Source{src("klog", model.SourceUnreadable), src("edac-sysfs", model.SourceEmpty)}, true},
+		{"a rasdaemon database without rows", []model.Source{src("rasdaemon", model.SourceEmpty), src("klog", model.SourceUnreadable)}, false},
+		{"a database that is closed to the user", []model.Source{src("rasdaemon", model.SourceUnreadable), src("klog", model.SourceError)}, true},
+		{"the daemon of mcelog answered", []model.Source{src("klog", model.SourceUnreadable), src("mcelog", model.SourceEmpty)}, false},
+		{"a saved event log of the BMC", []model.Source{src("sel", model.SourcePartial)}, false},
+	} {
+		if got := Blind(tc.sources); got != tc.blind {
+			t.Errorf("%s: blind = %v, want %v", tc.name, got, tc.blind)
+		}
+	}
+
+	// A directory that holds nothing of a host, read as a copy of one.
+	res, err := Run(ctx, ledger(t), Options{Root: t.TempDir(), TempDir: t.TempDir()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !Blind(res.Sources) {
+		t.Errorf("an empty directory is not blind: %s", inventory(res.Sources))
+	}
+	// The synthetic host tree is not.
+	root, ds := tree(t, synth.FlavorIntel)
+	if res, err = Run(ctx, ledger(t), Options{Root: root, Now: ds.Scenario.End, TempDir: t.TempDir()}); err != nil || Blind(res.Sources) {
+		t.Errorf("a host tree is blind: %v, %s", err, inventory(res.Sources))
+	}
+}
+
+// What makes a directory a copy of a host, as far as errors go.
+func TestHoldsErrorSource(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		files []string
+		holds bool
+	}{
+		{"an empty directory", nil, false},
+		{"host facts and SMBIOS alone", []string{"proc/stat", "proc/sys/kernel/hostname", "sys/firmware/dmi/tables/DMI", "dmidecode.txt"}, false},
+		{"an EDAC directory without a controller", []string{"sys/devices/system/edac/mc/power/control"}, false},
+		{"a rasdaemon database", []string{"var/lib/rasdaemon/ras-mc_event.db"}, true},
+		{"a database of a build from source", []string{"usr/local/var/lib/rasdaemon/ras-mc_event.db"}, true},
+		{"a kernel log file", []string{"var/log/messages"}, true},
+		{"a saved dmesg", []string{"dmesg"}, true},
+		{"a memory controller", []string{"sys/devices/system/edac/mc/mc0/ce_count"}, true},
+		{"a saved event log of the BMC", []string{"sos_commands/ipmitool/ipmitool_sel_elist"}, true},
+		{"saved output of nvidia-smi", []string{"sos_commands/nvidia/nvidia-smi_-q"}, true},
+	} {
+		root := t.TempDir()
+		for _, f := range tc.files {
+			write(t, filepath.Join(root, filepath.FromSlash(f)), "x\n", 0o644)
+		}
+		if got := HoldsErrorSource(&Options{Root: root}); got != tc.holds {
+			t.Errorf("%s: holds = %v, want %v", tc.name, got, tc.holds)
+		}
+	}
+	// Every capture of a real host holds one.
+	entries, err := os.ReadDir(testutil.Testdata(t, "real"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range entries {
+		if !e.IsDir() || e.Name() == "7.3.0-mce-fatal" { // that one holds a console log alone
+			continue
+		}
+		if !HoldsErrorSource(&Options{Root: testutil.Testdata(t, "real", e.Name())}) {
+			t.Errorf("capture %s holds no error source", e.Name())
+		}
+	}
+}

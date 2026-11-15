@@ -7,8 +7,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -16,6 +18,7 @@ import (
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/outfile"
 	"github.com/agenticode/my/internal/plugin"
@@ -361,6 +364,29 @@ func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now t
 		// The copy says when it was made; the clock of this run does not.
 		opts.Root, opts.Live, opts.Now = root, false, time.Time{}
 	}
+	if opts.Live && hostOS != "linux" {
+		// The sources of a scan are what the Linux kernel and its tools
+		// keep. Elsewhere there is nothing to read, and an overview that
+		// says "no errors on record" would be about nothing.
+		return nil, "", errors.New(say(lang, "err.not_linux", "os", hostOS))
+	}
+	if !opts.Live && !scan.HoldsErrorSource(&opts) {
+		// The directory holds nothing a scan reads errors from: it is no
+		// copy of a host. The ledger is left alone; the scan runs into a
+		// scratch file, which takes no time, to name what it looked for.
+		scratch, err := store.Open(ctx, filepath.Join(tmp, "nothing.db"), store.Create)
+		if err != nil {
+			return nil, "", err
+		}
+		res, err := scan.Run(ctx, scratch, opts)
+		scratch.Close()
+		if err != nil {
+			return nil, "", err
+		}
+		return nil, "", errors.New(blindText(lang, &opts, res.Sources))
+	}
+	_, statErr := os.Stat(path)
+	made := errors.Is(statErr, fs.ErrNotExist)
 	ledger, err := store.Open(ctx, path, store.Create)
 	if err != nil {
 		return nil, "", err
@@ -370,7 +396,52 @@ func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now t
 		ledger.Close()
 		return nil, "", err
 	}
+	if scan.Blind(res.Sources) {
+		// Nothing that could have shown an error was read. The scan ends
+		// here: its overview would read "no errors on record". A ledger
+		// this run made for it holds nothing worth keeping.
+		ledger.Close()
+		if made {
+			for _, suffix := range []string{"", "-wal", "-shm", "-journal"} {
+				os.Remove(path + suffix)
+			}
+		}
+		return nil, "", errors.New(blindText(lang, &opts, res.Sources))
+	}
 	return ledger, res.Host, nil
+}
+
+// hostOS is the operating system this binary runs on. A test sets it to
+// run a scan of a made-up host on any system.
+var hostOS = runtime.GOOS
+
+// blindText says that a scan read no source of error records: where it
+// looked, what it found there, and what would let it read.
+func blindText(lang i18n.Lang, opts *scan.Options, sources []model.Source) string {
+	var b strings.Builder
+	switch {
+	case !opts.Live:
+		b.WriteString(say(lang, "err.blind_root", "dir", opts.Root))
+	case opts.Privileged:
+		b.WriteString(say(lang, "err.blind_live"))
+	default:
+		b.WriteString(say(lang, "err.blind_user"))
+	}
+	for _, src := range sources {
+		switch src.Kind {
+		case "hostinfo", "smbios", ingest.SlotMapKind, ingest.TimeAlignKind:
+			continue // they describe the machine and hold no error
+		}
+		line := "\n  " + src.Kind + ": " + engine.Messages.Text(lang, "status."+string(src.Status), nil)
+		if src.Detail != "" && src.Detail != "not present" {
+			line += " (" + src.Detail + ")"
+		}
+		b.WriteString(line)
+	}
+	if opts.Live && !opts.Privileged {
+		b.WriteString("\n" + say(lang, "err.blind_sudo"))
+	}
+	return b.String()
 }
 
 // needHost ends a command that draws one host when the ledger holds

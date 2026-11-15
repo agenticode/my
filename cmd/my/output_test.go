@@ -9,6 +9,9 @@ import (
 
 	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
+	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/scan"
 )
 
 // A file that cannot be written is reported before the host is scanned,
@@ -138,5 +141,90 @@ func TestFiguresOfAHostWithNothingToDraw(t *testing.T) {
 	}
 	if _, err := os.Stat(dir); err == nil {
 		t.Errorf("an empty directory %s was made", dir)
+	}
+}
+
+// A scan that read nothing that could have shown an error does not answer
+// "no errors on record". It ends with what it looked for and exit code 70:
+// a directory that holds nothing of a host, a system that is not Linux, a
+// user who may read no source.
+func TestScanThatCanReadNothing(t *testing.T) {
+	empty := t.TempDir()
+	dir := t.TempDir()
+	keep := filepath.Join(dir, "host.db")
+	for _, args := range [][]string{
+		{"--root", empty},
+		{"why", "--root", empty},
+		{"timeline", "--root", empty, "--json"},
+		{"bundle", "--root", empty, "-o", filepath.Join(dir, "case.mycase")},
+		{"report", "--root", empty, "-o", filepath.Join(dir, "r.html")},
+		{"--root", empty, "--ledger", keep},
+	} {
+		code, stdout, stderr := runEnv(fixed, args...)
+		if code != cli.ExitFailure || stdout != "" {
+			t.Errorf("%v: exit code %d, stdout %q", args, code, stdout)
+		}
+		wantLines(t, stderr, empty+" holds no source of error records of a host, so there is nothing to scan:",
+			"  rasdaemon: not present", "  klog: not present (no kernel log file found", "  edac-sysfs: not present")
+		if strings.Contains(stderr, "hostinfo") || strings.Contains(stderr, "smbios") || strings.Contains(stderr, "sudo") {
+			t.Errorf("%v: the message lists what holds no error, or names root for a copy:\n%s", args, stderr)
+		}
+	}
+	// Nothing was written, and no ledger was left for a scan of nothing.
+	if left, _ := os.ReadDir(dir); len(left) != 0 {
+		t.Errorf("files left by scans that read nothing: %v", left)
+	}
+	// In Korean.
+	_, _, stderr := runEnv(fixed, "--root", empty, "--lang", "ko")
+	wantLines(t, stderr, empty+"에 호스트의 오류 기록 소스가 없어 스캔할 것이 없음:", "  rasdaemon: 없음")
+
+	// A ledger that was there before is kept as it was found: readable.
+	root := hostTree(t)
+	if code, _, stderr := runEnv(fixed, "--root", root, "--ledger", keep); code != 3 {
+		t.Fatalf("scan into a ledger: exit code %d, %s", code, stderr)
+	}
+	if code, _, _ := runEnv(fixed, "--root", empty, "--ledger", keep); code != cli.ExitFailure {
+		t.Errorf("a scan of nothing into a ledger: exit code %d", code)
+	}
+	if code, out, stderr := runEnv(fixed, "open", keep, "why", "--oneline"); code != 3 || !strings.Contains(out, "replace now") {
+		t.Errorf("the ledger after a scan of nothing: exit code %d, %q, %q", code, out, stderr)
+	}
+
+	// A system that is not Linux: the scan of this host is not tried.
+	saved := hostOS
+	defer func() { hostOS = saved }()
+	hostOS = "plan9"
+	code, stdout, stderr := runEnv(fixed)
+	if code != cli.ExitFailure || stdout != "" || !strings.Contains(stderr, "my: this is not a Linux host (plan9).") || !strings.Contains(stderr, `"my open FILE"`) {
+		t.Errorf("not Linux: exit code %d, stdout %q, stderr %q", code, stdout, stderr)
+	}
+	// A copy of a host's files is read on any system.
+	if code, _, stderr := runEnv(fixed, "--root", root); code != 3 {
+		t.Errorf("a copy of a host on another system: exit code %d, %s", code, stderr)
+	}
+	hostOS = saved
+
+	// What the message says on a live host, by who ran the scan.
+	sources := []model.Source{
+		{Kind: "hostinfo", Status: model.SourceOK},
+		{Kind: "rasdaemon", Status: model.SourceAbsent, Detail: "no rasdaemon database"},
+		{Kind: "klog", Status: model.SourceUnreadable, Detail: "the journal shows this user no kernel messages"},
+		{Kind: "edac-sysfs", Status: model.SourceEmpty, Detail: "no memory controller is registered"},
+		{Kind: "smbios", Status: model.SourceUnreadable, Detail: "permission denied"},
+	}
+	user := blindText(i18n.EN, &scan.Options{Root: "/", Live: true}, sources)
+	wantLines(t, user, "no source of error records can be read as this user, so the scan cannot say whether this host has memory errors:",
+		"\n  rasdaemon: not present (no rasdaemon database)", "\n  klog: not readable (the journal shows this user no kernel messages)",
+		"\n  edac-sysfs: no records (no memory controller is registered)", "\nAs root the scan reads the kernel log and the rasdaemon database: sudo my")
+	if strings.Contains(user, "smbios") || strings.Contains(user, "hostinfo") {
+		t.Errorf("the message lists a source that holds no error:\n%s", user)
+	}
+	if asRoot := blindText(i18n.EN, &scan.Options{Root: "/", Live: true, Privileged: true}, sources); strings.Contains(asRoot, "sudo") ||
+		!strings.HasPrefix(asRoot, "no source of error records can be read on this host, so the scan cannot say whether it has memory errors:") {
+		t.Errorf("as root:\n%s", asRoot)
+	}
+	if ko := blindText(i18n.KO, &scan.Options{Root: "/", Live: true}, sources); !strings.Contains(ko, "이 사용자로는 오류 기록 소스를 하나도 읽지 못해") ||
+		!strings.Contains(ko, "klog: 읽지 못함") || !strings.Contains(ko, "sudo my") {
+		t.Errorf("Korean:\n%s", ko)
 	}
 }
