@@ -68,6 +68,12 @@ func app() *cli.App {
 				Run:       live(runReport),
 			},
 			{
+				Name:      "export",
+				Summary:   "write the findings as an FMFM analysis log (JSON): my export fmfm",
+				SummaryKO: "소견을 FMFM 분석 로그(JSON)로 내보내기: my export fmfm",
+				Run:       live(runExport),
+			},
+			{
 				Name:      "open",
 				Summary:   "show a stored case (a .mycase bundle or a ledger) with the same commands",
 				SummaryKO: "저장된 케이스(.mycase 번들 또는 원장)를 같은 명령으로 보기",

@@ -145,6 +145,7 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded: injections that are missing, counted short or decoded as another row, column or channel ([docs/verify.md](docs/verify.md)) |
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
+| `my export fmfm [-o FILE]` | write the findings as an analysis log in the form of the OCP FMFM framework (JSON); `--records` adds every error record with FMFM field names ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
 | `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi` output (`-q`, or a query in CSV form), `mcelog --client` output, FMFM logs, a copy of a host's files |
 | `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>`; with `--fleet`, one exporter for every host of a rasdaemon store ([docs/exporter.md](docs/exporter.md), [contrib/](contrib/README.md)) |
@@ -233,6 +234,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text: colour, glyph density, ASCII, width |
 | `internal/report` | the HTML report: one file with inline SVG figures, the records behind them, and nothing loaded from elsewhere |
+| `internal/fmfmlog` | error records and findings in the forms of the FMFM framework: runtime error log and analysis log |
 | `internal/bundle` | case bundles: format, checks, anonymizing |
 | `internal/outfile` | writes the files the tool hands over: whole or not at all, and never in place of a device |
 | `internal/exporter` | the Prometheus metrics of a host and their text format |
