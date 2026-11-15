@@ -1,0 +1,94 @@
+# dmidecode 3.7
+Getting SMBIOS data from sysfs.
+SMBIOS 2.7 present.
+
+Handle 0x0053, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0052
+	Error Information Handle: No Error
+	Total Width: 32 bits
+	Data Width: 32 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: RAM slot #0
+	Bank Locator: RAM slot #0
+	Type: DRAM
+	Type Detail: EDO
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Memory Speed: Unknown
+
+Handle 0x0054, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0052
+	Error Information Handle: No Error
+	Total Width: 32 bits
+	Data Width: 32 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: RAM slot #1
+	Bank Locator: RAM slot #1
+	Type: DRAM
+	Type Detail: EDO
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Memory Speed: Unknown
+
+Handle 0x0055, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0052
+	Error Information Handle: No Error
+	Total Width: 32 bits
+	Data Width: 32 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: RAM slot #2
+	Bank Locator: RAM slot #2
+	Type: DRAM
+	Type Detail: EDO
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Memory Speed: Unknown
+
+Handle 0x0056, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0052
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: RAM slot #3
+	Bank Locator: RAM slot #3
+	Type: DRAM
+	Type Detail: Unknown
+
+Handle 0x0093, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0025
+	Error Information Handle: No Error
+	Total Width: 32 bits
+	Data Width: 32 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NVD #0
+	Bank Locator: NVD #0
+	Type: Other
+	Type Detail: Unknown
