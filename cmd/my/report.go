@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/outfile"
 	"github.com/agenticode/my/internal/report"
 )
 
@@ -55,10 +58,8 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		src = c
 	}
 	toStdout := *out == "-"
-	if *out != "" && !toStdout && !*force {
-		if _, err := os.Stat(*out); err == nil {
-			return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", *out))
-		}
+	if code, ok := o.checkTarget(env, lang, *out, *force); !ok {
+		return code
 	}
 	if *figures != "" {
 		if fi, err := os.Stat(*figures); err == nil && !fi.IsDir() {
@@ -105,19 +106,22 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		if figs, err = doc.Figures(); err != nil {
 			return o.failure(env, err)
 		}
-		if !*force {
+		if _, err := os.Stat(*figures); err == nil {
 			for _, f := range figs {
-				if _, err := os.Stat(filepath.Join(*figures, f.Name+".svg")); err == nil {
-					return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", filepath.Join(*figures, f.Name+".svg")))
+				if code, ok := o.checkTarget(env, lang, filepath.Join(*figures, f.Name+".svg"), *force); !ok {
+					return code
 				}
 			}
 		}
-		if err := os.MkdirAll(*figures, 0o755); err != nil {
-			return o.failure(env, err)
+		if len(figs) > 0 {
+			// The directory is made for the figures; a host without any gets none.
+			if err := os.MkdirAll(*figures, 0o777); err != nil {
+				return o.failure(env, err)
+			}
 		}
 		for _, f := range figs {
-			if err := writeWhole(filepath.Join(*figures, f.Name+".svg"), f.SVG); err != nil {
-				return o.failure(env, err)
+			if err := writeWhole(filepath.Join(*figures, f.Name+".svg"), f.SVG, *force); err != nil {
+				return o.failure(env, errors.New(targetText(lang, err)))
 			}
 		}
 	}
@@ -134,8 +138,8 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		return cli.ExitOK
 	}
 	if *out != "" {
-		if err := writeWhole(*out, buf.Bytes()); err != nil {
-			return o.failure(env, err)
+		if err := writeWhole(*out, buf.Bytes(), *force); err != nil {
+			return o.failure(env, errors.New(targetText(lang, err)))
 		}
 	}
 
@@ -175,8 +179,11 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	if *out != "" {
 		p("%s", say(lang, "report.written", "file", *out, "size", sizeText(int64(buf.Len()))))
 	}
-	if len(figs) > 0 {
+	switch {
+	case len(figs) > 0:
 		p("%s", say(lang, "report.figures", "dir", *figures, "n", len(figs)))
+	case *figures != "":
+		p("%s", say(lang, "report.no_figures"))
 	}
 	p("  %s", say(lang, "import.finding", "host", s.h.Host, "grade", findingText(lang, s.h)))
 	if *out == "" {
@@ -192,25 +199,12 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	return cli.ExitOK
 }
 
-// writeWhole writes a file beside its target and moves it into place, so
-// that a file that exists is whole.
-func writeWhole(path string, data []byte) error {
-	f, err := os.CreateTemp(filepath.Dir(path), ".my-report-*")
-	if err != nil {
+// writeWhole writes a file of the report: beside its target and moved into
+// place, so that a file that exists is whole.
+func writeWhole(path string, data []byte, force bool) error {
+	_, err := outfile.Write(path, force, func(w io.Writer) error {
+		_, err := w.Write(data)
 		return err
-	}
-	tmp := f.Name()
-	defer os.Remove(tmp)
-	if _, err := f.Write(data); err != nil {
-		f.Close()
-		return err
-	}
-	if err := f.Chmod(0o644); err != nil {
-		f.Close()
-		return err
-	}
-	if err := f.Close(); err != nil {
-		return err
-	}
-	return os.Rename(tmp, path)
+	})
+	return err
 }

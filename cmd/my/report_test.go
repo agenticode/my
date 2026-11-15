@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"html"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/agenticode/my/internal/adapter"
@@ -48,10 +50,13 @@ func TestReportCommand(t *testing.T) {
 			t.Errorf("the report lacks %q", want)
 		}
 	}
-	if fi, _ := os.Stat(out); fi.Mode().Perm() != 0o644 {
-		t.Errorf("mode of the report: %v", fi.Mode())
+	// The report gets the permissions new files of this user get.
+	umask := syscall.Umask(0)
+	syscall.Umask(umask)
+	if fi, _ := os.Stat(out); fi.Mode().Perm() != fs.FileMode(0o666&^umask) {
+		t.Errorf("mode of the report: %v with umask %03o", fi.Mode(), umask)
 	}
-	if left, _ := filepath.Glob(filepath.Join(dir, ".my-report-*")); len(left) != 0 {
+	if left, _ := filepath.Glob(filepath.Join(dir, ".*")); len(left) != 0 {
 		t.Errorf("a partial file was left behind: %v", left)
 	}
 
@@ -145,7 +150,7 @@ func TestReportMistakes(t *testing.T) {
 		{"missing file", []string{"report", filepath.Join(t.TempDir(), "none.mycase"), "-o", out}, cli.ExitFailure, "no such file"},
 		{"not a case", []string{"report", "report_test.go", "-o", out}, cli.ExitFailure, "neither a MemorY ledger nor a case bundle"},
 		{"unknown host", []string{"report", ledger, "-o", out, "--host", "h9"}, cli.ExitUsage, "no host named h9"},
-		{"a directory to write to", []string{"report", ledger, "-o", filepath.Join(t.TempDir(), "no", "such", "dir", "r.html")}, cli.ExitFailure, "no such file or directory"},
+		{"a directory to write to", []string{"report", ledger, "-o", filepath.Join(t.TempDir(), "no", "such", "dir", "r.html")}, cli.ExitUsage, filepath.Join("no", "such", "dir") + " does not exist"},
 	} {
 		code, stdout, stderr := run(tt.args...)
 		if code != tt.code || !strings.Contains(stderr, tt.want) || stdout != "" {

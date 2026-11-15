@@ -226,7 +226,9 @@ func TestCommandLineMistakes(t *testing.T) {
 		{"a directory", []string{"open", t.TempDir()}, cli.ExitFailure, "is a directory"},
 		{"no scan flags on a case", []string{"open", ledger, "--root", "/tmp"}, cli.ExitUsage, "flag provided but not defined: -root"},
 		{"a word that is no command", []string{"CPU0_C1"}, cli.ExitUsage, `unknown command "CPU0_C1"`},
-		{"root that is no directory", []string{"--root", filepath.Join(testutil.RepoRoot(t), "go.mod")}, cli.ExitFailure, "not a directory"},
+		{"a command after the flags", []string{"--root", "/tmp", "why"}, cli.ExitUsage, "the command comes before its flags: my why [flags]"},
+		{"an argument of a scan", []string{"--root", "/tmp", "CPU0_C1"}, cli.ExitUsage, `unexpected argument "CPU0_C1"`},
+		{"root that is no directory", []string{"--root", filepath.Join(testutil.RepoRoot(t), "go.mod")}, cli.ExitUsage, "not a directory"},
 	} {
 		code, out, errOut := run(tt.args...)
 		if code != tt.code || !strings.Contains(errOut, tt.want) || out != "" {

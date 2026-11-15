@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -87,10 +88,14 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 			return o.usageError(env, lang, "--key-file %s: %v", *keyFile, err)
 		}
 	}
-	if *out != "" && !*force {
-		if _, err := os.Stat(*out); err == nil {
-			return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", *out))
+	toStdout := *out == "-"
+	if toStdout {
+		if code, is := o.binaryToTerminal(env, lang); is {
+			return code
 		}
+	}
+	if code, ok := o.checkTarget(env, lang, *out, *force); !ok {
+		return code
 	}
 
 	tmp, err := os.MkdirTemp("", "my-import-")
@@ -175,12 +180,24 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		if err := c.Result.Save(ctx, ledger); err != nil {
 			return o.failure(env, err)
 		}
-		w, err := bundle.Write(ctx, ledger, *out, bundle.Options{Now: now, Tool: toolName(), Anonymize: *anonymize, Key: key, Force: *force})
+		bopts := bundle.Options{Now: now, Tool: toolName(), Anonymize: *anonymize, Key: key, Force: *force}
+		var w *bundle.Written
+		// With "-o -" the bundle is the standard output, and what is said
+		// about it goes to the standard error.
+		says := env.Stdout
+		if toStdout {
+			says = env.Stderr
+			if w, err = bundle.WriteTo(ctx, ledger, env.Stdout, bopts); err == nil {
+				w.Path = "-"
+			}
+		} else {
+			w, err = bundle.Write(ctx, ledger, *out, bopts)
+		}
 		if err != nil {
-			return o.failure(env, err)
+			return o.failure(env, errors.New(targetText(lang, err)))
 		}
 		if o.asJSON {
-			enc := json.NewEncoder(env.Stdout)
+			enc := json.NewEncoder(says)
 			enc.SetIndent("", "  ")
 			if err := enc.Encode(struct {
 				Path     string            `json:"path"`
@@ -193,13 +210,19 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 			}
 			return cli.ExitOK
 		}
-		summary(env.Stdout)
-		fmt.Fprintln(env.Stdout, say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
-		fmt.Fprintf(env.Stdout, "  %s\n", say(lang, "import.finding", "host", h.Host, "grade", findingText(lang, h)))
-		for name, word := range w.Names {
-			fmt.Fprintf(env.Stdout, "    %s -> %s\n", name, word)
+		summary(says)
+		if toStdout {
+			fmt.Fprintln(says, say(lang, "bundle.sent", "size", sizeText(w.Bytes)))
+		} else {
+			fmt.Fprintln(says, say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
 		}
-		fmt.Fprintln(env.Stdout, say(lang, "bundle.open", "file", w.Path))
+		fmt.Fprintf(says, "  %s\n", say(lang, "import.finding", "host", h.Host, "grade", findingText(lang, h)))
+		for name, word := range w.Names {
+			fmt.Fprintf(says, "    %s -> %s\n", name, word)
+		}
+		if regularFile(w.Path) {
+			fmt.Fprintln(says, say(lang, "bundle.open", "file", w.Path))
+		}
 		return cli.ExitOK
 	}
 

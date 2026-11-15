@@ -219,7 +219,7 @@ func TestBundleMistakes(t *testing.T) {
 		{"a key without anonymizing", []string{"bundle", "-o", filepath.Join(dir, "x"), "--key-file", short, "--root", root}, cli.ExitUsage, "--key-file goes with --anonymize"},
 		{"a key that is too short", []string{"bundle", "-o", filepath.Join(dir, "x"), "--anonymize", "--key-file", short, "--root", root}, cli.ExitUsage, "shorter than 8 characters"},
 		{"a key file that is missing", []string{"bundle", "-o", filepath.Join(dir, "x"), "--anonymize", "--key-file", filepath.Join(dir, "none"), "--root", root}, cli.ExitUsage, "no such file"},
-		{"a directory that is missing", []string{"bundle", "-o", filepath.Join(dir, "none", "x.mycase"), "--root", root}, cli.ExitFailure, "no such file or directory"},
+		{"a directory that is missing", []string{"bundle", "-o", filepath.Join(dir, "none", "x.mycase"), "--root", root}, cli.ExitUsage, "the directory " + filepath.Join(dir, "none") + " does not exist"},
 	} {
 		code, out, errOut := runEnv(fixed, tt.args...)
 		if code != tt.code || !strings.Contains(errOut, tt.want) || out != "" {

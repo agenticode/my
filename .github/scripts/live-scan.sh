@@ -56,6 +56,28 @@ unzip -l "$tmp/runner.mycase" || exit 1
 run "$bin" open "$tmp/runner.mycase"
 run "$bin" open "$tmp/runner.mycase" timeline
 
+# A bundle sent to the standard output is the same kind of file.
+echo "--- $bin bundle -o - > file"
+"$bin" bundle -o - > "$tmp/piped.mycase" || { echo "FAILED: bundle -o -"; exit 1; }
+unzip -tq "$tmp/piped.mycase" || exit 1
+run "$bin" open "$tmp/piped.mycase" why --oneline
+
+# A device named as the output is written to and stays a device. As root a
+# file moved onto /dev/null would take the device away from the machine.
+run "$bin" bundle -o /dev/null --force
+run "$bin" report -o /dev/null --force
+if [ ! -c /dev/null ]; then
+  echo "FAILED: /dev/null is no longer a character device"
+  ls -l /dev/null
+  exit 1
+fi
+left=$(ls -A /dev | grep -c '\.part$')
+if [ "$left" -ne 0 ]; then
+  echo "FAILED: files left in /dev"
+  ls -lA /dev | grep '\.part$'
+  exit 1
+fi
+
 # The name of this machine must not be in an anonymized bundle.
 name=$(hostname)
 mkdir "$tmp/x" && unzip -q -d "$tmp/x" "$tmp/runner.mycase" || exit 1
