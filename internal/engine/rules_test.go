@@ -313,15 +313,38 @@ func TestRuleGrowingFault(t *testing.T) {
 		}
 	})
 
-	t.Run("a storm on a row fault fires R-ROW-03", func(t *testing.T) {
+	t.Run("a recent storm on a row fault fires R-ROW-03", func(t *testing.T) {
+		b := ruleBuilder()
+		// A steady rate before and within the recent window, at the same
+		// columns: not rising, not spreading. Then 150 errors in half an
+		// hour two days before the reference time.
+		b.rowFault("d1", 3, 220, priorFrom, recentFrom)
+		b.rowFault("d1", 3, 50, asOf.Add(-2*day), asOf.Add(-2*day+30*time.Minute))
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictConsiderReplacement, RuleRow)
+		if got := codes(v); !equalStrings(got, []string{"R-ROW-03 row.storm"}) {
+			t.Errorf("evidence = %q", got)
+		}
+		if e := evidenceOf(t, v, RuleRow); e.Args["peak"] != int64(150) || e.Total != 150 || e.Args["when"] != stampText(asOf.Add(-2*day+6*time.Second).UnixMicro()) {
+			t.Errorf("evidence = %+v", e)
+		}
+	})
+
+	t.Run("a storm that lies further back raises no finding", func(t *testing.T) {
 		b := ruleBuilder()
 		b.rowFault("d1", 3, 20, t0.Add(day), t0.Add(2*day)) // long ago: not rising, not spreading
 		b.rowFault("d1", 3, 50, t0.Add(3*day), t0.Add(3*day+30*time.Minute))
 		v := verdictOf(t, b, asOf, "d1")
-		wantVerdict(t, v, model.VerdictConsiderReplacement, RuleRow)
-		if e := evidenceOf(t, v, RuleRow); e.Code != "row.storm" || e.Args["peak"] != int64(150) {
-			t.Errorf("evidence = %+v", e)
+		wantVerdict(t, v, model.VerdictObserve, RuleSoft)
+		// The burst is still said, with the errors of the DIMM.
+		if got := codes(v); !equalStrings(got, []string{"R-SOFT-01 soft.fault", "R-SOFT-01 soft.storm"}) {
+			t.Errorf("evidence = %q", got)
 		}
+		// Eight days back is outside the recent window of seven days.
+		b = ruleBuilder()
+		b.rowFault("d1", 3, 220, priorFrom, recentFrom)
+		b.rowFault("d1", 3, 50, asOf.Add(-8*day), asOf.Add(-8*day+30*time.Minute))
+		wantVerdict(t, verdictOf(t, b, asOf, "d1"), model.VerdictObserve, RuleSoft)
 	})
 
 	t.Run("more than one failing data line is stated with it", func(t *testing.T) {

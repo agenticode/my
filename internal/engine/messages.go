@@ -65,7 +65,7 @@ var Messages = i18n.Catalog{
 	"rule.R-UE-01":    {EN: "an uncorrected error on this DIMM", KO: "이 DIMM에서 UE 발생"},
 	"rule.R-FW-01":    {EN: "the BMC or the BIOS marks the DIMM as failed or disabled", KO: "BMC나 BIOS가 DIMM을 failed 또는 disabled로 표시"},
 	"rule.R-REP-01":   {EN: "repair resources are used up: a PPR failed, sparing is in use, or a GPU row remap failed (XID 64)", KO: "리페어 자원 소진: PPR 실패, sparing 발동, GPU row remap 실패(XID 64)"},
-	"rule.R-ROW-03":   {EN: "the corrected errors of a row, column or bank fault, or of a wider one, are rising, or its extent is spreading", KO: "row, column, bank 고장(더 넓은 고장 포함)의 CE가 증가 추세이거나 범위가 확산"},
+	"rule.R-ROW-03":   {EN: "the corrected errors of a row, column or bank fault, or of a wider one, are rising or came in a recent burst, or its extent is spreading", KO: "row, column, bank 고장(더 넓은 고장 포함)의 CE가 증가 추세이거나 최근에 폭주했거나 범위가 확산"},
 	"rule.R-OFF-02":   {EN: "the number of pages taken offline keeps growing", KO: "offline된 페이지 수가 계속 증가"},
 	"rule.R-SCRUB-01": {EN: "the patrol scrubber found an uncorrected error", KO: "패트롤 스크럽이 UE를 발견"},
 	"rule.R-REP-02":   {EN: "errors came back at the same place after a repair", KO: "리페어 뒤 같은 위치에서 재발"},
