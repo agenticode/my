@@ -17,8 +17,14 @@ import (
 	"github.com/agenticode/my/internal/model"
 )
 
-// toolName is how this binary names itself in what it writes.
-func toolName() string { return "my " + buildinfo.Version + " (" + buildinfo.Revision() + ")" }
+// toolName is how this binary names itself in what it writes: its version
+// and, where it is known, the commit it was built from.
+func toolName() string {
+	if buildinfo.Commit == "" {
+		return "my " + buildinfo.Version
+	}
+	return "my " + buildinfo.Version + " (" + buildinfo.Commit + ")"
+}
 
 // keyFromFile reads the key that makes anonymizing repeatable.
 func keyFromFile(path string) ([]byte, error) {

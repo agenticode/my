@@ -48,7 +48,7 @@ FUZZ_TARGETS := \
 	./internal/bundle:FuzzText \
 	./internal/bundle:FuzzReadManifest
 
-.PHONY: all build test test-race golden fuzz lint fmt fmt-check vet cross dist dist-check clean
+.PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 
 all: lint test build
 
@@ -66,6 +66,27 @@ test-race:
 # output, rewrite them and review the diff.
 golden:
 	UPDATE_GOLDEN=1 $(GO) test -p $(JOBS) ./internal/view/ ./internal/term/ ./internal/report/ ./cmd/my/
+
+# The files under examples/ are made by the tool itself, at a fixed time and
+# by a build without stamps, so that they come out the same on every
+# machine. A test compares them with what the command writes.
+EXAMPLE_NOW := 2026-11-13T09:30:00Z
+MY_EXAMPLE  := MY_NOW=$(EXAMPLE_NOW) $(GO) run -buildvcs=false ./cmd/my
+
+# The report and the figures of the example case. Run it after a change of
+# the report or of the engine, and review the diff.
+examples:
+	rm -f examples/figures/*.svg
+	$(MY_EXAMPLE) report examples/demo.mycase -o examples/demo-report.html --figures examples/figures --force
+
+# The example case: a bundle of the synthetic demo host with CPU0_C1 as its
+# subject. A bundle holds a ledger, which names itself anew every time it
+# is made; make the case again only when it has to change (a new ledger
+# schema, another demo scenario), then run "make examples".
+examples-case:
+	@set -e; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; \
+	$(GO) run -buildvcs=false ./cmd/my synth -scenario demo -ledger "$$tmp/demo.db" > /dev/null; \
+	$(MY_EXAMPLE) open "$$tmp/demo.db" bundle CPU0_C1 -o examples/demo.mycase --force
 
 fuzz:
 	@set -e; for t in $(FUZZ_TARGETS); do \

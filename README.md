@@ -98,6 +98,20 @@ in this slot since 2026-07-31  0 slot changes
 
 In the address map a horizontal line is a row fault, a vertical line a column fault, one cell that repeats a single-bit fault, and a cloud over the bank a bank fault. `my help reading` explains every figure.
 
+## Report
+
+`my report case.mycase -o report.html` writes the findings of a case as one HTML file: the figures as SVG, the finding of every DIMM with its evidence, the checks against a wrong diagnosis, the quality of the data, and an appendix with the original records. The file loads nothing from elsewhere, so it opens on a machine without network access and can be sent as it is. Printing it from a browser gives a PDF. In a browser, a cell of the address map or an event of the timeline opens the records behind it.
+
+The report of the demo host is [examples/demo-report.html](examples/demo-report.html), built from the case [examples/demo.mycase](examples/demo.mycase). Its slot map, and the address map and the timeline of the DIMM in `CPU0_C1`:
+
+![Slot map of the demo host: CPU0_C1 is marked replace now, CPU1_D1 observe](examples/figures/slotmap.svg)
+
+![Address map of CPU0_C1: a horizontal line of cells with errors in row 0x1a2f, one of them an uncorrected error](examples/figures/CPU0_C1-map.svg)
+
+![Timeline of CPU0_C1: corrected errors per day rising from late September, with reboots, a hard PPR, page offlines and an uncorrected error marked below](examples/figures/CPU0_C1-timeline.svg)
+
+`--audience fa` adds the steps of the confidence and the faults one by one, for failure analysis. `--lang ko` writes the report in Korean. `--figures DIR` writes each figure as an SVG file of its own, as the three above.
+
 ## Install
 
 `my` is one statically linked binary. A release holds an archive per platform (linux/amd64, linux/arm64, darwin/arm64) and a `SHA256SUMS` file:
