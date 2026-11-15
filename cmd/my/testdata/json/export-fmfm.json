@@ -1,0 +1,165 @@
+{
+  "format": "fmfm-analysis-log",
+  "format_version": 1,
+  "OutputDT": "2026-11-13T09:30:00.000Z",
+  "Analyzer": {
+    "Name": "MemorY",
+    "Version": "dev",
+    "engine_version": "1",
+    "level": 1
+  },
+  "HostID": "r12-n034",
+  "action_descriptors": "none",
+  "AnalysisLog": [
+    {
+      "OutputDT": "2026-11-13T09:30:00.000Z",
+      "DimmSerialNumber": "3B9C56",
+      "Location": {
+        "HostID": "r12-n034",
+        "SocketId": 0,
+        "ChannelId": 2,
+        "ChannelSlotId": 0,
+        "slot": "CPU0_C1"
+      },
+      "FaultMode": "Row fault",
+      "RiskClassifier": "Risk to UE",
+      "SeverityClassifier": "high",
+      "RasActionSuggestion": [
+        {
+          "Action": "Faulty DIMM Removal",
+          "Target": "S/N 3B9C56, CPU0_C1"
+        }
+      ],
+      "SystemIssue": false,
+      "Confidence": 91,
+      "manufacturer": "Example Memory",
+      "part_number": "EXM64G48R2X4-A",
+      "dimm_uid": "d878e1a15b6e30a44057",
+      "present": true,
+      "corrected": 1231,
+      "uncorrected": 1,
+      "faults": [
+        {
+          "FaultMode": "Row fault",
+          "mode": "row",
+          "Rank": 0,
+          "DeviceId": 7,
+          "BankGroup": 0,
+          "Bank": 3,
+          "row_min": 6703,
+          "row_max": 6704,
+          "column_min": 472,
+          "column_max": 2008,
+          "address_min": "0x41c68bcec0",
+          "address_max": "0x41c68c1c80",
+          "first_seen": "2026-09-24T23:27:41.565Z",
+          "last_seen": "2026-11-12T23:49:30.494Z",
+          "corrected": 1231,
+          "uncorrected": 1,
+          "grade": "A"
+        }
+      ],
+      "finding": {
+        "grade": "replace-now",
+        "label": "finding",
+        "rules": [
+          "R-UE-01",
+          "R-ROW-03",
+          "R-REP-02"
+        ],
+        "confidence": 91,
+        "evidence": [
+          "[R-UE-01] 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
+          "[R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before",
+          "[R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows",
+          "[R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device",
+          "[R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28"
+        ],
+        "checks": [
+          "open: no other DIMM on this channel: there is nothing to compare with",
+          "open: no slot move or reseat on record: a cause in the board is not ruled out",
+          "supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely"
+        ],
+        "missing": [
+          "no ECS counters",
+          "no DIMM temperature history"
+        ],
+        "next_action": "Replace the DIMM. Attach a case bundle of this DIMM to the return.",
+        "next_action_code": "next.replace"
+      },
+      "observation": {
+        "grade_a": 1232,
+        "grade_b": 0,
+        "grade_c": 0
+      },
+      "not_filled": [
+        "Location.SubChannel"
+      ]
+    },
+    {
+      "OutputDT": "2026-11-13T09:30:00.000Z",
+      "DimmSerialNumber": "2AEB41",
+      "Location": {
+        "HostID": "r12-n034",
+        "SocketId": 1,
+        "ChannelId": 3,
+        "ChannelSlotId": 0,
+        "slot": "CPU1_D1"
+      },
+      "FaultMode": "Single bit fault",
+      "RiskClassifier": "Low Risk",
+      "SeverityClassifier": "low",
+      "RasActionSuggestion": [],
+      "SystemIssue": false,
+      "Confidence": 65,
+      "manufacturer": "Example Memory",
+      "part_number": "EXM64G48R2X4-A",
+      "dimm_uid": "d6abde8014f7764becd7",
+      "present": true,
+      "corrected": 53,
+      "uncorrected": 0,
+      "faults": [
+        {
+          "FaultMode": "Single bit fault",
+          "mode": "single-bit",
+          "Rank": 0,
+          "DeviceId": 17,
+          "BankGroup": 5,
+          "Bank": 3,
+          "row_min": 42217,
+          "row_max": 42217,
+          "column_min": 272,
+          "column_max": 272,
+          "address_min": "0x166e93a4880",
+          "address_max": "0x166e93a4880",
+          "first_seen": "2026-08-03T13:53:44.241Z",
+          "last_seen": "2026-11-08T06:17:56.204Z",
+          "corrected": 53,
+          "uncorrected": 0,
+          "grade": "A"
+        }
+      ],
+      "finding": {
+        "grade": "observe",
+        "label": "finding",
+        "rules": [
+          "R-SOFT-01"
+        ],
+        "confidence": 65,
+        "evidence": [
+          "[R-SOFT-01] one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days"
+        ],
+        "next_action": "No action. Look again when the count grows or a new place appears.",
+        "next_action_code": "next.observe"
+      },
+      "observation": {
+        "grade_a": 53,
+        "grade_b": 0,
+        "grade_c": 0
+      },
+      "not_filled": [
+        "Location.SubChannel"
+      ]
+    }
+  ]
+}
