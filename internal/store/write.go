@@ -229,6 +229,11 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 
 // UpsertHost records a host, keeping known attributes when the new record
 // leaves them empty.
+//
+// The kernel log names the machine in one string, vendor and product
+// together ("Example Systems R650/0PYXKY"). A source that knows the two
+// apart is the better one: a product that is the known vendor and product
+// in one string does not replace them.
 func (w *Writer) UpsertHost(h *model.Host) error {
 	if h.Name == "" {
 		return invalid("host: name is empty")
@@ -238,7 +243,12 @@ func (w *Writer) UpsertHost(h *model.Host) error {
  ON CONFLICT(name) DO UPDATE SET
   arch           = CASE WHEN excluded.arch           != '' THEN excluded.arch           ELSE arch           END,
   system_vendor  = CASE WHEN excluded.system_vendor  != '' THEN excluded.system_vendor  ELSE system_vendor  END,
-  system_product = CASE WHEN excluded.system_product != '' THEN excluded.system_product ELSE system_product END,
+  system_product = CASE
+    WHEN excluded.system_product = '' THEN system_product
+    WHEN excluded.system_vendor = '' AND system_vendor != '' AND system_product != ''
+     AND substr(excluded.system_product, 1, length(system_vendor) + 1 + length(system_product)) = system_vendor || ' ' || system_product
+     THEN system_product
+    ELSE excluded.system_product END,
   board          = CASE WHEN excluded.board          != '' THEN excluded.board          ELSE board          END,
   first_seen = MIN(COALESCE(first_seen, excluded.first_seen), COALESCE(excluded.first_seen, first_seen)),
   last_seen  = MAX(COALESCE(last_seen, excluded.last_seen), COALESCE(excluded.last_seen, last_seen))`,

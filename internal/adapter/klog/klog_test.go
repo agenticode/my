@@ -598,3 +598,27 @@ func TestSinkErrorAndCancel(t *testing.T) {
 		t.Errorf("cancelled: report = %+v, %d events", rep, len(c.Events))
 	}
 }
+
+// TestOtherDMILinesAreNotTheMachine reads the boot banner of a kernel that
+// prints more than one line starting with "DMI:". Linux 6.8 and later say
+// how many memory slots are populated, right after the line that
+// identifies the machine. Seen on a real host: the second line replaced
+// the name of the machine.
+func TestOtherDMILinesAreNotTheMachine(t *testing.T) {
+	c, rep := collectText(t, strings.Join([]string{
+		"[    0.000000] Linux version 6.11.0-1018-azure (buildd@lcy02-amd64-086) (x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0) #18~24.04.1-Ubuntu SMP",
+		"[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-6.11.0-1018-azure root=/dev/sda1 ro console=tty1 console=ttyS0",
+		"[    0.016483] DMI: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 08/23/2024",
+		"[    0.016493] DMI: Memory slots populated: 2/2",
+		"",
+	}, "\n"), Options{BootTime: time.Date(2026, 11, 15, 4, 0, 0, 0, time.UTC)})
+	if rep.Status != model.SourceOK {
+		t.Fatalf("report = %+v", rep)
+	}
+	if len(c.Hosts) != 1 || c.Hosts[0].SystemProduct != "Microsoft Corporation Virtual Machine/Virtual Machine" {
+		t.Errorf("hosts = %+v", c.Hosts)
+	}
+	if len(c.Boots) != 1 || c.Boots[0].BIOS != "Hyper-V UEFI Release v4.1 08/23/2024" || c.Boots[0].Kernel != "6.11.0-1018-azure" {
+		t.Errorf("boots = %+v", c.Boots)
+	}
+}

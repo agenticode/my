@@ -278,8 +278,11 @@ func parseOffline(msg string) (o offline, ok bool) {
 // Boot banner lines.
 var (
 	linuxVersionRE = regexp.MustCompile(`^Linux version (\S+)`)
-	dmiRE          = regexp.MustCompile(`^DMI: (.*?)(?:, BIOS (.*))?$`)
-	cmdlineRE      = regexp.MustCompile(`^(?:Kernel command line|Command line): (.*)$`)
+	// The line that identifies the machine always has the BIOS part. Other
+	// lines of the DMI code ("DMI: Memory slots populated: 2/2", printed
+	// since Linux 6.8) do not, and are not about the machine's identity.
+	dmiRE     = regexp.MustCompile(`^DMI: (.*?), BIOS (.*)$`)
+	cmdlineRE = regexp.MustCompile(`^(?:Kernel command line|Command line): (.*)$`)
 	// rtc_cmos 00:02: setting system clock to 2026-11-12T03:14:07 UTC (1794539647)
 	rtcRE = regexp.MustCompile(`setting system clock to \S+(?: \S+)? UTC \((\d{9,11})\)`)
 )
