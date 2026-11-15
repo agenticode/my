@@ -96,7 +96,13 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 			term.Hint{Command: s.prefix + " why " + slot, Text: say(s.lang, "hint.why")})
 	}
 	if s.src == nil {
-		out = append(out, term.Hint{Command: "my bundle -o case.mycase", Text: say(s.lang, "hint.bundle")})
+		bundle := "my bundle -o case.mycase"
+		if s.o.sf.set() {
+			// The bundle of this host of the fleet, not of the machine the
+			// command runs on.
+			bundle = s.prefix + " bundle -o case.mycase"
+		}
+		out = append(out, term.Hint{Command: bundle, Text: say(s.lang, "hint.bundle")})
 	}
 	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
 	return out

@@ -599,7 +599,9 @@ type HostRow struct {
 	To    time.Time `json:"to,omitzero"`
 }
 
-// Hosts lists the hosts of a ledger with the finding for each.
+// Hosts lists the hosts of a ledger with the finding for each, the worst
+// first: by grade, then by uncorrected and corrected errors, then by name.
+// In a ledger that holds a fleet the hosts to look at come first.
 func (c *Case) Hosts() []HostRow {
 	out := make([]HostRow, 0, len(c.Result.Hosts))
 	for _, h := range c.Result.Hosts {
@@ -620,5 +622,17 @@ func (c *Case) Hosts() []HostRow {
 		}
 		out = append(out, row)
 	}
+	sort.SliceStable(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		switch {
+		case a.Grade != b.Grade:
+			return a.Grade.ExitCode() > b.Grade.ExitCode()
+		case a.UE != b.UE:
+			return a.UE > b.UE
+		case a.CE != b.CE:
+			return a.CE > b.CE
+		}
+		return a.Name < b.Name
+	})
 	return out
 }
