@@ -263,6 +263,18 @@ func TestDetectReadsThroughGzip(t *testing.T) {
 	if _, _, _, _, rep := yield(t, as[0]); rep.Status != model.SourceError {
 		t.Errorf("cut file: status %s, %q", rep.Status, rep.Detail)
 	}
+
+	// A compressed file that ends right behind its header holds nothing to
+	// recognise. The reason names the compression: before, it was the
+	// bare "unexpected EOF" of the decompressor. Found by FuzzDetect.
+	header := filepath.Join(dir, "header.gz")
+	if err := os.WriteFile(header, data[:10], 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := Detect(ctx, header, DetectOptions{}); err == nil ||
+		err.Error() != header+": gzip: the compressed data is damaged or cut off: unexpected EOF" {
+		t.Errorf("file that ends behind the gzip header: %v", err)
+	}
 }
 
 func TestDetectBinaryEventLog(t *testing.T) {

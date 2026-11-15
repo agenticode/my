@@ -10,6 +10,7 @@ import (
 	"math"
 	"os"
 	"os/exec"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -205,17 +206,36 @@ func parse(data []byte) (*Response, []string, error) {
 	}
 	var notes []string
 	if len(unknown) > 0 {
+		// The names are the analyzer's own text: they are shown clipped
+		// and without anything a terminal would act on.
 		names := make([]string, 0, len(unknown))
 		for k := range unknown {
-			names = append(names, k)
+			names = append(names, clip(k))
 		}
 		sort.Strings(names)
+		names = slices.Compact(names)
 		if len(names) > 8 {
 			names = append(names[:8], "...")
 		}
 		notes = append(notes, "the response has fields this version does not read: "+strings.Join(names, ", "))
 	}
 	return &resp, notes, nil
+}
+
+// unsafe reports whether a character changes what a terminal or a report
+// shows beyond its own place: a control character, a line or paragraph
+// separator, an override of the writing direction, or the mark of a broken
+// encoding.
+func unsafe(r rune) bool {
+	switch {
+	case unicode.IsControl(r), r == utf8.RuneError:
+		return true
+	case r == 0x2028, r == 0x2029:
+		return true
+	case r >= 0x202A && r <= 0x202E, r >= 0x2066 && r <= 0x2069:
+		return true
+	}
+	return false
 }
 
 // text checks a text of a response: its length, and that it holds nothing
@@ -228,8 +248,11 @@ func text(what, s string, limit int, required bool) error {
 		return fmt.Errorf("%s is longer than %d bytes", what, limit)
 	}
 	for _, r := range s {
-		if unicode.IsControl(r) || r == utf8.RuneError {
+		switch {
+		case unicode.IsControl(r) || r == utf8.RuneError:
 			return fmt.Errorf("%s holds a control character", what)
+		case unsafe(r):
+			return fmt.Errorf("%s holds a character that breaks the line or turns the writing direction (%U)", what, r)
 		}
 	}
 	return nil
@@ -238,7 +261,7 @@ func text(what, s string, limit int, required bool) error {
 // check holds a response against its request and builds the result.
 func check(req *Request, resp *Response) (*Result, error) {
 	if resp.Contract != Contract {
-		return nil, fmt.Errorf("it names the contract %q; this version speaks %q", resp.Contract, Contract)
+		return nil, fmt.Errorf("it names the contract %q; this version speaks %q", clip(resp.Contract), Contract)
 	}
 	for _, f := range []struct{ what, s string }{{"the name of the analyzer", resp.Analyzer.Name}, {"the version of the analyzer", resp.Analyzer.Version}} {
 		if err := text(f.what, f.s, MaxName, true); err != nil {
@@ -307,14 +330,21 @@ func check(req *Request, resp *Response) (*Result, error) {
 	return res, nil
 }
 
+// clip makes a text of a response fit for a message: its first 40
+// characters, with a question mark for every character that is unsafe.
 func clip(s string) string {
-	if len(s) > 40 {
-		s = s[:40] + "..."
-	}
-	return strings.Map(func(r rune) rune {
-		if unicode.IsControl(r) {
-			return '?'
+	var b strings.Builder
+	n := 0
+	for _, r := range s {
+		if n == 40 {
+			b.WriteString("...")
+			break
 		}
-		return r
-	}, s)
+		if unsafe(r) {
+			r = '?'
+		}
+		b.WriteRune(r)
+		n++
+	}
+	return b.String()
 }

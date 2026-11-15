@@ -227,6 +227,40 @@ func TestParseEventData(t *testing.T) {
 	}
 }
 
+// The event is looked for without regard to case, and what follows it is
+// cut out of the text itself. A lower-case copy made with strings.ToLower
+// has another length when the text holds certain letters outside ASCII:
+// the cut then fell beside the event, or beyond the end of the text, which
+// is a panic. Found by FuzzLabels.
+func TestTextWithLettersOutsideASCII(t *testing.T) {
+	for _, tc := range []struct {
+		text string
+		ev   MemoryEvent
+		rest string
+	}{
+		{"D\u0130MM_A1: Correctable ECC", MemCorrectable, ""},
+		{"\u023a\u023a\u023a\u023a correctable ecc", MemCorrectable, ""},
+		{"\u0130 Uncorrectable ECC at D\u0130MM 3", MemUncorrectable, "at D\u0130MM 3"},
+		{"\u212a\u212a Memory Device Disabled (\u212a)", MemDeviceDisabled, "(\u212a)"},
+	} {
+		if ev, rest := MemoryEventInText(tc.text); ev != tc.ev || rest != tc.rest {
+			t.Errorf("MemoryEventInText(%q) = %v, %q; want %v, %q", tc.text, ev, rest, tc.ev, tc.rest)
+		}
+	}
+	if ev, rest := MemoryEventFromText("Correctable ECC (D\u0130MM \u212a1)"); ev != MemCorrectable || rest != "(D\u0130MM \u212a1)" {
+		t.Errorf("MemoryEventFromText: %v, %q", ev, rest)
+	}
+	// A word with a letter that only folds to ASCII is not cut in two.
+	if got := ModuleNames("\u017fDIMM7 and DIMM\u212a2"); len(got) != 2 || got[0] != "\u017fDIMM7" || got[1] != "DIMM\u212a2" {
+		t.Errorf("ModuleNames: %q", got)
+	}
+	for in, want := range map[string]string{"": "", "abc": "abc", "ABC": "abc", "D\u0130MM Ecc": "d\u0130mm ecc", "\u212aZ": "\u212az"} {
+		if got := lowerASCII(in); got != want || len(got) != len(in) {
+			t.Errorf("lowerASCII(%q) = %q", in, got)
+		}
+	}
+}
+
 func FuzzParseRecord(f *testing.F) {
 	f.Add([]byte{0x01, 0x00, 0x02, 0xff, 0x2e, 0xf5, 0x6a, 0x33, 0x00, 0x04, 0x0c, 0x53, 0x6f, 0x30, 0xff, 0x03}, "Correctable ECC (@DIMMB1(CPU1))", "0x6fa0ff01")
 	f.Add([]byte{0x07, 0x00, 0xe0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, "Spare", "a1ffff")

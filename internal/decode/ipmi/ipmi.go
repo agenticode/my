@@ -218,7 +218,7 @@ var memoryTexts = []struct {
 // of the known names gives MemUnknown.
 func MemoryEventFromText(desc string) (ev MemoryEvent, rest string) {
 	d := strings.TrimSpace(desc)
-	low := strings.ToLower(d)
+	low := lowerASCII(d)
 	for _, t := range memoryTexts {
 		if !strings.HasPrefix(low, t.text) {
 			continue

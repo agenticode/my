@@ -1,14 +1,18 @@
 package rasdaemon
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/binary"
 	"math"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/testutil"
 )
 
@@ -263,6 +267,69 @@ func FuzzStoreSettings(f *testing.F) {
 		}
 		if conn == nil || origin == "" || (cfg.Password != "" && len(cfg.Password) > 3 && strings.Contains(origin, cfg.Password) && !strings.Contains(cfg.Host+cfg.Database+cfg.Schema, cfg.Password)) {
 			t.Fatalf("connector: %v, origin %q", conn, origin)
+		}
+	})
+}
+
+// FuzzDatabase hands the adapter a file of arbitrary bytes as a database:
+// a copy that was cut off, a file that was being written to when it was
+// copied, a file that only starts like a database. The SQLite library
+// reads what it can of such a file. Whatever it yields, the adapter
+// returns a report, hands on only complete records, and leaves the file
+// and the working directory as they were.
+func FuzzDatabase(f *testing.F) {
+	for _, fixture := range []string{"intel-skx-0.6.sql", "amd-upgraded-0.8.sql", "ghes-1.0.sql", "cxl-1.0.sql", "clock-step-0.8.sql"} {
+		db, err := os.ReadFile(testutil.BuildSQLite(f, testutil.Testdata(f, "rasdaemon", fixture), "seed.db"))
+		if err != nil {
+			f.Fatal(err)
+		}
+		f.Add(db, true)
+		f.Add(db[:len(db)/2], false)
+	}
+	f.Add([]byte("SQLite format 3\x00"), true)
+	f.Add([]byte{}, false)
+
+	dir := f.TempDir()
+	path := filepath.Join(dir, "ras-mc_event.db")
+	work := filepath.Join(dir, "work")
+	if err := os.Mkdir(work, 0o700); err != nil {
+		f.Fatal(err)
+	}
+	f.Fuzz(func(t *testing.T, data []byte, direct bool) {
+		if err := os.WriteFile(path, data, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		var c adapter.Collected
+		rep := New(path, Options{Direct: direct, TempDir: work}).Collect(ctx, &c)
+		if rep.Status == "" || rep.Kind != Kind || rep.SinkErr != nil {
+			t.Fatalf("report %+v", rep)
+		}
+		if rep.Skipped > rep.Records {
+			t.Errorf("%d of %d records skipped", rep.Skipped, rep.Records)
+		}
+		if n := len(c.Events) + len(c.Actions); n > 0 && rep.Status != model.SourceOK && rep.Status != model.SourcePartial {
+			t.Errorf("%d records from a source with status %s", n, rep.Status)
+		}
+		for _, e := range c.Events {
+			if y := e.ErrorDT.UTC().Year(); e.Fingerprint == "" || e.Source == "" || e.RawRef == "" || !e.ErrorSeverity.Valid() ||
+				!e.Grade.Valid() || e.Count < 1 || y < 1970 || y > 9999 {
+				t.Errorf("event the ledger would refuse: %+v", e)
+			}
+		}
+		for _, a := range c.Actions {
+			if y := a.At.UTC().Year(); a.Fingerprint == "" || a.Source == "" || !a.Kind.Valid() || y < 1970 || y > 9999 {
+				t.Errorf("action the ledger would refuse: %+v", a)
+			}
+		}
+		// The source is read, never written; the copy is gone.
+		if after, err := os.ReadFile(path); err != nil || !bytes.Equal(after, data) {
+			t.Errorf("the database was changed by reading it (%v)", err)
+		}
+		if entries, _ := os.ReadDir(work); len(entries) != 0 {
+			t.Errorf("%d entries left in the working directory", len(entries))
+		}
+		if entries, _ := os.ReadDir(dir); len(entries) != 2 {
+			t.Errorf("%d entries beside the database", len(entries)-2)
 		}
 	})
 }

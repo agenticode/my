@@ -224,7 +224,7 @@ Go 1.26 or newer.
 make build    # bin/my
 make test
 make golden   # rewrite the golden files of the figures after an intended change
-make fuzz     # each fuzz target for 10 s (FUZZTIME=1m for longer)
+make fuzz     # each fuzz target for 10 s (FUZZTIME=10m for a long run; docs/fuzzing.md)
 make cross    # dist/my-linux-amd64, dist/my-linux-arm64, dist/my-darwin-arm64
 make dist     # the release archives and SHA256SUMS in dist/
 ```

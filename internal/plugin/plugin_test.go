@@ -260,6 +260,34 @@ func TestRun(t *testing.T) {
 	}
 }
 
+// The names of fields the contract does not know are the analyzer's own
+// text. The remark that lists them goes to the terminal: it shows them
+// clipped and without a character a terminal would act on. Found by
+// FuzzResponse.
+func TestUnknownFieldNamesAreShownSafely(t *testing.T) {
+	req := request(t, 0)
+	long := strings.Repeat("n", 5000)
+	mode := `{"Contract":"` + Contract + `","Analyzer":{"Name":"a","Version":"1"},"Dimms":[{"DimmId":"DIMM","\u001b[2J":1,"` + long + `":2}],` +
+		`"\u0007":1,"\u202egnp.exe":2,"Sig\nature":3}`
+	res, err := run(t, mode, req, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := "the response has fields this version does not read: ?, ?gnp.exe, Dimms.?[2J, Dimms." + strings.Repeat("n", 34) + "..., Sig?ature"
+	if len(res.Notes) != 1 || res.Notes[0] != want {
+		t.Errorf("notes %q, want %q", res.Notes, want)
+	}
+	// A response with many such fields names eight of them.
+	var fields []string
+	for i := range 40 {
+		fields = append(fields, fmt.Sprintf(`"x%02d":0`, i))
+	}
+	res, err = run(t, `{"Contract":"`+Contract+`","Analyzer":{"Name":"a","Version":"1"},"Dimms":[],`+strings.Join(fields, ",")+`}`, req, 0)
+	if err != nil || len(res.Notes) != 1 || !strings.HasSuffix(res.Notes[0], ": x00, x01, x02, x03, x04, x05, x06, x07, ...") {
+		t.Errorf("forty unknown fields: %+v, %v", res, err)
+	}
+}
+
 // What makes a run fail, and what the reason says.
 func TestRunFailures(t *testing.T) {
 	req := request(t, 0)
@@ -280,6 +308,8 @@ func TestRunFailures(t *testing.T) {
 		{"another contract", `{"Contract":"my-analyzer/2","Analyzer":{"Name":"a","Version":"1"},"Dimms":[]}`, 0,
 			`it names the contract "my-analyzer/2"; this version speaks "my-analyzer/1"`},
 		{"no contract", `{"Analyzer":{"Name":"a","Version":"1"},"Dimms":[]}`, 0, `it names the contract ""`},
+		{"a contract name of 5000 characters", `{"Contract":"` + strings.Repeat("x", 5000) + `","Analyzer":{"Name":"a","Version":"1"},"Dimms":[]}`, 0,
+			`it names the contract "` + strings.Repeat("x", 40) + `..."; this version speaks "my-analyzer/1"`},
 		{"no name", `{"Contract":"` + Contract + `","Analyzer":{"Version":"1"},"Dimms":[]}`, 0, "the name of the analyzer is empty"},
 		{"a name with an escape sequence", `{"Contract":"` + Contract + `","Analyzer":{"Name":"a\u001b[31m","Version":"1"},"Dimms":[]}`, 0, "the name of the analyzer holds a control character"},
 		{"a wrong type", head + `{"DimmId":"DIMM","Baseline":{"Percentile":"high"}}]}`, 0, "not JSON in the form of the contract"},
@@ -289,6 +319,9 @@ func TestRunFailures(t *testing.T) {
 		{"a negative percentile", head + `{"DimmId":"DIMM","Baseline":{"Percentile":-1}}]}`, 0, "Dimms[0].Baseline.Percentile is -1"},
 		{"a line without a label", head + `{"DimmId":"DIMM","Level2":{"Lines":[{"Label":" ","Value":"x"}]}}]}`, 0, "Dimms[0].Level2.Lines[0].Label is empty"},
 		{"a value with a line break", head + `{"DimmId":"DIMM","Level2":{"Lines":[{"Label":"a","Value":"x\ny"}]}}]}`, 0, "Dimms[0].Level2.Lines[0].Value holds a control character"},
+		{"a value that turns the writing direction", head + `{"DimmId":"DIMM","Level2":{"Lines":[{"Label":"a","Value":"ok \u202edeliaf"}]}}]}`, 0,
+			"Dimms[0].Level2.Lines[0].Value holds a character that breaks the line or turns the writing direction (U+202E)"},
+		{"a note with a line separator", head + `{"DimmId":"DIMM","Level2":{"Notes":["a\u2028b"]}}]}`, 0, "Dimms[0].Level2.Notes[0] holds a character that breaks the line"},
 		{"a value that is too long", head + `{"DimmId":"DIMM","Level2":{"Lines":[{"Label":"a","Value":"` + strings.Repeat("x", MaxValue+1) + `"}]}}]}`, 0, "Dimms[0].Level2.Lines[0].Value is longer than 400 bytes"},
 		{"too many lines", head + `{"DimmId":"DIMM","Level2":{"Lines":[` + strings.TrimSuffix(strings.Repeat(`{"Label":"a","Value":"b"},`, MaxLines+1), ",") + `]}}]}`, 0, "Dimms[0].Level2 has 65 lines and 0 notes; the limits are 64 and 16"},
 		{"an empty note", head + `{"DimmId":"DIMM","Level2":{"Notes":[""]}}]}`, 0, "Dimms[0].Level2.Notes[0] is empty"},

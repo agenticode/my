@@ -117,7 +117,10 @@ func FromName(name string) string {
 	return FromDMI("", name)
 }
 
-var detectedRE = regexp.MustCompile(`^Hypervisor detected: (\S.*)$`)
+// The kernel prints the name of a hypervisor from its own table: a few
+// words in ASCII ("KVM", "Microsoft Hyper-V", "Xen HVM"). Text in that
+// place that is longer, or holds anything else, is no such name.
+var detectedRE = regexp.MustCompile(`^Hypervisor detected: ([A-Za-z0-9][A-Za-z0-9 ._+/()-]{0,39})$`)
 
 // FromKernelLine names the hypervisor the kernel says it runs under, from a
 // message of its log, or returns "". The x86 kernel prints the line once

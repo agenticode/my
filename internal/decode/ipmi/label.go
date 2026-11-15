@@ -56,8 +56,8 @@ func ModuleNames(text string) []string {
 	// Words with the designator attached. A spaced form found above leaves
 	// the bare word "DIMM" behind, which has no digit and is dropped here.
 	for _, w := range dimmWordRE.FindAllString(text, -1) {
-		i := strings.Index(strings.ToUpper(w), "DIMM")
-		if strings.ContainsAny(w[i:], "0123456789") {
+		i := strings.Index(lowerASCII(w), "dimm")
+		if i >= 0 && strings.ContainsAny(w[i:], "0123456789") {
 			add(w)
 		}
 	}
@@ -94,7 +94,7 @@ func SensorModule(name string) string {
 // Only the names that cannot mean anything else are searched for: a
 // message that merely holds the word "spare" or "parity" says too little.
 func MemoryEventInText(text string) (ev MemoryEvent, rest string) {
-	low := strings.ToLower(text)
+	low := lowerASCII(text)
 	for _, t := range memoryTexts {
 		switch t.ev {
 		case MemCorrectable, MemUncorrectable, MemLogLimit, MemDeviceDisabled, MemScrubFailed:
@@ -116,4 +116,24 @@ func MemoryEventInText(text string) (ev MemoryEvent, rest string) {
 		return t.ev, strings.TrimSpace(text[end:])
 	}
 	return MemUnknown, ""
+}
+
+// lowerASCII lowers the letters A to Z and leaves every other byte as it
+// is, so that a position in the result is the same position in s. The
+// lower case of some letters outside ASCII has another length in bytes
+// than the letter itself: a position found in strings.ToLower(s) can lie
+// beside, or beyond the end of, s.
+func lowerASCII(s string) string {
+	for i := 0; i < len(s); i++ {
+		if c := s[i]; c >= 'A' && c <= 'Z' {
+			b := []byte(s)
+			for j := i; j < len(b); j++ {
+				if c := b[j]; c >= 'A' && c <= 'Z' {
+					b[j] = c + 'a' - 'A'
+				}
+			}
+			return string(b)
+		}
+	}
+	return s
 }

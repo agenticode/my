@@ -177,7 +177,9 @@ func TestECSReadings(t *testing.T) {
 
 func TestBootLog(t *testing.T) {
 	c, rep := collect(t, "boot.json", Options{})
-	if rep.Status != model.SourcePartial || rep.Records != 1 || rep.Skipped != 2 || rep.HostHint != "r12-n034" {
+	// One boot record, the four entries of its installed memory and its
+	// one training event; two of the entries cannot be used.
+	if rep.Status != model.SourcePartial || rep.Records != 6 || rep.Skipped != 2 || rep.HostHint != "r12-n034" {
 		t.Errorf("report = %+v", rep)
 	}
 	wantNotes(t, rep,
@@ -220,6 +222,37 @@ func TestBootLog(t *testing.T) {
 
 // What a boot record holds and the reader cannot use is reported, never
 // dropped.
+// The report counts what was looked at and, among that, what could not
+// be used. A boot record with a list of installed memory was counted as
+// one record and each entry of the list that could not be used as one
+// skipped record: "1 record, 2 not usable" for the boot log of the
+// fixtures. An entry of a list is a record of the count, and a record
+// with several reasons against it is skipped once. Found by FuzzDetect of
+// package scan.
+func TestSkippedIsPartOfRecords(t *testing.T) {
+	read := func(doc string) adapter.Report {
+		var c adapter.Collected
+		return NewReader(strings.NewReader(doc), "boot.json", Options{Now: now}).Collect(ctx, &c)
+	}
+	for name, tc := range map[string]struct {
+		doc              string
+		records, skipped int
+	}{
+		"three entries, two of them unusable": {`{"CurrentBootDT": "2026:11:09:22:00:00:000",
+ "InstalledMemory": [{"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0}, "x", {"DimmSerialNumber": "S1"}]}`, 4, 2},
+		"one record with three reasons against it": {`{"CurrentBootDT": "soon", "InstalledMemory": 7, "TrainingEventLogs": "none"}`, 1, 1},
+		"training events without a boot time":      {`{"InstalledMemory": [], "TrainingEventLogs": [{"FailureTrainingStep": "a"}, {"FailureTrainingStep": "b"}]}`, 3, 2},
+		"a record and text that is no JSON":        {`{"CurrentBootDT": "2026:11:09:22:00:00:000"} {"CurrentBootDT": `, 2, 1},
+		"two entries with the numbers of one place and no name": {`{"CurrentBootDT": "2026:11:09:22:00:00:000", "InstalledMemory": [
+ {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DimmSerialNumber": "S1"}, {"SocketId": 0, "ChannelId": 1, "ChannelSlotId": 0, "DimmSerialNumber": "S2"}]}`, 3, 2},
+	} {
+		rep := read(tc.doc)
+		if rep.Records != tc.records || rep.Skipped != tc.skipped || rep.Status != model.SourcePartial {
+			t.Errorf("%s: %d records, %d skipped, status %s; want %d, %d, partial\n%s", name, rep.Records, rep.Skipped, rep.Status, tc.records, tc.skipped, strings.Join(rep.Notes, "\n"))
+		}
+	}
+}
+
 func TestBootRecordsReadInPart(t *testing.T) {
 	read := func(doc string) (*adapter.Collected, adapter.Report) {
 		var c adapter.Collected
@@ -347,7 +380,8 @@ func TestCrashLog(t *testing.T) {
 // keys of the operator's own.
 func TestDocumentsInARow(t *testing.T) {
 	c, rep := collect(t, "combined.jsonl", Options{})
-	if rep.Records != 5 || len(c.Boots) != 1 || len(c.Events) != 5 {
+	// Five records, and the five list entries of the boot record.
+	if rep.Records != 10 || len(c.Boots) != 1 || len(c.Events) != 5 {
 		t.Fatalf("report %+v, %d boots, %d events", rep, len(c.Boots), len(c.Events))
 	}
 	var refs []string

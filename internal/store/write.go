@@ -620,8 +620,10 @@ func (w *Writer) InsertCounterSample(host string, c *model.CounterSample) (inser
 	if c.CE > math.MaxInt64 || c.UE > math.MaxInt64 {
 		return false, invalid("counter sample: a count of %d corrected and %d uncorrected errors is out of range", c.CE, c.UE)
 	}
+	// A running time beyond a century is no running time, and as a
+	// duration it would overflow.
 	var resetAt time.Time
-	if c.SecondsSinceReset.Valid && c.SecondsSinceReset.V >= 0 {
+	if c.SecondsSinceReset.Valid && c.SecondsSinceReset.V >= 0 && c.SecondsSinceReset.V <= 100*365*24*3600 {
 		resetAt = c.ObservedAt.Add(-time.Duration(c.SecondsSinceReset.V) * time.Second)
 	}
 	// A recent count says something only together with its window.

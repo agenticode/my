@@ -283,6 +283,22 @@ func TestRawTablesOfOlderAndDamagedFirmware(t *testing.T) {
 		}
 	})
 
+	// A copy of a host's files may hold anything under the name of the
+	// table. What is far larger than a table is not read into memory.
+	t.Run("a file far larger than a table", func(t *testing.T) {
+		c, rep := read(make([]byte, maxTable+1))
+		if rep.Status != model.SourceError || len(c.Modules) != 0 || !strings.Contains(rep.Detail, "holds more than 16777216 bytes") {
+			t.Errorf("report = %+v, %d modules", rep, len(c.Modules))
+		}
+		// An entry point file of that size is passed over; the table is read.
+		var c2 adapter.Collected
+		fsys := fstest.MapFS{"DMI": {Data: ddr5Table()}, "smbios_entry_point": {Data: append([]byte("_SM3_"), make([]byte, maxEntryPoint)...)}}
+		rep = NewTables(fsys, ".", "tables", Options{Now: now}).Collect(ctx, &c2)
+		if rep.Status != model.SourceOK || len(c2.Modules) != 3 || strings.Contains(strings.Join(rep.Notes, " "), "SMBIOS") {
+			t.Errorf("large entry point: report = %+v, %d modules", rep, len(c2.Modules))
+		}
+	})
+
 	t.Run("table cut off in the middle", func(t *testing.T) {
 		full := ddr5Table()
 		c, rep := read(full[:len(full)-40])

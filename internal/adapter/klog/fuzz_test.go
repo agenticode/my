@@ -46,12 +46,20 @@ func FuzzCollect(f *testing.F) {
 		if rep.Status == "" {
 			t.Error("no status")
 		}
+		if rep.Skipped > rep.Records {
+			t.Errorf("%d of %d records skipped", rep.Skipped, rep.Records)
+		}
 		for _, e := range c.Events {
 			if y := e.ErrorDT.UTC().Year(); y < 1970 || y > 9999 {
 				t.Errorf("event time %v is out of range", e.ErrorDT)
 			}
 			if e.Fingerprint == "" || !e.ErrorSeverity.Valid() || !e.Grade.Valid() || e.Count < 1 {
 				t.Errorf("malformed event from fuzz input: %+v", e)
+			}
+		}
+		for _, b := range c.Boots {
+			if y := b.StartedAt.UTC().Year(); b.StartedAt.IsZero() || y < 1970 || y > 9999 {
+				t.Errorf("boot at %v is out of range", b.StartedAt)
 			}
 		}
 		for _, g := range c.GPUs {

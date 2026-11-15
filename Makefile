@@ -26,34 +26,53 @@ DIST_ARGS := -version $(VERSION) -commit $(COMMIT) -date $(DATE) -platforms $(su
 
 export CGO_ENABLED := 0
 
-# Fuzz targets as "package:function". FUZZTIME is the run time of each.
+# Fuzz targets as "package:function"; docs/fuzzing.md says what each one
+# reads. FUZZTIME is the run of each: a duration, or a number of calls
+# ("20000x"). FUZZMINIMIZE bounds the work spent on making an input
+# smaller that reached new code: the default of go test, 60 seconds per
+# input, leaves little of a run for fuzzing.
 FUZZTIME ?= 10s
+FUZZMINIMIZE ?= 200x
 FUZZ_TARGETS := \
 	./internal/decode/edac:FuzzParseDetail \
 	./internal/decode/cper:FuzzParseText \
 	./internal/decode/cper:FuzzParseBinary \
+	./internal/decode/mce:FuzzDecode \
+	./internal/decode/ipmi:FuzzParseRecord \
+	./internal/decode/ipmi:FuzzLabels \
+	./internal/decode/virt:FuzzNames \
 	./internal/adapter/smbios:FuzzTables \
+	./internal/adapter/smbios:FuzzEntryPoint \
 	./internal/adapter/smbios:FuzzDmidecode \
 	./internal/adapter/klog:FuzzCollect \
 	./internal/adapter/rasdaemon:FuzzRows \
+	./internal/adapter/rasdaemon:FuzzDatabase \
 	./internal/adapter/rasdaemon:FuzzStoreSettings \
-	./internal/decode/ipmi:FuzzParseRecord \
+	./internal/adapter/edacsysfs:FuzzCollect \
+	./internal/adapter/hostinfo:FuzzCollect \
 	./internal/adapter/sel:FuzzCollect \
 	./internal/adapter/redfish:FuzzCollect \
 	./internal/adapter/nvidia:FuzzCollect \
 	./internal/adapter/mcelog:FuzzCollect \
 	./internal/adapter/fmfm:FuzzCollect \
 	./internal/adapter/dcbrain:FuzzTables \
+	./internal/adapter/dcbrain:FuzzArchive \
+	./internal/scan:FuzzDetect \
 	./internal/injection:FuzzRead \
 	./internal/engine:FuzzConfigRead \
 	./internal/i18n:FuzzFormat \
 	./internal/bundle:FuzzText \
 	./internal/bundle:FuzzReadManifest \
+	./internal/bundle:FuzzMembers \
+	./internal/plugin:FuzzResponse \
 	./internal/redfish/client:FuzzParseTarget \
+	./internal/redfish/client:FuzzParseFingerprint \
 	./internal/redfish/client:FuzzResolve \
 	./internal/redfish/client:FuzzScrub \
+	./internal/redfish/client:FuzzAnswer \
 	./internal/redfish/collect:FuzzFilePath \
-	./internal/redfish/collect:FuzzParseManifest
+	./internal/redfish/collect:FuzzParseManifest \
+	./internal/redfish/collect:FuzzCrawl
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 
@@ -99,11 +118,7 @@ examples-case:
 	$(MY_EXAMPLE) open "$$tmp/demo.db" bundle CPU0_C1 -o examples/demo.mycase --force
 
 fuzz:
-	@set -e; for t in $(FUZZ_TARGETS); do \
-		pkg=$${t%%:*}; fn=$${t##*:}; \
-		echo "fuzz $$fn ($(FUZZTIME))"; \
-		$(GO) test -run '^$$' -fuzz "^$$fn\$$" -fuzztime $(FUZZTIME) -parallel $(JOBS) $$pkg; \
-	done
+	@GO="$(GO)" tools/fuzz.sh $(FUZZTIME) $(FUZZMINIMIZE) $(JOBS) $(FUZZ_TARGETS)
 
 lint: fmt-check vet
 
