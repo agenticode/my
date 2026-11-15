@@ -74,6 +74,13 @@ type Options struct {
 	// GradeB keeps the rank and drops bank, row and column; GradeC turns
 	// the errors of a DIMM into one count per day. Empty keeps everything.
 	Degrade model.Grade
+	// FromFirstError takes the first error of a server as the start of
+	// what is known about it. By default every server counts as watched
+	// from the first day of the dataset: the dataset is the error log of
+	// a fleet over eight months, so a server without rows before its
+	// first error had no errors until then, and the engine may call a
+	// burst of errors new.
+	FromFirstError bool
 	// Workers is the number of servers analysed at a time.
 	Workers int
 	// MaxRecords bounds the records of one server. A server with more is
@@ -390,6 +397,30 @@ type DatasetInfo struct {
 	// ExtraTickets is the number of tickets beyond the first of a server.
 	// Only the first ticket of a server is used.
 	ExtraTickets int64 `json:"extra_tickets"`
+	// Layout holds what the errors say about the place of a memoryid on
+	// the board, which the dataset description does not give.
+	Layout Layout `json:"layout"`
+}
+
+// Layout counts how the DIMMs with errors lie on the board that
+// dcbrain.Topology assumes: two sockets, six channels each, two DIMMs per
+// channel. If the assumption holds, DIMMs that fail together should share
+// a channel more often than chance puts them there, and servers with one
+// DIMM per channel should use one position only.
+type Layout struct {
+	// MultiDIMM is the number of servers with errors on two or more
+	// DIMMs, and Pairs the number of pairs of DIMMs with errors on one
+	// server.
+	MultiDIMM int64 `json:"multi_dimm_servers"`
+	Pairs     int64 `json:"pairs"`
+	// SameChannel and SameSocket count the pairs the layout puts on one
+	// channel, and on one socket but different channels.
+	SameChannel int64 `json:"pairs_same_channel"`
+	SameSocket  int64 `json:"pairs_same_socket"`
+	// ByDIMMs counts the DIMMs with errors by the number of DIMMs of their
+	// server (from the inventory; 0 when unknown) and by the position on
+	// the channel the layout gives them (0 or 1).
+	ByDIMMs map[int][2]int64 `json:"by_dimm_count"`
 }
 
 // Report is the result of a run.
@@ -403,7 +434,10 @@ type Report struct {
 	SplitDay    int             `json:"split_day"`
 	LeadTimes   []time.Duration `json:"lead_times"`
 	Degrade     model.Grade     `json:"degrade,omitzero"`
-	RecentDays  float64         `json:"recent_days"`
+	// FromFirstError is set when a server's history starts with its first
+	// error instead of the first day of the dataset.
+	FromFirstError bool    `json:"from_first_error,omitzero"`
+	RecentDays     float64 `json:"recent_days"`
 
 	Dataset DatasetInfo   `json:"dataset"`
 	Census  Census        `json:"census"`
@@ -437,6 +471,8 @@ type runner struct {
 	horizon dcbrain.Stamp
 	recent  dcbrain.Stamp
 	tickets map[string]dcbrain.Ticket
+	// dimmCount is the number of DIMMs of each server per the inventory.
+	dimmCount map[string]int
 }
 
 // Run evaluates the engine on the dataset.
@@ -453,13 +489,15 @@ func Run(ctx context.Context, ds *dcbrain.Dataset, opts Options) (*Report, error
 		return nil, fmt.Errorf("eval: thresholds: %w", err)
 	}
 	r := &runner{opts: opts, cfg: cfg, base: opts.Base, end: dcbrain.StampOfDay(dcbrain.SpanDays),
-		horizon: dcbrain.StampOfDay(opts.HorizonDays), recent: dcbrain.Stamp(cfg.RecentDays * 86400), tickets: map[string]dcbrain.Ticket{}}
+		horizon: dcbrain.StampOfDay(opts.HorizonDays), recent: dcbrain.Stamp(cfg.RecentDays * 86400), tickets: map[string]dcbrain.Ticket{},
+		dimmCount: map[string]int{}}
 	for _, c := range opts.Cutoffs {
 		r.cutoffs = append(r.cutoffs, dcbrain.StampOfDay(c))
 	}
 	rep := &Report{EngineVersion: engine.Version, Thresholds: cfg.Changed(), Cutoffs: opts.Cutoffs, HorizonDays: opts.HorizonDays,
-		SplitDay: opts.SplitDay, LeadTimes: opts.Leads, Degrade: opts.Degrade, RecentDays: cfg.RecentDays}
+		SplitDay: opts.SplitDay, LeadTimes: opts.Leads, Degrade: opts.Degrade, FromFirstError: opts.FromFirstError, RecentDays: cfg.RecentDays}
 	rep.Dataset.Path = ds.Path
+	rep.Dataset.Layout.ByDIMMs = map[int][2]int64{}
 	rep.Census.Rules, rep.Census.Codes = map[string]int64{}, map[string]int64{}
 	for _, m := range Modes {
 		rep.Census.Modes = append(rep.Census.Modes, ModeStats{Mode: m})
@@ -629,6 +667,7 @@ func (r *runner) readSideTables(ds *dcbrain.Dataset, rep *Report) (inventory map
 		inventory = map[string]bool{}
 		for _, s := range servers {
 			inventory[s.SID] = true
+			r.dimmCount[s.SID] = s.DIMMs
 		}
 		d.InventoryServers = int64(len(inventory))
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -143,6 +144,35 @@ func pct(part, total int64) string {
 		return "-"
 	}
 	return strconv.FormatFloat(100*float64(part)/float64(total), 'f', 2, 64) + "%"
+}
+
+// Interval returns the 95% Wilson score interval of a share of part in
+// total, as fractions. With few servers a measured share says little; the
+// interval says how little.
+func Interval(part, total int64) (lo, hi float64) {
+	if total <= 0 {
+		return 0, 1
+	}
+	const z = 1.959964
+	n, p := float64(total), float64(part)/float64(total)
+	centre := p + z*z/(2*n)
+	half := z * math.Sqrt(p*(1-p)/n+z*z/(4*n*n))
+	denom := 1 + z*z/n
+	return math.Max(0, (centre-half)/denom), math.Min(1, (centre+half)/denom)
+}
+
+// share writes "p% (part of total, 95% interval lo% to hi%)".
+func share(part, total int64) string {
+	if total == 0 {
+		return "- (0 of 0)"
+	}
+	lo, hi := Interval(part, total)
+	return fmt.Sprintf("%s (%s of %s, 95%% interval %.2f%% to %.2f%%)", pct(part, total), num(part), num(total), 100*lo, 100*hi)
+}
+
+// share0 writes "part (p%)".
+func share0(part, total int64) string {
+	return fmt.Sprintf("%s (%s)", num(part), pct(part, total))
 }
 
 // leadText names a lead time.
@@ -327,6 +357,11 @@ func (r *Report) print(p *printer) {
 	p.line("engine %s, thresholds: %s", r.EngineVersion, thresholds)
 	p.line("cut-offs at the start of days %s of the dataset calendar; outcome window %d days; cut-offs from day %d on are held out",
 		days(r.Cutoffs), r.HorizonDays, r.SplitDay)
+	if r.FromFirstError {
+		p.line("the history of a server starts with its first error")
+	} else {
+		p.line("every server counts as watched from the first day of the dataset")
+	}
 	switch r.Degrade {
 	case model.GradeB:
 		p.line("records degraded to observation grade B: bank, row and column removed, rank kept")
@@ -388,6 +423,30 @@ func (r *Report) printDataset(p *printer) {
 		p.line("%s tickets are a second or later ticket of a server and are not used", num(d.ExtraTickets))
 	}
 	p.line("records after merging rows that are equal in every column: %s", num(r.Census.Records))
+	if l := &d.Layout; l.Pairs > 0 {
+		// Among 24 slots, 12 of the 276 pairs share a channel and 120
+		// share a socket without sharing a channel.
+		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
+			num(l.MultiDIMM), num(l.Pairs), share0(l.SameChannel, l.Pairs), share0(l.SameSocket, l.Pairs))
+	}
+	if l := &d.Layout; len(l.ByDIMMs) > 0 {
+		counts := make([]int, 0, len(l.ByDIMMs))
+		for n := range l.ByDIMMs {
+			counts = append(counts, n)
+		}
+		sort.Ints(counts)
+		var rows [][]string
+		for _, n := range counts {
+			name := strconv.Itoa(n)
+			if n == 0 {
+				name = "not in the inventory"
+			}
+			by := l.ByDIMMs[n]
+			rows = append(rows, []string{name, num(by[0]), num(by[1])})
+		}
+		p.table("DIMMs with errors by the size of their server and the position on the channel the assumed layout gives them:",
+			[]string{"DIMMs of the server", "position 0", "position 1"}, rows)
+	}
 	for _, n := range r.Widened {
 		p.line("server %s: %s rows merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), n.BucketSeconds, num(int64(n.Records)))
 	}
@@ -505,8 +564,7 @@ func (r *Report) printCutoffs(p *printer) {
 					}
 					continue
 				}
-				p.line("%s, against %s: precision %s (%s of %s), recall %s (%s of %s)", gradeText(g), what,
-					pct(sc.Hit, sc.Flagged), num(sc.Hit), num(sc.Flagged), pct(sc.Hit, sc.Failures), num(sc.Hit), num(sc.Failures))
+				p.line("%s, against %s: precision %s; recall %s", gradeText(g), what, share(sc.Hit, sc.Flagged), share(sc.Hit, sc.Failures))
 			}
 		}
 		if n := s.Unseen.Total(); n > 0 {

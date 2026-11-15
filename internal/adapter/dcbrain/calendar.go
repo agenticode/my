@@ -11,6 +11,11 @@ import (
 // (02-29, 02-30, 04-31, 06-31) do not exist in a calendar year that starts
 // in January, so the text cannot be parsed as a date. A time is read as a
 // count of seconds from the first day instead.
+//
+// The dataset description does not give the month lengths. They are the
+// ones the authors' analysis scripts count with (compute_time_diff in
+// measurement/measurement.py of github.com/zncheng/dramanalysis starts
+// the months at days 0, 31, 61, 92, 123, 152, 183 and 213).
 
 // monthDays holds the length of the months 1 to 8 of the dataset calendar.
 var monthDays = [...]int{31, 30, 31, 31, 29, 31, 30, 31}

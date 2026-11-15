@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -404,6 +405,19 @@ func TestFixtureFindings(t *testing.T) {
 		t.Errorf("dataset: by type %v, month ends %v", rep.Dataset.ByType, rep.Dataset.MonthLastDay)
 	}
 
+	// The layout counts: s0006 has errors on memoryid 4 and 5, one channel;
+	// s0007 on 1, 8 and 17, which are one pair on one socket and two pairs
+	// across sockets.
+	l := rep.Dataset.Layout
+	if l.MultiDIMM != 2 || l.Pairs != 4 || l.SameChannel != 1 || l.SameSocket != 1 {
+		t.Errorf("layout = %+v", l)
+	}
+	// By size of the server: s0001 (12 DIMMs, memoryid 3) and s0006 (12
+	// DIMMs, memoryid 4 and 5) give one DIMM at position 0 and two at 1.
+	if l.ByDIMMs[12] != [2]int64{1, 2} || l.ByDIMMs[8] != [2]int64{1, 0} {
+		t.Errorf("layout by size = %v", l.ByDIMMs)
+	}
+
 	// One server only.
 	rep = fixtureRun(t, Options{Cutoffs: []int{71}, Servers: []string{"s0002"}})
 	if rep.Census.Servers != 1 || rep.ByCut[0].Servers != 1 || rep.ByCut[0].Unseen.Total() != 0 {
@@ -473,29 +487,74 @@ func TestSameAsLedger(t *testing.T) {
 			t.Fatal(err)
 		}
 		in := r.input(sid, recs)
-		for _, day := range []int{45, 71, 105, 131, 183, 207, 244} {
-			at := dcbrain.StampOfDay(day)
-			res, err := engine.Run(ctx, s, engine.Options{AsOf: at.Time(opts.Base), Now: at.Time(opts.Base)})
-			if err != nil {
-				t.Fatal(err)
-			}
-			h, err := r.analyze(in, sid, at)
-			if err != nil {
-				t.Fatal(err)
-			}
-			wantGrade, want := summary(res.Host(sid))
-			gotGrade, got := summary(h)
-			if gotGrade != wantGrade || len(got) != len(want) {
-				t.Errorf("%s day %d: harness %s %+v, ledger %s %+v", sid, day, gotGrade, got, wantGrade, want)
-				continue
-			}
-			for i := range want {
-				if got[i] != want[i] {
-					t.Errorf("%s day %d: harness %+v, ledger %+v", sid, day, got[i], want[i])
+		// Both ways of starting the history of a server: with its first
+		// error, and with the first day of the dataset.
+		for _, fromFirst := range []bool{true, false} {
+			r.opts.FromFirstError = fromFirst
+			for _, day := range []int{45, 71, 105, 131, 183, 207, 244} {
+				at := dcbrain.StampOfDay(day)
+				eo := engine.Options{AsOf: at.Time(opts.Base), Now: at.Time(opts.Base)}
+				if !fromFirst {
+					eo.ObservedFrom = opts.Base
+				}
+				res, err := engine.Run(ctx, s, eo)
+				if err != nil {
+					t.Fatal(err)
+				}
+				h, err := r.analyze(in, sid, at)
+				if err != nil {
+					t.Fatal(err)
+				}
+				wantGrade, want := summary(res.Host(sid))
+				gotGrade, got := summary(h)
+				if gotGrade != wantGrade || len(got) != len(want) {
+					t.Errorf("%s day %d: harness %s %+v, ledger %s %+v", sid, day, gotGrade, got, wantGrade, want)
+					continue
+				}
+				for i := range want {
+					if got[i] != want[i] {
+						t.Errorf("%s day %d: harness %+v, ledger %+v", sid, day, got[i], want[i])
+					}
 				}
 			}
 		}
 		s.Close()
+	}
+}
+
+// TestWatchedFromTheStart: a server that was quiet for months and then
+// logs a burst in one row has a new fault when the dataset counts as its
+// history, and an unknown trend when its history starts with the burst.
+func TestWatchedFromTheStart(t *testing.T) {
+	var rows []dcbrain.Row
+	at := dcbrain.StampOfDay(100)
+	for i := 0; i < 30; i++ {
+		rows = append(rows, dcbrain.Row{SID: "burst", MemoryID: 2, Bank: 1, Row: 77, Col: 8 * (i % 12), Type: dcbrain.TypeRead, At: at + dcbrain.Stamp(i*600)})
+	}
+	g := &Generated{Rows: rows, Tickets: []dcbrain.Ticket{{SID: "burst", Type: dcbrain.FailureUE, At: at + 30*3600}}}
+	dir := t.TempDir()
+	if err := g.WriteDir(dir); err != nil {
+		t.Fatal(err)
+	}
+	ds, err := dcbrain.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	consider, observe := gradeIndex(model.VerdictConsiderReplacement), gradeIndex(model.VerdictObserve)
+	rep := run(t, ds, Options{Cutoffs: []int{101}})
+	if c := rep.ByCut[0]; c.ByGrade[consider] != (Counts{FailedUE: 1}) || c.ByCode["row.new"] != (Counts{FailedUE: 1}) || rep.FromFirstError {
+		t.Errorf("watched from the start: by grade %v, by statement %v", c.ByGrade, c.ByCode)
+	}
+	rep = run(t, ds, Options{Cutoffs: []int{101}, FromFirstError: true})
+	if c := rep.ByCut[0]; c.ByGrade[observe] != (Counts{FailedUE: 1}) || !rep.FromFirstError {
+		t.Errorf("history from the first error: by grade %v, by statement %v", c.ByGrade, c.ByCode)
+	}
+	var a, b bytes.Buffer
+	rep.Write(&a, FormatText)
+	run(t, ds, Options{Cutoffs: []int{101}}).Write(&b, FormatText)
+	if !strings.Contains(a.String(), "the history of a server starts with its first error") ||
+		!strings.Contains(b.String(), "every server counts as watched from the first day of the dataset") {
+		t.Error("the report does not say where the history of a server starts")
 	}
 }
 
@@ -771,6 +830,25 @@ func TestReportFormats(t *testing.T) {
 		if got := leadText(d); got != want {
 			t.Errorf("leadText(%s) = %q, want %q", d, got, want)
 		}
+	}
+	// The Wilson interval: known values, and the edges.
+	for _, c := range []struct {
+		part, total int64
+		lo, hi      float64
+	}{{20, 81, 0.1659, 0.3508}, {0, 10, 0, 0.2775}, {10, 10, 0.7225, 1}, {1, 1, 0.2065, 1}, {50, 100, 0.4038, 0.5962}} {
+		lo, hi := Interval(c.part, c.total)
+		if math.Abs(lo-c.lo) > 0.0005 || math.Abs(hi-c.hi) > 0.0005 {
+			t.Errorf("Interval(%d, %d) = %.4f to %.4f, want %.4f to %.4f", c.part, c.total, lo, hi, c.lo, c.hi)
+		}
+	}
+	if lo, hi := Interval(0, 0); lo != 0 || hi != 1 {
+		t.Errorf("Interval(0, 0) = %v to %v", lo, hi)
+	}
+	if got := share(20, 81); got != "24.69% (20 of 81, 95% interval 16.59% to 35.08%)" {
+		t.Errorf("share = %q", got)
+	}
+	if got := share(0, 0); got != "- (0 of 0)" {
+		t.Errorf("share = %q", got)
 	}
 	if num(1234567) != "1,234,567" || num(-1000) != "-1,000" || num(12) != "12" || pct(1, 3) != "33.33%" || pct(1, 0) != "-" {
 		t.Errorf("number formats: %s %s %s %s %s", num(1234567), num(-1000), num(12), pct(1, 3), pct(1, 0))

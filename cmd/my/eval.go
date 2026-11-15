@@ -35,7 +35,7 @@ func evalCommand() *cli.Command {
 }
 
 const evalUsage = `Usage: my eval -data dir|zip [-format text|md|json] [-config file] [-set key=value]
-               [-cutoffs days] [-horizon days] [-split day] [-leads times] [-degrade B|C]
+               [-cutoffs days] [-horizon days] [-split day] [-leads times] [-degrade B|C] [-from-first-error]
                [-server sid] [-detail file] [-spool dir] [-scratch dir] [-workers n] [-max-records n] [-quiet]
        my eval -data dir|zip -extract sid -ledger file
        my eval -generate dir [-seed n] [-servers n]
@@ -60,6 +60,7 @@ func runEval(ctx context.Context, env *cli.Env, args []string) int {
 	split := fl.Int("split", eval.DefaultSplitDay, "cut-offs from this `day` on are the held-out period")
 	leads := fl.String("leads", "", "`times` before a failure at which the finding is taken, separated by commas (default 1s,5m,1h,24h,168h,720h)")
 	degrade := fl.String("degrade", "", "remove location detail to observation `grade` B or C before the engine sees the records")
+	fromFirst := fl.Bool("from-first-error", false, "start the history of a server with its first error; by default every server counts as watched from the first day of the dataset")
 	spool := fl.String("spool", "", "keep the error table, split by server, in this `directory` and use it again on the next run")
 	scratch := fl.String("scratch", "", "`directory` for temporary files (default: the system's)")
 	workers := fl.Int("workers", 0, "servers analysed at a time (default 2)")
@@ -134,7 +135,7 @@ func runEval(ctx context.Context, env *cli.Env, args []string) int {
 		return usage("%v", err)
 	}
 	opts := eval.Options{Config: &cfg, HorizonDays: *horizon, SplitDay: *split, Workers: *workers, MaxRecords: *maxRecords,
-		Spool: *spool, Scratch: *scratch, Servers: only}
+		Spool: *spool, Scratch: *scratch, Servers: only, FromFirstError: *fromFirst}
 	if *horizon < 1 {
 		return usage("-horizon %d: want at least 1 day", *horizon)
 	}
