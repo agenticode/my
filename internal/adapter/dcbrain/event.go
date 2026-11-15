@@ -31,7 +31,19 @@ func Topology(memoryID int) (socket, channel, position int) {
 }
 
 // SlotName returns the name the ledger uses for the slot of a memoryid.
-func SlotName(memoryID int) string { return "DIMM" + strconv.Itoa(memoryID) }
+func SlotName(memoryID int) string {
+	if memoryID >= 0 && memoryID < len(slotNames) {
+		return slotNames[memoryID]
+	}
+	return "DIMM" + strconv.Itoa(memoryID)
+}
+
+var slotNames = func() (out [MaxMemoryID + 1]string) {
+	for i := range out {
+		out[i] = "DIMM" + strconv.Itoa(i)
+	}
+	return out
+}()
 
 // Rec is the compact form of one or more rows of one server that share
 // place, error type and time. A fleet has tens of millions of rows; a Rec

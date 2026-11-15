@@ -15,10 +15,11 @@ Early development. This tree holds the data model, the SQLite ledger, the input 
 | `cmd/my` | the binary |
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS and host facts |
+| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS and host facts, and for the dcbrain DRAM error dataset |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 13 rules with fixed IDs to reach a finding per DIMM |
+| `internal/eval` | replays the dcbrain DRAM error dataset through the engine and compares the findings with the failure tickets that followed |
 | `internal/i18n` | message templates in English and Korean |
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
 | `testdata` | fixtures for every adapter |
