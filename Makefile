@@ -56,7 +56,7 @@ test-race:
 # The figures are pinned by golden files. After an intended change of the
 # output, rewrite them and review the diff.
 golden:
-	UPDATE_GOLDEN=1 $(GO) test -p $(JOBS) ./internal/view/ ./internal/term/ ./cmd/my/
+	UPDATE_GOLDEN=1 $(GO) test -p $(JOBS) ./internal/view/ ./internal/term/ ./internal/report/ ./cmd/my/
 
 fuzz:
 	@set -e; for t in $(FUZZ_TARGETS); do \
