@@ -16,6 +16,7 @@
 //	             first log file found under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
+//	GPU memory   on a live host, what "nvidia-smi -q -x" prints
 //
 // The same code reads a copy of a host's files (a directory with var, sys
 // and proc below it): only files are read then, no commands are run.
@@ -32,6 +33,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/klog"
+	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
 	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/ingest"
@@ -66,6 +68,9 @@ type Options struct {
 	// JournalTimeout bounds the reading of the journal; zero means
 	// DefaultJournalTimeout.
 	JournalTimeout time.Duration
+	// NvidiaSMI is the nvidia-smi program. Empty looks it up in PATH; "-"
+	// leaves GPU memory out.
+	NvidiaSMI string
 	// Location is the time zone of log files whose times carry none
 	// (syslog files). Nil means the zone of this process on a live host
 	// and UTC otherwise.
@@ -185,7 +190,45 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 		}
 	}
 	out = append(out, sm)
+	out = append(out, gpuMemory(&opts)...)
 	return out
+}
+
+// NvidiaSMIFiles lists where saved output of "nvidia-smi -q" is looked for
+// in a copy of a host's files.
+var NvidiaSMIFiles = []string{
+	"sos_commands/nvidia/nvidia-smi_-q",
+}
+
+// gpuMemory picks the source of GPU memory state. A live host is asked
+// through nvidia-smi, which only reads; a host without the program has no
+// NVIDIA driver and gets no entry, because most hosts have no GPU. A copy
+// of a host's files is read where the saved output is found.
+func gpuMemory(opts *Options) []adapter.Adapter {
+	nopts := nvidia.Options{Now: opts.Now, Location: opts.Location}
+	if opts.Live {
+		if nopts.Location == nil {
+			nopts.Location = time.Local
+		}
+		prog := opts.NvidiaSMI
+		switch prog {
+		case "-":
+			return nil
+		case "":
+			p, err := exec.LookPath("nvidia-smi")
+			if err != nil {
+				return nil
+			}
+			prog = p
+		}
+		return []adapter.Adapter{nvidia.NewCommand(prog, 0, nopts)}
+	}
+	for _, rel := range NvidiaSMIFiles {
+		if p := opts.path(rel); exists(p) {
+			return []adapter.Adapter{nvidia.NewFile(p, nopts)}
+		}
+	}
+	return nil
 }
 
 // kernelLog picks the kernel log source of a scan. What was tried and

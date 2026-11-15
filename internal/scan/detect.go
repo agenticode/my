@@ -19,6 +19,7 @@ import (
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/klog"
+	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
 	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/adapter/sel"
@@ -40,7 +41,8 @@ type DetectOptions struct {
 	// alone since.
 	ModTime bool
 	// Location is the time zone of times that carry none: syslog files,
-	// dmesg -T, and the text forms of a BMC event log. Nil means UTC.
+	// dmesg -T, the text forms of a BMC event log and the timestamp of
+	// nvidia-smi output. Nil means UTC.
 	Location *time.Location
 	// TempDir is where a private copy of a rasdaemon database of a host
 	// tree is made; empty means the system temporary directory.
@@ -56,6 +58,7 @@ const (
 	WhatDmidecode = "dmidecode output"
 	WhatSEL       = "BMC event log (SEL)"
 	WhatRedfish   = "Redfish dump"
+	WhatNvidiaSMI = "nvidia-smi -q output"
 )
 
 // ErrUnknownInput is returned by Detect, wrapped with what the input looks
@@ -76,7 +79,8 @@ const maxBinary = 16 << 20
 //     files and is read like a host;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
-//     output of dmidecode, a BMC event log, or a Redfish resource.
+//     output of dmidecode or of nvidia-smi -q, a BMC event log, or a
+//     Redfish resource.
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -265,6 +269,16 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = klog.NewReader(stream(), path, kopts)
 		} else {
 			a = klog.NewFile(path, kopts)
+		}
+
+	case nvidia.Sniff(text):
+		// The timestamp in the output is the local time of the host.
+		what = WhatNvidiaSMI
+		nopts := nvidia.Options{Now: seen, Location: opts.Location}
+		if zipped {
+			a = nvidia.NewReader(stream(), path, nopts)
+		} else {
+			a = nvidia.NewFile(path, nopts)
 		}
 
 	case redfish.Sniff(text):

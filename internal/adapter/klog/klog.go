@@ -2,7 +2,8 @@
 // formats, syslog files, /dev/kmsg records and journalctl -k -o json.
 //
 // It extracts EDAC error lines, firmware error records printed by GHES,
-// machine check records, page offlining messages and the boot banner. The
+// machine check records, page offlining messages, the Xid lines of the
+// NVIDIA GPU driver that report on GPU memory, and the boot banner. The
 // kernel log is a lossy source: the ring buffer wraps and some messages are
 // rate limited. It complements the rasdaemon database and does not replace it.
 package klog
@@ -14,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -137,6 +139,9 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if p.bigPages != "" {
 		rep.Notes = append(rep.Notes, p.bigPages)
 	}
+	if note := otherXIDNote(p.otherXID); note != "" {
+		rep.Notes = append(rep.Notes, note)
+	}
 	rep.Notes = append(rep.Notes, p.tally.Notes()...)
 	switch {
 	case rep.Records == 0:
@@ -179,6 +184,12 @@ type segment struct {
 
 	pageShift uint
 	records   int
+
+	// gpus maps a PCI address to the GPU the driver named there in this
+	// boot; lastGPU is the address of the latest such line, which the
+	// serial number line that follows belongs to.
+	gpus    map[string]*gpuIdent
+	lastGPU string
 }
 
 // pending is a record of the current boot whose time cannot be resolved
@@ -186,9 +197,13 @@ type segment struct {
 type pending struct {
 	ev      *model.Event
 	act     *model.Action
+	gpu     *model.GPUMem
 	mono    time.Duration
 	hasMono bool
 }
+
+// gpuIdent is what the driver printed about the GPU at a PCI address.
+type gpuIdent struct{ uuid, serial string }
 
 type ghesBlock struct {
 	first line
@@ -226,6 +241,7 @@ type parser struct {
 
 	lineNo        int
 	records       int
+	otherXID      map[int]int
 	notMemory     int
 	otherSections int
 	relative      int
@@ -488,6 +504,10 @@ func (p *parser) dispatch(l *line) error {
 		return err
 	}
 
+	if strings.Contains(msg, "NVRM: ") {
+		return p.nvrmLine(l)
+	}
+
 	if m := linuxVersionRE.FindStringSubmatch(msg); m != nil {
 		// A second banner in formats without seconds since boot is the
 		// only sign of a reboot.
@@ -508,6 +528,9 @@ func (p *parser) dispatch(l *line) error {
 			}
 		}
 		seg.banner, seg.kernel = msg, m[1]
+		// What the GPU driver said before this boot about which GPU sits
+		// where does not carry over.
+		seg.gpus, seg.lastGPU = nil, ""
 		if !l.wall.IsZero() && !l.hasMono && seg.startQuality == "" {
 			// The banner is the first message of a boot.
 			seg.start, seg.startQuality = l.wall, model.TimeExact
@@ -550,6 +573,112 @@ func (p *parser) dispatch(l *line) error {
 		return p.emit(nil, a, l)
 	}
 	return nil
+}
+
+// nvrmLine handles a line of the NVIDIA GPU driver: an Xid error, or the
+// identity of the GPU at a PCI address.
+func (p *parser) nvrmLine(l *line) error {
+	seg := p.seg
+	msg := l.msg
+	if m := gpuAtRE.FindStringSubmatch(msg); m != nil {
+		if seg.gpus == nil {
+			seg.gpus = map[string]*gpuIdent{}
+		}
+		seg.lastGPU = pciAddress(m[1])
+		seg.gpus[seg.lastGPU] = &gpuIdent{uuid: m[2]}
+		return nil
+	}
+	if m := gpuSerialRE.FindStringSubmatch(msg); m != nil {
+		if id := seg.gpus[seg.lastGPU]; id != nil && model.UsableSerial(m[1]) {
+			id.serial = m[1]
+		}
+		return nil
+	}
+	if !strings.Contains(msg, "NVRM: Xid") {
+		return nil
+	}
+	p.records++
+	seg.records++
+	m := xidRE.FindStringSubmatch(msg)
+	if m == nil {
+		p.tally.Skip(p.ref(l), "Xid line is unreadable")
+		return nil
+	}
+	code, err := strconv.Atoi(m[2])
+	if err != nil {
+		p.tally.Skip(p.ref(l), "Xid line is unreadable")
+		return nil
+	}
+	if _, memory := MemoryXIDs[code]; !memory {
+		if p.otherXID == nil {
+			p.otherXID = map[int]int{}
+		}
+		p.otherXID[code]++
+		return nil
+	}
+	g := &model.GPUMem{
+		Kind: model.GPUXID, XID: model.Some(code), XIDText: strings.TrimSpace(xidProcRE.ReplaceAllString(m[3], "")),
+		PCIBus: pciAddress(m[1]), Source: Kind + "/xid", RawRef: p.ref(l), Raw: l.msg,
+		Fingerprint: p.fingerprint("xid", l, ""),
+	}
+	if id := seg.gpus[g.PCIBus]; id != nil {
+		g.GPUUUID, g.GPUSerial = id.uuid, id.serial
+	}
+	switch {
+	case !l.wall.IsZero():
+		return p.sendGPU(g, l.wall, model.TimeExact, seg.bootID)
+	case l.hasMono && seg.startQuality != "":
+		return p.sendGPU(g, seg.start.Add(l.mono), seg.startQuality, seg.bootID)
+	}
+	p.pend = append(p.pend, pending{gpu: g, mono: l.mono, hasMono: l.hasMono})
+	return nil
+}
+
+func (p *parser) sendGPU(g *model.GPUMem, t time.Time, q model.TimeQuality, bootID string) error {
+	if y := t.UTC().Year(); y < 1970 || y > 9999 {
+		p.tally.Skip(g.RawRef, "time is out of range")
+		return nil
+	}
+	switch q {
+	case model.TimeRelative:
+		p.relative++
+	case model.TimeEstimated:
+		p.estimated++
+	}
+	g.ObservedAt, g.TimeQuality, g.BootID = t, q, bootID
+	if err := p.sink.GPU(g); err != nil {
+		return sinkError{err}
+	}
+	return nil
+}
+
+// otherXIDNote says which Xid records were left out because they are not
+// about GPU memory.
+func otherXIDNote(counts map[int]int) string {
+	if len(counts) == 0 {
+		return ""
+	}
+	codes := make([]int, 0, len(counts))
+	total := 0
+	for c, n := range counts {
+		codes = append(codes, c)
+		total += n
+	}
+	sort.Slice(codes, func(i, j int) bool {
+		if counts[codes[i]] != counts[codes[j]] {
+			return counts[codes[i]] > counts[codes[j]]
+		}
+		return codes[i] < codes[j]
+	})
+	var parts []string
+	for i, c := range codes {
+		if i == 8 {
+			parts = append(parts, "...")
+			break
+		}
+		parts = append(parts, fmt.Sprintf("Xid %d x%d", c, counts[c]))
+	}
+	return fmt.Sprintf("%d Xid records are not about GPU memory and were left out (%s)", total, strings.Join(parts, ", "))
 }
 
 // has64KPages reports whether a kernel release is known to be built with
@@ -1019,6 +1148,12 @@ func (p *parser) closeSegment(last bool) error {
 		if !pd.hasMono && q != model.TimeRelative {
 			// A message without any stamp: all that is known is the boot.
 			q = model.TimeEstimated
+		}
+		if pd.gpu != nil {
+			if err := p.sendGPU(pd.gpu, t, q, eventBoot); err != nil {
+				return err
+			}
+			continue
 		}
 		if err := p.send(pd.ev, pd.act, t, q, eventBoot); err != nil {
 			return err

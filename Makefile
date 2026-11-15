@@ -30,6 +30,7 @@ FUZZ_TARGETS := \
 	./internal/decode/ipmi:FuzzParseRecord \
 	./internal/adapter/sel:FuzzCollect \
 	./internal/adapter/redfish:FuzzCollect \
+	./internal/adapter/nvidia:FuzzCollect \
 	./internal/adapter/dcbrain:FuzzTables \
 	./internal/engine:FuzzConfigRead \
 	./internal/i18n:FuzzFormat

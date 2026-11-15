@@ -296,7 +296,52 @@ func candidate(raw string) bool {
 		strings.Contains(raw, "DMI: ") ||
 		strings.Contains(raw, "ommand line: ") ||
 		strings.Contains(raw, "setting system clock to ") ||
+		strings.Contains(raw, "NVRM: ") ||
 		// A journal message that is not valid UTF-8 is exported as an
 		// array of byte values and has to be decoded to be looked at.
 		strings.Contains(raw, `"MESSAGE":[`) || strings.Contains(raw, `"MESSAGE" : [`)
+}
+
+// Lines of the NVIDIA GPU driver. An Xid line reports an error of a GPU by
+// number; before the first one of a GPU in a boot the driver prints which
+// GPU sits at the PCI address and its board serial number:
+//
+//	NVRM: GPU at PCI:0000:3b:00: GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7
+//	NVRM: GPU Board Serial Number: 1562720005599
+//	NVRM: Xid (PCI:0000:3b:00): 48, pid=1234, name=python, An uncorrectable double bit error (DBE) has been detected ...
+//	NVRM: Xid (PCI:0000:01:00 GPU-I:05): 94, pid=7194, Contained: CE User Channel (0x9). RST: No, D-RST: No
+//	NVRM: Xid (0000:03:00): 14, Channel 00000001
+var (
+	xidRE       = regexp.MustCompile(`NVRM: Xid \((?:PCI:)?([0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})(?:\.[0-7])?(?: [^)]*)?\): (\d{1,4})(?:, ?(.*))?$`)
+	gpuAtRE     = regexp.MustCompile(`NVRM: GPU at (?:PCI:)?([0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})(?:\.[0-7])?: (GPU-[0-9a-fA-F-]{8,48})`)
+	gpuSerialRE = regexp.MustCompile(`NVRM: GPU Board Serial Number: ?(\S*)`)
+	// The process the driver blames, which is not part of the error text.
+	xidProcRE = regexp.MustCompile(`^(?:pid=[^,]*(?:, ?|$))?(?:name=[^,]*(?:, ?|$))?`)
+)
+
+// MemoryXIDs are the Xid numbers that report on the memory of a GPU, with
+// the names of the vendor's catalog. Other Xids (application errors, bus
+// and link errors) are counted and left out.
+var MemoryXIDs = map[int]string{
+	48:  "double bit ECC error",
+	63:  "GPU memory remapping event",
+	64:  "GPU memory remapping failure",
+	92:  "high single-bit ECC error rate",
+	94:  "contained memory error",
+	95:  "uncontained memory error",
+	140: "ECC unrecovered error",
+	156: "resource retirement event",
+	157: "resource retirement failure",
+	160: "channel retirement event",
+	161: "channel retirement failure",
+	168: "reduced GPU memory capacity",
+	171: "uncorrectable DRAM error",
+	172: "uncorrectable SRAM error",
+}
+
+// pciAddress writes a PCI address the way the ledger keeps it: domain,
+// bus, device and function in lower case, as nvidia-smi prints it without
+// the upper half of the domain.
+func pciAddress(domainBusDev string) string {
+	return strings.ToLower(domainBusDev) + ".0"
 }

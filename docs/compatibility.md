@@ -26,10 +26,11 @@ Every input gets an entry in the source inventory of a scan, also when it is abs
 | `# dmidecode` or `Handle 0x..., DMI type` lines | dmidecode output |
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
+| `NVSMI LOG` text or an `nvidia_smi_log` XML document | `nvidia-smi -q` output |
 
 A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
 
-Three things a file cannot say about itself are options of the import: the time zone of times that carry none (syslog files, `dmesg -T`, the text forms of a BMC event log), the time a kernel log with seconds since boot only was captured, and whether the modification time of a file may stand for the time it was saved.
+Three things a file cannot say about itself are options of the import: the time zone of times that carry none (syslog files, `dmesg -T`, the text forms of a BMC event log, the timestamp of `nvidia-smi` output), the time a kernel log with seconds since boot only was captured, and whether the modification time of a file may stand for the time it was saved.
 
 ## BMC event log (SEL)
 
@@ -207,3 +208,74 @@ A `ComputerSystem` resource gives the host name (`HostName`), the system vendor 
 - `MEM0008` ("is spare memory") is read as a spare taking over, like the IPMI state it follows.
 - The mark on a module has the time of the dump, which is later than the time the BMC set it.
 - A `disable` in a log is withdrawn by a later deasserted entry for the same module only within one dump.
+
+## NVIDIA GPU memory
+
+Two inputs describe the memory of a GPU: the Xid lines the driver writes to the kernel log, and the state `nvidia-smi -q` prints. Both go to the `gpu_mem` table of the ledger, keyed by the GPU serial number, and stay apart from the DIMM events.
+
+The driver does not report where in the memory of a GPU an error was. What can be read is a budget: rows remapped, a remap pending or failed, banks that still have spare rows. In the terms of the table at the top this is grade C.
+
+### Xid lines
+
+Read by the kernel log adapter (`klog`, source `klog/xid`) from every form of kernel log it reads.
+
+```
+NVRM: GPU at PCI:0000:3b:00: GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7
+NVRM: GPU Board Serial Number: 1650000000412
+NVRM: Xid (PCI:0000:3b:00): 48, pid=7062, name=python3, An uncorrectable double bit error (DBE) has been detected ...
+NVRM: Xid (PCI:0000:01:00 GPU-I:05): 94, pid=7194, Contained: CE User Channel (0x9). RST: No, D-RST: No
+NVRM: Xid (0000:03:00): 14, Channel 00000001
+```
+
+The Xid numbers that report on GPU memory are stored, with the number and the text of the line (the process the driver names is left out of the text and stays in the raw record):
+
+| Xid | Name in the vendor's catalog |
+| --- | --- |
+| 48 | double bit ECC error |
+| 63 | GPU memory remapping event (on older GPUs: page retirement) |
+| 64 | GPU memory remapping failure |
+| 92 | high single-bit ECC error rate |
+| 94 | contained memory error |
+| 95 | uncontained memory error |
+| 140 | ECC unrecovered error |
+| 156, 157 | resource retirement event, failure |
+| 160, 161 | channel retirement event, failure |
+| 168 | reduced GPU memory capacity |
+| 171, 172 | uncorrectable DRAM error, uncorrectable SRAM error |
+
+Other Xids (application errors, bus and link errors) are counted in the report by number and left out.
+
+A line names its GPU by the PCI address. The driver prints the UUID and the board serial number of the GPU at that address once per boot, before its first Xid; lines after that carry both. Times are those of the kernel log: exact with a journal or a syslog file, estimated from seconds since boot with a capture time, relative to boot without one.
+
+### nvidia-smi -q
+
+Adapter `nvidia-smi`, package `internal/adapter/nvidia`. It reads the text of `nvidia-smi -q` and the XML of `nvidia-smi -q -x`. One reading gives one snapshot per GPU.
+
+| Value | Text | XML |
+| --- | --- | --- |
+| identity | `Serial Number`, `GPU UUID`, `Product Name`, the `GPU <address>` line | `serial`, `uuid`, `product_name`, the `id` of `gpu` |
+| ECC in use | `ECC Mode` / `Current` | `ecc_mode/current_ecc` |
+| ECC counts | `ECC Errors` / `Volatile` and `Aggregate`: `DRAM Correctable`, `DRAM Uncorrectable`, `SRAM Correctable`, `SRAM Uncorrectable` (also split into `Parity` and `SEC-DED`, which are added) | `ecc_errors/volatile` and `aggregate` |
+| ECC counts of older GPUs | `Single Bit` and `Double Bit` / `Device Memory` and `Total`: the device memory is counted as DRAM, the rest of the total as SRAM | `single_bit`, `double_bit` |
+| SRAM limit passed | `SRAM Threshold Exceeded` | `sram_threshold_exceeded` |
+| retired pages (older GPUs) | `Retired Pages`: `Single Bit ECC`, `Double Bit ECC`, `Pending Page Blacklist` or `Pending` | `retired_pages` |
+| remapped rows | `Remapped Rows`: `Correctable Error`, `Uncorrectable Error`, `Pending`, `Remapping Failure Occurred` | `remapped_rows` |
+| spare rows per bank | `Bank Remap Availability Histogram`: `Max`, `High`, `Partial`, `Low`, `None` | `row_remapper_histogram` |
+
+`N/A` means the GPU does not report the value; the snapshot leaves it unset. A GPU that reports none of these values is still listed, and the report says how many there are.
+
+The time of a snapshot is the `Timestamp` of the output, which is the local time of the host without a zone. It is read as UTC unless the zone is given (`nvidia.Options.Location`). Output without a timestamp takes the time of the import.
+
+On a live host the scan runs `nvidia-smi -q -x` when the program is in the path, with a limit of 30 seconds. The query only reads. A host without the program has no NVIDIA driver and gets no entry in the source inventory; a program that is there and fails (driver not loaded, no permission) is reported with its message. In a copy of a host's files the output is read from `sos_commands/nvidia/nvidia-smi_-q`.
+
+### One GPU under several names
+
+A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in which the driver did not print the identity knows the PCI address only. When GPU records are read from the ledger, a record without a UUID takes it from a record with the same PCI address, of the same boot if there is one and nearest in time otherwise; serial number, index and model follow the UUID. The stored rows stay as their sources gave them, so a snapshot imported later completes Xid records imported before it.
+
+### Known gaps
+
+- DCGM is not read.
+- The text of an Xid line is kept and not taken apart: the partition a double bit error names, for example, is not a field.
+- The default table of `nvidia-smi` (without `-q`) and the files of `nvidia-bug-report.sh` are not read.
+- A GPU that was replaced in the same slot between two readings is told apart by its UUID; an Xid record with a PCI address only, between the two readings, goes to the nearer one.
+- GPUs of other vendors are not read.
