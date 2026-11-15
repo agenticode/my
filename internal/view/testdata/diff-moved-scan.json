@@ -1,0 +1,335 @@
+{
+  "host": "synth-moved-dimm",
+  "before": {
+    "file": "before.mycase",
+    "as_of": "2026-09-28T12:00:00Z",
+    "grade": "consider-replacement",
+    "grade_text": "consider replacement",
+    "dimms": 16,
+    "ce": 118,
+    "ue": 0,
+    "booted_at": "2026-09-01T03:00:00Z",
+    "kernel": "5.14.0-570.12.1.el9_6.x86_64",
+    "bios": "Example BIOS Inc. 2.4.4 03/11/2026"
+  },
+  "after": {
+    "file": "after.mycase",
+    "as_of": "2026-11-13T00:00:00Z",
+    "grade": "consider-replacement",
+    "grade_text": "consider replacement",
+    "dimms": 16,
+    "ce": 245,
+    "ue": 0,
+    "booted_at": "2026-10-01T03:00:00Z",
+    "kernel": "5.14.0-570.12.1.el9_6.x86_64",
+    "bios": "Example BIOS Inc. 2.4.4 03/11/2026"
+  },
+  "apart_days": 45.5,
+  "since": "2026-10-01T03:00:00Z",
+  "since_by": "restart",
+  "after_days": 42.88,
+  "before_days": 41.95,
+  "period": {
+    "code": "df.since.restart",
+    "args": {
+      "since": "2026-10-01 03:00 UTC",
+      "span": "42 days"
+    },
+    "text": "After counts from 2026-10-01 03:00 UTC, the last restart before the later case was taken: 42 days."
+  },
+  "restarts": [
+    {
+      "at": "2026-10-01T03:00:00Z",
+      "kernel": "5.14.0-570.12.1.el9_6.x86_64",
+      "bios": "Example BIOS Inc. 2.4.4 03/11/2026"
+    }
+  ],
+  "changes": [
+    {
+      "kind": "moved",
+      "dimm": "S/N 880018",
+      "from": "CPU0_C1",
+      "to": "CPU0_D1"
+    },
+    {
+      "kind": "moved",
+      "dimm": "S/N E7A387",
+      "from": "CPU0_D1",
+      "to": "CPU0_C1"
+    }
+  ],
+  "dimms": [
+    {
+      "dimm": {
+        "dimm_uid": "dd22aef98d8415ee7e55",
+        "serial": "880018",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N 880018",
+      "slot_before": "CPU0_C1",
+      "slot_after": "CPU0_D1",
+      "change": "moved",
+      "before": {
+        "ce": 114,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 114,
+        "ue": 0
+      },
+      "between": {
+        "ce": 5,
+        "ue": 0
+      },
+      "after": {
+        "ce": 121,
+        "ue": 0
+      },
+      "grade_before": "consider-replacement",
+      "grade_before_text": "consider replacement",
+      "grade_after": "consider-replacement",
+      "grade_after_text": "consider replacement"
+    },
+    {
+      "dimm": {
+        "dimm_uid": "d5a91ef81988c62d72f4",
+        "serial": "E7A387",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N E7A387",
+      "slot_before": "CPU0_D1",
+      "slot_after": "CPU0_C1",
+      "change": "moved",
+      "before": {
+        "ce": 0,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 0,
+        "ue": 0
+      },
+      "after": {
+        "ce": 0,
+        "ue": 0
+      },
+      "grade_before": "ok",
+      "grade_before_text": "ok",
+      "grade_after": "observe",
+      "grade_after_text": "observe",
+      "inherited": {
+        "ce": 114,
+        "ue": 0
+      }
+    },
+    {
+      "dimm": {
+        "dimm_uid": "d6040b49010ce9d619ac",
+        "serial": "01EAE2",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N 01EAE2",
+      "slot_before": "CPU1_A1",
+      "slot_after": "CPU1_A1",
+      "before": {
+        "ce": 1,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 1,
+        "ue": 0
+      },
+      "after": {
+        "ce": 0,
+        "ue": 0
+      },
+      "grade_before": "observe",
+      "grade_before_text": "observe",
+      "grade_after": "observe",
+      "grade_after_text": "observe"
+    },
+    {
+      "dimm": {
+        "dimm_uid": "da392286ecfdfe3826f2",
+        "serial": "D51D2B",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N D51D2B",
+      "slot_before": "CPU1_B1",
+      "slot_after": "CPU1_B1",
+      "before": {
+        "ce": 1,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 1,
+        "ue": 0
+      },
+      "after": {
+        "ce": 0,
+        "ue": 0
+      },
+      "grade_before": "observe",
+      "grade_before_text": "observe",
+      "grade_after": "observe",
+      "grade_after_text": "observe"
+    },
+    {
+      "dimm": {
+        "dimm_uid": "d4d1cf147bd946ff1c4a",
+        "serial": "332238",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N 332238",
+      "slot_before": "CPU1_C1",
+      "slot_after": "CPU1_C1",
+      "before": {
+        "ce": 0,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 0,
+        "ue": 0
+      },
+      "after": {
+        "ce": 1,
+        "ue": 0
+      },
+      "grade_before": "ok",
+      "grade_before_text": "ok",
+      "grade_after": "observe",
+      "grade_after_text": "observe"
+    },
+    {
+      "dimm": {
+        "dimm_uid": "d4d7f64de1edb5604305",
+        "serial": "A8A64B",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N A8A64B",
+      "slot_before": "CPU1_D1",
+      "slot_after": "CPU1_D1",
+      "before": {
+        "ce": 1,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 1,
+        "ue": 0
+      },
+      "after": {
+        "ce": 0,
+        "ue": 0
+      },
+      "grade_before": "observe",
+      "grade_before_text": "observe",
+      "grade_after": "observe",
+      "grade_after_text": "observe"
+    },
+    {
+      "dimm": {
+        "dimm_uid": "d9fc3ca9f34ae88007e7",
+        "serial": "3056DB",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "name": "S/N 3056DB",
+      "slot_before": "CPU1_F1",
+      "slot_after": "CPU1_F1",
+      "before": {
+        "ce": 1,
+        "ue": 0
+      },
+      "recent": {
+        "ce": 1,
+        "ue": 0
+      },
+      "after": {
+        "ce": 0,
+        "ue": 0
+      },
+      "grade_before": "observe",
+      "grade_before_text": "observe",
+      "grade_after": "observe",
+      "grade_after_text": "observe"
+    }
+  ],
+  "not_listed": 9,
+  "between": [
+    {
+      "slot": "CPU0_C1",
+      "ce": 5,
+      "ue": 0
+    }
+  ],
+  "between_placed": true,
+  "readings": [
+    {
+      "code": "df.followed",
+      "args": {
+        "aft": 121,
+        "aspan": "42 days",
+        "bspan": "41 days",
+        "dimm": "S/N 880018",
+        "from": "CPU0_C1",
+        "old": 0,
+        "other": "S/N E7A387",
+        "rec": 114,
+        "slot": "CPU0_C1",
+        "to": "CPU0_D1"
+      },
+      "text": "S/N 880018: the errors moved with the DIMM. 114 in CPU0_C1 in the 41 days before, 121 in CPU0_D1 in the 42 days after; CPU0_C1 has 0 with S/N E7A387 in it."
+    }
+  ],
+  "notes": [
+    {
+      "code": "df.note.between",
+      "args": {
+        "n": 5,
+        "since": "2026-10-01 03:00 UTC",
+        "slots": "CPU0_C1 5"
+      },
+      "text": "5 errors lie after the earlier case and before 2026-10-01 03:00 UTC (CPU0_C1 5), in neither window. Until then the DIMMs were where the earlier case has them, so they are counted apart for the DIMMs of that case."
+    },
+    {
+      "code": "df.note.inherited",
+      "args": {
+        "dimm": "S/N E7A387",
+        "grade": "observe",
+        "n": 114,
+        "other": "S/N 880018",
+        "slot": "CPU0_C1"
+      },
+      "text": "CPU0_C1: the later case counts 114 errors from before the earlier case was taken as errors of S/N E7A387, the only DIMM it has seen in that slot. The earlier case has S/N 880018 there. The finding of the later case for S/N E7A387 (observe) rests on them too."
+    },
+    {
+      "code": "df.note.window",
+      "args": {
+        "aspan": "42 days",
+        "bspan": "41 days"
+      },
+      "text": "The earlier case covers 41 days before it was taken, less than the 42 days after."
+    }
+  ],
+  "grade": "consider-replacement",
+  "grade_text": "consider replacement"
+}

@@ -1,0 +1,33 @@
+host synth-moved-dimm  before.mycase 2026-09-28 12:00 UTC  → after.mycase 2026-11-13 00:00 UTC
+45 days apart  host finding: consider replacement
+After counts from 2026-10-03 00:00 UTC, the time given for the change: 41 days.
+
+ changes  moved    S/N 880018, CPU0_C1 → CPU0_C2
+          restart  1 after the earlier case: 2026-10-01 03:00 UTC
+
+ DIMM        SLOT               BEFORE  LAST 41D  BETWEEN  AFTER 41D  FINDING
+ S/N 880018  CPU0_C1 → CPU0_C2  114 CE    114 CE     5 CE     116 CE  consider replacement
+ S/N 01EAE2  CPU1_A1              1 CE      1 CE        0          0  observe
+ S/N D51D2B  CPU1_B1              1 CE         0        0          0  observe
+ S/N 332238  CPU1_C1                 0         0        0       1 CE  ok → observe
+ S/N A8A64B  CPU1_D1              1 CE      1 CE        0          0  observe
+ S/N 3056DB  CPU1_F1              1 CE      1 CE        0          0  observe
+ S/N 86EACF  CPU0_A1                 0         0        0          0  ok
+ S/N A7C1DA  CPU0_B1                 0         0        0          0  ok
+ S/N E7A387  CPU0_D1                 0         0        0          0  ok
+ S/N 34C15C  CPU0_E1                 0         0        0          0  ok
+ S/N 31BCDE  CPU0_F1                 0         0        0          0  ok
+ S/N FF0C3B  CPU0_G1                 0         0        0          0  ok
+ S/N C56A80  CPU0_H1                 0         0        0          0  ok
+ S/N B31D2C  CPU1_E1                 0         0        0          0  ok
+ S/N 9CEE99  CPU1_G1                 0         0        0          0  ok
+ S/N 7F782A  CPU1_H1                 0         0        0          0  ok
+
+ reading  S/N 880018: the errors moved with the DIMM. 114 in CPU0_C1 in the 41 days before, 116 in
+          CPU0_C2 in the 41 days after; CPU0_C1 is empty now.
+
+ notes    10 errors lie after the earlier case and before 2026-10-03 00:00 UTC (CPU0_C1 5, CPU0_C2
+          5), in neither window. Until then the DIMMs were where the earlier case has them, so they
+          are counted apart for the DIMMs of that case.
+          CPU0_C2 is empty in the earlier case and has 5 errors before 2026-10-03 00:00 UTC: a DIMM
+          was put there earlier than the time given for the change.

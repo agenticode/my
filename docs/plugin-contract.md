@@ -11,7 +11,7 @@ The program can be written in any language and carry any license. It never links
 
 | Flag | Meaning |
 | --- | --- |
-| `--plugin PROGRAM` | run PROGRAM on the error records before the engine. Every command that shows findings takes it: `my`, `dimm`, `why`, `map`, `timeline`, `bundle`, `report`, `export`, `import`, also behind `my open FILE` |
+| `--plugin PROGRAM` | run PROGRAM on the error records before the engine. Every command that shows findings takes it: `my`, `dimm`, `why`, `map`, `timeline`, `gpu`, `verify`, `bundle`, `report`, `export`, `import`, also behind `my open FILE`, and `diff`, which asks it about each of its two cases |
 | `--plugin-timeout TIME` | how long the program may run (default 10s) |
 | `--plugin-logs N` | how many records before the newest one are sent per DIMM (default 1000) |
 

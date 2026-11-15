@@ -92,6 +92,7 @@ type glyphs struct {
 	cross    string
 	horiz    string
 	ellipsis string
+	arrow    string // comparison: from one state to the next
 }
 
 var unicodeGlyphs = glyphs{
@@ -100,7 +101,7 @@ var unicodeGlyphs = glyphs{
 	hold:  "?", ue: "X", bar: "█", barDim: "░", sep: "|",
 	up: "↑", flat: "→", down: "↓", unknown: "?",
 	note: "←", caret: "^", gap: "⋮",
-	vert: "│", corner: "└", joint: "┴", cross: "┼", horiz: "─", ellipsis: "…",
+	vert: "│", corner: "└", joint: "┴", cross: "┼", horiz: "─", ellipsis: "…", arrow: "→",
 }
 
 var asciiGlyphs = glyphs{
@@ -109,7 +110,7 @@ var asciiGlyphs = glyphs{
 	hold:  "?", ue: "X", bar: "#", barDim: ".", sep: "|",
 	up: "^", flat: "=", down: "v", unknown: "?",
 	note: "<-", caret: "^", gap: ":",
-	vert: "|", corner: "+", joint: "+", cross: "+", horiz: "-", ellipsis: "..",
+	vert: "|", corner: "+", joint: "+", cross: "+", horiz: "-", ellipsis: "..", arrow: "->",
 }
 
 func (st Style) g() *glyphs {
@@ -216,12 +217,13 @@ func heatColor(level int) string {
 // Glyphs returns the drawing characters of the style by name, for texts
 // that explain a figure: g0 to g4 are the five densities, hold the mark of
 // a hold finding, ue the mark of an uncorrected error, up, flat and down
-// the trend arrows.
+// the trend arrows, arrow the mark between two states of a comparison.
 func (st Style) Glyphs() map[string]any {
 	g := st.g()
 	return map[string]any{
 		"g0": g.shade[0], "g1": g.shade[1], "g2": g.shade[2], "g3": g.shade[3], "g4": g.shade[4],
 		"hold": g.hold, "ue": g.ue, "up": g.up, "flat": g.flat, "down": g.down, "zero": g.spark[0],
+		"arrow": g.arrow,
 	}
 }
 

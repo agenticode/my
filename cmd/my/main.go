@@ -80,6 +80,12 @@ func app() *cli.App {
 				Run:       runOpen,
 			},
 			{
+				Name:      "diff",
+				Summary:   "compare two cases of one host: before and after a reseat, a slot swap, a firmware update",
+				SummaryKO: "한 호스트의 케이스 둘을 비교: reseat, 슬롯 맞교환, 펌웨어 업데이트의 전후",
+				Run:       runDiff,
+			},
+			{
 				Name:      "import",
 				Summary:   "build a case from files: kernel logs, a rasdaemon database, BMC dumps, a copy of a host",
 				SummaryKO: "파일로 케이스 만들기: 커널 로그, rasdaemon DB, BMC 덤프, 호스트 파일 사본",
