@@ -42,6 +42,8 @@ func newServeOptions() *serveOptions {
 	o.fs.StringVar(&o.listen, "listen", serve.DefaultListen, "")
 	o.fs.StringVar(&o.interval, "interval", serve.DefaultInterval.String(), "")
 	o.fs.StringVar(&o.root, "root", "", "")
+	o.sf.register(o.fs)
+	o.fs.StringVar(&o.host, "host", "", "")
 	o.fs.StringVar(&o.lang, "lang", "", "")
 	o.cf.Register(o.fs)
 	o.fs.BoolVar(&o.help, "help", false, "")
@@ -102,7 +104,26 @@ func runServe(ctx context.Context, env *cli.Env, args []string) int {
 	}
 
 	log := &serveLog{w: env.Stderr}
-	src := &hostSource{lang: lang, cfg: cfg, root: o.root, now: clock(env)}
+	var src serve.Source
+	switch {
+	case o.sf.set() && o.root != "":
+		return o.usageError(env, lang, "%s", say(lang, "err.fleet_root"))
+	case o.sf.set():
+		// One server for the fleet: it reads the store the rasdaemons of
+		// the hosts write to.
+		if _, err := parseSince(o.sf.since, time.Now()); err != nil {
+			return o.usageError(env, lang, "%s", say(lang, "err.since", "value", o.sf.since))
+		}
+		fleet := newFleetSource(env, lang, cfg, o.sf, o.host, interval)
+		defer fleet.close()
+		src = fleet
+	case o.sf.since != "":
+		return o.usageError(env, lang, "%s", say(lang, "err.since_alone"))
+	case o.host != "":
+		return o.usageError(env, lang, "%s", say(lang, "err.host_alone"))
+	default:
+		src = &hostSource{lang: lang, cfg: cfg, root: o.root, now: clock(env)}
+	}
 	// A scan is logged when it says something the log does not say yet:
 	// the first one, one that found something else than the one before,
 	// one that failed, and the first that works again.
@@ -121,7 +142,7 @@ func runServe(ctx context.Context, env *cli.Env, args []string) int {
 				said = ""
 				return
 			}
-			if found := st.(*hostState).summary(lang); found != said {
+			if found := st.(interface{ summary(i18n.Lang) string }).summary(lang); found != said {
 				log.print(say(lang, "serve.scan", "found", found, "took", took.Round(time.Millisecond).String()))
 				said = found
 			}
