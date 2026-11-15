@@ -1171,3 +1171,81 @@ func TestHostsWorstFirst(t *testing.T) {
 		t.Errorf("hosts: %q", got)
 	}
 }
+
+// TestTimelineNamesOneDayAsOneDay checks the sentence of a group whose
+// events all fall on one day: it names the day, not a period from the day
+// to itself.
+func TestTimelineNamesOneDayAsOneDay(t *testing.T) {
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "day.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	day := time.Date(2026, 10, 1, 8, 0, 0, 0, time.UTC)
+	err = s.Update(ctx, func(w *store.Writer) error {
+		if err := w.UpsertHost(&model.Host{Name: "h"}); err != nil {
+			return err
+		}
+		for i := range 5 {
+			at := day.Add(time.Duration(i) * time.Hour)
+			// Three pages on the first day, two more on the next.
+			if i >= 3 {
+				at = at.AddDate(0, 0, 1)
+			}
+			a := &model.Action{Host: "h", At: at, TimeQuality: model.TimeExact, Kind: model.ActionPageOffline, Result: model.ResultOK,
+				OsPhysicalAddress: model.Some(uint64(0x1000 * (i + 1))), Slot: "A1", Source: "test", RawRef: "t#" + at.Format(time.RFC3339),
+				Fingerprint: model.Fingerprint("page", at.String())}
+			if _, err := w.InsertAction(a); err != nil {
+				return err
+			}
+		}
+		for i := range 2 {
+			at := day.Add(time.Duration(i) * time.Minute)
+			e := &model.Event{Host: "h", Kind: model.KindError, ErrorDT: at, ErrorSeverity: model.SevUE, Slot: "A1", Count: 1,
+				Source: "test", RawRef: "e#" + at.Format(time.RFC3339), Grade: model.GradeC, TimeQuality: model.TimeExact,
+				Fingerprint: model.Fingerprint("event", at.String())}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	texts := func(lang i18n.Lang, days int) map[string]string {
+		c, err := Open(ctx, s, lang, engine.Options{Now: now})
+		if err != nil {
+			t.Fatal(err)
+		}
+		h, err := c.Host("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		tl, err := c.Timeline(ctx, h, nil, TimelineOptions{Days: days})
+		if err != nil {
+			t.Fatal(err)
+		}
+		out := map[string]string{}
+		for _, g := range tl.Markers {
+			out[g.Kind] = g.Text.Text
+		}
+		return out
+	}
+	en := texts(i18n.EN, 0)
+	if en[MarkUE] != "2 UE on 2026-10-01" || en[string(model.ActionPageOffline)] != "5 pages offline, 2026-10-01 to 2026-10-02" {
+		t.Errorf("English: %v", en)
+	}
+	ko := texts(i18n.KO, 0)
+	if ko[MarkUE] != "2026-10-01 UE 2건" || ko[string(model.ActionPageOffline)] != "page offline 5건, 2026-10-01 ~ 2026-10-02" {
+		t.Errorf("Korean: %v", ko)
+	}
+	// Every message of a group that falls on one day has both languages
+	// and names the day once.
+	for _, code := range []string{"tl.ue.day", "tl.offline.day", "tl.action.day", "tl.move.day"} {
+		m := Messages[code]
+		if m.EN == "" || m.KO == "" || strings.Contains(m.EN, "{last}") || strings.Contains(m.KO, "{last}") {
+			t.Errorf("%s: %+v", code, m)
+		}
+	}
+}

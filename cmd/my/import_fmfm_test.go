@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/agenticode/my/internal/testutil"
@@ -30,7 +31,13 @@ func TestImportFMFMLogs(t *testing.T) {
 		" 1  CPU0_C1                 80A1C3   2   2  row ",
 		// A place the boot log does not list is named by its numbers.
 		" 2  socket1 channel0 dimm0  -        0   1  undetermined ",
+		// A slot that only register readings name: the ledger does not
+		// know whether a module is in it, and the slot map says so.
+		" -- module presence unknown",
 	)
+	if strings.Contains(out, "empty slot") {
+		t.Errorf("a slot of unknown state is called empty:\n%s", out)
+	}
 }
 
 // TestImportOneHostOfALog reads a log that holds the records of two hosts.

@@ -73,7 +73,6 @@ var Words = i18n.Catalog{
 	// 2. Slot map.
 	"cap.slotmap":  {EN: "One cell per slot: a line per socket and a group per memory channel, in board order. The colour and the mark of a cell give the grade of the finding for the DIMM in that slot. A slot without a module is an outline. A cell leads to the finding of its DIMM.", KO: "칸 하나가 슬롯 하나입니다. 소켓마다 한 줄, 메모리 채널마다 한 묶음이며 보드 순서를 따릅니다. 칸의 색과 표식이 그 슬롯 DIMM의 소견 등급입니다. 모듈이 없는 슬롯은 테두리만 그립니다. 칸을 누르면 그 DIMM의 판정으로 갑니다."},
 	"cap.ranking":  {EN: "DIMMs with errors or a finding, the worst first. CE and UE are corrected and uncorrected errors counted from the ledger, so the counts run across reboots. The trend draws the last {days} days in steps of {step} days, each line on its own scale.", KO: "오류나 소견이 있는 DIMM을 위험한 순서로 나열합니다. CE와 UE는 원장에서 센 누적값이라 재부팅해도 줄지 않습니다. 추세는 최근 {days}일을 {step}일씩 그리며 줄마다 눈금이 다릅니다."},
-	"slot.unknown": {EN: "not known whether a module is present", KO: "모듈 유무 미확인"},
 	"slot.title":   {EN: "{slot}: {state}", KO: "{slot}: {state}"},
 	"slot.serial":  {EN: "S/N {serial}", KO: "S/N {serial}"},
 	"fig.slotmap":  {EN: "Slot map of host {host}", KO: "호스트 {host}의 슬롯 맵"},

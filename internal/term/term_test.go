@@ -475,7 +475,7 @@ func TestGlyphsCarryTheGrade(t *testing.T) {
 	// glyph, in both glyph sets, and the heat map has five distinct shades.
 	for _, st := range []Style{{}, {ASCII: true}} {
 		seen := map[string]string{}
-		for _, state := range []string{"ok", "observe", "consider-replacement", "replace-now", "hold-replacement", view.SlotEmpty} {
+		for _, state := range []string{"ok", "observe", "consider-replacement", "replace-now", "hold-replacement", view.SlotEmpty, view.SlotUnknown} {
 			g := st.gradeGlyph(state)
 			if other, dup := seen[g]; dup {
 				t.Errorf("ASCII=%v: %s and %s share the glyph %q", st.ASCII, state, other, g)

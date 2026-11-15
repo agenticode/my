@@ -191,7 +191,7 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	}
 	var bands [][]bandRow
 	hidden := 0
-	emptyDrawn := false
+	emptyDrawn, unknownDrawn := false, false
 	for k := range positions {
 		var band []bandRow
 		occupied, slots := false, 0
@@ -222,8 +222,11 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 		}
 		for _, br := range band {
 			for _, c := range br.cells {
-				if c != nil && (c.State == view.SlotEmpty || c.State == view.SlotUnknown) {
+				if c != nil && c.State == view.SlotEmpty {
 					emptyDrawn = true
+				}
+				if c != nil && c.State == view.SlotUnknown {
+					unknownDrawn = true
 				}
 			}
 		}
@@ -280,6 +283,9 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	}
 	if emptyDrawn {
 		legend = append(legend, st.paint(gradeColor(view.SlotEmpty), st.gradeGlyph(view.SlotEmpty))+" "+st.say("ov.empty"))
+	}
+	if unknownDrawn {
+		legend = append(legend, st.paint(gradeColor(view.SlotUnknown), st.gradeGlyph(view.SlotUnknown))+" "+st.say("ov.unknown"))
 	}
 	for _, line := range flow(legend, "   ", st.width()-1) {
 		p.add(" " + line)
