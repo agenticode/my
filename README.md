@@ -144,11 +144,11 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
-| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, FMFM logs, a copy of a host's files |
+| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, `mcelog --client` output, FMFM logs, a copy of a host's files |
 | `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>`; with `--fleet`, one exporter for every host of a rasdaemon store ([docs/exporter.md](docs/exporter.md), [contrib/](contrib/README.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
 
-A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
+A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. Where the `mcelog` or `nvidia-smi` program is installed it also asks the mcelog daemon for its counts per DIMM and the driver for the state of GPU memory. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
 
 Where rasdaemon 1.0 writes to a MySQL, MariaDB or PostgreSQL server, `--fleet mysql` or `--fleet postgresql` reads that store in place of this host. Without `--host` the overview lists every host of the fleet with its finding, the worst first. With `--host NAME` the commands above show that host. The connection settings are the variables rasdaemon itself takes (`RAS_MYSQL_*`, `RAS_PG_*`), from the environment or from the file named with `--fleet-env`. [docs/compatibility.md](docs/compatibility.md#store-on-a-database-server) says what such a store holds.
 
@@ -221,7 +221,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `cmd/my` | the binary and its commands |
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | readers for the rasdaemon database (the SQLite file of a host, and the store on a MySQL or PostgreSQL server that the hosts of a fleet share), the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
+| `internal/adapter` | readers for the rasdaemon database (the SQLite file of a host, and the store on a MySQL or PostgreSQL server that the hosts of a fleet share), the kernel log, EDAC sysfs, the counts of the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |

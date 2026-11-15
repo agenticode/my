@@ -27,6 +27,7 @@ The same fault shows more or less of itself depending on who handles the error a
 | Fleet whose rasdaemons write to a MySQL or PostgreSQL server | rasdaemon store, read with `--fleet` | as the hosts' own databases | the rows are those each host would keep in its SQLite file, without serial numbers |
 | Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
 | No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
+| Host that runs the mcelog daemon in place of rasdaemon | `mcelog --client` output, kernel log | C | the daemon keeps counts per DIMM and no records |
 | NVIDIA GPU memory | Xid lines, `nvidia-smi -q` | C | the driver reports no location |
 
 These grades are what the adapters and decoders give on the fixtures and test cases of this repository. They have not been confirmed on real hosts of each kind.
@@ -46,6 +47,7 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
 | `NVSMI LOG` text or an `nvidia_smi_log` XML document | `nvidia-smi -q` output |
+| a `SOCKET n CHANNEL n DIMM n` line, or a line of the page table of the mcelog daemon | `mcelog --client` output |
 | JSON with `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` or `OsCrashDT` among its field names | FMFM log |
 
 A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
@@ -58,7 +60,7 @@ What a file cannot say about itself is an option of the import:
 | --- | --- | --- |
 | time zone of times that carry none | `--tz` | syslog files, `dmesg -T`, the text forms of a BMC event log, the timestamp of `nvidia-smi` output, times of an FMFM log written without a zone |
 | capture time | `--captured-at` | a kernel log that has seconds since boot only |
-| modification time of the file as its capture time | `--mtime` | the same log, and inventories that carry no time: dmidecode output, the memory resources of a Redfish dump, an FMFM boot record without a boot time |
+| modification time of the file as its capture time | `--mtime` | the same log, and inputs that carry no time: dmidecode output, the memory resources of a Redfish dump, an FMFM boot record without a boot time, `mcelog --client` output |
 | host | `--host` | a log that holds the records of several hosts (an FMFM log) |
 
 ## Which slot a record belongs to
@@ -246,6 +248,8 @@ The counters say how many errors a DIMM had since the driver was loaded and noth
 
 Each reading becomes a counter event with the growth since the reading before it, or since the counter started. The ledger then sets how many of these errors the located records of the same slot and time window already account for. Totals count the remainder, so a host with a rasdaemon database and EDAC counters is not counted twice, and errors that only the counter saw are still counted.
 
+A host can have a second set of counts per DIMM, those of the [mcelog daemon](#mcelog-daemon). The readings of each source are kept apart, and an error both sets count is counted once: the EDAC counters come first, and what they count beyond the located records covers the counts of the daemon for the same slot and time.
+
 ### Grade
 
 C.
@@ -255,6 +259,53 @@ C.
 - A host without an EDAC driver for its platform has no counters, which is usual in virtual machines. The entry in the source inventory says so.
 - A memory controller that only has the `csrow` directories of kernels before 3.6 is reported and not read.
 - The counters cannot tell two errors in one cell from two errors in two cells.
+
+## mcelog daemon
+
+Adapter `mcelog`, package `internal/adapter/mcelog`. It reads what `mcelog --client` prints: the error counts the mcelog daemon keeps per DIMM. A live scan runs the command when the `mcelog` program is installed; a saved answer (`mcelog --client > mcelog-client.txt`) is read by `my import`. A host without the program gets no entry in the source inventory.
+
+The daemon decodes each machine check, counts it for the DIMM it names and keeps no record of it. Its answer has one block per DIMM:
+
+```
+SOCKET 0 CHANNEL 1 DIMM 0
+DMI_NAME "DIMM_B1" DMI_LOCATION "NODE 0 CHANNEL 1 DIMM 0"
+corrected memory errors:
+	12 total
+	3 in 24h
+uncorrected memory errors:
+	0 total
+	0 in 24h
+```
+
+| Line | Read as |
+| --- | --- |
+| `SOCKET`, `CHANNEL`, `DIMM` | the place by numbers; `any` where the daemon could not tell |
+| `DMI_NAME` | the slot: the device locator of the SMBIOS table, which ties the counts to the DIMM in that slot and to its serial number |
+| `DMI_LOCATION` | the bank locator of the SMBIOS table, kept with the reading |
+| `total` | errors since the daemon started |
+| `in 24h` | the rate window of the daemon: the length is the one of its threshold setting (`ce-error-threshold`, `uc-error-threshold`), 24 hours unless changed |
+
+The counts are read like the EDAC counters. Each reading becomes counter events with the growth since the reading before it, and the ledger sets how many of these errors located records and the EDAC counters of the same slot already account for. A host with a kernel log, EDAC counters and the mcelog daemon reports one error three times and has it counted once.
+
+The counts live in the memory of the daemon. They start at zero when the daemon starts, which is at boot or when the service is restarted, and the answer does not say when that was. The first reading is therefore taken to cover the time since the boot it was made in. A later reading with a smaller count is taken as a new start.
+
+The number of the rate window counts the errors since the daemon last aged the window, which is less than the length of the window ago (`leaky-bucket.c`, `bucket_age`). At least that many errors are that recent, so a reading gives them a window of their own: `12 total` and `3 in 24h` are 3 errors in the last 24 hours and 9 before them. A trend can then be told from one reading.
+
+A block for `CHANNEL any DIMM any` is the total of a socket and holds every error of its DIMMs again. The reader keeps what is left after the blocks of that socket: the errors the daemon could not place. They count for the host and for no DIMM, as do the errors of a block that names a channel without a DIMM.
+
+A DIMM without a `DMI_NAME` line is kept under its numbers, as `socket0 channel1 dimm0`. The daemon prints the line when it could read the SMBIOS table at its start and understood the bank locators of the BIOS (`dmi-prepopulate`).
+
+### Grade
+
+C.
+
+### Known gaps
+
+- The page table of the answer (`Per page corrected memory statistics:`, one line per page with its count and `online`, `offline` or `offline-failed`) is counted in a note of the source inventory and not read into the ledger. Its lines have no time. The kernel log records each page offlining with its time.
+- The log file of the daemon (`/var/log/mcelog`, decoded machine checks one by one) is not read.
+- The reader was written from the source of mcelog (`memdb.c`, `page.c`, `leaky-bucket.c`, `client.c`) and checked on two published samples of the output. It has not read the answer of a running daemon.
+- A daemon that was restarted between two readings and has counted more since than before is taken for a daemon that kept running: the growth is then too small by the count at the restart.
+- A ledger made from this input alone, with no error in it, lists "no source of error records was read" among the missing data of a DIMM.
 
 ## SMBIOS
 

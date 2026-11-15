@@ -16,6 +16,7 @@ var Messages = i18n.Catalog{
 	"adds.klog":       {EN: "the kernel log (errors, page offlines and boots it recorded)", KO: "커널 로그(오류, page offline, 부팅 기록)"},
 	"adds.smbios":     {EN: "the SMBIOS tables (slot names and DIMM serial numbers)", KO: "SMBIOS 테이블(슬롯 이름과 DIMM 시리얼)"},
 	"adds.edac-sysfs": {EN: "the EDAC counters (error counts per DIMM)", KO: "EDAC 카운터(DIMM별 오류 수)"},
+	"adds.mcelog":     {EN: "the counts of the mcelog daemon (errors per DIMM since the daemon started)", KO: "mcelog 데몬의 카운트(데몬 시작 이후 DIMM별 오류 수)"},
 	"root.adds":       {EN: "This scan ran without root privileges. As root it also reads {what}.", KO: "root 권한 없이 스캔함. root로 실행하면 추가로 읽는 것: {what}."},
 
 	// Finding card.

@@ -41,6 +41,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/sel:FuzzCollect \
 	./internal/adapter/redfish:FuzzCollect \
 	./internal/adapter/nvidia:FuzzCollect \
+	./internal/adapter/mcelog:FuzzCollect \
 	./internal/adapter/fmfm:FuzzCollect \
 	./internal/adapter/dcbrain:FuzzTables \
 	./internal/injection:FuzzRead \

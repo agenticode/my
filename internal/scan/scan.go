@@ -16,6 +16,8 @@
 //	             first log file found under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
+//	mcelog       on a live host with the mcelog program, the counts its
+//	             daemon keeps per DIMM ("mcelog --client")
 //	GPU memory   on a live host, what "nvidia-smi -q -x" prints
 //	BMC log      in a copy of a host's files, a saved "ipmitool sel" listing
 //
@@ -38,6 +40,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/klog"
+	"github.com/agenticode/my/internal/adapter/mcelog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
 	"github.com/agenticode/my/internal/adapter/sel"
@@ -79,6 +82,9 @@ type Options struct {
 	// NvidiaSMI is the nvidia-smi program. Empty looks it up in PATH; "-"
 	// leaves GPU memory out.
 	NvidiaSMI string
+	// Mcelog is the mcelog program. Empty looks it up in PATH; "-" leaves
+	// the counts of the mcelog daemon out.
+	Mcelog string
 	// Location is the time zone of log files whose times carry none
 	// (syslog files). Nil means the zone of this process on a live host
 	// and UTC otherwise.
@@ -229,6 +235,7 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	out = append(out, kernelLog(ctx, &opts, info)...)
 
 	out = append(out, edacsysfs.NewRoot(opts.root(), edacsysfs.Options{Now: now}))
+	out = append(out, daemonCounts(&opts, now)...)
 
 	sm := adapter.Adapter(smbios.NewRoot(opts.root(), smbios.Options{Now: now}))
 	if !opts.Live && !exists(opts.path(smbios.TablesDir+"/DMI")) {
@@ -280,6 +287,30 @@ func bmcLog(opts *Options) []adapter.Adapter {
 		}
 	}
 	return nil
+}
+
+// daemonCounts picks the source of the error counts the mcelog daemon
+// keeps. A live host that has the mcelog program is asked through its
+// client, which only reads; a host without the program gets no entry,
+// because most hosts run rasdaemon or nothing. A copy of a host's files
+// has no place where the answer of the daemon is kept: a saved answer is
+// read by an import.
+func daemonCounts(opts *Options, now time.Time) []adapter.Adapter {
+	if !opts.Live {
+		return nil
+	}
+	prog := opts.Mcelog
+	switch prog {
+	case "-":
+		return nil
+	case "":
+		p, err := exec.LookPath("mcelog")
+		if err != nil {
+			return nil
+		}
+		prog = p
+	}
+	return []adapter.Adapter{mcelog.NewCommand(prog, 0, mcelog.Options{Now: now})}
 }
 
 // NvidiaSMIFiles lists where saved output of "nvidia-smi -q" is looked for
