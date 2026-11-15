@@ -281,7 +281,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 		return nil, "", fmt.Errorf("%w: binary data of no known kind", ErrUnknownInput)
 	}
 
-	kopts := klog.Options{CapturedAt: captured, Location: opts.Location}
+	kopts := klog.Options{CapturedAt: captured, Location: opts.Location, TempDir: opts.TempDir}
 	text := trimmed
 	var a adapter.Adapter
 	var what string
