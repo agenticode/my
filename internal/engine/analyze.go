@@ -31,8 +31,10 @@ type HostResult struct {
 	// ObservedFrom is the earliest time the ledger knows something about
 	// the host. It bounds how much history a trend can rest on.
 	ObservedFrom time.Time `json:"observed_from,omitzero"`
-	// Grade is the finding for the host: the grade of its worst DIMM or
-	// GPU. Hold replacement outranks the other grades. DIMMs that are no
+	// Grade is the finding for the host: the worst grade among its DIMMs,
+	// its GPUs and the host finding (Loose). Hold replacement outranks the
+	// other grades, except that a DIMM or GPU to replace now stands before
+	// a hold of the host finding (see withHostFinding). DIMMs that are no
 	// longer in the host do not count.
 	Grade model.VerdictGrade `json:"grade"`
 	// DIMMs holds every DIMM whose latest known place is this host, with
@@ -44,6 +46,13 @@ type HostResult struct {
 	// Unattributed counts errors of the host that could not be tied to a
 	// DIMM. They are in no fault.
 	Unattributed []Unattributed `json:"unattributed,omitzero"`
+	// Loose is the finding about those errors, and about the pages that
+	// were taken offline and are tied to no DIMM: the host finding. It is
+	// nil for a host without such records.
+	Loose *model.Verdict `json:"loose,omitzero"`
+	// LoosePages is the number of pages that were taken offline and are
+	// tied to no DIMM, each page counted once.
+	LoosePages int `json:"loose_pages,omitzero"`
 }
 
 // GPUResult holds the finding about the memory of one GPU.
@@ -380,6 +389,7 @@ func Analyze(in *Input, opts Options) (*Result, error) {
 	}
 	for name, h := range hosts {
 		h.GPUs = jd.gpus(name)
+		h.Loose = jd.loose(h, clocks[name])
 	}
 
 	for name, h := range hosts {
@@ -410,10 +420,29 @@ func Analyze(in *Input, opts Options) (*Result, error) {
 				h.Grade = g.Verdict.Grade
 			}
 		}
+		h.Grade = withHostFinding(h.Grade, h.Loose)
 		res.Hosts = append(res.Hosts, h)
 	}
 	sort.Slice(res.Hosts, func(i, j int) bool { return res.Hosts[i].Host < res.Hosts[j].Host })
 	return res, nil
+}
+
+// withHostFinding returns the grade of a host whose DIMMs and GPUs reach
+// the grade parts and whose host finding is loose (nil for none).
+//
+// The host finding counts like any other, with one exception. It holds
+// replacement because its records name no DIMM; it does not question a
+// DIMM or a GPU that is to be replaced on records of its own. "Replace
+// now" therefore stands before a hold of the host finding, where a hold
+// about a DIMM (a suspected channel, slot or mapping) outranks it.
+func withHostFinding(parts model.VerdictGrade, loose *model.Verdict) model.VerdictGrade {
+	switch {
+	case loose == nil, !worse(loose.Grade, parts):
+		return parts
+	case loose.Grade == model.VerdictHoldReplacement && parts == model.VerdictReplaceNow:
+		return parts
+	}
+	return loose.Grade
 }
 
 // newHostFacts collects what the findings of a host share.

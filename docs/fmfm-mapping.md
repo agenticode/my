@@ -149,5 +149,6 @@ A document written with `--records` is itself an FMFM log: `my import analysis.j
 
 - The names of the analysis log are not checked against the schema of the workgroup, which is not public. A consumer that has the schema needs a mapping of names.
 - An analysis record is per DIMM. The document's analyzer answers per new error log; a record here is the state of the DIMM at the time of the run.
+- The host finding (rules R-HOST-01 and R-HOST-02), which speaks about errors and page offlines that name no DIMM, is not in the analysis log: it has no DIMM to be a record of. With `--records` its errors are in the runtime records, without the fields of a place.
 - `Risk to SDC` and "Potential Row Hammering" are never written.
 - The sub-channel, the chip select ID of stacked DIMMs and the history of failed devices, which the document lists for the DRAM fault analyzer, are not written.

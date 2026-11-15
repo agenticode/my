@@ -155,9 +155,9 @@ $ my --fleet mysql
 3 hosts in this ledger. Name one with --host to see its figures.
 
  HOST    FINDING               DIMM  FLAGGED  CE  UE  WORST SLOT                      DATA UNTIL
- web-02  replace now              6        6   6   3  mc#0csrow#2channel#1            2026-11-13
- db-07   replace now              2        2   4   3  NODE 1 CPU1_DIMM_B1             2026-11-13
- web-01  consider replacement     2        2   6   1  CPU_SrcID#0_MC#0_Chan#1_DIMM#0  2026-11-13
+ db-07   replace now              2        2   7   3  NODE 1 CPU1_DIMM_B1             2026-11-13
+ web-02  replace now              6        6   7   3  mc#0csrow#2channel#1            2026-11-13
+ web-01  consider replacement     2        2   7   1  CPU_SrcID#0_MC#0_Chan#1_DIMM#0  2026-11-13
 ```
 
 A store is read as it is now, so the findings are as of the time of the command: a host whose last record is a month old has been quiet for a month.

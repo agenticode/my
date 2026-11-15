@@ -15,6 +15,6 @@ What the sources hold:
 - `var/lib/rasdaemon/ras-mc_event.db`: nothing from this boot. The kernel has no trace event for a soft offline. The four rows of `7.3.0-hwpoison` are still there: the database outlives a reboot, `dmesg` does not.
 - `extra/cec-array.txt`: the collector's own table, with 1,028 errors seen, one page offlined and the fourth page at a count of 5.
 - `extra/held.jsonl`: the two pages of the collector test before and after. The content of the retired page is intact at another page frame.
-- `my/`: no errors, 7 pages offline and one reboot on the timeline, exit code 0.
+- `my/`: no errors, 7 pages offline and one reboot on the timeline, exit code 0. That is what the tool printed when the capture was made. Since the host finding (R-HOST-02) the same records read "observe", exit code 1.
 
 The plan lists the fourth page with `count: 0`: a page that must not be reported offline.

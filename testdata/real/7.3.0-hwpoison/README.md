@@ -18,6 +18,6 @@ What the sources hold:
   - The times are 11 seconds ahead of the kernel's. chronyd set the clock back by 10.76 seconds after rasdaemon had started, and rasdaemon keeps the offset it measured at its start.
   - The page type reads `dirty unevictable LRU page` where the kernel says `dirty LRU page`. rasdaemon 0.8.0 names the type from a table of its own, indexed by a kernel enum that has since lost entries.
 - `extra/meminfo.txt`: `HardwareCorrupted: 16 kB`, four pages.
-- `my/`: no errors, 4 pages offline on the timeline, exit code 0.
+- `my/`: no errors, 4 pages offline on the timeline, exit code 0. That is what the tool printed when the capture was made. Since the host finding (R-HOST-02) the same records read "observe", exit code 1, with the check that a program asked for the 4 pages.
 
 `formats/` holds the kernel log of this boot in seven more forms: `dmesg -T`, `dmesg --time-format=iso`, `dmesg -r`, a read of `/dev/kmsg`, and `journalctl -k` as `short`, `short-iso-precise` and `short-monotonic`.

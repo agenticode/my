@@ -148,6 +148,9 @@ type Document struct {
 	DIMMs []*DIMM
 	// GPUs are the findings about GPU memory, the worst first.
 	GPUs []*GPU
+	// Host is the card of the host finding, which speaks about the errors
+	// and page offlines that are tied to no DIMM, or nil.
+	Host *view.Card
 	// Present is the number of DIMMs in the host.
 	Present int
 
@@ -352,6 +355,9 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 		doc.GPUs = append(doc.GPUs, gpu)
 	}
 	sort.SliceStable(doc.GPUs, func(i, j int) bool { return doc.GPUs[i].Grade.ExitCode() > doc.GPUs[j].Grade.ExitCode() })
+	if doc.Host, err = c.HostCard(ctx, h); err != nil {
+		return nil, err
+	}
 
 	if err := doc.gather(ctx, s, h); err != nil {
 		return nil, err
@@ -480,6 +486,13 @@ func (doc *Document) gather(ctx context.Context, s *store.Store, h *engine.HostR
 	for _, g := range doc.GPUs {
 		for i := range g.Evidence {
 			for _, r := range cited(&g.Evidence[i]) {
+				need(r.Kind, r.ID, true)
+			}
+		}
+	}
+	if doc.Host != nil {
+		for i := range doc.Host.Evidence {
+			for _, r := range cited(&doc.Host.Evidence[i]) {
 				need(r.Kind, r.ID, true)
 			}
 		}

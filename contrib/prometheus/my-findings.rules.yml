@@ -10,6 +10,10 @@
 # hour counts as 0 there, so a DIMM that shows up with a finding alerts too:
 # on a new host, after a replacement, and when the exporter is first set up.
 #
+# The series without a slot is the host finding: errors and page offlines
+# that the records tie to no DIMM, as on a host whose memory controller has
+# no EDAC driver. It alerts like the finding of a DIMM.
+#
 # The alert fires for ten minutes and then ends on its own, because by then
 # the hour it looks back on holds the new value. The finding itself stays:
 # route the alert without "resolved" messages (see ../alertmanager).
@@ -32,12 +36,15 @@ groups:
             {{ if eq $value 1.0 }}info{{ else if eq $value 3.0 }}critical{{ else }}warning{{ end }}
         annotations:
           summary: >-
-            {{ $labels.host }} {{ $labels.slot }}: the finding is now
+            {{ $labels.host }}{{ if $labels.slot }} {{ $labels.slot }}{{ else }}, records tied to no DIMM{{ end }}: the finding is now
             {{ if eq $value 1.0 }}observe{{ else if eq $value 2.0 }}consider replacement{{ else if eq $value 3.0 }}replace now{{ else }}hold replacement{{ end }}
           description: >-
-            DIMM in slot {{ $labels.slot }} of host {{ $labels.host }}{{ if $labels.serial }}, serial number {{ $labels.serial }}{{ end }}.
+            {{ if $labels.slot }}DIMM in slot {{ $labels.slot }} of host {{ $labels.host }}{{ if $labels.serial }}, serial number {{ $labels.serial }}{{ end }}.
             {{ if eq $value 4.0 }}A cause outside the DIMM is suspected: check the channel, the slot and the contact before the DIMM is pulled.
             {{ else if eq $value 3.0 }}An uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up.
             {{ else if eq $value 2.0 }}A fault is rising or spreading, pages keep being taken offline, the scrubber found an uncorrected error, or errors came back after a repair.
             {{ else }}Corrected errors without a growing fault.
-            {{ end }}"my why {{ $labels.slot }}" on the host, or /api/dimm/{{ $labels.slot }} of the exporter, shows what the finding rests on.
+            {{ end }}"my why {{ $labels.slot }}" on the host, or /api/dimm/{{ $labels.slot }} of the exporter, shows what the finding rests on.{{ else }}Errors or page offlines of host {{ $labels.host }} that the records tie to no DIMM.
+            {{ if eq $value 4.0 }}Uncorrected errors are among them: find the DIMM before one is pulled.
+            {{ else }}Corrected errors or pages taken offline.
+            {{ end }}"my why" on the host shows what the finding rests on.{{ end }}

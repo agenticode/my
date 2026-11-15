@@ -69,7 +69,7 @@ func TestWriteTo(t *testing.T) {
 	set.Add(LastScan, 1763026200.25)
 	set.Add(ScanFailures, 0)
 	got, _ := text(t, set)
-	want := `# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement.
+	want := `# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. An empty slot and serial carry the host finding, about errors and page offlines that are tied to no DIMM.
 # TYPE my_dimm_verdict gauge
 my_dimm_verdict{host="r12-n034",slot="CPU0_A1",serial="3B9C01"} 0
 my_dimm_verdict{host="r12-n034",slot="CPU0_C1",serial="3B9C56"} 3
@@ -400,7 +400,32 @@ func TestUnattributedErrorsAreCounted(t *testing.T) {
 		}
 	}
 	if c := count(x, "my_dimm_verdict"); c != 0 {
-		t.Errorf("%d verdict series for errors that belong to no DIMM", c)
+		t.Errorf("%d verdict series for a host without a host finding", c)
+	}
+
+	// The host finding speaks about such errors and about the pages that
+	// were taken offline and are tied to no DIMM. It is the series without
+	// a slot and a serial number, so that a rule on the findings of the
+	// DIMMs fires for it too.
+	h.Loose = &model.Verdict{Host: "h1", Grade: model.VerdictHoldReplacement, Rules: []string{engine.RuleHostUE}}
+	h.LoosePages = 5
+	set = &Set{}
+	if got, err = Host(ctx, s, h); err != nil {
+		t.Fatal(err)
+	}
+	set.Merge(got)
+	_, x = text(t, set)
+	for series, want := range map[string]float64{
+		`my_dimm_verdict{host="h1",slot="",serial=""}`:  4,
+		`my_dimm_offlined_pages{host="h1",slot=""}`:     5,
+		`my_dimm_ce_total{host="h1",slot="",serial=""}`: 3,
+	} {
+		if got, ok := x.Series[series]; !ok || got != want {
+			t.Errorf("%s = %v (present %v), want %v", series, got, ok, want)
+		}
+	}
+	if c := count(x, "my_dimm_verdict"); c != 1 {
+		t.Errorf("%d verdict series, want the one of the host finding", c)
 	}
 }
 

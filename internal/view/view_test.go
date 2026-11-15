@@ -1251,11 +1251,12 @@ func TestTimelineNamesOneDayAsOneDay(t *testing.T) {
 	}
 }
 
-// TestOverviewCountsWhatNoFindingCovers: errors and page offlines that are
-// tied to no DIMM are in no finding, and the grade of the host says
-// nothing about them. The overview counts them, the uncorrected errors
-// apart, and a page offline that two sources report once.
-func TestOverviewCountsWhatNoFindingCovers(t *testing.T) {
+// TestOverviewHasTheHostFinding: errors and page offlines that are tied to
+// no DIMM are in the finding of no DIMM. The host finding speaks about
+// them, and the overview carries it as a card of its own. It counts them,
+// the uncorrected errors apart, and a page offline that two sources report
+// once.
+func TestOverviewHasTheHostFinding(t *testing.T) {
 	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "loose.db"), store.Create)
 	if err != nil {
 		t.Fatal(err)
@@ -1338,18 +1339,70 @@ func TestOverviewCountsWhatNoFindingCovers(t *testing.T) {
 	if ov.Unattributed != 0 || ov.UnattributedUE != 0 || ov.LoosePages != 0 {
 		t.Errorf("demo: %d errors, %d uncorrected, %d page offlines tied to no DIMM", ov.Unattributed, ov.UnattributedUE, ov.LoosePages)
 	}
-	// A line that names the grade of such a host says what it leaves out.
-	if ce, ue := Loose(h); ce != 7 || ue != 3 || GradeWithLoose(i18n.EN, "ok", ce, ue) != "ok; CE 7, UE 3 tied to no DIMM are in no finding" ||
-		GradeWithLoose(i18n.KO, "정상", ce, ue) != "정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음" {
-		t.Errorf("CE %d, UE %d: %q", ce, ue, GradeWithLoose(i18n.EN, "ok", ce, ue))
+	if ov.HostFinding != nil {
+		t.Errorf("demo: a host finding without loose records: %+v", ov.HostFinding)
 	}
-	if ce, ue := Loose(hd); ce+ue != 0 || GradeWithLoose(i18n.EN, "replace now", ce, ue) != "replace now" {
+	if ce, ue := Loose(h); ce != 7 || ue != 3 {
+		t.Errorf("CE %d, UE %d tied to no DIMM", ce, ue)
+	}
+	if ce, ue := Loose(hd); ce+ue != 0 {
 		t.Errorf("demo: CE %d, UE %d tied to no DIMM", ce, ue)
 	}
-	// Every message about them has both languages.
-	for _, code := range []string{"ov.grade_loose", "ov.loose", "ov.loose_pages"} {
+
+	// The host finding of the first host: the uncorrected errors hold
+	// replacement, and the grade of the host is that grade.
+	ov, err = c.Overview(ctx, h, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	card := ov.HostFinding
+	if card == nil {
+		t.Fatal("no host finding in the overview")
+	}
+	if card.Scope != ScopeHost || card.Slot != "" || card.Host != "h" || card.CE != 7 || card.UE != 3 || card.Pages != 3 ||
+		card.Grade != model.VerdictHoldReplacement || card.GradeText != "hold replacement" || ov.Host.Grade != model.VerdictHoldReplacement ||
+		strings.Join(card.Rules, " ") != "R-HOST-01 R-HOST-02" || card.Next == nil || len(card.Evidence) != 3 {
+		t.Errorf("host finding = %+v", card)
+	}
+	for i, want := range []string{
+		"3 uncorrected errors tied to no DIMM, the latest on 2026-10-01 08:09 UTC at address 0x109000",
+		"7 corrected errors tied to no DIMM on 2026-10-01",
+		"3 pages taken offline and tied to no DIMM, the last on 2026-10-01",
+	} {
+		if i < len(card.Evidence) && card.Evidence[i].Text.Text != want {
+			t.Errorf("evidence %d = %q, want %q", i, card.Evidence[i].Text.Text, want)
+		}
+	}
+	// Every statement points at its records.
+	for _, e := range card.Evidence {
+		if e.Records == 0 || len(e.Cited) == 0 || e.First == "" {
+			t.Errorf("evidence without records: %+v", e)
+		}
+	}
+	b, err = json.Marshal(ov)
+	if err != nil || !strings.Contains(string(b), `"host_finding":{"scope":"host","host":"h","slot":""`) {
+		t.Errorf("JSON: %v\n%s", err, b)
+	}
+	// In Korean.
+	ck, err := Open(ctx, s, i18n.KO, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	hk, _ := ck.Host("")
+	kc, err := ck.HostCard(ctx, hk)
+	if err != nil || kc == nil || kc.GradeText != "교체 보류" || kc.Evidence[0].Text.Text != "DIMM 미확인 UE 3건, 최근 2026-10-01 08:09 UTC, address 0x109000" {
+		t.Errorf("Korean host finding: %+v, %v", kc, err)
+	}
+	// Every message about it has both languages.
+	for _, code := range []string{"ov.host_finding", "ov.host_pages", "card.host"} {
 		if m := Messages[code]; m.EN == "" || m.KO == "" {
 			t.Errorf("%s: %+v", code, m)
+		}
+	}
+	// A ledger with several hosts lists such a host with its errors.
+	for _, row := range c.Hosts() {
+		if row.Name == "h" && (row.CE != 7 || row.UE != 3 || row.Grade != model.VerdictHoldReplacement) {
+			t.Errorf("hosts row = %+v", row)
 		}
 	}
 }

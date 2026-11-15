@@ -67,6 +67,16 @@ func Host(ctx context.Context, s *store.Store, h *engine.HostResult) (*Set, erro
 		set.Add(DIMMCorrected, float64(u.CE), host, u.Slot, "")
 		set.Add(DIMMUncorrected, float64(u.UE), host, u.Slot, "")
 	}
+	// The host finding speaks about them and about the pages that were
+	// taken offline and are tied to no DIMM. It is the series without a
+	// slot and without a serial number, so that a rule on the findings of
+	// the DIMMs also fires for a host whose errors name none.
+	if h.Loose != nil {
+		set.Add(DIMMVerdict, float64(h.Loose.Grade.ExitCode()), host, "", "")
+	}
+	if h.LoosePages > 0 {
+		set.Add(DIMMOfflinedPages, float64(h.LoosePages), host, "")
+	}
 
 	actions, err := s.Actions(ctx, store.ActionFilter{Host: host, Kinds: repairKinds})
 	if err != nil {

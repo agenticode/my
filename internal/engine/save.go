@@ -53,6 +53,9 @@ func (r *Result) verdicts(fn func(*model.Verdict)) {
 		for _, g := range h.GPUs {
 			fn(g.Verdict)
 		}
+		if h.Loose != nil {
+			fn(h.Loose)
+		}
 	}
 }
 
@@ -143,6 +146,16 @@ func (r *Result) Save(ctx context.Context, s *store.Store) error {
 					return fmt.Errorf("engine: save %s: %w", h.Host, err)
 				}
 				g.Verdict.ID = v.ID
+				computed = v.ComputedAt
+			}
+			if h.Loose != nil {
+				// The host finding: a finding without a DIMM and without a GPU.
+				v := *h.Loose
+				v.ID = 0
+				if err := w.InsertVerdict(&v); err != nil {
+					return fmt.Errorf("engine: save %s: %w", h.Host, err)
+				}
+				h.Loose.ID = v.ID
 				computed = v.ComputedAt
 			}
 			rec := runRecord{EngineVersion: r.EngineVersion, ComputedAt: computed, AsOf: h.AsOf, Grade: string(h.Grade)}

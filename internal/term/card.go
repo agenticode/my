@@ -9,8 +9,16 @@ import (
 	"github.com/agenticode/my/internal/view"
 )
 
-// dimmHead draws the line that says which DIMM a screen is about.
+// dimmHead draws the line that says which DIMM a screen is about, or, for
+// the host finding, that it is about what names no DIMM.
 func (st Style) dimmHead(p *page, c *view.Card) {
+	if c.Scope == view.ScopeHost {
+		fields := []string{st.bold(st.say("card.host", "host", c.Host)), st.say("ov.host_finding"), st.looseCounts(c)}
+		for _, line := range flow(fields, "  ", st.width()) {
+			p.add(line)
+		}
+		return
+	}
 	fields := []string{st.bold(c.Slot)}
 	add := func(s string) { fields = append(fields, s) }
 	add(c.DIMM.Kind)
@@ -148,7 +156,12 @@ func Why(w io.Writer, cards []*view.Card, st Style) error {
 // statement of the evidence and the next step.
 func Oneline(c *view.Card, st Style) string {
 	var b strings.Builder
-	b.WriteString(c.Host + " " + c.Slot)
+	b.WriteString(c.Host)
+	if c.Scope != view.ScopeHost {
+		// The host finding names no DIMM: its first statement says what
+		// it is about.
+		b.WriteString(" " + c.Slot)
+	}
 	if c.DIMM.Serial != "" {
 		b.WriteString(" S/N " + c.DIMM.Serial)
 	}

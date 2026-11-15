@@ -8,7 +8,6 @@ import (
 	"unicode"
 
 	"github.com/agenticode/my/internal/engine"
-	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
 )
@@ -26,9 +25,13 @@ type Overview struct {
 	Quiet int `json:"quiet"`
 	// GPUs lists the findings about GPU memory.
 	GPUs []GPURow `json:"gpus,omitzero"`
+	// HostFinding is the finding about what the records of the host tie to
+	// no DIMM: errors, and pages that were taken offline. It is nil for a
+	// host without such records.
+	HostFinding *Card `json:"host_finding,omitzero"`
 	// Unattributed counts the errors of the host that are tied to no DIMM,
-	// and UnattributedUE those of them that were not corrected. No finding
-	// covers them: the grade of the host speaks of its DIMMs and GPUs.
+	// and UnattributedUE those of them that were not corrected. The host
+	// finding speaks about them.
 	Unattributed   int64 `json:"unattributed,omitzero"`
 	UnattributedUE int64 `json:"unattributed_ue,omitzero"`
 	// LoosePages counts the pages taken offline that are tied to no DIMM,
@@ -41,17 +44,6 @@ type Overview struct {
 	// Root says what a scan as root would add, when the scan ran without
 	// root privileges and that kept a source from being read.
 	Root *Text `json:"root,omitzero"`
-}
-
-// GradeWithLoose names the grade of a host in a line of text. The grade is
-// that of the worst DIMM or GPU. Where errors of the host are tied to no
-// DIMM (ce corrected, ue uncorrected), the text says that no finding
-// covers them: the grade alone would be read as "no errors".
-func GradeWithLoose(lang i18n.Lang, grade string, ce, ue int64) string {
-	if ce+ue == 0 {
-		return grade
-	}
-	return Messages.Text(lang, "ov.grade_loose", map[string]any{"grade": grade, "ce": ce, "ue": ue})
 }
 
 // Loose counts the corrected and the uncorrected errors of a host that
@@ -324,18 +316,12 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 	}
 	looseCE, looseUE := Loose(h)
 	ov.Unattributed, ov.UnattributedUE = looseCE+looseUE, looseUE
-	if !h.AsOf.IsZero() {
-		// The same days and the same events as on the timeline of the host.
-		offlines, err := c.store.Actions(ctx, store.ActionFilter{Host: h.Host, To: lastDay(h.AsOf).AddDate(0, 0, 1),
-			Kinds: []model.ActionKind{model.ActionPageOffline}})
-		if err != nil {
-			return nil, err
-		}
-		for _, a := range actionEvents(offlines) {
-			if a.DIMMUID == "" {
-				ov.LoosePages += max(a.Count, 1)
-			}
-		}
+	// The same days and the same events as on the timeline of the host.
+	if ov.LoosePages, err = c.loosePages(ctx, h); err != nil {
+		return nil, err
+	}
+	if ov.HostFinding, err = c.HostCard(ctx, h); err != nil {
+		return nil, err
 	}
 
 	var unreadable []string
@@ -707,6 +693,11 @@ func (c *Case) Hosts() []HostRow {
 				}
 			}
 		}
+		// The errors of the host, those that are tied to no DIMM among
+		// them: a host whose grade comes from its host finding must not
+		// read "CE 0, UE 0".
+		ce, ue := Loose(h)
+		row.CE, row.UE = row.CE+ce, row.UE+ue
 		out = append(out, row)
 	}
 	sort.SliceStable(out, func(i, j int) bool {

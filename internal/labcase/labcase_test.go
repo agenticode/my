@@ -44,6 +44,11 @@ type capture struct {
 	sources []string
 	// finding is the grade of the host.
 	finding model.VerdictGrade
+	// said is the grade "my" printed on the host when the capture was
+	// made, where it is not the finding of today: the captures of errors
+	// and page offlines that name no DIMM were made before the engine had
+	// a finding for them, and what was printed then stays as it was.
+	said model.VerdictGrade
 	// notes are remarks the sources must make, as "kind: text".
 	notes []string
 	// journal says that the capture holds journalctl -k -o json.
@@ -61,6 +66,13 @@ type capture struct {
 	reports []string
 	// noDIMM counts the errors that are tied to no DIMM.
 	noDIMM int64
+	// loose are the rules of the host finding, which speaks about the
+	// errors and the pages taken offline that are tied to no DIMM. A
+	// capture whose records all name a DIMM has no host finding. asked
+	// says that the finding notes that a program asked for pages to be
+	// taken offline.
+	loose []string
+	asked bool
 	// dimm is the DIMM the errors belong to, when the host names one.
 	dimm *dimm
 	// forms says what the kernel log of the boot gives when it is read
@@ -99,8 +111,10 @@ var captures = []capture{
 		reports: []string{"klog/offline", "rasdaemon/memory_failure_event"},
 		forms:   &forms{actions: 4, kernel: "7.3.0-ras", note: "klog: 4 page offlines were asked for by a program"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
-		notes:   []string{"klog: 4 page offlines were asked for by a program"},
+		// The pages name no DIMM: the host finding watches them, and its
+		// check says that a program asked for them.
+		finding: model.VerdictObserve, said: model.VerdictOK, loose: []string{"R-HOST-02"}, asked: true,
+		notes: []string{"klog: 4 page offlines were asked for by a program"},
 	},
 	{
 		// The second boot of the host: the database still holds the four
@@ -109,19 +123,22 @@ var captures = []capture{
 		// The kernel traces no soft offline: rasdaemon has nothing of this boot.
 		reports: []string{"klog/offline"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
+		// The kernel log of this boot does not say that a program asked
+		// for a soft offline, and the four pages of the boot before are
+		// known from the database alone: nothing marks them as asked for.
+		finding: model.VerdictObserve, said: model.VerdictOK, loose: []string{"R-HOST-02"},
 	},
 	{
 		// No EDAC driver and one virtual DIMM: the errors have addresses
-		// and no DIMM. A host whose errors cannot be tied to a DIMM gets
-		// no finding from the engine today.
+		// and no DIMM. They are in the finding of no DIMM; the host finding
+		// holds replacement for the uncorrected ones.
 		dir: "7.3.0-mce", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		// The kernel log has no machine check record: a logged record is
 		// not printed by default.
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
-		notes:   []string{"klog: the machine check injector (mce-inject) was set up in a boot of this log"},
+		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
+		notes: []string{"klog: the machine check injector (mce-inject) was set up in a boot of this log"},
 	},
 	{
 		// With mce=print_all the kernel log holds every record too: each
@@ -129,7 +146,7 @@ var captures = []capture{
 		dir: "7.3.0-mce-print-all", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
+		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
 	},
 	{
 		// The clock was set back by 10 seconds after rasdaemon started: its
@@ -137,8 +154,8 @@ var captures = []capture{
 		dir: "7.3.0-mce-clock-step", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
-		notes:   []string{"rasdaemon: 13 records are dated by the kernel's time"},
+		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
+		notes: []string{"rasdaemon: 13 records are dated by the kernel's time"},
 	},
 	{
 		// rasdaemon 1.0.0 built from source: 39 tables, more columns in
@@ -146,8 +163,8 @@ var captures = []capture{
 		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
-		finding: model.VerdictOK,
-		notes:   []string{"rasdaemon: table signal_event: 3 rows not read"},
+		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
+		notes: []string{"rasdaemon: table signal_event: 3 rows not read"},
 	},
 	{
 		// An emulated CXL memory device, recorded by rasdaemon 1.0.0. The
@@ -420,6 +437,28 @@ func TestCopyOfTheHost(t *testing.T) {
 			if loose != c.noDIMM {
 				t.Errorf("%d errors without a DIMM, want %d", loose, c.noDIMM)
 			}
+			// What names no DIMM has the host finding, and nothing else has one.
+			v := out.Hosts[0].Loose
+			switch {
+			case len(c.loose) == 0:
+				if v != nil {
+					t.Errorf("host finding %v of a capture whose records all name a DIMM", v.Rules)
+				}
+			case v == nil:
+				t.Errorf("no host finding, want %v", c.loose)
+			default:
+				asked := false
+				for _, k := range v.CounterEvidence {
+					asked = asked || k.Code == "check.host_asked"
+				}
+				if strings.Join(v.Rules, " ") != strings.Join(c.loose, " ") || asked != c.asked || v.NextAction.Code == "" {
+					t.Errorf("host finding: rules %v, asked for by a program %v; want %v, %v", v.Rules, asked, c.loose, c.asked)
+				}
+				// The machine checks carry addresses: the statement names one.
+				if c.ue > 0 && (len(v.Evidence) == 0 || v.Evidence[0].Code != "host.ue_located") {
+					t.Errorf("first statement of the host finding: %+v", v.Evidence)
+				}
+			}
 			if c.dimm != nil {
 				d := out.Hosts[0].InSlot(c.dimm.slot)
 				if d == nil || d.Verdict == nil {
@@ -681,9 +720,15 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 				t.Errorf("scan: host %q, kind %q, privileged %v", live.Host, live.Data.Host.Scan.Kind, live.Data.Host.Scan.Privileged)
 			}
 			ce, ue := c.ce+c.before.ce, c.ue+c.before.ue
-			if live.Data.Host.CE != ce || live.Data.Host.UE != ue || live.Data.Host.Grade != string(c.finding) || live.ExitCode != c.finding.ExitCode() {
+			// What was printed then, which for errors that name no DIMM
+			// is not the finding of today.
+			said := c.finding
+			if c.said != "" {
+				said = c.said
+			}
+			if live.Data.Host.CE != ce || live.Data.Host.UE != ue || live.Data.Host.Grade != string(said) || live.ExitCode != said.ExitCode() {
 				t.Errorf("live: CE %d, UE %d, finding %s, exit code %d; want %d, %d, %s", live.Data.Host.CE, live.Data.Host.UE,
-					live.Data.Host.Grade, live.ExitCode, ce, ue, c.finding)
+					live.Data.Host.Grade, live.ExitCode, ce, ue, said)
 			}
 			var got []string
 			for _, s := range live.Data.Sources {
@@ -695,7 +740,7 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 			if strings.Join(got, ", ") != strings.Join(c.sources, ", ") {
 				t.Errorf("live sources: %s\n        want: %s", strings.Join(got, ", "), strings.Join(c.sources, ", "))
 			}
-			if exit, _ := os.ReadFile(dir(t, c, "my", "scan.exit")); strings.TrimSpace(string(exit)) != "exit="+strconv.Itoa(c.finding.ExitCode()) {
+			if exit, _ := os.ReadFile(dir(t, c, "my", "scan.exit")); strings.TrimSpace(string(exit)) != "exit="+strconv.Itoa(said.ExitCode()) {
 				t.Errorf("exit code on the host: %q", exit)
 			}
 		})
