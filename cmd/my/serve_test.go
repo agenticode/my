@@ -239,6 +239,15 @@ func TestServeMetrics(t *testing.T) {
 	}
 	log := s.log.String()
 	wantLines(t, log, "listening on http://127.0.0.1:", "host r12-n034, finding replace now, 16 DIMMs, 2 with errors or a finding", "stopped")
+	// docs/exporter.md quotes the log of the demo host: the line about the
+	// scan is this one, but for the time the scan took.
+	doc, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), "docs", "exporter.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !regexp.MustCompile(` scan took [0-9]+ms: host r12-n034, finding replace now, 16 DIMMs, 2 with errors or a finding\n`).Match(doc) {
+		t.Error("docs/exporter.md does not quote the scan line of the demo host")
+	}
 	if strings.Count(log, "\n") != 3 {
 		t.Errorf("log:\n%s", log)
 	}
