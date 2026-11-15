@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/bits"
 	"os"
 	"path/filepath"
 	"sort"
@@ -282,9 +283,11 @@ var mergeBuckets = []uint32{1, 60, 3600, 86400}
 // serverRecs holds the records of one server after merging, in time order.
 type serverRecs struct {
 	index int
-	// rows is the number of rows of the error table the records stand for.
-	rows int64
-	recs []dcbrain.Rec
+	// rows is the number of rows of the error table the records stand for,
+	// and dimms the number of DIMMs they name.
+	rows  int64
+	dimms int
+	recs  []dcbrain.Rec
 	// bucket is the width in seconds of the time buckets the rows were
 	// merged in.
 	bucket uint32
@@ -396,7 +399,7 @@ func (s *spool) readBucket(i, limit int) ([]serverRecs, error) {
 		}
 		l := by[server]
 		if l == nil {
-			l = &loading{serverRecs: serverRecs{index: int(server)}}
+			l = &loading{serverRecs: serverRecs{index: int(server), dimms: bits.OnesCount32(s.info.ServerDIMMs[server])}}
 			if n := s.info.ServerRows[server]; n > int64(limit) {
 				l.agg = &aggregator{limit: limit, m: map[aggKey]dcbrain.Rec{}}
 			} else {

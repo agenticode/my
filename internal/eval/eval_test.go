@@ -632,7 +632,7 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Fatal(err)
 	}
 	rep := run(t, ds, Options{MaxRecords: 50, Cutoffs: []int{90, 150}})
-	if len(rep.Widened) != 1 || rep.Widened[0] != (ServerNote{SID: "minute", Rows: 300, Records: 5, BucketSeconds: 60}) {
+	if len(rep.Widened) != 1 || rep.Widened[0] != (ServerNote{SID: "minute", Rows: 300, DIMMs: 1, Records: 5, BucketSeconds: 60}) {
 		t.Errorf("widened = %+v", rep.Widened)
 	}
 	if len(rep.Dropped) != 1 || rep.Dropped[0].SID != "wide" || rep.Dropped[0].Rows != 400 || rep.Dropped[0].Records != 0 ||
@@ -652,8 +652,8 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, want := range []string{
-		"server minute: 300 rows merged in buckets of 60 seconds into 5 records",
-		"server wide: left out, 400 rows are too many records even when merged by the day; failure_type 2 at 0001-04-09 08:20:00",
+		"server minute: 300 rows on 1 DIMM merged in buckets of 60 seconds into 5 records",
+		"server wide: left out, 400 rows on 1 DIMM are too many records even when merged by the day; failure_type 2 at 0001-04-09 08:20:00",
 	} {
 		if !strings.Contains(buf.String(), want) {
 			t.Errorf("the text report lacks %q", want)

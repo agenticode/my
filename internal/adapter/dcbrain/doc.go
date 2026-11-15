@@ -29,8 +29,9 @@
 // DIMM serial numbers, no uncorrected error records and no repair
 // records. What follows from that for the analysis engine:
 //
-//   - a fault that spans several banks is reported as a device fault with
-//     the mode marked as estimated; it cannot be told from a DIMM fault;
+//   - a fault that spans several banks of one rank is reported as a device
+//     fault with the mode marked as estimated: it may lie in more than one
+//     device. A fault across both ranks is a DIMM fault;
 //   - a DIMM is identified by server and slot, so a replaced DIMM cannot be
 //     told from its predecessor;
 //   - the rules that need uncorrected errors, firmware marks, repairs, page

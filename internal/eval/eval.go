@@ -350,6 +350,8 @@ type Census struct {
 type ServerNote struct {
 	SID  string `json:"sid"`
 	Rows int64  `json:"rows"`
+	// DIMMs is the number of DIMMs of the server that have rows.
+	DIMMs int `json:"dimms"`
 	// Records is the number of records after merging; 0 for a server that
 	// was left out.
 	Records int `json:"records"`

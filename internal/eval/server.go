@@ -264,7 +264,7 @@ func viewOf(h *engine.HostResult) view {
 // server replays one server: the findings at every cut-off, the findings
 // before its failure, and the census over all its records.
 func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
-	res := &serverResult{note: ServerNote{SID: sid, Rows: sr.rows, Records: len(sr.recs), BucketSeconds: int(sr.bucket)}}
+	res := &serverResult{note: ServerNote{SID: sid, Rows: sr.rows, DIMMs: sr.dimms, Records: len(sr.recs), BucketSeconds: int(sr.bucket)}}
 	if t, ok := r.tickets[sid]; ok {
 		res.ticket = &t
 		res.note.Ticket = fmt.Sprintf("failure_type %d at %s", int(t.Type), t.At)

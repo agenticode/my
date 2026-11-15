@@ -170,6 +170,14 @@ func share(part, total int64) string {
 	return fmt.Sprintf("%s (%s of %s, 95%% interval %.2f%% to %.2f%%)", pct(part, total), num(part), num(total), 100*lo, 100*hi)
 }
 
+// dimmsText writes a number of DIMMs.
+func dimmsText(n int) string {
+	if n == 1 {
+		return "1 DIMM"
+	}
+	return fmt.Sprintf("%d DIMMs", n)
+}
+
 // share0 writes "part (p%)".
 func share0(part, total int64) string {
 	return fmt.Sprintf("%s (%s)", num(part), pct(part, total))
@@ -452,14 +460,14 @@ func (r *Report) printDataset(p *printer) {
 			[]string{"DIMMs of the server", "position 0", "position 1"}, rows)
 	}
 	for _, n := range r.Widened {
-		p.line("server %s: %s rows merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), n.BucketSeconds, num(int64(n.Records)))
+		p.line("server %s: %s rows on %s merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), dimmsText(n.DIMMs), n.BucketSeconds, num(int64(n.Records)))
 	}
 	for _, n := range r.Dropped {
 		t := ""
 		if n.Ticket != "" {
 			t = "; " + n.Ticket
 		}
-		p.line("server %s: left out, %s rows are too many records even when merged by the day%s", n.SID, num(n.Rows), t)
+		p.line("server %s: left out, %s rows on %s are too many records even when merged by the day%s", n.SID, num(n.Rows), dimmsText(n.DIMMs), t)
 	}
 }
 

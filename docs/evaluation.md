@@ -53,7 +53,7 @@ Every row is a corrected error of observation grade A: rank, bank, row and colum
 
 The dataset does not have the DRAM device, the failing bits, a physical address, DIMM serial numbers, uncorrected error records, repairs, page offlines or reboots. For the engine that means:
 
-- A fault that spans several banks is reported as a device fault with the mode marked as estimated. It cannot be told from a DIMM fault.
+- A fault that spans several banks of one rank is reported as a device fault with the mode marked as estimated: it may lie in more than one device. A fault across both ranks is a DIMM fault.
 - A DIMM is identified by server and slot. A replaced DIMM cannot be told from the one before it.
 - Of the 13 rules, three can fire: R-ROW-03 (consider replacement), R-SOFT-01 (observe) and R-SYS-01 (hold replacement). No DIMM can reach "replace now", so that grade cannot be measured on this dataset.
 
@@ -147,6 +147,6 @@ A server counts once per cut-off at which it is in the population, so the 390 se
 - A ticket names a server. When a server has errors on several DIMMs, the comparison cannot say which of them failed.
 - What the operator did between an error and a ticket is not in the data. A DIMM that was replaced in time leaves no ticket, and a server with a finding and no ticket may be one of those.
 - The engine reads records and states what they show at one moment. It does not forecast. The comparison asks whether servers with a worse finding failed more often afterwards, and how long before a failure a finding was there.
-- Without the DRAM device and the failing bits, the modes "device" and "DIMM" cannot be told apart and the check for several failing data lines never applies.
+- Without the DRAM device and the failing bits, a fault within one rank cannot be told to be in one device or in several, and the check for several failing data lines never applies.
 - The layout of `memoryid` on the board is an assumption taken from the scripts of the authors. R-SYS-01, which looks at the DIMMs of one channel, depends on it.
 - The rules about uncorrected errors, firmware marks, repairs, page offlines, moved DIMMs and reseats cannot be evaluated on this dataset at all.
