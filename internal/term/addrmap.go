@@ -3,7 +3,6 @@ package term
 import (
 	"fmt"
 	"io"
-	"regexp"
 	"strings"
 
 	"github.com/agenticode/my/internal/i18n"
@@ -21,9 +20,6 @@ func (st Style) MapCells() int {
 	}
 	return cells
 }
-
-// ansiRE matches the colour codes paint adds.
-var ansiRE = regexp.MustCompile("\x1b\\[[0-9;]*m")
 
 // mapLabelWidth is the width of the row labels of an address map: a row
 // address of up to five hexadecimal digits.
@@ -43,15 +39,12 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 		return
 	}
 
-	title := []string{st.bold(m.Bank.Label), st.say("map.axes")}
-	plain := []string{m.Bank.Label, st.say("map.axes")}
 	cellNote := st.say("map.cell", "n", m.ColumnsPerCell)
 	if m.Mode == view.MapBins {
 		cellNote = st.say("map.cell_bins", "n", m.ColumnsPerCell, "rows", m.RowsPerLine)
 	}
-	title, plain = append(title, cellNote), append(plain, cellNote)
-	for _, idx := range flowIndex(plain, "  ", st.width()-1) {
-		p.add(" " + strings.Join(title[idx[0]:idx[1]], "  "))
+	for _, line := range flow([]string{st.bold(m.Bank.Label), st.say("map.axes"), cellNote}, "  ", st.width()-1) {
+		p.add(" " + line)
 	}
 
 	// The scale: what each shade stands for.
@@ -68,12 +61,8 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 		legend = append(legend, st.paint(heatColor(i+1), g.shade[min(i+1, 4)])+" "+text)
 	}
 	legend = append(legend, st.paint(cBoldRed, g.ue)+" "+st.say("map.ue"))
-	plainLegend := make([]string, len(legend))
-	for i, l := range legend {
-		plainLegend[i] = ansiRE.ReplaceAllString(l, "")
-	}
-	for _, idx := range flowIndex(plainLegend, "   ", st.width()-1) {
-		p.add(" " + strings.Join(legend[idx[0]:idx[1]], "   "))
+	for _, line := range flow(legend, "   ", st.width()-1) {
+		p.add(" " + line)
 	}
 	p.blank()
 
@@ -178,15 +167,12 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 func AddressMap(w io.Writer, m *view.AddressMap, st Style) error {
 	p := &page{st: st}
 	head := []string{st.bold(m.Slot)}
-	plain := []string{m.Slot}
 	if m.DIMM.Serial != "" {
-		head, plain = append(head, "S/N "+m.DIMM.Serial), append(plain, "S/N "+m.DIMM.Serial)
+		head = append(head, "S/N "+m.DIMM.Serial)
 	}
-	if m.DIMM.Kind != "" {
-		head, plain = append(head, m.DIMM.Kind), append(plain, m.DIMM.Kind)
-	}
-	for _, idx := range flowIndex(plain, "  ", st.width()) {
-		p.add(strings.Join(head[idx[0]:idx[1]], "  "))
+	head = append(head, m.DIMM.Kind)
+	for _, line := range flow(head, "  ", st.width()) {
+		p.add(line)
 	}
 	p.blank()
 	st.addressMap(p, m)

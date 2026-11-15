@@ -334,12 +334,29 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	if err != nil {
 		return nil, err
 	}
+	// One page offline that two sources report (the kernel log and the
+	// rasdaemon database) is one event: the same page, the same outcome,
+	// within two minutes. The same page taken offline again later, after a
+	// reboot for example, is another event.
+	type pageKey struct {
+		page   uint64
+		failed bool
+	}
+	lastOffline := map[pageKey]time.Time{}
 	for _, a := range actions {
 		if a.TimeQuality == model.TimeRelative {
 			continue
 		}
+		if a.Kind == model.ActionPageOffline && a.OsPhysicalAddress.Valid {
+			k := pageKey{a.OsPhysicalAddress.V >> 12, a.Result == model.ResultFailed}
+			last, seen := lastOffline[k]
+			lastOffline[k] = a.At
+			if seen && a.At.Sub(last).Abs() <= 2*time.Minute {
+				continue
+			}
+		}
 		n := max(a.Count, 1)
-		kind := engine.Messages.Text(c.Lang, "kind."+string(a.Kind), nil)
+		kind := c.kindText(string(a.Kind))
 		var t Text
 		switch {
 		case a.Kind == model.ActionPageOffline && a.Result == model.ResultFailed:
@@ -423,7 +440,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 			case string(model.ActionPageOffline):
 				g.Text = c.say("tl.offline.many", "n", g.Count, "days", len(g.Days), "first", a, "last", b)
 			default:
-				g.Text = c.say("tl.action.many", "n", g.Count, "kind", engine.Messages.Text(c.Lang, "kind."+kind, nil), "first", a, "last", b)
+				g.Text = c.say("tl.action.many", "n", g.Count, "kind", c.kindText(kind), "first", a, "last", b)
 			}
 		}
 		tl.Markers = append(tl.Markers, *g)
@@ -448,6 +465,15 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	}
 	undated()
 	return tl, nil
+}
+
+// kindText names an action kind on the timeline. What firmware did to a
+// module is said in full; the repair kinds keep the names of the findings.
+func (c *Case) kindText(kind string) string {
+	if code := "tl.kind." + kind; Messages.Has(code) {
+		return Messages.Text(c.Lang, code, nil)
+	}
+	return engine.Messages.Text(c.Lang, "kind."+kind, nil)
 }
 
 // looseSeries builds the row of the errors that are tied to no DIMM.

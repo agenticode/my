@@ -214,10 +214,7 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 func Timeline(w io.Writer, tl *view.Timeline, st Style) error {
 	p := &page{st: st}
 	head := []string{st.say("ov.host", "name", st.bold(tl.Host))}
-	plain := []string{st.say("ov.host", "name", tl.Host)}
-	add := func(s string) {
-		head, plain = append(head, s), append(plain, s)
-	}
+	add := func(s string) { head = append(head, s) }
 	if tl.Slot != "" {
 		add(tl.Slot)
 		if tl.DIMM != nil && tl.DIMM.Serial != "" {
@@ -228,8 +225,8 @@ func Timeline(w io.Writer, tl *view.Timeline, st Style) error {
 		add(st.span(tl.From.Format("2006-01-02"), tl.To.Format("2006-01-02")))
 		add(st.say("tl.days", "n", i18n.Thousands(int64(tl.Days))))
 	}
-	for _, idx := range flowIndex(plain, "  ", st.width()) {
-		p.add(strings.Join(head[idx[0]:idx[1]], "  "))
+	for _, line := range flow(head, "  ", st.width()) {
+		p.add(line)
 	}
 	p.blank()
 	st.timeline(p, tl)
