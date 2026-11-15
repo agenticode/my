@@ -318,7 +318,8 @@ func TestJournalOfALiveHost(t *testing.T) {
 	if res.Scan.Kind != model.ScanLive {
 		t.Errorf("scan kind = %q", res.Scan.Kind)
 	}
-	// One kernel log source: the journal covers the running boot too.
+	// One kernel log source: this host has no ring buffer to read beside
+	// the journal.
 	n := 0
 	for _, s := range res.Sources {
 		if s.Kind == "klog" {
@@ -433,6 +434,25 @@ func TestKmsgRecords(t *testing.T) {
 	if err != nil || lost != 0 || strings.Count(string(text), "\n") != 2 || strings.Contains(string(text), "SUBSYSTEM") {
 		t.Errorf("readKmsg = %q, %d, %v", text, lost, err)
 	}
+	// A file larger than one read: no line may be cut where a read ends.
+	var long strings.Builder
+	for i := range 4000 {
+		fmt.Fprintf(&long, "6,%d,%d,-;line %d of a ring buffer that is longer than one read of it\n SUBSYSTEM=edac\n", i, 1000+i, i)
+	}
+	long.WriteString("6,4000,5000,-;the last line has no line end")
+	write(t, path, long.String(), 0o644)
+	text, _, err = readKmsg(path, maxKmsg)
+	got := strings.Split(string(text), "\n")
+	if err != nil || len(got) != 4002 || got[4001] != "" || got[4000] != "6,4000,5000,-;the last line has no line end" {
+		t.Fatalf("readKmsg of %d bytes: %d lines, %v, last %q", long.Len(), len(got), err, got[len(got)-2:])
+	}
+	for i, line := range got[:4000] {
+		if want := fmt.Sprintf("6,%d,%d,-;line %d of a ring buffer that is longer than one read of it", i, 1000+i, i); line != want {
+			t.Fatalf("line %d = %q, want %q", i, line, want)
+		}
+	}
+	write(t, path, rec+"4,1341,18412300,-;second\n", 0o644)
+
 	k := &kmsg{path: filepath.Join(dir, "none")}
 	if status, _ := k.probe(); status != model.SourceAbsent {
 		t.Errorf("probe of a missing buffer = %s", status)
@@ -447,6 +467,134 @@ func TestKmsgRecords(t *testing.T) {
 		k = &kmsg{path: path}
 		if status, detail := k.probe(); status != model.SourceUnreadable || !strings.Contains(detail, "dmesg_restrict") {
 			t.Errorf("probe of a closed buffer = %s, %q", status, detail)
+		}
+	}
+}
+
+// liveCopy makes the root of a "live" host out of a capture: its /proc,
+// which names the boot, and optionally its ring buffer as /dev/kmsg.
+func liveCopy(t *testing.T, capture string, kmsg bool) (root string, opts Options) {
+	t.Helper()
+	root = t.TempDir()
+	src := testutil.Testdata(t, "real", capture)
+	err := filepath.WalkDir(filepath.Join(src, "proc"), func(path string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		rel, _ := filepath.Rel(src, path)
+		b, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		write(t, filepath.Join(root, rel), string(b), 0o644)
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if kmsg {
+		write(t, filepath.Join(root, "dev", "kmsg"), string(testutil.ReadTestdata(t, "real", capture, "formats", "kmsg.txt")), 0o644)
+	}
+	opts = Options{Root: root, Live: true, TempDir: t.TempDir(), Journalctl: "-", NvidiaSMI: "-", Mcelog: "-"}
+	// The clock of the scan is the moment of the capture.
+	if opts.Now = uptimeTime(&opts); opts.Now.IsZero() {
+		t.Fatalf("%s: the capture does not say when it was made", capture)
+	}
+	return root, opts
+}
+
+// counts are what a ledger holds of one host.
+type counts struct {
+	ce, ue  int64
+	records int64
+	actions int
+	boots   int
+}
+
+func countsOf(t *testing.T, s *store.Store, host string) counts {
+	t.Helper()
+	var c counts
+	totals, err := s.Totals(ctx, store.EventFilter{Host: host})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, x := range totals {
+		c.ce, c.ue, c.records = c.ce+x.CE, c.ue+x.UE, c.records+x.Records
+	}
+	actions, err := s.Actions(ctx, store.ActionFilter{Host: host})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.actions = len(actions)
+	boots, err := s.Boots(ctx, host)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.boots = len(boots)
+	return c
+}
+
+// On a live host the journal and the ring buffer are both read. The
+// captures of the lab host hold one boot in both forms, as journalctl and
+// as /dev/kmsg gave it: read together they must count every error once.
+// A journal that has dropped the first part of the boot, which is what a
+// long-running host has, is completed by the ring buffer.
+func TestJournalAndRingBufferAreReadTogether(t *testing.T) {
+	for _, capture := range []string{"6.19.10-ghes", "7.3.0-hwpoison"} {
+		journal := testutil.Testdata(t, "real", capture, "journal-k.json")
+		whole := fakeJournalctl(t, "head -1 "+journal, "cat "+journal)
+		// The last two lines of the journal: the rest was rotated away.
+		lines := strings.Split(strings.TrimRight(string(testutil.ReadTestdata(t, "real", capture, "journal-k.json")), "\n"), "\n")
+		tail := filepath.Join(t.TempDir(), "tail.json")
+		write(t, tail, strings.Join(lines[len(lines)-2:], "\n")+"\n", 0o644)
+		rotated := fakeJournalctl(t, "head -1 "+tail, "cat "+tail)
+
+		scan := func(prog string, kmsg bool) (counts, []model.Source) {
+			_, opts := liveCopy(t, capture, kmsg)
+			opts.Journalctl = prog
+			s := ledger(t)
+			res, err := Run(ctx, s, opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var logs []model.Source
+			for _, src := range res.Sources {
+				if src.Kind == "klog" {
+					logs = append(logs, src)
+				}
+			}
+			return countsOf(t, s, res.Host), logs
+		}
+
+		want, logs := scan(whole, false)
+		if len(logs) != 1 || want.ce+want.ue+int64(want.actions) == 0 {
+			t.Fatalf("%s: the journal alone gives %+v from %s", capture, want, inventory(logs))
+		}
+		for _, tc := range []struct {
+			name    string
+			prog    string
+			sources int
+		}{
+			{"journal and ring buffer", whole, 2},
+			{"a journal that lost the start of the boot, and the ring buffer", rotated, 2},
+			{"the ring buffer alone", "-", 1},
+		} {
+			got, logs := scan(tc.prog, true)
+			if got != want {
+				t.Errorf("%s, %s: the ledger holds %+v, the journal alone gave %+v", capture, tc.name, got, want)
+			}
+			if len(logs) != tc.sources {
+				t.Errorf("%s, %s: kernel log sources: %s", capture, tc.name, inventory(logs))
+			}
+			for _, src := range logs {
+				if src.Status != model.SourceOK && src.Status != model.SourcePartial {
+					t.Errorf("%s, %s: %s is %s (%s)", capture, tc.name, src.Origin, src.Status, src.Detail)
+				}
+			}
+		}
+		// The rotated journal alone is what a scan as root saw before: less.
+		if less, _ := scan(rotated, false); less == want {
+			t.Errorf("%s: the last two lines of the journal hold everything; the test proves nothing", capture)
 		}
 	}
 }

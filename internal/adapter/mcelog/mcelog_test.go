@@ -418,7 +418,7 @@ func TestCommand(t *testing.T) {
 		{name: "no daemon", body: "echo 'mcelog: client connect: No such file or directory' >&2\nexit 0\n", status: model.SourceAbsent, detail: "no mcelog daemon is running"},
 		{name: "not root", body: "echo 'permission denied'\nexit 0\n", status: model.SourceUnreadable, detail: "answers root only"},
 		{name: "fails", body: "echo 'mcelog: unknown option' >&2\nexit 1\n", status: model.SourceError, detail: "mcelog --client failed: mcelog: unknown option"},
-		{name: "prints nothing", body: "exit 0\n", status: model.SourceEmpty, detail: "no output"},
+		{name: "prints nothing", body: "exit 0\n", status: model.SourceEmpty, detail: "the daemon answered and lists no DIMM"},
 		{name: "hangs", body: "sleep 30\n", timeout: 300 * time.Millisecond, status: model.SourceError, detail: "did not answer within"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

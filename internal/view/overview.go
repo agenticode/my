@@ -192,7 +192,11 @@ type GPURow struct {
 
 // Source is one entry of the source inventory.
 type Source struct {
-	Kind   string             `json:"kind"`
+	Kind string `json:"kind"`
+	// Name is what the source is called in a line of text: its kind, and
+	// where a scan read several sources of one kind, what tells them apart
+	// ("klog (journal)", "klog (ring buffer)").
+	Name   string             `json:"name"`
 	Origin string             `json:"origin"`
 	Status model.SourceStatus `json:"status"`
 	// StatusText is the status in the language of the view.
@@ -335,9 +339,10 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 	}
 
 	var unreadable []string
-	for _, s := range srcs {
+	names := c.sourceNames(srcs)
+	for i, s := range srcs {
 		ov.Sources = append(ov.Sources, Source{
-			Kind: s.Kind, Origin: s.Origin, Status: s.Status, StatusText: c.statusText(s.Status), Detail: s.Detail,
+			Kind: s.Kind, Name: names[i], Origin: s.Origin, Status: s.Status, StatusText: c.statusText(s.Status), Detail: s.Detail,
 			Records: s.Records, Events: s.Events, Actions: s.Actions, Skipped: s.Skipped, Grade: s.BestGrade(),
 			First: s.FirstTS, Last: s.LastTS, Notes: s.Notes,
 		})
@@ -372,6 +377,49 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 		ov.Root = &t
 	}
 	return ov, nil
+}
+
+// sourceNames names the sources of a scan for a line of text. A kind that
+// was read once is named by its kind. Where several sources of one kind
+// were read, as the journal and the ring buffer of a live host are, each
+// also says which one it is.
+func (c *Case) sourceNames(srcs []model.Source) []string {
+	read := func(s model.Source) bool {
+		switch s.Status {
+		case model.SourceOK, model.SourcePartial, model.SourceEmpty:
+			return true
+		}
+		return false
+	}
+	count := map[string]int{}
+	for _, s := range srcs {
+		if read(s) {
+			count[s.Kind]++
+		}
+	}
+	names := make([]string, len(srcs))
+	for i, s := range srcs {
+		names[i] = s.Kind
+		if !read(s) || count[s.Kind] < 2 {
+			continue
+		}
+		var which string
+		switch {
+		case strings.HasPrefix(s.Origin, "journalctl "):
+			which = Messages.Text(c.Lang, "src.journal", nil)
+		case s.Origin == "/dev/kmsg" || strings.HasSuffix(s.Origin, "/dev/kmsg"):
+			which = Messages.Text(c.Lang, "src.kmsg", nil)
+		default:
+			which = s.Origin
+			if i := strings.LastIndexAny(which, `/\`); i >= 0 && i+1 < len(which) {
+				which = which[i+1:]
+			}
+		}
+		if which != "" {
+			names[i] = s.Kind + " (" + which + ")"
+		}
+	}
+	return names
 }
 
 // absentMatters lists the sources whose absence a reader has to know

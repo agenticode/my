@@ -157,7 +157,11 @@ func finish(rep *adapter.Report, populated int) {
 		rep.Status = model.SourceOK
 	}
 	if rep.Records > 0 {
-		rep.Notes = append(rep.Notes, fmt.Sprintf("%d memory slots, %d populated", rep.Records, populated))
+		slots := "slots"
+		if rep.Records == 1 {
+			slots = "slot"
+		}
+		rep.Notes = append(rep.Notes, fmt.Sprintf("%d memory %s, %d populated", rep.Records, slots, populated))
 	}
 }
 

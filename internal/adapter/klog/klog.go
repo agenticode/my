@@ -192,6 +192,9 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	rep.Records = p.records
 	rep.Skipped = p.tally.Total()
 	rep.Notes = append(rep.Notes, fmt.Sprintf("%d lines read", p.lineNo))
+	if note := p.coverage(); note != "" {
+		rep.Notes = append(rep.Notes, note)
+	}
 	if p.notMemory > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("%d machine checks are not memory errors and were left out", p.notMemory))
 	}
@@ -228,6 +231,91 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		rep.Status = model.SourceOK
 	}
 	return rep
+}
+
+// stampOf returns the time a line of the input carries: a wall-clock time,
+// seconds since boot, or both.
+func (p *parser) stampOf(raw string) (l line, ok bool) {
+	if strings.HasPrefix(strings.TrimLeft(raw, " \t"), `{"`) {
+		l, err := frameJSON(0, raw)
+		return l, err == nil && (!l.wall.IsZero() || l.hasMono)
+	}
+	fr := p.fr // a copy: the framer keeps what it learned about the file
+	l, ok = fr.frame(0, raw)
+	return l, ok && (!l.wall.IsZero() || l.hasMono)
+}
+
+// coverage says what time the input covers, from its first and its last
+// line. A finding that says "no errors" speaks of this time and of no
+// other: a journal that kept two weeks says nothing about the months
+// before, and a ring buffer that has wrapped nothing about the start of
+// the boot.
+func (p *parser) coverage() string {
+	first, ok1 := p.stampOf(p.firstRaw)
+	last, ok2 := p.stampOf(p.lastRaw)
+	if !ok1 || !ok2 {
+		return ""
+	}
+	const layout = "2006-01-02 15:04"
+	wall := func(l line) time.Time {
+		switch {
+		case !l.wall.IsZero():
+			return l.wall
+		case l.hasMono && !p.opts.BootTime.IsZero() && p.segs <= 1:
+			// One boot, and the caller knows when it started.
+			return p.opts.BootTime.Add(l.mono)
+		}
+		return time.Time{}
+	}
+	from, to := wall(first), wall(last)
+	var note string
+	switch {
+	case !from.IsZero() && !to.IsZero():
+		note = fmt.Sprintf("covers %s to %s UTC", from.UTC().Format(layout), to.UTC().Format(layout))
+	case first.hasMono && last.hasMono && p.segs <= 1:
+		note = fmt.Sprintf("covers %s to %s after boot", sinceBoot(first.mono), sinceBoot(last.mono))
+	default:
+		return ""
+	}
+	// A log of one boot that does not start with the boot has lost its
+	// beginning: the ring buffer wrapped, or the file was cut.
+	if p.segs <= 1 && first.hasMono && first.mono > lateStart {
+		note += fmt.Sprintf("; it starts %s after boot, and what the kernel said before that is not in it", sinceBoot(first.mono))
+	}
+	return note
+}
+
+// machineName tidies the name of the machine in the DMI line of the kernel,
+// which is "vendor product/board". A board that only repeats the product,
+// as virtual machines and some servers report it, is left out.
+func machineName(s string) string {
+	s = strings.TrimSpace(s)
+	i := strings.LastIndexByte(s, '/')
+	if i <= 0 || i == len(s)-1 {
+		return strings.TrimSuffix(s, "/")
+	}
+	if board := s[i+1:]; strings.HasSuffix(s[:i], " "+board) || s[:i] == board {
+		return s[:i]
+	}
+	return s
+}
+
+// lateStart is how long after boot the first line of a kernel log may be
+// stamped before the log counts as cut. The first lines of a boot carry
+// stamps of a few seconds at most.
+const lateStart = time.Minute
+
+// sinceBoot writes a time since boot in the unit that fits it.
+func sinceBoot(d time.Duration) string {
+	switch {
+	case d >= 48*time.Hour:
+		return fmt.Sprintf("%.1f days", d.Hours()/24)
+	case d >= 2*time.Hour:
+		return fmt.Sprintf("%.1f hours", d.Hours())
+	case d >= 2*time.Minute:
+		return fmt.Sprintf("%.0f minutes", d.Minutes())
+	}
+	return fmt.Sprintf("%.0f s", d.Seconds())
 }
 
 type sinkError struct{ err error }
@@ -332,6 +420,9 @@ type parser struct {
 
 	lineNo  int
 	records int
+	// firstRaw and lastRaw are the first and the last line of the input,
+	// kept to say what time the input covers.
+	firstRaw, lastRaw string
 	// seen counts the records of each stamp and text, to tell equal
 	// lines apart.
 	seen          map[string]int
@@ -370,6 +461,12 @@ func (p *parser) run(r io.Reader) error {
 		}
 		if raw != "" || err == nil {
 			p.lineNo++
+			if !tooLong && strings.TrimSpace(raw) != "" {
+				if p.firstRaw == "" {
+					p.firstRaw = raw
+				}
+				p.lastRaw = raw
+			}
 			if tooLong {
 				p.tally.Skip(fmt.Sprintf("%s#L%d", p.origin, p.lineNo), "line is longer than 1 MiB")
 			} else if herr := p.handle(raw); herr != nil {
@@ -658,8 +755,8 @@ func (p *parser) dispatch(l *line) error {
 		return nil
 	}
 	if m := dmiRE.FindStringSubmatch(msg); m != nil {
-		seg.system, seg.bios = m[1], m[2]
-		p.hostDMI = m[1]
+		seg.system, seg.bios = machineName(m[1]), m[2]
+		p.hostDMI = seg.system
 		p.records++
 		return nil
 	}
