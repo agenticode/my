@@ -311,7 +311,7 @@ R-ROW-03 asked a bank, device or DIMM fault to be rising, spreading or bursting.
 | 3: an area fault counts without growth | development | 3,145 | 78 | 2.48% | 39.39% (78 of 198) | 21 | 45.65% (21 of 46) |
 | | held-out | 3,285 | 84 | 2.56% | 34.57% (84 of 243) | 19 | 36.54% (19 of 52) |
 
-Both changes were proposed from the development period. For the first, the held-out period was looked at after the change was made. For the second, the held-out numbers were seen before the change was written; they agree with the development period (8 of 351 servers, 2.3%). Engine 1 is the tree before pull request #86 and engine 2 the tree before #88. Engine 4 added two rules for errors that name no DIMM. This dataset has none, and engine 4 gives the numbers of engine 3 on it.
+Both changes were proposed from numbers of the development period: the first from the age of the bursts there, the second from the counts above. The held-out period was not hidden while they were made. Its numbers for the rules as they were stood on the same printouts, and for the second change so did a held-out count of the servers it would add (8 of 351 with a ticket, 2.3%). What the changed rules give on the held-out period was computed after each change was written. Engine 1 is the tree before pull request #86 and engine 2 the tree before #88. Engine 4 added two rules for errors that name no DIMM. This dataset has none, and engine 4 gives the numbers of engine 3 on it.
 
 With engine 1 the number of servers with "consider replacement" grew with every cut-off, from 1,711 at day 60 to 3,891 at day 210, because a burst never expired. Since engine 3 it stays between 1,016 and 1,129.
 
