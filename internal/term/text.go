@@ -124,7 +124,8 @@ func wrap(text string, w int) []string {
 }
 
 // flow joins fields with a gap into lines of at most w columns, breaking
-// between fields only.
+// between fields only. Empty fields are left out. Fields may be coloured:
+// colour codes take no columns.
 func flow(fields []string, gap string, w int) []string {
 	var lines []string
 	line, n := "", 0

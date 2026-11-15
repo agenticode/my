@@ -157,6 +157,16 @@ func (s *screen) timeline(ref string) string {
 // no escape sequences, and ASCII output of English text is ASCII.
 func check(t *testing.T, name string, v variant, got string) {
 	t.Helper()
+	inspect(t, name, v, got)
+	testutil.Golden(t, name+"."+v.name+".txt", []byte(got))
+}
+
+// inspect tests what holds for every screen.
+func inspect(t *testing.T, name string, v variant, got string) {
+	t.Helper()
+	if strings.TrimSpace(got) == "" {
+		t.Errorf("%s: nothing was drawn", name)
+	}
 	plain := ansi.ReplaceAllString(got, "")
 	if !v.st.Color && plain != got {
 		t.Errorf("%s: escape sequences in output without colour", name)
@@ -180,7 +190,6 @@ func check(t *testing.T, name string, v variant, got string) {
 			}
 		}
 	}
-	testutil.Golden(t, name+"."+v.name+".txt", []byte(got))
 }
 
 // oneLong reports whether a line is too wide only because it holds one
@@ -352,8 +361,10 @@ func TestWrapAndFlow(t *testing.T) {
 	if got := flow([]string{"aa", "", "bbb", "cc"}, "  ", 8); strings.Join(got, "|") != "aa  bbb|cc" {
 		t.Errorf("flow = %q", got)
 	}
-	if got := flowIndex([]string{"aa", "bbb", "cc"}, "  ", 8); len(got) != 2 || got[0] != [2]int{0, 2} || got[1] != [2]int{2, 3} {
-		t.Errorf("flowIndex = %v", got)
+	// Colour takes no columns: coloured fields break where plain ones do.
+	red := func(s string) string { return "\x1b[31m" + s + "\x1b[0m" }
+	if got := flow([]string{red("aa"), red("bbb"), "cc"}, "  ", 8); len(got) != 2 || got[0] != red("aa")+"  "+red("bbb") || got[1] != "cc" {
+		t.Errorf("flow of coloured fields = %q", got)
 	}
 }
 
@@ -512,5 +523,40 @@ func TestDetect(t *testing.T) {
 	}
 	if _, terminal := Size(nil); terminal {
 		t.Error("no file was taken for a terminal")
+	}
+}
+
+// TestEveryScenarioDraws draws every screen for every DIMM with a finding
+// in every built-in scenario, in three styles. The scenarios cover every
+// fault mode and every rule; the golden files pin a few of them, this test
+// makes sure that none of the others breaks a figure: nothing fails, no
+// line is wider than the style allows, and ASCII stays ASCII.
+func TestEveryScenarioDraws(t *testing.T) {
+	styles := []variant{en, {"ko-w60", Style{Lang: i18n.KO, Width: 60}}, {"ascii-w140", Style{Lang: i18n.EN, ASCII: true, Width: 140}}}
+	for _, name := range synth.Names() {
+		for _, v := range styles {
+			s := open(t, name, "", v)
+			inspect(t, name+" overview", v, s.overview())
+			inspect(t, name+" timeline", v, s.timeline(""))
+			listed := 0
+			for _, d := range s.h.DIMMs {
+				if !view.Listed(d) {
+					continue
+				}
+				// Every finding once; of the DIMMs that only have a stray
+				// error, a few are enough.
+				if listed++; listed > 4 {
+					break
+				}
+				ref := d.UID
+				inspect(t, name+" dimm "+d.Slot, v, s.examination(ref))
+				inspect(t, name+" why "+d.Slot, v, s.why(ref))
+				inspect(t, name+" map "+d.Slot, v, s.addressMap(ref, view.MapOptions{}))
+				inspect(t, name+" timeline "+d.Slot, v, s.timeline(ref))
+			}
+			if listed == 0 {
+				t.Errorf("scenario %s has no DIMM with a finding", name)
+			}
+		}
 	}
 }

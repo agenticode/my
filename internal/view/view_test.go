@@ -679,6 +679,39 @@ func TestTimeline(t *testing.T) {
 	}
 }
 
+func TestTimelineCountsAnOfflineOnce(t *testing.T) {
+	// On a host tree the page the kernel took offline after the uncorrected
+	// error is in the kernel log and in the rasdaemon database: two action
+	// records of one event. The timeline draws events.
+	c, h := open(t, "demo", synth.FlavorIntel, i18n.EN)
+	d := find(t, c, h, "CPU0_C1")
+	tl, err := c.Timeline(ctx, h, d, TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	actions, err := c.Store().Actions(ctx, store.ActionFilter{DIMMUID: d.UID, Kinds: []model.ActionKind{model.ActionPageOffline}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The same history stored directly has every offline once.
+	direct, hd := open(t, "demo", "", i18n.EN)
+	want, err := direct.Timeline(ctx, hd, find(t, direct, hd, "CPU0_C1"), TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	count := func(tl *Timeline) int {
+		for _, g := range tl.Markers {
+			if g.Kind == string(model.ActionPageOffline) {
+				return g.Count
+			}
+		}
+		return 0
+	}
+	if got := count(tl); got != count(want) || got != 7 || len(actions) != 8 {
+		t.Errorf("timeline counts %d offlines from %d action records; the history has %d", got, len(actions), count(want))
+	}
+}
+
 func TestTimelineShowsSlotChange(t *testing.T) {
 	c, h := open(t, "moved-dimm", "", i18n.EN)
 	tl, err := c.Timeline(ctx, h, find(t, c, h, "CPU0_D1"), TimelineOptions{})
@@ -698,6 +731,23 @@ func TestTimelineShowsSlotChange(t *testing.T) {
 	if tl.Series[0].Total != 240 {
 		t.Errorf("the DIMM has %d errors on its timeline, want 240", tl.Series[0].Total)
 	}
+}
+
+func TestTimelineSaysWhatFirmwareDid(t *testing.T) {
+	c, h := open(t, "fw-disabled", "", i18n.EN)
+	tl, err := c.Timeline(ctx, h, h.DIMMs[0], TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, g := range tl.Markers {
+		if g.Kind == string(model.ActionDisable) {
+			if g.Letter != "D" || g.Text.Text != "2026-10-01 taken out of use by firmware" {
+				t.Errorf("marker = %+v", g)
+			}
+			return
+		}
+	}
+	t.Errorf("no marker for the module firmware took out of use: %+v", tl.Markers)
 }
 
 func TestTimelineFoldsManyDIMMs(t *testing.T) {

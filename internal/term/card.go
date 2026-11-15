@@ -12,13 +12,7 @@ import (
 // dimmHead draws the line that says which DIMM a screen is about.
 func (st Style) dimmHead(p *page, c *view.Card) {
 	fields := []string{st.bold(c.Slot)}
-	plain := []string{c.Slot}
-	add := func(s string) {
-		if s != "" {
-			fields = append(fields, s)
-			plain = append(plain, s)
-		}
-	}
+	add := func(s string) { fields = append(fields, s) }
 	add(c.DIMM.Kind)
 	add(strings.TrimSpace(c.DIMM.Manufacturer + " " + c.DIMM.PartNumber))
 	if c.DIMM.Serial != "" {
@@ -33,8 +27,10 @@ func (st Style) dimmHead(p *page, c *view.Card) {
 	if !c.Present {
 		add(st.say("ov.gone"))
 	}
-	for _, idx := range flowIndex(plain, "  ", st.width()) {
-		p.add(strings.Join(fields[idx[0]:idx[1]], "  "))
+	// Fields flow to the next line where the width ends; an empty field
+	// takes no room.
+	for _, line := range flow(fields, "  ", st.width()) {
+		p.add(line)
 	}
 }
 

@@ -39,7 +39,7 @@ in this slot since 2026-11-13  0 slot changes
  CPU0_C1   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▃▃▃▃▄▄▄▅▅▆▆▇█  peak 73/day
  events                                B   OU
                                        │   │└ 2026-11-12 UE
-                                       │   └─ 8 pages offline, 2026-11-11 to 2026-11-12
+                                       │   └─ 7 pages offline, 2026-11-11 to 2026-11-12
                                        └───── 2026-10-28 reboot
 
  1,231 corrected and 1 uncorrected error from 2026-08-03 to 2026-11-12

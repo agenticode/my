@@ -156,40 +156,11 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		for i, h := range hints {
 			fields[i] = st.bold(h.Command) + ": " + h.Text
 		}
-		// Colour codes take no columns: measure the plain text.
-		plain := make([]string, len(hints))
-		for i, h := range hints {
-			plain[i] = h.Command + ": " + h.Text
-		}
-		for _, idx := range flowIndex(plain, "   ", st.width()-1) {
-			p.add(" " + strings.Join(fields[idx[0]:idx[1]], "   "))
+		for _, line := range flow(fields, "   ", st.width()-1) {
+			p.add(" " + line)
 		}
 	}
 	return p.writeTo(w)
-}
-
-// flowIndex is flow for fields that are drawn with colour: it returns the
-// index range of the fields of each line.
-func flowIndex(plain []string, gap string, w int) [][2]int {
-	var out [][2]int
-	start, n := 0, 0
-	gw := Width(gap)
-	for i, f := range plain {
-		fw := Width(f)
-		switch {
-		case i == start:
-			n = fw
-		case n+gw+fw > w:
-			out = append(out, [2]int{start, i})
-			start, n = i, fw
-		default:
-			n += gw + fw
-		}
-	}
-	if start < len(plain) {
-		out = append(out, [2]int{start, len(plain)})
-	}
-	return out
 }
 
 // slotMap draws the slots of the board: one line per socket, one column
