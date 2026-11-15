@@ -1,6 +1,8 @@
 package fmfmlog
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -104,11 +106,23 @@ func Build(ctx context.Context, s *store.Store, h *engine.HostResult, opts Build
 	if !opts.Records {
 		return doc, nil
 	}
-	for e, err := range s.Events(ctx, store.EventFilter{Host: h.Host}) {
+	err = runtimeLog(ctx, s, h.Host, func(r *Runtime) error {
+		doc.RuntimeLog = append(doc.RuntimeLog, *r)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return doc, nil
+}
+
+// runtimeLog hands the error records of a host to fn, one record per
+// error: what the ledger counts, as it counts it.
+func runtimeLog(ctx context.Context, s *store.Store, host string, fn func(*Runtime) error) error {
+	for e, err := range s.Events(ctx, store.EventFilter{Host: host}) {
 		if err != nil {
-			return nil, fmt.Errorf("fmfm runtime log: %w", err)
+			return fmt.Errorf("fmfm runtime log: %w", err)
 		}
-		// One record per error: what the ledger counts, as it counts it.
 		n := e.Errors()
 		if n <= 0 {
 			continue
@@ -120,9 +134,11 @@ func Build(ctx context.Context, s *store.Store, h *engine.HostResult, opts Build
 		if n != 1 {
 			r.Count = n
 		}
-		doc.RuntimeLog = append(doc.RuntimeLog, r)
+		if err := fn(&r); err != nil {
+			return err
+		}
 	}
-	return doc, nil
+	return nil
 }
 
 // Write writes the document as indented JSON.
@@ -130,4 +146,55 @@ func (doc *Document) Write(w io.Writer) error {
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	return enc.Encode(doc)
+}
+
+// Stream writes the analysis log of a host to w, byte for byte what Build
+// and Write give, and returns the document without its runtime log and the
+// number of runtime records written. The runtime log of a host with a
+// million errors is hundreds of megabytes as a document in memory; here
+// each record is written as it is read from the ledger.
+func Stream(ctx context.Context, w io.Writer, s *store.Store, h *engine.HostResult, opts BuildOptions) (doc *Document, records int, err error) {
+	withRecords := opts.Records
+	opts.Records = false
+	if doc, err = Build(ctx, s, h, opts); err != nil {
+		return nil, 0, err
+	}
+	head, err := json.MarshalIndent(doc, "", "  ")
+	if err != nil {
+		return nil, 0, err
+	}
+	bw := bufio.NewWriterSize(w, 256<<10)
+	if withRecords {
+		// The runtime log is the last field of the document and is left
+		// out when it is empty: the document is opened up for it when the
+		// first record is there.
+		err = runtimeLog(ctx, s, h.Host, func(r *Runtime) error {
+			b, err := json.MarshalIndent(r, "    ", "  ")
+			if err != nil {
+				return err
+			}
+			if records == 0 {
+				bw.Write(bytes.TrimSuffix(head, []byte("\n}")))
+				bw.WriteString(",\n  \"RuntimeLog\": [\n    ")
+			} else {
+				bw.WriteString(",\n    ")
+			}
+			records++
+			_, err = bw.Write(b)
+			return err
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	if records == 0 {
+		bw.Write(head)
+		bw.WriteString("\n")
+	} else {
+		bw.WriteString("\n  ]\n}\n")
+	}
+	if err := bw.Flush(); err != nil {
+		return nil, 0, err
+	}
+	return doc, records, nil
 }

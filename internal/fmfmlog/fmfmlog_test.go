@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -360,3 +361,61 @@ func TestRuntimeOf(t *testing.T) {
 		t.Errorf("relative record: %+v", r)
 	}
 }
+
+// Stream writes what Build and Write write, byte for byte, without the
+// runtime log in memory: with and without records, for a host with errors
+// and for one whose runtime log is empty.
+func TestStreamWritesTheSameBytes(t *testing.T) {
+	for _, scenario := range []string{"demo", "row", "system-channel"} {
+		for _, opts := range []BuildOptions{{}, {Records: true}, {Records: true, All: true, Lang: i18n.KO}} {
+			s, h := host(t, scenario, "")
+			opts.Now, opts.Tool, opts.Version = now, "MemorY", "test"
+			doc, err := Build(ctx, s, h, opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var want, got bytes.Buffer
+			if err := doc.Write(&want); err != nil {
+				t.Fatal(err)
+			}
+			head, n, err := Stream(ctx, &got, s, h, opts)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !bytes.Equal(got.Bytes(), want.Bytes()) {
+				a, b := got.String(), want.String()
+				i := 0
+				for i < len(a) && i < len(b) && a[i] == b[i] {
+					i++
+				}
+				t.Fatalf("%s %+v: the stream differs from the document at byte %d of %d:\n stream   %q\n document %q",
+					scenario, opts, i, len(b), a[max(0, i-60):min(len(a), i+60)], b[max(0, i-60):min(len(b), i+60)])
+			}
+			if n != len(doc.RuntimeLog) || len(head.AnalysisLog) != len(doc.AnalysisLog) || head.RuntimeLog != nil {
+				t.Errorf("%s %+v: %d records streamed, %d in the document", scenario, opts, n, len(doc.RuntimeLog))
+			}
+			if opts.Records && scenario == "demo" && n != 1285 {
+				t.Errorf("demo: %d records", n)
+			}
+		}
+	}
+
+	// A host without an error has no runtime log: the field is left out.
+	s, h := host(t, "demo", "")
+	empty := *h
+	empty.Host = "no-such-host"
+	var got bytes.Buffer
+	if _, n, err := Stream(ctx, &got, s, &empty, BuildOptions{Records: true, Now: now}); err != nil || n != 0 || strings.Contains(got.String(), "RuntimeLog") ||
+		!strings.HasSuffix(got.String(), "\n}\n") {
+		t.Errorf("host without records: %d records, %v, ends %q", n, err, got.String()[max(0, got.Len()-40):])
+	}
+
+	// A writer that fails ends the stream with its error.
+	if _, _, err := Stream(ctx, failing{}, s, h, BuildOptions{Records: true, Now: now}); err == nil {
+		t.Error("a writer that fails gave no error")
+	}
+}
+
+type failing struct{}
+
+func (failing) Write([]byte) (int, error) { return 0, errors.New("disk full") }
