@@ -460,17 +460,23 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		g.Events = events[kind]
 		if events[kind] > 1 {
 			a, b := when(first[kind]), when(last[kind])
+			// Events that all fall on one day are said to be on that day:
+			// a period from a day to the same day is none.
+			form := "many"
+			if a == b {
+				form = "day"
+			}
 			switch kind {
 			case MarkBoot:
 				g.Text = c.say("tl.boot.many", "n", g.Count)
 			case MarkUE:
-				g.Text = c.say("tl.ue.many", "n", g.Count, "first", a, "last", b)
+				g.Text = c.say("tl.ue."+form, "n", g.Count, "first", a, "last", b)
 			case MarkMove:
-				g.Text = c.say("tl.move.many", "n", g.Count, "first", a, "last", b)
+				g.Text = c.say("tl.move."+form, "n", g.Count, "first", a, "last", b)
 			case string(model.ActionPageOffline):
-				g.Text = c.say("tl.offline.many", "n", g.Count, "days", len(g.Days), "first", a, "last", b)
+				g.Text = c.say("tl.offline."+form, "n", g.Count, "days", len(g.Days), "first", a, "last", b)
 			default:
-				g.Text = c.say("tl.action.many", "n", g.Count, "kind", c.kindText(kind), "first", a, "last", b)
+				g.Text = c.say("tl.action."+form, "n", g.Count, "kind", c.kindText(kind), "first", a, "last", b)
 			}
 		}
 		tl.Markers = append(tl.Markers, *g)

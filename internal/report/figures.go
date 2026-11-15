@@ -199,7 +199,7 @@ func (doc *Document) slotMapFigure(sm *view.SlotMap, anchors map[string]string, 
 				state := doc.vsay("ov.empty")
 				switch cell.State {
 				case view.SlotUnknown:
-					state = doc.say("slot.unknown")
+					state = doc.vsay("ov.unknown")
 				case view.SlotEmpty:
 				default:
 					state = engine.GradeText(doc.Lang, model.VerdictGrade(cell.State))
@@ -269,7 +269,7 @@ func (doc *Document) slotLegend(sm *view.SlotMap, subject bool) *node {
 		ul.add(el("li", icon(view.SlotEmpty, 14), doc.vsay("ov.empty")))
 	}
 	if unknown {
-		ul.add(el("li", icon(view.SlotUnknown, 14), doc.say("slot.unknown")))
+		ul.add(el("li", icon(view.SlotUnknown, 14), doc.vsay("ov.unknown")))
 	}
 	if subject {
 		ul.add(el("li", pointerIcon(), doc.say("sum.subject")))

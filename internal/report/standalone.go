@@ -201,7 +201,7 @@ func (doc *Document) Figures() ([]Figure, error) {
 			legend = append(legend, gradeItem(view.SlotEmpty, doc.vsay("ov.empty")))
 		}
 		if unknown {
-			legend = append(legend, gradeItem(view.SlotUnknown, doc.say("slot.unknown")))
+			legend = append(legend, gradeItem(view.SlotUnknown, doc.vsay("ov.unknown")))
 		}
 		if subject != "" {
 			legend = append(legend, legendItem{[]*node{el("g", A{"class", "slot"}, el("path", A{"class", "pointer", "d", "M3 4h8l-4 6z"}))}, doc.say("sum.subject")})
