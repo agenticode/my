@@ -594,6 +594,61 @@ func TestMarkDuplicatesKeepsTheCXLTablesApart(t *testing.T) {
 	}
 }
 
+// Six corrected errors at one cell within a second, from the kernel log of
+// a host with firmware error records (testdata/real/6.19.10-ghes). The
+// kernel printed the firmware block of the first only, and the EDAC line of
+// each. The adapter declares the first EDAC line to be the second report of
+// the block. The five lines after it are five more errors: the block has
+// its EDAC line already.
+func TestMarkDuplicatesCountsDeclaredReports(t *testing.T) {
+	const cell = 0x180045640
+	graded := func(e *model.Event) *model.Event { e.Grade = model.GradeA; return e }
+	build := func(withDatabase bool) (*Store, []*model.Event) {
+		s := newStore(t)
+		block := graded(ev("klog/ghes", "L832-L842", at(0), cell))
+		var lines, rows []*model.Event
+		for i := 0; i < 6; i++ {
+			when := at(time.Duration(i) * 150 * time.Millisecond)
+			line := graded(ev("klog/edac", "L"+string(rune('A'+i)), when, cell))
+			if i == 0 {
+				line.DupOfFingerprint = block.Fingerprint
+			}
+			lines = append(lines, line)
+			rows = append(rows, graded(ev("rasdaemon/mc_event", "mc/"+string(rune('1'+i)), when.Truncate(time.Second), cell)))
+		}
+		all := append([]*model.Event{block}, lines...)
+		if withDatabase {
+			all = append(all, rows...)
+		}
+		insert(t, s, all...)
+		if _, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{}); err != nil {
+			t.Fatal(err)
+		}
+		return s, lines
+	}
+	for _, withDatabase := range []bool{false, true} {
+		s, lines := build(withDatabase)
+		totals, err := s.Totals(ctx, EventFilter{Host: "h1"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var ce int64
+		for _, x := range totals {
+			ce += x.CE
+		}
+		if ce != 6 {
+			t.Errorf("with the rasdaemon database %v: CE %d, the cell failed 6 times", withDatabase, ce)
+		}
+		if !withDatabase {
+			for i, line := range lines[1:] {
+				if got := dupOf(t, s, line); got != 0 {
+					t.Errorf("EDAC line %d is taken for a second report of record %d", i+2, got)
+				}
+			}
+		}
+	}
+}
+
 func TestMarkDuplicatesDeclaredByAdapter(t *testing.T) {
 	s := newStore(t)
 	// rasdaemon stored one error twice: as a decoded EDAC record and as the
