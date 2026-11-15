@@ -444,8 +444,9 @@ type envelope struct {
 	Version int       `json:"version"`
 	Lang    i18n.Lang `json:"lang"`
 	Host    string    `json:"host,omitzero"`
-	// Grade is the finding the exit code of the command stands for.
-	Grade    model.VerdictGrade `json:"grade"`
+	// Grade is the finding the exit code of the command stands for. A
+	// command whose exit code is no grade (verify) leaves it out.
+	Grade    model.VerdictGrade `json:"grade,omitzero"`
 	ExitCode int                `json:"exit_code"`
 	// Case describes the bundle the data comes from, when it comes from one.
 	Case *caseInfo `json:"case,omitzero"`
@@ -467,8 +468,15 @@ func writeJSON(w io.Writer, v any) error {
 	return enc.Encode(v)
 }
 
-// emit writes the output of a command: JSON, or the text draw writes.
+// emit writes the output of a command that shows findings: JSON, or the
+// text draw writes. The exit code is the grade.
 func (s *session) emit(name string, grade model.VerdictGrade, data any, draw func(w io.Writer) error) int {
+	return s.emitCode(name, grade, grade.ExitCode(), data, draw)
+}
+
+// emitCode writes the output of a command and returns its exit code. A
+// command whose exit code is no grade passes an empty grade.
+func (s *session) emitCode(name string, grade model.VerdictGrade, code int, data any, draw func(w io.Writer) error) int {
 	var err error
 	if s.o.asJSON {
 		host := ""
@@ -476,6 +484,7 @@ func (s *session) emit(name string, grade model.VerdictGrade, data any, draw fun
 			host = s.h.Host
 		}
 		e := newEnvelope(name, s.lang, host, grade, data)
+		e.ExitCode = code
 		if s.src != nil && s.src.manifest != nil {
 			m := s.src.manifest
 			e.Case = &caseInfo{CreatedAt: m.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"), Tool: m.Tool, Anonymized: m.Anonymized, Subject: m.Subject}
@@ -500,5 +509,5 @@ func (s *session) emit(name string, grade model.VerdictGrade, data any, draw fun
 	if err != nil {
 		return s.o.failure(s.env, err)
 	}
-	return grade.ExitCode()
+	return code
 }

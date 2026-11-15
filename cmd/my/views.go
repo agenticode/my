@@ -25,6 +25,7 @@ var viewCommands = map[string]viewFunc{
 	"map":      runMap,
 	"timeline": runTimeline,
 	"gpu":      runGPU,
+	"verify":   runVerify,
 	"bundle":   runBundle,
 	"report":   runReport,
 }

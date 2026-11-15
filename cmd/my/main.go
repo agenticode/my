@@ -86,6 +86,12 @@ func app() *cli.App {
 				Run:       runServe,
 			},
 			{
+				Name:      "verify",
+				Summary:   "compare an error injection plan with what the host recorded",
+				SummaryKO: "에러 주입 계획과 호스트의 기록 대조",
+				Run:       live(runVerify),
+			},
+			{
 				Name:      "version",
 				Summary:   "print version and build information",
 				SummaryKO: "버전과 빌드 정보",

@@ -1,0 +1,52 @@
+host lab-arm  plan ghes
+4 of 25 injections were not found as planned
+firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM
+
+  #  ID            INJECTED            PLANNED  FOUND  RESULT
+  1  row-1         CE                        1      1  as planned
+  2  row-2         CE                        1      1  decoded differently
+  3  row-3         CE                        3      3  as planned
+  4  row-4         CE                        1      1  as planned
+  5  row-5         CE                        1      1  as planned
+  6  row-6         CE                        1      1  as planned
+  7  row-7         CE                        1      1  as planned
+  8  row-8         CE Patrol                 1      1  as planned
+  9  row-9         CE                        1      1  as planned
+ 10  row-10        CE Patrol                 1      0  not found
+ 11  row-11        CE                        1      1  as planned
+ 12  row-12        CE                        1      1  as planned
+ 13  row-13        CE                        1      0  not found
+ 14  row-14        CE Patrol                 1      1  as planned
+ 15  row-15        CE                        1      1  as planned
+ 16  row-16        CE                        1      1  as planned
+ 17  row-17        CE                        1      1  as planned
+ 18  burst         CE                        6      6  as planned
+ 19  thr           CE                        1      1  as planned
+ 20  ue-1          Recoverable               1      1  as planned
+ 21  ue-1-offline  page offline hard         1      1  as planned
+ 22  ue-2          Recoverable Patrol        1      1  as planned
+ 23  ue-2-offline  page offline hard         1      1  as planned
+ 24  ghost-1       UE                        1      0  not found
+ 25  stay-1        page offline hard         0      0  as planned
+
+ what differs  row-2: row: injected 0x1a30, recorded 0x1a2f in 3 records (rasdaemon/mc_event
+               ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2;
+               klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac
+               ../../testdata/real/6.19.10-ghes/dmesg#L651)
+               row-2: column: injected 0x119, recorded 0x118 in 3 records (rasdaemon/mc_event
+               ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2;
+               klog/ghes ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac
+               ../../testdata/real/6.19.10-ghes/dmesg#L651)
+               row-10: no record of the host matches: CE Patrol at 0x100238180 DIMM 0 rank0 dev7 bg1
+               bank2 row 0x1a2f col 0x238
+               row-13: no record of the host matches: CE at 0x100238180 DIMM 0 rank0 dev7 bg1 bank2
+               row 0x1a2f col 0x238
+               ghost-1: no record of the host matches: UE at 0x1ffff0000 DIMM 0
+
+ records       klog/edac 26, klog/ghes 21, klog/offline 2, rasdaemon/mc_event 26
+               records that match an injection, by source; an error several sources report is found
+               once
+
+ method        QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic
+               hardware error source; kernel 6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt,
+               ras=on, emulated without hardware virtualization; rasdaemon 0.8.0

@@ -33,8 +33,9 @@ var words = i18n.Catalog{
 	"err.no_dimm":       {EN: "no slot or DIMM \"{ref}\" in host {host}.", KO: "호스트 {host}에 \"{ref}\" 슬롯이나 DIMM 없음."},
 	"err.with_findings": {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
 	"err.no_gpu":        {EN: "no GPU \"{ref}\" with memory records in host {host}; name a GPU by its index, its serial number, its UUID or its PCI address", KO: "호스트 {host}에 메모리 기록이 있는 GPU \"{ref}\" 없음. GPU는 인덱스, 시리얼, UUID, PCI 주소로 지정"},
+	"err.expect":        {EN: "name the injection plan with --expect, for example --expect plan.yaml", KO: "주입 계획을 --expect로 지정해야 함 (예: --expect plan.yaml)"},
 	"err.open_file":     {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, 또는 생략하면 개요)"},
+	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, verify, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, verify, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -215,7 +216,16 @@ var words = i18n.Catalog{
 	"help.gpu.text":  {EN: "The memory of the GPUs of this host as a repair budget. A GPU does not report where in its memory an error was; it reports how many rows were remapped, whether a remapping is pending or failed, and how many banks still have how many spare rows. The command reads the Xid lines of the kernel log and what nvidia-smi prints, and lists every GPU with memory records, the one with the least room first. Naming one GPU adds the counts behind its budget and its latest Xid records. The exit code is 3 when a row remapping failed on a GPU that is shown (rule R-REP-01) and 0 otherwise: no rule grades the other states.", KO: "이 호스트의 GPU 메모리를 리페어 예산으로 보여줍니다. GPU는 메모리의 어느 위치에서 오류가 났는지 보고하지 않습니다. 보고하는 것은 remap된 row 수, remap의 대기와 실패 여부, bank별로 남은 spare row입니다. 커널 로그의 Xid 줄과 nvidia-smi 출력을 읽어, 메모리 기록이 있는 GPU를 여유가 적은 순서로 나열합니다. GPU 하나를 지정하면 예산 뒤의 카운트와 최근 Xid 기록을 더합니다. 표시한 GPU 중 row remap이 실패한 것이 있으면 종료 코드는 3(규칙 R-REP-01)이고, 그 밖에는 0입니다. 다른 상태에 등급을 매기는 규칙은 없습니다."},
 	"help.gpu.flags": {EN: "--days N          count the Xid records of the last N days (default 30)", KO: "--days N          최근 N일의 Xid 기록을 셈 (기본 30)"},
 
-	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu ...] [옵션]"},
+	"help.verify.usage": {EN: "my verify --expect PLAN [flags]", KO: "my verify --expect PLAN [옵션]"},
+	"help.verify.text":  {EN: "Compares an error injection plan with what the sources of this host recorded. A plan is a text file that lists what a test put into the host: errors with their severity, address and place inside the DIMM, how many times, and pages taken offline. The command scans the host and looks every injection up in the ledger. It reports the injections that are missing or were found fewer times than planned, and every field a record decodes as something else than was injected: a wrong row, column, bank or channel is how a decoding bug shows. Fields the platform does not report are listed apart and are no mismatch; records beyond the plan are counted. The command injects nothing and changes nothing. The exit code is 0 when every injection was found as planned and 1 when one was not; it is no grade.", KO: "에러 주입 계획을 이 호스트의 소스가 기록한 것과 대조합니다. 계획은 시험이 호스트에 넣은 것을 적은 텍스트 파일입니다: 심각도와 주소와 DIMM 안 위치가 있는 오류, 주입 횟수, offline시킨 page. 명령은 호스트를 스캔하고 주입마다 원장에서 기록을 찾습니다. 기록이 없거나 계획한 수에 못 미치는 주입을 알려 주고, 기록이 주입과 다르게 디코딩한 필드를 모두 적습니다. row, column, bank, channel이 틀리게 나오는 것이 디코딩 버그의 모습입니다. 플랫폼이 보고하지 않는 필드는 따로 나열하며 불일치로 세지 않습니다. 계획 밖의 기록은 개수만 셉니다. 이 명령은 아무것도 주입하지 않고 아무것도 바꾸지 않습니다. 모든 주입이 계획대로 기록됐으면 종료 코드는 0, 하나라도 다르면 1입니다. 이 종료 코드는 등급이 아닙니다."},
+	"help.verify.flags": {
+		EN: "--expect PLAN     the injection plan: a text file with \"format: 1\", a scenario name and\n" +
+			"                  a list of injections (id, inject, severity, count, address, row, ...)",
+		KO: "--expect PLAN     주입 계획: \"format: 1\", 시나리오 이름, 주입 목록(id, inject, severity,\n" +
+			"                  count, address, row 등)이 든 텍스트 파일",
+	},
+
+	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [옵션]"},
 	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
 	"help.bundle.usage": {EN: "my bundle [slot|serial] -o FILE [--anonymize] [flags]", KO: "my bundle [슬롯|시리얼] -o FILE [--anonymize] [옵션]"},
@@ -342,6 +352,7 @@ var guides = map[string][]string{
 	"map":      {"guide.map", "guide.obs"},
 	"timeline": {"guide.timeline"},
 	"gpu":      {"guide.gpu"},
+	"verify":   {"guide.verify"},
 	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
 	"bundle":   nil,
 	"report":   nil,
@@ -391,7 +402,7 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" {
+	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)
