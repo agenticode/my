@@ -499,6 +499,10 @@ The poison list is read out on request, so the same range comes back with every 
 
 A for a DRAM event with its location, B for a DRAM event without one and for a general media event with a host address or a rank, C otherwise.
 
+### One error, one record
+
+A device reports an error as a DRAM event record or as a general media event record, never as both. Records of the CXL tables are therefore never taken for two reports of one error, however close in time they are: without a host address the slot is all they have in common. A record of another source for the same device may still be a second report.
+
 ### Which device
 
 The kernel's name of the device is the slot (`cxl:mem0`). The serial number in the tables is the DIMM identity: the history of a device follows its serial number, as it does for a DIMM. A device is recorded as present from its first to its last record in the database.

@@ -534,6 +534,66 @@ func TestMarkDuplicatesAcrossSources(t *testing.T) {
 	}
 }
 
+// Records of a CXL memory device as rasdaemon 1.0.0 stored them in the lab
+// (testdata/real/7.3.0-cxl): corrected errors with a DRAM location in one
+// table and, seconds later, corrected errors without one in another. The
+// device has no address in the host's address space, so the slot is all
+// they have in common. A device reports an error in one of the two forms:
+// these are eleven errors, not eight.
+func TestMarkDuplicatesKeepsTheCXLTablesApart(t *testing.T) {
+	s := newStore(t)
+	cxl := func(table, ref string, when time.Time, sev model.Severity, grade model.Grade) *model.Event {
+		return &model.Event{Host: "h1", ErrorDT: when, ErrorSeverity: sev, Source: "rasdaemon/" + table, RawRef: ref,
+			Label: "cxl:mem0", Slot: "cxl:mem0", Grade: grade, Fingerprint: model.Fingerprint(table, ref)}
+	}
+	var all, media []*model.Event
+	for i := 0; i < 8; i++ {
+		all = append(all, cxl("cxl_dram_event", "dram/"+string(rune('1'+i)), at(time.Duration(i)*time.Second), model.SevCE, model.GradeA))
+	}
+	all = append(all, cxl("cxl_dram_event", "dram/9", at(9*time.Second), model.SevUE, model.GradeA))
+	for i := 0; i < 3; i++ {
+		e := cxl("cxl_general_media_event", "media/"+string(rune('1'+i)), at(time.Duration(10+i)*time.Second), model.SevCE, model.GradeB)
+		media = append(media, e)
+		all = append(all, e)
+	}
+	// The kernel log of another host form: the same device named by a
+	// line of the kernel is a second report of the error next to it.
+	line := cxl("x", "L1", at(11*time.Second), model.SevCE, model.GradeC)
+	line.Source = "klog/edac"
+	all = append(all, line)
+	insert(t, s, all...)
+	n, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, e := range media {
+		if got := dupOf(t, s, e); got != 0 {
+			t.Errorf("general media record %d is taken for a second report of record %d", i+1, got)
+		}
+	}
+	if got := dupOf(t, s, line); got == 0 || n != 1 {
+		t.Errorf("the kernel log line stands alone (dup_of %d, %d duplicates): another source may still report the same error", got, n)
+	}
+	totals, err := s.Totals(ctx, EventFilter{Host: "h1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ce, ue int64
+	for _, x := range totals {
+		ce += x.CE
+		ue += x.UE
+	}
+	if ce != 11 || ue != 1 {
+		t.Errorf("CE %d, UE %d; the device reported 11 and 1", ce, ue)
+	}
+	for src, want := range map[string]string{"rasdaemon/cxl_dram_event": "rasdaemon/cxl", "rasdaemon/cxl_poison_event": "rasdaemon/cxl",
+		"rasdaemon/mc_event": "rasdaemon/mc_event", "klog/edac": "klog/edac"} {
+		if got := reporter(src); got != want {
+			t.Errorf("reporter(%q) = %q, want %q", src, got, want)
+		}
+	}
+}
+
 func TestMarkDuplicatesDeclaredByAdapter(t *testing.T) {
 	s := newStore(t)
 	// rasdaemon stored one error twice: as a decoded EDAC record and as the
