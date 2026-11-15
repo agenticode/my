@@ -436,6 +436,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"map", "?"}, "map", []string{"--bank N", "--rows A-B", "A horizontal line is a row fault"}},
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
+		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
 	} {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
 			args := append(append([]string{}, tt.args...), "--lang", string(lang))
@@ -448,14 +449,14 @@ func TestHelp(t *testing.T) {
 			flat := strings.Join(strings.Fields(out), " ")
 			if lang == i18n.EN {
 				wantLines(t, flat, tt.want...)
-			} else if !strings.Contains(out, "사용법:") || !strings.Contains(out, "종료 코드") {
+			} else if !strings.Contains(out, "사용법:") || !strings.Contains(out, "종료 코드") || !strings.Contains(out, "옵션:") {
 				t.Errorf("%v: not Korean:\n%s", args, out)
 			}
 			// Every flag of the command is in its help, and the help names
 			// no flag the command does not take.
 			o := newOptions(&cli.Env{Getenv: func(string) string { return "" }}, "my", sourceFor(tt.topic))
 			registerFlags(o, tt.topic)
-			known := map[string]bool{"--help": true}
+			known := map[string]bool{"--help": true, "--force": true}
 			o.fs.VisitAll(func(f *flag.Flag) {
 				if f.Name == "h" || f.Name == "help" {
 					return
@@ -528,5 +529,9 @@ func registerFlags(o *options, topic string) {
 		o.fs.String("rows", "", "")
 	case "timeline":
 		o.fs.Int("days", 0, "")
+	case "bundle":
+		o.fs.Bool("anonymize", false, "")
+		o.fs.String("key-file", "", "")
+		o.fs.Bool("force", false, "")
 	}
 }

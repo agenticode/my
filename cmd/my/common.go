@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
@@ -30,6 +31,8 @@ type source struct {
 	// ledger is the ledger file that is read: the file itself, or the
 	// ledger taken out of a bundle.
 	ledger string
+	// manifest is set when the case is a bundle.
+	manifest *bundle.Manifest
 	// cleanup removes what opening the case put on disk.
 	cleanup func()
 }
@@ -86,6 +89,8 @@ type session struct {
 	prefix string
 	// scanned says that the data comes from a scan of this run.
 	scanned bool
+	// src is the case that was opened, or nil.
+	src     *source
 	closers []func()
 }
 
@@ -187,7 +192,7 @@ func clock(env *cli.Env) time.Time {
 // start opens the data of a command: the case the reader opened, or a scan
 // of the host. It runs the engine and picks the host.
 func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *source) (*session, int) {
-	s := &session{ctx: ctx, env: env, o: o, lang: lang, st: o.style(env, lang), prefix: "my"}
+	s := &session{ctx: ctx, env: env, o: o, lang: lang, st: o.style(env, lang), prefix: "my", src: src}
 	cfg, err := o.cf.Config()
 	if err != nil {
 		return nil, o.usageError(env, lang, "%v", err)
@@ -265,7 +270,8 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 			ledger.Close()
 			return nil, "", fmt.Errorf("--root %s: %s", o.root, say(s.lang, "err.not_dir"))
 		}
-		opts.Root, opts.Live = o.root, false
+		// The copy says when it was made; the clock of this run does not.
+		opts.Root, opts.Live, opts.Now = o.root, false, time.Time{}
 	}
 	res, err := scan.Run(ctx, ledger, opts)
 	if err != nil {
@@ -323,7 +329,9 @@ type envelope struct {
 	// Grade is the finding the exit code of the command stands for.
 	Grade    model.VerdictGrade `json:"grade"`
 	ExitCode int                `json:"exit_code"`
-	Data     any                `json:"data"`
+	// Case describes the bundle the data comes from, when it comes from one.
+	Case *caseInfo `json:"case,omitzero"`
+	Data any       `json:"data"`
 }
 
 // jsonVersion is the version of the JSON output.
@@ -337,10 +345,27 @@ func (s *session) emit(name string, grade model.VerdictGrade, data any, draw fun
 		if s.h != nil {
 			e.Host = s.h.Host
 		}
+		if s.src != nil && s.src.manifest != nil {
+			m := s.src.manifest
+			e.Case = &caseInfo{CreatedAt: m.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"), Tool: m.Tool, Anonymized: m.Anonymized, Subject: m.Subject}
+		}
 		enc := json.NewEncoder(s.env.Stdout)
 		enc.SetIndent("", "  ")
 		err = enc.Encode(e)
 	} else {
+		// A case says what it is before anything is drawn from it.
+		if s.src != nil && s.src.manifest != nil {
+			for _, line := range s.st.Wrap(caseLine(s.lang, s.src.manifest), 0) {
+				fmt.Fprintln(s.env.Stdout, line)
+			}
+		}
+		if s.src != nil {
+			if note := s.storedNote(); note != "" {
+				for _, line := range s.st.Wrap(note, 0) {
+					fmt.Fprintln(s.env.Stdout, line)
+				}
+			}
+		}
 		err = draw(s.env.Stdout)
 	}
 	if err != nil {

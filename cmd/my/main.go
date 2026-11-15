@@ -52,6 +52,12 @@ func app() *cli.App {
 				Run:       live(runTimeline),
 			},
 			{
+				Name:      "bundle",
+				Summary:   "write the records of this host as one case file to send or attach",
+				SummaryKO: "이 호스트의 기록을 보내거나 첨부할 케이스 파일 하나로 저장",
+				Run:       live(runBundle),
+			},
+			{
 				Name:      "open",
 				Summary:   "show a stored case (a .mycase bundle or a ledger) with the same commands",
 				SummaryKO: "저장된 케이스(.mycase 번들 또는 원장)를 같은 명령으로 보기",
