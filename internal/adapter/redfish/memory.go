@@ -59,6 +59,20 @@ func placeInt(o object, key string) model.Opt[int] {
 	return model.Opt[int]{}
 }
 
+// memoryPlace reads the socket, channel and slot numbers of a memory
+// resource from its MemoryLocation.
+func memoryPlace(o object) ([3]int, bool) {
+	loc := child(o, "MemoryLocation")
+	if loc == nil {
+		return [3]int{}, false
+	}
+	socket, channel, slot := placeInt(loc, "Socket"), placeInt(loc, "Channel"), placeInt(loc, "Slot")
+	if !socket.Valid || !channel.Valid || !slot.Valid {
+		return [3]int{}, false
+	}
+	return [3]int{socket.V, channel.V, slot.V}, true
+}
+
 // isoWeek turns a ProductionDate into the manufacturing week.
 func isoWeek(s string) string {
 	for _, layout := range []string{time.RFC3339, "2006-01-02T15:04:05", "2006-01-02"} {
@@ -96,12 +110,9 @@ func (r *run) module(sink adapter.Sink, res *resource, marks map[string]int) (po
 	}
 
 	m := &model.Module{ObservedAt: r.now, Locator: name, Populated: populated, Source: Kind, RawRef: res.ref}
-	if loc := child(o, "MemoryLocation"); loc != nil {
-		socket, channel, slot := placeInt(loc, "Socket"), placeInt(loc, "Channel"), placeInt(loc, "Slot")
-		if socket.Valid && channel.Valid && slot.Valid {
-			m.Socket, m.Channel, m.Position = socket, channel, slot
-			r.places[[3]int{socket.V, channel.V, slot.V}] = name
-		}
+	if p, ok := memoryPlace(o); ok && !r.shared[p] {
+		m.Socket, m.Channel, m.Position = model.Some(p[0]), model.Some(p[1]), model.Some(p[2])
+		r.places[p] = name
 	}
 	if populated {
 		d := &m.DIMM

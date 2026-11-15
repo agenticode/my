@@ -361,6 +361,9 @@ type run struct {
 	// places the socket, channel and slot numbers of one to that name.
 	locators map[string]string
 	places   map[[3]int]string
+	// shared are numbers that two slots of the dump have. They do not say
+	// which slot a record means and are left off the modules.
+	shared map[[3]int]bool
 }
 
 // Collect reads the dump into sink.
@@ -540,6 +543,32 @@ func (r *run) emit(sink adapter.Sink) error {
 		if err := r.system(sink, &r.systems[i]); err != nil {
 			return err
 		}
+	}
+	// A BMC that counts channels per memory controller gives the slots of
+	// two controllers the same socket, channel and slot numbers.
+	first := map[[3]int]string{}
+	r.shared = map[[3]int]bool{}
+	sharing := 0
+	for i := range r.modules {
+		o := r.modules[i].obj
+		p, ok := memoryPlace(o)
+		name := locator(o)
+		if !ok || name == "" {
+			continue
+		}
+		if other, taken := first[p]; !taken {
+			first[p] = name
+		} else if model.NormalizeLabel(other) != model.NormalizeLabel(name) {
+			r.shared[p] = true
+		}
+	}
+	for i := range r.modules {
+		if p, ok := memoryPlace(r.modules[i].obj); ok && r.shared[p] {
+			sharing++
+		}
+	}
+	if sharing > 0 {
+		r.rep.Notes = append(r.rep.Notes, fmt.Sprintf("%d memory resources have the socket, channel and slot numbers of another one, as when channels are counted per memory controller: these numbers place no records", sharing))
 	}
 	populated := 0
 	marks := map[string]int{}

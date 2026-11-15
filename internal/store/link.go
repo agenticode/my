@@ -66,13 +66,17 @@ type LocationKey struct {
 	IMC           model.Opt[int]
 	ChannelId     model.Opt[int]
 	ChannelSlotId model.Opt[int]
-	// Records is the number of events that use the key.
-	Records int64
+	// Records is the number of events that use the key, Declared the
+	// number among them that their adapter declared to be a second report
+	// of another record.
+	Records  int64
+	Declared int64
 }
 
 // EventLocations returns the distinct location keys of the events of a host.
 func (s *Store) EventLocations(ctx context.Context, host string) ([]LocationKey, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT edac_mc, edac_location, smbios_handle, label, "SocketId", imc, "ChannelId", "ChannelSlotId", COUNT(*)
+	rows, err := s.db.QueryContext(ctx, `SELECT edac_mc, edac_location, smbios_handle, label, "SocketId", imc, "ChannelId", "ChannelSlotId", COUNT(*),
+ COALESCE(SUM(dup_fingerprint != ''), 0)
  FROM event WHERE host = ?
  GROUP BY edac_mc, edac_location, smbios_handle, label, "SocketId", imc, "ChannelId", "ChannelSlotId"
  ORDER BY edac_mc, edac_location, label, "SocketId", imc, "ChannelId", "ChannelSlotId"`, host)
@@ -84,7 +88,7 @@ func (s *Store) EventLocations(ctx context.Context, host string) ([]LocationKey,
 	for rows.Next() {
 		var k LocationKey
 		var mc, handle, socket, imc, ch, pos sql.NullInt64
-		if err := rows.Scan(&mc, &k.EdacLocation, &handle, &k.Label, &socket, &imc, &ch, &pos, &k.Records); err != nil {
+		if err := rows.Scan(&mc, &k.EdacLocation, &handle, &k.Label, &socket, &imc, &ch, &pos, &k.Records, &k.Declared); err != nil {
 			return nil, err
 		}
 		k.EdacMC, k.SMBIOSHandle = toOptInt(mc), toOptInt(handle)

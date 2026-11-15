@@ -1,0 +1,90 @@
+[
+  {
+    "ErrorDT": "2026:11:10:08:00:00:123",
+    "ErrorSeverity": "CE",
+    "ErrorScrubType": "Demand",
+    "HostID": "r12-n034",
+    "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0, "SubChannel": 1,
+    "Rank": 0, "DeviceId": 7, "BankGroup": 0, "Bank": 3, "Row": "0x1a2f", "Column": 568,
+    "ErrorVector": "dq:0x000c",
+    "OsPhysicalAddress": "0x1f8bd19c0",
+    "DimmTemp": 41,
+    "ProcessorMetadata": {"Retry": 1}
+  },
+  {
+    "ErrorDT": "2026-11-10T09:00:00.500Z",
+    "ErrorSeverity": "CE",
+    "ErrorScrubType": "Patrol scrub error",
+    "MemoryErrorLocation": {
+      "HostID": "r12-n034",
+      "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0,
+      "Rank": 0, "DeviceId": 7, "BankGroup": 0, "Bank": 3, "Row": 6703, "Column": 570
+    },
+    "ErrorVector": 12
+  },
+  {
+    "ErrorDT": 1794453247,
+    "ErrorSeverity": "UE",
+    "ErrorScrubType": "Demand read error",
+    "HostID": "r12-n034",
+    "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0,
+    "OsPhysicalAddress": 8469420480
+  },
+  {
+    "ErrorDT": "2026-11-11T00:00:00Z",
+    "HostID": "r12-n034",
+    "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0, "Rank": 0,
+    "EcsModeRegisters": [
+      {"DeviceId": 7, "MR14": 32, "MR15": 3, "MR16": "0x2f", "MR17": "0x1a", "MR18": 12, "MR19": 16, "MR20": 4},
+      {"DeviceId": 8, "MR14": 32, "MR15": 3, "MR16": 0, "MR17": 0, "MR18": 0, "MR19": 0, "MR20": 0}
+    ]
+  },
+  {
+    "ErrorDT": "2026-11-12T00:00:00Z",
+    "ErrorSeverity": "CE",
+    "HostID": "r12-n034",
+    "SocketId": 0, "ChannelId": 3, "ChannelSlotId": 0, "DeviceId": 2,
+    "EcsModeRegisters": "20 03 00 00 00 00 01"
+  },
+  {
+    "ErrorDT": "2026-11-13T00:00:00Z",
+    "HostID": "r12-n034",
+    "DeviceLocator": "CPU1_D1",
+    "EcsModeRegisters": [160, 3, null, null, null, 0, 2]
+  },
+  {
+    "ErrorDT": "2026-11-13T00:00:01Z",
+    "HostID": "r12-n034",
+    "SocketId": 1, "ChannelId": 0, "ChannelSlotId": 0,
+    "EcsModeRegisters": {"3": {"MR19": 0, "MR20": 0}, "Device11": {"MR19": 1, "MR20": 1}}
+  },
+  {
+    "ErrorDT": "2026-11-13T01:00:00Z", "ErrorSeverity": "Recoverable", "ErrorScrubType": "Other",
+    "HostID": "r12-n034", "SocketId": 1, "ChannelId": 0, "ChannelSlotId": 0, "Rank": 1
+  },
+  {
+    "ErrorDT": "2026-11-13T02:00:00Z", "ErrorSeverity": "Informational",
+    "HostID": "r12-n034", "ErrorType": "CPAD received and acted upon"
+  },
+  {
+    "ErrorDT": "2026-11-13T03:00:00Z", "ErrorSeverity": "CE",
+    "HostID": "r12-n035", "SocketId": 0, "ChannelId": 0, "ChannelSlotId": 0
+  },
+  {
+    "ErrorDT": "2026-11-13T04:00:00Z", "ErrorSeverity": "Corrected?",
+    "HostID": "r12-n034", "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0
+  },
+  {
+    "ErrorDT": "yesterday", "ErrorSeverity": "CE",
+    "HostID": "r12-n034", "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0
+  },
+  {
+    "ErrorDT": "2026-11-13T05:00:00Z",
+    "HostID": "r12-n034",
+    "EcsModeRegisters": "not registers"
+  },
+  {
+    "ErrorDT": "2026-11-13T06:00:00Z",
+    "HostID": "r12-n034", "DimmTemp": 55
+  }
+]

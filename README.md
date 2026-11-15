@@ -180,7 +180,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `cmd/my` | the binary and its commands |
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log, Redfish dumps and `nvidia-smi` output, and for the dcbrain DRAM error dataset |
+| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |

@@ -1,0 +1,25 @@
+{
+  "HostID": "r12-n034",
+  "CurrentBootDT": "2026:11:09:22:00:00:000",
+  "PrimordialBootDT": "2026:03:11:10:00:00:000",
+  "InstalledFirmware": {"Name": "BIOS", "Version": "2.4.1"},
+  "SystemMemoryConfig": {"CpuCount": 2, "ChannelsPerCpu": 8, "DimmsPerChannel": 1},
+  "InstalledMemory": [
+    {
+      "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0,
+      "DeviceLocator": "CPU0_C1",
+      "DimmSupplier": "Example Memory", "DimmPartNumber": "EXM64G48R2X4-A", "DimmSerialNumber": "80A1C3"
+    },
+    {
+      "SocketId": 0, "ChannelId": 3, "ChannelSlotId": 0,
+      "DimmSupplier": "Example Memory", "DimmPartNumber": "EXM64G48R2X4-A", "DimmSerialNumber": "80A1F7"
+    },
+    {"DimmSupplier": "Example Memory", "DimmPartNumber": "EXM64G48R2X4-A", "DimmSerialNumber": "80A200"},
+    "not an entry"
+  ],
+  "TrainingEventLogs": [
+    {"FailureTrainingStep": "write leveling", "SocketId": 1, "ChannelId": 0, "ChannelSlotId": 0, "SubChannel": 0, "DeviceId": 4, "DQ": 2}
+  ],
+  "PmicBootErrorLog": {"R04": 0, "R05": 0, "R06": 0},
+  "MemoryControllerMetadata": {"EccMode": "ADDDC"}
+}

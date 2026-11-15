@@ -21,6 +21,21 @@ type judge struct {
 	extra map[*DIMMResult]map[string][]model.RecordRef
 	// hosts holds what is known per host.
 	hosts map[string]*hostFacts
+	// ecs names the DIMMs with ECS readings; it is built on first use.
+	ecs map[string]bool
+}
+
+// hasECS reports whether the ledger holds ECS readings of the DIMM.
+func (j *judge) hasECS(uid string) bool {
+	if j.ecs == nil {
+		j.ecs = map[string]bool{}
+		for i := range j.in.ECS {
+			if u := j.in.ECS[i].DIMMUID; u != "" {
+				j.ecs[u] = true
+			}
+		}
+	}
+	return j.ecs[uid]
 }
 
 // hostFacts is what the findings of a host share.
@@ -927,10 +942,12 @@ func (j *judge) missing(fs *findings, grade model.VerdictGrade) []model.Statemen
 	if ft.Undated > 0 {
 		add("missing.dates", "n", ft.Undated)
 	}
-	// What no adapter collects yet, named where a finding asks for more
-	// than watching.
+	// What would say more about the DIMM, named where a finding asks for
+	// more than watching: the ECS counts of a DDR5 DIMM, unless the ledger
+	// has readings of them, and a temperature history, which no input
+	// stores yet.
 	if grade != model.VerdictOK && grade != model.VerdictObserve {
-		if d.DIMM != nil && strings.EqualFold(d.DIMM.MemoryType, "DDR5") {
+		if d.DIMM != nil && strings.EqualFold(d.DIMM.MemoryType, "DDR5") && !j.hasECS(d.UID) {
 			add("missing.ecs")
 		}
 		add("missing.temperature")
