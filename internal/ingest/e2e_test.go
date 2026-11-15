@@ -1,11 +1,13 @@
 package ingest
 
 import (
+	"reflect"
 	"slices"
 	"testing"
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
@@ -222,5 +224,88 @@ func TestCXLDeviceReachesTheRules(t *testing.T) {
 	}
 	if ce != 1 || ue != 1 {
 		t.Errorf("totals: %d corrected, %d uncorrected; want 1 and 1", ce, ue)
+	}
+}
+
+// TestFMFMLogsReachTheLedger reads the three FMFM logs of a host. The
+// runtime log names the module of its errors by socket, channel and slot
+// number; the boot log lists the module at those numbers with its serial
+// number. Errors and ECS readings come out under that serial number, and a
+// finding about the module no longer misses its ECS counts.
+func TestFMFMLogsReachTheLedger(t *testing.T) {
+	s := newStore(t)
+	now := time.Date(2026, 11, 14, 12, 0, 0, 0, time.UTC)
+	adapters := []adapter.Adapter{
+		// The runtime log first: its places are not named yet.
+		fmfm.NewFile(testutil.Testdata(t, "fmfm", "runtime.json"), fmfm.Options{Now: now}),
+		fmfm.NewFile(testutil.Testdata(t, "fmfm", "crash.json"), fmfm.Options{Now: now}),
+		fmfm.NewFile(testutil.Testdata(t, "fmfm", "boot.json"), fmfm.Options{Now: now}),
+	}
+	run, err := Run(ctx, s, adapters, Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if run.Host != "r12-n034" {
+		t.Errorf("host = %q, want the HostID of the log", run.Host)
+	}
+	if src := run.Sources[0]; src.Kind != "fmfm" || src.Events != 6 || src.Samples != 6 || src.GradeA != 2 || src.GradeB != 2 || src.GradeC != 2 {
+		t.Errorf("runtime log entry = %+v", src)
+	}
+
+	serialOf := func(uid string) string {
+		if uid == "" {
+			return ""
+		}
+		d, err := s.DIMM(ctx, uid)
+		if err != nil || d == nil {
+			t.Fatalf("dimm %s: %v", uid, err)
+		}
+		if d.Identity == model.IdentitySlot {
+			return "(slot)"
+		}
+		return d.Serial
+	}
+	totals := map[string][2]int64{}
+	ts, err := s.Totals(ctx, store.EventFilter{Host: "r12-n034"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, x := range ts {
+		totals[x.Slot+"/"+serialOf(x.DIMMUID)] = [2]int64{x.CE, x.UE}
+	}
+	want := map[string][2]int64{
+		"CPU0_C1/80A1C3":                {2, 2}, // two corrected errors, one uncorrected, one fatal at the crash
+		"socket0 channel3 dimm0/80A1F7": {1, 0}, // listed by numbers only
+		"socket1 channel0 dimm0/(slot)": {0, 1}, // not in the boot log: named by the numbers
+	}
+	if !reflect.DeepEqual(totals, want) {
+		t.Errorf("totals = %v\nwant %v", totals, want)
+	}
+
+	readings, err := s.ECS(ctx, store.ECSFilter{Host: "r12-n034"})
+	if err != nil || len(readings) != 6 {
+		t.Fatalf("%d ECS readings, %v", len(readings), err)
+	}
+	bySlot := map[string]int{}
+	for _, e := range readings {
+		bySlot[e.Slot+"/"+serialOf(e.DIMMUID)]++
+	}
+	wantECS := map[string]int{"CPU0_C1/80A1C3": 2, "socket0 channel3 dimm0/80A1F7": 1, "CPU1_D1/(slot)": 1, "socket1 channel0 dimm0/(slot)": 2}
+	if !reflect.DeepEqual(bySlot, wantECS) {
+		t.Errorf("ECS readings per slot = %v\nwant %v", bySlot, wantECS)
+	}
+
+	res, err := engine.Run(ctx, s, engine.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c1 := findings(t, res, "r12-n034")["CPU0_C1"]
+	if c1 == nil || !slices.Contains(c1.Rules, engine.RuleUE) || c1.Grade != model.VerdictReplaceNow {
+		t.Fatalf("CPU0_C1 = %+v", c1)
+	}
+	for _, m := range c1.Missing {
+		if m.Code == "missing.ecs" {
+			t.Errorf("the finding misses ECS counts although the ledger has readings: %+v", c1.Missing)
+		}
 	}
 }

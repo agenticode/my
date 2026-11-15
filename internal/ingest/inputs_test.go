@@ -126,10 +126,10 @@ func TestGPUAndECSRecords(t *testing.T) {
 	}
 	want := map[string]place{
 		"r1": {"DIMM_A1", "S-A1"},
-		"r2": {"DIMM_A1", "S-A1"}, // the same label with other separators
-		"r3": {"DIMM_B1", "S-B1"}, // by the numbers the inventory gave the slot
-		"r4": {},                  // numbers no inventory names: no slot, no DIMM
-		"r5": {"DIMM_Z9", ""},     // a label nothing else names is a slot of its own
+		"r2": {"DIMM_A1", "S-A1"},            // the same label with other separators
+		"r3": {"DIMM_B1", "S-B1"},            // by the numbers the inventory gave the slot
+		"r4": {"socket1 channel5 dimm0", ""}, // numbers no inventory names: a slot named by them
+		"r5": {"DIMM_Z9", ""},                // a label nothing else names is a slot of its own
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("slots of the readings = %v\nwant %v", got, want)
@@ -188,8 +188,8 @@ func TestInventoryPlaces(t *testing.T) {
 	}
 	want := map[string]string{
 		"e1": "DIMM_B1",
-		"e2": "",        // socket 1 is not in the inventory
-		"e3": "DIMM_C1", // the label is unknown, the numbers are the inventory's
+		"e2": "socket1 channel0 dimm0", // socket 1 is not in the inventory: a slot named by the numbers
+		"e3": "DIMM_C1",                // the label is unknown, the numbers are the inventory's
 		"e4": "DIMM_A1",
 	}
 	if !reflect.DeepEqual(got, want) {
@@ -213,6 +213,8 @@ func TestInventoryPlaces(t *testing.T) {
 		"DIMM_A1": {zero, model.Some(0), zero, model.Some(true)},
 		"DIMM_B1": {zero, model.Some(1), zero, model.Some(true)},
 		"DIMM_C1": {zero, model.Some(2), zero, model.Some(false)},
+		// Known through an error only.
+		"socket1 channel0 dimm0": {model.Some(1), model.Some(0), zero, model.Opt[bool]{}},
 	}
 	if !reflect.DeepEqual(rows, wantRows) {
 		t.Errorf("slot rows after two runs = %v\nwant %v", rows, wantRows)
@@ -223,22 +225,128 @@ func TestInventoryPlaces(t *testing.T) {
 	}
 }
 
-// Numbers alone never make a slot: two sources that both count from zero do
-// not have to mean the same DIMM.
-func TestBareNumbersNameNoSlot(t *testing.T) {
+// TestPlaceNamedByNumbers follows a place that error records name by
+// socket, channel and slot number only. It gets a slot named by the
+// numbers. When an inventory later names the place, the records move to
+// the inventory's slot and the numbered slot is gone.
+func TestPlaceNamedByNumbers(t *testing.T) {
 	s := newStore(t)
 	t0 := time.Date(2026, 11, 10, 0, 0, 0, 0, time.UTC)
-	a := &fake{kind: "fmfm", fn: func(sink adapter.Sink) error {
-		return sink.Event(&model.Event{ErrorDT: t0, ErrorSeverity: model.SevCE, Source: "fmfm/runtime", RawRef: "e1", Fingerprint: "e1",
-			SocketId: model.Some(0), ChannelId: model.Some(1), ChannelSlotId: model.Some(0)})
+	ev := func(ref string, d time.Duration) *model.Event {
+		return &model.Event{ErrorDT: t0.Add(d), ErrorSeverity: model.SevCE, Source: "fmfm/runtime", RawRef: ref, Fingerprint: ref,
+			SocketId: model.Some(0), ChannelId: model.Some(1), ChannelSlotId: model.Some(0)}
+	}
+	errs := &fake{kind: "fmfm", fn: func(sink adapter.Sink) error {
+		if err := sink.Event(ev("e1", time.Hour)); err != nil {
+			return err
+		}
+		return sink.ECS(&model.ECSSample{ObservedAt: t0.Add(2 * time.Hour), SocketId: model.Some(0), ChannelId: model.Some(1), ChannelSlotId: model.Some(0),
+			MR20: model.Some(1), Source: "fmfm/runtime", RawRef: "c1", Fingerprint: "c1"})
+	}}
+	if _, err := Run(ctx, s, []adapter.Adapter{errs}, Options{Host: "h1", Now: t0.Add(3 * time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	state := func() (eventSlot, ecsSlot, identity string, slots []string) {
+		events, _ := s.EventList(ctx, store.EventFilter{Host: "h1"})
+		readings, _ := s.ECS(ctx, store.ECSFilter{Host: "h1"})
+		rows, _ := s.Slots(ctx, "h1")
+		for _, r := range rows {
+			slots = append(slots, r.Name)
+		}
+		if len(events) != 1 || len(readings) != 1 {
+			t.Fatalf("%d events, %d readings", len(events), len(readings))
+		}
+		if d, _ := s.DIMM(ctx, events[0].DIMMUID); d != nil {
+			identity = string(d.Identity) + " " + d.Serial
+		}
+		return events[0].Slot, readings[0].Slot, strings.TrimSpace(identity), slots
+	}
+	if e, c, id, slots := state(); e != "socket0 channel1 dimm0" || c != e || id != "slot" || !reflect.DeepEqual(slots, []string{"socket0 channel1 dimm0"}) {
+		t.Errorf("before the inventory: event slot %q, reading slot %q, identity %q, slots %q", e, c, id, slots)
+	}
+	// The inventory arrives in a later run.
+	inventory := &fake{kind: "redfish", fn: func(sink adapter.Sink) error { return emitModules(sink, bmcModules(t0)) }}
+	if _, err := Run(ctx, s, []adapter.Adapter{inventory}, Options{Host: "h1", Now: t0.Add(24 * time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	if e, c, id, slots := state(); e != "DIMM_B1" || c != "DIMM_B1" || id != "serial S-B1" || !reflect.DeepEqual(slots, []string{"DIMM_A1", "DIMM_B1", "DIMM_C1"}) {
+		t.Errorf("after the inventory: event slot %q, reading slot %q, identity %q, slots %q", e, c, id, slots)
+	}
+	dimms, _ := s.DIMMs(ctx)
+	for _, d := range dimms {
+		if d.Identity == model.IdentitySlot {
+			t.Errorf("the placeholder identity of the numbered slot is still there: %+v", d)
+		}
+	}
+}
+
+// Records that are all second reports of records with a better name do
+// not make a slot of their own: a machine check next to the EDAC record
+// decoded from it.
+// An inventory that gives two slots the same socket, channel and slot
+// numbers (channels counted per memory controller, the controller left out)
+// does not say which slot a record with those numbers means. The record
+// keeps a slot named by the numbers, and neither DIMM is blamed.
+func TestSharedPlaceNumbersNameNoSlot(t *testing.T) {
+	s := newStore(t)
+	t0 := time.Date(2026, 11, 10, 0, 0, 0, 0, time.UTC)
+	mods := bmcModules(t0)
+	// DIMM_C1 gets the numbers of DIMM_A1 and a module of its own.
+	mods[2].Channel, mods[2].Populated = model.Some(0), true
+	mods[2].DIMM = model.DIMM{Manufacturer: "Example Memory", PartNumber: "EXM64G48R2X4-A", Serial: "S-C1", SizeBytes: 64 << 30}
+	ev := func(ref string, channel int) *model.Event {
+		return &model.Event{ErrorDT: t0.Add(time.Hour), ErrorSeverity: model.SevCE, Source: "redfish/log", RawRef: ref, Fingerprint: ref,
+			SocketId: model.Some(0), ChannelId: model.Some(channel), ChannelSlotId: model.Some(0)}
+	}
+	dump := &fake{kind: "redfish", fn: func(sink adapter.Sink) error {
+		if err := emitModules(sink, mods); err != nil {
+			return err
+		}
+		if err := sink.Event(ev("shared", 0)); err != nil {
+			return err
+		}
+		return sink.Event(ev("unique", 1))
+	}}
+	if _, err := Run(ctx, s, []adapter.Adapter{dump}, Options{Host: "h1", Now: t0.Add(2 * time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	events, err := s.EventList(ctx, store.EventFilter{Host: "h1"})
+	if err != nil || len(events) != 2 {
+		t.Fatalf("%d events, %v", len(events), err)
+	}
+	got := map[string]string{}
+	for _, e := range events {
+		d, _ := s.DIMM(ctx, e.DIMMUID)
+		serial := ""
+		if d != nil {
+			serial = d.Serial
+		}
+		got[e.RawRef] = e.Slot + "/" + serial
+	}
+	want := map[string]string{"shared": "socket0 channel0 dimm0/", "unique": "DIMM_B1/S-B1"}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("events = %v\nwant %v", got, want)
+	}
+}
+
+func TestSecondReportsNameNoSlot(t *testing.T) {
+	s := newStore(t)
+	t0 := time.Date(2026, 11, 10, 0, 0, 0, 0, time.UTC)
+	a := &fake{kind: "rasdaemon", fn: func(sink adapter.Sink) error {
+		primary := &model.Event{ErrorDT: t0, ErrorSeverity: model.SevCE, Source: "rasdaemon/mc_event", RawRef: "mc_event/1", Label: "DIMM_A1", Fingerprint: "mc-1"}
+		twin := &model.Event{ErrorDT: t0, ErrorSeverity: model.SevCE, Source: "rasdaemon/mce_record", RawRef: "mce_record/1", Fingerprint: "mce-1",
+			DupOfFingerprint: "mc-1", SocketId: model.Some(0), ChannelId: model.Some(1), ChannelSlotId: model.Some(0)}
+		if err := sink.Event(primary); err != nil {
+			return err
+		}
+		return sink.Event(twin)
 	}}
 	if _, err := Run(ctx, s, []adapter.Adapter{a}, Options{Host: "h1", Now: t0}); err != nil {
 		t.Fatal(err)
 	}
-	events, _ := s.EventList(ctx, store.EventFilter{Host: "h1"})
 	slots, _ := s.Slots(ctx, "h1")
-	if len(events) != 1 || events[0].Slot != "" || events[0].DIMMUID != "" || len(slots) != 0 {
-		t.Errorf("event = %+v, slots = %+v; want no slot", events, slots)
+	if len(slots) != 1 || slots[0].Name != "DIMM_A1" {
+		t.Errorf("slots = %+v, want DIMM_A1 only", slots)
 	}
 }
 

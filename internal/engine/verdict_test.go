@@ -416,6 +416,18 @@ func TestMissingData(t *testing.T) {
 		if got := missingCodes(v); !equalStrings(got, want) {
 			t.Errorf("missing = %q\nwant %q", got, want)
 		}
+		// With readings of the ECS registers of the DIMM in the ledger its
+		// ECS counts are no longer missing. Readings of another DIMM, and
+		// readings later than the time of the analysis, do not count.
+		b.in.ECS = []model.ECSSample{{DIMMUID: "d2", ObservedAt: t0}, {DIMMUID: "d1", ObservedAt: asOf.Add(time.Hour)}}
+		if got := missingCodes(verdictOf(t, b, asOf, "d1")); !has(got, "missing.ecs") {
+			t.Errorf("readings of another DIMM or of a later time count: missing = %q", got)
+		}
+		b.in.ECS = append(b.in.ECS, model.ECSSample{DIMMUID: "d1", ObservedAt: t0.Add(40 * day)})
+		if got := missingCodes(verdictOf(t, b, asOf, "d1")); has(got, "missing.ecs") || !has(got, "missing.temperature") {
+			t.Errorf("with ECS readings of the DIMM: missing = %q", got)
+		}
+		b.in.ECS = nil
 		text := map[string]string{}
 		for _, m := range v.Missing {
 			text[m.Code] = m.Text

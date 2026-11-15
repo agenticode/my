@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -350,6 +351,47 @@ func TestInputsThatAreNotADump(t *testing.T) {
 
 // A resource that is in the dump twice, as a member of an expanded
 // collection and as a file of its own, is read once.
+// A BMC that counts channels per memory controller gives slots of two
+// controllers the same socket, channel and slot numbers. The numbers then
+// say nothing about which slot a log entry means: they stay off the
+// modules, and an entry that names its module by numbers gets no label.
+func TestMemoryLocationsThatShareNumbers(t *testing.T) {
+	mem := func(id, name string, controller, channel int) string {
+		return fmt.Sprintf(`{"@odata.id": "/redfish/v1/Systems/1/Memory/%s", "@odata.type": "#Memory.v1_17_0.Memory", "Id": %q,
+ "DeviceLocator": %q, "SerialNumber": "SN-%s", "CapacityMiB": 65536, "Status": {"State": "Enabled", "Health": "OK"},
+ "MemoryLocation": {"Socket": 0, "MemoryController": %d, "Channel": %d, "Slot": 0}}`, id, id, name, id, controller, channel)
+	}
+	entry := func(id, channel string) string {
+		return fmt.Sprintf(`{"@odata.id": "/redfish/v1/Systems/1/LogServices/Log/Entries/%s", "@odata.type": "#LogEntry.v1_9_0.LogEntry", "Id": %q,
+ "EntryType": "Event", "Created": "2026-11-12T03:14:07Z", "MessageId": "OpenBMC.0.1.MemoryECCCorrectable", "MessageArgs": ["0", %q, "0", "1"]}`, id, id, channel)
+	}
+	doc := strings.Join([]string{
+		mem("1", "DIMM_A1", 0, 0), mem("2", "DIMM_B1", 0, 1), mem("3", "DIMM_D1", 1, 0), mem("4", "DIMM_F1", 1, 2),
+		entry("1", "A"), entry("2", "B"), entry("3", "C"),
+	}, "\n")
+	var c adapter.Collected
+	rep := NewReader(strings.NewReader(doc), "dump.json", Options{Now: now}).Collect(ctx, &c)
+	if rep.Status != model.SourceOK || len(c.Modules) != 4 || len(c.Events) != 3 {
+		t.Fatalf("report %+v, %d modules, %d events", rep, len(c.Modules), len(c.Events))
+	}
+	wantNotes(t, rep, "2 memory resources have the socket, channel and slot numbers of another one")
+	var mods, events []string
+	for _, m := range c.Modules {
+		mods = append(mods, m.Locator+" "+m.Socket.String()+"/"+m.Channel.String()+"/"+m.Position.String())
+	}
+	for _, e := range c.Events {
+		events = append(events, e.Label+" "+e.SocketId.String()+"/"+e.ChannelId.String()+"/"+e.ChannelSlotId.String())
+	}
+	none := model.Opt[int]{}.String()
+	unplaced := none + "/" + none + "/" + none
+	wantMods := []string{"DIMM_A1 " + unplaced, "DIMM_B1 0/1/0", "DIMM_D1 " + unplaced, "DIMM_F1 0/2/0"}
+	// Channel A is the shared one; B and C belong to one slot each.
+	wantEvents := []string{" 0/0/0", "DIMM_B1 0/1/0", "DIMM_F1 0/2/0"}
+	if !reflect.DeepEqual(mods, wantMods) || !reflect.DeepEqual(events, wantEvents) {
+		t.Errorf("modules %q\n   want %q\nevents  %q\n   want %q", mods, wantMods, events, wantEvents)
+	}
+}
+
 func TestResourceSeenTwice(t *testing.T) {
 	entry := `{"@odata.id": "/redfish/v1/Systems/1/LogServices/Log/Entries/1", "@odata.type": "#LogEntry.v1_9_0.LogEntry", "Id": "1",
  "EntryType": "SEL", "SensorType": "Memory", "Created": "2026-11-12T03:14:07Z", "Message": "Uncorrectable ECC"}`

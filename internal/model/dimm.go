@@ -178,6 +178,15 @@ type Module struct {
 	RawRef string
 }
 
+// PlaceName is the name of a slot that is known by numbers only: the
+// socket, the channel within the socket and the position on the channel.
+// The ledger gives this name to a place error records name by such numbers
+// when no inventory names the slot, and an inventory that lists a module by
+// numbers without a locator uses it, so both mean the same slot.
+func PlaceName(socket, channel, position int) string {
+	return fmt.Sprintf("socket%d channel%d dimm%d", socket, channel, position)
+}
+
 // Placement records that a DIMM was seen in a slot of a host over a period.
 type Placement struct {
 	ID        int64     `json:"id,omitzero"`

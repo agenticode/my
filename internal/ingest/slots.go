@@ -40,9 +40,11 @@ func aliasTopo(socket, imc, channel, position int) string {
 // aliasPlace is the alias of a place numbered without a memory controller:
 // socket, channel within the socket, and position on the channel. Firmware
 // records and BMC inventories name places this way. Only an inventory that
-// numbers its slots defines these aliases: two sources that both use bare
-// numbers do not have to mean the same slot by them, so the numbers of an
-// error record alone never name a slot.
+// numbers its slots defines these aliases. A record that names its place by
+// such numbers and nothing else is tied to the inventory's slot when one
+// has the numbers, and to a slot of its own, named by the numbers,
+// otherwise. That slot has no alias: once an inventory names the place, the
+// records move to the inventory's slot and the numbered one is dropped.
 func aliasPlace(socket, channel, position int) string {
 	return fmt.Sprintf("place:%d:%d:%d", socket, channel, position)
 }
@@ -332,6 +334,7 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 	// time). Names are made unique within a snapshot: the same locator in
 	// two snapshots is the same slot.
 	names := make([]string, len(mods))
+	snapshots := make([]string, len(mods))
 	groups := map[string][]int{}
 	var order []string
 	for i, m := range mods {
@@ -340,6 +343,7 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 			order = append(order, key)
 		}
 		groups[key] = append(groups[key], i)
+		snapshots[i] = key
 	}
 	for _, key := range order {
 		idx := groups[key]
@@ -351,12 +355,40 @@ func recordInventory(w *store.Writer, host string, mods []*model.Module) error {
 			names[idx[j]] = n
 		}
 	}
+	// Within one snapshot a place is one slot. Numbers that two slots of a
+	// snapshot share (a source that counts channels per memory controller
+	// and leaves the controller out) say nothing about which slot a record
+	// means, and are not used.
+	type claim struct {
+		snapshot string
+		place    [3]int
+	}
+	claimOf := func(i int) (claim, bool) {
+		m := mods[i]
+		if !m.Socket.Valid || !m.Channel.Valid || !m.Position.Valid {
+			return claim{}, false
+		}
+		return claim{snapshots[i], [3]int{m.Socket.V, m.Channel.V, m.Position.V}}, true
+	}
+	claimed := map[claim]string{}
+	shared := map[claim]bool{}
+	for i := range mods {
+		c, ok := claimOf(i)
+		if !ok {
+			continue
+		}
+		if first, taken := claimed[c]; !taken {
+			claimed[c] = names[i]
+		} else if first != names[i] {
+			shared[c] = true
+		}
+	}
 	for i, m := range mods {
 		name := names[i]
 		row := model.Slot{Host: host, Name: name, Locator: m.Locator, BankLocator: m.BankLocator, SMBIOSHandle: m.Handle,
 			Populated: model.Some(m.Populated)}
 		row.Socket, row.Channel, row.Position = bankLocatorTopology(m.BankLocator)
-		if m.Socket.Valid && m.Channel.Valid && m.Position.Valid {
+		if c, ok := claimOf(i); ok && !shared[c] {
 			// The source numbered the place itself.
 			if !row.Socket.Valid {
 				row.Socket, row.Channel, row.Position = m.Socket, m.Channel, m.Position
@@ -749,6 +781,11 @@ func unknownSlotName(k store.LocationKey) string {
 		return fmt.Sprintf("mc%d %s", k.EdacMC.V, k.EdacLocation)
 	case k.SocketId.Valid && k.IMC.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid:
 		return fmt.Sprintf("socket%d imc%d channel%d dimm%d", k.SocketId.V, k.IMC.V, k.ChannelId.V, k.ChannelSlotId.V)
+	case k.SocketId.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid && k.Records > k.Declared:
+		// Numbers without a memory controller. Records that are all second
+		// reports of records with a better name (a machine check next to
+		// its EDAC record) do not make a slot of their own.
+		return model.PlaceName(k.SocketId.V, k.ChannelId.V, k.ChannelSlotId.V)
 	case k.SMBIOSHandle.Valid:
 		return fmt.Sprintf("handle 0x%04X", k.SMBIOSHandle.V)
 	}
