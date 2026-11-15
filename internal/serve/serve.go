@@ -2,9 +2,11 @@
 // through a Source, again and again with a pause in between, and answers
 // from the latest state that was read:
 //
-//	/metrics     the metrics of the state in the Prometheus text format
-//	/-/healthy   200 while the process runs
-//	/-/ready     200 once the first scan has finished
+//	/metrics          the metrics of the state in the Prometheus text format
+//	/api/dimm/<ref>   the finding for one DIMM as JSON, named by slot or
+//	                  serial number; /api/dimm lists the DIMMs with findings
+//	/-/healthy        200 while the process runs
+//	/-/ready          200 once the first scan has finished
 //
 // The server only reads. A scan that fails leaves the last state in place
 // and is counted in my_exporter_scan_failures_total, so that metrics which
@@ -15,6 +17,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -36,9 +39,36 @@ type State interface {
 	// Metrics returns the metrics of the state. The server reads the set
 	// once, when it takes the state over.
 	Metrics() *exporter.Set
+	// DIMM answers /api/dimm: the document about the DIMM the query
+	// names, or about the DIMMs with findings when it names none. An
+	// *Error says what the reader got wrong; any other error is a failure
+	// of the server.
+	DIMM(ctx context.Context, q Query) (any, error)
 	// Close releases what the state holds: its ledger, its files.
 	Close()
 }
+
+// Query is a request to /api/dimm.
+type Query struct {
+	// Ref names the DIMM: a slot, a serial number or the end of one. It
+	// is empty for the list.
+	Ref string
+	// Host, Lang and All are the query parameters host, lang and all as
+	// they were sent.
+	Host string
+	Lang string
+	All  bool
+}
+
+// Error is a request the state cannot answer because of what it asks for.
+type Error struct {
+	// Status is the HTTP status: 400 for a request that is wrong, 404 for
+	// a DIMM or a host that is not there.
+	Status  int
+	Message string
+}
+
+func (e *Error) Error() string { return e.Message }
 
 // Source reads the data the server shows.
 type Source interface {
@@ -284,6 +314,8 @@ func (s *Server) Handler() http.Handler {
 	if s.opts.Metrics {
 		mux.HandleFunc("/metrics", s.metrics)
 	}
+	mux.HandleFunc("/api/dimm", s.dimm)
+	mux.HandleFunc("/api/dimm/{ref...}", s.dimm)
 	mux.HandleFunc("/-/healthy", func(w http.ResponseWriter, _ *http.Request) { plain(w, http.StatusOK, "ok\n") })
 	mux.HandleFunc("/-/ready", func(w http.ResponseWriter, _ *http.Request) {
 		if p := s.page.Load(); !p.ready {
@@ -330,9 +362,62 @@ func (s *Server) index() string {
 	if s.opts.Metrics {
 		b.WriteString("/metrics     metrics in the Prometheus text format\n")
 	}
+	b.WriteString("/api/dimm    the DIMMs with errors or a finding, as \"my why --json\" prints them\n")
+	b.WriteString("/api/dimm/<slot or serial>\n")
+	b.WriteString("             the finding for one DIMM, as \"my why <slot or serial> --json\" prints it\n")
+	b.WriteString("             ?lang=en|ko chooses the language, ?all=1 lists every DIMM\n")
 	b.WriteString("/-/healthy   200 while the process runs\n")
 	b.WriteString("/-/ready     200 once the first scan has finished\n")
 	return b.String()
+}
+
+// dimm answers /api/dimm and /api/dimm/<ref> from the latest state.
+func (s *Server) dimm(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	q := Query{Ref: r.PathValue("ref"), Host: query.Get("host"), Lang: query.Get("lang")}
+	switch query.Get("all") {
+	case "", "0", "false":
+	default:
+		q.All = true
+	}
+
+	// The state stays open while the request reads it.
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.state == nil {
+		writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": s.page.Load().reason})
+		return
+	}
+	doc, err := s.state.DIMM(r.Context(), q)
+	var bad *Error
+	switch {
+	case errors.As(err, &bad):
+		writeJSON(w, bad.Status, map[string]string{"error": bad.Message})
+	case err != nil:
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	default:
+		writeJSON(w, http.StatusOK, doc)
+	}
+}
+
+// writeJSON sends a document the way the commands print JSON: indented,
+// with a line feed at the end.
+func writeJSON(w http.ResponseWriter, status int, doc any) {
+	var b bytes.Buffer
+	enc := json.NewEncoder(&b)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(doc); err != nil {
+		status = http.StatusInternalServerError
+		b.Reset()
+		fmt.Fprintf(&b, "{\n  \"error\": %q\n}\n", err.Error())
+	}
+	h := w.Header()
+	h.Set("Content-Type", "application/json; charset=utf-8")
+	h.Set("X-Content-Type-Options", "nosniff")
+	h.Set("Cache-Control", "no-store")
+	h.Set("Content-Length", fmt.Sprint(b.Len()))
+	w.WriteHeader(status)
+	w.Write(b.Bytes())
 }
 
 // metrics answers /metrics from the page the last scan rendered.

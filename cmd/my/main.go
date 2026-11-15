@@ -71,8 +71,8 @@ func app() *cli.App {
 			},
 			{
 				Name:      "serve",
-				Summary:   "run as an exporter: Prometheus metrics of this host over HTTP",
-				SummaryKO: "exporter로 실행: 이 호스트의 Prometheus 지표를 HTTP로 제공",
+				Summary:   "run as a server: Prometheus metrics and the findings of this host over HTTP",
+				SummaryKO: "서버로 실행: 이 호스트의 Prometheus 지표와 소견을 HTTP로 제공",
 				Run:       runServe,
 			},
 			{
