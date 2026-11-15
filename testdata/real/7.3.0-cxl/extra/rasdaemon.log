@@ -1,0 +1,142 @@
+rasdaemon: Failed to open config file /usr/local/etc/sysconfig/rasdaemon: No such file or directory
+rasdaemon: Cpu fault isolation is disabled
+rasdaemon: module ipmi_bmc init failed: -19
+rasdaemon: Improper PAGE_CE_ACTION, set to default soft
+rasdaemon: Page offline choice on Corrected Errors is soft
+rasdaemon: Improper PAGE_CE_THRESHOLD, set to default 50.
+rasdaemon: Improper PAGE_CE_REFRESH_CYCLE, set to default 86400s.
+rasdaemon: Threshold of memory Corrected Errors is 50 / 86400s
+rasdaemon: Improper ROW_CE_ACTION, set to default off
+rasdaemon: Row offline choice on Corrected Errors is off
+rasdaemon: Enabling DB backend: sqlite3
+rasdaemon: block:block_rq_error event enabled
+rasdaemon: Enabled event block:block_rq_error
+rasdaemon: cxl:cxl_aer_correctable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_correctable_error
+rasdaemon: cxl:cxl_aer_uncorrectable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_uncorrectable_error
+rasdaemon: cxl:cxl_dram event enabled
+rasdaemon: Enabled event cxl:cxl_dram
+rasdaemon: cxl:cxl_general_media event enabled
+rasdaemon: Enabled event cxl:cxl_general_media
+rasdaemon: cxl:cxl_generic_event event enabled
+rasdaemon: Enabled event cxl:cxl_generic_event
+rasdaemon: cxl:cxl_memory_module event enabled
+rasdaemon: Enabled event cxl:cxl_memory_module
+rasdaemon: cxl:cxl_memory_sparing event enabled
+rasdaemon: Enabled event cxl:cxl_memory_sparing
+rasdaemon: cxl:cxl_overflow event enabled
+rasdaemon: Enabled event cxl:cxl_overflow
+rasdaemon: cxl:cxl_poison event enabled
+rasdaemon: Enabled event cxl:cxl_poison
+rasdaemon: mce:mce_record event enabled
+rasdaemon: Enabled event mce:mce_record
+rasdaemon: net:net_dev_xmit_timeout event enabled
+rasdaemon: Enabled event net:net_dev_xmit_timeout
+rasdaemon: ras:aer_event event enabled
+rasdaemon: Enabled event ras:aer_event
+rasdaemon: 	 no AER_CE_TRIGGER ((nil))
+rasdaemon: ras:arm_event event enabled
+rasdaemon: Enabled event ras:arm_event
+rasdaemon: ras:extlog_mem_event event not exist
+rasdaemon: Can't get traces from ras:extlog_mem_event
+rasdaemon: ras:mc_event event enabled
+rasdaemon: Enabled event ras:mc_event
+rasdaemon: ras:memory_failure_event event enabled
+rasdaemon: Enabled event ras:memory_failure_event
+rasdaemon: ras:non_standard_event event enabled
+rasdaemon: Enabled event ras:non_standard_event
+rasdaemon: ras:reri_event event not exist
+rasdaemon: Can't get traces from ras:reri_event
+rasdaemon: signal:signal_generate event enabled
+rasdaemon: Enabled event signal:signal_generate
+rasdaemon: devlink:devlink_health_report event not exist
+rasdaemon: Can't get traces from devlink:devlink_health_report
+rasdaemon: Recording aer_event events
+rasdaemon: Recording arm_event events
+rasdaemon: Recording cxl_poison_event events
+rasdaemon: Recording cxl_aer_ue_event events
+rasdaemon: Recording cxl_aer_ce_event events
+rasdaemon: Recording cxl_overflow_event events
+rasdaemon: Recording cxl_generic_event events
+rasdaemon: Recording cxl_general_media_event events
+rasdaemon: Recording cxl_dram_event events
+rasdaemon: Recording cxl_memory_module_event events
+rasdaemon: Recording cxl_memory_sparing_event events
+rasdaemon: Recording devlink_event events
+rasdaemon: Recording disk_errors events
+rasdaemon: Recording extlog_event events
+rasdaemon: Recording mc_event events
+rasdaemon: Recording memory_failure_event events
+rasdaemon: Recording non_standard_event events
+rasdaemon: Recording reri_event events
+rasdaemon: Recording signal_event events
+rasdaemon: Recording mce_record events
+rasdaemon: Recording amp_payload0_event events
+rasdaemon: Recording amp_payload1_event events
+rasdaemon: Recording amp_payload2_event events
+rasdaemon: Recording amp_payload3_event events
+rasdaemon: Recording ampereone_payload0_event events
+rasdaemon: Recording ampereone_payload1_event events
+rasdaemon: Recording ampereone_payload2_event events
+rasdaemon: Recording ampereone_payload3_event events
+rasdaemon: Recording ampereone_payload4_event events
+rasdaemon: Recording ampereone_payload5_event events
+rasdaemon: Recording ampereone_payload6_event events
+rasdaemon: Recording hip08_oem_type1_event_v2 events
+rasdaemon: Recording hip08_oem_type2_event_v2 events
+rasdaemon: Recording hip08_pcie_local_event_v2 events
+rasdaemon: Recording hisi_common_section_v2 events
+rasdaemon: Recording jm_payload0_event events
+rasdaemon: Recording nvidia_ns_event events
+rasdaemon: Recording nvidia_vera_ns_event events
+rasdaemon: Recording yitian_ddr_reg_dump_event events
+rasdaemon: Database backend started: sqlite3.
+rasdaemon: Listening to events for cpus 0 to 1
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000005 cxl_dram [ERROR] 2026-11-15 11:06:13 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:12 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x1000400 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:16 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000005 cxl_dram [ERROR] 2026-11-15 11:06:14 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x2 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:13 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x1006a00 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:424 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:15 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x3 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:14 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x100b000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:704 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:16 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x4 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:15 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x1000400 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:16 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:17 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x5 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:16 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x100fe00 dpa_flags:descriptor:memory_event_type:Scrub Media ECC Error memory_event_sub_type:Not Reported transaction_type:Internal Media Scrub hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:1016 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:18 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x6 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:17 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x1006a00 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:424 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:19 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x7 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:18 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x1003800 dpa_flags:descriptor:memory_event_type:Scrub Media ECC Error memory_event_sub_type:Not Reported transaction_type:Internal Media Scrub hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:224 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:20 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x8 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:19 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x100b000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:4 bank_group:2 bank:1 row:11068 column:704 
+rasdaemon: cxl_dram_event store: 0x160b7f78
+rasdaemon: register inserted at db
+           <...>-78    [001] .....     0.000006 cxl_dram [ERROR] 2026-11-15 11:06:21 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Failure hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:20 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x100b000 dpa_flags:descriptor:'UNCORRECTABLE EVENT' memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:12 bank_group:2 bank:1 row:11068 column:704 
+rasdaemon: cxl_general_media_event store: 0x160972f8
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_general_media [ERROR] 2026-11-15 11:06:22 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:fbcd0a77-c260-417f-85a9-088b1621eba6 hdr_handle:0x9 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:21 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x2001000 dpa_flags:descriptor:memory_event_type:ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:0 device:20 
+rasdaemon: cxl_general_media_event store: 0x160972f8
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_general_media [ERROR] 2026-11-15 11:06:23 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:fbcd0a77-c260-417f-85a9-088b1621eba6 hdr_handle:0xa hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:22 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x2002000 dpa_flags:descriptor:memory_event_type:ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:0 device:20 
+rasdaemon: cxl_general_media_event store: 0x160972f8
+rasdaemon: register inserted at db
+           <...>-76    [001] .....     0.000006 cxl_general_media [ERROR] 2026-11-15 11:06:24 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Informational hdr_uuid:fbcd0a77-c260-417f-85a9-088b1621eba6 hdr_handle:0xb hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:23 +0000 hdr_length:128 hdr_maint_op_class:0 dpa:0x2003000 dpa_flags:descriptor:memory_event_type:ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:0 device:20 
+rasdaemon: cxl_memory_module_event store: 0x160c04f8
+rasdaemon: register inserted at db
+           <...>-77    [000] .....     0.000007 cxl_memory_module 2026-11-15 11:06:25 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 log type:Warning hdr_uuid:fe927475-dd59-4339-a586-79bab113b774 hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-15 11:06:24 +0000 hdr_length:128 hdr_maint_op_class:0 event_type:Health Status Change event_sub_type:Not Reported health_status:'MAINTENANCE_NEEDED' 'REPLACEMENT_NEEDED' media_status:Normal as_life_used:Normal as_dev_temp:Normal as_cor_vol_err_cnt:Normal as_cor_per_err_cnt:Normal life_used:42 device_temp:51 dirty_shutdown_cnt:3 cor_vol_err_cnt:9 cor_per_err_cnt:0 
+rasdaemon: cxl_poison_event store: 0x1609c2a8
+rasdaemon: register inserted at db
+           <...>-219   [001] .....     0.000007 cxl_poison [ERROR] 2026-11-15 11:06:31 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 trace_type:List region: region_uuid: hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff dpa:0x3004000 dpa_length:0x80 source:Internal flags:0 overflow timestamp:1970-01-01 00:00:00 +0000
+
+rasdaemon: cxl_poison_event store: 0x1609c2a8
+rasdaemon: register inserted at db
+           <...>-219   [001] .....     0.000007 cxl_poison [ERROR] 2026-11-15 11:06:31 +0000 memdev:mem0 host:0000:0d:00.0 serial:0x4c41420001 trace_type:List region: region_uuid: hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff dpa:0x3000000 dpa_length:0x80 source:Internal flags:0 overflow timestamp:1970-01-01 00:00:00 +0000
+

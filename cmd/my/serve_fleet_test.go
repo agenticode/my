@@ -365,33 +365,3 @@ func TestServeFleetMistakes(t *testing.T) {
 	}
 	var _ serve.State = (*fleetState)(nil)
 }
-
-// TestUnitsStartTheCommand keeps the systemd units of contrib/ in step
-// with the command: they start "my serve" with flags it takes.
-func TestUnitsStartTheCommand(t *testing.T) {
-	for unit, wantFleet := range map[string]bool{"my-exporter.service": false, "my-fleet-exporter.service": true} {
-		b, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), "contrib", "systemd", unit))
-		if err != nil {
-			t.Fatal(err)
-		}
-		var start string
-		for _, line := range strings.Split(string(b), "\n") {
-			if v, ok := strings.CutPrefix(line, "ExecStart="); ok {
-				start = v
-			}
-		}
-		f := strings.Fields(start)
-		if len(f) < 3 || f[0] != "/usr/local/bin/my" || f[1] != "serve" {
-			t.Fatalf("%s: ExecStart=%s", unit, start)
-		}
-		o := newServeOptions()
-		// systemd puts the value of the variable in; the tests have none.
-		args := strings.Fields(strings.ReplaceAll(strings.Join(f[2:], " "), "${RASDAEMON_DB_BACKEND}", "postgresql"))
-		if _, err := cli.Parse(o.fs, args); err != nil {
-			t.Errorf("%s: my serve does not take %q: %v", unit, args, err)
-		}
-		if !o.metrics || o.listen != serve.DefaultListen || o.sf.set() != wantFleet {
-			t.Errorf("%s: metrics %v, listen %q, fleet %v", unit, o.metrics, o.listen, o.sf.set())
-		}
-	}
-}

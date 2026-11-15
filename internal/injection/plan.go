@@ -424,6 +424,9 @@ func (in *Injection) validate() error {
 	if in.ID == "" {
 		return errors.New("it has no id")
 	}
+	if in.DPA.Valid && in.DeviceName == "" {
+		return errors.New("an address within a device (dpa) needs the device (device_name)")
+	}
 	switch in.Inject {
 	case InjectError:
 		if !in.Severity.Valid() {
@@ -435,8 +438,8 @@ func (in *Injection) validate() error {
 		if in.How != "" {
 			return errors.New("\"how\" belongs to a page offline")
 		}
-		if !in.Address.Valid && !in.DPA.Valid && !in.Row.Valid && in.Label == "" {
-			return errors.New("an error needs an address, a row or a label to be found by")
+		if !in.Address.Valid && !in.Row.Valid && in.Label == "" && in.DeviceName == "" {
+			return errors.New("an error needs an address, a row, a label or a device to be found by")
 		}
 	case InjectOffline:
 		if in.How != "hard" && in.How != "soft" {
@@ -455,9 +458,6 @@ func (in *Injection) validate() error {
 		return errors.New("it does not say what was injected (inject: error or page-offline)")
 	default:
 		return fmt.Errorf("inject %q is neither error nor page-offline", in.Inject)
-	}
-	if in.DPA.Valid && in.DeviceName == "" {
-		return errors.New("an address within a device (dpa) needs the device (device_name)")
 	}
 	return nil
 }

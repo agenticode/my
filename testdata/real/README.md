@@ -11,6 +11,9 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `7.3.0-mce-print-all` | the same guest booted with `mce=print_all` | the same; the kernel log holds every record too |
 | `7.3.0-mce-clock-step` | the same guest, clock set back after rasdaemon started | the same; rasdaemon's times are 10 seconds ahead |
 | `7.3.0-mce-fatal` | the same guest | 1 fatal machine check; only the console is left |
+| `7.3.0-mce-rasdaemon-1.0` | the same guest, rasdaemon 1.0.0 | the machine checks of `7.3.0-mce` |
+| `7.3.0-cxl` | the same guest with an emulated CXL memory device, rasdaemon 1.0.0 | 11 corrected and 1 uncorrected error of the device, a health record, 2 poison ranges |
+| `6.19.10-ghes` | aarch64 guest with a firmware error source | 24 corrected and 2 uncorrected errors on one DIMM, as firmware error records with row and column |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 
@@ -34,7 +37,7 @@ my open testdata/real/7.3.0-mce/my/case.mycase
 | `capture.env` | the time of the capture and the versions |
 | `my/` | what `my` printed on the host as root: `scan.json`, `scan.txt`, `timeline.txt`, and the bundle `case.mycase` written with `--anonymize` |
 | `extra/` | what the injectors printed, what the kernel counts itself (`/proc/meminfo`, the table of the corrected error collector) and the output of `ras-mc-ctl` |
-| `formats/` | in `7.3.0-hwpoison`: the kernel log of the boot in seven more forms |
+| `formats/` | in `7.3.0-hwpoison` and `6.19.10-ghes`: the kernel log of the boot in seven more forms |
 | `console.log` | in `7.3.0-mce-fatal`: the kernel's lines on the serial console |
 
 What named the lab was replaced with `tools/lab/sanitize.py`: host names, machine IDs, hardware and network addresses, UUIDs of file systems. Boot IDs are as recorded.

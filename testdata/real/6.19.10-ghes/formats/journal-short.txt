@@ -1,0 +1,884 @@
+Nov 15 10:38:01 localhost kernel: Booting Linux on physical CPU 0x0000000000 [0x414fd0c1]
+Nov 15 10:38:01 localhost kernel: Linux version 6.19.10-300.fc44.aarch64 (mockbuild@fea49c8fbab948b09d95fb7305196ad4) (gcc (GCC) 16.0.1 20260321 (Red Hat 16.0.1-0), GNU ld version 2.46-1.fc44) #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026
+Nov 15 10:38:01 localhost kernel: KASLR enabled
+Nov 15 10:38:01 localhost kernel: efi: EFI v2.7 by EDK II
+Nov 15 10:38:01 localhost kernel: efi: SMBIOS 3.0=0x47e80000 OvmfDebugLog=0x47f80000 MEMATTR=0x4567c018 ACPI 2.0=0x47ff3018 MOKvar=0x455d0000 INITRD=0x4567f818 RNG=0x47ff3698 MEMRESERVE=0x4567f718 
+Nov 15 10:38:01 localhost kernel: random: crng init done
+Nov 15 10:38:01 localhost kernel: secureboot: Secure boot disabled
+Nov 15 10:38:01 localhost kernel: ACPI: Early table checksum verification disabled
+Nov 15 10:38:01 localhost kernel: ACPI: RSDP 0x0000000047FF3018 000024 (v02 BOCHS )
+Nov 15 10:38:01 localhost kernel: ACPI: XSDT 0x0000000047FF3F18 00006C (v01 BOCHS  BXPC     00000001      01000013)
+Nov 15 10:38:01 localhost kernel: ACPI: FACP 0x0000000047FF3B18 000114 (v06 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: DSDT 0x0000000047FF1018 0015C5 (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: APIC 0x0000000047FF3098 0002E8 (v04 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: PPTT 0x0000000047FF3C98 0000EC (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: GTDT 0x0000000047FF3E18 000068 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: MCFG 0x0000000047FF3498 00003C (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: SPCR 0x0000000047FF3A98 000050 (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: DBG2 0x0000000047FF3918 000057 (v00 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: HEST 0x0000000047FF3518 0000E0 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: IORT 0x0000000047FF3998 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+Nov 15 10:38:01 localhost kernel: ACPI: SPCR: console: pl011,mmio32,0x9000000,9600
+Nov 15 10:38:01 localhost kernel: NUMA: Faking a node at [mem 0x0000000040000000-0x000000023fffffff]
+Nov 15 10:38:01 localhost kernel: NODE_DATA(0) allocated [mem 0x23edf5280-0x23ee0bfff]
+Nov 15 10:38:01 localhost kernel: Zone ranges:
+Nov 15 10:38:01 localhost kernel:   DMA      [mem 0x0000000040000000-0x00000000ffffffff]
+Nov 15 10:38:01 localhost kernel:   DMA32    empty
+Nov 15 10:38:01 localhost kernel:   Normal   [mem 0x0000000100000000-0x000000023fffffff]
+Nov 15 10:38:01 localhost kernel:   Device   empty
+Nov 15 10:38:01 localhost kernel: Movable zone start for each node
+Nov 15 10:38:01 localhost kernel: Early memory node ranges
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000040000000-0x00000000455cffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x00000000455d0000-0x00000000455dffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x00000000455e0000-0x000000004565ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000045660000-0x000000004566ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000045670000-0x000000004629ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x00000000462a0000-0x000000004641ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000046420000-0x00000000464bffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x00000000464c0000-0x000000004655ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000046560000-0x0000000047a4ffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000047a50000-0x0000000047feffff]
+Nov 15 10:38:01 localhost kernel:   node   0: [mem 0x0000000047ff0000-0x000000023fffffff]
+Nov 15 10:38:01 localhost kernel: Initmem setup node 0 [mem 0x0000000040000000-0x000000023fffffff]
+Nov 15 10:38:01 localhost kernel: cma: Reserved 64 MiB at 0x00000000fc000000
+Nov 15 10:38:01 localhost kernel: psci: probing for conduit method from ACPI.
+Nov 15 10:38:01 localhost kernel: psci: PSCIv1.1 detected in firmware.
+Nov 15 10:38:01 localhost kernel: psci: Using standard PSCI v0.2 function IDs
+Nov 15 10:38:01 localhost kernel: psci: Trusted OS migration not required
+Nov 15 10:38:01 localhost kernel: psci: SMC Calling Convention v1.0
+Nov 15 10:38:01 localhost kernel: percpu: Embedded 57 pages/cpu s107480 r8192 d117800 u233472
+Nov 15 10:38:01 localhost kernel: pcpu-alloc: s107480 r8192 d117800 u233472 alloc=57*4096
+Nov 15 10:38:01 localhost kernel: pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 [0] 6 [0] 7 
+Nov 15 10:38:01 localhost kernel: Detected PIPT I-cache on CPU0
+Nov 15 10:38:01 localhost kernel: CPU features: detected: GICv3 CPU interface
+Nov 15 10:38:01 localhost kernel: CPU features: detected: Spectre-v4
+Nov 15 10:38:01 localhost kernel: CPU features: detected: Spectre-BHB
+Nov 15 10:38:01 localhost kernel: CPU features: kernel page table isolation forced ON by KASLR
+Nov 15 10:38:01 localhost kernel: CPU features: detected: Kernel page table isolation (KPTI)
+Nov 15 10:38:01 localhost kernel: CPU features: detected: SSBS not fully self-synchronizing
+Nov 15 10:38:01 localhost kernel: alternatives: applying boot alternatives
+Nov 15 10:38:01 localhost kernel: Kernel command line: BOOT_IMAGE=(hd0,gpt2)/boot/vmlinuz-6.19.10-300.fc44.aarch64 no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off root=UUID=00000000-0000-4000-8000-000000000002 rootflags=subvol=root systemd.default_device_timeout_sec=900 systemd.default_timeout_start_sec=900 enforcing=0
+Nov 15 10:38:01 localhost kernel: Unknown kernel command line parameters "no_timer_check", will be passed to user space.
+Nov 15 10:38:01 localhost kernel: printk: log buffer data + meta data: 262144 + 917504 = 1179648 bytes
+Nov 15 10:38:01 localhost kernel: Dentry cache hash table entries: 1048576 (order: 11, 8388608 bytes, linear)
+Nov 15 10:38:01 localhost kernel: Inode-cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+Nov 15 10:38:01 localhost kernel: software IO TLB: area num 8.
+Nov 15 10:38:01 localhost kernel: software IO TLB: mapped [mem 0x00000000f8000000-0x00000000fc000000] (64MB)
+Nov 15 10:38:01 localhost kernel: Fallback order for Node 0: 0 
+Nov 15 10:38:01 localhost kernel: Built 1 zonelists, mobility grouping on.  Total pages: 2097152
+Nov 15 10:38:01 localhost kernel: Policy zone: Normal
+Nov 15 10:38:01 localhost kernel: mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+Nov 15 10:38:01 localhost kernel: SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=8, Nodes=1
+Nov 15 10:38:01 localhost kernel: ftrace: allocating 68925 entries in 270 pages
+Nov 15 10:38:01 localhost kernel: ftrace: allocated 270 pages with 4 groups
+Nov 15 10:38:01 localhost kernel: Dynamic Preempt: voluntary
+Nov 15 10:38:01 localhost kernel: rcu: Preemptible hierarchical RCU implementation.
+Nov 15 10:38:01 localhost kernel: rcu:         RCU event tracing is enabled.
+Nov 15 10:38:01 localhost kernel: rcu:         RCU restricting CPUs from NR_CPUS=4096 to nr_cpu_ids=8.
+Nov 15 10:38:01 localhost kernel:         Trampoline variant of Tasks RCU enabled.
+Nov 15 10:38:01 localhost kernel:         Rude variant of Tasks RCU enabled.
+Nov 15 10:38:01 localhost kernel:         Tracing variant of Tasks RCU enabled.
+Nov 15 10:38:01 localhost kernel: rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+Nov 15 10:38:01 localhost kernel: rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=8
+Nov 15 10:38:01 localhost kernel: RCU Tasks: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+Nov 15 10:38:01 localhost kernel: RCU Tasks Rude: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+Nov 15 10:38:01 localhost kernel: RCU Tasks Trace: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+Nov 15 10:38:01 localhost kernel: NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+Nov 15 10:38:01 localhost kernel: GICv3: 256 SPIs implemented
+Nov 15 10:38:01 localhost kernel: GICv3: 0 Extended SPIs implemented
+Nov 15 10:38:01 localhost kernel: Root IRQ handler: gic_handle_irq
+Nov 15 10:38:01 localhost kernel: GICv3: GICv3 features: 16 PPIs
+Nov 15 10:38:01 localhost kernel: GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+Nov 15 10:38:01 localhost kernel: GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+Nov 15 10:38:01 localhost kernel: ITS [mem 0x08080000-0x0809ffff]
+Nov 15 10:38:01 localhost kernel: ITS@0x0000000008080000: allocated 8192 Devices @1002e0000 (indirect, esz 8, psz 64K, shr 1)
+Nov 15 10:38:01 localhost kernel: ITS@0x0000000008080000: allocated 8192 Interrupt Collections @1002f0000 (flat, esz 8, psz 64K, shr 1)
+Nov 15 10:38:01 localhost kernel: GICv3: using LPI property table @0x0000000100300000
+Nov 15 10:38:01 localhost kernel: GICv3: CPU0: using allocated LPI pending table @0x0000000100310000
+Nov 15 10:38:01 localhost kernel: rcu: srcu_init: Setting srcu_struct sizes based on contention.
+Nov 15 10:38:01 localhost kernel: arch_timer: cp15 timer running at 62.50MHz (virt).
+Nov 15 10:38:01 localhost kernel: clocksource: arch_sys_counter: mask: 0x1ffffffffffffff max_cycles: 0x1cd42e208c, max_idle_ns: 881590405314 ns
+Nov 15 10:38:01 localhost kernel: sched_clock: 57 bits at 63MHz, resolution 16ns, wraps every 4398046511096ns
+Nov 15 10:38:01 localhost kernel: kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+Nov 15 10:38:01 localhost kernel: Console: colour dummy device 80x25
+Nov 15 10:38:01 localhost kernel: printk: legacy console [tty1] enabled
+Nov 15 10:38:01 localhost kernel: ACPI: Core revision 20250807
+Nov 15 10:38:01 localhost kernel: Calibrating delay loop (skipped), value calculated using timer frequency.. 125.00 BogoMIPS (lpj=62500)
+Nov 15 10:38:01 localhost kernel: pid_max: default: 32768 minimum: 301
+Nov 15 10:38:01 localhost kernel: Yama: becoming mindful.
+Nov 15 10:38:01 localhost kernel: SELinux:  Initializing.
+Nov 15 10:38:02 localhost kernel: LSM support for eBPF active
+Nov 15 10:38:02 localhost kernel: landlock: Up and running.
+Nov 15 10:38:02 localhost kernel: Mount-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+Nov 15 10:38:02 localhost kernel: Mountpoint-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+Nov 15 10:38:02 localhost kernel: rcu: Hierarchical SRCU implementation.
+Nov 15 10:38:02 localhost kernel: rcu:         Max phase no-delay instances is 400.
+Nov 15 10:38:02 localhost kernel: Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+Nov 15 10:38:02 localhost kernel: fsl-mc MSI: ITS@0x8080000 domain created
+Nov 15 10:38:02 localhost kernel: Remapping and enabling EFI services.
+Nov 15 10:38:02 localhost kernel: smp: Bringing up secondary CPUs ...
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU1
+Nov 15 10:38:02 localhost kernel: GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU1: using allocated LPI pending table @0x0000000100320000
+Nov 15 10:38:02 localhost kernel: CPU1: Booted secondary processor 0x0000000001 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU2
+Nov 15 10:38:02 localhost kernel: GICv3: CPU2: found redistributor 2 region 0:0x00000000080e0000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU2: using allocated LPI pending table @0x0000000100330000
+Nov 15 10:38:02 localhost kernel: CPU2: Booted secondary processor 0x0000000002 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU3
+Nov 15 10:38:02 localhost kernel: GICv3: CPU3: found redistributor 3 region 0:0x0000000008100000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU3: using allocated LPI pending table @0x0000000100340000
+Nov 15 10:38:02 localhost kernel: CPU3: Booted secondary processor 0x0000000003 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU4
+Nov 15 10:38:02 localhost kernel: GICv3: CPU4: found redistributor 4 region 0:0x0000000008120000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU4: using allocated LPI pending table @0x0000000100350000
+Nov 15 10:38:02 localhost kernel: CPU4: Booted secondary processor 0x0000000004 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU5
+Nov 15 10:38:02 localhost kernel: GICv3: CPU5: found redistributor 5 region 0:0x0000000008140000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU5: using allocated LPI pending table @0x0000000100360000
+Nov 15 10:38:02 localhost kernel: CPU5: Booted secondary processor 0x0000000005 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU6
+Nov 15 10:38:02 localhost kernel: GICv3: CPU6: found redistributor 6 region 0:0x0000000008160000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU6: using allocated LPI pending table @0x0000000100370000
+Nov 15 10:38:02 localhost kernel: CPU6: Booted secondary processor 0x0000000006 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: Detected PIPT I-cache on CPU7
+Nov 15 10:38:02 localhost kernel: GICv3: CPU7: found redistributor 7 region 0:0x0000000008180000
+Nov 15 10:38:02 localhost kernel: GICv3: CPU7: using allocated LPI pending table @0x0000000100380000
+Nov 15 10:38:02 localhost kernel: CPU7: Booted secondary processor 0x0000000007 [0x414fd0c1]
+Nov 15 10:38:02 localhost kernel: smp: Brought up 1 node, 8 CPUs
+Nov 15 10:38:02 localhost kernel: SMP: Total of 8 processors activated.
+Nov 15 10:38:02 localhost kernel: CPU: All CPU(s) started at EL1
+Nov 15 10:38:02 localhost kernel: CPU features: detected: 32-bit EL0 Support
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Common not Private translations
+Nov 15 10:38:02 localhost kernel: CPU features: detected: CRC32 instructions
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Data cache clean to Point of Persistence
+Nov 15 10:38:02 localhost kernel: CPU features: detected: RCpc load-acquire (LDAPR)
+Nov 15 10:38:02 localhost kernel: CPU features: detected: LSE atomic instructions
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Privileged Access Never
+Nov 15 10:38:02 localhost kernel: CPU features: detected: PMUv3
+Nov 15 10:38:02 localhost kernel: CPU features: detected: RAS Extension Support
+Nov 15 10:38:02 localhost kernel: CPU features: detected: XNX
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+Nov 15 10:38:02 localhost kernel: alternatives: applying system-wide alternatives
+Nov 15 10:38:02 localhost kernel: CPU features: detected: Hardware dirty bit management on CPU0-7
+Nov 15 10:38:02 localhost kernel: Memory: 7957172K/8388608K available (22976K kernel code, 6030K rwdata, 19488K rodata, 14720K init, 10298K bss, 355068K reserved, 65536K cma-reserved)
+Nov 15 10:38:02 localhost kernel: devtmpfs: initialized
+Nov 15 10:38:02 localhost kernel: clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+Nov 15 10:38:02 localhost kernel: posixtimers hash table entries: 4096 (order: 4, 65536 bytes, linear)
+Nov 15 10:38:02 localhost kernel: futex hash table entries: 2048 (131072 bytes on 1 NUMA nodes, total 128 KiB, linear).
+Nov 15 10:38:02 localhost kernel: 2G module region forced by RANDOMIZE_MODULE_REGION_FULL
+Nov 15 10:38:02 localhost kernel: 0 pages in range for non-PLT usage
+Nov 15 10:38:02 localhost kernel: 505840 pages in range for PLT usage
+Nov 15 10:38:02 localhost kernel: SMBIOS 3.0.0 present.
+Nov 15 10:38:02 localhost kernel: DMI: QEMU lab-arm, BIOS edk2-20260812-10.fc44 08/12/2026
+Nov 15 10:38:02 localhost kernel: DMI: Memory slots populated: 1/1
+Nov 15 10:38:02 localhost kernel: NET: Registered PF_NETLINK/PF_ROUTE protocol family
+Nov 15 10:38:02 localhost kernel: DMA: preallocated 1024 KiB GFP_KERNEL pool for atomic allocations
+Nov 15 10:38:02 localhost kernel: DMA: preallocated 1024 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+Nov 15 10:38:02 localhost kernel: audit: initializing netlink subsys (disabled)
+Nov 15 10:38:02 localhost kernel: audit: type=2000 audit(0.745:1): state=initialized audit_enabled=0 res=1
+Nov 15 10:38:02 localhost kernel: thermal_sys: Registered thermal governor 'fair_share'
+Nov 15 10:38:02 localhost kernel: thermal_sys: Registered thermal governor 'step_wise'
+Nov 15 10:38:02 localhost kernel: thermal_sys: Registered thermal governor 'user_space'
+Nov 15 10:38:02 localhost kernel: cpuidle: using governor menu
+Nov 15 10:38:02 localhost kernel: hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+Nov 15 10:38:02 localhost kernel: ASID allocator initialised with 32768 entries
+Nov 15 10:38:02 localhost kernel: acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+Nov 15 10:38:02 localhost kernel: Serial: AMBA PL011 UART driver
+Nov 15 10:38:02 localhost kernel: HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+Nov 15 10:38:02 localhost kernel: HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+Nov 15 10:38:02 localhost kernel: HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+Nov 15 10:38:02 localhost kernel: HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+Nov 15 10:38:02 localhost kernel: HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+Nov 15 10:38:02 localhost kernel: HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+Nov 15 10:38:02 localhost kernel: HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+Nov 15 10:38:02 localhost kernel: HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+Nov 15 10:38:02 localhost kernel: raid6: skipped pq benchmark and selected neonx8
+Nov 15 10:38:02 localhost kernel: raid6: using neon recovery algorithm
+Nov 15 10:38:02 localhost kernel: fbcon: Taking over console
+Nov 15 10:38:02 localhost kernel: ACPI: Added _OSI(Module Device)
+Nov 15 10:38:02 localhost kernel: ACPI: Added _OSI(Processor Device)
+Nov 15 10:38:02 localhost kernel: ACPI: Added _OSI(Processor Aggregator Device)
+Nov 15 10:38:02 localhost kernel: ACPI: 1 ACPI AML tables successfully acquired and loaded
+Nov 15 10:38:02 localhost kernel: ACPI: Interpreter enabled
+Nov 15 10:38:02 localhost kernel: ACPI: Using GIC for interrupt routing
+Nov 15 10:38:02 localhost kernel: ACPI: MCFG table detected, 1 entries
+Nov 15 10:38:02 localhost kernel: HEST: Table parsing has been initialized.
+Nov 15 10:38:02 localhost kernel: GHES: Failed to enable APEI firmware first mode.
+Nov 15 10:38:02 localhost kernel: ACPI: CPU0 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU1 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU2 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU3 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU4 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU5 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU6 has been hot-added
+Nov 15 10:38:02 localhost kernel: ACPI: CPU7 has been hot-added
+Nov 15 10:38:02 localhost kernel: ARMH0011:00: ttyAMA0 at MMIO 0x9000000 (irq = 12, base_baud = 0) is a SBSA
+Nov 15 10:38:02 localhost kernel: printk: console [ttyAMA0] enabled
+Nov 15 10:38:02 localhost kernel: ACPI: PCI: Interrupt link L000 configured for IRQ 35
+Nov 15 10:38:02 localhost kernel: ACPI: PCI: Interrupt link L001 configured for IRQ 36
+Nov 15 10:38:02 localhost kernel: ACPI: PCI: Interrupt link L002 configured for IRQ 37
+Nov 15 10:38:02 localhost kernel: ACPI: PCI: Interrupt link L003 configured for IRQ 38
+Nov 15 10:38:02 localhost kernel: ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+Nov 15 10:38:02 localhost kernel: acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+Nov 15 10:38:02 localhost kernel: acpi PNP0A08:00: _OSC: platform does not support [LTR DPC]
+Nov 15 10:38:02 localhost kernel: acpi PNP0A08:00: _OSC: OS now controls [PCIeHotplug PME AER PCIeCapability]
+Nov 15 10:38:02 localhost kernel: acpi PNP0A08:00: ECAM area [mem 0x4010000000-0x401fffffff] reserved by PNP0C02:00
+Nov 15 10:38:03 localhost kernel: acpi PNP0A08:00: ECAM at [mem 0x4010000000-0x401fffffff] for [bus 00-ff]
+Nov 15 10:38:03 localhost kernel: ACPI: Remapped I/O 0x000000003eff0000 to [io  0x0000-0xffff window]
+Nov 15 10:38:03 localhost kernel: PCI host bridge to bus 0000:00
+Nov 15 10:38:03 localhost kernel: pci_bus 0000:00: root bus resource [mem 0x10000000-0x3efeffff window]
+Nov 15 10:38:03 localhost kernel: pci_bus 0000:00: root bus resource [io  0x0000-0xffff window]
+Nov 15 10:38:03 localhost kernel: pci_bus 0000:00: root bus resource [mem 0x8000000000-0xffffffffff window]
+Nov 15 10:38:03 localhost kernel: pci_bus 0000:00: root bus resource [bus 00-ff]
+Nov 15 10:38:03 localhost kernel: PCI: OF: of_root node is NULL, cannot create PCI host bridge node
+Nov 15 10:38:03 localhost kernel: pci 0000:00:00.0: [1b36:0008] type 00 class 0x060000 conventional PCI endpoint
+Nov 15 10:38:03 localhost kernel: pci 0000:00:01.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+Nov 15 10:38:04 localhost kernel: pci 0000:00:01.0: BAR 0 [io  0x00a0-0x00bf]
+Nov 15 10:38:04 localhost kernel: pci 0000:00:01.0: BAR 1 [mem 0x10042000-0x10042fff]
+Nov 15 10:38:04 localhost kernel: pci 0000:00:01.0: BAR 4 [mem 0x8000000000-0x8000003fff 64bit pref]
+Nov 15 10:38:04 localhost kernel: pci 0000:00:01.0: ROM [mem 0xfffc0000-0xffffffff pref]
+Nov 15 10:38:04 localhost kernel: pci 0000:00:02.0: [1af4:1005] type 00 class 0x00ff00 conventional PCI endpoint
+Nov 15 10:38:04 localhost kernel: pci 0000:00:02.0: BAR 0 [io  0x0080-0x009f]
+Nov 15 10:38:05 localhost kernel: pci 0000:00:02.0: BAR 1 [mem 0x10041000-0x10041fff]
+Nov 15 10:38:05 localhost kernel: pci 0000:00:02.0: BAR 4 [mem 0x8000004000-0x8000007fff 64bit pref]
+Nov 15 10:38:05 localhost kernel: pci 0000:00:03.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+Nov 15 10:38:05 localhost kernel: pci 0000:00:03.0: BAR 0 [io  0x0000-0x007f]
+Nov 15 10:38:05 localhost kernel: pci 0000:00:03.0: BAR 1 [mem 0x10040000-0x10040fff]
+Nov 15 10:38:05 localhost kernel: pci 0000:00:03.0: BAR 4 [mem 0x8000008000-0x800000bfff 64bit pref]
+Nov 15 10:38:06 localhost kernel: pci 0000:00:01.0: ROM [mem 0x10000000-0x1003ffff pref]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:01.0: BAR 4 [mem 0x8000000000-0x8000003fff 64bit pref]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:02.0: BAR 4 [mem 0x8000004000-0x8000007fff 64bit pref]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:03.0: BAR 4 [mem 0x8000008000-0x800000bfff 64bit pref]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:01.0: BAR 1 [mem 0x10040000-0x10040fff]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:02.0: BAR 1 [mem 0x10041000-0x10041fff]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:03.0: BAR 1 [mem 0x10042000-0x10042fff]: assigned
+Nov 15 10:38:06 localhost kernel: pci 0000:00:03.0: BAR 0 [io  0x1000-0x107f]: assigned
+Nov 15 10:38:07 localhost kernel: pci 0000:00:01.0: BAR 0 [io  0x1080-0x109f]: assigned
+Nov 15 10:38:07 localhost kernel: pci 0000:00:02.0: BAR 0 [io  0x10a0-0x10bf]: assigned
+Nov 15 10:38:07 localhost kernel: pci_bus 0000:00: resource 4 [mem 0x10000000-0x3efeffff window]
+Nov 15 10:38:07 localhost kernel: pci_bus 0000:00: resource 5 [io  0x0000-0xffff window]
+Nov 15 10:38:07 localhost kernel: pci_bus 0000:00: resource 6 [mem 0x8000000000-0xffffffffff window]
+Nov 15 10:38:07 localhost kernel: iommu: Default domain type: Translated
+Nov 15 10:38:07 localhost kernel: iommu: DMA domain TLB invalidation policy: lazy mode
+Nov 15 10:38:07 localhost kernel: SCSI subsystem initialized
+Nov 15 10:38:07 localhost kernel: libata version 3.00 loaded.
+Nov 15 10:38:07 localhost kernel: ACPI: bus type USB registered
+Nov 15 10:38:07 localhost kernel: usbcore: registered new interface driver usbfs
+Nov 15 10:38:07 localhost kernel: usbcore: registered new interface driver hub
+Nov 15 10:38:07 localhost kernel: usbcore: registered new device driver usb
+Nov 15 10:38:07 localhost kernel: pps_core: LinuxPPS API ver. 1 registered
+Nov 15 10:38:07 localhost kernel: pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+Nov 15 10:38:07 localhost kernel: PTP clock support registered
+Nov 15 10:38:07 localhost kernel: EDAC MC: Ver: 3.0.0
+Nov 15 10:38:07 localhost kernel: scmi_core: SCMI protocol bus registered
+Nov 15 10:38:07 localhost kernel: efivars: Registered efivars operations
+Nov 15 10:38:07 localhost kernel: OVMF debug log: firmware version: "edk2-20260812-10.fc44"
+Nov 15 10:38:07 localhost kernel: OVMF debug log: buffer size: 128k
+Nov 15 10:38:07 localhost kernel: NetLabel: Initializing
+Nov 15 10:38:07 localhost kernel: NetLabel:  domain hash size = 128
+Nov 15 10:38:07 localhost kernel: NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+Nov 15 10:38:07 localhost kernel: NetLabel:  unlabeled traffic allowed by default
+Nov 15 10:38:07 localhost kernel: mctp: management component transport protocol core
+Nov 15 10:38:07 localhost kernel: NET: Registered PF_MCTP protocol family
+Nov 15 10:38:07 localhost kernel: vgaarb: loaded
+Nov 15 10:38:07 localhost kernel: clocksource: Switched to clocksource arch_sys_counter
+Nov 15 10:38:07 localhost kernel: VFS: Disk quotas dquot_6.6.0
+Nov 15 10:38:07 localhost kernel: VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+Nov 15 10:38:07 localhost kernel: pnp: PnP ACPI init
+Nov 15 10:38:07 localhost kernel: system 00:00: [mem 0x4010000000-0x401fffffff window] could not be reserved
+Nov 15 10:38:07 localhost kernel: pnp: PnP ACPI: found 1 devices
+Nov 15 10:38:07 localhost kernel: NET: Registered PF_INET protocol family
+Nov 15 10:38:07 localhost kernel: IP idents hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+Nov 15 10:38:07 localhost kernel: tcp_listen_portaddr_hash hash table entries: 4096 (order: 4, 65536 bytes, linear)
+Nov 15 10:38:07 localhost kernel: Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+Nov 15 10:38:07 localhost kernel: TCP established hash table entries: 65536 (order: 7, 524288 bytes, linear)
+Nov 15 10:38:07 localhost kernel: TCP bind hash table entries: 65536 (order: 9, 2097152 bytes, linear)
+Nov 15 10:38:07 localhost kernel: TCP: Hash tables configured (established 65536 bind 65536)
+Nov 15 10:38:07 localhost kernel: MPTCP token hash table entries: 8192 (order: 6, 196608 bytes, linear)
+Nov 15 10:38:07 localhost kernel: UDP hash table entries: 4096 (order: 6, 262144 bytes, linear)
+Nov 15 10:38:07 localhost kernel: UDP-Lite hash table entries: 4096 (order: 6, 262144 bytes, linear)
+Nov 15 10:38:07 localhost kernel: NET: Registered PF_UNIX/PF_LOCAL protocol family
+Nov 15 10:38:07 localhost kernel: NET: Registered PF_XDP protocol family
+Nov 15 10:38:07 localhost kernel: PCI: CLS 0 bytes, default 64
+Nov 15 10:38:07 localhost kernel: ACPI: bus type thunderbolt registered
+Nov 15 10:38:07 localhost kernel: Trying to unpack rootfs image as initramfs...
+Nov 15 10:38:07 localhost kernel: kvm [1]: HYP mode not available
+Nov 15 10:38:07 localhost kernel: Initialise system trusted keyrings
+Nov 15 10:38:07 localhost kernel: Key type blacklist registered
+Nov 15 10:38:07 localhost kernel: workingset: timestamp_bits=37 max_order=21 bucket_order=0
+Nov 15 10:38:07 localhost kernel: integrity: Platform Keyring initialized
+Nov 15 10:38:07 localhost kernel: integrity: Machine keyring initialized
+Nov 15 10:38:07 localhost kernel: cryptd: max_cpu_qlen set to 1000
+Nov 15 10:38:07 localhost kernel: NET: Registered PF_ALG protocol family
+Nov 15 10:38:07 localhost kernel: xor: measuring software checksum speed
+Nov 15 10:38:07 localhost kernel:    8regs           :  1154 MB/sec
+Nov 15 10:38:07 localhost kernel:    32regs          :  1512 MB/sec
+Nov 15 10:38:07 localhost kernel:    arm64_neon      :   747 MB/sec
+Nov 15 10:38:07 localhost kernel: xor: using function: 32regs (1512 MB/sec)
+Nov 15 10:38:07 localhost kernel: Key type asymmetric registered
+Nov 15 10:38:07 localhost kernel: Asymmetric key parser 'x509' registered
+Nov 15 10:38:07 localhost kernel: Block layer SCSI generic (bsg) driver version 0.4 loaded (major 241)
+Nov 15 10:38:07 localhost kernel: io scheduler mq-deadline registered
+Nov 15 10:38:07 localhost kernel: io scheduler kyber registered
+Nov 15 10:38:07 localhost kernel: io scheduler bfq registered
+Nov 15 10:38:07 localhost kernel: atomic64_test: passed
+Nov 15 10:38:07 localhost kernel: ledtrig-cpu: registered to indicate activity on CPUs
+Nov 15 10:38:07 localhost kernel: input: Power Button as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input0
+Nov 15 10:38:07 localhost kernel: ACPI: button: Power Button [PWRB]
+Nov 15 10:38:07 localhost kernel: ACPI: \_SB_.L001: Enabled at IRQ 36
+Nov 15 10:38:08 localhost kernel: virtio-pci 0000:00:01.0: enabling device (0005 -> 0007)
+Nov 15 10:38:08 localhost kernel: ACPI: \_SB_.L002: Enabled at IRQ 37
+Nov 15 10:38:08 localhost kernel: virtio-pci 0000:00:02.0: enabling device (0005 -> 0007)
+Nov 15 10:38:08 localhost kernel: ACPI: \_SB_.L003: Enabled at IRQ 38
+Nov 15 10:38:08 localhost kernel: virtio-pci 0000:00:03.0: enabling device (0005 -> 0007)
+Nov 15 10:38:08 localhost kernel: Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+Nov 15 10:38:08 localhost kernel: msm_serial: driver initialized
+Nov 15 10:38:08 localhost kernel: SuperH (H)SCI(F) driver initialized
+Nov 15 10:38:08 localhost kernel: ACPI: bus type drm_connector registered
+Nov 15 10:38:08 localhost kernel: virtio_blk virtio2: 8/0/0 default/read/poll queues
+Nov 15 10:38:08 localhost kernel: virtio_blk virtio2: [vda] 41943040 512-byte logical blocks (21.5 GB/20.0 GiB)
+Nov 15 10:38:08 localhost kernel: GPT:Primary header thinks Alt. header is not at the end of the disk.
+Nov 15 10:38:08 localhost kernel: GPT:10485759 != 41943039
+Nov 15 10:38:08 localhost kernel: GPT:Alternate GPT header not at the end of the disk.
+Nov 15 10:38:08 localhost kernel: GPT:10485759 != 41943039
+Nov 15 10:38:08 localhost kernel: GPT: Use GNU Parted to correct GPT errors.
+Nov 15 10:38:08 localhost kernel:  vda: vda1 vda2
+Nov 15 10:38:08 localhost kernel: CAN device driver interface
+Nov 15 10:38:08 localhost kernel: usbcore: registered new interface driver usbserial_generic
+Nov 15 10:38:08 localhost kernel: usbserial: USB Serial support registered for generic
+Nov 15 10:38:08 localhost kernel: mousedev: PS/2 mouse device common for all mice
+Nov 15 10:38:08 localhost kernel: rtc-efi rtc-efi.0: registered as rtc0
+Nov 15 10:38:08 localhost kernel: rtc-efi rtc-efi.0: setting system clock to 2026-11-15T10:37:11 UTC (1794739031)
+Nov 15 10:38:08 localhost kernel: device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+Nov 15 10:38:08 localhost kernel: device-mapper: uevent: version 1.0.3
+Nov 15 10:38:08 localhost kernel: device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+Nov 15 10:38:08 localhost kernel: ghes_edac: This system has 1 DIMM sockets.
+Nov 15 10:38:08 localhost kernel: EDAC MC0: Giving out device to module ghes_edac.c controller ghes_edac: DEV ghes (INTERRUPT)
+Nov 15 10:38:08 localhost kernel: hid: raw HID events driver (C) Jiri Kosina
+Nov 15 10:38:08 localhost kernel: usbcore: registered new interface driver usbhid
+Nov 15 10:38:08 localhost kernel: usbhid: USB HID core driver
+Nov 15 10:38:08 localhost kernel: hw perfevents: enabled with armv8_pmuv3_0 PMU driver, 7 (0,8000003f) counters available
+Nov 15 10:38:08 localhost kernel: watchdog: NMI not fully supported
+Nov 15 10:38:08 localhost kernel: watchdog: Hard watchdog permanently disabled
+Nov 15 10:38:08 localhost kernel: drop_monitor: Initializing network drop monitor service
+Nov 15 10:38:08 localhost kernel: Initializing XFRM netlink socket
+Nov 15 10:38:08 localhost kernel: NET: Registered PF_INET6 protocol family
+Nov 15 10:38:08 localhost kernel: Segment Routing with IPv6
+Nov 15 10:38:08 localhost kernel: RPL Segment Routing with IPv6
+Nov 15 10:38:08 localhost kernel: In-situ OAM (IOAM) with IPv6
+Nov 15 10:38:08 localhost kernel: mip6: Mobile IPv6
+Nov 15 10:38:08 localhost kernel: NET: Registered PF_PACKET protocol family
+Nov 15 10:38:08 localhost kernel: can: controller area network core
+Nov 15 10:38:08 localhost kernel: NET: Registered PF_CAN protocol family
+Nov 15 10:38:08 localhost kernel: registered taskstats version 1
+Nov 15 10:38:08 localhost kernel: Loading compiled-in X.509 certificates
+Nov 15 10:38:08 localhost kernel: Loaded X.509 cert 'Fedora kernel signing key: ae73a0479fdcdd7483824a83e738e71a87e7cafe'
+Nov 15 10:38:08 localhost kernel: Freeing initrd memory: 42752K
+Nov 15 10:38:08 localhost kernel: Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+Nov 15 10:38:08 localhost kernel: Demotion targets for Node 0: null
+Nov 15 10:38:08 localhost kernel: page_owner is disabled
+Nov 15 10:38:08 localhost kernel: Key type .fscrypt registered
+Nov 15 10:38:08 localhost kernel: Key type fscrypt-provisioning registered
+Nov 15 10:38:08 localhost kernel: Btrfs loaded, zoned=yes, fsverity=yes
+Nov 15 10:38:08 localhost kernel: Key type big_key registered
+Nov 15 10:38:08 localhost kernel: Key type encrypted registered
+Nov 15 10:38:08 localhost kernel: ima: secureboot mode disabled
+Nov 15 10:38:08 localhost kernel: ima: No TPM chip found, activating TPM-bypass!
+Nov 15 10:38:08 localhost kernel: Loading compiled-in module X.509 certificates
+Nov 15 10:38:08 localhost kernel: Loaded X.509 cert 'Fedora kernel signing key: ae73a0479fdcdd7483824a83e738e71a87e7cafe'
+Nov 15 10:38:08 localhost kernel: ima: Allocated hash algorithm: sha256
+Nov 15 10:38:08 localhost kernel: ima: No architecture policies found
+Nov 15 10:38:08 localhost kernel: evm: Initialising EVM extended attributes:
+Nov 15 10:38:08 localhost kernel: evm: security.selinux
+Nov 15 10:38:08 localhost kernel: evm: security.SMACK64 (disabled)
+Nov 15 10:38:08 localhost kernel: evm: security.SMACK64EXEC (disabled)
+Nov 15 10:38:08 localhost kernel: evm: security.SMACK64TRANSMUTE (disabled)
+Nov 15 10:38:08 localhost kernel: evm: security.SMACK64MMAP (disabled)
+Nov 15 10:38:08 localhost kernel: evm: security.apparmor (disabled)
+Nov 15 10:38:08 localhost kernel: evm: security.ima
+Nov 15 10:38:08 localhost kernel: evm: security.capability
+Nov 15 10:38:08 localhost kernel: evm: HMAC attrs: 0x1
+Nov 15 10:38:08 localhost kernel: alg: No test for 842 (842-scomp)
+Nov 15 10:38:08 localhost kernel: clk: Disabling unused clocks
+Nov 15 10:38:08 localhost kernel: PM: genpd: Disabling unused power domains
+Nov 15 10:38:08 localhost kernel: Freeing unused kernel memory: 14720K
+Nov 15 10:38:08 localhost kernel: Checked W+X mappings: passed, no W+X pages found
+Nov 15 10:38:08 localhost kernel: Run /init as init process
+Nov 15 10:38:08 localhost kernel:   with arguments:
+Nov 15 10:38:08 localhost kernel:     /init
+Nov 15 10:38:08 localhost kernel:     no_timer_check
+Nov 15 10:38:08 localhost kernel:   with environment:
+Nov 15 10:38:08 localhost kernel:     HOME=/
+Nov 15 10:38:08 localhost kernel:     TERM=linux
+Nov 15 10:38:08 localhost kernel: fuse: init (API version 7.45)
+Nov 15 10:38:08 localhost systemd[1]: Successfully made /usr/ read-only.
+Nov 15 10:38:08 localhost systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+Nov 15 10:38:08 localhost systemd[1]: Detected virtualization qemu.
+Nov 15 10:38:08 localhost systemd[1]: Detected architecture arm64.
+Nov 15 10:38:08 localhost systemd[1]: Running in initrd.
+Nov 15 10:38:08 localhost systemd[1]: Initializing machine ID from random generator.
+Nov 15 10:38:08 localhost systemd[1]: No hostname configured, using default hostname.
+Nov 15 10:38:08 localhost systemd[1]: Hostname set to <localhost>.
+Nov 15 10:38:08 localhost systemd[1]: bpf-restrict-fs: LSM BPF program attached
+Nov 15 10:38:08 localhost kernel: hrtimer: interrupt took 2413584 ns
+Nov 15 10:38:08 localhost systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+Nov 15 10:38:08 localhost systemd[1]: Queued start job for default target initrd.target.
+Nov 15 10:38:08 localhost systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Nov 15 10:38:08 localhost systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+Nov 15 10:38:08 localhost systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+Nov 15 10:38:08 localhost systemd[1]: Reached target paths.target - Path Units.
+Nov 15 10:38:08 localhost systemd[1]: Reached target slices.target - Slice Units.
+Nov 15 10:38:08 localhost systemd[1]: Reached target swap.target - Swaps.
+Nov 15 10:38:08 localhost systemd[1]: Reached target timers.target - Timer Units.
+Nov 15 10:38:08 localhost systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+Nov 15 10:38:08 localhost systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+Nov 15 10:38:08 localhost systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Nov 15 10:38:08 localhost systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+Nov 15 10:38:08 localhost systemd[1]: Reached target sockets.target - Socket Units.
+Nov 15 10:38:08 localhost systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Nov 15 10:38:08 localhost systemd[1]: memstrack.service - Memstrack Anylazing Service skipped, no trigger condition checks were met.
+Nov 15 10:38:08 localhost systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+Nov 15 10:38:08 localhost systemd[1]: Starting systemd-journald.service - Journal Service...
+Nov 15 10:38:08 localhost systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Nov 15 10:38:08 localhost systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+Nov 15 10:38:08 localhost systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Nov 15 10:38:08 localhost systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+Nov 15 10:38:08 localhost systemd-journald[268]: Collecting audit messages is disabled.
+Nov 15 10:38:08 localhost systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+Nov 15 10:38:08 localhost systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+Nov 15 10:38:08 localhost systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+Nov 15 10:38:08 localhost systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+Nov 15 10:38:08 localhost systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+Nov 15 10:38:08 localhost systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+Nov 15 10:38:08 localhost systemd[1]: Started systemd-journald.service - Journal Service.
+Nov 15 10:40:11 localhost kernel: BTRFS: device label fedora devid 1 transid 24 /dev/vda2 (253:2) scanned by mount (516)
+Nov 15 10:40:11 localhost kernel: BTRFS info (device vda2): first mount of filesystem 00000000-0000-4000-8000-000000000002
+Nov 15 10:40:11 localhost kernel: BTRFS info (device vda2): using crc32c (crc32c-lib) checksum algorithm
+Nov 15 10:40:11 localhost kernel: BTRFS info (device vda2): turning on async discard
+Nov 15 10:40:11 localhost kernel: BTRFS info (device vda2): enabling free space tree
+Nov 15 10:41:24 localhost systemd-journald[268]: Received SIGTERM from PID 1 (systemd).
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission firmware_load in class system not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission kexec_image_load in class system not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission policy_load in class system not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission x509_certificate_load in class system not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Permission allowed in class io_uring not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux:  Class memfd_file not defined in policy.
+Nov 15 10:43:27 localhost kernel: SELinux: the above unknown classes and permissions will be allowed
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability network_peer_controls=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability open_perms=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability extended_socket_class=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability always_check_network=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability cgroup_seclabel=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability nnp_nosuid_transition=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability genfs_seclabel_symlinks=1
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability ioctl_skip_cloexec=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability userspace_initial_context=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability netlink_xperm=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability netif_wildcard=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability genfs_seclabel_wildcard=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability functionfs_seclabel=0
+Nov 15 10:43:27 localhost kernel: SELinux:  policy capability memfd_class=0
+Nov 15 10:43:27 localhost kernel: audit: type=1403 audit(1794739291.404:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+Nov 15 10:43:27 localhost systemd[1]: Successfully loaded SELinux policy in 1.602417s.
+Nov 15 10:43:27 localhost kernel: NET: Registered PF_VSOCK protocol family
+Nov 15 10:43:27 localhost systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 962.038ms.
+Nov 15 10:43:27 localhost systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+Nov 15 10:43:27 localhost systemd[1]: Detected virtualization qemu.
+Nov 15 10:43:27 localhost systemd[1]: Detected architecture arm64.
+Nov 15 10:43:27 localhost systemd[1]: Detected first boot.
+Nov 15 10:43:27 localhost systemd[1]: Initializing machine ID from random generator.
+Nov 15 10:43:27 localhost systemd[1]: bpf-restrict-fs: LSM BPF program attached
+Nov 15 10:43:27 localhost kernel: zram: Added device: zram0
+Nov 15 10:43:27 localhost systemd[1]: Applying preset policy.
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/default.target: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/sockets.target.wants/systemd-resolved-monitor.socket: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/sockets.target.wants/systemd-resolved-varlink.socket: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/multi-user.target.wants/lvm-devices-import.path: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/multi-user.target.wants/lvm-devices-import.service: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: Unit /usr/lib/systemd/system/qemu-guest-agent.service is added as a dependency to a non-existent unit dev-virtio\x2dports-org.qemu.guest_agent.0.device.
+Nov 15 10:43:27 localhost systemd[1]: Failed to preset all unit /etc/systemd/system/multi-user.target.wants/remote-integritysetup.target: Read-only file system
+Nov 15 10:43:27 localhost systemd[1]: initrd-switch-root.service: Deactivated successfully.
+Nov 15 10:43:27 localhost systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+Nov 15 10:43:27 localhost systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+Nov 15 10:43:27 localhost systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+Nov 15 10:43:27 localhost systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Nov 15 10:43:27 localhost systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+Nov 15 10:43:27 localhost systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+Nov 15 10:43:27 localhost systemd[1]: Created slice user.slice - User and Session Slice.
+Nov 15 10:43:28 localhost systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Nov 15 10:43:28 localhost systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Nov 15 10:43:28 localhost systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Nov 15 10:43:28 localhost systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+Nov 15 10:43:28 localhost systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0001.device - /dev/disk/by-uuid/0000-0001...
+Nov 15 10:43:28 localhost systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+Nov 15 10:43:28 localhost systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+Nov 15 10:43:28 localhost systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Nov 15 10:43:28 localhost systemd[1]: Reached target imports.target - Image Downloads.
+Nov 15 10:43:28 localhost systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+Nov 15 10:43:28 localhost systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+Nov 15 10:43:28 localhost systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+Nov 15 10:43:28 localhost systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+Nov 15 10:43:28 localhost systemd[1]: Reached target paths.target - Path Units.
+Nov 15 10:43:28 localhost systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+Nov 15 10:43:28 localhost systemd[1]: Reached target remote-fs.target - Remote File Systems.
+Nov 15 10:43:28 localhost systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+Nov 15 10:43:28 localhost systemd[1]: Reached target slices.target - Slice Units.
+Nov 15 10:43:28 localhost systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+Nov 15 10:43:28 localhost systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+Nov 15 10:43:28 localhost systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+Nov 15 10:43:28 localhost systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+Nov 15 10:43:28 localhost systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+Nov 15 10:43:28 localhost systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+Nov 15 10:43:28 localhost systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+Nov 15 10:43:28 localhost systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+Nov 15 10:43:28 localhost systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+Nov 15 10:43:28 localhost systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Nov 15 10:43:28 localhost systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+Nov 15 10:43:28 localhost systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Nov 15 10:43:28 localhost systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+Nov 15 10:43:28 localhost systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+Nov 15 10:43:28 localhost systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+Nov 15 10:43:28 localhost systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+Nov 15 10:43:28 localhost systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+Nov 15 10:43:28 localhost systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+Nov 15 10:43:28 localhost systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+Nov 15 10:43:28 localhost systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-journald.service - Journal Service...
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+Nov 15 10:43:28 localhost systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+Nov 15 10:43:28 localhost systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+Nov 15 10:43:28 localhost systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+Nov 15 10:43:28 localhost systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+Nov 15 10:43:28 localhost systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+Nov 15 10:43:29 localhost systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+Nov 15 10:43:29 localhost systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+Nov 15 10:43:29 localhost systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+Nov 15 10:43:29 localhost systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+Nov 15 10:43:29 localhost systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+Nov 15 10:43:29 localhost kernel: BTRFS info (device vda2 state M): use zstd compression, level 1
+Nov 15 10:43:29 localhost systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+Nov 15 10:43:29 localhost systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+Nov 15 10:43:29 localhost systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+Nov 15 10:43:29 localhost systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+Nov 15 10:43:29 localhost systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+Nov 15 10:43:29 localhost systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+Nov 15 10:43:29 localhost systemd-journald[785]: Collecting audit messages is enabled.
+Nov 15 10:43:29 localhost systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+Nov 15 10:43:29 localhost kernel: audit: type=1130 audit(1794739406.752:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:29 localhost systemd[1]: Started systemd-journald.service - Journal Service.
+Nov 15 10:43:29 localhost kernel: audit: type=1130 audit(1794739409.170:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:30 localhost kernel: audit: type=1130 audit(1794739410.011:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:31 localhost kernel: audit: type=1334 audit(1794739411.137:6): prog-id=48 op=LOAD
+Nov 15 10:43:31 localhost kernel: audit: type=1334 audit(1794739411.149:7): prog-id=49 op=LOAD
+Nov 15 10:43:31 localhost kernel: audit: type=1334 audit(1794739411.160:8): prog-id=50 op=LOAD
+Nov 15 10:43:34 localhost kernel: audit: type=1130 audit(1794739414.862:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:40 localhost kernel: audit: type=1130 audit(1794739420.577:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:41 localhost kernel: audit: type=1334 audit(1794739421.022:11): prog-id=51 op=LOAD
+Nov 15 10:43:48 localhost kernel: audit: type=1130 audit(1794739428.928:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:49 localhost kernel: audit: type=1334 audit(1794739429.077:13): prog-id=23 op=UNLOAD
+Nov 15 10:43:49 localhost kernel: audit: type=1334 audit(1794739429.085:14): prog-id=22 op=UNLOAD
+Nov 15 10:43:49 localhost kernel: audit: type=1334 audit(1794739429.128:15): prog-id=52 op=LOAD
+Nov 15 10:43:49 localhost kernel: audit: type=1334 audit(1794739429.138:16): prog-id=53 op=LOAD
+Nov 15 10:43:49 localhost kernel: audit: type=1130 audit(1794739429.515:17): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:43:55 localhost kernel: audit: type=1130 audit(1794739435.450:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:44:00 localhost kernel: zram0: detected capacity change from 0 to 16181248
+Nov 15 10:44:03 localhost kernel: audit: type=1130 audit(1794739442.955:19): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:44:05 localhost kernel: Adding 8090620k swap on /dev/zram0.  Priority:100 extents:1 across:8090620k SSDsc
+Nov 15 10:44:07 localhost kernel: audit: type=1334 audit(1794739447.327:20): prog-id=54 op=LOAD
+Nov 15 10:44:07 localhost kernel: audit: type=1334 audit(1794739447.345:21): prog-id=55 op=LOAD
+Nov 15 10:44:07 localhost kernel: audit: type=1334 audit(1794739447.363:22): prog-id=56 op=LOAD
+Nov 15 10:44:13 localhost kernel: audit: type=1130 audit(1794739453.162:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:44:30 localhost kernel: audit: type=1130 audit(1794739470.723:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:45:35 localhost systemd-journald[785]: Received client request to flush runtime journal.
+Nov 15 10:45:35 localhost systemd-journald[785]: Creating journal file /var/log/journal/0123456789abcdef0123456789abcd01/system.journal on a btrfs file system, and copy-on-write is enabled. This is likely to slow down journal access substantially, please consider turning off the copy-on-write file attribute on the journal directory, using chattr +C.
+Nov 15 10:45:35 localhost kernel: audit: type=1130 audit(1794739529.942:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-random-seed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:45:35 localhost kernel: audit: type=1130 audit(1794739535.411:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journal-flush comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:45:37 localhost kernel: audit: type=1130 audit(1794739537.172:27): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdb-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:45:40 localhost kernel: audit: type=1130 audit(1794739540.399:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-binfmt comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:45:58 localhost kernel: audit: type=1130 audit(1794739558.007:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Nov 15 10:46:02 localhost kernel: audit: type=1305 audit(1794739561.953:30): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+Nov 15 10:46:02 localhost kernel: audit: type=1300 audit(1794739561.953:30): arch=c00000b7 syscall=206 success=yes exit=60 a0=3 a1=fffffce30bb0 a2=3c a3=0 items=0 ppid=917 pid=922 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="auditd" exe="/usr/bin/auditd" subj=system_u:system_r:auditd_t:s0 key=(null)
+Nov 15 10:46:02 localhost kernel: audit: type=1327 audit(1794739561.953:30): proctitle="/usr/bin/auditd"
+Nov 15 10:46:10 localhost kernel: virtio_net virtio0 enp0s1: renamed from eth0
+Nov 15 10:48:28 lab-arm kernel: BTRFS info (device vda2): resize device /dev/vda2 (devid 1) from 5262782464 to 21368909824
+Nov 15 11:02:17 lab-arm systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+Nov 15 11:02:17 lab-arm systemd[1]: Detected virtualization qemu.
+Nov 15 11:02:17 lab-arm systemd[1]: Detected architecture arm64.
+Nov 15 11:02:20 lab-arm systemd[1]: bpf-restrict-fs: LSM BPF program attached
+Nov 15 11:07:25 lab-arm kernel: NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+Nov 15 11:07:25 lab-arm kernel: NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+Nov 15 11:09:38 lab-arm kernel: {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:38 lab-arm kernel: {1}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:38 lab-arm kernel: {1}[Hardware Error]: event severity: corrected
+Nov 15 11:09:38 lab-arm kernel: {1}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:38
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:   physical_address: 0x0000000100010140
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:39 lab-arm kernel: {1}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:39 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100010 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]: event severity: corrected
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:41
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:   physical_address: 0x0000000100118140
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:41 lab-arm kernel: {2}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:41 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100118 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]: event severity: corrected
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:44
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:   physical_address: 0x0000000100238180
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:44 lab-arm kernel: {3}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:44 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x100238 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]: event severity: corrected
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:47
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:   physical_address: 0x00000001002a0140
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:47 lab-arm kernel: {4}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:47 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x1002a0 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:50 lab-arm kernel: {5}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:50 lab-arm kernel: {5}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]: event severity: corrected
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:50
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:   physical_address: 0x00000001003f0180
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:51 lab-arm kernel: {5}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:51 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x1003f0 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:53 lab-arm kernel: {6}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:53 lab-arm kernel: {6}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]: event severity: corrected
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:53
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:   physical_address: 0x0000000100118140
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:54 lab-arm kernel: {6}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:54 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100118 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]: event severity: corrected
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:  precise tstamp: 2026-11-15 11:09:57
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:   section_type: memory error
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:   physical_address: 0x0000000100238180
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:09:57 lab-arm kernel: {7}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:09:57 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x100238 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]: event severity: corrected
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:00
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:   physical_address: 0x0000000100010140
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:   error_type: 13, scrub corrected error
+Nov 15 11:10:00 lab-arm kernel: {8}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:00 lab-arm kernel: EDAC MC0: 1 CE scrub corrected error on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100010 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]: event severity: corrected
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:03
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:   physical_address: 0x00000001002a0140
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:03 lab-arm kernel: {9}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:03 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x1002a0 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]: event severity: corrected
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:06
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:   physical_address: 0x0000000100238180
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:   error_type: 13, scrub corrected error
+Nov 15 11:10:06 lab-arm kernel: {10}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:06 lab-arm kernel: EDAC MC0: 1 CE scrub corrected error on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x100238 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]: event severity: corrected
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:09
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:   physical_address: 0x00000001003f0180
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:09 lab-arm kernel: {11}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:09 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x1003f0 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]: event severity: corrected
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:12
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:   physical_address: 0x0000000100118140
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:12 lab-arm kernel: {12}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:13 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100118 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]: event severity: corrected
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:15
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:   physical_address: 0x0000000100238180
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:15 lab-arm kernel: {13}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:15 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0 page:0x100238 offset:0x180 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]: event severity: corrected
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:18
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:   physical_address: 0x0000000100010140
+Nov 15 11:10:18 lab-arm kernel: {14}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 
+Nov 15 11:10:19 lab-arm kernel: {14}[Hardware Error]:   error_type: 13, scrub corrected error
+Nov 15 11:10:19 lab-arm kernel: {14}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:19 lab-arm kernel: EDAC MC0: 1 CE scrub corrected error on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100010 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:21 lab-arm kernel: {15}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:21 lab-arm kernel: {15}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]: event severity: corrected
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:21
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:   physical_address: 0x00000001002a0140
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:22 lab-arm kernel: {15}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:22 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x1002a0 offset:0x140 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]: event severity: corrected
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:24
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:   physical_address: 0x0000000100518000
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:280 bit_position:5 
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:25 lab-arm kernel: {16}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:25 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100518 offset:0x0 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]: event severity: corrected
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:28
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:   physical_address: 0x0000000100638000
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:568 bit_position:5 
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:28 lab-arm kernel: {17}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:28 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:568 bit_position:5 DIMM location: BANK 0 DIMM 0 page:0x100638 offset:0x0 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:568 bit_position:5 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]: event severity: corrected
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:31
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:   physical_address: 0x0000000180045640
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:   node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:31 lab-arm kernel: {18}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:31 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]: It has been corrected by h/w and requires no further action
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]: event severity: corrected
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:48
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:  Error 0, type: corrected
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:   physical_address: 0x000000011b47b100
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:0 bank_address:3 device:2 row:1911 column:64 bit_position:1 
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:   error_type: 2, single-bit ECC
+Nov 15 11:10:48 lab-arm kernel: {19}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:48 lab-arm kernel: EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:0 bank_address:3 device:2 row:1911 column:64 bit_position:1 DIMM location: BANK 0 DIMM 0 page:0x11b47b offset:0x100 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:0 bank_group:0 bank_address:3 device:2 row:1911 column:64 bit_position:1 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]: event severity: recoverable
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:52
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:  Error 0, type: recoverable
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:   physical_address: 0x00000001207dd200
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:2 bank_address:0 device:9 row:8193 column:496 
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:   error_type: 3, multi-bit ECC
+Nov 15 11:10:52 lab-arm kernel: {20}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:52 lab-arm kernel: EDAC MC0: 1 UE multi-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:0 bank_group:2 bank_address:0 device:9 row:8193 column:496 DIMM location: BANK 0 DIMM 0 page:0x1207dd offset:0x200 grain:1 - APEI location: node:0 card:0 module:0 rank:0 bank_group:2 bank_address:0 device:9 row:8193 column:496 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:52 lab-arm kernel: Memory failure: 0x1207dd: recovery action for dirty LRU page: Recovered
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]: event severity: recoverable
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:  precise tstamp: 2026-11-15 11:10:56
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:  Error 0, type: recoverable
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:  fru_text: DIMM 0
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:   section_type: memory error
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:   physical_address: 0x0000000110781300
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:   node:0 card:0 module:0 rank:1 bank_group:3 bank_address:1 device:11 row:16382 column:8 
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:   error_type: 14, scrub uncorrected error
+Nov 15 11:10:56 lab-arm kernel: {21}[Hardware Error]:   DIMM location: BANK 0 DIMM 0 
+Nov 15 11:10:56 lab-arm kernel: EDAC MC0: 1 UE scrub uncorrected error on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:3 bank_address:1 device:11 row:16382 column:8 DIMM location: BANK 0 DIMM 0 page:0x110781 offset:0x300 grain:1 - APEI location: node:0 card:0 module:0 rank:1 bank_group:3 bank_address:1 device:11 row:16382 column:8 DIMM location: BANK 0 DIMM 0)
+Nov 15 11:10:56 lab-arm kernel: Memory failure: 0x110781: recovery action for dirty LRU page: Recovered

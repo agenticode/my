@@ -1,0 +1,42 @@
+Memory controller events:
+1 2026-11-15 11:09:37 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4295033152, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0
+2 2026-11-15 11:09:40 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4296114496, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0
+3 2026-11-15 11:09:43 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297294208, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0
+4 2026-11-15 11:09:46 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297720128, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0
+5 2026-11-15 11:09:50 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4299096448, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0
+6 2026-11-15 11:09:53 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4296114496, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0
+7 2026-11-15 11:09:56 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297294208, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0
+8 2026-11-15 11:09:59 +0000 1 Corrected error(s): scrub corrected error at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4295033152, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0
+9 2026-11-15 11:10:02 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297720128, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0
+10 2026-11-15 11:10:05 +0000 1 Corrected error(s): scrub corrected error at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297294208, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0
+11 2026-11-15 11:10:08 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4299096448, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:1008 bit_position:6 DIMM location: BANK 0 DIMM 0
+12 2026-11-15 11:10:11 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4296114496, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0
+13 2026-11-15 11:10:15 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297294208, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:568 bit_position:6 DIMM location: BANK 0 DIMM 0
+14 2026-11-15 11:10:18 +0000 1 Corrected error(s): scrub corrected error at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4295033152, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:16 bit_position:5 DIMM location: BANK 0 DIMM 0
+15 2026-11-15 11:10:21 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4297720128, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6703 column:672 bit_position:5 DIMM location: BANK 0 DIMM 0
+16 2026-11-15 11:10:24 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4300308480, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:280 bit_position:5 DIMM location: BANK 0 DIMM 0
+17 2026-11-15 11:10:27 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4301488128, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:7 row:6704 column:568 bit_position:5 DIMM location: BANK 0 DIMM 0
+18 2026-11-15 11:10:30 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+19 2026-11-15 11:10:30 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+20 2026-11-15 11:10:30 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+21 2026-11-15 11:10:30 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+22 2026-11-15 11:10:31 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+23 2026-11-15 11:10:31 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 6442735168, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0
+24 2026-11-15 11:10:47 +0000 1 Corrected error(s): single-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4752650496, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:0 bank_address:3 device:2 row:1911 column:64 bit_position:1 DIMM location: BANK 0 DIMM 0
+25 2026-11-15 11:10:52 +0000 1 Uncorrected error(s): multi-bit ECC at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4840083968, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:0 bank_group:2 bank_address:0 device:9 row:8193 column:496 DIMM location: BANK 0 DIMM 0
+26 2026-11-15 11:10:56 +0000 1 Uncorrected error(s): scrub uncorrected error at BANK 0 DIMM 0 location: 0:0:-1:-1, addr 4571271936, grain 0, syndrome 0 APEI location: node:0 card:0 module:0 rank:1 bank_group:3 bank_address:1 device:11 row:16382 column:8 DIMM location: BANK 0 DIMM 0
+
+No PCIe AER errors.
+
+No ARM processor errors.
+
+No Extlog errors.
+
+No devlink errors.
+
+No disk errors.
+
+No Memory failure errors.
+
+No MCE errors.
+

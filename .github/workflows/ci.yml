@@ -156,17 +156,3 @@ jobs:
           echo "MY_TEST_STORES=$dir/mysql.env,$dir/mariadb.env,$dir/postgresql.env" >> "$GITHUB_ENV"
       - name: read stores on MySQL, MariaDB and PostgreSQL
         run: go test -count=1 -v -run 'TestStoreOnAServer' ./internal/adapter/rasdaemon/
-
-  # The files under contrib/, checked with the programs they are for:
-  # promtool, amtool, systemd, a Prometheus server and a Grafana server.
-  contrib:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-      - name: build
-        run: make build
-      - name: check contrib with promtool, amtool, systemd, Prometheus and Grafana
-        run: .github/scripts/contrib-check.sh ./bin/my

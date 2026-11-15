@@ -1,0 +1,167 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: cxl
+summary: "event records of an emulated CXL memory device: 11 corrected and 1 uncorrected error, a health record, 2 poison ranges"
+method: "QMP of QEMU: cxl-inject-dram-event, cxl-inject-general-media-event, cxl-inject-memory-module-event, cxl-inject-poison"
+kernel: 7.3.0-ras
+rasdaemon: 1.0.0
+device: "QEMU CXL type 3 memory device, 256 MB volatile, behind an emulated CXL host bridge and root port"
+injections:
+  - id: dram-1
+    time: 2026-11-15T11:06:14.458Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x1000400
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x10
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-2
+    time: 2026-11-15T11:06:15.464Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x1006a00
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x1a8
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-3
+    time: 2026-11-15T11:06:16.467Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x100b000
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x2c0
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-4
+    time: 2026-11-15T11:06:17.469Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x1000400
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x10
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-5
+    time: 2026-11-15T11:06:18.472Z
+    inject: error
+    severity: CE
+    scrub: Patrol
+    count: 1
+    dpa: 0x100fe00
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x3f8
+    note: "CXL DRAM event record, scrub media ECC error"
+  - id: dram-6
+    time: 2026-11-15T11:06:19.474Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x1006a00
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x1a8
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-7
+    time: 2026-11-15T11:06:20.477Z
+    inject: error
+    severity: CE
+    scrub: Patrol
+    count: 1
+    dpa: 0x1003800
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0xe0
+    note: "CXL DRAM event record, scrub media ECC error"
+  - id: dram-8
+    time: 2026-11-15T11:06:21.480Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x100b000
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x2c0
+    note: "CXL DRAM event record, media ECC error"
+  - id: dram-ue
+    time: 2026-11-15T11:06:22.483Z
+    inject: error
+    severity: UE
+    count: 1
+    dpa: 0x100b008
+    device_name: mem0
+    channel: 1
+    rank: 1
+    bank_group: 2
+    bank: 1
+    row: 0x2b3c
+    column: 0x2c0
+    note: "CXL DRAM event record, uncorrectable, media ECC error"
+  - id: media-1
+    time: 2026-11-15T11:06:23.486Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x2001000
+    device_name: mem0
+    channel: 1
+    rank: 0
+    note: "CXL general media event record, media ECC error"
+  - id: media-2
+    time: 2026-11-15T11:06:24.488Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x2002000
+    device_name: mem0
+    channel: 1
+    rank: 0
+    note: "CXL general media event record, media ECC error"
+  - id: media-3
+    time: 2026-11-15T11:06:25.492Z
+    inject: error
+    severity: CE
+    count: 1
+    dpa: 0x2003000
+    device_name: mem0
+    channel: 1
+    rank: 0
+    note: "CXL general media event record, media ECC error"

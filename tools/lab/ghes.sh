@@ -27,7 +27,7 @@
 #             the row next to it
 #   burst     6 corrected errors at one cell of another rank within a second
 #   thr       1 corrected error with the flag "error threshold exceeded": the
-#             kernel moves the page elsewhere
+#             kernel takes the page offline soft, and nothing records that
 #   ue-1      1 uncorrected recoverable error (multi-bit ECC) on a page in use
 #   ue-2      1 uncorrected recoverable error found by the scrubber
 set -eu
@@ -105,7 +105,12 @@ boot)
 	;;
 
 prepare)
-	guest 'dnf -y -q install rasdaemon sqlite dmidecode gcc >/root/dnf.log 2>&1; rpm -q rasdaemon sqlite dmidecode gcc; systemctl enable rasdaemon; mkdir -p /root/my-lab/tools /root/my-lab/bin /root/my-lab/tmp /root/my-lab/cap'
+	# The emulated guest downloads slowly: metadata in the plain form, and a few tries.
+	guest 'for try in 1 2 3; do
+			dnf -y -q --setopt=zchunk=false --disablerepo="*" --enablerepo=fedora --enablerepo=updates install rasdaemon sqlite dmidecode gcc >/root/dnf.log 2>&1 && break
+			dnf clean all >/dev/null 2>&1
+		done
+		rpm -q rasdaemon sqlite dmidecode gcc; systemctl enable --now rasdaemon; mkdir -p /root/my-lab/tools /root/my-lab/bin /root/my-lab/tmp /root/my-lab/cap'
 	push "$HERE"/capture.sh "$HERE"/plan.py "$HERE"/hwpoison.c root@127.0.0.1:/root/my-lab/tools/
 	push "$LAB/bin/my-arm64" root@127.0.0.1:/root/my-lab/bin/my
 	[ -f "$LAB/anon.key" ] && push "$LAB/anon.key" root@127.0.0.1:/root/my-lab/anon.key
@@ -163,8 +168,8 @@ run)
 	addr() { printf '0x%x' $(($1 * 4096 + $2)); }
 
 	ghes --id thr --severity corrected --threshold --type 2 "${dimm[@]}" --rank 0 --device 2 --bank-group 0 --bank-address 3 \
-		--row 0x0777 --column 0x040 --bit 1 --address "$(addr "${pfn[1]}" 0x100)" --note "the kernel takes the page offline soft"
-	printf '{"id":"thr-offline","inject":"page-offline","how":"soft","count":1,"address":"%s","note":"asked for by the record of thr"}\n' "$(addr "${pfn[1]}" 0)" >>"$WORK/injected.jsonl"
+		--row 0x0777 --column 0x040 --bit 1 --address "$(addr "${pfn[1]}" 0x100)" \
+		--note "the kernel moves the content of the page elsewhere and retires it, and leaves no record of that: no line in the kernel log, no trace event (extra/held.jsonl shows the page frame before and after)"
 	sleep 4
 	ghes --id ue-1 --severity recoverable --type 3 "${dimm[@]}" --rank 0 --device 9 --bank-group 2 --bank-address 0 \
 		--row 0x2001 --column 0x1f0 --address "$(addr "${pfn[2]}" 0x200)"

@@ -2,8 +2,6 @@
 
 `my serve --metrics` runs MemorY as a Prometheus exporter. It scans the host, serves what the scan found at `/metrics`, and scans again after a pause. It reads the sources `my` reads and changes nothing on the host. The same server answers `/api/dimm/<slot or serial>` with the finding for one DIMM as JSON.
 
-On the demo host its log starts like this:
-
 ```
 $ my serve --metrics
 2026-11-15T05:25:59Z listening on http://127.0.0.1:10163
@@ -18,7 +16,7 @@ $ my serve --metrics
 | `--root DIR` | scan a copy of a host's files below `DIR` instead of this host |
 | `--fleet KIND`, `--fleet-env FILE`, `--since TIME`, `--host NAME` | read the store of a fleet in place of this host: see "One exporter for a fleet" |
 | `--config FILE`, `--set KEY=VALUE` | thresholds of the engine, as for the other commands |
-| `--lang en\|ko` | language of the log, and of the answers of the API when a request names none |
+| `--lang en\|ko` | language of the log |
 
 The log goes to standard error. A scan is logged when it found something else than the scan before, and when it failed. SIGINT or SIGTERM stops the server with exit code 0. The exit code is 70 when the server cannot listen on its address.
 
@@ -140,12 +138,6 @@ The server answers GET and HEAD only.
 The default address is `127.0.0.1:10163`, which only the host itself can reach. `--listen :10163` or `--listen 10.0.0.5:10163` opens it to the network. The server has no TLS and no authentication. The metrics name slots and DIMM serial numbers, and the API also names the files the records came from.
 
 Port 10163 is not registered in the Prometheus list of default port allocations.
-
-## Alerts, dashboard and services
-
-[contrib/](../contrib/README.md) holds files to take from: systemd units for the exporter of a host and of a fleet, a Prometheus scrape configuration, two alert rules with their rule tests, Alertmanager routes for them, and a Grafana dashboard.
-
-The alert about memory is `MemoryFindingWorse`. It fires when `my_dimm_verdict` of a DIMM is higher than in the hour before, and on nothing else: error counts raise no alert, and a finding that stays as it is raises none. The second rule, `MemoryFindingsStale`, is about the exporter: its findings have not been renewed for 30 minutes.
 
 ## Scrape configuration
 

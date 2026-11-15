@@ -19,6 +19,8 @@
 #   mce.sh fatal        one uncorrected error with the processor context corrupt: the
 #                       kernel panics. Only the console of the guest tells; it is
 #                       kept as $LAB/cap/mce-fatal/console.log
+#   mce.sh rasdaemon-1.0  as the first, recorded by rasdaemon 1.0.0 built from source
+#                       ($RASDAEMON, default $LAB/src/rasdaemon/build/rasdaemon)
 #
 # What is injected, at addresses of pages a waiting process holds:
 #
@@ -53,8 +55,12 @@ if [ "${1:-}" != "--inside" ]; then
 		append=(--append "mce=print_all")
 		;;
 	fatal) name=mce-fatal ;;
+	rasdaemon-1.0)
+		name=mce-rasdaemon-1.0
+		RASDAEMON=${RASDAEMON:-$LAB/src/rasdaemon/build/rasdaemon}
+		;;
 	*)
-		echo "usage: mce.sh [print-all|clock-step|fatal]" >&2
+		echo "usage: mce.sh [print-all|clock-step|fatal|rasdaemon-1.0]" >&2
 		exit 2
 		;;
 	esac
@@ -64,7 +70,7 @@ if [ "${1:-}" != "--inside" ]; then
 	# check, the console is the only place that says so.
 	vng --verbose --run "/boot/vmlinuz-$(uname -r)" --disable-kvm --cpus 2 --memory 4G --user root --name lab-guest \
 		--rwdir="$LAB" "${append[@]}" --qemu-opts="-cpu Skylake-Server" \
-		--exec "$HERE/mce.sh --inside $name" >"$LAB/tmp/$name-console.log" 2>&1 || true
+		--exec "RASDAEMON=${RASDAEMON:-rasdaemon} $HERE/mce.sh --inside $name" >"$LAB/tmp/$name-console.log" 2>&1 || true
 	if [ "$name" = mce-fatal ]; then
 		# The guest is gone. What is left is what a serial console server or
 		# the console log of a BMC would hold: the kernel's lines.
@@ -92,8 +98,10 @@ modprobe mce-inject
 
 # rasdaemon with a database of its own: the guest sees the host's file
 # system, the database of the host included.
+RASDAEMON=${RASDAEMON:-rasdaemon}
+export RASDAEMON # capture.sh records its version
 rm -f /var/lib/rasdaemon/ras-mc_event.db
-rasdaemon -f -r >"$WORK/$name-rasdaemon.log" 2>&1 &
+"$RASDAEMON" -f -r >"$WORK/$name-rasdaemon.log" 2>&1 &
 for _ in $(seq 1 30); do
 	grep -q "Listening to events" "$WORK/$name-rasdaemon.log" && break
 	sleep 1
@@ -112,7 +120,7 @@ now() { date -u +%Y-%m-%dT%H:%M:%S.%3NZ; }
 plan() { # SUMMARY: writes the plan from what was injected
 	python3 "$HERE/plan.py" --scenario "$name" --summary "$1" \
 		--method "mce-inject module, records handed to the machine check poller and exception handler" \
-		--set "kernel=$(uname -r)" --set "rasdaemon=$(rasdaemon --version | awk '{print $2; exit}')" \
+		--set "kernel=$(uname -r)" --set "rasdaemon=$("$RASDAEMON" --version | awk '{print $2; exit}')" \
 		--set "cpu=Skylake-SP (family 6 model 85) emulated by QEMU without hardware virtualization" \
 		<"$WORK/injected.jsonl" >"$WORK/plan.yaml"
 }
