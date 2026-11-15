@@ -64,6 +64,12 @@ func app() *cli.App {
 				Run:       runOpen,
 			},
 			{
+				Name:      "import",
+				Summary:   "build a case from files: kernel logs, a rasdaemon database, BMC dumps, a copy of a host",
+				SummaryKO: "파일로 케이스 만들기: 커널 로그, rasdaemon DB, BMC 덤프, 호스트 파일 사본",
+				Run:       runImport,
+			},
+			{
 				Name:      "version",
 				Summary:   "print version and build information",
 				SummaryKO: "버전과 빌드 정보",

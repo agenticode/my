@@ -38,6 +38,20 @@ var words = i18n.Catalog{
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
 	"err.exists":      {EN: "{file} exists; --force replaces it", KO: "{file}이 이미 있음. --force를 주면 덮어씀"},
 
+	"err.import_files":  {EN: "name the files to import", KO: "가져올 파일을 지정해야 함"},
+	"err.import_root":   {EN: "--root is for a scan; give the directory as an argument instead", KO: "--root는 스캔용 옵션임. 디렉터리를 인자로 지정"},
+	"err.anonymize_out": {EN: "--anonymize goes with -o: it applies to the bundle that is written", KO: "--anonymize는 -o와 함께 써야 함: 저장하는 번들에 적용됨"},
+	"err.time":          {EN: "{flag} {value}: want a date (2026-11-12) or a time (2026-11-12T03:14:00Z)", KO: "{flag} {value}: 날짜(2026-11-12) 또는 시각(2026-11-12T03:14:00Z)이어야 함"},
+	"err.tz":            {EN: "--tz {value}: want a time zone name such as Asia/Seoul or UTC", KO: "--tz {value}: Asia/Seoul이나 UTC 같은 시간대 이름이어야 함"},
+
+	// What "my import" says.
+	"import.records": {EN: "{n} {n|record|records}", KO: "기록 {n}건"},
+	"import.events":  {EN: "{n} error {n|record|records} (grade {grade})", KO: "오류 기록 {n}건({grade} 등급)"},
+	"import.actions": {EN: "{n} {n|action|actions}", KO: "조치 {n}건"},
+	"import.skipped": {EN: "{n} not usable", KO: "쓰지 못한 기록 {n}건"},
+	"import.total":   {EN: "host {host}: {events} error {events|record|records} and {actions} {actions|action|actions} added, {dup} reported by more than one source and counted once", KO: "호스트 {host}: 오류 기록 {events}건과 조치 {actions}건 추가, 여러 소스가 함께 보고한 {dup}건은 한 번만 계산"},
+	"import.finding": {EN: "host {host}, finding: {grade}", KO: "호스트 {host}, 소견: {grade}"},
+
 	// What "my bundle" says.
 	"bundle.written":    {EN: "case bundle written: {file} ({size})", KO: "케이스 번들 저장: {file} ({size})"},
 	"bundle.host":       {EN: "host {host}: {dimms} {dimms|DIMM|DIMMs}, CE {ce}, UE {ue}, finding: {grade}", KO: "호스트 {host}: DIMM {dimms}개, CE {ce}건, UE {ue}건, 소견: {grade}"},
@@ -58,6 +72,7 @@ var words = i18n.Catalog{
 	"hint.dimm":   {EN: "examination of this DIMM", KO: "이 DIMM 진찰 화면"},
 	"hint.why":    {EN: "what the finding rests on", KO: "판정 근거"},
 	"hint.bundle": {EN: "write a case bundle", KO: "번들 만들기"},
+	"hint.import": {EN: "keep the import as a case to look closer", KO: "가져온 것을 케이스로 저장해 자세히 보기"},
 	"hint.help":   {EN: "how to read the figures", KO: "판독법"},
 
 	// Help.
@@ -83,6 +98,22 @@ var words = i18n.Catalog{
 			"--host NAME       원장에 호스트가 여럿일 때 볼 호스트\n" +
 			"--config FILE     임계값 파일 (key = value 줄)\n" +
 			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"",
+	},
+	"help.output": {
+		EN: "--lang en|ko        language of the output (default: from the locale, English otherwise)\n" +
+			"--json              print the result as JSON\n" +
+			"--ascii             draw with ASCII characters only\n" +
+			"--color WHEN        auto (on a terminal, unless NO_COLOR is set), always or never\n" +
+			"--width N           columns to fill (default: the terminal, 100 otherwise)\n" +
+			"--config FILE       read thresholds from FILE (key = value lines)\n" +
+			"--set KEY=VALUE     change one threshold; \"my help thresholds\" lists them",
+		KO: "--lang en|ko        출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
+			"--json              결과를 JSON으로 출력\n" +
+			"--ascii             ASCII 문자만으로 그림\n" +
+			"--color WHEN        auto(터미널일 때, NO_COLOR가 없을 때), always, never\n" +
+			"--width N           출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)\n" +
+			"--config FILE       임계값 파일 (key = value 줄)\n" +
+			"--set KEY=VALUE     임계값 하나 변경. 목록은 \"my help thresholds\"",
 	},
 	"help.scan": {
 		EN: "--ledger FILE     keep the scan in the ledger FILE and add to it on every run\n" +
@@ -140,6 +171,31 @@ var words = i18n.Catalog{
 			"--force           FILE이 있으면 덮어씀",
 	},
 
+	"help.import.usage": {EN: "my import <file|directory>... [-o FILE] [flags]", KO: "my import <파일|디렉터리>... [-o FILE] [옵션]"},
+	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, or a directory that is a copy of a host's files. An input that is not recognised stops the import. All inputs are taken to be one host. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, 호스트 파일 사본 디렉터리. 알아보지 못한 입력이 있으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
+	"help.import.flags": {
+		EN: "-o FILE             write the case as a bundle (case.mycase)\n" +
+			"--host NAME         the host the files come from, when they do not say\n" +
+			"--captured-at TIME  when a kernel log without dates was captured (2026-11-12T03:14:00Z)\n" +
+			"--mtime             take the modification time of such a file as its capture time\n" +
+			"--tz ZONE           the time zone of times that carry none (default UTC)\n" +
+			"--ledger FILE       keep the import in the ledger FILE and add to it on every run\n" +
+			"--anonymize         with -o: replace host names and network addresses\n" +
+			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
+			"--force             replace FILE when it exists\n" +
+			"--all               in the overview, list every DIMM",
+		KO: "-o FILE             케이스를 번들로 저장 (case.mycase)\n" +
+			"--host NAME         파일에 호스트 이름이 없을 때 쓸 이름\n" +
+			"--captured-at TIME  날짜 없는 커널 로그를 받은 시각 (2026-11-12T03:14:00Z)\n" +
+			"--mtime             그런 파일의 수정 시각을 받은 시각으로 사용\n" +
+			"--tz ZONE           시간대 표기가 없는 시각의 시간대 (기본 UTC)\n" +
+			"--ledger FILE       가져온 것을 원장 FILE에 남기고 실행할 때마다 누적\n" +
+			"--anonymize         -o와 함께: 호스트 이름과 네트워크 주소를 바꿈\n" +
+			"--key-file FILE     --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
+			"--force             FILE이 있으면 덮어씀\n" +
+			"--all               개요에 모든 DIMM을 나열",
+	},
+
 	"help.rules.title":      {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
 	"help.thresholds.title": {EN: "Thresholds, with their defaults. Change one with --set KEY=VALUE or a --config file.", KO: "임계값과 기본값. --set KEY=VALUE 또는 --config 파일로 바꿉니다."},
 	"help.topics":           {EN: "More: my help reading (every figure), my help rules, my help thresholds.", KO: "더 보기: my help reading (모든 그림), my help rules, my help thresholds."},
@@ -154,6 +210,7 @@ var guides = map[string][]string{
 	"timeline": {"guide.timeline"},
 	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
 	"bundle":   nil,
+	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
 	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades", "guide.obs"},
 }
 
@@ -180,10 +237,15 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 	}
 	fmt.Fprintf(w, "\n%s\n", say(lang, "help.flags"))
 	blocks := []string{"help." + topic + ".flags"}
-	if topic != "open" {
-		blocks = append(blocks, "help.scan")
+	switch topic {
+	case "open":
+		blocks = append(blocks, "help.common")
+	case "import":
+		// An import has no host to scan, and names its host itself.
+		blocks = append(blocks, "help.output")
+	default:
+		blocks = append(blocks, "help.scan", "help.common")
 	}
-	blocks = append(blocks, "help.common")
 	for _, code := range blocks {
 		if !words.Has(code) {
 			continue
@@ -192,13 +254,13 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" {
+	if topic != "bundle" && topic != "import" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)
 		}
 	}
-	if topic != "open" && topic != "overview" && topic != "bundle" {
+	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
 			fmt.Fprintln(w, line)
