@@ -158,7 +158,7 @@ The finding lists why the records name no DIMM (no slot in them, or a slot that 
 | --- | --- |
 | evidence | one statement per thing a rule saw, with the ledger records behind it: the first and the last when there are more than `evidence.max_records` |
 | checks | tests against other explanations. "supports" speaks for the finding, "weakens" against it, "open" could not be tested and names what would settle it. Examples: the neighbours on the channel have no errors; no slot move or reseat is on record; `check.host_wide_min_dimms` DIMMs of the host have unconfined errors in the same period |
-| missing | data the finding did not have: a source that could not be read, no serial number, no rows and columns, no device, too little history for a trend, a virtual machine |
+| missing | data the finding did not have: a source that could not be read, no serial number, no rows and columns, no device, too little history for a trend, a virtual machine, a BIOS setting that keeps errors out of the records (patrol scrub off, no corrected errors logged to the BMC) |
 | next | the step that follows |
 | confidence | a number from 5 to 95; 75 and more reads "high", 50 and more "medium" |
 

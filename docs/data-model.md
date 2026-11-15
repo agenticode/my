@@ -144,7 +144,7 @@ These passes run after every read, in a fixed order, and each computes its resul
 
 ## Readings that are not events
 
-`counter_sample`, `gpu_mem`, `ecs_sample`, `bmc`, `bios_setting` and `bmc_memory` hold readings. No total of the ledger includes them. Counter readings become counter events as described above. The engine reads the GPU records for the finding of a GPU, and it notes for a DDR5 DIMM whether ECS readings are on record. What a BMC says about itself, the BIOS settings and its modules is kept as read, with the error counts as the BMC gives them.
+`counter_sample`, `gpu_mem`, `ecs_sample`, `bmc`, `bios_setting` and `bmc_memory` hold readings. No total of the ledger includes them. Counter readings become counter events as described above. The GPU records are what the finding of a GPU rests on. ECS readings and BIOS settings are read for what they say about the records of a DIMM: a finding notes a DDR5 DIMM without ECS readings, a patrol scrubber that the BIOS has switched off, and a firmware that logs no corrected errors to the BMC. `my bios` checks the settings against a profile. The error counts a BMC keeps per module are stored as the BMC gives them.
 
 ## Actions
 
