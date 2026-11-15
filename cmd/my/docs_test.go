@@ -300,3 +300,32 @@ func TestLinksOfThePages(t *testing.T) {
 		t.Errorf("followed %d links; the pages hold more", links)
 	}
 }
+
+// TestLayoutOfTheSourceTree keeps the layout table of CONTRIBUTING.md
+// complete: every package directory below internal/ and every directory
+// below tools/ has a row.
+func TestLayoutOfTheSourceTree(t *testing.T) {
+	root := testutil.RepoRoot(t)
+	b, err := os.ReadFile(filepath.Join(root, "CONTRIBUTING.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, table, ok := strings.Cut(string(b), "\n## Layout\n")
+	if !ok {
+		t.Fatal("CONTRIBUTING.md has no section \"Layout\"")
+	}
+	for _, parent := range []string{"internal", "tools"} {
+		entries, err := os.ReadDir(filepath.Join(root, parent))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, e := range entries {
+			if !e.IsDir() {
+				continue
+			}
+			if dir := parent + "/" + e.Name(); !strings.Contains(table, "`"+dir+"`") {
+				t.Errorf("CONTRIBUTING.md: the layout table has no row for %s", dir)
+			}
+		}
+	}
+}
