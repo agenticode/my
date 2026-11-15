@@ -146,6 +146,41 @@ func TestTrendNeedsHistory(t *testing.T) {
 	}
 }
 
+// TestObservedFrom: a caller that knows the host was watched before its
+// first record can say so, and a burst of errors is then new.
+func TestObservedFrom(t *testing.T) {
+	asOf := t0.Add(60 * day)
+	b := newBuilder()
+	b.spreadOver(cellA, 12, asOf.Add(-2*day), asOf)
+	since := asOf.Add(-20 * day)
+	h := analyze(t, b.in, Options{AsOf: asOf, ObservedFrom: since}).Host("h1")
+	d := h.DIMM("d1")
+	cfg := DefaultConfig()
+	if tr := d.Features.Trend; tr.Direction != TrendNew || tr.PriorDays != 13 || tr.Recent != 12 || !tr.Rising(&cfg) {
+		t.Errorf("trend = %+v, want new over 13 days", tr)
+	}
+	if !h.ObservedFrom.Equal(since) || !d.clk.equalFrom(since) {
+		t.Errorf("observed from %s, want %s", h.ObservedFrom, since)
+	}
+	// A time after the first record changes nothing: the record is known.
+	h = analyze(t, b.in, Options{AsOf: asOf, ObservedFrom: asOf.Add(-day)}).Host("h1")
+	if d := h.DIMM("d1"); d.Features.Trend.Direction != TrendUnknown || !d.clk.equalFrom(asOf.Add(-2*day+2*time.Hour)) {
+		t.Errorf("trend = %+v, observed from %s", d.Features.Trend, h.ObservedFrom)
+	}
+	// It also holds without a reference time given by the caller.
+	h = analyze(t, b.in, Options{ObservedFrom: since}).Host("h1")
+	if !h.ObservedFrom.Equal(since) || h.DIMM("d1").Features.Trend.Direction != TrendNew {
+		t.Errorf("without AsOf: observed from %s, trend %+v", h.ObservedFrom, h.DIMM("d1").Features.Trend)
+	}
+	// A host the ledger has no dated record of has no reference time, and
+	// the start of the watch gives it none.
+	empty := NewInput()
+	empty.Hosts = []model.Host{{Name: "h9"}}
+	if h := analyze(t, empty, Options{ObservedFrom: since}).Host("h9"); !h.AsOf.IsZero() || !h.ObservedFrom.IsZero() {
+		t.Errorf("host without records: as of %s, observed from %s", h.AsOf, h.ObservedFrom)
+	}
+}
+
 func (c clock) equalFrom(t time.Time) bool { return c.from == t.UnixMicro() }
 
 // TestRecordsWithoutDateAreInNoTrend: seconds since boot cannot be placed
