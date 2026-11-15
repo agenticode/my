@@ -16,13 +16,15 @@ import (
 
 // runReport is "my report [FILE] -o OUT": the findings of a case as one
 // HTML file. FILE is a case bundle or a ledger; without it the host is
-// scanned, as the other commands do.
+// scanned, as the other commands do. With --figures the figures of the
+// report are also written as SVG files of their own.
 func runReport(ctx context.Context, env *cli.Env, args []string, src *source) int {
 	o := newOptions(env, cmdName("report", src), src)
 	out := o.fs.String("o", "", "")
 	audience := o.fs.String("audience", string(report.Customer), "")
 	force := o.fs.Bool("force", false, "")
 	all := o.fs.Bool("all", false, "")
+	figures := o.fs.String("figures", "", "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -38,7 +40,7 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[0]))
 	case len(pos) > 1:
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
-	case *out == "":
+	case *out == "" && *figures == "":
 		return o.usageError(env, lang, "%s", say(lang, "err.report_out"))
 	}
 	if len(pos) == 1 {
@@ -54,9 +56,14 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		src = c
 	}
 	toStdout := *out == "-"
-	if !toStdout && !*force {
+	if *out != "" && !toStdout && !*force {
 		if _, err := os.Stat(*out); err == nil {
 			return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", *out))
+		}
+	}
+	if *figures != "" {
+		if fi, err := os.Stat(*figures); err == nil && !fi.IsDir() {
+			return o.usageError(env, lang, "--figures %s: %s", *figures, say(lang, "err.not_dir"))
 		}
 	}
 
@@ -92,9 +99,34 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	if err != nil {
 		return o.failure(env, err)
 	}
+	// The figures first: a name that is taken stops the run before
+	// anything is written.
+	var figs []report.Figure
+	if *figures != "" {
+		if figs, err = doc.Figures(); err != nil {
+			return o.failure(env, err)
+		}
+		if !*force {
+			for _, f := range figs {
+				if _, err := os.Stat(filepath.Join(*figures, f.Name+".svg")); err == nil {
+					return o.usageError(env, lang, "%s", say(lang, "err.exists", "file", filepath.Join(*figures, f.Name+".svg")))
+				}
+			}
+		}
+		if err := os.MkdirAll(*figures, 0o755); err != nil {
+			return o.failure(env, err)
+		}
+		for _, f := range figs {
+			if err := writeWhole(filepath.Join(*figures, f.Name+".svg"), f.SVG); err != nil {
+				return o.failure(env, err)
+			}
+		}
+	}
 	var buf bytes.Buffer
-	if err := doc.Write(&buf); err != nil {
-		return o.failure(env, err)
+	if *out != "" {
+		if err := doc.Write(&buf); err != nil {
+			return o.failure(env, err)
+		}
 	}
 	if toStdout {
 		if _, err := env.Stdout.Write(buf.Bytes()); err != nil {
@@ -102,8 +134,10 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		}
 		return cli.ExitOK
 	}
-	if err := writeWhole(*out, buf.Bytes()); err != nil {
-		return o.failure(env, err)
+	if *out != "" {
+		if err := writeWhole(*out, buf.Bytes()); err != nil {
+			return o.failure(env, err)
+		}
 	}
 
 	if o.asJSON {
@@ -122,9 +156,14 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 			CaseID   string             `json:"case_id"`
 			DIMMs    []dimm             `json:"dimms"`
 			Records  int                `json:"records"`
-		}{*out, buf.Len(), s.h.Host, s.h.Grade, aud, string(lang), doc.CaseID, []dimm{}, len(doc.Records)}
+			// Figures are the files written with --figures.
+			Figures []string `json:"figures,omitzero"`
+		}{*out, buf.Len(), s.h.Host, s.h.Grade, aud, string(lang), doc.CaseID, []dimm{}, len(doc.Records), nil}
 		for _, d := range doc.DIMMs {
 			res.DIMMs = append(res.DIMMs, dimm{d.Card.Slot, d.Card.DIMM.Serial, d.Card.Grade})
+		}
+		for _, f := range figs {
+			res.Figures = append(res.Figures, filepath.Join(*figures, f.Name+".svg"))
 		}
 		enc := json.NewEncoder(env.Stdout)
 		enc.SetIndent("", "  ")
@@ -134,8 +173,16 @@ func runReport(ctx context.Context, env *cli.Env, args []string, src *source) in
 		return cli.ExitOK
 	}
 	p := func(format string, a ...any) { fmt.Fprintf(env.Stdout, format+"\n", a...) }
-	p("%s", say(lang, "report.written", "file", *out, "size", sizeText(int64(buf.Len()))))
+	if *out != "" {
+		p("%s", say(lang, "report.written", "file", *out, "size", sizeText(int64(buf.Len()))))
+	}
+	if len(figs) > 0 {
+		p("%s", say(lang, "report.figures", "dir", *figures, "n", len(figs)))
+	}
 	p("  %s", say(lang, "import.finding", "host", s.h.Host, "grade", engine.GradeText(lang, s.h.Grade)))
+	if *out == "" {
+		return cli.ExitOK
+	}
 	p("  %s", say(lang, "report.holds", "dimms", len(doc.DIMMs), "records", len(doc.Records), "audience", report.Words.Text(lang, "audience."+string(aud), nil)))
 	if note := s.storedNote(); src != nil && note != "" {
 		for _, line := range s.st.Wrap(note, 2) {

@@ -716,6 +716,7 @@ func TestSelfContained(t *testing.T) {
 	if root.attrs["lang"] != "ko" {
 		t.Errorf("lang = %q", root.attrs["lang"])
 	}
+	styleSheet := styleSheet + figureSheet
 	for _, text := range []string{styleSheet, script} {
 		if strings.ContainsAny(text, "<&") {
 			t.Error("the style sheet or the script holds '<' or '&': the report would not be well-formed")
@@ -946,8 +947,13 @@ func TestSubject(t *testing.T) {
 		if (tt.uid != "") != (subjects == 1) {
 			t.Errorf("subject %q: %d DIMMs marked", tt.uid, subjects)
 		}
-		if tt.uid != "" && len(root.find("path.pointer")) != 1 {
-			t.Errorf("subject %q is not pointed at in the slot map", tt.uid)
+		// The subject is pointed at in the slot map, and the legend says
+		// what the pointer means.
+		if n := len(root.find("svg.slotmap")[0].find("path.pointer")); (tt.uid != "") != (n == 1) {
+			t.Errorf("subject %q: %d pointers in the slot map", tt.uid, n)
+		}
+		if legend := root.find("ul.legend")[0].content(); (tt.uid != "") != strings.Contains(legend, "subject of the case") {
+			t.Errorf("subject %q: legend %q", tt.uid, legend)
 		}
 	}
 }
@@ -1414,5 +1420,123 @@ func TestOtherStates(t *testing.T) {
 	})
 	if cell == nil || cell.tag != "g" || !cell.hasClass("g-ok") || !strings.Contains(cell.find("title")[0].content0(), "NEW00001") {
 		t.Errorf("the slot of the replaced DIMM: %+v", cell)
+	}
+}
+
+// TestFigures checks the figures of a report as pictures of their own:
+// each is a well-formed SVG document that carries its style, a heading,
+// its legend and its notes, and leads nowhere.
+func TestFigures(t *testing.T) {
+	doc := build(t, "demo", "", i18n.EN, Customer)
+	figs, err := doc.Figures()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	byName := map[string]*elem{}
+	for _, f := range figs {
+		names = append(names, f.Name)
+		root, err := parseXML(f.SVG, "svg")
+		if err != nil {
+			t.Fatalf("%s: %v", f.Name, err)
+		}
+		byName[f.Name] = root
+		if root.attrs["xmlns"] != "http://www.w3.org/2000/svg" || root.attrs["viewBox"] == "" || root.attrs["role"] != "img" || root.attrs["aria-label"] == "" {
+			t.Errorf("%s: root attributes %v", f.Name, root.attrs)
+		}
+		if len(root.kids) < 4 || root.kids[0].tag != "title" || root.kids[1].tag != "style" || root.kids[1].content0() != figureSheet || !root.kids[2].hasClass("bg") {
+			t.Errorf("%s: a figure starts with its title, its style and its background", f.Name)
+		}
+		// Nothing leads out of a picture, and nothing in it is a link.
+		root.walk(func(e *elem) {
+			if e.tag == "a" || e.attrs["href"] != "" || e.attrs["data-rec"] != "" {
+				t.Errorf("%s: <%s %v> is a link", f.Name, e.tag, e.attrs)
+			}
+			if _, ok := svgAllowed[e.tag]; !ok && e.tag != "style" {
+				t.Errorf("%s: element <%s>", f.Name, e.tag)
+			}
+		})
+		// The picture is as tall as what it holds: the last line of text
+		// lies inside it.
+		var h, last float64
+		fmt.Sscanf(strings.Fields(root.attrs["viewBox"])[3], "%g", &h)
+		for _, e := range root.kids {
+			if e.tag == "text" {
+				var y float64
+				fmt.Sscanf(e.attrs["y"], "%g", &y)
+				last = max(last, y)
+			}
+		}
+		if last > h-8 || h > 2000 || root.attrs["height"] != strings.Fields(root.attrs["viewBox"])[3] {
+			t.Errorf("%s: height %v (%s), last line at %v", f.Name, h, root.attrs["height"], last)
+		}
+		if !bytes.HasSuffix(f.SVG, []byte("</svg>\n")) || bytes.Contains(f.SVG, []byte("<!DOCTYPE")) {
+			t.Errorf("%s: not a bare SVG document", f.Name)
+		}
+	}
+	want := "slotmap timeline CPU0_C1-topology CPU0_C1-map CPU0_C1-timeline CPU1_D1-topology CPU1_D1-map CPU1_D1-timeline"
+	if strings.Join(names, " ") != want {
+		t.Fatalf("figures: %v\nwant %s", names, want)
+	}
+	for name, wants := range map[string][]string{
+		"slotmap":          {"Slot map of host r12-n034", "replace now", "hold replacement", "empty slot", "32 slots, 16 DIMMs", "CPU0", "H2"},
+		"timeline":         {"Host r12-n034: every DIMM with errors, 2026-07-31 to 2026-11-12", "peak 73/day", "3 reboots", "CPU0_C1: 2026-11-12 UE (demand read)"},
+		"CPU0_C1-topology": {"CPU0_C1 S/N 3B9C56: where the errors sit (width = share of the errors of this DIMM)", "bg0 bank3", "98%"},
+		"CPU0_C1-map": {"CPU0_C1 S/N 3B9C56: rank0 dev7 bg0 bank3, row by column, one cell = 32 columns", "10-99", "100+", "uncorrected error", "0x1a2f", "row fault",
+			"row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2, DQ3, first"},
+		"CPU0_C1-timeline": {"CPU0_C1 S/N 3B9C56: errors per day and events, 2026-07-31 to 2026-11-12", "corrected errors per day", "hard PPR", "790 of them since the boot of 2026-10-28"},
+	} {
+		text := byName[name].content()
+		for _, w := range wants {
+			if !strings.Contains(text, w) {
+				t.Errorf("%s lacks %q:\n%s", name, w, text)
+			}
+		}
+	}
+	// What a mark says is kept as its title.
+	titles := 0
+	byName["CPU0_C1-map"].walk(func(e *elem) {
+		if e.tag == "title" && strings.Contains(e.content0(), "columns 0x220 to 0x23f: 568 errors") {
+			titles++
+		}
+	})
+	if titles != 1 {
+		t.Errorf("the cell of the map lost its title")
+	}
+	// The same case gives the same pictures.
+	again, _ := doc.Figures()
+	for i := range figs {
+		if !bytes.Equal(figs[i].SVG, again[i].SVG) {
+			t.Errorf("%s differs between two runs", figs[i].Name)
+		}
+	}
+
+	// Every scenario, in Korean: the pictures are written and well-formed.
+	for _, name := range scenarios() {
+		doc := build(t, name, "", i18n.KO, FA)
+		figs, err := doc.Figures()
+		if err != nil || len(figs) < 3 {
+			t.Errorf("%s: %d figures, %v", name, len(figs), err)
+			continue
+		}
+		seen := map[string]bool{}
+		for _, f := range figs {
+			if _, err := parseXML(f.SVG, "svg"); err != nil {
+				t.Errorf("%s %s: %v", name, f.Name, err)
+			}
+			if seen[f.Name] || !regexp.MustCompile(`^[A-Za-z0-9_-]+$`).MatchString(f.Name) {
+				t.Errorf("%s: figure name %q", name, f.Name)
+			}
+			seen[f.Name] = true
+		}
+	}
+	// A host without errors has its slot map and a timeline of its boots.
+	quiet, err := buildFrom(t, emptyHost(t), options(i18n.EN, Customer)).Figures()
+	if err != nil || len(quiet) != 2 || quiet[0].Name != "slotmap" || quiet[1].Name != "timeline" {
+		t.Errorf("a host without errors: %d figures, %v", len(quiet), err)
+	}
+	// A long note is broken between words.
+	if lines := wrapText("one two three four five six", 10, 80); len(lines) < 2 || strings.Join(lines, " ") != "one two three four five six" {
+		t.Errorf("wrapText: %q", lines)
 	}
 }

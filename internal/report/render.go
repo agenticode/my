@@ -61,7 +61,7 @@ func (doc *Document) html() (*node, error) {
 		el("meta", A{"name", "color-scheme", "content", "light"}),
 		el("meta", A{"name", "generator", "content", doc.Tool}),
 		el("title", doc.say("title.page", "host", host.Name, "grade", host.GradeText)),
-		el("style", rawText(styleSheet)),
+		el("style", rawText(styleSheet+figureSheet)),
 	)
 	sheet := el("div", A{"class", "sheet"},
 		el("header", A{"class", "top"},
@@ -319,7 +319,7 @@ func (doc *Document) slotMap() *node {
 				subject = d.Card.Slot
 			}
 		}
-		s.add(el("figure", doc.slotMapFigure(sm, doc.anchors(), subject), doc.slotLegend(sm),
+		s.add(el("figure", doc.slotMapFigure(sm, doc.anchors(), subject), doc.slotLegend(sm, subject != ""),
 			el("figcaption", doc.vsay("ov.slots", "slots", sm.Slots, "dimms", sm.Populated))),
 			how(doc.say("cap.slotmap")))
 	}
