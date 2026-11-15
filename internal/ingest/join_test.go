@@ -396,3 +396,144 @@ func TestGaps(t *testing.T) {
 		t.Error("a description that adds nothing is reported as adding something")
 	}
 }
+
+// boardFake is a fake source that lists the modules of the whole board, as
+// the dump of a BMC does.
+type boardFake struct{ fake }
+
+func (*boardFake) BoardInventory() bool { return true }
+
+// otherBMC is the dump of a BMC whose DIMMs have the given serial numbers,
+// with an error record, a BMC record, a setting and facts about the
+// machine.
+func otherBMC(serials ...string) adapter.Adapter {
+	return &boardFake{fake{kind: "redfish", fn: func(sink adapter.Sink) error {
+		if err := sink.Host(&model.Host{SystemVendor: "Another Vendor", SystemProduct: "Another Product", Board: "BMC-board"}); err != nil {
+			return err
+		}
+		for i, serial := range serials {
+			if err := sink.Module(bmcModule(joinBMCTime, fmt.Sprintf("DIMM.Socket.A%d", i+1), serial)); err != nil {
+				return err
+			}
+		}
+		if err := sink.Event(&model.Event{ErrorDT: joinBMCTime, ErrorSeverity: model.SevCE, Source: "redfish/log", RawRef: "sel/9", Fingerprint: "sel/9",
+			Label: "DIMM.Socket.A1"}); err != nil {
+			return err
+		}
+		if err := sink.BMC(&model.BMC{ObservedAt: joinBMCTime, Address: "10.0.0.9", Source: "redfish/manifest", Fingerprint: "bmc 9"}); err != nil {
+			return err
+		}
+		return sink.BIOSSetting(&model.BIOSSetting{ObservedAt: joinBMCTime, Name: "PatrolScrub", Value: "Enabled", HasValue: true, Source: "redfish/bios"})
+	}}}
+}
+
+// The dump of a BMC is an inventory of the whole board. When none of its
+// DIMMs is a DIMM SMBIOS lists for the host, it is the dump of another
+// machine: nothing of it is added, and the source inventory says why.
+func TestBMCOfAnotherMachineIsRefused(t *testing.T) {
+	const detail = "describes another machine: none of the 2 DIMM serial numbers it lists is among the 2 SMBIOS lists for this host. Nothing of it was added"
+	check := func(t *testing.T, s *store.Store, res *Result) {
+		t.Helper()
+		var src *model.Source
+		for i := range res.Sources {
+			if res.Sources[i].Kind == "redfish" {
+				src = &res.Sources[i]
+			}
+		}
+		if src == nil || src.Status != model.SourceError || src.Detail != detail || src.Events != 0 || src.Samples != 0 {
+			t.Fatalf("source = %+v", src)
+		}
+		if res.Events != 0 || res.Samples != 0 {
+			t.Errorf("the run added %d events and %d readings", res.Events, res.Samples)
+		}
+		st := stateOf(t, s, "node-a")
+		if len(st.Slots) != 3 || len(st.DIMMs) != 2 || len(st.Events) != 0 {
+			t.Errorf("ledger = %+v", st)
+		}
+		if bmcs, _ := s.BMCs(ctx, "node-a"); len(bmcs) != 0 {
+			t.Errorf("BMC records = %+v", bmcs)
+		}
+		if settings, _ := s.BIOSSettings(ctx, "node-a"); len(settings) != 0 {
+			t.Errorf("settings = %+v", settings)
+		}
+		// The refusal is on record with the run.
+		stored, err := s.Sources(ctx, res.Scan.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, x := range stored {
+			found = found || x.Kind == "redfish" && x.Detail == detail
+		}
+		if !found {
+			t.Errorf("stored sources = %+v", stored)
+		}
+	}
+	t.Run("in the run that reads SMBIOS", func(t *testing.T) {
+		s := newStore(t)
+		check(t, s, mustRun(t, s, joinSMBIOSTime, joinBoard(), otherBMC("X0000001", "X0000002")))
+	})
+	t.Run("in a later run", func(t *testing.T) {
+		s := newStore(t)
+		mustRun(t, s, joinSMBIOSTime, joinBoard())
+		check(t, s, mustRun(t, s, joinSMBIOSTime, otherBMC("X0000001", "X0000002")))
+	})
+}
+
+// The check needs serial numbers on both sides, and one DIMM in common is
+// enough: DIMMs are replaced, and a BMC can list fewer than SMBIOS.
+func TestBMCIsTakenWhenItCanBeTheSameMachine(t *testing.T) {
+	for name, tt := range map[string]struct {
+		before, with []adapter.Adapter
+	}{
+		"one DIMM in common":          {nil, []adapter.Adapter{joinBoard(), otherBMC("D0A1-0001", "X0000002")}},
+		"SMBIOS was not read":         {nil, []adapter.Adapter{otherBMC("X0000001", "X0000002")}},
+		"the BMC lists no serial":     {nil, []adapter.Adapter{joinBoard(), otherBMC("", "NO DIMM")}},
+		"the BMC comes before SMBIOS": {nil, []adapter.Adapter{otherBMC("X0000001", "X0000002"), joinBoard()}},
+		"SMBIOS came without a serial": {[]adapter.Adapter{&fake{kind: smbios.Kind, fn: func(sink adapter.Sink) error {
+			return emitModules(sink, []*model.Module{boardModule(joinSMBIOSTime, 0x1100, "A1", "")})
+		}}}, []adapter.Adapter{otherBMC("X0000001")}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			s := newStore(t)
+			if tt.before != nil {
+				mustRun(t, s, joinSMBIOSTime, tt.before...)
+			}
+			res := mustRun(t, s, joinSMBIOSTime, tt.with...)
+			for _, src := range res.Sources {
+				if src.Kind == "redfish" && src.Status != model.SourceOK {
+					t.Errorf("source = %+v", src)
+				}
+			}
+			if bmcs, _ := s.BMCs(ctx, "node-a"); len(bmcs) != 1 {
+				t.Errorf("%d BMC records, want 1", len(bmcs))
+			}
+		})
+	}
+	// A source that lists some modules and is no inventory of the board,
+	// CXL devices in the rasdaemon database for one, is not checked.
+	s := newStore(t)
+	devices := &fake{kind: "rasdaemon", fn: func(sink adapter.Sink) error {
+		m := bmcModule(joinBMCTime, "cxl:mem0", "0xabc123")
+		m.Source = "rasdaemon"
+		return sink.Module(m)
+	}}
+	res := mustRun(t, s, joinSMBIOSTime, joinBoard(), devices)
+	if st := stateOf(t, s, "node-a"); len(st.Slots) != 4 || res.Sources[1].Status != model.SourceOK {
+		t.Errorf("slots = %v, source %+v", st.Slots, res.Sources[1])
+	}
+}
+
+// What a BMC says about the machine fills what the host does not say
+// about itself, and replaces nothing.
+func TestBMCFactsAboutTheHostFillGaps(t *testing.T) {
+	s := newStore(t)
+	facts := &fake{kind: "hostinfo", fn: func(sink adapter.Sink) error {
+		return sink.Host(&model.Host{SystemVendor: "Example Systems", SystemProduct: "R760"})
+	}}
+	mustRun(t, s, joinSMBIOSTime, facts, joinBoard(), otherBMC("D0A10001"))
+	hosts, err := s.Hosts(ctx)
+	if err != nil || len(hosts) != 1 || hosts[0].SystemVendor != "Example Systems" || hosts[0].SystemProduct != "R760" || hosts[0].Board != "BMC-board" {
+		t.Errorf("hosts = %+v, %v", hosts, err)
+	}
+}

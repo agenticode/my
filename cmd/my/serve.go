@@ -201,7 +201,7 @@ func (h *hostSource) Scan(ctx context.Context) (serve.State, error) {
 		}
 	}()
 	var host string
-	if st.ledger, host, err = scanInto(ctx, h.lang, filepath.Join(tmp, "ledger.db"), h.root, tmp, h.now); err != nil {
+	if st.ledger, host, err = scanInto(ctx, h.lang, filepath.Join(tmp, "ledger.db"), h.root, tmp, h.now, nil); err != nil {
 		return nil, err
 	}
 	if st.c, err = view.Open(ctx, st.ledger, h.lang, engine.Options{Config: &h.cfg, Now: h.now}); err != nil {

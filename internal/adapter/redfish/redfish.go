@@ -163,6 +163,12 @@ func NewReader(r io.Reader, origin string, opts Options) *Adapter {
 func (a *Adapter) Kind() string   { return Kind }
 func (a *Adapter) Origin() string { return a.origin }
 
+// BoardInventory says that the memory resources of a BMC list the modules
+// of the whole board, as the SMBIOS tables of the host do. The ledger
+// refuses a dump whose modules are all unknown to the SMBIOS tables of the
+// host it is read for: it is the dump of another machine.
+func (a *Adapter) BoardInventory() bool { return true }
+
 var errTooLarge = errors.New("larger than 64 MiB")
 
 func readLimited(r io.Reader, limit int64) ([]byte, error) {
