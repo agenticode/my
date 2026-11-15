@@ -57,9 +57,12 @@ build:
 test:
 	$(GO) test -p $(JOBS) ./...
 
-# The race detector needs cgo; the product build stays CGO_ENABLED=0.
+# The race detector needs cgo; the product build stays CGO_ENABLED=0. Under
+# the detector the command tests take minutes, and on a shared CI machine
+# several times as long as on a workstation: the ten minutes go test allows
+# a package by default are not enough there.
 test-race:
-	CGO_ENABLED=1 $(GO) test -race -p $(JOBS) ./...
+	CGO_ENABLED=1 $(GO) test -race -timeout 30m -p $(JOBS) ./...
 
 # The figures are pinned by golden files. After an intended change of the
 # output, rewrite them and review the diff.
