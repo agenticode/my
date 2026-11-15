@@ -299,28 +299,68 @@ func (s *session) needHost() (int, bool) {
 
 // find resolves the slot or serial number the reader named.
 func (s *session) find(ref string) (*engine.DIMMResult, int) {
-	d, err := s.c.Find(s.ctx, s.h, ref)
+	d, msg, err := findDIMM(s.ctx, s.c, s.h, s.lang, ref)
+	switch {
+	case d != nil:
+		return d, 0
+	case msg != "":
+		return nil, s.o.usageError(s.env, s.lang, "%s", msg)
+	}
+	return nil, s.o.failure(s.env, err)
+}
+
+// findDIMM resolves a slot or a serial number in a host. When the name
+// fits no DIMM, or more than one, it returns the error of view.Case.Find
+// together with a message that says the same in the reader's language. An
+// error without a message means that the ledger could not be read.
+func findDIMM(ctx context.Context, c *view.Case, h *engine.HostResult, lang i18n.Lang, ref string) (*engine.DIMMResult, string, error) {
+	d, err := c.Find(ctx, h, ref)
 	switch {
 	case err == nil:
-		return d, 0
+		return d, "", nil
 	case errors.Is(err, view.ErrEmptySlot):
-		return nil, s.o.usageError(s.env, s.lang, "%s", say(s.lang, "err.empty_slot", "slot", ref))
+		return nil, say(lang, "err.empty_slot", "slot", ref), err
 	case errors.Is(err, view.ErrAmbiguousDIMM):
-		return nil, s.o.usageError(s.env, s.lang, "%v", err)
+		return nil, err.Error(), err
 	case errors.Is(err, view.ErrNoSuchDIMM):
 		var known []string
-		for _, x := range s.h.DIMMs {
+		for _, x := range h.DIMMs {
 			if x.Present && view.Listed(x) {
 				known = append(known, x.Slot)
 			}
 		}
-		msg := say(s.lang, "err.no_dimm", "ref", ref, "host", s.h.Host)
+		msg := say(lang, "err.no_dimm", "ref", ref, "host", h.Host)
 		if len(known) > 0 {
-			msg += " " + say(s.lang, "err.with_findings", "slots", strings.Join(known, ", "))
+			msg += " " + say(lang, "err.with_findings", "slots", strings.Join(known, ", "))
 		}
-		return nil, s.o.usageError(s.env, s.lang, "%s", msg)
+		return nil, msg, err
 	}
-	return nil, s.o.failure(s.env, err)
+	return nil, "", err
+}
+
+// whyCards builds what "my why" shows: the finding card of one DIMM, or,
+// when d is nil, of every DIMM of the host that has errors or a finding
+// (with all set, of every DIMM), the worst first.
+func whyCards(ctx context.Context, c *view.Case, h *engine.HostResult, d *engine.DIMMResult, all bool) ([]*view.Card, error) {
+	cards := []*view.Card{}
+	if d != nil {
+		card, err := c.Card(ctx, h, d)
+		if err != nil {
+			return nil, err
+		}
+		return append(cards, card), nil
+	}
+	for _, x := range h.DIMMs {
+		if !all && !view.Listed(x) {
+			continue
+		}
+		card, err := c.Card(ctx, h, x)
+		if err != nil {
+			return nil, err
+		}
+		cards = append(cards, card)
+	}
+	return cards, nil
 }
 
 // envelope is the JSON form of a command's output.
@@ -344,21 +384,32 @@ type envelope struct {
 // jsonVersion is the version of the JSON output.
 const jsonVersion = 1
 
+// newEnvelope wraps the data of a view for output as JSON.
+func newEnvelope(name string, lang i18n.Lang, host string, grade model.VerdictGrade, data any) envelope {
+	return envelope{View: name, Version: jsonVersion, Lang: lang, Host: host, Grade: grade, ExitCode: grade.ExitCode(), Data: data}
+}
+
+// writeJSON writes a document the way --json prints it.
+func writeJSON(w io.Writer, v any) error {
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	return enc.Encode(v)
+}
+
 // emit writes the output of a command: JSON, or the text draw writes.
 func (s *session) emit(name string, grade model.VerdictGrade, data any, draw func(w io.Writer) error) int {
 	var err error
 	if s.o.asJSON {
-		e := envelope{View: name, Version: jsonVersion, Lang: s.lang, Grade: grade, ExitCode: grade.ExitCode(), Data: data}
+		host := ""
 		if s.h != nil {
-			e.Host = s.h.Host
+			host = s.h.Host
 		}
+		e := newEnvelope(name, s.lang, host, grade, data)
 		if s.src != nil && s.src.manifest != nil {
 			m := s.src.manifest
 			e.Case = &caseInfo{CreatedAt: m.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"), Tool: m.Tool, Anonymized: m.Anonymized, Subject: m.Subject}
 		}
-		enc := json.NewEncoder(s.env.Stdout)
-		enc.SetIndent("", "  ")
-		err = enc.Encode(e)
+		err = writeJSON(s.env.Stdout, e)
 	} else {
 		// A case says what it is before anything is drawn from it.
 		if s.src != nil && s.src.manifest != nil {

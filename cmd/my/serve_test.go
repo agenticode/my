@@ -397,19 +397,21 @@ func TestServeHelp(t *testing.T) {
 			}
 			flat := strings.Join(strings.Fields(out), " ")
 			if lang == i18n.EN {
-				wantLines(t, flat, "Usage: my serve --metrics [--listen ADDR] [--interval TIME] [flags]", "It changes nothing on the host.",
+				wantLines(t, flat, "Usage: my serve [--metrics] [--listen ADDR] [--interval TIME] [flags]", "It changes nothing on the host.",
+					`/api/dimm/<slot|serial> answers with the JSON that "my why <slot|serial> --json" prints`,
 					"No metric has an address as a label.", "default 127.0.0.1:10163", "has no authentication", "the exit code is then 0")
 			} else if !strings.Contains(out, "사용법:") || !strings.Contains(out, "옵션:") || !strings.Contains(flat, "주소를 라벨로 쓰는 지표는 없습니다") {
 				t.Errorf("%v: not Korean:\n%s", args, out)
 			}
 			// A server shows no grade and scans on its own schedule: the
 			// paragraphs about that are not in its help.
-			for _, not := range []string{"Exit code: the grade", "종료 코드: 보여준", "my open case.mycase serve", "--json", "--ledger"} {
+			for _, not := range []string{"Exit code: the grade", "종료 코드: 보여준", "my open case.mycase serve", "--ascii", "--ledger"} {
 				if strings.Contains(out, not) {
 					t.Errorf("%v (%s): the help says %q", args, lang, not)
 				}
 			}
-			known := map[string]bool{"--help": true}
+			// --json is the flag of "my why" that the text about the API names.
+			known := map[string]bool{"--help": true, "--json": true}
 			newServeOptions().fs.VisitAll(func(f *flag.Flag) {
 				if f.Name == "h" || f.Name == "help" {
 					return
@@ -435,7 +437,134 @@ func TestServeHelp(t *testing.T) {
 	if _, out, _ := run("help"); !strings.Contains(out, "\n  serve ") {
 		t.Errorf("the command list lacks serve:\n%s", out)
 	}
-	if _, out, _ := run("help", "--lang", "ko"); !strings.Contains(out, "exporter로 실행") {
+	if _, out, _ := run("help", "--lang", "ko"); !strings.Contains(out, "서버로 실행") {
 		t.Errorf("the Korean command list lacks serve:\n%s", out)
 	}
+}
+
+// TestServeAPI checks that /api/dimm answers with what "my why --json"
+// prints on the same host: the same bytes.
+func TestServeAPI(t *testing.T) {
+	t.Setenv("TMPDIR", t.TempDir())
+	root := hostTree(t)
+	// No --metrics: the API does not depend on it.
+	s := startServe(t, fixed, "--root", root, "--interval", "1h")
+	deadline := time.Now().Add(60 * time.Second)
+	for {
+		if code, _ := s.get("/-/ready"); code == http.StatusOK {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("the first scan did not finish:\n%s", s.log.String())
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+
+	for path, args := range map[string][]string{
+		"/api/dimm/CPU0_C1":                 {"why", "CPU0_C1"},
+		"/api/dimm/3B9C56":                  {"why", "3B9C56"},
+		"/api/dimm/cpu0_c1?lang=ko":         {"why", "cpu0_c1", "--lang", "ko"},
+		"/api/dimm/CPU1_D1?host=r12-n034":   {"why", "CPU1_D1"},
+		"/api/dimm/CPU0_A1":                 {"why", "CPU0_A1"},
+		"/api/dimm":                         {"why"},
+		"/api/dimm?all=1&lang=ko":           {"why", "--all", "--lang", "ko"},
+		"/api/dimm/?lang=en":                {"why", "--lang", "en"},
+		"/api/dimm/CPU0_C1?lang=ko_KR.UTF8": {"why", "CPU0_C1", "--lang", "ko"},
+	} {
+		code, body := s.get(path)
+		_, want, errOut := runEnv(fixed, append(args, "--root", root, "--json")...)
+		if code != http.StatusOK || errOut != "" || body != want {
+			t.Errorf("GET %s = %d and differs from my %s --json (stderr %q):\n%s\nwant:\n%s", path, code, strings.Join(args, " "), errOut, body, want)
+		}
+		var doc struct {
+			View     string            `json:"view"`
+			Host     string            `json:"host"`
+			ExitCode int               `json:"exit_code"`
+			Data     []json.RawMessage `json:"data"`
+		}
+		if err := json.Unmarshal([]byte(body), &doc); err != nil || doc.View != "why" || doc.Host != "r12-n034" {
+			t.Errorf("GET %s: %v, %+v", path, err, doc)
+		}
+	}
+	// The lines docs/exporter.md quotes are the lines the server sends.
+	doc, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), "docs", "exporter.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	const quoted = "$ curl -s http://127.0.0.1:10163/api/dimm/CPU0_C1 | head -n 8\n"
+	_, c1 := s.get("/api/dimm/CPU0_C1")
+	if i := strings.Index(string(doc), quoted); i < 0 {
+		t.Error("docs/exporter.md does not quote the answer for CPU0_C1")
+	} else if want := strings.Join(strings.SplitAfter(c1, "\n")[:8], ""); !strings.HasPrefix(string(doc)[i+len(quoted):], want+"```") {
+		t.Errorf("docs/exporter.md quotes other lines than the server sends:\n%s", want)
+	}
+
+	// One DIMM is one card, and the grade is that of the DIMM.
+	_, body := s.get("/api/dimm/CPU1_D1")
+	if !strings.Contains(body, `"exit_code": 1`) || strings.Count(body, `"slot":`) != 1 {
+		t.Errorf("GET /api/dimm/CPU1_D1:\n%s", body)
+	}
+
+	// What does not resolve is answered with the sentence the command
+	// prints, and with a status a client can act on.
+	for path, want := range map[string]struct {
+		code int
+		args []string
+		text string
+	}{
+		"/api/dimm/CPU9_Z9":            {http.StatusNotFound, []string{"why", "CPU9_Z9"}, `no slot or DIMM "CPU9_Z9" in host r12-n034. DIMMs with errors or a finding: CPU0_C1, CPU1_D1`},
+		"/api/dimm/CPU9_Z9?lang=ko":    {http.StatusNotFound, []string{"why", "CPU9_Z9", "--lang", "ko"}, `호스트 r12-n034에 "CPU9_Z9" 슬롯이나 DIMM 없음.`},
+		"/api/dimm/CPU0_A2":            {http.StatusNotFound, []string{"why", "CPU0_A2"}, "slot CPU0_A2 holds no DIMM"},
+		"/api/dimm/CPU0_C1?host=other": {http.StatusNotFound, nil, "no host named other in the ledger (hosts: r12-n034)"},
+		"/api/dimm/CPU0_C1?lang=fr":    {http.StatusBadRequest, nil, `unknown language "fr"`},
+	} {
+		code, body := s.get(path)
+		var doc struct {
+			Error string `json:"error"`
+		}
+		if err := json.Unmarshal([]byte(body), &doc); err != nil || code != want.code || !strings.Contains(doc.Error, want.text) {
+			t.Errorf("GET %s = %d %q (%v), want %d and %q", path, code, body, err, want.code, want.text)
+		}
+		if want.args != nil {
+			if _, _, errOut := runEnv(fixed, append(want.args, "--root", root)...); !strings.Contains(errOut, doc.Error) {
+				t.Errorf("GET %s says %q, the command says %q", path, doc.Error, errOut)
+			}
+		}
+	}
+	if code := s.end(); code != cli.ExitOK {
+		t.Errorf("exit code %d", code)
+	}
+}
+
+// TestServeAPIAmbiguousName: the end of a serial number that two DIMMs
+// share is a request the client has to make more precise.
+func TestServeAPIAmbiguousName(t *testing.T) {
+	t.Setenv("TMPDIR", t.TempDir())
+	dir := t.TempDir()
+	root := filepath.Join(dir, "root")
+	ds := testledger.Generate(t, "demo", 1, nil)
+	ds.Modules[0].Serial, ds.Modules[1].Serial = "AA0XYZW", "AA1XYZW"
+	if err := ds.WriteHostTree(root, synth.FlavorIntel); err != nil {
+		t.Fatal(err)
+	}
+	s := startServe(t, fixed, "--root", root, "--interval", "1h", "--lang", "ko")
+	deadline := time.Now().Add(60 * time.Second)
+	for {
+		if code, _ := s.get("/-/ready"); code == http.StatusOK {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("the first scan did not finish:\n%s", s.log.String())
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	code, body := s.get("/api/dimm/XYZW")
+	if code != http.StatusBadRequest || !strings.Contains(body, "more than one DIMM matches") {
+		t.Errorf("GET /api/dimm/XYZW = %d %s", code, body)
+	}
+	// The language of the server is the language of an answer that names none.
+	if _, body := s.get("/api/dimm/CPU0_C1"); !strings.Contains(body, `"lang": "ko"`) || !strings.Contains(body, "즉시 교체") {
+		t.Errorf("the answer is not in the language of the server:\n%s", body)
+	}
+	s.end()
 }

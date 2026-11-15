@@ -1102,3 +1102,31 @@ func TestTimelineKeepsTheLatestMarks(t *testing.T) {
 		t.Errorf("the marks run from %v to %v, want the latest %d up to %v", g.Marks[0].At, g.Marks[MaxMarks-1].At, MaxMarks, last)
 	}
 }
+
+// TestCaseInAnotherLanguage: the same case gives the same card in another
+// language without the engine running again, and the card is the one a
+// case opened in that language gives.
+func TestCaseInAnotherLanguage(t *testing.T) {
+	en, h := open(t, "demo", "", i18n.EN)
+	ko := en.In(i18n.KO)
+	if ko == en || ko.Result != en.Result || ko.Store() != en.Store() || ko.Lang != i18n.KO || en.Lang != i18n.EN {
+		t.Fatalf("In(ko): result shared %v, lang %s, the original is now %s", ko.Result == en.Result, ko.Lang, en.Lang)
+	}
+	if en.In(i18n.EN) != en || en.In("") != en {
+		t.Error("In with the language of the case, or with none, returns another case")
+	}
+	direct, hk := open(t, "demo", "", i18n.KO)
+	want, err := direct.Card(ctx, hk, find(t, direct, hk, "CPU0_C1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := ko.Card(ctx, h, find(t, ko, h, "CPU0_C1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, _ := json.Marshal(want)
+	b, _ := json.Marshal(got)
+	if string(a) != string(b) || got.GradeText != "즉시 교체" {
+		t.Errorf("the card of In(ko) differs from the card of a case opened in Korean:\n%s\n%s", b, a)
+	}
+}

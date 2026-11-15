@@ -1,6 +1,6 @@
 # Exporter
 
-`my serve --metrics` runs MemorY as a Prometheus exporter. It scans the host, serves what the scan found at `/metrics`, and scans again after a pause. It reads the sources `my` reads and changes nothing on the host.
+`my serve --metrics` runs MemorY as a Prometheus exporter. It scans the host, serves what the scan found at `/metrics`, and scans again after a pause. It reads the sources `my` reads and changes nothing on the host. The same server answers `/api/dimm/<slot or serial>` with the finding for one DIMM as JSON.
 
 ```
 $ my serve --metrics
@@ -59,6 +59,39 @@ The totals are counted from error records, as in the commands. They last across 
 
 A scan that fails leaves the metrics of the scan before in place and adds one to `my_exporter_scan_failures_total`. `time() - my_exporter_last_scan_timestamp_seconds` is the age of the metrics. Until the first scan has succeeded `/metrics` answers 503, so the target shows as down.
 
+## DIMM API
+
+`GET /api/dimm/<slot or serial>` answers with the JSON document that `my why <slot or serial> --json` prints on the same host: the finding, the rules that fired, the evidence with the records behind it, the checks, the missing data and the faults. The `slot` and `serial` labels of `my_dimm_verdict` are names it takes, so a dashboard can link a DIMM to its document.
+
+| Request | Answer |
+| --- | --- |
+| `GET /api/dimm/CPU0_C1` | the DIMM in slot `CPU0_C1` |
+| `GET /api/dimm/3B9C56` | the DIMM with that serial number. The last four or more characters of a serial number are enough when they fit one DIMM |
+| `GET /api/dimm` | every DIMM with errors or a finding, the worst first. `?all=1` lists every DIMM |
+
+`?lang=en` or `?lang=ko` chooses the language of the sentences. Without it they are in the language of the server (`--lang`). The codes and arguments behind the sentences are in the document too.
+
+```
+$ curl -s http://127.0.0.1:10163/api/dimm/CPU0_C1 | head -n 8
+{
+  "view": "why",
+  "version": 1,
+  "lang": "en",
+  "host": "r12-n034",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": [
+```
+
+| Status | When |
+| --- | --- |
+| 200 | the document |
+| 400 | the name fits more than one DIMM, or the language is unknown |
+| 404 | no slot or DIMM has that name, or the slot is empty |
+| 503 | no scan has succeeded yet |
+
+An error is a JSON object with one field, `error`, that holds the sentence the command would print. The API is served with and without `--metrics`.
+
 ## How a scan runs
 
 Each scan reads the sources of the host into a new ledger in the temporary directory and removes the ledger of the scan before. The exporter keeps no file between scans or across a restart.
@@ -72,6 +105,7 @@ The exporter reads what its user may read. As root it reads every source that is
 | Path | Answer |
 | --- | --- |
 | `/metrics` | the metrics, when `--metrics` is given. The body is gzip when the client accepts it |
+| `/api/dimm/<slot or serial>`, `/api/dimm` | the finding for one DIMM, or for every DIMM with errors or a finding, as JSON |
 | `/-/healthy` | 200 while the process runs |
 | `/-/ready` | 200 once the first scan has succeeded, 503 before |
 | `/` | the list of these paths |
@@ -80,7 +114,7 @@ The server answers GET and HEAD only.
 
 ## Access
 
-The default address is `127.0.0.1:10163`, which only the host itself can reach. `--listen :10163` or `--listen 10.0.0.5:10163` opens it to the network. The server has no TLS and no authentication. The metrics name slots and DIMM serial numbers.
+The default address is `127.0.0.1:10163`, which only the host itself can reach. `--listen :10163` or `--listen 10.0.0.5:10163` opens it to the network. The server has no TLS and no authentication. The metrics name slots and DIMM serial numbers, and the API also names the files the records came from.
 
 Port 10163 is not registered in the Prometheus list of default port allocations.
 
