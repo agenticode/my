@@ -436,6 +436,8 @@ func TestSniff(t *testing.T) {
 		"dmidecode": "# dmidecode 3.5\nHandle 0x1100, DMI type 17, 92 bytes\nMemory Device\n\tSize: 32 GB\n",
 		"sel save":  "0x04 0x0c 0x53 0x6f 0xa0 0xff 0x01 # Memory #0x53 Correctable ECC\n",
 		"sqlite":    "SQLite format 3\x00" + strings.Repeat("\x00", 84),
+		"kmsg":      "6,1234,5678901,-;EDAC MC0: 1 CE memory read error\n",
+		"csv":       "1,2,3\na,b,c\n",
 	} {
 		if Sniff([]byte(data)) {
 			t.Errorf("%s is taken for a SEL dump", name)

@@ -12,6 +12,25 @@ The observation grade of a record says how much of the place of an error its sou
 
 Every input gets an entry in the source inventory of a scan, also when it is absent or unreadable. The entry carries the status, the number of records read and skipped, and notes such as "3 records of other sensors were left out".
 
+## How a file is recognised
+
+`scan.Detect` picks the adapter for a file or a directory by its content. File names play no part.
+
+| Content | Read as |
+| --- | --- |
+| directory with `proc`, `sys`, `var/log`, `var/lib/rasdaemon` or `sos_commands` below it | copy of a host's files, read like a live host |
+| directory with Redfish resources in JSON files | Redfish dump |
+| SQLite file | rasdaemon database |
+| lines with a kernel stamp, `/dev/kmsg` records, `dmesg -T` dates or syslog lines | kernel log |
+| JSON objects with `MESSAGE` and journal fields | kernel log from `journalctl -o json` |
+| `# dmidecode` or `Handle 0x..., DMI type` lines | dmidecode output |
+| lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
+| JSON with `@odata` properties | Redfish resource |
+
+A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
+
+Three things a file cannot say about itself are options of the import: the time zone of times that carry none (syslog files, `dmesg -T`, the text forms of a BMC event log), the time a kernel log with seconds since boot only was captured, and whether the modification time of a file may stand for the time it was saved.
+
 ## BMC event log (SEL)
 
 Adapter `sel`, package `internal/adapter/sel`. A SEL is the log to read when the host cannot be reached, and it holds the error that took a host down before the operating system could record it.

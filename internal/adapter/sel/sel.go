@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -236,11 +237,26 @@ func sniff(data []byte) (form, why string) {
 		case strings.Contains(l, "SEL has no entries"):
 			return formList, ""
 		}
-		if _, ok := splitListLine(l); ok {
+		if f, ok := splitListLine(l); ok && listRecord(f) {
 			return formList, ""
 		}
 	}
 	return "", "no SEL records found: the input is none of the forms this reader knows"
+}
+
+// listDateRE is a date as "ipmitool sel list" prints it.
+var listDateRE = regexp.MustCompile(`^\d{1,4}[/.-]\d{1,2}[/.-]\d{2,4}$`)
+
+// listRecord reports whether the fields of a line are those of a record of
+// "ipmitool sel list": the second field is a date, the mark of a record
+// from before the clock was set, or the start of a record without a time.
+// Other text has lines with a number first and separators after it too.
+func listRecord(f []string) bool {
+	if len(f) < 2 {
+		return false
+	}
+	d := f[1]
+	return d == "Pre-Init" || listDateRE.MatchString(d) || strings.HasPrefix(d, "OEM record") || strings.HasPrefix(d, "Linux kernel panic")
 }
 
 // isBinary reports whether data is not text. Every record of a binary dump
