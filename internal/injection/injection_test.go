@@ -136,7 +136,7 @@ func TestReadRejects(t *testing.T) {
 		{"unknown kind", head + "injections:\n  - id: a\n    inject: fire\n", `inject "fire" is neither`},
 		{"severity", head + "injections:\n  - id: a\n    inject: error\n    severity: bad\n    address: 1\n", `severity "bad" is none of`},
 		{"scrub", head + "injections:\n  - id: a\n    inject: error\n    severity: CE\n    scrub: Weekly\n    address: 1\n", `scrub "Weekly" is none of`},
-		{"error without a place", head + "injections:\n  - id: a\n    inject: error\n    severity: CE\n", "an error needs an address, a row or a label"},
+		{"error without a place", head + "injections:\n  - id: a\n    inject: error\n    severity: CE\n", "an error needs an address, a row, a label or a device"},
 		{"offline without address", head + "injections:\n  - id: a\n    inject: page-offline\n    how: soft\n", "needs the address of the page"},
 		{"offline how", head + "injections:\n  - id: a\n    inject: page-offline\n    how: gently\n    address: 0x1000\n", `how "gently" is neither hard nor soft`},
 		{"offline count", head + "injections:\n  - id: a\n    inject: page-offline\n    how: soft\n    count: 2\n    address: 0x1000\n", "count is 0 or 1"},
@@ -307,7 +307,7 @@ func TestCompare(t *testing.T) {
 	// label: the records of the device that have no row and do not
 	// contradict the place the plan gives.
 	p3, err := Read(strings.NewReader("format: 1\nscenario: s\ninjections:\n" +
-		"  - id: media\n    inject: error\n    severity: CE\n    count: 2\n    label: \"cxl:mem0\"\n    channel: 1\n    rank: 0\n    device: 32\n"))
+		"  - id: media\n    inject: error\n    severity: CE\n    count: 2\n    dpa: 0x2001000\n    device_name: mem0\n    channel: 1\n    rank: 0\n    device: 32\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -325,6 +325,46 @@ func TestCompare(t *testing.T) {
 	}
 	if c := res.Checks[0]; !c.OK() || c.Found != 2 || res.UnplannedErrors != 2 {
 		t.Errorf("media: %+v, %d unplanned", c, res.UnplannedErrors)
+	}
+
+	// Several injections at one address: each takes the records of its
+	// own moment and no more than it put in. A record too many is beyond
+	// the plan.
+	p4, err := Read(strings.NewReader("format: 1\nscenario: s\ninjections:\n" +
+		"  - id: late\n    time: 2026-11-15T05:20:00Z\n    inject: error\n    severity: Recoverable\n    count: 1\n    address: 0x7000\n    label: \"DIMM 0\"\n" +
+		"  - id: early\n    time: 2026-11-15T05:14:12Z\n    inject: error\n    severity: Recoverable\n    count: 2\n    address: 0x7000\n    label: \"DIMM 0\"\n" +
+		"  - id: fatal\n    inject: error\n    severity: Fatal\n    address: 0x8000\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s4 := ledger(t, []*model.Event{
+		// EDAC says "uncorrected" where firmware said "recoverable"; its
+		// label adds the bank, and the ledger tied it to the slot.
+		{ErrorSeverity: model.SevUE, OsPhysicalAddress: addr(0x7000), Label: "BANK 0 DIMM 0", Slot: "DIMM 0", Source: "rasdaemon/mc_event", ErrorDT: at},
+		{ErrorSeverity: model.SevRecoverable, OsPhysicalAddress: addr(0x7000), Label: "DIMM 0", Source: "klog/ghes", ErrorDT: at.Add(time.Second)},
+		{ErrorSeverity: model.SevUE, OsPhysicalAddress: addr(0x7000), Label: "BANK 0 DIMM 0", Slot: "DIMM 0", Source: "rasdaemon/mc_event", ErrorDT: at.Add(time.Minute)},
+		{ErrorSeverity: model.SevUE, OsPhysicalAddress: addr(0x7000), Label: "BANK 0 DIMM 0", Slot: "DIMM 0", Source: "rasdaemon/mc_event", ErrorDT: at.Add(6 * time.Minute)},
+		{ErrorSeverity: model.SevUE, OsPhysicalAddress: addr(0x7000), Label: "BANK 1 DIMM 3", Slot: "DIMM 3", Source: "rasdaemon/mc_event", ErrorDT: at.Add(7 * time.Minute)},
+		// The plan says fatal; a record that says the system survived differs.
+		{ErrorSeverity: model.SevUE, OsPhysicalAddress: addr(0x8000), Source: "rasdaemon/mc_event", ErrorDT: at},
+	}, nil)
+	res, err = Compare(ctx, s4, "h", p4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c := res.Checks[1]; c.Injection.ID != "early" || !c.OK() || c.Found != 2 || c.Sources["rasdaemon/mc_event"] != 2 || c.Sources["klog/ghes"] != 1 {
+		t.Errorf("early: %+v", c)
+	}
+	if c := res.Checks[0]; c.Injection.ID != "late" || !c.OK() || c.Found != 1 || len(c.Sources) != 1 {
+		t.Errorf("late: %+v", c)
+	}
+	if c := res.Checks[2]; c.OK() || c.Found != 1 || len(c.Differences) != 1 || c.Differences[0].Field != "severity" ||
+		c.Differences[0].Want != "fatal" || c.Differences[0].Got != "uncorrected" {
+		t.Errorf("fatal: %+v", c)
+	}
+	// The fifth record at the address is one error too many, on another DIMM.
+	if res.UnplannedErrors != 1 || len(res.Unplanned) != 1 || !strings.Contains(res.Unplanned[0], "test#e") {
+		t.Errorf("unplanned: %d, %v", res.UnplannedErrors, res.Unplanned)
 	}
 
 	// Another host has none of it.

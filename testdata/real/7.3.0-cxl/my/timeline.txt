@@ -1,0 +1,9 @@
+host lab-guest  2026-11-15 to 2026-11-15  1 day
+
+
+ cxl:mem0  █  peak 11/day
+ events    UF
+           │└ cxl:mem0: 2026-11-15 marked as failed by firmware
+           └─ cxl:mem0: 2026-11-15 UE (demand read)
+
+ 11 corrected and 1 uncorrected error from 2026-11-15 to 2026-11-15

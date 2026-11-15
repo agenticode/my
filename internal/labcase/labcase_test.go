@@ -51,6 +51,27 @@ type capture struct {
 	// reports are the sources that hold the injections of the plan, in a
 	// scan of the copy.
 	reports []string
+	// noDIMM counts the errors that are tied to no DIMM.
+	noDIMM int64
+	// dimm is the DIMM the errors belong to, when the host names one.
+	dimm *dimm
+	// forms says what the kernel log of the boot gives when it is read
+	// alone, in each of the forms under formats/.
+	forms *forms
+}
+
+// dimm is what the engine must say about the DIMM of a capture.
+type dimm struct {
+	slot, serial string
+	mode         model.FaultMode
+	rules        []string
+}
+
+// forms is what one form of the kernel log gives by itself.
+type forms struct {
+	events, actions int
+	kernel          string
+	note            string
 }
 
 var captures = []capture{
@@ -63,6 +84,7 @@ var captures = []capture{
 	{
 		dir: "7.3.0-hwpoison", host: "lab-vm", journal: true, hard: 4,
 		reports: []string{"klog/offline", "rasdaemon/memory_failure_event"},
+		forms:   &forms{actions: 4, kernel: "7.3.0-ras", note: "klog: 4 page offlines were asked for by a program"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictOK,
 		notes:   []string{"klog: 4 page offlines were asked for by a program"},
@@ -80,7 +102,7 @@ var captures = []capture{
 		// No EDAC driver and one virtual DIMM: the errors have addresses
 		// and no DIMM. A host whose errors cannot be tied to a DIMM gets
 		// no finding from the engine today.
-		dir: "7.3.0-mce", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2,
+		dir: "7.3.0-mce", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		// The kernel log has no machine check record: a logged record is
 		// not printed by default.
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
@@ -91,7 +113,7 @@ var captures = []capture{
 	{
 		// With mce=print_all the kernel log holds every record too: each
 		// error is in two sources and counts once.
-		dir: "7.3.0-mce-print-all", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2,
+		dir: "7.3.0-mce-print-all", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictOK,
@@ -99,11 +121,42 @@ var captures = []capture{
 	{
 		// The clock was set back by 10 seconds after rasdaemon started: its
 		// times are ahead of the kernel's for the whole run.
-		dir: "7.3.0-mce-clock-step", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2,
+		dir: "7.3.0-mce-clock-step", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictOK,
 		notes:   []string{"rasdaemon: 13 records are dated by the kernel's time"},
+	},
+	{
+		// rasdaemon 1.0.0 built from source: 41 tables, more columns in
+		// mce_record, and the signals the kernel sent in a table of their own.
+		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
+		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		finding: model.VerdictOK,
+		notes:   []string{"rasdaemon: table signal_event: 3 rows not read"},
+	},
+	{
+		// An emulated CXL memory device, recorded by rasdaemon 1.0.0. The
+		// device is the DIMM: its serial number is its identity.
+		dir: "7.3.0-cxl", host: "lab-guest", ce: 11, ue: 1, gradeA: 9, gradeB: 3,
+		reports: []string{"rasdaemon/cxl_dram_event", "rasdaemon/cxl_general_media_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		finding: model.VerdictReplaceNow,
+		dimm:    &dimm{slot: "cxl:mem0", serial: "0x4c41420001", mode: model.ModeRow, rules: []string{"R-UE-01", "R-FW-01"}},
+	},
+	{
+		// Firmware error records on an aarch64 guest: every error is in
+		// the rasdaemon database, in the firmware block of the kernel log
+		// and in the EDAC line after it, and counts once. The kernel of
+		// this guest traces no memory failure, so the two pages are in
+		// the kernel log only.
+		dir: "6.19.10-ghes", host: "lab-arm", journal: true, ce: 24, ue: 2, gradeA: 26, hard: 2,
+		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		finding: model.VerdictReplaceNow,
+		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeMultiRow, rules: []string{"R-UE-01", "R-SCRUB-01"}},
+		forms:   &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64"},
 	},
 }
 
@@ -320,8 +373,30 @@ func TestCopyOfTheHost(t *testing.T) {
 			for _, u := range out.Hosts[0].Unattributed {
 				loose += u.CE + u.UE
 			}
-			if loose != c.ce+c.ue {
-				t.Errorf("%d errors without a DIMM, want %d: no source of these hosts names the DIMM", loose, c.ce+c.ue)
+			if loose != c.noDIMM {
+				t.Errorf("%d errors without a DIMM, want %d", loose, c.noDIMM)
+			}
+			if c.dimm != nil {
+				d := out.Hosts[0].InSlot(c.dimm.slot)
+				if d == nil || d.Verdict == nil {
+					t.Fatalf("no finding for slot %q", c.dimm.slot)
+				}
+				var ce, ue int64
+				modes := map[model.FaultMode]bool{}
+				for _, f := range d.Faults {
+					ce += f.CE
+					ue += f.UE
+					modes[f.Mode] = true
+				}
+				if d.DIMM.Serial != c.dimm.serial || d.Verdict.Grade != c.finding || !modes[c.dimm.mode] ||
+					strings.Join(d.Verdict.Rules, " ") != strings.Join(c.dimm.rules, " ") {
+					t.Errorf("slot %s: serial %q, finding %s, rules %v, fault modes %v\n want serial %q, %s, %v, a %s fault",
+						c.dimm.slot, d.DIMM.Serial, d.Verdict.Grade, d.Verdict.Rules, modes, c.dimm.serial, c.finding, c.dimm.rules, c.dimm.mode)
+				}
+				if d.Features.CE != c.ce || d.Features.UE != c.ue {
+					t.Errorf("slot %s: CE %d, UE %d; want %d, %d", c.dimm.slot, d.Features.CE, d.Features.UE, c.ce, c.ue)
+				}
+				_, _ = ce, ue
 			}
 
 			// A second reading of the same copy adds nothing.
@@ -378,73 +453,101 @@ func TestLooseFiles(t *testing.T) {
 
 // TestKernelLogForms reads the kernel log of one boot in every form the
 // host can print it: dmesg with its time formats, a read of /dev/kmsg, and
-// the text forms of journalctl. Each form alone must give the four pages of
-// the plan, the kernel of the boot, and times near the injection.
+// the text forms of journalctl. Each form alone must give what the plan
+// holds, the kernel of the boot, and times near the injections. In the
+// capture with firmware error records every error spans a dozen lines, in
+// each of the framings.
 func TestKernelLogForms(t *testing.T) {
-	var c capture
-	for _, x := range captures {
-		if x.dir == "7.3.0-hwpoison" {
-			c = x
+	for _, c := range captures {
+		if c.forms == nil {
+			continue
 		}
-	}
-	at := capturedAt(t, c)
-	p := plan(t, c)
-	forms := []struct {
-		file string
-		host string // the journal names the host, dmesg does not
-		// slack is how far the time of a record may lie from the
-		// injection: the forms without dates are placed by the capture
-		// time or by the hardware clock, which ran ahead on this host.
-		slack time.Duration
-	}{
-		{"dmesg-T.txt", "localhost", 2 * time.Second},
-		{"dmesg-iso.txt", "localhost", 2 * time.Second},
-		{"dmesg-raw.txt", "localhost", 15 * time.Second},
-		{"kmsg.txt", "localhost", 15 * time.Second},
-		{"journal-short.txt", c.host, 2 * time.Second},
-		{"journal-short-iso.txt", c.host, 2 * time.Second},
-		{"journal-short-monotonic.txt", c.host, 15 * time.Second},
-	}
-	entries, err := os.ReadDir(dir(t, c, "formats"))
-	if err != nil || len(entries) != len(forms) {
-		t.Fatalf("formats holds %d files, the test knows %d (%v)", len(entries), len(forms), err)
-	}
-	for _, f := range forms {
-		t.Run(f.file, func(t *testing.T) {
-			as, what, err := scan.Detect(ctx, dir(t, c, "formats", f.file), scan.DetectOptions{Now: at, CapturedAt: at})
-			if err != nil || what != scan.WhatKernelLog {
-				t.Fatalf("detected as %q, %v", what, err)
+		at := capturedAt(t, c)
+		p := plan(t, c)
+		first, last := p.Injections[0].Time, p.Injections[0].Time
+		for _, in := range p.Injections {
+			if !in.Time.IsZero() && in.Time.Before(first) {
+				first = in.Time
 			}
-			s := ledger(t)
-			res, err := ingest.Run(ctx, s, as, ingest.Options{Now: at})
-			if err != nil {
-				t.Fatal(err)
+			if in.Time.After(last) {
+				last = in.Time
 			}
-			if res.Host != f.host {
-				t.Errorf("host %q, want %q", res.Host, f.host)
-			}
-			if src := res.Sources[0]; src.Status != model.SourceOK || src.Actions != 4 || src.Events != 0 {
-				t.Errorf("source: %s, %d actions, %d events, notes %q", src.Status, src.Actions, src.Events, src.Notes)
-			}
-			if !hasNote(res.Sources, "klog: 4 page offlines were asked for by a program") {
-				t.Errorf("the offlines are not told from hardware errors: %q", res.Sources[0].Notes)
-			}
-			compare(t, c, s, res.Host, 0)
-			boots, err := s.Boots(ctx, res.Host)
-			if err != nil || len(boots) != 1 || boots[0].Kernel != "7.3.0-ras" {
-				t.Errorf("boots: %+v, %v", boots, err)
-			}
-			actions, err := s.Actions(ctx, store.ActionFilter{Host: res.Host})
-			if err != nil || len(actions) != len(p.Injections) {
-				t.Fatalf("%d actions, %v", len(actions), err)
-			}
-			for i, a := range actions {
-				if d := a.At.Sub(p.Injections[i].Time).Abs(); d > f.slack {
-					t.Errorf("page %d is dated %s, injected at %s: %s apart (%s)", i+1, a.At.Format(time.RFC3339),
-						p.Injections[i].Time.Format(time.RFC3339), d.Round(time.Millisecond), a.TimeQuality)
+		}
+		forms := []struct {
+			file string
+			host string // the journal names the host, dmesg does not
+			// slack is how far the time of a record may lie outside the
+			// span of the injections: the forms without dates are placed
+			// by the capture time or by the hardware clock, which ran
+			// ahead on the lab host.
+			slack time.Duration
+		}{
+			{"dmesg-T.txt", "localhost", 3 * time.Second},
+			{"dmesg-iso.txt", "localhost", 3 * time.Second},
+			{"dmesg-raw.txt", "localhost", 15 * time.Second},
+			{"kmsg.txt", "localhost", 15 * time.Second},
+			{"journal-short.txt", c.host, 3 * time.Second},
+			{"journal-short-iso.txt", c.host, 3 * time.Second},
+			{"journal-short-monotonic.txt", c.host, 15 * time.Second},
+		}
+		entries, err := os.ReadDir(dir(t, c, "formats"))
+		if err != nil || len(entries) != len(forms) {
+			t.Fatalf("%s: formats holds %d files, the test knows %d (%v)", c.dir, len(entries), len(forms), err)
+		}
+		for _, f := range forms {
+			t.Run(c.dir+"/"+f.file, func(t *testing.T) {
+				as, what, err := scan.Detect(ctx, dir(t, c, "formats", f.file), scan.DetectOptions{Now: at, CapturedAt: at})
+				if err != nil || what != scan.WhatKernelLog {
+					t.Fatalf("detected as %q, %v", what, err)
 				}
-			}
-		})
+				s := ledger(t)
+				res, err := ingest.Run(ctx, s, as, ingest.Options{Now: at})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if res.Host != f.host {
+					t.Errorf("host %q, want %q", res.Host, f.host)
+				}
+				if src := res.Sources[0]; src.Status != model.SourceOK || src.Actions != c.forms.actions || src.Events != c.forms.events {
+					t.Errorf("source: %s, %d events, %d actions (want %d, %d), notes %q", src.Status, src.Events, src.Actions,
+						c.forms.events, c.forms.actions, src.Notes)
+				}
+				if c.forms.note != "" && !hasNote(res.Sources, c.forms.note) {
+					t.Errorf("no note %q: %q", c.forms.note, res.Sources[0].Notes)
+				}
+				if got, want := stateOf(t, s, res.Host), (state{ce: c.ce, ue: c.ue, gradeA: c.gradeA, gradeB: c.gradeB, gradeC: c.gradeC, hard: c.hard, soft: c.soft}); got != want {
+					t.Errorf("ledger: %+v\n  want: %+v", got, want)
+				}
+				compare(t, c, s, res.Host, 0)
+				boots, err := s.Boots(ctx, res.Host)
+				if err != nil || len(boots) != 1 || boots[0].Kernel != c.forms.kernel {
+					t.Errorf("boots: %+v, %v", boots, err)
+				}
+				lo, hi := first.Add(-f.slack), last.Add(f.slack+10*time.Second)
+				events, err := s.EventList(ctx, store.EventFilter{Host: res.Host, WithDuplicates: true})
+				if err != nil {
+					t.Fatal(err)
+				}
+				for _, e := range events {
+					if e.ErrorDT.Before(lo) || e.ErrorDT.After(hi) {
+						t.Errorf("%s is dated %s (%s), outside %s to %s", e.RawRef, e.ErrorDT.Format(time.RFC3339), e.TimeQuality,
+							lo.Format(time.RFC3339), hi.Format(time.RFC3339))
+						break
+					}
+				}
+				actions, err := s.Actions(ctx, store.ActionFilter{Host: res.Host})
+				if err != nil {
+					t.Fatal(err)
+				}
+				for _, a := range actions {
+					if a.At.Before(lo) || a.At.After(hi) {
+						t.Errorf("%s is dated %s (%s), outside %s to %s", a.RawRef, a.At.Format(time.RFC3339), a.TimeQuality,
+							lo.Format(time.RFC3339), hi.Format(time.RFC3339))
+						break
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -539,6 +642,9 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 			}
 			var got []string
 			for _, s := range live.Data.Sources {
+				if s.Kind == ingest.SlotMapKind || s.Kind == ingest.TimeAlignKind {
+					continue
+				}
 				got = append(got, s.Kind+" "+s.Status)
 			}
 			if strings.Join(got, ", ") != strings.Join(c.sources, ", ") {

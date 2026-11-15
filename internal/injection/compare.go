@@ -95,6 +95,9 @@ const earlier = 10 * time.Minute
 //
 // An error is found by its address: records of the same cache line and
 // severity class, dated no earlier than ten minutes before the injection.
+// A record belongs to one injection: several injections at one address are
+// served in the order of their times, and each takes as many errors as it
+// put in.
 // An error the plan gives no address for is found by its row, column and
 // bank. One that has neither is found by its label among the records
 // without a row, as long as channel, rank, device and bank do not
@@ -113,23 +116,47 @@ func Compare(ctx context.Context, s *store.Store, host string, p *Plan) (*Result
 	usedEvent := make([]bool, len(events))
 	usedAction := make([]bool, len(actions))
 
-	for i := range p.Injections {
+	// Second reports follow the record they repeat.
+	primary := map[int64]int{} // event ID -> index of the record that counts
+	for j, e := range events {
+		if e.DupOf == 0 {
+			primary[e.ID] = j
+		}
+	}
+	seconds := map[int][]int{}
+	for j, e := range events {
+		if e.DupOf != 0 {
+			if pj, ok := primary[e.DupOf]; ok {
+				seconds[pj] = append(seconds[pj], j)
+			}
+		}
+	}
+
+	// Injections are served in the order of their times, so that several
+	// at one address each get the records of their own moment: a record
+	// belongs to one injection, and an injection takes no more errors
+	// than it put in. What is left over is beyond the plan.
+	order := make([]int, len(p.Injections))
+	for i := range order {
+		order[i] = i
+	}
+	sort.SliceStable(order, func(a, b int) bool {
+		ta, tb := p.Injections[order[a]].Time, p.Injections[order[b]].Time
+		return !ta.IsZero() && !tb.IsZero() && ta.Before(tb)
+	})
+	res.Checks = make([]Check, len(p.Injections))
+	for _, i := range order {
 		in := &p.Injections[i]
 		c := Check{Injection: in, Sources: map[string]int{}}
 		switch in.Inject {
 		case InjectError:
 			c.Grades = map[model.Grade]int{}
 			reported := map[string]bool{}
-			for j, e := range events {
-				if !in.matchesEvent(e) {
-					continue
-				}
+			take := func(j int) {
+				e := events[j]
 				usedEvent[j] = true
 				c.Sources[e.Source]++
 				c.Grades[e.Grade]++
-				if e.DupOf == 0 {
-					c.Found += max(e.Count, 1)
-				}
 				for _, f := range in.fields() {
 					got, ok := f.of(e)
 					if !ok {
@@ -139,6 +166,19 @@ func Compare(ctx context.Context, s *store.Store, host string, p *Plan) (*Result
 					if got != f.want {
 						c.Differences = append(c.Differences, Difference{Field: f.name, Want: f.want, Got: got, Record: e.Source + " " + e.RawRef})
 					}
+				}
+			}
+			for j, e := range events {
+				if c.Found >= max(in.Count, 1) {
+					break
+				}
+				if usedEvent[j] || e.DupOf != 0 || !in.matchesEvent(e) {
+					continue
+				}
+				c.Found += max(e.Count, 1)
+				take(j)
+				for _, k := range seconds[j] {
+					take(k)
 				}
 			}
 			if len(c.Sources) > 0 {
@@ -168,7 +208,15 @@ func Compare(ctx context.Context, s *store.Store, host string, p *Plan) (*Result
 				c.Found = 1
 			}
 		}
-		res.Checks = append(res.Checks, c)
+		res.Checks[i] = c
+	}
+	// A second report whose first report was claimed is accounted for.
+	for j, e := range events {
+		if e.DupOf != 0 {
+			if pj, ok := primary[e.DupOf]; ok && usedEvent[pj] {
+				usedEvent[j] = true
+			}
+		}
 	}
 
 	note := func(s string) {
@@ -217,15 +265,25 @@ func (in *Injection) matchesEvent(e *model.Event) bool {
 		same := func(want, got model.Opt[int]) bool { return !want.Valid || (got.Valid && got.V == want.V) }
 		return same(in.Row, e.Row) && same(in.Column, e.Column) && same(in.Bank, e.Bank) && same(in.BankGroup, e.BankGroup) &&
 			same(in.Device, e.DeviceId) && same(in.Rank, e.Rank)
-	case in.Label != "":
+	case in.place() != "":
 		// By the DIMM or device alone many errors look alike: what the
 		// plan says about the place inside it must not be contradicted.
 		same := func(want, got model.Opt[int]) bool { return !want.Valid || !got.Valid || got.V == want.V }
-		return (model.NormalizeLabel(e.Label) == model.NormalizeLabel(in.Label) || e.Slot == in.Label) &&
+		return (model.NormalizeLabel(e.Label) == model.NormalizeLabel(in.place()) || e.Slot == in.place()) &&
 			same(in.Channel, e.ChannelId) && same(in.Rank, e.Rank) && same(in.Device, e.DeviceId) &&
 			same(in.BankGroup, e.BankGroup) && same(in.Bank, e.Bank) && !e.Row.Valid
 	}
 	return false
+}
+
+// place returns the name the ledger has for the DIMM or device of an
+// injection: its label, or for a CXL memory device the kernel's name of it
+// with the prefix the ledger gives such devices.
+func (in *Injection) place() string {
+	if in.Label == "" && in.DeviceName != "" {
+		return "cxl:" + in.DeviceName
+	}
+	return in.Label
 }
 
 // field is one thing a plan says about an error, with how a record says it.
@@ -255,7 +313,7 @@ func (in *Injection) fields() []field {
 			return "", false
 		}})
 	}
-	out = append(out, field{"severity", string(in.Severity), func(e *model.Event) (string, bool) { return string(e.ErrorSeverity), true }})
+	out = append(out, field{"severity", severityWord(in.Severity), func(e *model.Event) (string, bool) { return severityWord(e.ErrorSeverity), true }})
 	if in.Scrub != "" {
 		out = append(out, field{"scrub", string(in.Scrub), func(e *model.Event) (string, bool) { return string(e.ErrorScrubType), e.ErrorScrubType != "" }})
 	}
@@ -276,17 +334,38 @@ func (in *Injection) fields() []field {
 			return "", false
 		}})
 	}
-	if in.Label != "" {
-		want := model.NormalizeLabel(in.Label)
+	if in.place() != "" {
+		// The DIMM is right when the record names it, or when the ledger
+		// tied the record to the slot of that name: an EDAC label may add
+		// the bank to the locator ("BANK 0 DIMM 0" for "DIMM 0").
+		want := model.NormalizeLabel(in.place())
 		out = append(out, field{"label", want, func(e *model.Event) (string, bool) {
+			label, slot := model.NormalizeLabel(e.Label), model.NormalizeLabel(e.Slot)
 			switch {
-			case e.Label != "":
-				return model.NormalizeLabel(e.Label), true
-			case e.Slot != "":
-				return model.NormalizeLabel(e.Slot), true
+			case label == want || slot == want:
+				return want, true
+			case slot != "":
+				return slot, true
+			case label != "":
+				return label, true
 			}
 			return "", false
 		}})
 	}
 	return out
+}
+
+// severityWord names a severity as far as every source can tell it. EDAC
+// has one word for an uncorrected error the system survived, where a
+// firmware record and a machine check say "recoverable".
+func severityWord(s model.Severity) string {
+	switch s {
+	case model.SevCE:
+		return "corrected"
+	case model.SevRecoverable, model.SevUE:
+		return "uncorrected"
+	case model.SevFatal:
+		return "fatal"
+	}
+	return strings.ToLower(string(s))
 }

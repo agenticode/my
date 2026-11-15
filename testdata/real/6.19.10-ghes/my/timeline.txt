@@ -1,0 +1,9 @@
+host lab-arm  2026-11-15 to 2026-11-15  1 day
+
+
+ DIMM 0    █  peak 24/day
+ events    UO
+           │└ 2 pages offline, 2026-11-15 to 2026-11-15
+           └─ 2 UE, 2026-11-15 to 2026-11-15
+
+ 24 corrected and 2 uncorrected errors from 2026-11-15 to 2026-11-15
