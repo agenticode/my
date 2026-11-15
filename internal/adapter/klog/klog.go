@@ -246,11 +246,13 @@ func (p *parser) stampOf(raw string) (l line, ok bool) {
 	return l, ok && (!l.wall.IsZero() || l.hasMono)
 }
 
-// coverage says what time the input covers, from its first and its last
-// line. A finding that says "no errors" speaks of this time and of no
-// other: a journal that kept two weeks says nothing about the months
-// before, and a ring buffer that has wrapped nothing about the start of
-// the boot.
+// coverage says when the first and the last line of the input were
+// written. A finding that says "no errors" speaks of the time from the
+// first line on and of no time before it: a journal that kept two weeks
+// says nothing about the months before, and a ring buffer that has wrapped
+// nothing about the start of the boot. The last line is not the end of
+// what a log of a running host covers: a kernel that has been silent for
+// a month has a last line of a month ago.
 func (p *parser) coverage() string {
 	first, ok1 := p.stampOf(p.firstRaw)
 	last, ok2 := p.stampOf(p.lastRaw)
@@ -272,16 +274,16 @@ func (p *parser) coverage() string {
 	var note string
 	switch {
 	case !from.IsZero() && !to.IsZero():
-		note = fmt.Sprintf("covers %s to %s UTC", from.UTC().Format(layout), to.UTC().Format(layout))
+		note = fmt.Sprintf("its lines run from %s to %s UTC", from.UTC().Format(layout), to.UTC().Format(layout))
 	case first.hasMono && last.hasMono && p.segs <= 1:
-		note = fmt.Sprintf("covers %s to %s after boot", sinceBoot(first.mono), sinceBoot(last.mono))
+		note = fmt.Sprintf("its lines run from %s to %s after boot", sinceBoot(first.mono), sinceBoot(last.mono))
 	default:
 		return ""
 	}
 	// A log of one boot that does not start with the boot has lost its
 	// beginning: the ring buffer wrapped, or the file was cut.
 	if p.segs <= 1 && first.hasMono && first.mono > lateStart {
-		note += fmt.Sprintf("; it starts %s after boot, and what the kernel said before that is not in it", sinceBoot(first.mono))
+		note += fmt.Sprintf("; the first is from %s after boot, and what the kernel said before that is not in it", sinceBoot(first.mono))
 	}
 	return note
 }

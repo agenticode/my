@@ -54,6 +54,8 @@ jobs:
         run: .github/scripts/live-scan.sh ./dist/my-linux-amd64
       - name: scan this machine as root
         run: sudo .github/scripts/live-scan.sh ./dist/my-linux-amd64
+      - name: the validation run of docs/validation.md on this machine, as a normal user and as root
+        run: python3 tools/validate/host.py --my ./dist/my-linux-amd64 --out "$RUNNER_TEMP/validate" --sudo --devnull --serve
       - name: run the exporter on this machine as a normal user
         run: .github/scripts/live-serve.sh ./dist/my-linux-amd64
       - name: run the exporter on this machine as root
