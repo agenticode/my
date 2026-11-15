@@ -21,12 +21,12 @@ The build needs Go 1.26 or newer. The binary is pure Go and statically linked (`
 | `make lint` | `gofmt` and `go vet` |
 | `make test-race` | the tests with the race detector; it needs a C compiler and takes several minutes |
 | `make cross` | builds linux/amd64, linux/arm64 and darwin/arm64 into `dist/` |
-| `make fuzz` | runs every fuzz target for `FUZZTIME` (10 s by default) |
+| `make fuzz` | runs every fuzz target for `FUZZTIME` (10 s by default); [docs/fuzzing.md](docs/fuzzing.md) lists the targets and what they check |
 | `make golden` | writes the golden files of the figures again |
 | `make examples` | writes the report and the figures under `examples/` again |
 | `make dist-check` | builds the release archives twice and compares them |
 
-CI runs `make lint`, `make test`, `make test-race` and `make cross` on every pull request, then runs the Linux binary on its own machine as a normal user and as root.
+CI runs `make lint`, `make test`, `make test-race` and `make cross` on every pull request, then runs the Linux binary on its own machine as a normal user and as root. A further job gives every fuzz target 20,000 inputs.
 
 Nothing in the tests needs a server with memory errors. Parsers read fixtures under `testdata/`, and `my synth` makes hosts with a known fault for the engine and the figures. `my synth -list` names the scenarios, `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).
 
