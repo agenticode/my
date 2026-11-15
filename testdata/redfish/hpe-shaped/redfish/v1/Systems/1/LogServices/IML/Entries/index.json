@@ -1,0 +1,41 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries",
+  "@odata.type": "#LogEntryCollection.LogEntryCollection",
+  "Name": "Integrated Management Logs",
+  "Members@odata.count": 3,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/1",
+      "@odata.type": "#LogEntry.v1_0_0.LogEntry",
+      "Id": "1",
+      "Name": "Integrated Management Log",
+      "EntryType": "Oem",
+      "OemRecordFormat": "Hpe-IML",
+      "Created": "2026-09-30T11:02:00Z",
+      "Message": "Server Power Restored",
+      "Severity": "OK"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/2",
+      "@odata.type": "#LogEntry.v1_0_0.LogEntry",
+      "Id": "2",
+      "Name": "Integrated Management Log",
+      "EntryType": "Oem",
+      "OemRecordFormat": "Hpe-IML",
+      "Created": "2026-11-03T06:14:22Z",
+      "Message": "Corrected Memory Error threshold exceeded (Processor 1, Memory Module 3)",
+      "Severity": "Warning"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/3",
+      "@odata.type": "#LogEntry.v1_0_0.LogEntry",
+      "Id": "3",
+      "Name": "Integrated Management Log",
+      "EntryType": "Oem",
+      "OemRecordFormat": "Hpe-IML",
+      "Created": "2026-11-09T17:45:03Z",
+      "Message": "Corrected Memory Error threshold exceeded (Processor 1, Memory Module 3)",
+      "Severity": "Warning"
+    }
+  ]
+}

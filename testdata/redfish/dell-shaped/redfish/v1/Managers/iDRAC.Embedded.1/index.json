@@ -1,0 +1,13 @@
+{
+  "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1",
+  "@odata.type": "#Manager.v1_9_0.Manager",
+  "Id": "iDRAC.Embedded.1",
+  "Name": "Manager",
+  "ManagerType": "BMC",
+  "Model": "14G Monolithic",
+  "FirmwareVersion": "4.40.00.00",
+  "DateTime": "2026-11-12T03:00:40+00:00",
+  "LogServices": {
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices"
+  }
+}

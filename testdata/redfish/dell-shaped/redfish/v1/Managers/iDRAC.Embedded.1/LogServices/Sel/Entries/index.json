@@ -1,0 +1,52 @@
+{
+  "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries",
+  "@odata.type": "#LogEntryCollection.LogEntryCollection",
+  "Name": "Log Entry Collection",
+  "Members@odata.count": 4,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/1",
+      "@odata.type": "#LogEntry.v1_6_0.LogEntry",
+      "Id": "1",
+      "Name": "Log Entry 1",
+      "EntryType": "Event",
+      "Created": "2026-10-02T08:16:10+00:00",
+      "MessageId": "SYS1003",
+      "Message": "System CPU Resetting.",
+      "Severity": "OK"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/2",
+      "@odata.type": "#LogEntry.v1_6_0.LogEntry",
+      "Id": "2",
+      "Name": "Log Entry 2",
+      "EntryType": "Event",
+      "Created": "2026-10-28T21:04:55+00:00",
+      "MessageId": "MEM0701",
+      "Message": "Correctable memory error rate exceeded for DIMM_A1.",
+      "Severity": "Warning"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/3",
+      "@odata.type": "#LogEntry.v1_6_0.LogEntry",
+      "Id": "3",
+      "Name": "Log Entry 3",
+      "EntryType": "Event",
+      "Created": "2026-11-05T02:41:07+00:00",
+      "MessageId": "MEM0702",
+      "Message": "Correctable memory error rate exceeded for DIMM_A1.",
+      "Severity": "Critical"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/4",
+      "@odata.type": "#LogEntry.v1_6_0.LogEntry",
+      "Id": "4",
+      "Name": "Log Entry 4",
+      "EntryType": "Event",
+      "Created": "2026-11-11T19:22:31+00:00",
+      "MessageId": "PSU0003",
+      "Message": "The power supply unit 2 is removed.",
+      "Severity": "Critical"
+    }
+  ]
+}

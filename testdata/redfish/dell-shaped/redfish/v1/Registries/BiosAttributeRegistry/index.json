@@ -1,0 +1,16 @@
+{
+  "@odata.id": "/redfish/v1/Registries/BiosAttributeRegistry",
+  "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+  "Id": "BiosAttributeRegistry",
+  "Name": "BIOS Attribute Registry File",
+  "Registry": "BiosAttributeRegistry.v1_0_0",
+  "Languages": [
+    "en"
+  ],
+  "Location": [
+    {
+      "Language": "en",
+      "Uri": "/redfish/v1/Systems/System.Embedded.1/Bios/BiosRegistry"
+    }
+  ]
+}

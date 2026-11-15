@@ -1,0 +1,20 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/Memory",
+  "@odata.type": "#MemoryCollection.MemoryCollection",
+  "Name": "MemoryCollection",
+  "Members@odata.count": 4,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc1dimm1"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc1dimm3"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc2dimm1"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc2dimm3"
+    }
+  ]
+}

@@ -218,7 +218,7 @@ func TestVendorText(t *testing.T) {
 
 func TestExpandedMemoryCollection(t *testing.T) {
 	c, rep := collect(t, "memory-expanded.json")
-	if len(c.Modules) != 3 || rep.Status != model.SourceOK || rep.Records != 3 {
+	if len(c.Modules) != 3 || rep.Status != model.SourceOK || rep.Records != 4 {
 		t.Fatalf("%d modules, report %+v", len(c.Modules), rep)
 	}
 	m4, m5, m6 := c.Modules[0], c.Modules[1], c.Modules[2]
@@ -238,7 +238,8 @@ func TestExpandedMemoryCollection(t *testing.T) {
 	check(t, c, []got{
 		{"proc1dimm5", "action disable/ok: State Enabled; Health OK", "PROC 1 DIMM 5", now.Format("2006-01-02 15:04:05"), "by bmc"},
 	})
-	wantNotes(t, rep, "3 memory slots, 2 populated", "1 MemoryMetrics resources were not read")
+	// The metrics in the file are those of a module the file does not hold.
+	wantNotes(t, rep, "3 memory slots, 2 populated", "2 modules link no MemoryMetrics", "1 MemoryMetrics resources belong to no module of the dump")
 }
 
 // The mark on a module is one fact however often the module is read.
@@ -306,7 +307,7 @@ func TestInputsThatAreNotADump(t *testing.T) {
 		status  model.SourceStatus
 		detail  string
 	}{
-		"empty":        {"", model.SourceEmpty, "no log entries, memory resources or systems found"},
+		"empty":        {"", model.SourceEmpty, "no log entries, memory resources, BIOS settings or systems found"},
 		"other json":   {`{"hello": ["world", {"a": 1}]}`, model.SourceEmpty, "no log entries"},
 		"service root": {`{"@odata.type": "#ServiceRoot.v1_15_0.ServiceRoot", "Systems": {"@odata.id": "/redfish/v1/Systems"}}`, model.SourceEmpty, "no log entries"},
 		"broken":       {`{"Members": [`, model.SourceError, "no file could be read as JSON"},

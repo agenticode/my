@@ -345,6 +345,8 @@ func (r *run) logs(sink adapter.Sink) error {
 		}
 		res := &r.entries[i]
 		o := res.obj
+		// Every entry counts for the period its log covers.
+		r.cover(res)
 		if strings.EqualFold(str(o, "EntryType"), "CXL") {
 			cxl++
 			continue
@@ -354,6 +356,7 @@ func (r *run) logs(sink adapter.Sink) error {
 			notMemory++
 			continue
 		}
+		r.coverMemory(res)
 		// A place given by numbers is the slot the same dump describes
 		// with those numbers.
 		if len(d.labels) == 0 && d.socket.Valid && d.channel.Valid && d.position.Valid {
@@ -361,12 +364,7 @@ func (r *run) logs(sink adapter.Sink) error {
 				d.labels = []string{name}
 			}
 		}
-		created := str(o, "Created")
-		at, ok := parseTime(created)
-		if !ok {
-			created = str(o, "EventTimestamp")
-			at, ok = parseTime(created)
-		}
+		created, at, ok := entryTime(o)
 		if !ok {
 			r.tally.Skip(res.ref, "log entry about memory has no readable time")
 			continue

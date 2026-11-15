@@ -1,0 +1,322 @@
+{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios/BiosRegistry",
+  "@odata.type": "#AttributeRegistry.v1_3_0.AttributeRegistry",
+  "Id": "BiosAttributeRegistry.v1_0_0",
+  "Name": "BIOS Attribute Registry",
+  "Language": "en",
+  "OwningEntity": "Dell",
+  "RegistryVersion": "1.0.0",
+  "RegistryEntries": {
+    "Attributes": [
+      {
+        "AttributeName": "AdddcSetting",
+        "DisplayName": "ADDDC Setting",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "AssetTag",
+        "DisplayName": "Asset Tag",
+        "MenuPath": "./MiscSettingsRef",
+        "Type": "String",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "MaxLength": 63
+      },
+      {
+        "AttributeName": "BootMode",
+        "DisplayName": "Boot Mode",
+        "MenuPath": "./BootSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Bios",
+            "ValueDisplayName": "BIOS"
+          },
+          {
+            "ValueName": "Uefi",
+            "ValueDisplayName": "UEFI"
+          }
+        ]
+      },
+      {
+        "AttributeName": "CECriticalSEL",
+        "DisplayName": "Correctable Error Logging",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "CorrEccSmi",
+        "DisplayName": "Correctable Memory ECC SMI",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemFrequency",
+        "DisplayName": "Memory Frequency",
+        "MenuPath": "./SysProfileSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "MaxPerf",
+            "ValueDisplayName": "Maximum Performance"
+          },
+          {
+            "ValueName": "MaxReliability",
+            "ValueDisplayName": "Maximum Reliability"
+          },
+          {
+            "ValueName": "2933MHz",
+            "ValueDisplayName": "2933MHz"
+          },
+          {
+            "ValueName": "2666MHz",
+            "ValueDisplayName": "2666MHz"
+          },
+          {
+            "ValueName": "2400MHz",
+            "ValueDisplayName": "2400MHz"
+          },
+          {
+            "ValueName": "2133MHz",
+            "ValueDisplayName": "2133MHz"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemOpMode",
+        "DisplayName": "Memory Operating Mode",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "OptimizerMode",
+            "ValueDisplayName": "Optimizer Mode"
+          },
+          {
+            "ValueName": "SingleRankSpareMode",
+            "ValueDisplayName": "Single Rank Spare Mode"
+          },
+          {
+            "ValueName": "MultiRankSpareMode",
+            "ValueDisplayName": "Multi Rank Spare Mode"
+          },
+          {
+            "ValueName": "MirrorMode",
+            "ValueDisplayName": "Mirror Mode"
+          },
+          {
+            "ValueName": "FaultResilientMode",
+            "ValueDisplayName": "Dell Fault Resilient Mode"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemPatrolScrub",
+        "DisplayName": "Memory Patrol Scrub",
+        "MenuPath": "./SysProfileSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Standard",
+            "ValueDisplayName": "Standard"
+          },
+          {
+            "ValueName": "Extended",
+            "ValueDisplayName": "Extended"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemRefreshRate",
+        "DisplayName": "Memory Refresh Rate",
+        "MenuPath": "./SysProfileSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "1x",
+            "ValueDisplayName": "1x"
+          },
+          {
+            "ValueName": "2x",
+            "ValueDisplayName": "2x"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemTest",
+        "DisplayName": "System Memory Testing",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "NodeInterleave",
+        "DisplayName": "Node Interleaving",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "PersistentMemPassphrase",
+        "DisplayName": "Passphrase",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "Password",
+        "ReadOnly": false,
+        "ResetRequired": true
+      },
+      {
+        "AttributeName": "ProcVirtualization",
+        "DisplayName": "Virtualization Technology",
+        "MenuPath": "./ProcSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "SetupPassword",
+        "DisplayName": "Setup Password",
+        "MenuPath": "./SysSecurityRef",
+        "Type": "Password",
+        "ReadOnly": false,
+        "ResetRequired": true
+      },
+      {
+        "AttributeName": "SysMemSize",
+        "DisplayName": "System Memory Size",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "String",
+        "ReadOnly": true,
+        "ResetRequired": false
+      },
+      {
+        "AttributeName": "SysMemSpeed",
+        "DisplayName": "System Memory Speed",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "String",
+        "ReadOnly": true,
+        "ResetRequired": false
+      },
+      {
+        "AttributeName": "SysMfrContactInfo",
+        "DisplayName": "System Manufacturer Contact Information",
+        "MenuPath": "./SysInformationRef",
+        "Type": "String",
+        "ReadOnly": true,
+        "ResetRequired": false
+      },
+      {
+        "AttributeName": "SysProfile",
+        "DisplayName": "System Profile",
+        "MenuPath": "./SysProfileSettingsRef",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "PerfPerWattOptimizedDapc",
+            "ValueDisplayName": "Performance Per Watt (DAPC)"
+          },
+          {
+            "ValueName": "PerfOptimized",
+            "ValueDisplayName": "Performance"
+          },
+          {
+            "ValueName": "Custom",
+            "ValueDisplayName": "Custom"
+          }
+        ]
+      },
+      {
+        "AttributeName": "VideoMem",
+        "DisplayName": "Video Memory",
+        "MenuPath": "./MemSettingsRef",
+        "Type": "String",
+        "ReadOnly": true,
+        "ResetRequired": false
+      }
+    ]
+  }
+}

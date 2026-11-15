@@ -1,0 +1,28 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/Bios",
+  "@odata.type": "#Bios.v1_0_0.Bios",
+  "Id": "Bios",
+  "Name": "BIOS Current Settings",
+  "AttributeRegistry": "BiosAttributeRegistryU30.v1_2_68",
+  "Attributes": {
+    "AdminName": "",
+    "AdminPhone": "",
+    "AdvancedMemProtection": "FastFaultTolerantADDDC",
+    "BootMode": "Uefi",
+    "ExtendedMemTest": "Disabled",
+    "MaxMemBusFreqMHz": "Auto",
+    "MemFastTraining": "Enabled",
+    "MemMirrorMode": "Full",
+    "MemPatrolScrubbing": "Enabled",
+    "MemRefreshRate": "Refreshx1",
+    "OpportunisticSelfRefresh": "Disabled",
+    "ServerName": "node-h",
+    "WorkloadProfile": "GeneralPowerEfficientCompute"
+  },
+  "@Redfish.Settings": {
+    "@odata.type": "#Settings.v1_0_0.Settings",
+    "SettingsObject": {
+      "@odata.id": "/redfish/v1/Systems/1/Bios/Settings"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1",
+  "@odata.type": "#ComputerSystem.v1_17_0.ComputerSystem",
+  "Id": "1",
+  "Name": "ComputerSystem",
+  "Manufacturer": "Lenovo",
+  "Model": "ThinkSystem SR650 V3",
+  "HostName": "node-l",
+  "BiosVersion": "ESE128B",
+  "Bios": {
+    "@odata.id": "/redfish/v1/Systems/1/Bios"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1",
+  "@odata.type": "#ComputerSystem.v1_12_0.ComputerSystem",
+  "Id": "System.Embedded.1",
+  "Name": "System",
+  "Manufacturer": "Dell Inc.",
+  "Model": "PowerEdge R740",
+  "HostName": "node-d",
+  "BiosVersion": "2.12.2",
+  "LastResetTime": "2026-10-02T08:15:00+00:00",
+  "ProcessorSummary": {
+    "Count": 2,
+    "Model": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz"
+  },
+  "MemorySummary": {
+    "TotalSystemMemoryGiB": 128
+  },
+  "Memory": {
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Memory"
+  },
+  "Bios": {
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios"
+  }
+}

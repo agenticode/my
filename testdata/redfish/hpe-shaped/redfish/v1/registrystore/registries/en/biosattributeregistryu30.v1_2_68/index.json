@@ -1,0 +1,206 @@
+{
+  "@odata.type": "#AttributeRegistry.v1_2_1.AttributeRegistry",
+  "Id": "BiosAttributeRegistryU30.v1_2_68",
+  "Name": "BIOS Attribute Registry",
+  "Language": "en",
+  "OwningEntity": "HPE",
+  "RegistryVersion": "1.2.68",
+  "RegistryEntries": {
+    "Attributes": [
+      {
+        "AttributeName": "AdvancedMemProtection",
+        "DisplayName": "Advanced Memory Protection",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "FastFaultTolerantADDDC",
+            "ValueDisplayName": "Fault Tolerant Memory (ADDDC)"
+          },
+          {
+            "ValueName": "AdvancedEcc",
+            "ValueDisplayName": "Advanced ECC Support"
+          },
+          {
+            "ValueName": "OnlineSpareAdvancedEcc",
+            "ValueDisplayName": "Online Spare with Advanced ECC Support"
+          },
+          {
+            "ValueName": "MirroredAdvancedEcc",
+            "ValueDisplayName": "Mirrored Memory with Advanced ECC Support"
+          }
+        ]
+      },
+      {
+        "AttributeName": "BootMode",
+        "DisplayName": "Boot Mode",
+        "MenuPath": "./BootOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Uefi",
+            "ValueDisplayName": "UEFI Mode"
+          },
+          {
+            "ValueName": "LegacyBios",
+            "ValueDisplayName": "Legacy BIOS Mode"
+          }
+        ]
+      },
+      {
+        "AttributeName": "ExtendedMemTest",
+        "DisplayName": "Extended Memory Test",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MaxMemBusFreqMHz",
+        "DisplayName": "Maximum Memory Bus Frequency",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Auto",
+            "ValueDisplayName": "Auto"
+          },
+          {
+            "ValueName": "MaxMemBusFreq2933",
+            "ValueDisplayName": "2933 MHz"
+          },
+          {
+            "ValueName": "MaxMemBusFreq2667",
+            "ValueDisplayName": "2667 MHz"
+          },
+          {
+            "ValueName": "MaxMemBusFreq2400",
+            "ValueDisplayName": "2400 MHz"
+          },
+          {
+            "ValueName": "MaxMemBusFreq2133",
+            "ValueDisplayName": "2133 MHz"
+          },
+          {
+            "ValueName": "MaxMemBusFreq1867",
+            "ValueDisplayName": "1867 MHz"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemFastTraining",
+        "DisplayName": "Memory Fast Training",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemMirrorMode",
+        "DisplayName": "Memory Mirroring Mode",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": true,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Full",
+            "ValueDisplayName": "Full Mirror"
+          },
+          {
+            "ValueName": "PartialOsConfig",
+            "ValueDisplayName": "Partial Mirror (OS Configured)"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemPatrolScrubbing",
+        "DisplayName": "Memory Patrol Scrubbing",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "MemRefreshRate",
+        "DisplayName": "Memory Refresh Rate",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Refreshx1",
+            "ValueDisplayName": "1x Refresh"
+          },
+          {
+            "ValueName": "Refreshx2",
+            "ValueDisplayName": "2x Refresh"
+          }
+        ]
+      },
+      {
+        "AttributeName": "OpportunisticSelfRefresh",
+        "DisplayName": "Opportunistic Self-Refresh",
+        "MenuPath": "./MemOptions",
+        "Type": "Enumeration",
+        "ReadOnly": false,
+        "ResetRequired": true,
+        "Value": [
+          {
+            "ValueName": "Enabled",
+            "ValueDisplayName": "Enabled"
+          },
+          {
+            "ValueName": "Disabled",
+            "ValueDisplayName": "Disabled"
+          }
+        ]
+      },
+      {
+        "AttributeName": "ServerName",
+        "DisplayName": "Server Name",
+        "MenuPath": "./ServerAssetText",
+        "Type": "String",
+        "ReadOnly": false,
+        "ResetRequired": false
+      }
+    ]
+  }
+}

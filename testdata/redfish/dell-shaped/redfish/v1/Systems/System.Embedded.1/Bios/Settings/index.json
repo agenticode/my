@@ -1,0 +1,12 @@
+{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios/Settings",
+  "@odata.type": "#Bios.v1_1_0.Bios",
+  "Id": "Settings",
+  "Name": "BIOS Configuration Pending Settings",
+  "AttributeRegistry": "BiosAttributeRegistry.v1_0_0",
+  "Attributes": {
+    "MemPatrolScrub": "Disabled",
+    "MemFrequency": "2666MHz",
+    "BootMode": "Uefi"
+  }
+}

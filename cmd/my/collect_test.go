@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -15,10 +16,13 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/redfish/bmctest"
 	"github.com/agenticode/my/internal/redfish/collect"
+	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/term"
 	"github.com/agenticode/my/internal/testutil"
 )
@@ -423,5 +427,78 @@ func TestCollectHelp(t *testing.T) {
 		if m.EN == "" || m.KO == "" {
 			t.Errorf("%s lacks a language", code)
 		}
+	}
+}
+
+// From a BMC to a case: what the BMC says beyond events is in the ledger
+// of the bundle, tied to the slots of the inventory, and says that this
+// tool asked the BMC itself.
+func TestCollectedCaseHoldsWhatTheBMCSays(t *testing.T) {
+	srv := bmctest.New(t, os.DirFS(testutil.Testdata(t, "redfish", "dell-shaped")), bmctest.Options{User: bmcUser, Password: bmcPassword})
+	file := filepath.Join(t.TempDir(), "node-d.mycase")
+	code, stdout, stderr := runEnv(account(), "collect", "redfish", "--bmc", srv.URL, "--insecure", "-o", file, "--quiet")
+	if code != cli.ExitOK {
+		t.Fatalf("exit code %d\n%s\n%s", code, stdout, stderr)
+	}
+	wantLines(t, stdout, "  1 host: node-d")
+	c, err := bundle.Open(context.Background(), file, t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	ledger, err := store.Open(context.Background(), c.Ledger, store.ReadOnly)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ledger.Close()
+
+	bmcs, err := ledger.BMCs(context.Background(), "node-d")
+	if err != nil || len(bmcs) != 1 {
+		t.Fatalf("BMCs = %+v, %v", bmcs, err)
+	}
+	b := bmcs[0]
+	if !b.Live || b.Complete != model.Some(true) || b.Address != "127.0.0.1" || b.Auth != "basic" || b.TLS != "none" ||
+		b.Firmware != "4.40.00.00" || b.BIOSVersion != "2.12.2" || b.ObservedAt.Format("2006-01-02T15:04:05Z") != "2026-11-16T03:00:00Z" {
+		t.Errorf("bmc = %+v", b)
+	}
+	states := map[string]string{}
+	for _, cl := range b.Classes {
+		states[cl.Class] = cl.State
+	}
+	// One of the four modules links no metrics; the others gave theirs.
+	if states["memory"] != "ok" || states["memory-metrics"] != "ok" || states["bios-settings"] != "ok" || states["attribute-registry"] != "ok" {
+		t.Errorf("classes = %v", states)
+	}
+	if !strings.HasPrefix(b.RawRef, "bmc:127.0.0.1/") || strings.Contains(b.RawRef, os.TempDir()) {
+		t.Errorf("raw reference %q", b.RawRef)
+	}
+	settings, err := ledger.BIOSSettings(context.Background(), "node-d")
+	if err != nil || len(settings) != 12 {
+		t.Fatalf("%d settings, %v", len(settings), err)
+	}
+	for _, s := range settings {
+		if s.Name == "MemPatrolScrub" && (s.Value != "Standard" || s.Pending != "Disabled" || !s.ResetRequired.Or(false)) {
+			t.Errorf("MemPatrolScrub = %+v", s)
+		}
+		if strings.Contains(strings.ToLower(s.Name), "pass") || s.Name == "AssetTag" || s.Name == "SysMfrContactInfo" {
+			t.Errorf("%s is in the ledger", s.Name)
+		}
+	}
+	mems, err := ledger.BMCMemory(context.Background(), "node-d")
+	if err != nil || len(mems) != 4 {
+		t.Fatalf("%d module readings, %v", len(mems), err)
+	}
+	for _, m := range mems {
+		if m.Slot != m.Label {
+			t.Errorf("module %s is tied to slot %q", m.Label, m.Slot)
+		}
+		if m.Label == "A1" && (m.CELifetime != model.Some(int64(1250)) || !m.AlarmCE.Or(false)) {
+			t.Errorf("A1 = %+v", m)
+		}
+	}
+	// The account is in nothing the ledger holds.
+	raw, err := os.ReadFile(c.Ledger)
+	if err != nil || bytes.Contains(raw, []byte(bmcPassword)) {
+		t.Errorf("ledger: %v", err)
 	}
 }
