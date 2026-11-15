@@ -29,6 +29,9 @@ type Input struct {
 	// ECS holds the readings of the DDR5 error check and scrub registers.
 	// They are not errors: they say that a DIMM is watched from the inside.
 	ECS []model.ECSSample
+	// Settings holds the BIOS settings a BMC reported. They change no
+	// finding; they say what the records of a host can and cannot show.
+	Settings []model.BIOSSetting
 	// Places lists the names error records use for the place of an error,
 	// next to the slot the records were tied to.
 	Places []store.EventPlace
@@ -321,6 +324,9 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	if in.ECS, err = s.ECS(ctx, store.ECSFilter{}); err != nil {
 		return fail("ECS readings", err)
+	}
+	if in.Settings, err = s.BIOSSettings(ctx, ""); err != nil {
+		return fail("BIOS settings", err)
 	}
 	return in, nil
 }
