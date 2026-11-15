@@ -60,6 +60,23 @@ var columns = map[string]treatment{
 	"action.result": keep, "action.label": keep, "action.slot": keep, "action.dimm_uid": dimmUID, "action.boot_id": bootID,
 	"action.detail": freeText, "action.source": keep, "action.raw_ref": freeText, "action.raw": freeText, "action.fingerprint": derived,
 
+	"bios_setting.host": hostName, "bios_setting.observed_at": keep, "bios_setting.name": keep, "bios_setting.value": freeText,
+	"bios_setting.pending": freeText, "bios_setting.value_type": keep, "bios_setting.registry": keep, "bios_setting.display_name": keep,
+	"bios_setting.menu_path": keep, "bios_setting.allowed": freeText, "bios_setting.default_value": freeText, "bios_setting.source": keep,
+	"bios_setting.raw_ref": freeText,
+
+	// The address of a BMC names a machine on a network, like a host name.
+	"bmc.host": hostName, "bmc.observed_at": keep, "bmc.address": hostName, "bmc.manager": keep, "bmc.firmware": keep,
+	"bmc.bios_version": keep, "bmc.redfish_version": keep, "bmc.bios_registry": keep, "bmc.tls": keep, "bmc.auth": keep,
+	"bmc.last_reset": keep, "bmc.classes": keep, "bmc.logs": freeText, "bmc.notes": freeText, "bmc.source": keep,
+	"bmc.raw_ref": freeText, "bmc.fingerprint": derived,
+
+	"bmc_memory.host": hostName, "bmc_memory.observed_at": keep, "bmc_memory.label": keep, "bmc_memory.slot": keep,
+	"bmc_memory.device_locator": keep, "bmc_memory.service_label": keep, "bmc_memory.resource_id": keep, "bmc_memory.state": keep,
+	"bmc_memory.health": keep, "bmc_memory.error_correction": keep, "bmc_memory.allowed_speeds": keep,
+	"bmc_memory.device_width_source": keep, "bmc_memory.metrics": keep, "bmc_memory.current_since": keep, "bmc_memory.source": keep,
+	"bmc_memory.raw_ref": freeText, "bmc_memory.raw": freeText, "bmc_memory.fingerprint": derived,
+
 	"boot.host": hostName, "boot.boot_id": bootID, "boot.started_at": keep, "boot.start_quality": keep, "boot.last_seen": keep,
 	"boot.kernel": keep, "boot.bios": keep, "boot.bmc": keep, "boot.cmdline": commandLine, "boot.source": keep, "boot.raw_ref": freeText,
 

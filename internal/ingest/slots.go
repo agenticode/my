@@ -733,6 +733,29 @@ func resolveECSSlots(ctx context.Context, s *store.Store, host string) error {
 	})
 }
 
+// resolveBMCMemorySlots ties the modules as a BMC describes them to slots,
+// through the name the BMC uses. The inventory of the same BMC made the
+// slot, so the name is known; a name no slot answers to stays untied.
+func resolveBMCMemorySlots(ctx context.Context, s *store.Store, host string) error {
+	labels, err := s.BMCMemoryLabels(ctx, host)
+	if err != nil || len(labels) == 0 {
+		return err
+	}
+	aliases, err := s.SlotAliases(ctx, host)
+	if err != nil {
+		return err
+	}
+	return s.Update(ctx, func(w *store.Writer) error {
+		for _, label := range labels {
+			name, _ := lookupLabel(aliases, label)
+			if err := w.SetBMCMemorySlot(host, label, name); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 // keyAliases lists the aliases a location key can be looked up by, most
 // specific first.
 func keyAliases(k store.LocationKey) []string {

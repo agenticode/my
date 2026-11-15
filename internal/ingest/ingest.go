@@ -192,6 +192,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		{"event slots", func() error { return resolveEventSlots(ctx, s, host) }},
 		{"action slots", func() error { return resolveActionSlots(ctx, s, host) }},
 		{"ECS slots", func() error { return resolveECSSlots(ctx, s, host) }},
+		{"BMC memory slots", func() error { return resolveBMCMemorySlots(ctx, s, host) }},
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
 		{"clocks", func() (err error) {
 			// Before the records without a date are dated by the others.
@@ -378,7 +379,40 @@ func (k *sink) ECS(e *model.ECSSample) error {
 	return nil
 }
 
-// sample counts a GPU memory record or an ECS reading.
+func (k *sink) BMC(b *model.BMC) error {
+	b.Host, b.ScanID = k.host, k.scanID
+	b.Fingerprint = model.Fingerprint(k.host, b.Fingerprint)
+	inserted, err := k.w.InsertBMC(b)
+	if err != nil {
+		return k.refuse(b.RawRef, err)
+	}
+	k.sample(b.ObservedAt, model.TimeExact, inserted)
+	return nil
+}
+
+func (k *sink) BIOSSetting(s *model.BIOSSetting) error {
+	s.Host, s.ScanID = k.host, k.scanID
+	if err := k.w.PutBIOSSetting(s); err != nil {
+		return k.refuse(s.RawRef, err)
+	}
+	k.sample(s.ObservedAt, model.TimeExact, true)
+	return nil
+}
+
+func (k *sink) BMCMemory(m *model.BMCMemory) error {
+	m.Host, m.ScanID = k.host, k.scanID
+	m.Fingerprint = model.Fingerprint(k.host, m.Fingerprint)
+	inserted, err := k.w.InsertBMCMemory(m)
+	if err != nil {
+		return k.refuse(m.RawRef, err)
+	}
+	k.sample(m.ObservedAt, model.TimeExact, inserted)
+	return nil
+}
+
+// sample counts a reading that is neither an event nor an action: a GPU
+// memory record, an ECS reading, or what a BMC says about itself, the BIOS
+// settings and a memory module.
 func (k *sink) sample(t time.Time, q model.TimeQuality, inserted bool) {
 	k.src.Samples++
 	if q != model.TimeRelative {

@@ -174,6 +174,9 @@ var tables = map[string]string{
 	"verdict":        "findings of the analysis engine with their evidence",
 	"gpu_mem":        "GPU memory records: row remapping state, ECC counters, XID events",
 	"ecs_sample":     "readings of the DDR5 error check and scrub registers",
+	"bmc":            "readings of a BMC: its firmware, the BIOS version, which resources it gave, the period its logs cover",
+	"bios_setting":   "settings of the system firmware that bear on memory errors, as a BMC reports them, with the pending values",
+	"bmc_memory":     "memory modules as a BMC describes them: names, state, speed, and the BMC's own error counts",
 	"meta":           "ledger identity, schema history and what the findings were computed with",
 }
 
