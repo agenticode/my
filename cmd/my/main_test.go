@@ -3,12 +3,17 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 
+	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
+	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/store"
 )
 
@@ -27,6 +32,40 @@ func TestVersionCommand(t *testing.T) {
 	}
 	if !strings.HasPrefix(out.String(), "my ") {
 		t.Errorf("version output = %q, want it to start with %q", out.String(), "my ")
+	}
+	// One line: version, source, Go version, platform.
+	if !regexp.MustCompile(`^my \S+ \([^)]+\) go\S+ \w+/\w+\n$`).MatchString(out.String()) {
+		t.Errorf("version output = %q", out.String())
+	}
+
+	// As JSON, with the versions of what the binary reads and writes.
+	code, stdout, stderr := run("version", "--json")
+	var v struct {
+		Version, Commit, Go, OS, Arch string
+		EngineVersion                 string `json:"engine_version"`
+		LedgerSchema                  int    `json:"ledger_schema"`
+		BundleFormat                  int    `json:"bundle_format"`
+		JSONVersion                   int    `json:"json_version"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &v); err != nil || code != cli.ExitOK || stderr != "" {
+		t.Fatalf("version --json: exit code %d, %v\n%s%s", code, err, stdout, stderr)
+	}
+	if v.Version == "" || v.Commit == "" || v.Go != runtime.Version() || v.OS != runtime.GOOS || v.Arch != runtime.GOARCH ||
+		v.EngineVersion != engine.Version || v.LedgerSchema != store.SchemaVersion() || v.BundleFormat != bundle.Version || v.JSONVersion != jsonVersion {
+		t.Errorf("version --json: %+v", v)
+	}
+
+	// Help, and what it does not take.
+	if code, stdout, _ := run("version", "--help"); code != cli.ExitOK || !strings.Contains(stdout, "Usage: my version [--json]") {
+		t.Errorf("version --help: exit code %d\n%s", code, stdout)
+	}
+	if code, stdout, _ := runEnv(map[string]string{"MY_LANG": "ko"}, "version", "-h"); code != cli.ExitOK || !strings.Contains(stdout, "사용법: my version") {
+		t.Errorf("version -h in Korean: exit code %d\n%s", code, stdout)
+	}
+	for _, args := range [][]string{{"version", "extra"}, {"version", "--frob"}} {
+		if code, stdout, stderr := run(args...); code != cli.ExitUsage || stdout != "" || !strings.Contains(stderr, "my version: takes no arguments") {
+			t.Errorf("%v: exit code %d, stdout %q, stderr %q", args, code, stdout, stderr)
+		}
 	}
 }
 

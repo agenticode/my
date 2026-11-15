@@ -82,6 +82,10 @@ var words = i18n.Catalog{
 	"case.thresholds":   {EN: "The sender changed thresholds. To see what they saw, add: {sets}", KO: "보낸 쪽이 임계값을 바꿨습니다. 같은 화면을 보려면 추가: {sets}"},
 	"case.grade":        {EN: "The sender's host finding was {theirs}; this run gives {ours}.", KO: "보낸 쪽의 호스트 소견은 {theirs}, 이번 실행은 {ours}입니다."},
 
+	// "my version".
+	"help.version": {EN: "Usage: my version [--json]\n\nPrints the version, the commit and its day, the Go version and the platform of this binary. With --json it also prints the versions of what the binary reads and writes: the engine, the ledger schema, the case bundle format and the JSON output.", KO: "사용법: my version [--json]\n\n이 바이너리의 버전, 커밋과 그 날짜, Go 버전, 플랫폼을 출력합니다. --json을 주면 바이너리가 읽고 쓰는 것의 버전도 함께 출력합니다: 엔진, 원장 스키마, 케이스 번들 형식, JSON 출력."},
+	"err.version":  {EN: "takes no arguments; --json prints the build information as JSON", KO: "인자를 받지 않음. --json은 빌드 정보를 JSON으로 출력"},
+
 	// What "my report" says.
 	"report.written": {EN: "report written: {file} ({size})", KO: "리포트 저장: {file} ({size})"},
 	"report.holds":   {EN: "{dimms} {dimms|DIMM|DIMMs} described, {records} {records|record|records} in the appendix, {audience}", KO: "DIMM {dimms}개 기술, 부록 기록 {records}건, {audience}"},
