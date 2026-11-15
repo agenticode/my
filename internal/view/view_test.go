@@ -268,7 +268,7 @@ func TestSlotMapWithoutTopology(t *testing.T) {
 		{Host: "h", Name: "A1"},
 	}
 	sm := slotMap(h, slots)
-	if len(sm.Rows) != 3 || sm.Populated != 2 {
+	if len(sm.Rows) != 2 || sm.Populated != 2 {
 		t.Fatalf("rows = %+v", sm.Rows)
 	}
 	got := map[string][]string{}
@@ -279,7 +279,9 @@ func TestSlotMapWithoutTopology(t *testing.T) {
 			}
 		}
 	}
-	want := map[string][]string{"": {"A1=unknown"}, "CPU0": {"A2=empty", "A10=ok"}, "CPU1": {"B1=ok"}}
+	// CPU1_B1 is alone under its prefix: it keeps its whole name and joins
+	// the row of the names that share nothing.
+	want := map[string][]string{"": {"A1=unknown", "CPU1_B1=ok"}, "CPU0": {"A2=empty", "A10=ok"}}
 	for label, cells := range want {
 		if strings.Join(got[label], " ") != strings.Join(cells, " ") {
 			t.Errorf("row %q = %v, want %v", label, got[label], cells)

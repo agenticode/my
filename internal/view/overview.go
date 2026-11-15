@@ -426,7 +426,17 @@ func slotMap(h *engine.HostResult, slots []model.Slot) SlotMap {
 	for _, k := range known {
 		add(rowKey{socket: k.slot.Socket}, k.slot)
 	}
+	// A name that shares its beginning with no other name stands in one
+	// row with the others of its kind, under its whole name: a row of one
+	// cell would split a name for nothing.
+	groupSize := map[string]int{}
 	for _, k := range loose {
+		groupSize[k.group]++
+	}
+	for _, k := range loose {
+		if groupSize[k.group] < 2 {
+			k.group = ""
+		}
 		add(rowKey{group: k.group}, k.slot)
 	}
 
@@ -437,6 +447,9 @@ func slotMap(h *engine.HostResult, slots []model.Slot) SlotMap {
 			names[i] = sl.Name
 		}
 		prefix := commonPrefix(names)
+		if !k.socket.Valid && k.group == "" {
+			prefix = "" // names that share nothing by design
+		}
 		row.Label = strings.TrimRightFunc(prefix, isSeparator)
 		if row.Label == "" {
 			prefix = ""

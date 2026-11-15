@@ -436,6 +436,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"map", "?"}, "map", []string{"--bank N", "--rows A-B", "A horizontal line is a row fault"}},
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
+		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
 	} {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
@@ -480,7 +481,7 @@ func TestHelp(t *testing.T) {
 	}
 	// The command list, and the topics that are not commands.
 	_, out, _ := run("help")
-	wantLines(t, out, "my [flags]", "scan ", "dimm ", "why ", "map ", "timeline ", "open ", "version ")
+	wantLines(t, out, "my [flags]", "scan ", "dimm ", "why ", "map ", "timeline ", "bundle ", "open ", "import ", "version ")
 	// "my --help" is the command list; "my scan" is the command without a name.
 	if _, same, _ := run("--help"); same != out {
 		t.Errorf("my --help differs from my help:\n%s", same)
@@ -507,7 +508,7 @@ func TestHelp(t *testing.T) {
 // sourceFor returns the source a help topic is about: "open" works on a
 // case, the others on the host.
 func sourceFor(topic string) *source {
-	if topic == "open" {
+	if topic == "open" || topic == "import" {
 		return &source{}
 	}
 	return nil
@@ -529,6 +530,15 @@ func registerFlags(o *options, topic string) {
 		o.fs.String("rows", "", "")
 	case "timeline":
 		o.fs.Int("days", 0, "")
+	case "import":
+		o.fs.String("ledger", "", "")
+		o.fs.String("captured-at", "", "")
+		o.fs.Bool("mtime", false, "")
+		o.fs.String("tz", "", "")
+		o.fs.Bool("anonymize", false, "")
+		o.fs.String("key-file", "", "")
+		o.fs.Bool("force", false, "")
+		o.fs.Bool("all", false, "")
 	case "bundle":
 		o.fs.Bool("anonymize", false, "")
 		o.fs.String("key-file", "", "")
