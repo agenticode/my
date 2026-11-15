@@ -474,29 +474,74 @@ func TestSameAsLedger(t *testing.T) {
 			t.Fatal(err)
 		}
 		in := r.input(sid, recs)
-		for _, day := range []int{45, 71, 105, 131, 183, 207, 244} {
-			at := dcbrain.StampOfDay(day)
-			res, err := engine.Run(ctx, s, engine.Options{AsOf: at.Time(opts.Base), Now: at.Time(opts.Base)})
-			if err != nil {
-				t.Fatal(err)
-			}
-			h, err := r.analyze(in, sid, at)
-			if err != nil {
-				t.Fatal(err)
-			}
-			wantGrade, want := summary(res.Host(sid))
-			gotGrade, got := summary(h)
-			if gotGrade != wantGrade || len(got) != len(want) {
-				t.Errorf("%s day %d: harness %s %+v, ledger %s %+v", sid, day, gotGrade, got, wantGrade, want)
-				continue
-			}
-			for i := range want {
-				if got[i] != want[i] {
-					t.Errorf("%s day %d: harness %+v, ledger %+v", sid, day, got[i], want[i])
+		// Both ways of starting the history of a server: with its first
+		// error, and with the first day of the dataset.
+		for _, fromFirst := range []bool{true, false} {
+			r.opts.FromFirstError = fromFirst
+			for _, day := range []int{45, 71, 105, 131, 183, 207, 244} {
+				at := dcbrain.StampOfDay(day)
+				eo := engine.Options{AsOf: at.Time(opts.Base), Now: at.Time(opts.Base)}
+				if !fromFirst {
+					eo.ObservedFrom = opts.Base
+				}
+				res, err := engine.Run(ctx, s, eo)
+				if err != nil {
+					t.Fatal(err)
+				}
+				h, err := r.analyze(in, sid, at)
+				if err != nil {
+					t.Fatal(err)
+				}
+				wantGrade, want := summary(res.Host(sid))
+				gotGrade, got := summary(h)
+				if gotGrade != wantGrade || len(got) != len(want) {
+					t.Errorf("%s day %d: harness %s %+v, ledger %s %+v", sid, day, gotGrade, got, wantGrade, want)
+					continue
+				}
+				for i := range want {
+					if got[i] != want[i] {
+						t.Errorf("%s day %d: harness %+v, ledger %+v", sid, day, got[i], want[i])
+					}
 				}
 			}
 		}
 		s.Close()
+	}
+}
+
+// TestWatchedFromTheStart: a server that was quiet for months and then
+// logs a burst in one row has a new fault when the dataset counts as its
+// history, and an unknown trend when its history starts with the burst.
+func TestWatchedFromTheStart(t *testing.T) {
+	var rows []dcbrain.Row
+	at := dcbrain.StampOfDay(100)
+	for i := 0; i < 30; i++ {
+		rows = append(rows, dcbrain.Row{SID: "burst", MemoryID: 2, Bank: 1, Row: 77, Col: 8 * (i % 12), Type: dcbrain.TypeRead, At: at + dcbrain.Stamp(i*600)})
+	}
+	g := &Generated{Rows: rows, Tickets: []dcbrain.Ticket{{SID: "burst", Type: dcbrain.FailureUE, At: at + 30*3600}}}
+	dir := t.TempDir()
+	if err := g.WriteDir(dir); err != nil {
+		t.Fatal(err)
+	}
+	ds, err := dcbrain.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	consider, observe := gradeIndex(model.VerdictConsiderReplacement), gradeIndex(model.VerdictObserve)
+	rep := run(t, ds, Options{Cutoffs: []int{101}})
+	if c := rep.ByCut[0]; c.ByGrade[consider] != (Counts{FailedUE: 1}) || c.ByCode["row.new"] != (Counts{FailedUE: 1}) || rep.FromFirstError {
+		t.Errorf("watched from the start: by grade %v, by statement %v", c.ByGrade, c.ByCode)
+	}
+	rep = run(t, ds, Options{Cutoffs: []int{101}, FromFirstError: true})
+	if c := rep.ByCut[0]; c.ByGrade[observe] != (Counts{FailedUE: 1}) || !rep.FromFirstError {
+		t.Errorf("history from the first error: by grade %v, by statement %v", c.ByGrade, c.ByCode)
+	}
+	var a, b bytes.Buffer
+	rep.Write(&a, FormatText)
+	run(t, ds, Options{Cutoffs: []int{101}}).Write(&b, FormatText)
+	if !strings.Contains(a.String(), "the history of a server starts with its first error") ||
+		!strings.Contains(b.String(), "every server counts as watched from the first day of the dataset") {
+		t.Error("the report does not say where the history of a server starts")
 	}
 }
 

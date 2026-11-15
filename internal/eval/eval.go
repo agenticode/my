@@ -74,6 +74,13 @@ type Options struct {
 	// GradeB keeps the rank and drops bank, row and column; GradeC turns
 	// the errors of a DIMM into one count per day. Empty keeps everything.
 	Degrade model.Grade
+	// FromFirstError takes the first error of a server as the start of
+	// what is known about it. By default every server counts as watched
+	// from the first day of the dataset: the dataset is the error log of
+	// a fleet over eight months, so a server without rows before its
+	// first error had no errors until then, and the engine may call a
+	// burst of errors new.
+	FromFirstError bool
 	// Workers is the number of servers analysed at a time.
 	Workers int
 	// MaxRecords bounds the records of one server. A server with more is
@@ -403,7 +410,10 @@ type Report struct {
 	SplitDay    int             `json:"split_day"`
 	LeadTimes   []time.Duration `json:"lead_times"`
 	Degrade     model.Grade     `json:"degrade,omitzero"`
-	RecentDays  float64         `json:"recent_days"`
+	// FromFirstError is set when a server's history starts with its first
+	// error instead of the first day of the dataset.
+	FromFirstError bool    `json:"from_first_error,omitzero"`
+	RecentDays     float64 `json:"recent_days"`
 
 	Dataset DatasetInfo   `json:"dataset"`
 	Census  Census        `json:"census"`
@@ -458,7 +468,7 @@ func Run(ctx context.Context, ds *dcbrain.Dataset, opts Options) (*Report, error
 		r.cutoffs = append(r.cutoffs, dcbrain.StampOfDay(c))
 	}
 	rep := &Report{EngineVersion: engine.Version, Thresholds: cfg.Changed(), Cutoffs: opts.Cutoffs, HorizonDays: opts.HorizonDays,
-		SplitDay: opts.SplitDay, LeadTimes: opts.Leads, Degrade: opts.Degrade, RecentDays: cfg.RecentDays}
+		SplitDay: opts.SplitDay, LeadTimes: opts.Leads, Degrade: opts.Degrade, FromFirstError: opts.FromFirstError, RecentDays: cfg.RecentDays}
 	rep.Dataset.Path = ds.Path
 	rep.Census.Rules, rep.Census.Codes = map[string]int64{}, map[string]int64{}
 	for _, m := range Modes {

@@ -138,7 +138,11 @@ func (r *runner) input(sid string, recs []dcbrain.Rec) *engine.Input {
 // analyze runs the engine over the server as of the given time.
 func (r *runner) analyze(in *engine.Input, sid string, at dcbrain.Stamp) (*engine.HostResult, error) {
 	t := at.Time(r.base)
-	res, err := engine.Analyze(in, engine.Options{Config: &r.cfg, AsOf: t, Now: t})
+	opts := engine.Options{Config: &r.cfg, AsOf: t, Now: t}
+	if !r.opts.FromFirstError {
+		opts.ObservedFrom = r.base
+	}
+	res, err := engine.Analyze(in, opts)
 	if err != nil {
 		return nil, err
 	}

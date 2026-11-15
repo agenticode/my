@@ -352,6 +352,11 @@ func (r *Report) print(p *printer) {
 	p.line("engine %s, thresholds: %s", r.EngineVersion, thresholds)
 	p.line("cut-offs at the start of days %s of the dataset calendar; outcome window %d days; cut-offs from day %d on are held out",
 		days(r.Cutoffs), r.HorizonDays, r.SplitDay)
+	if r.FromFirstError {
+		p.line("the history of a server starts with its first error")
+	} else {
+		p.line("every server counts as watched from the first day of the dataset")
+	}
 	switch r.Degrade {
 	case model.GradeB:
 		p.line("records degraded to observation grade B: bank, row and column removed, rank kept")
