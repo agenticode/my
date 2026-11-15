@@ -170,6 +170,14 @@ func share(part, total int64) string {
 	return fmt.Sprintf("%s (%s of %s, 95%% interval %.2f%% to %.2f%%)", pct(part, total), num(part), num(total), 100*lo, 100*hi)
 }
 
+// dimmsText writes a number of DIMMs.
+func dimmsText(n int) string {
+	if n == 1 {
+		return "1 DIMM"
+	}
+	return fmt.Sprintf("%d DIMMs", n)
+}
+
 // share0 writes "part (p%)".
 func share0(part, total int64) string {
 	return fmt.Sprintf("%s (%s)", num(part), pct(part, total))
@@ -423,11 +431,15 @@ func (r *Report) printDataset(p *printer) {
 		p.line("%s tickets are a second or later ticket of a server and are not used", num(d.ExtraTickets))
 	}
 	p.line("records after merging rows that are equal in every column: %s", num(r.Census.Records))
-	if l := &d.Layout; l.Pairs > 0 {
-		// Among 24 slots, 12 of the 276 pairs share a channel and 120
-		// share a socket without sharing a channel.
-		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
-			num(l.MultiDIMM), num(l.Pairs), share0(l.SameChannel, l.Pairs), share0(l.SameSocket, l.Pairs))
+	// Among 24 slots, 12 of the 276 pairs share a channel and 120 share a
+	// socket without sharing a channel.
+	if l := &d.Layout; l.All.Pairs > 0 {
+		p.line("servers with errors on two or more DIMMs: %s, with %s pairs of such DIMMs; the assumed layout puts %s on one channel and %s on one socket but different channels",
+			num(l.All.Servers), num(l.All.Pairs), share0(l.All.SameChannel, l.All.Pairs), share0(l.All.SameSocket, l.All.Pairs))
+	}
+	if l := &d.Layout; l.Full.Pairs > 0 {
+		p.line("of them on servers with 24 DIMMs, where every slot is filled: %s servers with %s pairs; %s on one channel (chance among 24 slots: 4.35%%) and %s on one socket but different channels (chance: 43.48%%)",
+			num(l.Full.Servers), num(l.Full.Pairs), share0(l.Full.SameChannel, l.Full.Pairs), share0(l.Full.SameSocket, l.Full.Pairs))
 	}
 	if l := &d.Layout; len(l.ByDIMMs) > 0 {
 		counts := make([]int, 0, len(l.ByDIMMs))
@@ -448,14 +460,14 @@ func (r *Report) printDataset(p *printer) {
 			[]string{"DIMMs of the server", "position 0", "position 1"}, rows)
 	}
 	for _, n := range r.Widened {
-		p.line("server %s: %s rows merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), n.BucketSeconds, num(int64(n.Records)))
+		p.line("server %s: %s rows on %s merged in buckets of %d seconds into %s records", n.SID, num(n.Rows), dimmsText(n.DIMMs), n.BucketSeconds, num(int64(n.Records)))
 	}
 	for _, n := range r.Dropped {
 		t := ""
 		if n.Ticket != "" {
 			t = "; " + n.Ticket
 		}
-		p.line("server %s: left out, %s rows are too many records even when merged by the day%s", n.SID, num(n.Rows), t)
+		p.line("server %s: left out, %s rows on %s are too many records even when merged by the day%s", n.SID, num(n.Rows), dimmsText(n.DIMMs), t)
 	}
 }
 
@@ -619,7 +631,11 @@ func (r *Report) printLeads(p *printer) {
 			head = append(head, gradeText(g))
 		}
 		head = append(head, "consider or replace now")
-		p.table(fmt.Sprintf("Servers with a ticket of failure type %d (%s):", failureType(out), out), head, rows)
+		what := out.String()
+		if out == FailedUnspecified {
+			what = "not defined in the description of the dataset"
+		}
+		p.table(fmt.Sprintf("Servers with a ticket of failure type %d (%s):", failureType(out), what), head, rows)
 	}
 }
 

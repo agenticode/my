@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,6 +25,79 @@ type view struct {
 	codes []string
 	// widest is the widest fault mode on the server.
 	widest model.FaultMode
+	// act says how active the server was up to the time of the view.
+	act activity
+}
+
+// activity is what the rows of a server say by themselves at one time,
+// without the engine. The detail output carries it next to the finding,
+// to see which servers a threshold separates.
+type activity struct {
+	// errors is the number of errors up to the time, recent the number
+	// among them in the recent window of the trend.
+	errors, recent int64
+	// lastError is the age of the latest error in seconds.
+	lastError int64
+	// lastBurst is the age in seconds of the latest moment at which one
+	// DIMM had a storm's worth of errors within the storm window, or -1
+	// when there was none.
+	lastBurst int64
+}
+
+// history holds running sums over the records of one server, for activity.
+type history struct {
+	at []dcbrain.Stamp
+	// sum[i] is the number of errors in the first i records.
+	sum []int64
+	// bursts are the times, in order, at which some DIMM reached the storm
+	// count within the storm window.
+	bursts []dcbrain.Stamp
+}
+
+// newHistory prepares the sums over recs, which are in time order.
+func (r *runner) newHistory(recs []dcbrain.Rec) *history {
+	h := &history{at: make([]dcbrain.Stamp, len(recs)), sum: make([]int64, len(recs)+1)}
+	window := dcbrain.Stamp(r.cfg.StormMinutes * 60)
+	type run struct {
+		idx []int32
+		lo  int
+		n   int64
+	}
+	var byDIMM [256]*run
+	for i := range recs {
+		rec := &recs[i]
+		h.at[i] = rec.Stamp()
+		h.sum[i+1] = h.sum[i] + int64(rec.Count)
+		d := byDIMM[rec.MemoryID]
+		if d == nil {
+			d = &run{}
+			byDIMM[rec.MemoryID] = d
+		}
+		d.idx = append(d.idx, int32(i))
+		d.n += int64(rec.Count)
+		for h.at[i]-h.at[d.idx[d.lo]] > window {
+			d.n -= int64(recs[d.idx[d.lo]].Count)
+			d.lo++
+		}
+		if d.n >= int64(r.cfg.StormCount) && (len(h.bursts) == 0 || h.bursts[len(h.bursts)-1] != h.at[i]) {
+			h.bursts = append(h.bursts, h.at[i])
+		}
+	}
+	return h
+}
+
+// activity returns what the rows say up to the given time.
+func (h *history) activity(at, recent dcbrain.Stamp) activity {
+	j := sort.Search(len(h.at), func(k int) bool { return h.at[k] > at })
+	k := sort.Search(len(h.at), func(k int) bool { return h.at[k] > at-recent })
+	a := activity{errors: h.sum[j], recent: h.sum[j] - h.sum[k], lastError: -1, lastBurst: -1}
+	if j > 0 {
+		a.lastError = int64(at - h.at[j-1])
+	}
+	if b := sort.Search(len(h.bursts), func(k int) bool { return h.bursts[k] > at }); b > 0 {
+		a.lastBurst = int64(at - h.bursts[b-1])
+	}
+	return a
 }
 
 // Cut-off states of a server.
@@ -50,14 +124,14 @@ type serverResult struct {
 	note    ServerNote
 	dropped bool
 	dimms   int
-	// memory has a bit set for every memoryid with errors.
-	memory  uint32
 	records int
 	errors  int64
 	ticket  *dcbrain.Ticket
 	cuts    []cutObs
 	leads   []leadObs
 	census  *engine.HostResult
+	// censusAct is the activity at the end of the dataset.
+	censusAct activity
 }
 
 func gradeIndex(g model.VerdictGrade) int { return g.ExitCode() }
@@ -190,7 +264,7 @@ func viewOf(h *engine.HostResult) view {
 // server replays one server: the findings at every cut-off, the findings
 // before its failure, and the census over all its records.
 func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
-	res := &serverResult{note: ServerNote{SID: sid, Rows: sr.rows, Records: len(sr.recs), BucketSeconds: int(sr.bucket)}}
+	res := &serverResult{note: ServerNote{SID: sid, Rows: sr.rows, DIMMs: sr.dimms, Records: len(sr.recs), BucketSeconds: int(sr.bucket)}}
 	if t, ok := r.tickets[sid]; ok {
 		res.ticket = &t
 		res.note.Ticket = fmt.Sprintf("failure_type %d at %s", int(t.Type), t.At)
@@ -209,14 +283,12 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 		if id := recs[i].MemoryID; !seenDIMM[id] {
 			seenDIMM[id] = true
 			res.dimms++
-			if id < 32 {
-				res.memory |= 1 << id
-			}
 		}
 		res.errors += int64(recs[i].Count)
 	}
 	res.records = len(recs)
 	in := r.input(sid, recs)
+	hist := r.newHistory(recs)
 
 	res.cuts = make([]cutObs, len(r.cutoffs))
 	for i, c := range r.cutoffs {
@@ -235,13 +307,12 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 			return nil, err
 		}
 		o.view = viewOf(h)
+		o.view.act = hist.activity(c, r.recent)
 		if t := res.ticket; t != nil && t.At > c && t.At <= c+r.horizon {
 			o.outcome = outcomeOf(t.Type)
 		}
-		// Records are in time order: the last one at or before the cut-off
-		// says whether the server was active in the recent window.
-		j := sort.Search(len(recs), func(k int) bool { return recs[k].Stamp() > c })
-		o.active = j > 0 && recs[j-1].Stamp() > c-r.recent
+		// The reference: an error in the recent window before the cut-off.
+		o.active = o.view.act.recent > 0
 	}
 
 	if t := res.ticket; t != nil {
@@ -256,6 +327,7 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 				return nil, err
 			}
 			res.leads[i] = leadObs{seen: true, view: viewOf(h)}
+			res.leads[i].view.act = hist.activity(at, r.recent)
 		}
 	}
 
@@ -264,6 +336,7 @@ func (r *runner) server(sid string, sr *serverRecs) (*serverResult, error) {
 		return nil, err
 	}
 	res.census = h
+	res.censusAct = hist.activity(r.end, r.recent)
 	return res, nil
 }
 
@@ -284,7 +357,8 @@ type detail struct {
 }
 
 // DetailHeader names the columns of the detail output.
-const DetailHeader = "sid,kind,at,finding,rules,statements,widest_mode,dimms_with_errors,outcome,errors_of_server,ticket"
+const DetailHeader = "sid,kind,at,finding,rules,statements,widest_mode,dimms_with_errors,outcome,errors_of_server,ticket," +
+	"errors_so_far,errors_recent,last_error_days,last_burst_days"
 
 func (r *runner) keepDetail(res *serverResult) {
 	if r.opts.Detail == nil || res.dropped {
@@ -312,8 +386,10 @@ func (r *runner) keepDetail(res *serverResult) {
 		r.details = append(r.details, d)
 	}
 	if res.census != nil {
+		v := viewOf(res.census)
+		v.act = res.censusAct
 		r.details = append(r.details, detail{sid: res.note.SID, kind: "all", at: dcbrain.SpanDays, errors: res.errors, ticket: res.note.Ticket,
-			seen: true, view: viewOf(res.census)})
+			seen: true, view: v})
 	}
 }
 
@@ -345,8 +421,24 @@ func (r *runner) writeDetail() error {
 				dimms += n
 			}
 		}
-		fmt.Fprintf(bw, "%s,%s,%d,%s,%s,%s,%s,%d,%s,%d,%s\n", d.sid, d.kind, d.at, finding, strings.Join(d.view.rules, " "),
-			strings.Join(d.view.codes, " "), mode, dimms, d.outcome, d.errors, d.ticket)
+		// Ages are written in days; a column is empty when there is nothing
+		// to say (no error yet, no burst so far).
+		age := func(sec int64) string {
+			if !d.seen || sec < 0 {
+				return ""
+			}
+			return strconv.FormatFloat(float64(sec)/86400, 'f', 3, 64)
+		}
+		count := func(n int64) string {
+			if !d.seen {
+				return ""
+			}
+			return strconv.FormatInt(n, 10)
+		}
+		a := d.view.act
+		fmt.Fprintf(bw, "%s,%s,%d,%s,%s,%s,%s,%d,%s,%d,%s,%s,%s,%s,%s\n", d.sid, d.kind, d.at, finding, strings.Join(d.view.rules, " "),
+			strings.Join(d.view.codes, " "), mode, dimms, d.outcome, d.errors, d.ticket,
+			count(a.errors), count(a.recent), age(a.lastError), age(a.lastBurst))
 	}
 	return bw.Flush()
 }
@@ -361,8 +453,6 @@ func (r *runner) merge(rep *Report, res *serverResult) {
 	if res.note.BucketSeconds > 1 {
 		rep.Widened = append(rep.Widened, res.note)
 	}
-	rep.Dataset.DIMMs += int64(res.dimms)
-	r.layout(&rep.Dataset.Layout, res)
 
 	for i := range res.cuts {
 		o, st := &res.cuts[i], &rep.ByCut[i]
@@ -473,39 +563,6 @@ func (r *runner) merge(rep *Report, res *serverResult) {
 		}
 		if !device {
 			c.NoDevice += n
-		}
-	}
-}
-
-// layout adds the DIMMs with errors of one server to the layout counts.
-func (r *runner) layout(l *Layout, res *serverResult) {
-	var ids []int
-	for id := 0; id < 32; id++ {
-		if res.memory&(1<<id) != 0 {
-			ids = append(ids, id)
-		}
-	}
-	by := l.ByDIMMs[r.dimmCount[res.note.SID]]
-	for _, id := range ids {
-		_, _, position := dcbrain.Topology(id)
-		by[position]++
-	}
-	l.ByDIMMs[r.dimmCount[res.note.SID]] = by
-	if len(ids) < 2 {
-		return
-	}
-	l.MultiDIMM++
-	for i, a := range ids {
-		for _, b := range ids[i+1:] {
-			l.Pairs++
-			sa, ca, _ := dcbrain.Topology(a)
-			sb, cb, _ := dcbrain.Topology(b)
-			switch {
-			case sa == sb && ca == cb:
-				l.SameChannel++
-			case sa == sb:
-				l.SameSocket++
-			}
 		}
 	}
 }

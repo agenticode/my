@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/bits"
 	"os"
 	"path/filepath"
 	"sort"
@@ -21,7 +22,7 @@ import (
 // fixed 20 bytes. One bucket fits in memory; the table does not have to.
 
 const (
-	spoolVersion = 2
+	spoolVersion = 3
 	spoolBuckets = 64
 	spoolRecSize = 20
 	spoolMeta    = "spool.json"
@@ -55,9 +56,11 @@ type spoolInfo struct {
 	MaxRow      int `json:"max_row"`
 	MaxCol      int `json:"max_col"`
 	// Servers lists the server IDs in the order they first occur; a row
-	// refers to its server by position. ServerRows counts rows per server.
-	Servers    []string `json:"servers"`
-	ServerRows []int64  `json:"server_rows"`
+	// refers to its server by position. ServerRows counts rows per server,
+	// and ServerDIMMs has a bit set for every memoryid a server has rows of.
+	Servers     []string `json:"servers"`
+	ServerRows  []int64  `json:"server_rows"`
+	ServerDIMMs []uint32 `json:"server_dimms"`
 }
 
 // spool is an open spool directory.
@@ -115,7 +118,8 @@ func openSpool(ctx context.Context, ds *dcbrain.Dataset, keep, scratch string, p
 		if b, err := os.ReadFile(filepath.Join(keep, spoolMeta)); err == nil {
 			var info spoolInfo
 			if json.Unmarshal(b, &info) == nil && info.Version == spoolVersion && info.Source == name &&
-				info.SourceSize == size && info.SourceTime == mtime && len(info.Servers) == len(info.ServerRows) {
+				info.SourceSize == size && info.SourceTime == mtime && len(info.Servers) == len(info.ServerRows) &&
+				len(info.Servers) == len(info.ServerDIMMs) {
 				progress("using the spool in %s (%d rows of %d servers)", keep, info.Rows, len(info.Servers))
 				return &spool{dir: keep, info: info}, nil
 			}
@@ -200,8 +204,10 @@ func (s *spool) write(ctx context.Context, ds *dcbrain.Dataset, progress func(st
 			index[r.SID] = i
 			info.Servers = append(info.Servers, r.SID)
 			info.ServerRows = append(info.ServerRows, 0)
+			info.ServerDIMMs = append(info.ServerDIMMs, 0)
 		}
 		info.ServerRows[i]++
+		info.ServerDIMMs[i] |= 1 << uint(r.MemoryID)
 		info.Rows++
 		info.ByType[r.Type]++
 		at := int64(r.At)
@@ -277,9 +283,11 @@ var mergeBuckets = []uint32{1, 60, 3600, 86400}
 // serverRecs holds the records of one server after merging, in time order.
 type serverRecs struct {
 	index int
-	// rows is the number of rows of the error table the records stand for.
-	rows int64
-	recs []dcbrain.Rec
+	// rows is the number of rows of the error table the records stand for,
+	// and dimms the number of DIMMs they name.
+	rows  int64
+	dimms int
+	recs  []dcbrain.Rec
 	// bucket is the width in seconds of the time buckets the rows were
 	// merged in.
 	bucket uint32
@@ -391,7 +399,7 @@ func (s *spool) readBucket(i, limit int) ([]serverRecs, error) {
 		}
 		l := by[server]
 		if l == nil {
-			l = &loading{serverRecs: serverRecs{index: int(server)}}
+			l = &loading{serverRecs: serverRecs{index: int(server), dimms: bits.OnesCount32(s.info.ServerDIMMs[server])}}
 			if n := s.info.ServerRows[server]; n > int64(limit) {
 				l.agg = &aggregator{limit: limit, m: map[aggKey]dcbrain.Rec{}}
 			} else {

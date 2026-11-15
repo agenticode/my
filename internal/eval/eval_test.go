@@ -409,8 +409,12 @@ func TestFixtureFindings(t *testing.T) {
 	// s0007 on 1, 8 and 17, which are one pair on one socket and two pairs
 	// across sockets.
 	l := rep.Dataset.Layout
-	if l.MultiDIMM != 2 || l.Pairs != 4 || l.SameChannel != 1 || l.SameSocket != 1 {
+	if l.All != (Pairs{Servers: 2, Pairs: 4, SameChannel: 1, SameSocket: 1}) {
 		t.Errorf("layout = %+v", l)
+	}
+	// Of the two, s0007 is listed with 24 DIMMs and s0006 with 12.
+	if l.Full != (Pairs{Servers: 1, Pairs: 3, SameChannel: 0, SameSocket: 1}) {
+		t.Errorf("layout of servers with 24 DIMMs = %+v", l.Full)
 	}
 	// By size of the server: s0001 (12 DIMMs, memoryid 3) and s0006 (12
 	// DIMMs, memoryid 4 and 5) give one DIMM at position 0 and two at 1.
@@ -628,7 +632,7 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Fatal(err)
 	}
 	rep := run(t, ds, Options{MaxRecords: 50, Cutoffs: []int{90, 150}})
-	if len(rep.Widened) != 1 || rep.Widened[0] != (ServerNote{SID: "minute", Rows: 300, Records: 5, BucketSeconds: 60}) {
+	if len(rep.Widened) != 1 || rep.Widened[0] != (ServerNote{SID: "minute", Rows: 300, DIMMs: 1, Records: 5, BucketSeconds: 60}) {
 		t.Errorf("widened = %+v", rep.Widened)
 	}
 	if len(rep.Dropped) != 1 || rep.Dropped[0].SID != "wide" || rep.Dropped[0].Rows != 400 || rep.Dropped[0].Records != 0 ||
@@ -636,7 +640,7 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Errorf("dropped = %+v", rep.Dropped)
 	}
 	c := &rep.Census
-	if c.Servers != 2 || c.Errors != 320 || c.Records != 25 || rep.Dataset.Rows != 720 || rep.Dataset.Servers != 3 || rep.Dataset.DIMMs != 2 {
+	if c.Servers != 2 || c.Errors != 320 || c.Records != 25 || rep.Dataset.Rows != 720 || rep.Dataset.Servers != 3 || rep.Dataset.DIMMs != 3 || c.DIMMs != 2 {
 		t.Errorf("census: %d servers, %d errors, %d records; dataset: %d rows, %d servers, %d DIMMs",
 			c.Servers, c.Errors, c.Records, rep.Dataset.Rows, rep.Dataset.Servers, rep.Dataset.DIMMs)
 	}
@@ -648,8 +652,8 @@ func TestServersWithManyRecords(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, want := range []string{
-		"server minute: 300 rows merged in buckets of 60 seconds into 5 records",
-		"server wide: left out, 400 rows are too many records even when merged by the day; failure_type 2 at 0001-04-09 08:20:00",
+		"server minute: 300 rows on 1 DIMM merged in buckets of 60 seconds into 5 records",
+		"server wide: left out, 400 rows on 1 DIMM are too many records even when merged by the day; failure_type 2 at 0001-04-09 08:20:00",
 	} {
 		if !strings.Contains(buf.String(), want) {
 			t.Errorf("the text report lacks %q", want)
@@ -928,14 +932,16 @@ func TestDetail(t *testing.T) {
 		t.Fatalf("%d lines, want %d:\n%s", len(lines), want, buf.String())
 	}
 	for _, want := range []string{
-		"s0001,cutoff,71,observe,R-SOFT-01,soft.cell,single-bit,1,no ticket,24,",
-		"s0002,cutoff,71,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0002,cutoff,131,,,,,0,failed before,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0003,cutoff,71,,,,,0,first error later,40,",
-		"s0002,lead,86400,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07",
-		"s0006,cutoff,207,hold-replacement,R-SYS-01,sys.channel,system-issue,2,no ticket,30,",
-		"s0007,cutoff,207,observe,R-SOFT-01,soft.stray_once,single-bit,3,type 0,3,failure_type 0 at 0001-08-10 09:30:00",
-		"s0008,all,244,observe,R-SOFT-01,soft.cell,single-bit,1,,9,",
+		"s0001,cutoff,71,observe,R-SOFT-01,soft.cell,single-bit,1,no ticket,24,,24,0,7.349,",
+		"s0002,cutoff,71,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07,88,38,0.106,",
+		"s0002,cutoff,131,,,,,0,failed before,88,failure_type 1 at 0001-03-11 03:14:07,,,,",
+		"s0003,cutoff,71,,,,,0,first error later,40,,,,,",
+		"s0002,lead,86400,consider-replacement,R-ROW-03,row.rising row.spreading_line,row,1,uncorrectable error,88,failure_type 1 at 0001-03-11 03:14:07,82,36,0.417,",
+		"s0006,cutoff,207,hold-replacement,R-SYS-01,sys.channel,system-issue,2,no ticket,30,,30,30,1.106,",
+		"s0007,cutoff,207,observe,R-SOFT-01,soft.stray_once,single-bit,3,type 0,3,failure_type 0 at 0001-08-10 09:30:00,3,0,46.179,",
+		"s0008,all,244,observe,R-SOFT-01,soft.cell,single-bit,1,,9,,9,0,119.500,",
+		// s0005 had its burst of 150 errors about two hours before its ticket.
+		"s0005,lead,1,consider-replacement,R-ROW-03,row.rising row.spreading_area row.storm,device,1,correctable errors,210,failure_type 2 at 0001-06-31 05:00:00,210,184,0.090,0.090",
 	} {
 		found := false
 		for _, l := range lines {
