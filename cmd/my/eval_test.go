@@ -149,3 +149,83 @@ func TestEvalUsageErrors(t *testing.T) {
 		}
 	}
 }
+
+// docExcerpts returns the parts of an evaluation report that
+// docs/evaluation.md quotes: the findings of the development period up to
+// the first line about precision, and the findings before the tickets for
+// an uncorrectable error.
+func docExcerpts(report string) []string {
+	lines := strings.Split(report, "\n")
+	cut := func(first string, last func(string) bool) string {
+		for i, l := range lines {
+			if !strings.HasPrefix(l, first) {
+				continue
+			}
+			for j := i + 1; j < len(lines); j++ {
+				if last(lines[j]) {
+					return strings.Join(lines[i:j+1], "\n") + "\n"
+				}
+			}
+		}
+		return ""
+	}
+	return []string{
+		cut("Findings and what followed, development period", func(l string) bool {
+			return strings.HasPrefix(l, "  consider replacement, against a ticket of type 1, 2 or 3")
+		}),
+		cut("  Servers with a ticket of failure type 1 ", func(l string) bool { return strings.HasPrefix(l, "    30 days ") }),
+	}
+}
+
+// TestEvalDocExcerpt keeps the report excerpts of docs/evaluation.md equal
+// to what the command prints for the made-up fleet the page names.
+// "make golden" rewrites them after an intended change.
+func TestEvalDocExcerpt(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "fleet")
+	if code, _, errOut := run("eval", "-generate", dir); code != cli.ExitOK {
+		t.Fatalf("exit code %d, stderr %s", code, errOut)
+	}
+	code, out, errOut := run("eval", "-data", dir, "-quiet", "-scratch", t.TempDir())
+	if code != cli.ExitOK {
+		t.Fatalf("exit code %d, stderr %s", code, errOut)
+	}
+	want := docExcerpts(out)
+	for i, w := range want {
+		if w == "" {
+			t.Fatalf("the report has no part %d to quote:\n%s", i, out)
+		}
+	}
+	path := filepath.Join(testutil.RepoRoot(t), "docs", "evaluation.md")
+	doc, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The quoted parts are the fenced blocks that start like a part.
+	text := string(doc)
+	starts := []string{"```\nFindings and what followed, development period", "```\n  Servers with a ticket of failure type 1 "}
+	changed := false
+	for i, start := range starts {
+		at := strings.Index(text, start)
+		if at < 0 {
+			t.Fatalf("%s has no block that starts with %q", path, start)
+		}
+		body := at + len("```\n")
+		end := strings.Index(text[body:], "```")
+		if end < 0 {
+			t.Fatalf("%s: the block that starts with %q is not closed", path, start)
+		}
+		if got := text[body : body+end]; got != want[i] {
+			if os.Getenv("UPDATE_GOLDEN") == "" {
+				t.Errorf("%s quotes a report that the command no longer prints (run \"make golden\"):\n--- quoted\n%s--- printed\n%s", path, got, want[i])
+				continue
+			}
+			text = text[:body] + want[i] + text[body+end:]
+			changed = true
+		}
+	}
+	if changed {
+		if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+}

@@ -133,7 +133,7 @@ A command that shows findings exits with the grade of what it showed, the host o
 | 3 | replace now | an uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up |
 | 4 | hold replacement | a cause outside the DIMM is suspected: the channel, the slot, the contact, or slot names that disagree |
 
-A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results. `my help rules` lists the 13 rules, `my help thresholds` the thresholds, and `--set key=value` or `--config FILE` changes them.
+A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results. `my help rules` lists the 13 rules, `my help thresholds` the thresholds, and `--set key=value` or `--config FILE` changes them. [docs/evaluation.md](docs/evaluation.md) describes how findings are compared with the failure tickets of a public fleet dataset.
 
 Platforms report different amounts of location detail, so every record has an observation grade and a finding only says what the grade allows: A (bank, row and column known: fault modes can be told), B (physical address or rank: a row is an estimate), C (a count per DIMM: trends only). [docs/compatibility.md](docs/compatibility.md) says what each input gives.
 
@@ -193,7 +193,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `internal/synth` | synthetic hosts and error histories for tests and demos |
 | `testdata` | fixtures for every adapter |
 
-Two development commands are left out of the command list: `my synth` generates synthetic hosts (`my synth -list` names the scenarios) and `my analyze` prints the engine result of a ledger.
+Three development commands are left out of the command list: `my synth` generates synthetic hosts (`my synth -list` names the scenarios), `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).
 
 ## License
 
