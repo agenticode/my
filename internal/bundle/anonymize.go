@@ -64,8 +64,8 @@ var columns = map[string]treatment{
 	"boot.kernel": keep, "boot.bios": keep, "boot.bmc": keep, "boot.cmdline": commandLine, "boot.source": keep, "boot.raw_ref": freeText,
 
 	"counter_sample.host": hostName, "counter_sample.observed_at": keep, "counter_sample.mc_name": keep, "counter_sample.location": keep,
-	"counter_sample.label": keep, "counter_sample.reset_at": keep, "counter_sample.mem_type": keep, "counter_sample.dev_type": keep,
-	"counter_sample.edac_mode": keep, "counter_sample.source": keep, "counter_sample.raw_ref": freeText,
+	"counter_sample.label": keep, "counter_sample.bank_locator": keep, "counter_sample.reset_at": keep, "counter_sample.mem_type": keep,
+	"counter_sample.dev_type": keep, "counter_sample.edac_mode": keep, "counter_sample.source": keep, "counter_sample.raw_ref": freeText,
 
 	"dimm.dimm_uid": dimmUID, "dimm.identity": keep, "dimm.manufacturer": keep, "dimm.part_number": keep, "dimm.serial": keep,
 	"dimm.manufacturer_id": keep, "dimm.memory_type": keep, "dimm.form_factor": keep, "dimm.module_type": keep, "dimm.technology": keep,
