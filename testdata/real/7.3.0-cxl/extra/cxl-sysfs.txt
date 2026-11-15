@@ -1,6 +1,4 @@
-+ echo '# ls -l /sys/bus/cxl/devices'
 # ls -l /sys/bus/cxl/devices
-+ ls -l /sys/bus/cxl/devices/
 total 0
 lrwxrwxrwx 1 root root 0 Nov 15 11:05 decoder0.0 -> ../../../devices/platform/ACPI0017:00/root0/decoder0.0
 lrwxrwxrwx 1 root root 0 Nov 15 11:05 decoder1.0 -> ../../../devices/platform/ACPI0017:00/root0/port1/decoder1.0
@@ -13,46 +11,13 @@ lrwxrwxrwx 1 root root 0 Nov 15 11:05 mem0 -> ../../../devices/pci0000:0c/0000:0
 lrwxrwxrwx 1 root root 0 Nov 15 11:05 nvdimm-bridge0 -> ../../../devices/platform/ACPI0017:00/root0/nvdimm-bridge0
 lrwxrwxrwx 1 root root 0 Nov 15 11:05 port1 -> ../../../devices/platform/ACPI0017:00/root0/port1
 lrwxrwxrwx 1 root root 0 Nov 15 11:05 root0 -> ../../../devices/platform/ACPI0017:00/root0
-+ for d in /sys/bus/cxl/devices/mem*
-+ echo '# /sys/bus/cxl/devices/mem0'
 # /sys/bus/cxl/devices/mem0
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/serial ']'
-++ cat /sys/bus/cxl/devices/mem0/serial
-+ echo 'serial: 0x4c41420001'
 serial: 0x4c41420001
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/firmware_version ']'
-++ cat /sys/bus/cxl/devices/mem0/firmware_version
-+ echo 'firmware_version: BWFW VERSION 00'
 firmware_version: BWFW VERSION 00
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/payload_max ']'
-++ cat /sys/bus/cxl/devices/mem0/payload_max
-+ echo 'payload_max: 2048'
 payload_max: 2048
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/ram/size ']'
-++ cat /sys/bus/cxl/devices/mem0/ram/size
-+ echo 'ram/size: 0x10000000'
 ram/size: 0x10000000
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/pmem/size ']'
-++ cat /sys/bus/cxl/devices/mem0/pmem/size
-+ echo 'pmem/size: 0x0'
 pmem/size: 0x0
-+ for f in serial firmware_version payload_max ram/size pmem/size numa_node
-+ '[' -r /sys/bus/cxl/devices/mem0/numa_node ']'
-++ cat /sys/bus/cxl/devices/mem0/numa_node
-+ echo 'numa_node: -1'
 numa_node: -1
-+ echo '# ls /sys/bus/edac/devices'
 # ls /sys/bus/edac/devices
-+ ls /sys/bus/edac/devices/
 cxl_mem0
 mc
-+ for d in /sys/bus/edac/devices/cxl_*
-+ '[' -d /sys/bus/edac/devices/cxl_mem0 ']'
-+ find /sys/bus/edac/devices/cxl_mem0 -maxdepth 2 -type f -perm -u+r
-+ sort
-+ read -r f

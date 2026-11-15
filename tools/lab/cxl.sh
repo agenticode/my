@@ -84,7 +84,7 @@ sleep 3
 	for d in /sys/bus/edac/devices/cxl_*; do
 		[ -d "$d" ] && find "$d" -maxdepth 2 -type f -perm -u+r | sort | while read -r f; do echo "$f: $(cat "$f" 2>/dev/null)"; done
 	done
-} >"$WORK/cxl-sysfs.txt" 2>&1
+} >"$WORK/cxl-sysfs.txt" 2>/dev/null
 
 python3 "$HERE/plan.py" --scenario "$name" \
 	--summary "event records of an emulated CXL memory device: 11 corrected and 1 uncorrected error, a health record, 2 poison ranges" \

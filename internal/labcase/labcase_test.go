@@ -72,6 +72,11 @@ type forms struct {
 	events, actions int
 	kernel          string
 	note            string
+	// idle is how long before the capture the kernel logged its last
+	// line. A log with seconds since boot only is placed by the capture
+	// time, as if its last line had been written then: its records are
+	// dated late by this much.
+	idle time.Duration
 }
 
 var captures = []capture{
@@ -128,7 +133,7 @@ var captures = []capture{
 		notes:   []string{"rasdaemon: 13 records are dated by the kernel's time"},
 	},
 	{
-		// rasdaemon 1.0.0 built from source: 41 tables, more columns in
+		// rasdaemon 1.0.0 built from source: 39 tables, more columns in
 		// mce_record, and the signals the kernel sent in a table of their own.
 		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
@@ -156,7 +161,7 @@ var captures = []capture{
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
 		finding: model.VerdictReplaceNow,
 		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeMultiRow, rules: []string{"R-UE-01", "R-SCRUB-01"}},
-		forms:   &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64"},
+		forms:   &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64", idle: 40 * time.Second},
 	},
 }
 
@@ -484,11 +489,11 @@ func TestKernelLogForms(t *testing.T) {
 		}{
 			{"dmesg-T.txt", "localhost", 3 * time.Second},
 			{"dmesg-iso.txt", "localhost", 3 * time.Second},
-			{"dmesg-raw.txt", "localhost", 15 * time.Second},
-			{"kmsg.txt", "localhost", 15 * time.Second},
+			{"dmesg-raw.txt", "localhost", 15*time.Second + c.forms.idle},
+			{"kmsg.txt", "localhost", 15*time.Second + c.forms.idle},
 			{"journal-short.txt", c.host, 3 * time.Second},
 			{"journal-short-iso.txt", c.host, 3 * time.Second},
-			{"journal-short-monotonic.txt", c.host, 15 * time.Second},
+			{"journal-short-monotonic.txt", c.host, 15*time.Second + c.forms.idle},
 		}
 		entries, err := os.ReadDir(dir(t, c, "formats"))
 		if err != nil || len(entries) != len(forms) {
@@ -686,11 +691,18 @@ func TestBundleWrittenOnTheHost(t *testing.T) {
 				t.Errorf("ledger of the bundle: %+v\n               want: %+v", got, c.want())
 			}
 			compare(t, c, s, m.Hosts[0].Name, c.earlier)
-			// Nothing in it names the lab host.
-			for _, name := range []string{c.host} {
+			// Nothing in it names the host. The SMBIOS product name is
+			// kept by design, and the aarch64 guest was given its host
+			// name as product name: there the name is looked for in the
+			// host table only.
+			hosts, err := s.Hosts(ctx)
+			if err != nil || len(hosts) != 1 || hosts[0].Name != m.Hosts[0].Name {
+				t.Fatalf("hosts of the bundle: %+v, %v", hosts, err)
+			}
+			if hosts[0].SystemProduct != c.host {
 				raw, _ := os.ReadFile(b.Ledger)
-				if strings.Contains(string(raw), name) {
-					t.Errorf("the ledger of the bundle holds %q", name)
+				if strings.Contains(string(raw), c.host) {
+					t.Errorf("the ledger of the bundle holds %q", c.host)
 				}
 			}
 		})

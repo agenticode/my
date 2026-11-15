@@ -8,19 +8,21 @@ The captures are in `testdata/real`, one directory per scenario with a `README.m
 
 One virtual machine, and guests inside it.
 
-| | Lab host | x86 guest |
-| --- | --- | --- |
-| Machine | VMware guest, 16 CPUs, 48 GB | QEMU 10.2.2 without hardware virtualization, CPU model Skylake-Server (family 6 model 85, ten machine check banks), 2 CPUs, 4 GB |
-| System | Fedora 44, systemd 259 | the file system of the lab host, copy-on-write, started with virtme-ng 1.41; no systemd |
-| Kernel | 7.3.0 from kernel.org with `MEMORY_FAILURE`, `RAS_CEC`, `RAS_CEC_DEBUG`, `X86_MCE_INJECT`, `X86_MCELOG_LEGACY`, `EDAC_GHES`, `EDAC_DEBUG` | the same kernel |
-| rasdaemon | 0.8.0, package `rasdaemon-0.8.0-9.fc44`, started by systemd | the same program, started by hand with a database of its own |
-| What can be injected | what the kernel does with a page | machine check records, through the `mce-inject` module |
+| | Lab host | x86 guest | aarch64 guest |
+| --- | --- | --- | --- |
+| Machine | VMware guest, 16 CPUs, 48 GB | QEMU 10.2.2, CPU model Skylake-Server (family 6 model 85, ten machine check banks), 2 CPUs, 4 GB; for one capture with an emulated CXL memory device | QEMU 10.2.2 `virt,ras=on`, CPU model neoverse-n1, 8 CPUs, 8 GB as one DIMM |
+| System | Fedora 44, systemd 259 | the file system of the lab host, copy-on-write, started with virtme-ng 1.41; no systemd | Fedora 44 cloud image |
+| Kernel | 7.3.0 from kernel.org with `MEMORY_FAILURE`, `RAS_CEC`, `RAS_CEC_DEBUG`, `X86_MCE_INJECT`, `X86_MCELOG_LEGACY`, `EDAC_GHES`, `EDAC_DEBUG` and the CXL drivers | the same kernel | 6.19.10-300.fc44.aarch64, as the image ships it |
+| rasdaemon | 0.8.0, package `rasdaemon-0.8.0-9.fc44`, started by systemd | the same program, started by hand with a database of its own; for two captures 1.0.0, built from its release tag | 0.8.0, the package, started by systemd |
+| What can be injected | what the kernel does with a page | machine check records through the `mce-inject` module; event records of the CXL device through QMP | firmware error records (CPER) through QMP |
 
-The hypervisor shows the lab host no machine check banks, no memory controller and no ACPI error injection table. On the host itself only the last step of error handling can be driven: the kernel is told that a page is bad. Machine checks are injected one level down, in a guest whose processor is emulated. Hardware virtualization is not available inside the lab host, so a guest boots in about a minute and runs slowly.
+The hypervisor shows the lab host no machine check banks, no memory controller and no ACPI error injection table. On the host itself only the last step of error handling can be driven: the kernel is told that a page is bad. Everything else is injected one level down, in guests that QEMU emulates without hardware virtualization, which is not available inside the lab host. The x86 guest boots in a minute, the aarch64 guest in twelve.
+
+QEMU builds the ACPI tables of its guests. For an aarch64 guest with `ras=on` they hold a generic hardware error source, and QEMU can put a record into it from outside. That is the one way the lab gets errors with a DIMM, a row and a column: the kernel handles such a record as it handles one of real firmware, through `ghes` and `ghes_edac`.
 
 ## Method
 
-1. A scenario is a script that injects a fixed set of errors and writes down what it injected: `tools/lab/vm.sh` on the lab host, `tools/lab/mce.sh` in the x86 guest. Addresses are those of pages that a waiting process holds (`tools/lab/hwpoison.c`), so the kernel has something to move or to take away.
+1. A scenario is a script that injects a fixed set of errors and writes down what it injected: `tools/lab/vm.sh` on the lab host, `tools/lab/mce.sh` and `tools/lab/cxl.sh` in the x86 guest, `tools/lab/ghes.sh` for the aarch64 guest. Where the kernel is to act on a page, the address is that of a page a waiting process holds (`tools/lab/hwpoison.c`), so the kernel has something to move or to take away.
 2. The result is an injection plan, `plan.yaml`: every injection with its time, its address, how many times, and what the kernel is expected to do with the page.
 3. `tools/lab/capture.sh` collects `dmesg`, `journalctl -k -o json`, the rasdaemon database, the EDAC tree, `dmidecode -t 17`, the files under `/proc` and `/sys` that name the host, and what `my scan` and `my bundle --anonymize` say on the host as root.
 4. `tools/lab/sanitize.py` replaces what names the lab and fails when a part of such a value is left anywhere, also inside the database and the bundle.
@@ -39,8 +41,11 @@ The plan format and the comparison are in `internal/injection`.
 | `7.3.0-mce-print-all` | the same, kernel booted with `mce=print_all` | every record in three lines, as on a console after a fatal error | the same | the same: each error is in two sources and counts once |
 | `7.3.0-mce-clock-step` | the same, clock set back by 10 seconds after rasdaemon started | as before, dated by the kernel's clock | `timestamp` 9 to 10 seconds ahead of `walltime` | the same |
 | `7.3.0-mce-fatal` | 1 uncorrected error, processor context corrupt | the record and `Kernel panic - not syncing: Fatal machine check`, on the console only | nothing: the guest was gone | 1 fatal error from `console.log` |
+| `7.3.0-mce-rasdaemon-1.0` | as `7.3.0-mce` | as `7.3.0-mce` | rasdaemon 1.0.0: the same rows in a database of 39 tables, and 3 rows in `signal_event` | the same |
+| `7.3.0-cxl` | 9 DRAM event records, 3 general media event records, 1 memory module event record, 2 poison ranges of an emulated CXL device | nothing per record | rasdaemon 1.0.0: 9, 3, 1 and 2 rows in the CXL tables | CE 11, UE 1 on `cxl:mem0`, grade A 9 and B 3, a row fault, "replace now" |
+| `6.19.10-ghes` | 26 firmware error records on one DIMM: a row with 15 corrected errors, 2 in the row next to it, 6 at one cell within a second, 1 with the threshold flag, 2 uncorrected | 21 firmware blocks, 26 EDAC lines, 2 `Memory failure` lines | 26 rows in `mc_event`, none in `memory_failure_event` | CE 24, UE 2 on `DIMM 0`, grade A, a multi-row fault, "replace now" |
 
-No capture has an EDAC memory controller: the EDAC tree of every host is empty. All errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM.
+The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guest has the memory controller `ghes_edac` registers, with its one DIMM and its counters.
 
 ## What the captures changed
 
@@ -52,13 +57,20 @@ Each of these was wrong or missing before the capture showed it.
 - `journalctl -o short-monotonic` puts `host kernel:` between the stamp and the message. The boot banner was not recognised behind it.
 - The kernel announces a page that a program asked it to give up (`Injecting memory failure for pfn ...`). Such a page is now marked in the ledger and counted in the source report. A boot in which `mce-inject` or EINJ was set up is named.
 - With one day on record, the timeline drew one letter where an uncorrected error, the offline of its page and a reboot share a column, and dropped the other kinds with their text.
+- Six corrected errors at one cell within a second are six equal lines in the kernel log. In the forms that date a line to the second (`dmesg -T`, syslog) they had equal stamps too and were stored as two records.
+- The kernel prints the firmware block of a corrected error at most twice in five seconds, and the EDAC line of every error. Of six such errors the log has one block and six EDAC lines; the second line was taken for another report of the block, because the first, which the adapter had already tied to the block, did not count as the block's EDAC line.
+- A CXL device reports an error as a DRAM event record or as a general media event record. Records of the two tables that followed each other within 5 seconds were taken for one error: "CE 8" for 11.
 - An anonymized bundle kept `root=UUID=...` of the kernel command line.
 - A copy of a host's files was dated by the newest of its files. A copy that lost the times of its files, as every checkout of `testdata/real` does, is now dated by its own boot time and uptime.
 
 ## What the kernel and rasdaemon do that the hand-written fixtures did not show
 
 - rasdaemon stores the status register of a machine check as a signed number. The package of Fedora 44 creates seven tables and none for CXL; its `mce_record` has no `ppin`, `microcode`, `ipid` or `synd` column.
-- rasdaemon 0.8.0 names the page type of a memory failure from a table of its own, indexed by a kernel enum that lost entries since. On kernel 7.3 it writes `dirty unevictable LRU page` where the kernel says `dirty LRU page`. The result (`Recovered`) is right.
+- rasdaemon 0.8.0 names the page type of a memory failure from a table of its own, indexed by a kernel enum that lost entries since. On kernel 7.3 it writes `dirty unevictable LRU page` where the kernel says `dirty LRU page`. The result (`Recovered`) is right. rasdaemon 1.0.0 names the type as the kernel does, and stores the signals the kernel sends for poisoned pages in a table of their own.
+- The aarch64 kernel 6.19.10 of Fedora has no `ras:memory_failure_event` trace point. rasdaemon stores no page offline there; the kernel log is the only source.
+- A soft offline that firmware asks for with the flag "error threshold exceeded" leaves nothing at all: no line in the kernel log, no trace event. The content of the page was found at another page frame afterwards.
+- `ghes_edac` labels a DIMM with its bank locator and its device locator (`BANK 0 DIMM 0` for the device `DIMM 0`), and prints row and column in decimal under the names `bank_group` and `bank_address`.
+- The kernel prints nothing for a CXL event record. The records are in the trace only, so a host without rasdaemon has no trace of them.
 - A soft offline that succeeds leaves one line in the kernel log, the request. There is no line for the outcome and no trace event.
 - The corrected error collector takes a page offline at the second corrected error on an Intel processor. On the lab host, with an AMD processor, its threshold is 1,023.
 - With `CONFIG_X86_MCELOG_LEGACY`, as in the lab kernel, a logged machine check is not printed: the kernel log says `Machine check events logged` and nothing else. The record is printed with `mce=print_all`, and on the console when the kernel panics.
@@ -69,12 +81,12 @@ Each of these was wrong or missing before the capture showed it.
 
 ## What the lab cannot exercise
 
-- An EDAC driver of a real memory controller (`skx_edac`, `i10nm_edac`, `amd64_edac`): no hardware and no emulation of it. DIMM labels from EDAC, the row and column these drivers decode, and the EDAC counters are covered by hand-written fixtures only.
+- An EDAC driver of a real memory controller (`skx_edac`, `i10nm_edac`, `amd64_edac`): no hardware and no emulation of it. The labels, rows and columns these drivers decode are covered by hand-written fixtures only. Row, column and DIMM come from firmware error records in the lab, through `ghes_edac`.
 - Machine check banks of real hardware: corrected error interrupts, a record that stays in its bank across a reset and is logged by the next boot, the decoding of AMD processors (their memory banks lie above the ten banks QEMU emulates).
-- ACPI error injection (EINJ) and firmware-first handling on x86.
-- A BMC, a GPU, CXL memory, repairs by firmware.
+- ACPI error injection (EINJ), and firmware-first handling on x86: QEMU builds a firmware error source for aarch64 guests only.
+- A BMC, a GPU, repairs by firmware. The CXL device is emulated: its records are real to the kernel, its memory cells are not.
 - Time: every capture spans minutes. Trends over days, the 30 day baseline and a database that grew for months are not in them.
-- Other versions: one kernel and one rasdaemon package.
+- Other versions: two kernels (7.3.0 on x86, 6.19.10 on aarch64) and two versions of rasdaemon (0.8.0 as packaged, 1.0.0).
 
 ## Open points
 
@@ -95,7 +107,10 @@ make cross && cp dist/my-linux-amd64 $LAB/bin/my
 gcc -O2 -o $LAB/bin/hwpoison tools/lab/hwpoison.c
 
 $LAB/tools/vm.sh baseline        # then: hwpoison, soft
-$LAB/tools/mce.sh                # then: print-all, clock-step, fatal
+$LAB/tools/mce.sh                # then: print-all, clock-step, fatal, rasdaemon-1.0
+$LAB/tools/cxl.sh                # needs rasdaemon with CXL support at $RASDAEMON
+$LAB/tools/ghes.sh image         # once, from a Fedora cloud image for aarch64 under $LAB/img
+$LAB/tools/ghes.sh boot && $LAB/tools/ghes.sh prepare && $LAB/tools/ghes.sh run
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 

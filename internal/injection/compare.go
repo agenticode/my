@@ -335,14 +335,15 @@ func (in *Injection) fields() []field {
 		}})
 	}
 	if in.place() != "" {
-		// The DIMM is right when the record names it, or when the ledger
-		// tied the record to the slot of that name: an EDAC label may add
-		// the bank to the locator ("BANK 0 DIMM 0" for "DIMM 0").
+		// The DIMM is right when the record names it, when the ledger tied
+		// the record to the slot of that name, or when the label of the
+		// record ends in the name: ghes_edac puts the bank locator before
+		// the device locator ("BANK 0 DIMM 0" for "DIMM 0").
 		want := model.NormalizeLabel(in.place())
 		out = append(out, field{"label", want, func(e *model.Event) (string, bool) {
 			label, slot := model.NormalizeLabel(e.Label), model.NormalizeLabel(e.Slot)
 			switch {
-			case label == want || slot == want:
+			case label == want || slot == want || strings.HasSuffix(label, " "+want):
 				return want, true
 			case slot != "":
 				return slot, true

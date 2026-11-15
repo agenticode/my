@@ -168,7 +168,7 @@ The reader is tested against MySQL 8.4, MariaDB 11.4 and PostgreSQL 17, on table
 
 - Rows that rasdaemon itself wrote to a MySQL or PostgreSQL server have not been read yet. The layout is taken from the source of rasdaemon 1.0.0.
 - A database without machine check records (ARM servers, firmware-first error handling) gives no way to see that rasdaemon's clock was off. Its records keep rasdaemon's time.
-- The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right.
+- The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right. rasdaemon 1.0.0 names the type as the kernel does.
 - The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.
 - rasdaemon stores what it traced while it ran. Errors from before it was started, and from a boot in which it did not run, are in the kernel log only.
 - A database that fails the SQLite integrity check is refused.

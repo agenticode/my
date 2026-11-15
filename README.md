@@ -195,7 +195,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines and machine checks, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, case bundles, the HTML report and the Prometheus exporter. Not merged yet: the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. The inputs are also checked against captures of a lab host: a running kernel and rasdaemon with injected page offlines, machine checks, firmware error records and CXL event records, each capture compared with the plan of its injection ([docs/validation-lab.md](docs/validation-lab.md)). Hosts with the EDAC driver of a real memory controller have not been validated yet. No version has been tagged yet, so there is no release to download.
 
 ## Build
 

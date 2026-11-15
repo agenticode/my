@@ -12,7 +12,7 @@ CXL mailbox and traces them; rasdaemon stores the traces.
 What is injected, with addresses inside the device (DPA):
 
   dram-1..8   8 corrected DRAM errors in one row (rank 1, bank group 2, bank 1,
-              row 0x2b3c), on six columns, 2 of them found by the scrubber
+              row 0x2b3c), on five columns, 2 of them found by the scrubber
   dram-ue     1 uncorrected DRAM error in the same row
   media-1..3  3 corrected media errors without a DRAM location (channel 1, rank 0)
   module      1 health record: maintenance needed, hardware replacement needed
