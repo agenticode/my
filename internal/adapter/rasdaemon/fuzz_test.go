@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"math"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/agenticode/my/internal/adapter"
@@ -220,6 +221,48 @@ func FuzzRows(f *testing.F) {
 			if a.Fingerprint == "" || a.Source == "" || a.Kind == "" || a.At.IsZero() {
 				t.Fatalf("%s: incomplete action %+v", table, a)
 			}
+		}
+	})
+}
+
+// FuzzStoreSettings feeds an environment file to the reader of the store
+// settings. Whatever the file holds, reading it and building the
+// connection from it must end in settings or in an error.
+func FuzzStoreSettings(f *testing.F) {
+	for _, seed := range []string{
+		"RASDAEMON_DB_BACKEND=mysql\nRAS_MYSQL_HOST=db.example\nRAS_MYSQL_PORT=3307\nRAS_MYSQL_PASSWORD=\"s3 cret\"\n",
+		"RASDAEMON_DB_BACKEND=postgresql\nRAS_PG_HOST=pg.example\nRAS_PG_SCHEMA=ras\nRAS_PG_SSL_MODE=verify-full\nRAS_PG_PASSWORD='a\\'b'\n",
+		"# comment\n; comment\nexport RASDAEMON_DB_BACKEND=mariadb\nRAS_MYSQL_SOCKET=/run/mysqld/mysqld.sock\nRAS_MYSQL_USE_SSL=yes\n",
+		"RASDAEMON_DB_BACKEND=sqlite3\n",
+		"RAS_PG_PORT=99999\nRASDAEMON_DB_BACKEND=pg\nRAS_PG_CONNECT_TIMEOUT=0\n",
+		"=\n",
+		"",
+	} {
+		f.Add(seed)
+	}
+	f.Fuzz(func(t *testing.T, text string) {
+		env, err := ParseEnvFile(strings.NewReader(text))
+		if err != nil {
+			return
+		}
+		cfg, err := StoreConfigFromEnv("", func(k string) string { return env[k] })
+		if err != nil {
+			return
+		}
+		if cfg.Backend != BackendMySQL && cfg.Backend != BackendPostgreSQL {
+			t.Fatalf("settings without an error and with backend %q", cfg.Backend)
+		}
+		// A host makes the connection independent of the sockets on the
+		// machine the fuzzer runs on.
+		if cfg.Host == "" {
+			cfg.Host = "db.example"
+		}
+		conn, origin, err := cfg.connector()
+		if err != nil {
+			return
+		}
+		if conn == nil || origin == "" || (cfg.Password != "" && len(cfg.Password) > 3 && strings.Contains(origin, cfg.Password) && !strings.Contains(cfg.Host+cfg.Database+cfg.Schema, cfg.Password)) {
+			t.Fatalf("connector: %v, origin %q", conn, origin)
 		}
 	})
 }

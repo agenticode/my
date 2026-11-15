@@ -83,7 +83,7 @@ EDAC positions carry the memory controller and are tied to SMBIOS slots on evide
 
 ## rasdaemon database
 
-Adapter `rasdaemon`, package `internal/adapter/rasdaemon`. It reads the SQLite file rasdaemon keeps, `ras-mc_event.db`, with the tables of rasdaemon 0.6 to 1.0. Columns are read by name, because a database that was upgraded in place has its newer columns in another order than a fresh one.
+Adapter `rasdaemon`, package `internal/adapter/rasdaemon`. It reads the SQLite file rasdaemon keeps, `ras-mc_event.db`, with the tables of rasdaemon 0.6 to 1.0, and the store rasdaemon 1.0 keeps on a MySQL, MariaDB or PostgreSQL server (see "Store on a database server"). Columns are read by name, because a database that was upgraded in place has its newer columns in another order than a fresh one.
 
 A scan looks for the file at `/var/lib/rasdaemon/ras-mc_event.db` and `/usr/local/var/lib/rasdaemon/ras-mc_event.db`. On a live host it reads a private copy, so it takes no lock on a file rasdaemon is writing to. An imported file is read in place.
 
@@ -110,8 +110,38 @@ rasdaemon dates a record by the uptime of its trace event plus the difference be
 
 A machine check record also holds the time the kernel gave the error (`walltime`). Where the two times differ by more than a second, the record is dated by the kernel's time. Rows of other tables within ten minutes of such a record are moved by the same amount: the EDAC report of the same error, the page the kernel gave up after it. The source report says how far rasdaemon's clock was off and how many records were corrected.
 
+### Store on a database server
+
+rasdaemon 1.0 can write to a MySQL or MariaDB database, or to a schema of a PostgreSQL database, in place of the SQLite file. Every host of a fleet then writes to the same tables. They are the tables of the SQLite file with one more column, `hostname`, after the first, and with the time of a row in a time type of the server.
+
+The same adapter reads such a store, one host at a time, with the code that reads the SQLite file: a host gives the same records either way. The connection settings are the variables rasdaemon itself takes, with its defaults, so the environment file rasdaemon is started with also points the reader at the store.
+
+| | MySQL, MariaDB | PostgreSQL |
+| --- | --- | --- |
+| Backend | `RASDAEMON_DB_BACKEND=mysql` | `RASDAEMON_DB_BACKEND=postgresql` |
+| Server | `RAS_MYSQL_HOST`, `RAS_MYSQL_PORT` (3306), or `RAS_MYSQL_SOCKET` | `RAS_PG_HOST`, `RAS_PG_PORT` (5432) |
+| Account | `RAS_MYSQL_USER` (`rasdaemon`), `RAS_MYSQL_PASSWORD` | `RAS_PG_USER` (`rasdaemon`), `RAS_PG_PASSWORD` |
+| Tables | database `RAS_MYSQL_DATABASE` (`rasdaemon`) | schema `RAS_PG_SCHEMA` (`rasdaemon`) of database `RAS_PG_DATABASE` (`rasdaemon`) |
+| Time of a row | `DATETIME`, which rasdaemon fills in UTC | `TIMESTAMPTZ` |
+| TLS | `RAS_MYSQL_USE_SSL=true` encrypts and, as in rasdaemon, does not check the certificate of the server | `RAS_PG_SSL_MODE`; without it `prefer`, the default of libpq. `RAS_PG_USE_SSL=true` means `require` |
+| Timeout | `RAS_MYSQL_CONNECT_TIMEOUT` (10 s) | `RAS_PG_CONNECT_TIMEOUT` (10 s) |
+
+With an empty host the server on the same machine is reached through its Unix socket.
+
+The rows of a host are read in one read-only transaction at the isolation level repeatable read, so the tables are seen as of one moment. Every statement the reader sends is a SELECT; an account that may only SELECT from the tables is enough. A record refers to its row by the store, the table and the row number, without the account: `mysql://db.example:3306/rasdaemon#mc_event/1234`.
+
+What a store does not hold:
+
+- The UTC offset of the host's clock. The SQLite file has local time with the offset; a store has the instant.
+- A host without a row. A host appears with its first record.
+- Rows without a host name, from a rasdaemon that could not learn the name of its host, cannot be told apart by host. They are counted and not read. `RASDAEMON_HOSTNAME` gives rasdaemon the name.
+- Anything but what rasdaemon traced: no SMBIOS tables, no counters, no kernel log. A DIMM is known by the label of its slot and has no serial number.
+
+The reader is tested against MySQL 8.4, MariaDB 11.4 and PostgreSQL 17, on tables created the way rasdaemon 1.0.0 creates them (the columns of its table descriptors, the types of its backends) and filled from the SQLite fixtures. Every fixture read from a server gives the records the file gives.
+
 ### Known gaps
 
+- Rows that rasdaemon itself wrote to a MySQL or PostgreSQL server have not been read yet. The layout is taken from the source of rasdaemon 1.0.0.
 - A database without machine check records (ARM servers, firmware-first error handling) gives no way to see that rasdaemon's clock was off. Its records keep rasdaemon's time.
 - The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right.
 - The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.

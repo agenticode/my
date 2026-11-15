@@ -78,3 +78,81 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 3
+
+  # The stores rasdaemon 1.0 keeps on a database server, read from real
+  # servers: MySQL, MariaDB and PostgreSQL.
+  stores:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: rasdaemon_test
+          MYSQL_USER: rasdaemon
+          MYSQL_PASSWORD: ras-test-pw
+          MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -urasdaemon -pras-test-pw"
+          --health-interval 5s --health-timeout 5s --health-retries 40
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_DATABASE: rasdaemon_test
+          MARIADB_USER: rasdaemon
+          MARIADB_PASSWORD: ras-test-pw
+          MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd "mariadb-admin ping -h 127.0.0.1 -urasdaemon -pras-test-pw"
+          --health-interval 5s --health-timeout 5s --health-retries 40
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: rasdaemon
+          POSTGRES_USER: rasdaemon
+          POSTGRES_PASSWORD: "ras test'pw"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rasdaemon"
+          --health-interval 5s --health-timeout 5s --health-retries 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: settings of the test servers, as rasdaemon takes them
+        run: |
+          dir="$RUNNER_TEMP/stores"
+          mkdir -p "$dir"
+          cat > "$dir/mysql.env" <<'EOF'
+          RASDAEMON_DB_BACKEND=mysql
+          RAS_MYSQL_HOST=127.0.0.1
+          RAS_MYSQL_PORT=3306
+          RAS_MYSQL_USER=rasdaemon
+          RAS_MYSQL_PASSWORD=ras-test-pw
+          RAS_MYSQL_DATABASE=rasdaemon_test
+          EOF
+          cat > "$dir/mariadb.env" <<'EOF'
+          RASDAEMON_DB_BACKEND=mysql
+          RAS_MYSQL_HOST=127.0.0.1
+          RAS_MYSQL_PORT=3307
+          RAS_MYSQL_USER=rasdaemon
+          RAS_MYSQL_PASSWORD=ras-test-pw
+          RAS_MYSQL_DATABASE=rasdaemon_test
+          EOF
+          cat > "$dir/postgresql.env" <<'EOF'
+          RASDAEMON_DB_BACKEND=postgresql
+          RAS_PG_HOST=127.0.0.1
+          RAS_PG_PORT=5432
+          RAS_PG_USER=rasdaemon
+          RAS_PG_PASSWORD="ras test'pw"
+          RAS_PG_DATABASE=rasdaemon
+          RAS_PG_SCHEMA=rasdaemon_test
+          EOF
+          echo "MY_TEST_STORES=$dir/mysql.env,$dir/mariadb.env,$dir/postgresql.env" >> "$GITHUB_ENV"
+      - name: read stores on MySQL, MariaDB and PostgreSQL
+        run: go test -count=1 -v -run 'TestStoreOnAServer' ./internal/adapter/rasdaemon/
