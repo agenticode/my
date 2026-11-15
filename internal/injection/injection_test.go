@@ -303,6 +303,30 @@ func TestCompare(t *testing.T) {
 	if c := res.Checks[2]; c.OK() || c.Found != 1 || len(c.Differences) != 2 || c.Differences[0].Field != "how" || c.Differences[0].Got != "soft" {
 		t.Errorf("hard: %+v", c)
 	}
+	// Errors without an address and without a row are found by their
+	// label: the records of the device that have no row and do not
+	// contradict the place the plan gives.
+	p3, err := Read(strings.NewReader("format: 1\nscenario: s\ninjections:\n" +
+		"  - id: media\n    inject: error\n    severity: CE\n    count: 2\n    label: \"cxl:mem0\"\n    channel: 1\n    rank: 0\n    device: 32\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s3 := ledger(t, []*model.Event{
+		{ErrorSeverity: model.SevCE, Label: "cxl:mem0", ChannelId: some(1), Rank: some(0), DeviceId: some(32), Source: "rasdaemon/cxl_general_media_event"},
+		{ErrorSeverity: model.SevCE, Label: "cxl:mem0", ChannelId: some(1), Rank: some(0), DeviceId: some(32), Source: "rasdaemon/cxl_general_media_event"},
+		// Another rank of the same device, and an error of it with a row: other errors.
+		{ErrorSeverity: model.SevCE, Label: "cxl:mem0", ChannelId: some(1), Rank: some(1), Source: "rasdaemon/cxl_general_media_event"},
+		{ErrorSeverity: model.SevCE, Label: "cxl:mem0", ChannelId: some(1), Rank: some(0), Row: some(7), Column: some(1), Bank: some(1), BankGroup: some(0),
+			Source: "rasdaemon/cxl_dram_event", ErrorDT: at.Add(time.Minute)},
+	}, nil)
+	res, err = Compare(ctx, s3, "h", p3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c := res.Checks[0]; !c.OK() || c.Found != 2 || res.UnplannedErrors != 2 {
+		t.Errorf("media: %+v, %d unplanned", c, res.UnplannedErrors)
+	}
+
 	// Another host has none of it.
 	res, err = Compare(ctx, s, "other", p)
 	if err != nil || res.OK() || res.Checks[0].Found != 0 {

@@ -105,7 +105,12 @@ boot)
 	;;
 
 prepare)
-	guest 'dnf -y -q install rasdaemon sqlite dmidecode gcc >/root/dnf.log 2>&1; rpm -q rasdaemon sqlite dmidecode gcc; systemctl enable rasdaemon; mkdir -p /root/my-lab/tools /root/my-lab/bin /root/my-lab/tmp /root/my-lab/cap'
+	# The emulated guest downloads slowly: metadata in the plain form, and a few tries.
+	guest 'for try in 1 2 3; do
+			dnf -y -q --setopt=zchunk=false --disablerepo="*" --enablerepo=fedora --enablerepo=updates install rasdaemon sqlite dmidecode gcc >/root/dnf.log 2>&1 && break
+			dnf clean all >/dev/null 2>&1
+		done
+		rpm -q rasdaemon sqlite dmidecode gcc; systemctl enable --now rasdaemon; mkdir -p /root/my-lab/tools /root/my-lab/bin /root/my-lab/tmp /root/my-lab/cap'
 	push "$HERE"/capture.sh "$HERE"/plan.py "$HERE"/hwpoison.c root@127.0.0.1:/root/my-lab/tools/
 	push "$LAB/bin/my-arm64" root@127.0.0.1:/root/my-lab/bin/my
 	[ -f "$LAB/anon.key" ] && push "$LAB/anon.key" root@127.0.0.1:/root/my-lab/anon.key

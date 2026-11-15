@@ -96,8 +96,10 @@ const earlier = 10 * time.Minute
 // An error is found by its address: records of the same cache line and
 // severity class, dated no earlier than ten minutes before the injection.
 // An error the plan gives no address for is found by its row, column and
-// bank, or by its label. A page offline is found by its page and by how
-// the page was taken offline.
+// bank. One that has neither is found by its label among the records
+// without a row, as long as channel, rank, device and bank do not
+// contradict the plan. A page offline is found by its page and by how the
+// page was taken offline.
 func Compare(ctx context.Context, s *store.Store, host string, p *Plan) (*Result, error) {
 	events, err := s.EventList(ctx, store.EventFilter{Host: host, Kinds: []model.EventKind{model.KindError}, WithDuplicates: true})
 	if err != nil {
@@ -216,7 +218,12 @@ func (in *Injection) matchesEvent(e *model.Event) bool {
 		return same(in.Row, e.Row) && same(in.Column, e.Column) && same(in.Bank, e.Bank) && same(in.BankGroup, e.BankGroup) &&
 			same(in.Device, e.DeviceId) && same(in.Rank, e.Rank)
 	case in.Label != "":
-		return model.NormalizeLabel(e.Label) == model.NormalizeLabel(in.Label) || e.Slot == in.Label
+		// By the DIMM or device alone many errors look alike: what the
+		// plan says about the place inside it must not be contradicted.
+		same := func(want, got model.Opt[int]) bool { return !want.Valid || !got.Valid || got.V == want.V }
+		return (model.NormalizeLabel(e.Label) == model.NormalizeLabel(in.Label) || e.Slot == in.Label) &&
+			same(in.Channel, e.ChannelId) && same(in.Rank, e.Rank) && same(in.Device, e.DeviceId) &&
+			same(in.BankGroup, e.BankGroup) && same(in.Bank, e.Bank) && !e.Row.Valid
 	}
 	return false
 }
