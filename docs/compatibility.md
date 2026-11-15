@@ -24,6 +24,7 @@ The same fault shows more or less of itself depending on who handles the error a
 | Errors handled by firmware first (GHES), on x86 and ARM | rasdaemon database, kernel log | A to C | as much as the firmware put into the error record |
 | CXL memory device | rasdaemon database | A | DRAM event records carry bank, row and column |
 | Fleet with FMFM logging | FMFM logs | A to C | as much as the logging fills in |
+| Fleet whose rasdaemons write to a MySQL or PostgreSQL server | rasdaemon store, read with `--fleet` | as the hosts' own databases | the rows are those each host would keep in its SQLite file, without serial numbers |
 | Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
 | No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
 | NVIDIA GPU memory | Xid lines, `nvidia-smi -q` | C | the driver reports no location |
