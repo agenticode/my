@@ -338,7 +338,7 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 // absentMatters lists the sources whose absence a reader has to know
 // about: without them there are no located error records, or no DIMM
 // identities.
-var absentMatters = map[string]bool{"rasdaemon": true, "klog": true, "edac-sysfs": true, "smbios": true}
+var absentMatters = map[string]bool{"hostinfo": true, "rasdaemon": true, "klog": true, "edac-sysfs": true, "smbios": true}
 
 func (c *Case) statusText(s model.SourceStatus) string {
 	switch s {
@@ -352,7 +352,8 @@ func (c *Case) statusText(s model.SourceStatus) string {
 // findings use for it.
 func (c *Case) missingSource(s model.Source) Text {
 	st := model.Statement{Code: "missing.source", Args: map[string]any{"kind": s.Kind, "status": "@status." + string(s.Status)}}
-	if s.Detail != "" && s.Status != model.SourceAbsent {
+	// "not present" as the detail of a source that is not there adds nothing.
+	if s.Detail != "" && s.Detail != "not present" {
 		st.Code = "missing.source_detail"
 		st.Args["detail"] = s.Detail
 	}

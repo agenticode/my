@@ -49,7 +49,10 @@ type Options struct {
 	Live bool
 	// Privileged records whether the scan runs as root.
 	Privileged bool
-	// Now is the time of the scan; zero means the current time.
+	// Now is the time of the scan. Zero means the current time on a live
+	// host. For a copy of a host's files zero means the time the copy was
+	// made, taken from the newest of the files that are read: counters and
+	// seconds since boot in the copy count back from that moment.
 	Now time.Time
 	// Host names the host in the ledger; empty takes the name the host
 	// gives itself.
@@ -119,9 +122,40 @@ func exists(path string) bool {
 	return err == nil && !fi.IsDir()
 }
 
+// treeTime returns when a copy of a host's files was made: the newest
+// modification time among the files a scan reads. A copy cannot be older
+// than its newest file.
+func treeTime(opts *Options) time.Time {
+	var newest time.Time
+	see := func(path string) {
+		if fi, err := os.Stat(path); err == nil && !fi.IsDir() && fi.ModTime().After(newest) {
+			newest = fi.ModTime()
+		}
+	}
+	for _, rel := range []string{"proc/stat", "proc/sys/kernel/random/boot_id", smbios.TablesDir + "/DMI"} {
+		see(opts.path(rel))
+	}
+	for _, list := range [][]string{RasdaemonPaths, LogFiles, DmidecodeFiles} {
+		for _, rel := range list {
+			see(opts.path(rel))
+		}
+	}
+	// The counters: a few files per DIMM, a few dozen DIMMs.
+	_ = filepath.WalkDir(opts.path(edacsysfs.Dir), func(path string, d os.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			see(path)
+		}
+		return nil
+	})
+	return newest
+}
+
 // Sources returns the adapters of a scan, in the order they are read.
 func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	now := opts.Now
+	if now.IsZero() && !opts.Live {
+		now = treeTime(&opts)
+	}
 	hi := hostinfo.NewRoot(opts.root(), hostinfo.Options{Now: now})
 	info, _ := hi.Read()
 	out := []adapter.Adapter{hi}
@@ -240,6 +274,9 @@ func Run(ctx context.Context, s *store.Store, opts Options) (*ingest.Result, err
 	kind := model.ScanImport
 	if opts.Live {
 		kind = model.ScanLive
+	}
+	if opts.Now.IsZero() && !opts.Live {
+		opts.Now = treeTime(&opts)
 	}
 	return ingest.Run(ctx, s, Sources(ctx, opts), ingest.Options{
 		Host: opts.Host, Kind: kind, Now: opts.Now, Privileged: opts.Privileged, Note: opts.Note,
