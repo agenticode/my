@@ -340,3 +340,17 @@ func validTime(t time.Time) bool {
 	y := t.UTC().Year()
 	return !t.IsZero() && y >= 1970 && y <= 9999
 }
+
+// Snapshot writes a compact copy of the ledger to a new file at path. The
+// copy is a complete single-file ledger, taken in one read transaction, so
+// it is consistent also while the ledger is being written. The file must
+// not exist.
+func (s *Store) Snapshot(ctx context.Context, path string) error {
+	if _, err := os.Stat(path); err == nil {
+		return fmt.Errorf("ledger snapshot %s: %w", path, fs.ErrExist)
+	}
+	if _, err := s.db.ExecContext(ctx, `VACUUM INTO ?`, path); err != nil {
+		return fmt.Errorf("ledger snapshot %s: %w", path, err)
+	}
+	return nil
+}

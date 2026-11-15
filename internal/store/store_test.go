@@ -422,3 +422,37 @@ func TestWriterSetMeta(t *testing.T) {
 		t.Errorf("meta after a rolled back update = %q", v)
 	}
 }
+
+func TestSnapshot(t *testing.T) {
+	ctx := context.Background()
+	dir := t.TempDir()
+	s, err := Open(ctx, filepath.Join(dir, "ledger.db"), Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetMeta(ctx, "note", "kept"); err != nil {
+		t.Fatal(err)
+	}
+	copyPath := filepath.Join(dir, "copy.db")
+	if err := s.Snapshot(ctx, copyPath); err != nil {
+		t.Fatal(err)
+	}
+	// The copy must not replace a file that is there.
+	if err := s.Snapshot(ctx, copyPath); !errors.Is(err, fs.ErrExist) {
+		t.Errorf("second snapshot to the same file: %v", err)
+	}
+	s.Close()
+
+	// The copy is a ledger of its own, and a read-only ledger can be copied.
+	c, err := Open(ctx, copyPath, ReadOnly)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	if v, _ := c.Meta(ctx, "note"); v != "kept" {
+		t.Errorf("meta of the copy = %q", v)
+	}
+	if err := c.Snapshot(ctx, filepath.Join(dir, "copy2.db")); err != nil {
+		t.Errorf("snapshot of a read-only ledger: %v", err)
+	}
+}
