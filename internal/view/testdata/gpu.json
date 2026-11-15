@@ -77,7 +77,7 @@
           "record": {
             "kind": "gpu",
             "id": 3,
-            "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L7"
+            "raw_ref": "testdata/klog/nvidia-xid.messages#L7"
           }
         },
         {
@@ -88,7 +88,7 @@
           "record": {
             "kind": "gpu",
             "id": 2,
-            "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L5"
+            "raw_ref": "testdata/klog/nvidia-xid.messages#L5"
           }
         },
         {
@@ -99,7 +99,7 @@
           "record": {
             "kind": "gpu",
             "id": 1,
-            "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L3"
+            "raw_ref": "testdata/klog/nvidia-xid.messages#L3"
           }
         }
       ],

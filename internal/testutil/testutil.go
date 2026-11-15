@@ -2,6 +2,7 @@
 package testutil
 
 import (
+	"bytes"
 	"database/sql"
 	"os"
 	"path/filepath"
@@ -81,6 +82,12 @@ const UpdateGoldenEnv = "UPDATE_GOLDEN"
 func Golden(tb testing.TB, name string, got []byte) {
 	tb.Helper()
 	path := filepath.Join("testdata", filepath.FromSlash(name))
+	// Output that names the directory of this checkout is the same on no
+	// other machine: a golden file made of it passes here and fails
+	// everywhere else. Read fixtures under a name of their own instead.
+	if root := RepoRoot(tb); bytes.Contains(got, []byte(root)) {
+		tb.Fatalf("%s: the output holds the path of this checkout (%s); it must not depend on where the repository lies", path, root)
+	}
 	if os.Getenv(UpdateGoldenEnv) != "" {
 		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			tb.Fatal(err)
