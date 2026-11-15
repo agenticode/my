@@ -1,0 +1,38 @@
+host node-h  HPE ProLiant DL380 Gen10  BIOS U30 v2.90 (07/20/2023)  BMC iLO 5 v3.09
+8 memory settings of the BIOS on record, read 2026-11-13 09:30 UTC
+attribute registry BiosAttributeRegistryU30.v1_2_68
+profile built-in, mapping for HPE (by the system manufacturer)
+
+ SETTING              STATE        EXPECTED  CHECK        BIOS ATTRIBUTE = VALUE
+ patrol scrub         on           on        as expected  MemPatrolScrubbing = Enabled
+ ADDDC                on           -         reported
+                      AdvancedMemProtection = FastFaultTolerantADDDC
+                      pending: AdvancedEcc (off); it takes effect after a reboot
+                      the device width (x4 or x8) of 4 of 4 DIMMs is not known: ADDDC has an effect
+                      on x4 DIMMs only
+ memory mode          ADDDC        -         reported
+                      AdvancedMemProtection = FastFaultTolerantADDDC
+                      pending: AdvancedEcc (advanced ECC); it takes effect after a reboot
+ CE logging           -            on        not mapped
+ CE threshold event   -            -         not mapped
+ leaky bucket         -            -         not mapped
+ post package repair  -            -         not mapped
+ memory frequency     not limited  -         reported     MaxMemBusFreqMHz = Auto
+ refresh rate         1x           -         reported     MemRefreshRate = Refreshx1
+
+ Not mapped (CE logging, CE threshold event, leaky bucket, post package repair): no public document
+ that was read gives a BIOS attribute for it.
+
+ all 4 DIMMs with a known speed run at the speed they are rated for
+
+ 4 other memory settings on record that the profile maps to nothing:
+   ExtendedMemTest = Disabled, MemFastTraining = Enabled, MemMirrorMode = Full
+   OpportunisticSelfRefresh = Disabled
+
+ Where the mappings and rules in use come from:
+   Bios resource definitions of iLO 5 v3.09
+     https://servermanagementportal.ext.hpe.com/docs/redfishservices/ilos/ilo5/ilo5_309/ilo5_bios_resourcedefns309
+   Memory Errors and Dell EMC PowerEdge YX4X Server Memory RAS Features, Revision 1.0, 2020-01-03
+     https://dl.dell.com/manuals/common/dellemc_poweredge_yx4x_memoryras_v1_0.pdf
+
+ 1 expectation of the profile, all met

@@ -1,0 +1,27 @@
+host node-l  Lenovo ThinkSystem SR650 V3  BIOS ESE128B
+3 memory settings of the BIOS on record, read 2026-11-13 09:30 UTC
+the attribute registry was not read
+profile built-in, mapping for Lenovo (by the system manufacturer)
+
+ SETTING              STATE        EXPECTED  CHECK       BIOS ATTRIBUTE = VALUE
+ patrol scrub         -            on        not mapped
+ ADDDC                -            -         not mapped
+ memory mode          -            -         not mapped
+ CE logging           -            on        not mapped
+ CE threshold event   -            -         not mapped
+ leaky bucket         -            -         not mapped
+ post package repair  -            -         not mapped
+ memory frequency     not limited  -         reported    Memory_MemorySpeed = MaxPerformance
+ refresh rate         -            -         not mapped
+
+ Not mapped (patrol scrub, ADDDC, memory mode, CE logging, CE threshold event, leaky bucket, post
+ package repair, refresh rate): no public document that was read gives a BIOS attribute for it.
+
+ 2 other memory settings on record that the profile maps to nothing:
+   Memory_AdvMemTestOptions = 0 (→ 983040), Memory_MemoryTest = Enabled
+
+ Where the mappings and rules in use come from:
+   Lenovo XClarity Controller 2 REST API reference, GET - The pending BIOS settings
+     https://pubs.lenovo.com/xcc2-restapi/pending_bios_settings_get
+
+ none of the settings the profile expects something of could be read

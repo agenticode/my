@@ -157,6 +157,12 @@ func (in *Input) until(t time.Time) *Input {
 			out.ECS = append(out.ECS, e)
 		}
 	}
+	out.Settings = nil
+	for _, s := range in.Settings {
+		if !s.ObservedAt.After(t) {
+			out.Settings = append(out.Settings, s)
+		}
+	}
 	return &out
 }
 
@@ -472,7 +478,7 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 		if errorSourceKinds[src.Kind] {
 			switch src.Status {
 			case model.SourceOK, model.SourcePartial, model.SourceEmpty:
-				hf.errorSource = true
+				hf.errorSource, hf.hostSource = true, true
 			}
 		}
 	}
@@ -490,6 +496,12 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 	for i := range in.Hosts {
 		if in.Hosts[i].Name == name {
 			hf.virtual = in.Hosts[i].Virtual
+			hf.bios = biosFactsOf(in, name, in.Hosts[i].SystemVendor)
+		}
+	}
+	for _, src := range hf.sources {
+		if src.Kind == "redfish" || src.Kind == "sel" {
+			hf.bmcSource = true
 		}
 	}
 	for _, sl := range in.Slots {

@@ -63,7 +63,7 @@ vendors:
           - value: Extended
             means: on
             note: the whole memory is scrubbed more often than in Standard
-            note_ko: Standard보다 자주 전체 메모리를 스크럽
+            note_ko: 스크럽 주기가 Standard 모드에 비해 짧음
           - value: Disabled
             means: off
       # BIOS.MemSettings.AdddcSetting
