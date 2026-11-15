@@ -1,0 +1,18 @@
+{
+  "@odata.id": "/redfish/v1/Systems/system/Memory/dimm2",
+  "@odata.type": "#Memory.v1_17_0.Memory",
+  "Id": "dimm2",
+  "Name": "DIMM Slot",
+  "DeviceLocator": "DIMM_C1",
+  "MemoryLocation": {"Socket": 0, "MemoryController": 0, "Channel": 2, "Slot": 0},
+  "CapacityMiB": 65536,
+  "MemoryType": "DRAM",
+  "MemoryDeviceType": "DDR5",
+  "BaseModuleType": "RDIMM",
+  "Manufacturer": "Example Memory",
+  "PartNumber": "EXM64G48R2X4-A",
+  "SerialNumber": "80A1F7",
+  "RankCount": 2,
+  "OperatingSpeedMhz": 4800,
+  "Status": {"State": "Enabled", "Health": "Warning"}
+}

@@ -1,0 +1,9 @@
+{
+  "@odata.id": "/redfish/v1/Systems/system/Memory/dimm3",
+  "@odata.type": "#Memory.v1_17_0.Memory",
+  "Id": "dimm3",
+  "Name": "DIMM Slot",
+  "DeviceLocator": "DIMM_D1",
+  "MemoryLocation": {"Socket": 0, "MemoryController": 0, "Channel": 3, "Slot": 0},
+  "Status": {"State": "Absent"}
+}
