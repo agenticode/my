@@ -48,6 +48,13 @@ type Options struct {
 	// The zero value uses, per host, the latest time the ledger knows
 	// something about the host.
 	AsOf time.Time
+	// ObservedFrom says that every host was watched from this time on:
+	// a host without records before its first error had no errors then.
+	// The zero value takes the earliest record of each host as the start
+	// of what is known about it. A replay of a fleet log sets it to the
+	// start of the log; without it a fault cannot be called new until the
+	// host has a week of records.
+	ObservedFrom time.Time
 	// Now is stored with findings as the time they were computed; the zero
 	// value means the current time. It does not change any finding.
 	Now time.Time

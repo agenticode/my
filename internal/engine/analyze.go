@@ -226,6 +226,13 @@ func Analyze(in *Input, opts Options) (*Result, error) {
 		if from == 0 || from > asOf {
 			from = asOf
 		}
+		// A caller that knows the hosts were watched earlier than their
+		// first record says so.
+		if !opts.ObservedFrom.IsZero() && asOf > 0 {
+			if o := opts.ObservedFrom.UnixMicro(); o < from {
+				from = o
+			}
+		}
 		h := &HostResult{Host: name}
 		if asOf > 0 {
 			h.AsOf, h.ObservedFrom = timeOf(asOf), timeOf(from)
