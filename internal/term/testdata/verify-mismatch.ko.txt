@@ -1,0 +1,51 @@
+호스트 lab-arm  계획 ghes
+주입 25건 중 4건이 계획과 다름
+firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM
+
+  #  ID            주입                계획  기록  결과
+  1  row-1         CE                     1     1  계획대로
+  2  row-2         CE                     1     1  디코딩 불일치
+  3  row-3         CE                     3     3  계획대로
+  4  row-4         CE                     1     1  계획대로
+  5  row-5         CE                     1     1  계획대로
+  6  row-6         CE                     1     1  계획대로
+  7  row-7         CE                     1     1  계획대로
+  8  row-8         CE Patrol              1     1  계획대로
+  9  row-9         CE                     1     1  계획대로
+ 10  row-10        CE Patrol              1     0  기록 없음
+ 11  row-11        CE                     1     1  계획대로
+ 12  row-12        CE                     1     1  계획대로
+ 13  row-13        CE                     1     0  기록 없음
+ 14  row-14        CE Patrol              1     1  계획대로
+ 15  row-15        CE                     1     1  계획대로
+ 16  row-16        CE                     1     1  계획대로
+ 17  row-17        CE                     1     1  계획대로
+ 18  burst         CE                     6     6  계획대로
+ 19  thr           CE                     1     1  계획대로
+ 20  ue-1          Recoverable            1     1  계획대로
+ 21  ue-1-offline  page offline hard      1     1  계획대로
+ 22  ue-2          Recoverable Patrol     1     1  계획대로
+ 23  ue-2-offline  page offline hard      1     1  계획대로
+ 24  ghost-1       UE                     1     0  기록 없음
+ 25  stay-1        page offline hard      0     0  계획대로
+
+ 불일치     row-2: row: 주입 0x1a30, 기록 0x1a2f, 기록 3건(rasdaemon/mc_event
+            ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2; klog/ghes
+            ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac
+            ../../testdata/real/6.19.10-ghes/dmesg#L651)
+            row-2: column: 주입 0x119, 기록 0x118, 기록 3건(rasdaemon/mc_event
+            ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2; klog/ghes
+            ../../testdata/real/6.19.10-ghes/dmesg#L640-L650; klog/edac
+            ../../testdata/real/6.19.10-ghes/dmesg#L651)
+            row-10: 호스트 기록에 일치하는 것 없음: 0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row
+            0x1a2f col 0x238의 CE Patrol
+            row-13: 호스트 기록에 일치하는 것 없음: 0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row
+            0x1a2f col 0x238의 CE
+            ghost-1: 호스트 기록에 일치하는 것 없음: 0x1ffff0000 DIMM 0의 UE
+
+ 기록       klog/edac 26건, klog/ghes 21건, klog/offline 2건, rasdaemon/mc_event 26건
+            주입과 일치하는 기록 수(소스별). 여러 소스가 보고한 오류는 한 번으로 셈
+
+ 방법       QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic
+            hardware error source; kernel 6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt,
+            ras=on, emulated without hardware virtualization; rasdaemon 0.8.0

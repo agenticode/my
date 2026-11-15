@@ -1,0 +1,66 @@
+host lab-arm  plan ghes
+4 of 25 injections were not found as planned
+firmware error records in an aarch64 guest: 24 corrected and
+2 uncorrected memory errors on one DIMM
+
+ ID            PLANNED  FOUND  RESULT
+ row-1               1      1  as planned
+ row-2               1      1  decoded differently
+ row-3               3      3  as planned
+ row-4               1      1  as planned
+ row-5               1      1  as planned
+ row-6               1      1  as planned
+ row-7               1      1  as planned
+ row-8               1      1  as planned
+ row-9               1      1  as planned
+ row-10              1      0  not found
+ row-11              1      1  as planned
+ row-12              1      1  as planned
+ row-13              1      0  not found
+ row-14              1      1  as planned
+ row-15              1      1  as planned
+ row-16              1      1  as planned
+ row-17              1      1  as planned
+ burst               6      6  as planned
+ thr                 1      1  as planned
+ ue-1                1      1  as planned
+ ue-1-offline        1      1  as planned
+ ue-2                1      1  as planned
+ ue-2-offline        1      1  as planned
+ ghost-1             1      0  not found
+ stay-1              0      0  as planned
+
+ what differs  row-2: row: injected 0x1a30, recorded 0x1a2f
+               in 3 records (rasdaemon/mc_event
+               ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2;
+               klog/ghes
+               ../../testdata/real/6.19.10-ghes/dmesg#L640-L650;
+               klog/edac
+               ../../testdata/real/6.19.10-ghes/dmesg#L651)
+               row-2: column: injected 0x119, recorded 0x118
+               in 3 records (rasdaemon/mc_event
+               ../../testdata/real/6.19.10-ghes/var/lib/rasdaemon/ras-mc_event.db#mc_event/2;
+               klog/ghes
+               ../../testdata/real/6.19.10-ghes/dmesg#L640-L650;
+               klog/edac
+               ../../testdata/real/6.19.10-ghes/dmesg#L651)
+               row-10: no record of the host matches: CE
+               Patrol at 0x100238180 DIMM 0 rank0 dev7 bg1
+               bank2 row 0x1a2f col 0x238
+               row-13: no record of the host matches: CE at
+               0x100238180 DIMM 0 rank0 dev7 bg1 bank2 row
+               0x1a2f col 0x238
+               ghost-1: no record of the host matches: UE at
+               0x1ffff0000 DIMM 0
+
+ records       klog/edac 26, klog/ghes 21, klog/offline 2,
+               rasdaemon/mc_event 26
+               records that match an injection, by source;
+               an error several sources report is found once
+
+ method        QMP inject-ghes-v2-error of QEMU: CPER memory
+               error sections through the generic hardware
+               error source; kernel
+               6.19.10-300.fc44.aarch64; machine QEMU 10.2.2
+               virt, ras=on, emulated without hardware
+               virtualization; rasdaemon 0.8.0

@@ -1,0 +1,35 @@
+호스트 lab-arm  계획 ghes
+주입 23건 모두 계획대로 기록됨
+firmware error records in an aarch64 guest: 24 corrected and 2 uncorrected memory errors on one DIMM
+
+  #  ID            주입                위치                                계획  기록  결과
+  1  row-1         CE                  0x100010140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  2  row-2         CE                  0x100118140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  3  row-3         CE                  0x100238180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  4  row-4         CE                  0x1002a0140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  5  row-5         CE                  0x1003f0180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  6  row-6         CE                  0x100118140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  7  row-7         CE                  0x100238180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  8  row-8         CE Patrol           0x100010140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+  9  row-9         CE                  0x1002a0140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 10  row-10        CE Patrol           0x100238180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 11  row-11        CE                  0x1003f0180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 12  row-12        CE                  0x100118140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 13  row-13        CE                  0x100238180 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 14  row-14        CE Patrol           0x100010140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 15  row-15        CE                  0x1002a0140 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 16  row-16        CE                  0x100518000 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 17  row-17        CE                  0x100638000 DIMM 0 rank0 dev7 bg1…     1     1  계획대로
+ 18  burst         CE                  0x180045640 DIMM 0 rank1 dev3 bg0…     6     6  계획대로
+ 19  thr           CE                  0x11b47b100 DIMM 0 rank0 dev2 bg0…     1     1  계획대로
+ 20  ue-1          Recoverable         0x1207dd200 DIMM 0 rank0 dev9 bg2…     1     1  계획대로
+ 21  ue-1-offline  page offline hard   0x1207dd000                            1     1  계획대로
+ 22  ue-2          Recoverable Patrol  0x110781300 DIMM 0 rank1 dev11 bg…     1     1  계획대로
+ 23  ue-2-offline  page offline hard   0x110781000                            1     1  계획대로
+
+ 기록       klog/edac 26건, klog/ghes 21건, klog/offline 2건, rasdaemon/mc_event 26건
+            주입과 일치하는 기록 수(소스별). 여러 소스가 보고한 오류는 한 번으로 셈
+
+ 방법       QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic
+            hardware error source; kernel 6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt,
+            ras=on, emulated without hardware virtualization; rasdaemon 0.8.0
