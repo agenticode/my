@@ -83,11 +83,13 @@ golden:
 EXAMPLE_NOW := 2026-11-13T09:30:00Z
 MY_EXAMPLE  := MY_NOW=$(EXAMPLE_NOW) $(GO) run -buildvcs=false ./cmd/my
 
-# The report and the figures of the example case. Run it after a change of
-# the report or of the engine, and review the diff.
+# The report and the figures of the example case, in English and, under
+# examples/ko, in Korean. Run it after a change of the report or of the
+# engine, and review the diff.
 examples:
-	rm -f examples/figures/*.svg
+	rm -f examples/figures/*.svg examples/ko/figures/*.svg
 	$(MY_EXAMPLE) report examples/demo.mycase -o examples/demo-report.html --figures examples/figures --force
+	$(MY_EXAMPLE) report examples/demo.mycase -o examples/ko/demo-report.html --figures examples/ko/figures --lang ko --force
 
 # The example case: a bundle of the synthetic demo host with CPU0_C1 as its
 # subject. A bundle holds a ledger, which names itself anew every time it
