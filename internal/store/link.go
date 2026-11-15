@@ -383,10 +383,19 @@ type DuplicateTolerance struct {
 	Exact time.Duration
 	// Estimated applies when either time was derived from seconds since boot.
 	Estimated time.Duration
+	// BMC applies between a record of a BMC log and a record of the host's
+	// own logs. The two were stamped by different clocks.
+	BMC time.Duration
 }
 
 // DefaultDuplicateTolerance is used when a zero tolerance is passed.
-var DefaultDuplicateTolerance = DuplicateTolerance{Exact: 5 * time.Second, Estimated: 2 * time.Minute}
+var DefaultDuplicateTolerance = DuplicateTolerance{Exact: 5 * time.Second, Estimated: 2 * time.Minute, BMC: 2 * time.Minute}
+
+// bmcSource reports whether a record comes from a log a BMC keeps. Such a
+// record names a module at best and never an address.
+func bmcSource(source string) bool {
+	return strings.HasPrefix(source, "sel/") || strings.HasPrefix(source, "redfish/")
+}
 
 func sourceRank(source string) int {
 	switch {
@@ -419,6 +428,14 @@ func gradeRank(g model.Grade) int {
 // tolerance, and at most one record per source in a group. The record with
 // the best observation grade stays; the others point at it through dup_of.
 //
+// A record of a BMC log is matched once more, because it has no address to
+// match on: it is a duplicate when the host's own logs hold a record of the
+// same severity class for the same slot within the BMC tolerance. Firmware
+// logs such a record when it handles an error the operating system also
+// reports, and often one for a whole series of corrected errors. A BMC
+// record without a counterpart stays: the error that took the host down is
+// in no other log.
+//
 // It returns the number of records marked as duplicates.
 func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTolerance) (int, error) {
 	if tol.Exact <= 0 {
@@ -426,6 +443,9 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 	}
 	if tol.Estimated <= 0 {
 		tol.Estimated = DefaultDuplicateTolerance.Estimated
+	}
+	if tol.BMC <= 0 {
+		tol.BMC = DefaultDuplicateTolerance.BMC
 	}
 	maxTol := max(tol.Exact, tol.Estimated)
 
@@ -455,6 +475,15 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 	}
 	open := map[string][]*cluster{}
 	updates := map[int64]int64{} // duplicate id -> primary id
+
+	// Records by severity class and slot, for the BMC match: the ones from
+	// the host's own logs in time order, and the ones from a BMC log.
+	type stamped struct {
+		id int64
+		t  time.Time
+	}
+	hostLog := map[string][]stamped{}
+	bmcLog := map[string][]stamped{}
 
 	closeCluster := func(c *cluster) {
 		if len(c.members) < 2 {
@@ -517,6 +546,14 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 		t := parseTS(sql.NullString{String: dt, Valid: true})
 		est := model.TimeQuality(quality) != model.TimeExact
+		if slot != "" {
+			k := class + "|" + slot
+			if bmcSource(source) {
+				bmcLog[k] = append(bmcLog[k], stamped{id, t})
+			} else {
+				hostLog[k] = append(hostLog[k], stamped{id, t})
+			}
+		}
 
 		// Drop clusters that are too old to take another member.
 		cs := open[key]
@@ -564,6 +601,34 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 	for _, cs := range open {
 		for _, c := range cs {
 			closeCluster(c)
+		}
+	}
+
+	// BMC records that are still counted: the nearest record of the host's
+	// own logs for the same slot, if one is near enough, reports the same
+	// error with more detail.
+	for k, recs := range bmcLog {
+		host := hostLog[k]
+		if len(host) == 0 {
+			continue
+		}
+		for _, b := range recs {
+			if _, dup := updates[b.id]; dup {
+				continue
+			}
+			i := sort.Search(len(host), func(i int) bool { return !host[i].t.Before(b.t) })
+			best, bestDiff := int64(0), tol.BMC+1
+			for _, j := range []int{i - 1, i} {
+				if j < 0 || j >= len(host) {
+					continue
+				}
+				if d := host[j].t.Sub(b.t).Abs(); d < bestDiff {
+					best, bestDiff = host[j].id, d
+				}
+			}
+			if best != 0 {
+				updates[b.id] = best
+			}
 		}
 	}
 

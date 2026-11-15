@@ -4,11 +4,15 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/sel"
+	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
+	"github.com/agenticode/my/internal/testutil"
 )
 
 // bmcModules is a board as a BMC inventory describes it: slots it names and
@@ -296,5 +300,74 @@ func TestActionLabelSeparators(t *testing.T) {
 	d, _ := s.DIMM(ctx, acts[0].DIMMUID)
 	if acts[0].Slot != "DIMM_B1" || d == nil || d.Serial != "S-B1" {
 		t.Errorf("action slot %q, DIMM %+v; want DIMM_B1 and serial S-B1", acts[0].Slot, d)
+	}
+}
+
+// TestSELWithInventory reads a BMC event log next to the SMBIOS table of
+// the same board: the events and actions of the log follow the DIMM in the
+// slot they name.
+func TestSELWithInventory(t *testing.T) {
+	s := newStore(t)
+	now := time.Date(2026, 11, 14, 12, 0, 0, 0, time.UTC)
+	var b smbios.Builder
+	for i, name := range []string{"DIMM_A1", "DIMM_B1", "DIMM_C1", "DIMM_F1"} {
+		b.AddMemoryDevice(smbios.MemoryDevice{Handle: uint16(0x1100 + i), Locator: name, SizeMB: 32768, MemoryType: smbios.TypeDDR4,
+			FormFactor: smbios.FormDIMM, Manufacturer: "Example Memory", Serial: "SER-" + name[5:], PartNumber: "EXM32G32R2X4-A"})
+	}
+	adapters := []adapter.Adapter{
+		smbios.NewTables(fstest.MapFS{"DMI": {Data: b.Bytes()}}, ".", "/sys/firmware/dmi/tables", smbios.Options{Now: now}),
+		sel.NewFile(testutil.Testdata(t, "sel", "ipmitool-elist.txt"), sel.Options{}),
+	}
+	res, err := Run(ctx, s, adapters, Options{Host: "h1", Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := res.Sources[1]
+	if src.Kind != "sel" || src.Status != model.SourceOK || src.Events != 10 || src.Actions != 2 || src.GradeC != 10 || src.Records != 20 {
+		t.Errorf("source inventory entry = %+v", src)
+	}
+
+	serialOf := func(uid string) string {
+		if uid == "" {
+			return ""
+		}
+		d, err := s.DIMM(ctx, uid)
+		if err != nil || d == nil {
+			t.Fatalf("dimm %s: %v", uid, err)
+		}
+		if d.Identity == model.IdentitySlot {
+			return "(slot)"
+		}
+		return d.Serial
+	}
+	totals := map[string][2]int64{}
+	ts, err := s.Totals(ctx, store.EventFilter{Host: "h1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, x := range ts {
+		totals[x.Slot+"/"+serialOf(x.DIMMUID)] = [2]int64{x.CE, x.UE}
+	}
+	want := map[string][2]int64{
+		"DIMM_C1/SER-C1": {2, 1},
+		"/":              {1, 0}, // the record of the shared sensor
+		"DIMM_A1/SER-A1": {1, 0}, // from before the BMC's clock was set
+	}
+	for k, v := range want {
+		if totals[k] != v {
+			t.Errorf("totals of %q = %v, want %v (all: %v)", k, totals[k], v, totals)
+		}
+	}
+
+	acts, err := s.Actions(ctx, store.ActionFilter{Host: "h1"})
+	if err != nil || len(acts) != 2 {
+		t.Fatalf("actions = %+v, %v", acts, err)
+	}
+	got := map[model.ActionKind]string{}
+	for _, a := range acts {
+		got[a.Kind] = a.Slot + "/" + serialOf(a.DIMMUID)
+	}
+	if got[model.ActionDisable] != "DIMM_C1/SER-C1" || got[model.ActionSparing] != "DIMM_F1/SER-F1" {
+		t.Errorf("actions = %v", got)
 	}
 }

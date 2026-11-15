@@ -1,0 +1,3 @@
+   1 | 11/05/2026 | 13:02:44 | Memory #0x02 | Correctable ECC ( DIMMA1) | Asserted
+   2 | 11/05/2026 | 13:40:10 | Memory #0x01 | Uncorrectable ECC ( DIMMA1,DIMMA2) | Asserted
+   3 | 11/05/2026 | 13:41:00 | Memory #0x01 | Memory Device Disabled ( DIMMA1,DIMMA2) | Asserted

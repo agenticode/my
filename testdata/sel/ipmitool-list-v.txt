@@ -1,0 +1,78 @@
+SEL Record ID          : 0001
+ Record Type           : 02
+ Timestamp             : 11/12/2026 03:14:07
+ Generator ID          : 0033
+ EvM Revision          : 04
+ Sensor Type           : Memory
+ Sensor Number         : 53
+ Event Type            : Sensor-specific Discrete
+ Event Direction       : Assertion Event
+ Event Data            : 30ff03
+ Description           : Correctable ECC
+
+SEL Record ID          : 0002
+ Record Type           : 02
+ Timestamp             : 11/12/2026 03:14:09
+ Generator ID          : 0033
+ EvM Revision          : 04
+ Sensor Type           : Memory
+ Sensor Number         : 53
+ Event Type            : Sensor-specific Discrete
+ Event Direction       : Assertion Event
+ Event Data            : a1ffff
+ Description           : Uncorrectable ECC
+
+SEL Record ID          : 0003
+ Record Type           : 02
+ Timestamp             : 11/12/2026 03:20:00
+ Generator ID          : 0001
+ EvM Revision          : 04
+ Sensor Type           : Memory
+ Sensor Number         : 53
+ Event Type            : Sensor-specific Discrete
+ Event Direction       : Assertion Event
+ Event Data            : 34ff02
+ Description           : Memory Device Disabled
+
+SEL Record ID          : 0004
+ Record Type           : c1  (OEM timestamped)
+ Timestamp             : 11/12/2026 03:20:01
+ Manufactacturer ID    : 000157
+ OEM Defined           : 0a1b2c3d4e5f [..,=N_]
+
+SEL Record ID          : 0005
+ Record Type           : 02
+ Timestamp             : 11/12/2026 03:25:00
+ Generator ID          : 0020
+ EvM Revision          : 04
+ Sensor Type           : Temperature
+ Sensor Number         : 30
+ Event Type            : Threshold
+ Event Direction       : Assertion Event
+ Event Data            : 595f5a
+ Description           : Upper Critical going high
+
+SEL Record ID          : 0006
+ Record Type           : 02
+ Timestamp             : 11/12/2026 03:30:00
+ Generator ID          : 0020
+ EvM Revision          : 04
+ Sensor Type           : Memory
+ Sensor Number         : 60
+ Event Type            : Generic Discrete
+ Event Direction       : Assertion Event
+ Event Data            : 01ffff
+ Description           : Redundancy Lost
+
+SEL Record ID          : 0007
+ Record Type           : 02
+ Timestamp             : S+ 70/001 00:02:03
+ Generator ID          : 0033
+ EvM Revision          : 04
+ Sensor Type           : Memory
+ Sensor Number         : 53
+ Event Type            : Sensor-specific Discrete
+ Event Direction       : Assertion Event
+ Event Data            : 38ff05
+ Description           : Spare
+

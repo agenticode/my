@@ -437,3 +437,100 @@ func TestMigrateVersion2(t *testing.T) {
 		t.Errorf("source inventory = %+v, want 8 samples on the second entry", srcs)
 	}
 }
+
+// TestMarkDuplicatesOfBMCRecords checks the match between a record of a BMC
+// log, which has no address, and the host's own record of the same error.
+func TestMarkDuplicatesOfBMCRecords(t *testing.T) {
+	s := newStore(t)
+	bmc := func(source, ref string, when time.Time, slot string, sev model.Severity) *model.Event {
+		return &model.Event{Host: "h1", ErrorDT: when, ErrorSeverity: sev, Source: source, RawRef: ref, Label: slot, Slot: slot,
+			Grade: model.GradeC, Fingerprint: model.Fingerprint(source, ref)}
+	}
+	host := func(ref string, when time.Time, addr uint64, sev model.Severity) *model.Event {
+		e := ev("rasdaemon/mc_event", ref, when, addr)
+		e.ErrorSeverity, e.Grade = sev, model.GradeA
+		return e
+	}
+	hour := time.Hour
+
+	// An uncorrected error the kernel handled: in the database and, 20 s
+	// later by the BMC's clock, in the SEL.
+	ue := host("mc/1", at(0), 0x1000, model.SevUE)
+	selUE := bmc("sel/list", "sel#1", at(20*time.Second), "CPU0_C1", model.SevUE)
+	// A series of corrected errors, and the one record firmware logged when
+	// their count passed its limit.
+	ce1 := host("mc/2", at(hour), 0x2000, model.SevCE)
+	ce2 := host("mc/3", at(hour+30*time.Second), 0x2040, model.SevCE)
+	ce3 := host("mc/4", at(hour+60*time.Second), 0x2080, model.SevCE)
+	selCE := bmc("sel/list", "sel#2", at(hour+61*time.Second), "CPU0_C1", model.SevCE)
+	// The error that took the host down: only the BMC saw it.
+	fatal := bmc("sel/list", "sel#3", at(5*hour), "CPU0_C1", model.SevUE)
+	// The same slot and time, the other severity class.
+	ce4 := host("mc/5", at(6*hour), 0x3000, model.SevCE)
+	selUE2 := bmc("sel/list", "sel#4", at(6*hour), "CPU0_C1", model.SevUE)
+	// Another slot.
+	selOther := bmc("sel/list", "sel#5", at(6*hour), "CPU1_D1", model.SevCE)
+	// Too far apart.
+	ce5 := host("mc/6", at(8*hour), 0x4000, model.SevCE)
+	selLate := bmc("sel/list", "sel#6", at(8*hour+3*time.Minute), "CPU0_C1", model.SevCE)
+	// One BMC event exported twice, as a SEL line and as a Redfish entry,
+	// with the host's record of it.
+	ue2 := host("mc/7", at(10*hour), 0x5000, model.SevUE)
+	selTwice := bmc("sel/list", "sel#7", at(10*hour+2*time.Second), "CPU0_C1", model.SevUE)
+	rfTwice := bmc("redfish/log", "Entries/7", at(10*hour+2*time.Second), "CPU0_C1", model.SevUE)
+	// Two exports of one BMC event the host has no record of: one of them stays.
+	selOnly := bmc("sel/list", "sel#8", at(12*hour), "CPU0_C1", model.SevCE)
+	rfOnly := bmc("redfish/log", "Entries/8", at(12*hour+time.Second), "CPU0_C1", model.SevCE)
+	// Informational records are never duplicates.
+	info := bmc("sel/list", "sel#9", at(0), "CPU0_C1", model.SevInformational)
+	// A BMC record without a slot has nothing to be matched on.
+	noSlot := bmc("sel/list", "sel#10", at(time.Second), "", model.SevUE)
+	// A record from before the BMC's clock was set has no time to match on.
+	relative := bmc("sel/list", "sel#11", time.Unix(42, 0).UTC(), "CPU0_C1", model.SevUE)
+	relative.TimeQuality = model.TimeRelative
+
+	insert(t, s, ue, selUE, ce1, ce2, ce3, selCE, fatal, ce4, selUE2, selOther, ce5, selLate, ue2, selTwice, rfTwice, selOnly, rfOnly, info, noSlot, relative)
+	n, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tt := range []struct {
+		name string
+		e    *model.Event
+		want int64
+	}{
+		{"host record of the uncorrected error", ue, 0},
+		{"SEL record of it", selUE, ue.ID},
+		{"corrected errors of the host", ce1, 0},
+		{"SEL record of the series points at the nearest one", selCE, ce3.ID},
+		{"error only the BMC saw", fatal, 0},
+		{"other severity class", selUE2, 0},
+		{"other slot", selOther, 0},
+		{"beyond the tolerance", selLate, 0},
+		{"SEL export of an error the host recorded", selTwice, ue2.ID},
+		{"Redfish export of the same event", rfTwice, ue2.ID},
+		{"first export of a BMC-only event", selOnly, 0},
+		{"second export of it", rfOnly, selOnly.ID},
+		{"informational record", info, 0},
+		{"record without a slot", noSlot, 0},
+		{"record without a date", relative, 0},
+	} {
+		if got := dupOf(t, s, tt.e); got != tt.want {
+			t.Errorf("%s: dup_of = %d, want %d", tt.name, got, tt.want)
+		}
+	}
+	if n != 5 {
+		t.Errorf("MarkDuplicates marked %d records, want 5", n)
+	}
+	// With a wider tolerance the late record is matched as well.
+	if _, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{BMC: 5 * time.Minute}); err != nil {
+		t.Fatal(err)
+	}
+	if got := dupOf(t, s, selLate); got != ce5.ID {
+		t.Errorf("with a tolerance of 5 minutes: dup_of = %d, want %d", got, ce5.ID)
+	}
+	// The pass recomputes: back to the default.
+	if n2, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{}); err != nil || n2 != n {
+		t.Errorf("third run marked %d, %v; want %d", n2, err, n)
+	}
+}

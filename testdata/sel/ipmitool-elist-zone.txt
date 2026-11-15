@@ -1,0 +1,2 @@
+   1 | 11/12/26 | 12:14:07 KST | Memory DIMM_A1 | Correctable ECC | Asserted
+   2 | 11/12/26 | 12:14:09 KST | Memory DIMM_A1 | Uncorrectable ECC | Asserted

@@ -1,0 +1,7 @@
+ID  | Date        | Time     | Name             | Type                     | Event
+1   | Nov-10-2026 | 06:20:11 | DIMM_A1          | Memory                   | Correctable memory error
+2   | Nov-10-2026 | 06:20:12 | DIMM_B2          | Memory                   | Uncorrectable memory error ; OEM Event Data2 code = 00h ; OEM Event Data3 code = 12h
+3   | Nov-10-2026 | 06:21:00 | PS1 Status       | Power Supply             | Presence detected
+4   | Nov-10-2026 | 06:22:30 | DIMM_B2          | Memory                   | Memory Device Disabled
+5   | PostInit    | PostInit | DIMM_A1          | Memory                   | Correctable memory error
+6   | Nov-10-2026 | 06:30:00 | DIMM_C1          | Memory                   | Correctable memory error logging limit reached
