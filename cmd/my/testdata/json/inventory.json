@@ -1,0 +1,338 @@
+{
+  "view": "inventory",
+  "version": 1,
+  "lang": "en",
+  "host": "node-d",
+  "exit_code": 0,
+  "case": {
+    "created_at": "2026-11-13T09:30:00Z",
+    "tool": "my dev",
+    "anonymized": false
+  },
+  "data": {
+    "host": "node-d",
+    "machine": "Dell Inc. PowerEdge R740",
+    "bios_version": "2.12.2",
+    "bmc": {
+      "firmware": "4.40.00.00",
+      "read_at": "2026-11-13T09:30:00Z",
+      "live": false
+    },
+    "lead": [
+      {
+        "code": "inv.count",
+        "args": {
+          "dimms": 4,
+          "slots": 4
+        },
+        "text": "4 DIMMs in 4 slots"
+      },
+      {
+        "code": "inv.sources",
+        "args": {
+          "sources": "the BMC (read 2026-11-13 09:30 UTC)"
+        },
+        "text": "slot names and module data from the BMC (read 2026-11-13 09:30 UTC)"
+      },
+      {
+        "code": "inv.ras_common",
+        "args": {
+          "ras": "patrol scrub, ADDDC (width not known)"
+        },
+        "text": "memory RAS settings of the BIOS in effect for every DIMM: patrol scrub, ADDDC (width not known)"
+      }
+    ],
+    "columns": {
+      "slot": "SLOT",
+      "serial": "SERIAL",
+      "maker": "MAKER",
+      "part": "PART NUMBER",
+      "size": "SIZE",
+      "org": "ORG",
+      "speed": "SPEED",
+      "ras": "RAS",
+      "ce_os": "CE OS",
+      "ce_bmc": "CE BMC",
+      "empty": "empty"
+    },
+    "rows": [
+      {
+        "slot": "A1",
+        "bmc_names": [
+          "DIMM A1",
+          "DIMM.Socket.A1"
+        ],
+        "populated": true,
+        "dimm_uid": "db7e6754069a55ddcbd1",
+        "maker": "Example Memory",
+        "part_number": "EXM32G29R2X4-B",
+        "serial": "D0A10001",
+        "size_bytes": 34359738368,
+        "size": "32 GB",
+        "type": "DDR4 RDIMM",
+        "ranks": 2,
+        "org": "2R",
+        "speed_operating": 2666,
+        "speed_rated": 2933,
+        "speed": "2666/2933",
+        "settings": [
+          {
+            "setting": "patrol-scrub",
+            "state": "on",
+            "text": "patrol scrub"
+          },
+          {
+            "setting": "adddc",
+            "state": "on",
+            "effect": "unknown",
+            "text": "ADDDC (width not known)"
+          }
+        ],
+        "ras": "patrol scrub, ADDDC (width not known)",
+        "ce_bmc": 2,
+        "bmc_count": {
+          "ce_lifetime": 1250,
+          "ce_current": 3,
+          "ue_lifetime": 0,
+          "ue_current": 0,
+          "current_since": "2026-10-02T08:15:00Z",
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "bmc_events": [
+          {
+            "at": "2026-10-28T21:04:55Z",
+            "severity": "CE",
+            "text": "correctable ECC",
+            "source": "redfish/log"
+          },
+          {
+            "at": "2026-11-05T02:41:07Z",
+            "severity": "CE",
+            "text": "correctable ECC",
+            "source": "redfish/log"
+          }
+        ],
+        "lines": [
+          {
+            "code": "inv.line.module",
+            "text": "DDR4 RDIMM; BMC: DIMM A1, DIMM.Socket.A1"
+          },
+          {
+            "code": "inv.line.count",
+            "args": {
+              "counts": "1,250 over the life of the module, 3 since the reset of 2026-10-02 08:15 UTC"
+            },
+            "text": "corrected errors the BMC counts: 1,250 over the life of the module, 3 since the reset of 2026-10-02 08:15 UTC"
+          },
+          {
+            "code": "inv.line.event",
+            "args": {
+              "text": "correctable ECC",
+              "when": "2026-10-28 21:04 UTC"
+            },
+            "text": "BMC log 2026-10-28 21:04 UTC: correctable ECC"
+          },
+          {
+            "code": "inv.line.event",
+            "args": {
+              "text": "correctable ECC",
+              "when": "2026-11-05 02:41 UTC"
+            },
+            "text": "BMC log 2026-11-05 02:41 UTC: correctable ECC"
+          }
+        ]
+      },
+      {
+        "slot": "A2",
+        "bmc_names": [
+          "DIMM A2",
+          "DIMM.Socket.A2"
+        ],
+        "populated": true,
+        "dimm_uid": "dfe0f1d62c388c75a30a",
+        "maker": "Example Memory",
+        "part_number": "EXM32G29R2X4-B",
+        "serial": "D0A20002",
+        "size_bytes": 34359738368,
+        "size": "32 GB",
+        "type": "DDR4 RDIMM",
+        "ranks": 2,
+        "org": "2R",
+        "speed_operating": 2666,
+        "speed_rated": 2933,
+        "speed": "2666/2933",
+        "settings": [
+          {
+            "setting": "patrol-scrub",
+            "state": "on",
+            "text": "patrol scrub"
+          },
+          {
+            "setting": "adddc",
+            "state": "on",
+            "effect": "unknown",
+            "text": "ADDDC (width not known)"
+          }
+        ],
+        "ras": "patrol scrub, ADDDC (width not known)",
+        "ce_bmc": 0,
+        "bmc_count": {
+          "ce_lifetime": 0,
+          "ce_current": 0,
+          "ue_lifetime": 0,
+          "ue_current": 0,
+          "current_since": "2026-10-02T08:15:00Z",
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "lines": [
+          {
+            "code": "inv.line.module",
+            "text": "DDR4 RDIMM; BMC: DIMM A2, DIMM.Socket.A2"
+          }
+        ]
+      },
+      {
+        "slot": "B1",
+        "bmc_names": [
+          "DIMM B1",
+          "DIMM.Socket.B1"
+        ],
+        "populated": true,
+        "dimm_uid": "d5fa2b6809a3da45c1e7",
+        "maker": "Example Memory",
+        "part_number": "EXM32G29R2X4-B",
+        "serial": "D0B10003",
+        "size_bytes": 34359738368,
+        "size": "32 GB",
+        "type": "DDR4 RDIMM",
+        "ranks": 2,
+        "org": "2R",
+        "speed_operating": 2666,
+        "speed_rated": 2933,
+        "speed": "2666/2933",
+        "settings": [
+          {
+            "setting": "patrol-scrub",
+            "state": "on",
+            "text": "patrol scrub"
+          },
+          {
+            "setting": "adddc",
+            "state": "on",
+            "effect": "unknown",
+            "text": "ADDDC (width not known)"
+          }
+        ],
+        "ras": "patrol scrub, ADDDC (width not known)",
+        "ce_bmc": 0,
+        "bmc_count": {
+          "ce_lifetime": 2,
+          "ce_current": 0,
+          "ue_lifetime": 0,
+          "ue_current": 0,
+          "current_since": "2026-10-02T08:15:00Z",
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "lines": [
+          {
+            "code": "inv.line.module",
+            "text": "DDR4 RDIMM; BMC: DIMM B1, DIMM.Socket.B1"
+          },
+          {
+            "code": "inv.line.count",
+            "args": {
+              "counts": "2 over the life of the module, 0 since the reset of 2026-10-02 08:15 UTC"
+            },
+            "text": "corrected errors the BMC counts: 2 over the life of the module, 0 since the reset of 2026-10-02 08:15 UTC"
+          }
+        ]
+      },
+      {
+        "slot": "B2",
+        "bmc_names": [
+          "DIMM B2",
+          "DIMM.Socket.B2"
+        ],
+        "populated": true,
+        "dimm_uid": "d82ddeaa351bcbf1ca50",
+        "maker": "Example Memory",
+        "part_number": "EXM32G29R2X4-B",
+        "serial": "D0B20004",
+        "size_bytes": 34359738368,
+        "size": "32 GB",
+        "type": "DDR4 RDIMM",
+        "ranks": 2,
+        "org": "2R",
+        "speed_operating": 2666,
+        "speed_rated": 2933,
+        "speed": "2666/2933",
+        "settings": [
+          {
+            "setting": "patrol-scrub",
+            "state": "on",
+            "text": "patrol scrub"
+          },
+          {
+            "setting": "adddc",
+            "state": "on",
+            "effect": "unknown",
+            "text": "ADDDC (width not known)"
+          }
+        ],
+        "ras": "patrol scrub, ADDDC (width not known)",
+        "ce_bmc": 0,
+        "lines": [
+          {
+            "code": "inv.line.module",
+            "text": "DDR4 RDIMM; BMC: DIMM B2, DIMM.Socket.B2"
+          }
+        ]
+      }
+    ],
+    "dimms": 4,
+    "slots": 4,
+    "empty_slots": 0,
+    "ras_common": "patrol scrub, ADDDC (width not known)",
+    "legend": [
+      {
+        "code": "inv.legend",
+        "text": "ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s."
+      },
+      {
+        "code": "inv.legend_ce_bmc",
+        "text": "CE BMC counts the entries about corrected errors in the logs of the BMC. No source of the operating system was read."
+      }
+    ],
+    "notes": [
+      {
+        "code": "inv.note_width",
+        "args": {
+          "n": 4,
+          "total": 4
+        },
+        "text": "4 of 4 DIMMs have no device width on record. SMBIOS and Redfish have no field for it; the EDAC driver of the host reports it where it is loaded."
+      }
+    ],
+    "sides": {
+      "os": {
+        "read": false
+      },
+      "bmc": {
+        "read": true,
+        "sources": [
+          "redfish"
+        ],
+        "from": "2026-10-02T08:16:10Z",
+        "to": "2026-11-13T09:30:00Z"
+      },
+      "common": false,
+      "lead": [
+        {
+          "code": "sides.no_os",
+          "text": "No source of the operating system was read, so there is nothing to set against the logs of the BMC."
+        }
+      ],
+      "rows": []
+    }
+  }
+}

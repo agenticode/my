@@ -1,0 +1,77 @@
+host r12-n034  Example Systems R760  BIOS 1.4.2  BMC 2.14.0
+16 DIMMs; 16 empty slots not listed (--all lists them)
+slot names and module data from SMBIOS, EDAC, the BMC at 127.0.0.1 (read 2026-11-16 03:00 UTC)
+the settings profile has no mapping for this BIOS, so the RAS column is empty; my bios says more
+
+ SLOT     SERIAL  MAKER           PART NUMBER      SIZE  ORG   SPEED      CE OS  CE BMC
+ CPU0_A1  5C331B  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.3, DIMM A3, DIMM3; EDAC: CPU_SrcID#0_MC#0_Chan#0_DIMM#0
+          corrected errors the BMC counts: 30 over the life of the module, 3 since the reset of
+          2026-11-10 00:00 UTC
+ CPU0_B1  DE7FF0  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.4, DIMM A4, DIMM4; EDAC: CPU_SrcID#0_MC#0_Chan#1_DIMM#0
+ CPU0_C1  3B9C56  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800    604       6
+          DDR5 RDIMM; BMC: BMC.Slot.1, DIMM A1, DIMM1; EDAC: CPU_SrcID#0_MC#1_Chan#0_DIMM#0
+          corrected errors the BMC counts: 10 over the life of the module, 1 since the reset of
+          2026-11-10 00:00 UTC
+          BMC log 2026-11-06 01:00 UTC: correctable ECC
+          BMC log 2026-11-07 01:00 UTC: correctable ECC
+ CPU0_D1  80D01E  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.5, DIMM A5, DIMM5; EDAC: CPU_SrcID#0_MC#1_Chan#1_DIMM#0
+ CPU0_E1  E2CD51  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.6, DIMM A6, DIMM6; EDAC: CPU_SrcID#0_MC#2_Chan#0_DIMM#0
+ CPU0_F1  2B6332  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.7, DIMM A7, DIMM7; EDAC: CPU_SrcID#0_MC#2_Chan#1_DIMM#0
+ CPU0_G1  382A8A  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.8, DIMM A8, DIMM8; EDAC: CPU_SrcID#0_MC#3_Chan#0_DIMM#0
+ CPU0_H1  4B3B31  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.9, DIMM A9, DIMM9; EDAC: CPU_SrcID#0_MC#3_Chan#1_DIMM#0
+ CPU1_A1  2C9305  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.10, DIMM A10, DIMM10; EDAC: CPU_SrcID#1_MC#0_Chan#0_DIMM#0
+ CPU1_B1  DBC9CE  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.11, DIMM A11, DIMM11; EDAC: CPU_SrcID#1_MC#0_Chan#1_DIMM#0
+ CPU1_C1  99B7F7  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.12, DIMM A12, DIMM12; EDAC: CPU_SrcID#1_MC#1_Chan#0_DIMM#0
+ CPU1_D1  2AEB41  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      4       0
+          DDR5 RDIMM; BMC: BMC.Slot.2, DIMM A2, DIMM2; EDAC: CPU_SrcID#1_MC#1_Chan#1_DIMM#0
+          corrected errors the BMC counts: 20 over the life of the module, 2 since the reset of
+          2026-11-10 00:00 UTC
+ CPU1_E1  02AC34  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.13, DIMM A13, DIMM13; EDAC: CPU_SrcID#1_MC#2_Chan#0_DIMM#0
+ CPU1_F1  848BE3  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.14, DIMM A14, DIMM14; EDAC: CPU_SrcID#1_MC#2_Chan#1_DIMM#0
+ CPU1_G1  D7A399  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.15, DIMM A15, DIMM15; EDAC: CPU_SrcID#1_MC#3_Chan#0_DIMM#0
+ CPU1_H1  55C12A  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.16, DIMM A16, DIMM16; EDAC: CPU_SrcID#1_MC#3_Chan#1_DIMM#0
+
+ ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
+ CE OS counts the corrected errors in the records of the operating system, CE BMC the entries about
+ corrected errors in the logs of the BMC, both from 2026-11-02 01:00 UTC to 2026-11-13 00:00 UTC,
+ the period both sides cover.
+
+ OS and BMC side by side, 2026-11-02 01:00 UTC to 2026-11-13 00:00 UTC. The records of the operating
+ system begin 2026-08-03 13:53 UTC, the logs of the BMC 2026-11-02 01:00 UTC.
+ The clock of the BMC was 2 minutes ahead of the machine that read it. The times of its logs are as
+ the BMC wrote them.
+ The lifetime count of the BMC covers the life of a module, and the EDAC counters of the operating
+ system start again at every boot: the two are shown and not compared.
+   - CPU0_A1: since the reset of 2026-11-10 00:00 UTC the BMC counts 3 corrected errors, the OS has
+     0
+   - CPU0_C1: the OS has 604 corrected errors, the logs of the BMC 6 entries; 1 of the entries
+     stands at the time of an OS record
+   - CPU0_C1: since the reset of 2026-11-10 00:00 UTC the BMC counts 1 corrected error, the OS has
+     206
+   - CPU1_D1: the OS has 4 corrected errors, the logs of the BMC have none
+   - CPU1_D1: since the reset of 2026-11-10 00:00 UTC the BMC counts 2 corrected errors, the OS has
+     0
+
+ Errors the OS has and the logs of the BMC lack. Candidates for the reason, none established:
+   - a threshold or a leaky bucket in the BIOS can keep corrected errors out of the logs of the BMC;
+     no such setting of this BIOS is on record
+
+ Counts since the reset that differ. Candidates for the reason, none established:
+   - the BMC counts what the firmware corrected; the OS has what the kernel reported to it and its
+     sources kept
+   - the current counts of the BMC start again when they are cleared (ClearCurrentPeriod), which can
+     be later than the reset
