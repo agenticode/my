@@ -265,8 +265,15 @@ func FuzzStoreSettings(f *testing.F) {
 		if err != nil {
 			return
 		}
-		if conn == nil || origin == "" || (cfg.Password != "" && len(cfg.Password) > 3 && strings.Contains(origin, cfg.Password) && !strings.Contains(cfg.Host+cfg.Database+cfg.Schema, cfg.Password)) {
-			t.Fatalf("connector: %v, origin %q", conn, origin)
+		// What names the store in reports does not depend on the
+		// password. (A password that is part of another word of the
+		// origin, such as "esql" of "postgresql", is no leak: an earlier
+		// form of this check took it for one.)
+		bare := cfg
+		bare.Password = ""
+		_, want, err := bare.connector()
+		if conn == nil || origin == "" || err != nil || origin != want {
+			t.Fatalf("connector: %v, origin %q; without the password %q, %v", conn, origin, want, err)
 		}
 	})
 }
