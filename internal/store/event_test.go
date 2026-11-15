@@ -661,3 +661,82 @@ func TestActionsRoundTripAndFilter(t *testing.T) {
 		t.Errorf("firmware marks = %+v", fw)
 	}
 }
+
+// The duplicate pass drops the groups it has closed while it reads, and
+// keeps the host's own records for the BMC match only when a BMC log has
+// records. With more records than one round of that holds, and errors at
+// thousands of addresses, the result is what it is for a handful: every
+// error two sources reported is counted once, the record with the better
+// grade stays, an error three seconds apart from its second report stays
+// two, and a BMC record is matched to the record of the host's own log.
+func TestMarkDuplicatesOfALongHistory(t *testing.T) {
+	s := newStore(t)
+	const n = 20000
+	base := time.Date(2026, 11, 1, 0, 0, 0, 0, time.UTC)
+	var events []*model.Event
+	for i := range n {
+		at := base.Add(time.Duration(i) * 7 * time.Second)
+		addr := uint64(0x10000000 + i*4096)
+		a := ev("rasdaemon/mc_event", fmt.Sprintf("row %d", i), at, addr)
+		a.Grade = model.GradeA
+		a.Row, a.Column, a.Bank = model.Some(i), model.Some(8), model.Some(1)
+		b := ev("klog/edac", fmt.Sprintf("line %d", i), at.Add(time.Second), addr)
+		b.Grade = model.GradeB
+		if i%1000 == 999 {
+			// Too far apart to be one error.
+			b.ErrorDT = at.Add(6 * time.Second)
+		}
+		events = append(events, a, b)
+	}
+	insert(t, s, events...)
+	got, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := n - n/1000; got != want {
+		t.Fatalf("%d records marked as duplicates, want %d", got, want)
+	}
+	// The record of the kernel log points at the record of rasdaemon.
+	rows, err := s.db.QueryContext(ctx, `SELECT d.source, p.source, d.raw_ref, p.raw_ref FROM event d JOIN event p ON p.id = d.dup_of`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	pairs := 0
+	for rows.Next() {
+		var ds, ps, dref, pref string
+		if err := rows.Scan(&ds, &ps, &dref, &pref); err != nil {
+			t.Fatal(err)
+		}
+		if ds != "klog/edac" || ps != "rasdaemon/mc_event" || strings.TrimPrefix(dref, "line ") != strings.TrimPrefix(pref, "row ") {
+			t.Fatalf("%s %q is a duplicate of %s %q", ds, dref, ps, pref)
+		}
+		pairs++
+	}
+	if pairs != got {
+		t.Errorf("%d pairs, %d duplicates", pairs, got)
+	}
+	totals, err := s.Totals(ctx, EventFilter{})
+	if err != nil || len(totals) != 1 || totals[0].CE != n+n/1000 {
+		t.Errorf("totals %+v, %v; want %d corrected errors", totals, err, n+n/1000)
+	}
+
+	// A BMC log joins late: its records for the slot are duplicates of the
+	// nearest record of the host's own logs, and a second run finds the
+	// same.
+	var bmc []*model.Event
+	for i := range 50 {
+		e := ev("sel/list", fmt.Sprintf("sel %d", i), base.Add(time.Duration(i*400)*7*time.Second+20*time.Second), 0)
+		e.OsPhysicalAddress = model.Opt[uint64]{}
+		e.Grade = model.GradeC
+		bmc = append(bmc, e)
+	}
+	insert(t, s, bmc...)
+	again, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{})
+	if err != nil || again != got+50 {
+		t.Fatalf("with a BMC log: %d duplicates, %v; want %d", again, err, got+50)
+	}
+	if third, err := s.MarkDuplicates(ctx, "h1", DuplicateTolerance{}); err != nil || third != again {
+		t.Errorf("a second run marks %d, the first %d (%v)", third, again, err)
+	}
+}

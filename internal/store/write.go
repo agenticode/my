@@ -28,7 +28,15 @@ func invalid(format string, args ...any) error {
 // Writer applies changes inside one transaction. It is only valid inside the
 // function passed to Store.Update.
 type Writer struct {
+	// ctx is the context of the update: when it ends, the next statement
+	// is not run. run is the context the statements run under, which does
+	// not end. The SQLite driver starts a goroutine for every statement
+	// whose context can end, to interrupt it; an import runs a statement
+	// per record, and that goroutine was a sixth of its CPU time. A
+	// statement of the writer is short, so stopping between two of them
+	// is as good as stopping inside one.
 	ctx   context.Context
+	run   context.Context
 	tx    *sql.Tx
 	stmts map[string]*sql.Stmt
 }
@@ -42,7 +50,7 @@ func (s *Store) Update(ctx context.Context, fn func(w *Writer) error) error {
 	if err != nil {
 		return err
 	}
-	w := &Writer{ctx: ctx, tx: tx, stmts: make(map[string]*sql.Stmt)}
+	w := &Writer{ctx: ctx, run: context.WithoutCancel(ctx), tx: tx, stmts: make(map[string]*sql.Stmt)}
 	defer w.close()
 	if err := fn(w); err != nil {
 		tx.Rollback()
@@ -62,7 +70,10 @@ func (w *Writer) stmt(query string) (*sql.Stmt, error) {
 	if st, ok := w.stmts[query]; ok {
 		return st, nil
 	}
-	st, err := w.tx.PrepareContext(w.ctx, query)
+	if err := w.ctx.Err(); err != nil {
+		return nil, err
+	}
+	st, err := w.tx.PrepareContext(w.run, query)
 	if err != nil {
 		return nil, err
 	}
@@ -71,20 +82,27 @@ func (w *Writer) stmt(query string) (*sql.Stmt, error) {
 }
 
 func (w *Writer) exec(query string, args ...any) (sql.Result, error) {
+	if err := w.ctx.Err(); err != nil {
+		return nil, err
+	}
 	st, err := w.stmt(query)
 	if err != nil {
 		return nil, err
 	}
-	return st.ExecContext(w.ctx, args...)
+	return st.ExecContext(w.run, args...)
 }
 
 func (w *Writer) queryRow(query string, args ...any) *sql.Row {
 	st, err := w.stmt(query)
 	if err != nil {
-		// Surface the prepare error through Scan.
+		// Surface the error through Scan: that of the prepare, or that
+		// of a context that has ended.
 		return w.tx.QueryRowContext(w.ctx, query, args...)
 	}
-	return st.QueryRowContext(w.ctx, args...)
+	if w.ctx.Err() != nil {
+		return w.tx.QueryRowContext(w.ctx, query, args...)
+	}
+	return st.QueryRowContext(w.run, args...)
 }
 
 func optInt(o model.Opt[int]) any {
