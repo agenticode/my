@@ -7,6 +7,7 @@ A case of a synthetic host, and what `my report` makes of it. The host, `r12-n03
 | `demo.mycase` | the case bundle, with `CPU0_C1` as its subject |
 | `demo-report.html` | the report of the case; download it and open it in a browser |
 | `figures/*.svg` | the figures of the report as files of their own |
+| `ko/demo-report.html`, `ko/figures/*.svg` | the same report and figures in Korean (`--lang ko`) |
 | `plugin/` | an example vendor analyzer, with a request and its response ([plugin/README.md](plugin/README.md)) |
 
 Look at the case with the commands of the tool:
@@ -16,10 +17,11 @@ my open examples/demo.mycase
 my open examples/demo.mycase dimm CPU0_C1
 ```
 
-The files are made by the tool. `make examples` writes the report and the figures again from the case, and a test fails when they differ from what the command writes:
+The files are made by the tool. `make examples` writes the reports and the figures again from the case, and a test fails when they differ from what the command writes:
 
 ```
 my report examples/demo.mycase -o examples/demo-report.html --figures examples/figures
+my report examples/demo.mycase -o examples/ko/demo-report.html --figures examples/ko/figures --lang ko
 ```
 
 The case itself comes from the synthetic generator (`make examples-case`):

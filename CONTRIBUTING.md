@@ -1,0 +1,87 @@
+# Contributing
+
+This page says how to report a problem, how to build and test, what a change needs, and how the source tree is laid out.
+
+## Reporting a problem
+
+Open an issue with the command line, what was printed, and the output of `my version`. For a wrong finding, the case itself helps most: `my bundle -o case.mycase --anonymize` writes it, and [docs/bundle-format.md](docs/bundle-format.md) says what the file holds and what `--anonymize` replaces. Look at the file before you attach it to a public issue.
+
+A platform whose records are decoded wrongly, or not at all, is a report worth making even without a fix: the kernel release, the EDAC driver and a few of the original log lines are enough to start.
+
+Security problems do not belong in an issue: see [SECURITY.md](SECURITY.md).
+
+## Building and testing
+
+The build needs Go 1.26 or newer. The binary is pure Go and statically linked (`CGO_ENABLED=0`).
+
+| Command | What it does |
+| --- | --- |
+| `make build` | writes `bin/my` |
+| `make test` | `go test ./...` |
+| `make lint` | `gofmt` and `go vet` |
+| `make test-race` | the tests with the race detector; it needs a C compiler and takes several minutes |
+| `make cross` | builds linux/amd64, linux/arm64 and darwin/arm64 into `dist/` |
+| `make fuzz` | runs every fuzz target for `FUZZTIME` (10 s by default) |
+| `make golden` | writes the golden files of the figures again |
+| `make examples` | writes the report and the figures under `examples/` again |
+| `make dist-check` | builds the release archives twice and compares them |
+
+CI runs `make lint`, `make test`, `make test-race` and `make cross` on every pull request, then runs the Linux binary on its own machine as a normal user and as root.
+
+Nothing in the tests needs a server with memory errors. Parsers read fixtures under `testdata/`, and `my synth` makes hosts with a known fault for the engine and the figures. `my synth -list` names the scenarios, `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).
+
+## What a change needs
+
+- Tests. A parser gets a fixture with the lines or rows it reads; a rule gets a history that fires it and one that does not.
+- An error message that says what failed and with which input. No silent fallback: a source that cannot be read is listed with the reason.
+- No write outside the output files of the command. MemorY never changes system state: no page offlining, no repair, no counter reset, no setting. A change that needs one of these does not fit the project.
+- No network access unless the command line asks for it.
+- Both languages. A message has an English and a Korean text in the message table of its package; a new one gets both.
+- The pages that describe it. `docs/rules.md`, `docs/data-model.md` and `docs/bundle-format.md` have tests that fail when a rule, a threshold, a ledger table or a manifest field is missing from them, and the screens quoted in the README and in `docs/reading-guide.md` are compared with what the commands print.
+
+After a change of the output, run `make golden` and `make examples` and read the diff: it is the review of what a user will see.
+
+## Sending a change
+
+One topic per pull request. The message of a commit says what changed and why, in plain sentences. `make lint` and `make test` pass before it is sent.
+
+Contributions are accepted under the license of the project, Apache-2.0.
+
+## Writing
+
+Documentation and help texts state what the tool does, with the command, the number or the file that shows it. They carry no praise of the tool and no claim that a test or a measurement does not back.
+
+## Layout
+
+| Path | Content |
+| --- | --- |
+| `cmd/my` | the binary and its commands |
+| `internal/model` | ledger records; the error event uses the field names of the FMFM runtime error log |
+| `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
+| `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
+| `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, the signs of a virtual machine |
+| `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
+| `internal/ingest` | runs adapters against a ledger and records what each source yielded |
+| `internal/engine` | groups the errors of a DIMM into faults, measures trend, spread and baselines, and applies the rules |
+| `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
+| `internal/term` | draws the figures as text |
+| `internal/report` | the HTML report: one file with inline SVG figures |
+| `internal/fmfmlog` | records and findings in the forms of the FMFM framework |
+| `internal/plugin` | the vendor analyzer contract: request, response, the run of the program, the checks |
+| `internal/bundle` | case bundles: format, checks, anonymizing |
+| `internal/outfile` | writes output files whole or not at all, and never in place of a device |
+| `internal/redfish` | the read-only Redfish client and the collection of `my collect redfish` |
+| `internal/exporter`, `internal/serve` | the Prometheus metrics and the HTTP server of `my serve` |
+| `internal/eval` | replays a field dataset through the engine and compares the findings with the failure tickets |
+| `internal/injection`, `internal/labcase` | injection plans, and tests over the captures of real hosts |
+| `internal/i18n` | message templates in English and Korean |
+| `internal/synth` | synthetic hosts and error histories |
+| `internal/cli`, `internal/buildinfo` | flag parsing, exit codes, the version stamp |
+| `internal/testutil`, `internal/testledger`, `internal/testcapture` | helpers of the tests |
+| `testdata` | fixtures for every adapter; `testdata/real` holds captures of real hosts with their injection plans |
+| `examples` | the example case with its report and figures, and an example vendor analyzer |
+| `contrib` | for the exporter: systemd units, alert rules with their tests, Alertmanager routes, a Grafana dashboard |
+| `tools/dist` | builds the release archives, the same bytes for the same commit |
+| `tools/lab` | scripts that inject errors on a lab host and capture what it recorded |
+| `tools/validate` | runs the binary against the host it is on ([docs/validation.md](docs/validation.md)) |
+| `docs` | the pages listed in the README |
