@@ -594,6 +594,7 @@ section#s7.sec
   p: Every source that was looked for was read in full.
   ### Remarks of the sources
   li: klog: 807 lines read
+  li: klog: covers 2026-10-28 01:30 to 2026-11-12 23:49 UTC
   li: smbios: SMBIOS 3.5
   li: smbios: 32 memory slots, 16 populated
   li: slot-map: all 32 EDAC DIMM positions are tied to SMBIOS slots

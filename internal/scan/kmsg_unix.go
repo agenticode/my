@@ -3,6 +3,7 @@
 package scan
 
 import (
+	"bytes"
 	"errors"
 	"syscall"
 )
@@ -15,9 +16,12 @@ func openKmsg(path string) (int, error) {
 
 func closeKmsg(fd int) { _ = syscall.Close(fd) }
 
-// readKmsg reads the records in the ring buffer. Each read returns one
-// record. lost counts the times the kernel reported that records were
-// overwritten before they could be read.
+// readKmsg reads the records in the ring buffer. The device returns one
+// whole record per read. A plain file, which stands in for the device in a
+// copy of a host and in tests, returns as much as fits the buffer, so a
+// read can end in the middle of a line: what follows the last line end is
+// kept for the next read. lost counts the times the kernel reported that
+// records were overwritten before they could be read.
 func readKmsg(path string, limit int) (text []byte, lost int, err error) {
 	fd, err := openKmsg(path)
 	if err != nil {
@@ -25,6 +29,7 @@ func readKmsg(path string, limit int) (text []byte, lost int, err error) {
 	}
 	defer closeKmsg(fd)
 	buf := make([]byte, 64<<10)
+	var rest []byte
 	for len(text) < limit {
 		n, err := syscall.Read(fd, buf)
 		switch {
@@ -34,16 +39,20 @@ func readKmsg(path string, limit int) (text []byte, lost int, err error) {
 			lost++ // the reader was overtaken: the next read continues
 			continue
 		case errors.Is(err, syscall.EAGAIN):
-			return text, lost, nil // the end of the buffer
+			return records(text, rest), lost, nil // the end of the buffer
 		case err != nil:
-			if len(text) > 0 {
+			if text = records(text, rest); len(text) > 0 {
 				return text, lost, nil
 			}
 			return nil, lost, err
 		case n == 0:
-			return text, lost, nil // a plain file: end of file
+			return records(text, rest), lost, nil // a plain file: end of file
 		}
-		text = records(text, buf[:n])
+		rest = append(rest, buf[:n]...)
+		if end := bytes.LastIndexByte(rest, '\n'); end >= 0 {
+			text = records(text, rest[:end+1])
+			rest = append(rest[:0], rest[end+1:]...)
+		}
 	}
-	return text, lost, nil
+	return records(text, rest), lost, nil
 }

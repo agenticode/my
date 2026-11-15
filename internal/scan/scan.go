@@ -10,10 +10,10 @@
 //
 //	host facts   /proc and /sys/class/dmi: host name, kernel, boot time
 //	rasdaemon    the SQLite database rasdaemon keeps
-//	kernel log   the systemd journal of every boot on record; where that
-//	             cannot be read, the kernel ring buffer of the running
-//	             boot (/dev/kmsg); where that cannot be read either, the
-//	             first log file found under /var/log
+//	kernel log   the systemd journal of every boot on record, and the
+//	             kernel ring buffer of the running boot (/dev/kmsg);
+//	             where neither can be read, the first log file found
+//	             under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
 //	mcelog       on a live host with the mcelog program, the counts its
@@ -365,11 +365,18 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 	var out []adapter.Adapter
 
 	if opts.Live {
+		// The journal and the ring buffer are read together. The journal
+		// holds the boots before this one; the ring buffer holds what the
+		// kernel said since this boot, also after the journal has dropped
+		// it to make room. A line that is in both has the same stamp and
+		// the same text in both and is stored once.
+		journalRead := false
 		if prog := journalctl(opts); prog != "" {
 			j := &journal{prog: prog, timeout: opts.JournalTimeout, opts: kopts}
 			switch status, detail := j.probe(ctx); status {
 			case model.SourceOK:
-				return []adapter.Adapter{j}
+				out = append(out, j)
+				journalRead = true
 			case model.SourceUnreadable, model.SourceError:
 				out = append(out, report{kind: klog.Kind, origin: j.Origin(), status: status, detail: detail})
 			}
@@ -379,7 +386,14 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 		case model.SourceOK:
 			return append(out, k)
 		case model.SourceUnreadable, model.SourceError:
-			out = append(out, report{kind: klog.Kind, origin: k.Origin(), status: status, detail: detail})
+			// With the journal read, a ring buffer that is closed takes
+			// little away and is no line of its own.
+			if !journalRead {
+				out = append(out, report{kind: klog.Kind, origin: k.Origin(), status: status, detail: detail})
+			}
+		}
+		if journalRead {
+			return out
 		}
 	}
 

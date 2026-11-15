@@ -80,6 +80,8 @@ var Messages = i18n.Catalog{
 	"ov.sources":      {EN: "sources", KO: "소스"},
 	"ov.source":       {EN: "{kind} {n} {n|record|records}", KO: "{kind} {n}건"},
 	"ov.source_empty": {EN: "{kind} without records", KO: "{kind} 기록 없음"},
+	"src.journal":     {EN: "journal", KO: "저널"},
+	"src.kmsg":        {EN: "ring buffer", KO: "링 버퍼"},
 	"ov.quiet":        {EN: "{n} {n|DIMM|DIMMs} without errors", KO: "오류 없는 DIMM {n}개"},
 	"ov.loose":        {EN: "{n} {n|error|errors} of this host {n|is|are} tied to no DIMM", KO: "이 호스트의 오류 {n}건은 어느 DIMM에도 묶이지 않음"},
 	"ov.loose_pages":  {EN: "{n} page {n|offline|offlines} of this host {n|is|are} tied to no DIMM", KO: "이 호스트의 page offline {n}건은 어느 DIMM에도 묶이지 않음"},

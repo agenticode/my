@@ -615,7 +615,8 @@ func TestOtherDMILinesAreNotTheMachine(t *testing.T) {
 	if rep.Status != model.SourceOK {
 		t.Fatalf("report = %+v", rep)
 	}
-	if len(c.Hosts) != 1 || c.Hosts[0].SystemProduct != "Microsoft Corporation Virtual Machine/Virtual Machine" {
+	// The board of this machine repeats the product name and is left out.
+	if len(c.Hosts) != 1 || c.Hosts[0].SystemProduct != "Microsoft Corporation Virtual Machine" {
 		t.Errorf("hosts = %+v", c.Hosts)
 	}
 	if len(c.Boots) != 1 || c.Boots[0].BIOS != "Hyper-V UEFI Release v4.1 08/23/2024" || c.Boots[0].Kernel != "6.11.0-1018-azure" {
