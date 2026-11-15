@@ -49,6 +49,9 @@ type AddressMap struct {
 	// Scale holds the lower bounds of the four shades above zero.
 	Scale []int64   `json:"scale"`
 	Lines []MapLine `json:"lines"`
+	// Refs point from the cells that hold errors to the ledger records
+	// behind them, line by line.
+	Refs []CellRef `json:"refs,omitzero"`
 	// Marks point at the columns of column faults.
 	Marks []ColumnMark `json:"marks,omitzero"`
 	// Faults are the faults that have errors in the bank, the largest
@@ -98,6 +101,33 @@ type MapLine struct {
 	Errors int64 `json:"errors,omitzero"`
 	// Note says what the line shows, where a fault explains it.
 	Note *Text `json:"note,omitzero"`
+}
+
+// MaxCellUE bounds CellRef.UE.
+const MaxCellUE = 3
+
+// CellRef points from one cell of the grid to the ledger records behind
+// it: a point of the figure leads back to the original records.
+type CellRef struct {
+	// Line is the index of the line in AddressMap.Lines, and Cell the
+	// index of the cell in that line.
+	Line int `json:"line"`
+	Cell int `json:"cell"`
+	// Errors is the number of errors in the cell, UEs the uncorrected ones
+	// among them, and Records the number of ledger records they come from.
+	Errors  int64 `json:"errors"`
+	UEs     int64 `json:"ues,omitzero"`
+	Records int   `json:"records"`
+	// First and Last are the IDs of the earliest and the latest record of
+	// the cell. From and To are their times; they are unset when the
+	// records carry seconds since boot only.
+	First int64     `json:"first"`
+	Last  int64     `json:"last"`
+	From  time.Time `json:"from,omitzero"`
+	To    time.Time `json:"to,omitzero"`
+	// UE lists the IDs of the records of uncorrected errors, up to
+	// MaxCellUE of them, the earliest first.
+	UE []int64 `json:"ue,omitzero"`
 }
 
 // ColumnMark points at one cell of the column axis.
@@ -277,7 +307,10 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		}
 	}
 	type cellKey struct{ row, col int }
-	type cellVal struct{ ce, ue int64 }
+	type cellVal struct {
+		ce, ue int64
+		refs   cellRefs
+	}
 	type faultStat struct {
 		errors, ue  int64
 		rows, cols  map[int]struct{}
@@ -312,6 +345,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		} else {
 			v.ce += n
 		}
+		v.refs.add(e, ue)
 		colMax = max(colMax, e.Column.V)
 
 		fi, ok := faultOf[e.ID]
@@ -407,7 +441,19 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		ln := MapLine{Row: row, Rows: n, Cells: make([]int64, nCells)}
 		return ln
 	}
-	fill := func(ln *MapLine) {
+	// refs collects, per line and cell of the grid, the records behind it.
+	type gridKey struct{ line, cell int }
+	refs := map[gridKey]*cellRefs{}
+	refer := func(line, cell int, v *cellVal) {
+		k := gridKey{line, cell}
+		r := refs[k]
+		if r == nil {
+			r = &cellRefs{}
+			refs[k] = r
+		}
+		r.merge(&v.refs)
+	}
+	fill := func(index int, ln *MapLine) {
 		ue := map[int]bool{}
 		for k, v := range cells {
 			if k.row < ln.Row || k.row >= ln.Row+ln.Rows {
@@ -419,6 +465,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			if v.ue > 0 {
 				ue[i] = true
 			}
+			refer(index, i, v)
 		}
 		for i := range ue {
 			ln.UE = append(ln.UE, i)
@@ -433,6 +480,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	case need <= maxLines:
 		m.Mode, m.RowsPerLine = MapRows, 1
 		byRow := map[int]*MapLine{}
+		lineOf := map[int]int{}
 		for i, s := range spans {
 			if i > 0 {
 				prev := spans[i-1].hi
@@ -445,6 +493,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		for i := range m.Lines {
 			if !m.Lines[i].Gap {
 				byRow[m.Lines[i].Row] = &m.Lines[i]
+				lineOf[m.Lines[i].Row] = i
 			}
 		}
 		// One pass over the cells instead of one per line.
@@ -461,6 +510,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 				ue[cellKey{k.row, i}] = true
 				ln.UE = append(ln.UE, i)
 			}
+			refer(lineOf[k.row], i, v)
 		}
 		for i := range m.Lines {
 			sort.Ints(m.Lines[i].UE)
@@ -475,10 +525,20 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		m.Mode, m.RowsPerLine = MapBins, step
 		for r := lo; r <= hi; r += step {
 			ln := line(r, step)
-			fill(&ln)
+			fill(len(m.Lines), &ln)
 			m.Lines = append(m.Lines, ln)
 		}
 	}
+	for k, r := range refs {
+		m.Refs = append(m.Refs, r.ref(k.line, k.cell))
+	}
+	sort.Slice(m.Refs, func(i, j int) bool {
+		a, b := m.Refs[i], m.Refs[j]
+		if a.Line != b.Line {
+			return a.Line < b.Line
+		}
+		return a.Cell < b.Cell
+	})
 
 	// What the faults have in this bank, and what the lines show.
 	order := make([]int, 0, len(stats))
@@ -556,6 +616,84 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		}
 	}
 	return m, nil
+}
+
+// cellRefs gathers what a CellRef says about a set of records.
+type cellRefs struct {
+	errors, ues int64
+	records     int
+	first, last recordAt
+	ue          []recordAt
+}
+
+// recordAt is a record and where it stands in time. Records that carry
+// seconds since boot only come before the dated ones, as in the ledger.
+type recordAt struct {
+	id    int64
+	at    time.Time
+	dated bool
+}
+
+func (a recordAt) before(b recordAt) bool {
+	if !a.at.Equal(b.at) {
+		return a.at.Before(b.at)
+	}
+	return a.id < b.id
+}
+
+func (c *cellRefs) add(e *model.Event, ue bool) {
+	n := int64(e.Errors())
+	r := recordAt{id: e.ID, at: e.ErrorDT, dated: e.TimeQuality != model.TimeRelative}
+	c.errors += n
+	if c.records == 0 || r.before(c.first) {
+		c.first = r
+	}
+	if c.records == 0 || c.last.before(r) {
+		c.last = r
+	}
+	c.records++
+	if ue {
+		c.ues += n
+		c.ue = append(c.ue, r)
+		c.trim()
+	}
+}
+
+func (c *cellRefs) merge(o *cellRefs) {
+	if o.records == 0 {
+		return
+	}
+	if c.records == 0 || o.first.before(c.first) {
+		c.first = o.first
+	}
+	if c.records == 0 || c.last.before(o.last) {
+		c.last = o.last
+	}
+	c.errors, c.ues, c.records = c.errors+o.errors, c.ues+o.ues, c.records+o.records
+	c.ue = append(c.ue, o.ue...)
+	c.trim()
+}
+
+// trim keeps the earliest MaxCellUE records of uncorrected errors.
+func (c *cellRefs) trim() {
+	sort.Slice(c.ue, func(i, j int) bool { return c.ue[i].before(c.ue[j]) })
+	if len(c.ue) > MaxCellUE {
+		c.ue = c.ue[:MaxCellUE]
+	}
+}
+
+func (c *cellRefs) ref(line, cell int) CellRef {
+	r := CellRef{Line: line, Cell: cell, Errors: c.errors, UEs: c.ues, Records: c.records, First: c.first.id, Last: c.last.id}
+	if c.first.dated {
+		r.From = c.first.at
+	}
+	if c.last.dated {
+		r.To = c.last.at
+	}
+	for _, u := range c.ue {
+		r.UE = append(r.UE, u.id)
+	}
+	return r
 }
 
 // FaultName names a fault by its mode: "row fault", "system issue".

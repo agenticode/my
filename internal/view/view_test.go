@@ -875,3 +875,230 @@ func TestOverviewSaysWhatRootWouldAdd(t *testing.T) {
 		t.Errorf("Korean root line = %+v, %v", kov.Root, err)
 	}
 }
+
+// TestRecordReferences checks that a point of a figure leads back to the
+// ledger records behind it: the cells of an address map, the events of a
+// timeline and the statements of a finding.
+func TestRecordReferences(t *testing.T) {
+	c, h := open(t, "demo", "", i18n.EN)
+	d := find(t, c, h, "CPU0_C1")
+	s := c.Store()
+
+	// Address map, one row per line: every cell with errors has a
+	// reference, and the references add up to the errors of the grid.
+	m, err := c.AddressMap(ctx, h, d, MapOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkRefs := func(m *AddressMap) {
+		t.Helper()
+		type key struct{ line, cell int }
+		seen := map[key]bool{}
+		var errs int64
+		records := 0
+		for i, r := range m.Refs {
+			if i > 0 && (m.Refs[i-1].Line > r.Line || (m.Refs[i-1].Line == r.Line && m.Refs[i-1].Cell >= r.Cell)) {
+				t.Errorf("references out of order at %d: %+v", i, r)
+			}
+			ln := m.Lines[r.Line]
+			if ln.Gap || ln.Cells[r.Cell] != r.Errors || r.Records == 0 || r.First == 0 || r.Last == 0 || len(r.UE) > MaxCellUE {
+				t.Errorf("reference %+v does not match line %+v", r, ln)
+			}
+			if r.From.After(r.To) || (r.Records == 1 && r.First != r.Last) {
+				t.Errorf("reference %+v: first and last disagree", r)
+			}
+			seen[key{r.Line, r.Cell}] = true
+			errs += r.Errors
+			records += r.Records
+			// The records are in the cell they are said to be in.
+			for _, id := range append([]int64{r.First, r.Last}, r.UE...) {
+				e, err := s.Event(ctx, id)
+				if err != nil || e == nil {
+					t.Fatalf("record %d: %v", id, err)
+				}
+				if e.Row.V < ln.Row || e.Row.V >= ln.Row+ln.Rows || e.Column.V/m.ColumnsPerCell != r.Cell {
+					t.Errorf("record %d (row %#x col %#x) is not in line %#x cell %d", id, e.Row.V, e.Column.V, ln.Row, r.Cell)
+				}
+			}
+			for _, id := range r.UE {
+				if e, _ := s.Event(ctx, id); e == nil || !e.ErrorSeverity.Uncorrected() {
+					t.Errorf("record %d is listed as an uncorrected error", id)
+				}
+			}
+			if (len(r.UE) > 0) != (r.UEs > 0) {
+				t.Errorf("reference %+v: uncorrected errors and their records disagree", r)
+			}
+		}
+		for li, ln := range m.Lines {
+			for ci, n := range ln.Cells {
+				if (n > 0) != seen[key{li, ci}] {
+					t.Errorf("line %d cell %d holds %d errors, reference %v", li, ci, n, seen[key{li, ci}])
+				}
+			}
+		}
+		if errs != m.Located-otherBanks(m) || records == 0 {
+			t.Errorf("references cover %d errors in %d records, the bank holds %d", errs, records, m.Located-otherBanks(m))
+		}
+	}
+	checkRefs(m)
+	var ue *CellRef
+	for i := range m.Refs {
+		if m.Refs[i].UEs > 0 {
+			ue = &m.Refs[i]
+		}
+	}
+	if ue == nil || ue.Line != 3 || ue.Cell != 0x238/32 || ue.UEs != 1 || len(ue.UE) != 1 || ue.From.IsZero() || !ue.To.After(ue.From) {
+		t.Errorf("the cell of the uncorrected error = %+v", ue)
+	}
+
+	// Lines that stand for many rows.
+	cb, hb := open(t, "bank", "", i18n.EN)
+	mb, err := cb.AddressMap(ctx, hb, hb.DIMMs[0], MapOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if mb.Mode != MapBins || len(mb.Refs) < 300 {
+		t.Fatalf("bank fault: mode %s, %d references", mb.Mode, len(mb.Refs))
+	}
+	s = cb.Store()
+	checkRefs(mb)
+	s = c.Store()
+
+	// Timeline: every event is there with the record it comes from.
+	tl, err := c.Timeline(ctx, h, d, TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, g := range tl.Markers {
+		if len(g.Marks) == 0 || len(g.Marks) > MaxMarks {
+			t.Errorf("%s: %d marks", g.Kind, len(g.Marks))
+		}
+		n := 0
+		days := map[int]bool{}
+		for i, mk := range g.Marks {
+			if i > 0 && mk.At.Before(g.Marks[i-1].At) {
+				t.Errorf("%s: marks out of order", g.Kind)
+			}
+			if mk.Text.Text == "" || mk.Count < 1 || mk.Day < 0 || mk.Day >= tl.Days {
+				t.Errorf("%s: mark %+v", g.Kind, mk)
+			}
+			n += mk.Count
+			days[mk.Day] = true
+			switch g.Kind {
+			case MarkBoot, MarkMove:
+				if mk.Record != nil {
+					t.Errorf("%s: a boot or a move has no original record: %+v", g.Kind, mk.Record)
+				}
+			case MarkUE:
+				e, _ := s.Event(ctx, mk.Record.ID)
+				if mk.Record.Kind != model.RecordEvent || e == nil || !e.ErrorSeverity.Uncorrected() || e.RawRef != mk.Record.RawRef {
+					t.Errorf("UE mark %+v", mk.Record)
+				}
+			default:
+				if mk.Record == nil || mk.Record.Kind != model.RecordAction || mk.Record.ID == 0 || mk.Record.RawRef == "" {
+					t.Errorf("%s: mark without its action: %+v", g.Kind, mk.Record)
+				}
+			}
+		}
+		if n != g.Count || len(days) != len(g.Days) {
+			t.Errorf("%s: marks add up to %d on %d days, the group says %d on %d", g.Kind, n, len(days), g.Count, len(g.Days))
+		}
+	}
+
+	// A finding: the statements cite records, the first and the last of
+	// them as the card prints them.
+	card, err := c.Card(ctx, h, d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cited := 0
+	for _, e := range card.Evidence {
+		if e.Records == 0 {
+			if len(e.Cited) != 0 {
+				t.Errorf("%s cites records and counts none", e.Code)
+			}
+			continue
+		}
+		if len(e.Cited) == 0 || len(e.Cited) > e.Records || e.Cited[0].RawRef != e.First || e.Cited[len(e.Cited)-1].RawRef != e.Last {
+			t.Errorf("%s: %d records, cited %+v, first %q, last %q", e.Code, e.Records, e.Cited, e.First, e.Last)
+		}
+		cited += len(e.Cited)
+	}
+	if cited < 4 {
+		t.Errorf("the finding cites %d records", cited)
+	}
+}
+
+// otherBanks returns the located errors of a DIMM outside the bank that
+// is drawn.
+func otherBanks(m *AddressMap) int64 {
+	var n int64
+	for _, b := range m.Banks {
+		if b.Label != m.Bank.Label {
+			n += b.Errors
+		}
+	}
+	return n
+}
+
+// TestTimelineKeepsTheLatestMarks checks the bound on the events a marker
+// group lists one by one.
+func TestTimelineKeepsTheLatestMarks(t *testing.T) {
+	dir := t.TempDir()
+	s, err := store.Open(ctx, filepath.Join(dir, "many.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	start := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	const pages = MaxMarks + 40
+	err = s.Update(ctx, func(w *store.Writer) error {
+		if err := w.UpsertHost(&model.Host{Name: "h"}); err != nil {
+			return err
+		}
+		for i := range pages {
+			at := start.Add(time.Duration(i) * time.Hour)
+			a := &model.Action{Host: "h", At: at, TimeQuality: model.TimeExact, Kind: model.ActionPageOffline, Result: model.ResultOK,
+				OsPhysicalAddress: model.Some(uint64(0x1000 * (i + 1))), Slot: "A1", Source: "test", RawRef: "t#" + at.Format(time.RFC3339),
+				Fingerprint: model.Fingerprint("page", at.String())}
+			if _, err := w.InsertAction(a); err != nil {
+				return err
+			}
+			e := &model.Event{Host: "h", Kind: model.KindError, ErrorDT: at, ErrorSeverity: model.SevCE, Slot: "A1", Count: 1,
+				Source: "test", RawRef: "e#" + at.Format(time.RFC3339), Grade: model.GradeC, TimeQuality: model.TimeExact,
+				Fingerprint: model.Fingerprint("event", at.String())}
+			if _, err := w.InsertEvent(e); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := Open(ctx, s, i18n.EN, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h, err := c.Host("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tl, err := c.Timeline(ctx, h, nil, TimelineOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var g *MarkerGroup
+	for i := range tl.Markers {
+		if tl.Markers[i].Kind == string(model.ActionPageOffline) {
+			g = &tl.Markers[i]
+		}
+	}
+	if g == nil || g.Count != pages || len(g.Marks) != MaxMarks {
+		t.Fatalf("page offlines: %+v", g)
+	}
+	last := start.Add((pages - 1) * time.Hour)
+	if !g.Marks[MaxMarks-1].At.Equal(last) || !g.Marks[0].At.Equal(last.Add(-(MaxMarks-1)*time.Hour)) {
+		t.Errorf("the marks run from %v to %v, want the latest %d up to %v", g.Marks[0].At, g.Marks[MaxMarks-1].At, MaxMarks, last)
+	}
+}

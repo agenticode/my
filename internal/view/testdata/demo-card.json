@@ -37,7 +37,14 @@
       "text": "1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
       "records": 1,
       "first": "synth:demo#event1228",
-      "last": "synth:demo#event1228"
+      "last": "synth:demo#event1228",
+      "cited": [
+        {
+          "kind": "event",
+          "id": 1228,
+          "raw_ref": "synth:demo#event1228"
+        }
+      ]
     },
     {
       "rule": "R-ROW-03",
@@ -53,7 +60,109 @@
       "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before",
       "records": 421,
       "first": "synth:demo#event863",
-      "last": "synth:demo#event1285"
+      "last": "synth:demo#event1285",
+      "cited": [
+        {
+          "kind": "event",
+          "id": 863,
+          "raw_ref": "synth:demo#event863"
+        },
+        {
+          "kind": "event",
+          "id": 864,
+          "raw_ref": "synth:demo#event864"
+        },
+        {
+          "kind": "event",
+          "id": 865,
+          "raw_ref": "synth:demo#event865"
+        },
+        {
+          "kind": "event",
+          "id": 866,
+          "raw_ref": "synth:demo#event866"
+        },
+        {
+          "kind": "event",
+          "id": 867,
+          "raw_ref": "synth:demo#event867"
+        },
+        {
+          "kind": "event",
+          "id": 868,
+          "raw_ref": "synth:demo#event868"
+        },
+        {
+          "kind": "event",
+          "id": 869,
+          "raw_ref": "synth:demo#event869"
+        },
+        {
+          "kind": "event",
+          "id": 870,
+          "raw_ref": "synth:demo#event870"
+        },
+        {
+          "kind": "event",
+          "id": 871,
+          "raw_ref": "synth:demo#event871"
+        },
+        {
+          "kind": "event",
+          "id": 872,
+          "raw_ref": "synth:demo#event872"
+        },
+        {
+          "kind": "event",
+          "id": 1276,
+          "raw_ref": "synth:demo#event1276"
+        },
+        {
+          "kind": "event",
+          "id": 1277,
+          "raw_ref": "synth:demo#event1277"
+        },
+        {
+          "kind": "event",
+          "id": 1278,
+          "raw_ref": "synth:demo#event1278"
+        },
+        {
+          "kind": "event",
+          "id": 1279,
+          "raw_ref": "synth:demo#event1279"
+        },
+        {
+          "kind": "event",
+          "id": 1280,
+          "raw_ref": "synth:demo#event1280"
+        },
+        {
+          "kind": "event",
+          "id": 1281,
+          "raw_ref": "synth:demo#event1281"
+        },
+        {
+          "kind": "event",
+          "id": 1282,
+          "raw_ref": "synth:demo#event1282"
+        },
+        {
+          "kind": "event",
+          "id": 1283,
+          "raw_ref": "synth:demo#event1283"
+        },
+        {
+          "kind": "event",
+          "id": 1284,
+          "raw_ref": "synth:demo#event1284"
+        },
+        {
+          "kind": "event",
+          "id": 1285,
+          "raw_ref": "synth:demo#event1285"
+        }
+      ]
     },
     {
       "rule": "R-ROW-03",
@@ -69,7 +178,109 @@
       "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows",
       "records": 1232,
       "first": "synth:demo#event30",
-      "last": "synth:demo#event1285"
+      "last": "synth:demo#event1285",
+      "cited": [
+        {
+          "kind": "event",
+          "id": 30,
+          "raw_ref": "synth:demo#event30"
+        },
+        {
+          "kind": "event",
+          "id": 32,
+          "raw_ref": "synth:demo#event32"
+        },
+        {
+          "kind": "event",
+          "id": 33,
+          "raw_ref": "synth:demo#event33"
+        },
+        {
+          "kind": "event",
+          "id": 34,
+          "raw_ref": "synth:demo#event34"
+        },
+        {
+          "kind": "event",
+          "id": 35,
+          "raw_ref": "synth:demo#event35"
+        },
+        {
+          "kind": "event",
+          "id": 36,
+          "raw_ref": "synth:demo#event36"
+        },
+        {
+          "kind": "event",
+          "id": 38,
+          "raw_ref": "synth:demo#event38"
+        },
+        {
+          "kind": "event",
+          "id": 39,
+          "raw_ref": "synth:demo#event39"
+        },
+        {
+          "kind": "event",
+          "id": 40,
+          "raw_ref": "synth:demo#event40"
+        },
+        {
+          "kind": "event",
+          "id": 42,
+          "raw_ref": "synth:demo#event42"
+        },
+        {
+          "kind": "event",
+          "id": 1276,
+          "raw_ref": "synth:demo#event1276"
+        },
+        {
+          "kind": "event",
+          "id": 1277,
+          "raw_ref": "synth:demo#event1277"
+        },
+        {
+          "kind": "event",
+          "id": 1278,
+          "raw_ref": "synth:demo#event1278"
+        },
+        {
+          "kind": "event",
+          "id": 1279,
+          "raw_ref": "synth:demo#event1279"
+        },
+        {
+          "kind": "event",
+          "id": 1280,
+          "raw_ref": "synth:demo#event1280"
+        },
+        {
+          "kind": "event",
+          "id": 1281,
+          "raw_ref": "synth:demo#event1281"
+        },
+        {
+          "kind": "event",
+          "id": 1282,
+          "raw_ref": "synth:demo#event1282"
+        },
+        {
+          "kind": "event",
+          "id": 1283,
+          "raw_ref": "synth:demo#event1283"
+        },
+        {
+          "kind": "event",
+          "id": 1284,
+          "raw_ref": "synth:demo#event1284"
+        },
+        {
+          "kind": "event",
+          "id": 1285,
+          "raw_ref": "synth:demo#event1285"
+        }
+      ]
     },
     {
       "rule": "R-ROW-03",
@@ -92,7 +303,114 @@
       "text": "764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28",
       "records": 765,
       "first": "synth:demo#action1",
-      "last": "synth:demo#event1285"
+      "last": "synth:demo#event1285",
+      "cited": [
+        {
+          "kind": "action",
+          "id": 1,
+          "raw_ref": "synth:demo#action1"
+        },
+        {
+          "kind": "event",
+          "id": 489,
+          "raw_ref": "synth:demo#event489"
+        },
+        {
+          "kind": "event",
+          "id": 490,
+          "raw_ref": "synth:demo#event490"
+        },
+        {
+          "kind": "event",
+          "id": 491,
+          "raw_ref": "synth:demo#event491"
+        },
+        {
+          "kind": "event",
+          "id": 492,
+          "raw_ref": "synth:demo#event492"
+        },
+        {
+          "kind": "event",
+          "id": 493,
+          "raw_ref": "synth:demo#event493"
+        },
+        {
+          "kind": "event",
+          "id": 494,
+          "raw_ref": "synth:demo#event494"
+        },
+        {
+          "kind": "event",
+          "id": 495,
+          "raw_ref": "synth:demo#event495"
+        },
+        {
+          "kind": "event",
+          "id": 496,
+          "raw_ref": "synth:demo#event496"
+        },
+        {
+          "kind": "event",
+          "id": 497,
+          "raw_ref": "synth:demo#event497"
+        },
+        {
+          "kind": "event",
+          "id": 498,
+          "raw_ref": "synth:demo#event498"
+        },
+        {
+          "kind": "event",
+          "id": 1276,
+          "raw_ref": "synth:demo#event1276"
+        },
+        {
+          "kind": "event",
+          "id": 1277,
+          "raw_ref": "synth:demo#event1277"
+        },
+        {
+          "kind": "event",
+          "id": 1278,
+          "raw_ref": "synth:demo#event1278"
+        },
+        {
+          "kind": "event",
+          "id": 1279,
+          "raw_ref": "synth:demo#event1279"
+        },
+        {
+          "kind": "event",
+          "id": 1280,
+          "raw_ref": "synth:demo#event1280"
+        },
+        {
+          "kind": "event",
+          "id": 1281,
+          "raw_ref": "synth:demo#event1281"
+        },
+        {
+          "kind": "event",
+          "id": 1282,
+          "raw_ref": "synth:demo#event1282"
+        },
+        {
+          "kind": "event",
+          "id": 1283,
+          "raw_ref": "synth:demo#event1283"
+        },
+        {
+          "kind": "event",
+          "id": 1284,
+          "raw_ref": "synth:demo#event1284"
+        },
+        {
+          "kind": "event",
+          "id": 1285,
+          "raw_ref": "synth:demo#event1285"
+        }
+      ]
     }
   ],
   "checks": [

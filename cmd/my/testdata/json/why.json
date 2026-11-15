@@ -45,7 +45,109 @@
           "text": "one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days",
           "records": 53,
           "first": "synth:demo#event1",
-          "last": "synth:demo#event971"
+          "last": "synth:demo#event971",
+          "cited": [
+            {
+              "kind": "event",
+              "id": 1,
+              "raw_ref": "synth:demo#event1"
+            },
+            {
+              "kind": "event",
+              "id": 2,
+              "raw_ref": "synth:demo#event2"
+            },
+            {
+              "kind": "event",
+              "id": 3,
+              "raw_ref": "synth:demo#event3"
+            },
+            {
+              "kind": "event",
+              "id": 4,
+              "raw_ref": "synth:demo#event4"
+            },
+            {
+              "kind": "event",
+              "id": 5,
+              "raw_ref": "synth:demo#event5"
+            },
+            {
+              "kind": "event",
+              "id": 6,
+              "raw_ref": "synth:demo#event6"
+            },
+            {
+              "kind": "event",
+              "id": 7,
+              "raw_ref": "synth:demo#event7"
+            },
+            {
+              "kind": "event",
+              "id": 8,
+              "raw_ref": "synth:demo#event8"
+            },
+            {
+              "kind": "event",
+              "id": 9,
+              "raw_ref": "synth:demo#event9"
+            },
+            {
+              "kind": "event",
+              "id": 10,
+              "raw_ref": "synth:demo#event10"
+            },
+            {
+              "kind": "event",
+              "id": 388,
+              "raw_ref": "synth:demo#event388"
+            },
+            {
+              "kind": "event",
+              "id": 392,
+              "raw_ref": "synth:demo#event392"
+            },
+            {
+              "kind": "event",
+              "id": 480,
+              "raw_ref": "synth:demo#event480"
+            },
+            {
+              "kind": "event",
+              "id": 603,
+              "raw_ref": "synth:demo#event603"
+            },
+            {
+              "kind": "event",
+              "id": 638,
+              "raw_ref": "synth:demo#event638"
+            },
+            {
+              "kind": "event",
+              "id": 658,
+              "raw_ref": "synth:demo#event658"
+            },
+            {
+              "kind": "event",
+              "id": 798,
+              "raw_ref": "synth:demo#event798"
+            },
+            {
+              "kind": "event",
+              "id": 849,
+              "raw_ref": "synth:demo#event849"
+            },
+            {
+              "kind": "event",
+              "id": 919,
+              "raw_ref": "synth:demo#event919"
+            },
+            {
+              "kind": "event",
+              "id": 971,
+              "raw_ref": "synth:demo#event971"
+            }
+          ]
         }
       ],
       "checks": [],
