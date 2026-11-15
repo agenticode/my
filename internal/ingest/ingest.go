@@ -58,6 +58,9 @@ type Result struct {
 	// Duplicates is the number of records of the host that are marked as
 	// duplicates of another record after the run.
 	Duplicates int
+	// Aligned says what was done with boots whose records carry no exact
+	// time (see store.AlignTimes).
+	Aligned []store.Alignment
 }
 
 // HostHinter is implemented by adapters that can name the host before any
@@ -69,6 +72,10 @@ type HostHinter interface {
 // SlotMapKind is the source inventory entry that reports how EDAC positions
 // were tied to SMBIOS slots.
 const SlotMapKind = "slot-map"
+
+// TimeAlignKind is the source inventory entry that reports how records
+// without a date were dated by the records of another source.
+const TimeAlignKind = "time-align"
 
 // Run reads the adapters into the ledger. A source that cannot be read does
 // not fail the run: it is recorded in the source inventory with the reason.
@@ -181,6 +188,13 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		{"action slots", func() error { return resolveActionSlots(ctx, s, host) }},
 		{"ECS slots", func() error { return resolveECSSlots(ctx, s, host) }},
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
+		{"times", func() (err error) {
+			if res.Aligned, err = s.AlignTimes(ctx, host); err != nil {
+				return err
+			}
+			// Records that got a date belong to the boot of that date.
+			return s.LinkBoots(ctx, host)
+		}},
 		{"DIMM attribution", func() error { return s.LinkDIMMs(ctx, host) }},
 		{"duplicates", func() (err error) {
 			res.Duplicates, err = s.MarkDuplicates(ctx, host, opts.Tolerance)
@@ -196,6 +210,31 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		if err := st.fn(); err != nil {
 			return nil, fmt.Errorf("ingest: %s: %w", st.name, err)
 		}
+	}
+
+	// What the time alignment did is part of the inventory: it changes how
+	// records without dates are counted.
+	if len(res.Aligned) > 0 {
+		src := model.Source{ScanID: res.Scan.ID, Kind: TimeAlignKind, Origin: host, Status: model.SourceOK}
+		for _, a := range res.Aligned {
+			src.Records += a.Records
+			if a.Aligned {
+				note := fmt.Sprintf("the times of %d records were set by %d errors another source reports with a date", a.Records, a.Matched)
+				if !a.StartedAt.IsZero() && a.StartedAt.Year() > 1970 {
+					note += fmt.Sprintf(": their boot started %s UTC", a.StartedAt.UTC().Format("2006-01-02 15:04:05"))
+				}
+				src.Notes = append(src.Notes, note)
+				continue
+			}
+			src.Status = model.SourcePartial
+			src.Skipped += a.Records
+			src.Detail = "records without a date could not be matched with the dated records of the same errors; they may be counted twice"
+			src.Notes = append(src.Notes, fmt.Sprintf("%d records of one boot carry no date; dated records of the same errors exist and do not settle on one boot time", a.Records))
+		}
+		if err := s.Update(ctx, func(w *store.Writer) error { return w.InsertSource(&src) }); err != nil {
+			return nil, fmt.Errorf("ingest: %w", err)
+		}
+		res.Sources = append(res.Sources, src)
 	}
 
 	finished := time.Now().UTC()
