@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/view"
 )
 
@@ -16,6 +15,15 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 	if tl.Days == 0 {
 		p.add(" " + st.say("tl.none"))
 		for _, n := range tl.Notes {
+			p.add(" " + n.Text)
+		}
+		return
+	}
+	if len(tl.Series) == 0 && len(tl.Markers) == 0 {
+		// Nothing happened in the period: say so instead of drawing a line
+		// of nothing.
+		p.add(" " + st.say("tl.quiet"))
+		for _, n := range tl.Notes[1:] {
 			p.add(" " + n.Text)
 		}
 		return
@@ -223,7 +231,7 @@ func Timeline(w io.Writer, tl *view.Timeline, st Style) error {
 	}
 	if tl.Days > 0 {
 		add(st.span(tl.From.Format("2006-01-02"), tl.To.Format("2006-01-02")))
-		add(st.say("tl.days", "n", i18n.Thousands(int64(tl.Days))))
+		add(st.say("tl.days", "n", tl.Days))
 	}
 	for _, line := range flow(head, "  ", st.width()) {
 		p.add(line)

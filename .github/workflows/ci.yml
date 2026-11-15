@@ -50,3 +50,7 @@ jobs:
           done
       - name: run the native binary
         run: ./dist/my-linux-amd64 version
+      - name: scan this machine as a normal user
+        run: .github/scripts/live-scan.sh ./dist/my-linux-amd64
+      - name: scan this machine as root
+        run: sudo .github/scripts/live-scan.sh ./dist/my-linux-amd64
