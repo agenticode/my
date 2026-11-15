@@ -1,0 +1,36 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: soft-offline
+summary: "pages taken offline soft: two through madvise, one by the corrected error collector"
+method: "madvise(MADV_SOFT_OFFLINE); debugfs ras/cec/pfn"
+kernel: 7.3.0-ras
+rasdaemon: 0.8.0
+injections:
+  - id: soft-1
+    time: 2026-11-15T10:28:26.436Z
+    inject: page-offline
+    how: soft
+    count: 1
+    address: 0x113257000
+    note: "anonymous page that was written, madvise(MADV_SOFT_OFFLINE)"
+  - id: soft-2
+    time: 2026-11-15T10:28:26.741Z
+    inject: page-offline
+    how: soft
+    count: 1
+    address: 0x112aab000
+    note: "anonymous page that was written, madvise(MADV_SOFT_OFFLINE)"
+  - id: cec-1
+    time: 2026-11-15T10:28:27.058Z
+    inject: page-offline
+    how: soft
+    count: 1
+    address: 0x110b5e000
+    note: "1023 corrected errors reported to the corrected error collector for this page through debugfs: its threshold"
+  - id: cec-below
+    time: 2026-11-15T10:28:27.058Z
+    inject: page-offline
+    how: soft
+    count: 0
+    address: 0x10bab5000
+    note: "5 corrected errors reported for this page, below the threshold of 1023: the page stays in use"

@@ -1,0 +1,36 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: hwpoison
+summary: "four pages of a test process taken offline hard"
+method: "madvise(MADV_HWPOISON)"
+kernel: 7.3.0-ras
+rasdaemon: 0.8.0
+injections:
+  - id: anon-1
+    time: 2026-11-15T10:26:53.324Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x117d97000
+    note: "anonymous page that was written, madvise(MADV_HWPOISON); the process got SIGBUS BUS_MCEERR_AR"
+  - id: anon-2
+    time: 2026-11-15T10:26:53.630Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x10f2aa000
+    note: "anonymous page that was written, madvise(MADV_HWPOISON); the process got SIGBUS BUS_MCEERR_AR"
+  - id: mlocked-3
+    time: 2026-11-15T10:26:53.933Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x11414f000
+    note: "anonymous page that was written and locked, madvise(MADV_HWPOISON); the process got SIGBUS BUS_MCEERR_AR"
+  - id: file-4
+    time: 2026-11-15T10:26:54.235Z
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0x114144000
+    note: "page of a file that was read, madvise(MADV_HWPOISON)"

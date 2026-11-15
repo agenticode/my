@@ -1,0 +1,1266 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-vm",
+  "grade": "ok",
+  "exit_code": 0,
+  "data": {
+    "host": {
+      "name": "lab-vm",
+      "system": "VMware, Inc. VMware Virtual Platform",
+      "from": "2026-11-15T10:25:28.516307Z",
+      "to": "2026-11-15T10:28:33.223853Z",
+      "ce": 0,
+      "ue": 0,
+      "records": 0,
+      "grade_a": 0,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "ok",
+      "grade_text": "ok",
+      "boots": 2,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-15T10:28:33.054382Z",
+        "privileged": true,
+        "tool_version": "e4bc2d4"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "label": "NVD",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "NVD #0",
+                  "label": "0",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #1",
+                  "label": "1",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #2",
+                  "label": "2",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #3",
+                  "label": "3",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #4",
+                  "label": "4",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #5",
+                  "label": "5",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #6",
+                  "label": "6",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #7",
+                  "label": "7",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #8",
+                  "label": "8",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #9",
+                  "label": "9",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #10",
+                  "label": "10",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #11",
+                  "label": "11",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #12",
+                  "label": "12",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #13",
+                  "label": "13",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #14",
+                  "label": "14",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #15",
+                  "label": "15",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #16",
+                  "label": "16",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #17",
+                  "label": "17",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #18",
+                  "label": "18",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #19",
+                  "label": "19",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #20",
+                  "label": "20",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #21",
+                  "label": "21",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #22",
+                  "label": "22",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #23",
+                  "label": "23",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #24",
+                  "label": "24",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #25",
+                  "label": "25",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #26",
+                  "label": "26",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #27",
+                  "label": "27",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #28",
+                  "label": "28",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #29",
+                  "label": "29",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #30",
+                  "label": "30",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #31",
+                  "label": "31",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #32",
+                  "label": "32",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #33",
+                  "label": "33",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #34",
+                  "label": "34",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #35",
+                  "label": "35",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #36",
+                  "label": "36",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #37",
+                  "label": "37",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #38",
+                  "label": "38",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #39",
+                  "label": "39",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #40",
+                  "label": "40",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #41",
+                  "label": "41",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #42",
+                  "label": "42",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #43",
+                  "label": "43",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #44",
+                  "label": "44",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #45",
+                  "label": "45",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #46",
+                  "label": "46",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #47",
+                  "label": "47",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #48",
+                  "label": "48",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #49",
+                  "label": "49",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #50",
+                  "label": "50",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #51",
+                  "label": "51",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #52",
+                  "label": "52",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #53",
+                  "label": "53",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #54",
+                  "label": "54",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #55",
+                  "label": "55",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #56",
+                  "label": "56",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #57",
+                  "label": "57",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #58",
+                  "label": "58",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #59",
+                  "label": "59",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #60",
+                  "label": "60",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #61",
+                  "label": "61",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #62",
+                  "label": "62",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "NVD #63",
+                  "label": "63",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "RAM slot",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #0",
+                  "label": "0",
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #1",
+                  "label": "1",
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #2",
+                  "label": "2",
+                  "state": "ok"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #3",
+                  "label": "3",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #4",
+                  "label": "4",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #5",
+                  "label": "5",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #6",
+                  "label": "6",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #7",
+                  "label": "7",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #8",
+                  "label": "8",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #9",
+                  "label": "9",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #10",
+                  "label": "10",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #11",
+                  "label": "11",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #12",
+                  "label": "12",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #13",
+                  "label": "13",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #14",
+                  "label": "14",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #15",
+                  "label": "15",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #16",
+                  "label": "16",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #17",
+                  "label": "17",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #18",
+                  "label": "18",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #19",
+                  "label": "19",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #20",
+                  "label": "20",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #21",
+                  "label": "21",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #22",
+                  "label": "22",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #23",
+                  "label": "23",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #24",
+                  "label": "24",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #25",
+                  "label": "25",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #26",
+                  "label": "26",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #27",
+                  "label": "27",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #28",
+                  "label": "28",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #29",
+                  "label": "29",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #30",
+                  "label": "30",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #31",
+                  "label": "31",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #32",
+                  "label": "32",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #33",
+                  "label": "33",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #34",
+                  "label": "34",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #35",
+                  "label": "35",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #36",
+                  "label": "36",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #37",
+                  "label": "37",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #38",
+                  "label": "38",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #39",
+                  "label": "39",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #40",
+                  "label": "40",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #41",
+                  "label": "41",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #42",
+                  "label": "42",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #43",
+                  "label": "43",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #44",
+                  "label": "44",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #45",
+                  "label": "45",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #46",
+                  "label": "46",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #47",
+                  "label": "47",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #48",
+                  "label": "48",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #49",
+                  "label": "49",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #50",
+                  "label": "50",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #51",
+                  "label": "51",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #52",
+                  "label": "52",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #53",
+                  "label": "53",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #54",
+                  "label": "54",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #55",
+                  "label": "55",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #56",
+                  "label": "56",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #57",
+                  "label": "57",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #58",
+                  "label": "58",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #59",
+                  "label": "59",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #60",
+                  "label": "60",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #61",
+                  "label": "61",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #62",
+                  "label": "62",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "RAM slot #63",
+                  "label": "63",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 128,
+      "populated": 3
+    },
+    "ranking": [],
+    "quiet": 3,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 4,
+        "skipped": 0,
+        "first": "2026-11-15T10:27:03Z",
+        "last": "2026-11-15T10:27:04Z"
+      },
+      {
+        "kind": "klog",
+        "origin": "journalctl -o json _TRANSPORT=kernel",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 15,
+        "events": 0,
+        "actions": 7,
+        "skipped": 0,
+        "first": "2026-11-15T10:26:53.328549Z",
+        "last": "2026-11-15T10:28:27.075612Z",
+        "notes": [
+          "2988 lines read",
+          "4 page offlines were asked for by a program (madvise or the hwpoison injector): they follow no error the hardware reported"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 128,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.7",
+          "128 memory slots, 3 populated"
+        ]
+      }
+    ]
+  }
+}

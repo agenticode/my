@@ -1,0 +1,18 @@
+host lab-guest  QEMU Standard PC (Q35 + ICH9, 2009)  2026-11-15 to 2026-11-15  CE 7, UE 3
+observation grade B
+host finding: ok
+
+    DIMM 0
+    ░░
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
+ 1 slot, 1 DIMM
+
+ no DIMM has errors on record
+
+ 1 DIMM without errors
+ 10 errors of this host are tied to no DIMM
+ sources  hostinfo 2 records, rasdaemon 13 records, klog 19 records, edac-sysfs without records,
+          smbios 1 record
+
+ my bundle -o case.mycase: write a case bundle   my help: how to read the figures

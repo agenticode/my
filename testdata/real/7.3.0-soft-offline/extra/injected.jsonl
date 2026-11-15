@@ -1,0 +1,4 @@
+{"id":"soft-1","kind":"soft","advice":"MADV_SOFT_OFFLINE","pfn":"0x113257","address":"0x113257000","vaddr":"0x7f7f34509000","time":"2026-11-15T10:28:26.436Z","pfn_after":"0x1167de"}
+{"id":"soft-2","kind":"soft","advice":"MADV_SOFT_OFFLINE","pfn":"0x112aab","address":"0x112aab000","vaddr":"0x7f7f34509000","time":"2026-11-15T10:28:26.741Z","pfn_after":"0x1167de"}
+{"id":"cec-1","time":"2026-11-15T10:28:27.058Z","inject":"page-offline","how":"soft","count":1,"address":"0x110b5e000","note":"1023 corrected errors reported to the corrected error collector for this page through debugfs: its threshold"}
+{"id":"cec-below","time":"2026-11-15T10:28:27.058Z","inject":"page-offline","how":"soft","count":0,"address":"0x10bab5000","note":"5 corrected errors reported for this page, below the threshold of 1023: the page stays in use"}

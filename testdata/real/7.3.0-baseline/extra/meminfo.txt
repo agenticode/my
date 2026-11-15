@@ -1,0 +1,2 @@
+MemTotal:       49413028 kB
+HardwareCorrupted:     0 kB

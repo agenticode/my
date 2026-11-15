@@ -1,0 +1,26 @@
+host lab-vm  VMware, Inc. VMware Virtual Platform  2026-11-15 to 2026-11-15  no errors on record
+host finding: ok
+
+            0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15   16
+ NVD        ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+ RAM slot   ░░   ░░   ░░   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+            17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33
+ NVD        ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+ RAM slot   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+            34   35   36   37   38   39   40   41   42   43   44   45   46   47   48   49   50
+ NVD        ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+ RAM slot   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+            51   52   53   54   55   56   57   58   59   60   61   62   63
+ NVD        ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+ RAM slot   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··   ··
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement   ·· empty slot
+ 128 slots, 3 DIMMs
+
+ no DIMM has errors on record
+
+ 3 DIMMs without errors
+ sources  hostinfo 2 records, rasdaemon without records, klog 4 records, edac-sysfs without records,
+          smbios 128 records
+
+ my bundle -o case.mycase: write a case bundle   my help: how to read the figures

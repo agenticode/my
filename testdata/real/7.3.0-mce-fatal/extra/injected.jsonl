@@ -1,0 +1,1 @@
+{"id":"fatal-1","time":"2026-11-15T10:44:56.896Z","inject":"error","severity":"Fatal","count":1,"address":"0x12345040","socket":0,"channel":0,"note":"machine check exception, bank 7, status 0xbe00000000010090 (uncorrected memory read error, processor context corrupt); the kernel panics"}

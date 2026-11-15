@@ -137,7 +137,6 @@
         89
       ],
       "count": 3,
-      "events": 3,
       "text": {
         "code": "tl.boot.many",
         "args": {
@@ -191,7 +190,6 @@
         89
       ],
       "count": 1,
-      "events": 1,
       "text": {
         "code": "tl.action.one",
         "args": {
@@ -229,7 +227,6 @@
         104
       ],
       "count": 7,
-      "events": 7,
       "text": {
         "code": "tl.offline.many",
         "args": {
@@ -376,7 +373,6 @@
         104
       ],
       "count": 1,
-      "events": 1,
       "text": {
         "code": "tl.ue.one_how",
         "args": {

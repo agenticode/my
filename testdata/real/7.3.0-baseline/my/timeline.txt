@@ -1,0 +1,3 @@
+host lab-vm  2026-11-15 to 2026-11-15  1 day
+
+ no errors and no events in this period

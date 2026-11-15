@@ -1,0 +1,27 @@
+No Memory errors.
+
+No PCIe AER errors.
+
+No Extlog errors.
+
+No devlink errors.
+
+No disk errors.
+
+Memory failure events:
+1 2026-11-15 10:42:16 +0000 error: pfn=0x104f27, page_type=dirty unevictable LRU page, action_result=Recovered
+2 2026-11-15 10:42:17 +0000 error: pfn=0x10451d, page_type=dirty unevictable LRU page, action_result=Recovered
+3 2026-11-15 10:42:19 +0000 error: pfn=0x103f00, page_type=dirty unevictable LRU page, action_result=Recovered
+
+MCE events:
+1 2026-11-15 10:42:05 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x104e5b040, misc=0x00000086, walltime=0x6af98c73, cpuid=0x00050654, bank=0x00000007
+2 2026-11-15 10:42:07 +0000 error: MEMORY CONTROLLER RD_CHANNEL1_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010091, addr=0x104f17980, misc=0x00000086, walltime=0x6af98c75, cpuid=0x00050654, bank=0x00000007
+3 2026-11-15 10:42:09 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x103e78100, misc=0x00000086, walltime=0x6af98c76, cpuid=0x00050654, bank=0x00000008
+4 2026-11-15 10:42:10 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x103e78100, misc=0x00000086, walltime=0x6af98c78, cpuid=0x00050654, bank=0x00000008
+5 2026-11-15 10:42:12 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x104530fc0, misc=0x00000086, walltime=0x6af98c79, cpuid=0x00050654, bank=0x00000007
+6 2026-11-15 10:42:13 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x104530fc0, misc=0x00000086, walltime=0x6af98c7b, cpuid=0x00050654, bank=0x00000007
+7 2026-11-15 10:42:14 +0000 error: MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr, mcg mcgstatus=0, mci Corrected_error Error_enabled, n_errors=1, mcgcap=0x0100010a, status=0x9c00004000010090, addr=0x104530fc0, misc=0x00000086, walltime=0x6af98c7c, cpuid=0x00050654, bank=0x00000007
+8 2026-11-15 10:42:16 +0000 error: MEMORY CONTROLLER MS_CHANNEL0_ERR Transaction: Memory scrubbing error MscodDataRdErr, mcg mcgstatus=0, mci Uncorrected_error Error_enabled, n_errors=0, mcgcap=0x0100010a, status=0xbc000000000100c0, addr=0x104f27200, misc=0x00000086, walltime=0x6af98c7e, cpuid=0x00050654, bank=0x00000007
+9 2026-11-15 10:42:17 +0000 error: MEMORY CONTROLLER MS_CHANNEL0_ERR Transaction: Memory scrubbing error MscodDataRdErr, mcg mcgstatus=5 RIPV MCIP, mci Uncorrected_error Error_enabled SRAO, n_errors=0, mcgcap=0x0100010a, mcgstatus=0x00000005, status=0xbd000000000100c0, addr=0x10451d400, misc=0x00000086, tsc=0x37fe8de75f, walltime=0x6af98c7f, cpuid=0x00050654, bank=0x00000007
+10 2026-11-15 10:42:19 +0000 error: Data CACHE Level-0 Data-Read Error, mcg mcgstatus=7 RIPV EIPV MCIP, mci Uncorrected_error Error_enabled SRAR, mcgcap=0x0100010a, mcgstatus=0x00000007, status=0xbd80000000100134, addr=0x103f00340, misc=0x00000086, ip=0x00401000, tsc=0x3942e83274, walltime=0x6af98c81, cpuid=0x00050654, cs=0x00000033, bank=0x00000001
+

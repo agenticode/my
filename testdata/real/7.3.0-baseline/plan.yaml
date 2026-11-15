@@ -1,0 +1,8 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: baseline
+summary: "no injection: the host as it is after a boot"
+method: none
+kernel: 7.3.0-ras
+rasdaemon: 0.8.0
+injections: []

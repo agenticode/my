@@ -1,0 +1,16 @@
+No Memory errors.
+
+No PCIe AER errors.
+
+No Extlog errors.
+
+No devlink errors.
+No disk errors.
+Memory failure events summary:
+	Recovered errors: 3
+
+MCE records summary:
+	1 Data CACHE Level-0 Data-Read Error errors
+	2 MEMORY CONTROLLER MS_CHANNEL0_ERR Transaction: Memory scrubbing error MscodDataRdErr errors
+	6 MEMORY CONTROLLER RD_CHANNEL0_ERR Transaction: Memory read error MscodDataRdErr errors
+	1 MEMORY CONTROLLER RD_CHANNEL1_ERR Transaction: Memory read error MscodDataRdErr errors

@@ -1,0 +1,4 @@
+{"id":"anon-1","kind":"anon","advice":"MADV_HWPOISON","pfn":"0x117d97","address":"0x117d97000","vaddr":"0x7f4e1de49000","time":"2026-11-15T10:26:53.324Z","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","si_addr_lsb":12,"read_again":"SIGBUS BUS_MCEERR_AR"}
+{"id":"anon-2","kind":"anon","advice":"MADV_HWPOISON","pfn":"0x10f2aa","address":"0x10f2aa000","vaddr":"0x7f4e1de49000","time":"2026-11-15T10:26:53.630Z","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","si_addr_lsb":12,"read_again":"SIGBUS BUS_MCEERR_AR"}
+{"id":"mlocked-3","kind":"mlocked","advice":"MADV_HWPOISON","pfn":"0x11414f","address":"0x11414f000","vaddr":"0x7f4e1de49000","time":"2026-11-15T10:26:53.933Z","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","si_addr_lsb":12,"read_again":"SIGBUS BUS_MCEERR_AR"}
+{"id":"file-4","kind":"file","advice":"MADV_HWPOISON","pfn":"0x114144","address":"0x114144000","vaddr":"0x7f4e1de47000","time":"2026-11-15T10:26:54.235Z","read_again":"no signal"}

@@ -1,0 +1,7 @@
+case bundle written: my/case.mycase (14.0 kB)
+  host host-4434c565: 1 DIMM, CE 0, UE 0, finding: ok
+  host names replaced:
+    lab-guest -> host-4434c565
+  Keep these lines: the bundle does not hold the names, and an answer about it will use the new
+  ones.
+look at it: my open my/case.mycase

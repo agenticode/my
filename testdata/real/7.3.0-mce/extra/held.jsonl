@@ -1,0 +1,7 @@
+{"id":"hold-1","kind":"held","pfn":"0x1060bc","pfn_after":"0x1060bc","content":"intact","time":"2026-11-15T10:36:58.175Z"}
+{"id":"hold-2","kind":"held","pfn":"0x1060bf","pfn_after":"0x1060bf","content":"intact","time":"2026-11-15T10:36:58.177Z"}
+{"id":"hold-3","kind":"held","pfn":"0x1060c0","pfn_after":"0x1062d8","content":"intact","time":"2026-11-15T10:36:58.179Z"}
+{"id":"hold-4","kind":"held","pfn":"0x1060c1","pfn_after":"0x103e93","content":"intact","time":"2026-11-15T10:36:58.180Z"}
+{"id":"hold-5","kind":"held","pfn":"0x1060c2","pfn_after":"0x0","content":"lost","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","time":"2026-11-15T10:36:58.183Z"}
+{"id":"hold-6","kind":"held","pfn":"0x1060c3","pfn_after":"0x0","content":"lost","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","time":"2026-11-15T10:36:58.184Z"}
+{"id":"hold-7","kind":"held","pfn":"0x1060c4","pfn_after":"0x0","content":"lost","signal":"SIGBUS","si_code":"BUS_MCEERR_AR","time":"2026-11-15T10:36:58.186Z"}

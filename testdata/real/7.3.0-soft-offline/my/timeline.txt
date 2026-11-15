@@ -1,0 +1,9 @@
+host lab-vm  2026-11-15 to 2026-11-15  1 day
+
+
+ CE        ▁
+ events    OB
+           └┼ 7 pages offline, 2026-11-15 to 2026-11-15
+            └ 2026-11-15 reboot
+
+ 0 corrected and 0 uncorrected errors from 2026-11-15 to 2026-11-15
