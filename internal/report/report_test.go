@@ -43,12 +43,22 @@ func options(lang i18n.Lang, aud Audience) Options {
 	return Options{Lang: lang, Audience: aud, Now: now, Tool: "my test", Case: &CaseInfo{ID: "0123456789ab"}}
 }
 
+// cases keeps the engine result of a ledger per language: many tests
+// build reports from the same ledger, and the engine need not run for
+// each of them.
+var cases = map[string]*view.Case{}
+
 // buildFrom builds the report of the only host of a ledger.
 func buildFrom(t testing.TB, s *store.Store, opts Options) *Document {
 	t.Helper()
-	c, err := view.Open(ctx, s, opts.Lang, engine.Options{Now: now})
-	if err != nil {
-		t.Fatal(err)
+	key := s.Path() + "|" + string(opts.Lang)
+	c := cases[key]
+	if c == nil {
+		var err error
+		if c, err = view.Open(ctx, s, opts.Lang, engine.Options{Now: now}); err != nil {
+			t.Fatal(err)
+		}
+		cases[key] = c
 	}
 	h, err := c.Host("")
 	if err != nil {
@@ -207,12 +217,23 @@ func TestGolden(t *testing.T) {
 	}
 }
 
+// scenarios returns the built-in scenarios a test runs over: all of them,
+// or a few with different shapes under the race detector. The report is
+// built without goroutines, so the detector has nothing more to find in
+// the seventeenth scenario than in the fifth, and takes minutes for it.
+func scenarios() []string {
+	if testutil.Race {
+		return []string{"demo", "bank", "system-channel", "moved-dimm", "fw-disabled"}
+	}
+	return synth.Names()
+}
+
 // TestEveryScenarioIsValid writes the report of every built-in scenario,
 // for both audiences and in both languages, and holds each against the
 // rules of a valid report. The scenarios cover every fault mode and every
 // rule.
 func TestEveryScenarioIsValid(t *testing.T) {
-	for _, name := range synth.Names() {
+	for _, name := range scenarios() {
 		for _, v := range []struct {
 			lang i18n.Lang
 			aud  Audience
@@ -240,7 +261,11 @@ func TestEveryScenarioIsValid(t *testing.T) {
 		}
 	}
 	// What the platforms of a host tree record: fewer location fields.
-	for _, fl := range []synth.Flavor{synth.FlavorIntel, synth.FlavorAMD, synth.FlavorGHES} {
+	flavors := []synth.Flavor{synth.FlavorIntel, synth.FlavorAMD, synth.FlavorGHES}
+	if testutil.Race {
+		flavors = flavors[1:2]
+	}
+	for _, fl := range flavors {
 		doc := build(t, "demo", fl, i18n.EN, FA)
 		raw, root := render(t, doc)
 		for _, bad := range checkHTML(root, raw) {
@@ -1159,7 +1184,11 @@ func TestEveryFixtureInput(t *testing.T) {
 		t.Fatalf("%d inputs, %v", len(inputs), err)
 	}
 	reports := 0
-	for _, in := range inputs {
+	for i, in := range inputs {
+		// Under the race detector every fourth input is enough.
+		if testutil.Race && i%4 != 0 {
+			continue
+		}
 		name := filepath.Base(in)
 		as, _, err := scan.Detect(ctx, in, scan.DetectOptions{Now: now, TempDir: t.TempDir()})
 		if err != nil {
@@ -1206,7 +1235,7 @@ func TestEveryFixtureInput(t *testing.T) {
 		}
 		s.Close()
 	}
-	if reports < 60 {
+	if reports < 60 && !testutil.Race {
 		t.Errorf("%d reports built", reports)
 	}
 }
