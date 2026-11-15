@@ -556,6 +556,15 @@ func (j *judge) gpus(host string) []*GPUResult {
 	return out
 }
 
+// EventIDs returns the ledger IDs of the records of a fault, in time order.
+// A view uses them to tell which fault a record on screen belongs to.
+func (r *Result) EventIDs(f *Fault) []int64 {
+	if r.in == nil {
+		return nil
+	}
+	return r.in.EventIDs(f)
+}
+
 // Host returns the result of the named host, or nil.
 func (r *Result) Host(name string) *HostResult {
 	for _, h := range r.Hosts {
