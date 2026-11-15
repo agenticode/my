@@ -13,6 +13,7 @@ import (
 // and host. The kernel log reaches a reader in several shapes:
 //
 //	[ 1234.567890] msg                                   dmesg
+//	[ 1234.567890] host kernel: msg                      journalctl -o short-monotonic
 //	<6>[ 1234.567890] msg                                dmesg -r
 //	[Thu Nov 12 03:14:07 2026] msg                       dmesg -T
 //	2026-11-12T03:14:07,123456+09:00 msg                 dmesg --time-format=iso
@@ -64,6 +65,10 @@ type framer struct {
 	ref time.Time
 	// syslog is set once a "host kernel:" line was seen.
 	syslog bool
+	// tagged is set once a line with a stamp in brackets was followed by
+	// "host kernel:": the output of journalctl -o short-monotonic, which
+	// holds the lines of other programs in the same shape.
+	tagged bool
 }
 
 // stamp splits a leading "[ 1234.567890] " off a message.
@@ -120,6 +125,18 @@ func (f *framer) frame(n int, raw string) (l line, ok bool) {
 
 	if rest, mono, ok := stamp(s); ok {
 		l.msg, l.mono, l.hasMono = rest, mono, true
+		// journalctl -o short-monotonic puts the host and the program
+		// between the stamp and the message. A kernel message of plain
+		// dmesg output does not start with "word kernel: ".
+		if tm := tagRE.FindStringSubmatch(rest); tm != nil && !strings.Contains(tm[1], ":") {
+			switch {
+			case tm[2] == "kernel":
+				f.tagged = true
+				l.host, l.msg = tm[1], tm[3]
+			case f.tagged && looksLikeTag(tm[2]):
+				l.host, l.kernel, l.msg = tm[1], false, tm[3]
+			}
+		}
 		return l, true
 	}
 	if m := ctimeRE.FindStringSubmatch(s); m != nil {

@@ -622,3 +622,179 @@ func TestOtherDMILinesAreNotTheMachine(t *testing.T) {
 		t.Errorf("boots = %+v", c.Boots)
 	}
 }
+
+// Lines of the lab host, kernel 7.3: four pages taken offline through
+// madvise(MADV_HWPOISON). The kernel says before each that a program asked
+// for it. Such an offline follows no error of the hardware.
+func TestOfflinesAskedForByAProgram(t *testing.T) {
+	c, rep := collectText(t, strings.Join([]string{
+		"[   90.700723] Injecting memory failure for pfn 0x64faa1 at process virtual address 0x7fea4881e000",
+		"[   90.702810] Memory failure: 0x64faa1: Sending SIGBUS to hwpoison:2309 due to hardware memory corruption",
+		"[   90.703791] Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered",
+		"[   90.704441] MCE: Killing hwpoison:2309 due to hardware memory corruption fault at 7fea4881e000",
+		"[   91.610961] Injecting memory failure for pfn 0x11bae2 at process virtual address 0x7fea4881c000",
+		"[   91.611096] Memory failure: 0x11bae2: corrupted page was clean: dropped without side effects",
+		"[   91.611298] Memory failure: 0x11bae2: recovery action for clean LRU page: Recovered",
+		// The injector of debugfs words it differently.
+		"[   95.000001] Injecting memory failure at pfn 0x17bddb",
+		"[   95.000100] Memory failure: 0x17bddb: recovery action for free buddy page: Recovered",
+		// A page the kernel gave up after a machine check: nothing announces it.
+		"[  151.085238] mce: [Hardware Error]: Machine check events logged",
+		"[  151.092935] Memory failure: 0x106b26: recovery action for dirty LRU page: Recovered",
+		// The same page again, long after its injection, is not the injection.
+		"[  200.000000] Memory failure: 0x64faa1: recovery action for already poisoned page: Failed",
+		"",
+	}, "\n"), Options{BootTime: utc(2026, 11, 15, 4, 56, 46)})
+	if rep.Status != model.SourceOK || len(c.Actions) != 5 || len(c.Events) != 0 {
+		t.Fatalf("report = %+v, %d actions, %d events; want ok, 5 actions, no events", rep, len(c.Actions), len(c.Events))
+	}
+	want := []struct {
+		addr   uint64
+		detail string
+		result model.ActionResult
+	}{
+		{0x64faa1000, "dirty LRU page: Recovered; asked for through madvise", model.ResultOK},
+		{0x11bae2000, "clean LRU page: Recovered; asked for through madvise", model.ResultOK},
+		{0x17bddb000, "free buddy page: Recovered; asked for through the hwpoison injector", model.ResultOK},
+		{0x106b26000, "dirty LRU page: Recovered", model.ResultOK},
+		{0x64faa1000, "already poisoned page: Failed", model.ResultFailed},
+	}
+	for i, w := range want {
+		a := c.Actions[i]
+		if a.Kind != model.ActionPageOffline || a.Method != "hard" || a.OsPhysicalAddress != addr(w.addr) || a.Detail != w.detail || a.Result != w.result {
+			t.Errorf("action %d: %+v\nwant %+v", i, *a, w)
+		}
+	}
+	if !hasNote(rep, "3 page offlines were asked for by a program") {
+		t.Errorf("notes = %q", rep.Notes)
+	}
+
+	// An announcement whose offline never comes labels nothing later on.
+	var lines []string
+	lines = append(lines, "[   10.000000] Injecting memory failure for pfn 0x1000 at process virtual address 0x7f0000000000")
+	for i := 0; i < injectionReach+1; i++ {
+		lines = append(lines, "[   11.000000] EDAC DEBUG: nothing of interest")
+	}
+	lines = append(lines, "[   12.000000] Memory failure: 0x1000: recovery action for dirty LRU page: Recovered", "")
+	c, rep = collectText(t, strings.Join(lines, "\n"), Options{BootTime: utc(2026, 11, 15, 4, 56, 46)})
+	if len(c.Actions) != 1 || c.Actions[0].Detail != "dirty LRU page: Recovered" || hasNote(rep, "asked for by a program") {
+		t.Errorf("an announcement %d lines back still labelled the offline: %+v, notes %q", injectionReach+2, c.Actions, rep.Notes)
+	}
+}
+
+// A boot in which an injector was set up says so: its records may come
+// from a test. Lines of the lab guest with the mce-inject module loaded.
+func TestInjectorsAreNamed(t *testing.T) {
+	_, rep := collectText(t, strings.Join([]string{
+		"[    0.000000] Linux version 7.3.0-ras (root@lab-vm) (gcc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2), GNU ld version 2.46.1-1.fc44) #2 SMP PREEMPT_DYNAMIC Thu Nov 12 10:40:04 UTC 2026",
+		"[   36.108967] mce: Machine check injector initialized",
+		"[   40.938984] mce: [Hardware Error]: Machine check events logged",
+		"",
+	}, "\n"), Options{BootTime: utc(2026, 11, 15, 5, 13, 30)})
+	if !hasNote(rep, "the machine check injector (mce-inject) was set up in a boot of this log") || hasNote(rep, "EINJ") {
+		t.Errorf("notes = %q", rep.Notes)
+	}
+	_, rep = collectText(t, "[    9.000000] EINJ: Error INJection is initialized.\n[   10.000000] Linux version 6.8.0 (x@y) #1 SMP\n", Options{})
+	if !hasNote(rep, "the ACPI error injection interface (EINJ) was set up") {
+		t.Errorf("notes = %q", rep.Notes)
+	}
+}
+
+// The journal files the first messages of a boot under "localhost": they
+// are logged before the host has its name. The name of the host is the one
+// its later lines carry. Entries of the lab host, cut to the fields read.
+func TestHostNameOfAJournal(t *testing.T) {
+	entry := func(host, mono, msg string) string {
+		return `{"MESSAGE":"` + msg + `","_HOSTNAME":"` + host + `","_TRANSPORT":"kernel","_BOOT_ID":"938af0493f6d43dcb52fbdb7ae00f8ce",` +
+			`"__REALTIME_TIMESTAMP":"1794718633209869","__MONOTONIC_TIMESTAMP":"16055546","_SOURCE_MONOTONIC_TIMESTAMP":"` + mono + `"}`
+	}
+	_, rep := collectText(t, strings.Join([]string{
+		entry("localhost", "0", "Linux version 7.3.0-ras (root@lab-vm) #2 SMP PREEMPT_DYNAMIC Thu Nov 12 10:40:04 UTC 2026"),
+		entry("localhost", "0", "DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020"),
+		entry("lab-vm", "90703791", "Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered"),
+		"",
+	}, "\n"), Options{})
+	if rep.HostHint != "lab-vm" {
+		t.Errorf("host hint = %q, want the name of the later entries", rep.HostHint)
+	}
+	// An import asks for the name before it reads the records: the end of
+	// the file answers.
+	dir := t.TempDir()
+	write := func(name string, lines ...string) string {
+		p := filepath.Join(dir, name)
+		if err := os.WriteFile(p, []byte(strings.Join(lines, "\n")+"\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}
+	journal := write("journal.json",
+		entry("localhost", "0", "Linux version 7.3.0-ras (root@lab-vm) #2 SMP PREEMPT_DYNAMIC Thu Nov 12 10:40:04 UTC 2026"),
+		entry("lab-vm", "90703791", "Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered"))
+	if got := NewFile(journal, Options{}).HostHint(); got != "lab-vm" {
+		t.Errorf("journal file: HostHint() = %q", got)
+	}
+	messages := write("messages",
+		"Nov 15 04:57:13 localhost kernel: Linux version 7.3.0-ras (root@lab-vm) #2 SMP",
+		"Nov 15 04:58:16 lab-vm kernel: Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered",
+		"Nov 15 04:58:17 lab-vm sshd[4410]: Accepted publickey for root")
+	if got := NewFile(messages, Options{CapturedAt: utc(2026, 11, 15, 5, 0, 0)}).HostHint(); got != "lab-vm" {
+		t.Errorf("syslog file: HostHint() = %q", got)
+	}
+	dmesg := write("dmesg", "[    0.000000] Linux version 7.3.0-ras (root@lab-vm) #2 SMP", "[   90.703791] Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered")
+	if got := NewFile(dmesg, Options{}).HostHint(); got != "" {
+		t.Errorf("dmesg names no host: HostHint() = %q", got)
+	}
+	early := write("early.json", entry("localhost", "0", "Linux version 7.3.0-ras (root@lab-vm) #2 SMP"))
+	if got := NewFile(early, Options{}).HostHint(); got != "localhost" {
+		t.Errorf("a journal that ends before the host has its name: HostHint() = %q", got)
+	}
+	if got := NewFile(filepath.Join(dir, "absent"), Options{}).HostHint(); got != "" {
+		t.Errorf("missing file: HostHint() = %q", got)
+	}
+	if got := NewReader(strings.NewReader("x"), "stdin", Options{}).HostHint(); got != "" {
+		t.Errorf("a stream cannot be read twice: HostHint() = %q", got)
+	}
+	// Only the end of a large file is read.
+	big := filepath.Join(dir, "big.json")
+	var sb strings.Builder
+	for sb.Len() < hintTail+4096 {
+		sb.WriteString(entry("localhost", "0", "early boot message") + "\n")
+	}
+	sb.WriteString(entry("lab-vm", "90703791", "late message") + "\n")
+	if err := os.WriteFile(big, []byte(sb.String()), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if got := NewFile(big, Options{}).HostHint(); got != "lab-vm" {
+		t.Errorf("large journal: HostHint() = %q", got)
+	}
+
+	// A host that has no other name keeps the one it has.
+	_, rep = collectText(t, entry("localhost", "0", "Linux version 7.3.0-ras (root@lab-vm) #2 SMP")+"\n", Options{})
+	if rep.HostHint != "localhost" {
+		t.Errorf("host hint = %q", rep.HostHint)
+	}
+	// The same in a syslog file and in journalctl -o short-monotonic.
+	_, rep = collectText(t, "Nov 15 04:57:13 localhost kernel: Linux version 7.3.0-ras (root@lab-vm) #2 SMP\n"+
+		"Nov 15 04:58:16 lab-vm kernel: Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered\n", Options{CapturedAt: utc(2026, 11, 15, 5, 0, 0)})
+	if rep.HostHint != "lab-vm" {
+		t.Errorf("syslog: host hint = %q", rep.HostHint)
+	}
+	c, rep := collectText(t, strings.Join([]string{
+		"[   16.055546] localhost kernel: Linux version 7.3.0-ras (root@lab-vm) (gcc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2), GNU ld version 2.46.1-1.fc44) #2 SMP PREEMPT_DYNAMIC Thu Nov 12 10:40:04 UTC 2026",
+		"[   16.089904] localhost kernel: Command line: BOOT_IMAGE=(hd0,gpt3)/boot/vmlinuz-7.3.0-ras ro console=ttyS0,115200n8",
+		"[   16.091000] localhost kernel: DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020",
+		"[   32.185375] lab-vm systemd[1]: Hostname set to <lab-vm>.",
+		"[   90.700723] lab-vm kernel: Injecting memory failure for pfn 0x64faa1 at process virtual address 0x7fea4881e000",
+		"[   90.703791] lab-vm kernel: Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered",
+		// What rasdaemon wrote to the journal about the same page is not a kernel message.
+		"[  101.204000] lab-vm rasdaemon[1644]: rasdaemon: memory_failure_event store: 0x55d6203fc438 Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered",
+		"",
+	}, "\n"), Options{BootTime: utc(2026, 11, 15, 4, 56, 46)})
+	if rep.HostHint != "lab-vm" || len(c.Boots) != 1 || c.Boots[0].Kernel != "7.3.0-ras" || !strings.HasPrefix(c.Boots[0].Cmdline, "BOOT_IMAGE=") ||
+		c.Boots[0].BIOS != "6.00 11/12/2020" {
+		t.Errorf("short-monotonic: host hint %q, boots %+v", rep.HostHint, c.Boots)
+	}
+	if len(c.Actions) != 1 || c.Actions[0].Detail != "dirty LRU page: Recovered; asked for through madvise" {
+		t.Errorf("short-monotonic: actions %+v", c.Actions)
+	}
+}

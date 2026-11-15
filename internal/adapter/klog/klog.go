@@ -56,11 +56,13 @@ type Adapter struct {
 	origin string
 	open   func() (io.ReadCloser, time.Time, error)
 	opts   Options
+	// path is the file behind the adapter, when it reads one.
+	path string
 }
 
 // NewFile returns an adapter for a kernel log file.
 func NewFile(path string, opts Options) *Adapter {
-	return &Adapter{origin: path, opts: opts, open: func() (io.ReadCloser, time.Time, error) {
+	return &Adapter{origin: path, path: path, opts: opts, open: func() (io.ReadCloser, time.Time, error) {
 		f, err := os.Open(path)
 		if err != nil {
 			return nil, time.Time{}, err
@@ -88,6 +90,72 @@ func NewReader(r io.Reader, origin string, opts Options) *Adapter {
 
 func (a *Adapter) Kind() string   { return Kind }
 func (a *Adapter) Origin() string { return a.origin }
+
+// hintTail is how much of the end of a file is looked at for a host name.
+const hintTail = 256 << 10
+
+// HostHint returns the host name the latest lines of a log file carry, or
+// "" when the log names no host: syslog files and journal exports name the
+// host on every line, dmesg output does not. The first lines of a boot are
+// filed under "localhost", so the end of the file is what tells.
+func (a *Adapter) HostHint() string {
+	if a.path == "" {
+		return ""
+	}
+	f, err := os.Open(a.path)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil || !fi.Mode().IsRegular() {
+		return ""
+	}
+	off := max(fi.Size()-hintTail, 0)
+	buf := make([]byte, fi.Size()-off)
+	if _, err := io.ReadFull(io.NewSectionReader(f, off, int64(len(buf))), buf); err != nil {
+		return ""
+	}
+	lines := strings.Split(string(buf), "\n")
+	if off > 0 && len(lines) > 0 {
+		lines = lines[1:] // the first line of the tail is cut
+	}
+	loc := a.opts.Location
+	if loc == nil {
+		loc = time.UTC
+	}
+	fr := framer{loc: loc, ref: a.opts.CapturedAt}
+	fallback := ""
+	// Forward, so that the framer learns what kind of file this is; the
+	// last name that is a name wins.
+	name := ""
+	for i, raw := range lines {
+		raw = strings.TrimRight(raw, "\r")
+		var l line
+		if strings.HasPrefix(strings.TrimLeft(raw, " \t"), `{"`) {
+			var err error
+			if l, err = frameJSON(i+1, raw); err != nil {
+				continue
+			}
+		} else {
+			var ok bool
+			if l, ok = fr.frame(i+1, raw); !ok {
+				continue
+			}
+		}
+		switch {
+		case l.host == "":
+		case unnamedHost(l.host):
+			fallback = l.host
+		default:
+			name = l.host
+		}
+	}
+	if name == "" {
+		return fallback
+	}
+	return name
+}
 
 // maxLine bounds the length of one input line.
 const maxLine = 1 << 20
@@ -138,6 +206,14 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	if p.bigPages != "" {
 		rep.Notes = append(rep.Notes, p.bigPages)
+	}
+	if p.injected > 0 {
+		rep.Notes = append(rep.Notes, fmt.Sprintf("%d page offlines were asked for by a program (madvise or the hwpoison injector): they follow no error the hardware reported", p.injected))
+	}
+	for _, inj := range injectorMarks {
+		if p.injectors[inj.name] {
+			rep.Notes = append(rep.Notes, fmt.Sprintf("%s was set up in a boot of this log: records of that boot may come from a test", inj.name))
+		}
 	}
 	if note := otherXIDNote(p.otherXID); note != "" {
 		rep.Notes = append(rep.Notes, note)
@@ -190,7 +266,22 @@ type segment struct {
 	// serial number line that follows belongs to.
 	gpus    map[string]*gpuIdent
 	lastGPU string
+
+	// injecting maps a page frame number to the line that announced its
+	// offline as asked for by a program.
+	injecting map[uint64]injection
 }
+
+// injection is an announced software injection of a memory failure.
+type injection struct {
+	n   int    // line number
+	how string // "madvise" or "the hwpoison injector"
+}
+
+// injectionReach is how many lines after its announcement the offline of
+// an injected page is expected. The kernel prints the two within a few
+// lines of each other.
+const injectionReach = 200
 
 // pending is a record of the current boot whose time cannot be resolved
 // before the end of the boot is seen.
@@ -241,6 +332,8 @@ type parser struct {
 
 	lineNo        int
 	records       int
+	injected      int
+	injectors     map[string]bool
 	otherXID      map[int]int
 	notMemory     int
 	otherSections int
@@ -456,7 +549,10 @@ func (p *parser) fingerprint(class string, l *line, extra string) string {
 }
 
 func (p *parser) dispatch(l *line) error {
-	if l.host != "" && p.rep.HostHint == "" {
+	// The name of the host is the one its latest lines carry. The first
+	// messages of a boot are logged before the host has its name: the
+	// journal files them under "localhost".
+	if l.host != "" && (p.rep.HostHint == "" || unnamedHost(p.rep.HostHint) || !unnamedHost(l.host)) {
 		p.rep.HostHint = l.host
 	}
 	seg := p.seg
@@ -561,9 +657,38 @@ func (p *parser) dispatch(l *line) error {
 		}
 		return nil
 	}
+	if m := injectRE.FindStringSubmatch(msg); m != nil {
+		if pfn, err := strconv.ParseUint(strings.TrimPrefix(m[2], "0x"), 16, 44); err == nil {
+			if seg.injecting == nil {
+				seg.injecting = map[uint64]injection{}
+			}
+			how := "madvise"
+			if m[1] == "at" {
+				how = "the hwpoison injector"
+			}
+			seg.injecting[pfn] = injection{n: l.n, how: how}
+		}
+		return nil
+	}
+	for _, inj := range injectorMarks {
+		if strings.Contains(msg, inj.mark) {
+			if p.injectors == nil {
+				p.injectors = map[string]bool{}
+			}
+			p.injectors[inj.name] = true
+			return nil
+		}
+	}
 	if o, ok := parseOffline(msg); ok {
 		p.records++
 		seg.records++
+		if inj, ok := seg.injecting[o.pfn]; ok && o.method == "hard" {
+			delete(seg.injecting, o.pfn)
+			if l.n-inj.n <= injectionReach {
+				o.detail += "; asked for through " + inj.how
+				p.injected++
+			}
+		}
 		a := &model.Action{
 			Kind: model.ActionPageOffline, Method: o.method, Result: o.result,
 			OsPhysicalAddress: model.Some(o.pfn << seg.pageShift), Detail: o.detail,
@@ -679,6 +804,16 @@ func otherXIDNote(counts map[int]int) string {
 		parts = append(parts, fmt.Sprintf("Xid %d x%d", c, counts[c]))
 	}
 	return fmt.Sprintf("%d Xid records are not about GPU memory and were left out (%s)", total, strings.Join(parts, ", "))
+}
+
+// unnamedHost reports whether a host name in a log line is the name a
+// system has before it was given one.
+func unnamedHost(name string) bool {
+	switch strings.ToLower(name) {
+	case "localhost", "localhost.localdomain", "(none)":
+		return true
+	}
+	return false
 }
 
 // has64KPages reports whether a kernel release is known to be built with

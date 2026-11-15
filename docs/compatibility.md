@@ -124,6 +124,8 @@ Adapter `klog`, package `internal/adapter/klog`. The kernel log is a lossy sourc
 | Form | Times |
 | --- | --- |
 | `journalctl -k -o json`, also for several boots | exact |
+| `journalctl -k` in its text forms: `short`, `short-iso`, `short-iso-precise` | exact; the zone has to be given when the lines have none |
+| `journalctl -k -o short-monotonic` | as `dmesg` with seconds since boot |
 | syslog files (`/var/log/messages`, `kern.log`, `syslog`), with or without ISO dates | exact; the zone has to be given when the lines have none |
 | `dmesg -T` | taken as printed; `dmesg` computes them from the uptime, so they are off after a suspend |
 | `/dev/kmsg` records, `dmesg` with seconds since boot | see "Times" below |
@@ -143,6 +145,12 @@ A scan of a live host reads the journal of every boot on record, as far as the c
 
 A line read from `dmesg` and the same line read from the journal are one record: a record is identified by the kernel's own stamp and its text.
 
+A page a program asked the kernel to give up is told from a page the kernel gave up after an error. The kernel announces the first kind (`Injecting memory failure for pfn ...` for `madvise`, `Injecting memory failure at pfn ...` for the hwpoison injector); the action then says "asked for through madvise" and the source report counts such pages. A boot in which the machine check injector (`mce-inject`) or the ACPI error injection interface (EINJ) was set up is named in the source report, because its records may come from a test.
+
+### Host name
+
+Syslog lines and journal entries name the host. The first messages of a boot are filed under `localhost`, before the host has its name, so the name is taken from the end of the file. `dmesg` output names no host: an import of it alone is stored under `localhost` unless `--host` names it.
+
 ### Grade
 
 As for the rasdaemon database: A with row, column and bank, B with an address or a rank, C otherwise.
@@ -156,7 +164,7 @@ A capture with seconds since boot only says when an error happened relative to t
 1. On a live host, the boot time in `/proc/stat`. Times are exact.
 2. A machine check record in the log, which carries its own wall-clock time. Times are exact.
 3. A capture time (`--captured-at`, or `--mtime` for the modification time of the file): the boot started at that time minus the last stamp. Times are marked as estimated.
-4. The line in which the kernel sets the system clock from the hardware clock. Times are marked as estimated.
+4. The line in which the kernel sets the system clock from the hardware clock. Times are marked as estimated: they are wrong by as much as the hardware clock was (10 seconds on the lab host).
 
 With none of them the records stay relative to their boot. They are then dated by the records of another source that reports the same errors with a date, when there is one; the `time-align` entry of the source inventory says what was done.
 

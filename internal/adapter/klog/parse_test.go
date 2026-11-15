@@ -37,6 +37,9 @@ func TestFrame(t *testing.T) {
 			time.Date(2026, 11, 11, 18, 14, 7, 123456000, time.UTC), mono, true, "r12-n034", true},
 		{"journalctl -o short-iso", "2026-11-12T03:14:07+0900 r12-n034 kernel: EDAC MC0: x", time.UTC, "EDAC MC0: x", time.Date(2026, 11, 11, 18, 14, 7, 0, time.UTC), 0, false, "r12-n034", true},
 		{"/dev/kmsg", "4,1532,1234567890,-;EDAC MC0: x", time.UTC, "EDAC MC0: x", time.Time{}, mono, true, "", true},
+		{"journalctl -o short-monotonic", "[ 1234.567890] r12-n034 kernel: EDAC MC0: x", time.UTC, "EDAC MC0: x", time.Time{}, mono, true, "r12-n034", true},
+		{"dmesg, message with a colon in its first word", "[ 1234.567890] mce: [Hardware Error]: Machine check events logged", time.UTC,
+			"mce: [Hardware Error]: Machine check events logged", time.Time{}, mono, true, "", true},
 		{"bare message", "EDAC MC0: 1 CE x", time.UTC, "EDAC MC0: 1 CE x", time.Time{}, 0, false, "", true},
 		{"firmware block line, bare", "{1}[Hardware Error]: event severity: corrected", time.UTC, "{1}[Hardware Error]: event severity: corrected", time.Time{}, 0, false, "", true},
 	}
@@ -66,6 +69,27 @@ func TestFrame(t *testing.T) {
 	}
 	if l, _ := f.frame(2, "2026-11-12T03:14:08+09:00 host chronyd[812]: Selected source"); l.kernel {
 		t.Errorf("line of another program was taken for a kernel message: %+v", l)
+	}
+}
+
+// journalctl -o short-monotonic prints every program in the shape dmesg
+// prints kernel messages. Lines of other programs are told apart once a
+// "host kernel:" line showed what the input is.
+func TestFrameShortMonotonic(t *testing.T) {
+	f := framer{loc: time.UTC}
+	if l, _ := f.frame(1, "[   32.185375] lab-vm systemd[1]: Hostname set to <lab-vm>."); !l.kernel {
+		t.Errorf("before any kernel line a tagged line is a message: %+v", l)
+	}
+	if l, _ := f.frame(2, "[   16.055546] localhost kernel: Linux version 7.3.0-ras (root@lab-vm) #2 SMP"); !l.kernel || l.host != "localhost" ||
+		l.msg != "Linux version 7.3.0-ras (root@lab-vm) #2 SMP" || l.mono != 16055546*time.Microsecond {
+		t.Errorf("kernel line: %+v", l)
+	}
+	if l, _ := f.frame(3, "[   32.185375] lab-vm systemd[1]: Hostname set to <lab-vm>."); l.kernel || l.host != "lab-vm" {
+		t.Errorf("line of another program was taken for a kernel message: %+v", l)
+	}
+	if l, _ := f.frame(4, "[   90.703791] lab-vm kernel: Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered"); !l.kernel ||
+		l.msg != "Memory failure: 0x64faa1: recovery action for dirty LRU page: Recovered" {
+		t.Errorf("kernel line with colons in the message: %+v", l)
 	}
 }
 
