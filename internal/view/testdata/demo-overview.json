@@ -1,0 +1,426 @@
+{
+  "host": {
+    "name": "r12-n034",
+    "system": "Example Systems R760",
+    "from": "2026-07-31T11:00:00Z",
+    "to": "2026-11-13T00:00:00Z",
+    "ce": 1284,
+    "ue": 1,
+    "records": 1285,
+    "grade_a": 1285,
+    "grade_b": 0,
+    "grade_c": 0,
+    "grade": "replace-now",
+    "grade_text": "replace now",
+    "boots": 4,
+    "scan": {
+      "kind": "synthetic",
+      "at": "2026-11-13T00:00:00Z",
+      "privileged": false,
+      "tool_version": "dev"
+    }
+  },
+  "slot_map": {
+    "rows": [
+      {
+        "socket": 0,
+        "label": "CPU0",
+        "channels": [
+          {
+            "channel": 0,
+            "slots": [
+              {
+                "slot": "CPU0_A1",
+                "label": "A1",
+                "position": 0,
+                "state": "ok",
+                "serial": "5C331B"
+              },
+              {
+                "slot": "CPU0_A2",
+                "label": "A2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 1,
+            "slots": [
+              {
+                "slot": "CPU0_B1",
+                "label": "B1",
+                "position": 0,
+                "state": "ok",
+                "serial": "DE7FF0"
+              },
+              {
+                "slot": "CPU0_B2",
+                "label": "B2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 2,
+            "slots": [
+              {
+                "slot": "CPU0_C1",
+                "label": "C1",
+                "position": 0,
+                "state": "replace-now",
+                "serial": "3B9C56",
+                "ce": 1231,
+                "ue": 1
+              },
+              {
+                "slot": "CPU0_C2",
+                "label": "C2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 3,
+            "slots": [
+              {
+                "slot": "CPU0_D1",
+                "label": "D1",
+                "position": 0,
+                "state": "ok",
+                "serial": "80D01E"
+              },
+              {
+                "slot": "CPU0_D2",
+                "label": "D2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 4,
+            "slots": [
+              {
+                "slot": "CPU0_E1",
+                "label": "E1",
+                "position": 0,
+                "state": "ok",
+                "serial": "E2CD51"
+              },
+              {
+                "slot": "CPU0_E2",
+                "label": "E2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 5,
+            "slots": [
+              {
+                "slot": "CPU0_F1",
+                "label": "F1",
+                "position": 0,
+                "state": "ok",
+                "serial": "2B6332"
+              },
+              {
+                "slot": "CPU0_F2",
+                "label": "F2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 6,
+            "slots": [
+              {
+                "slot": "CPU0_G1",
+                "label": "G1",
+                "position": 0,
+                "state": "ok",
+                "serial": "382A8A"
+              },
+              {
+                "slot": "CPU0_G2",
+                "label": "G2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 7,
+            "slots": [
+              {
+                "slot": "CPU0_H1",
+                "label": "H1",
+                "position": 0,
+                "state": "ok",
+                "serial": "4B3B31"
+              },
+              {
+                "slot": "CPU0_H2",
+                "label": "H2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "socket": 1,
+        "label": "CPU1",
+        "channels": [
+          {
+            "channel": 0,
+            "slots": [
+              {
+                "slot": "CPU1_A1",
+                "label": "A1",
+                "position": 0,
+                "state": "ok",
+                "serial": "2C9305"
+              },
+              {
+                "slot": "CPU1_A2",
+                "label": "A2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 1,
+            "slots": [
+              {
+                "slot": "CPU1_B1",
+                "label": "B1",
+                "position": 0,
+                "state": "ok",
+                "serial": "DBC9CE"
+              },
+              {
+                "slot": "CPU1_B2",
+                "label": "B2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 2,
+            "slots": [
+              {
+                "slot": "CPU1_C1",
+                "label": "C1",
+                "position": 0,
+                "state": "ok",
+                "serial": "99B7F7"
+              },
+              {
+                "slot": "CPU1_C2",
+                "label": "C2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 3,
+            "slots": [
+              {
+                "slot": "CPU1_D1",
+                "label": "D1",
+                "position": 0,
+                "state": "observe",
+                "serial": "2AEB41",
+                "ce": 53
+              },
+              {
+                "slot": "CPU1_D2",
+                "label": "D2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 4,
+            "slots": [
+              {
+                "slot": "CPU1_E1",
+                "label": "E1",
+                "position": 0,
+                "state": "ok",
+                "serial": "02AC34"
+              },
+              {
+                "slot": "CPU1_E2",
+                "label": "E2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 5,
+            "slots": [
+              {
+                "slot": "CPU1_F1",
+                "label": "F1",
+                "position": 0,
+                "state": "ok",
+                "serial": "848BE3"
+              },
+              {
+                "slot": "CPU1_F2",
+                "label": "F2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 6,
+            "slots": [
+              {
+                "slot": "CPU1_G1",
+                "label": "G1",
+                "position": 0,
+                "state": "ok",
+                "serial": "D7A399"
+              },
+              {
+                "slot": "CPU1_G2",
+                "label": "G2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          },
+          {
+            "channel": 7,
+            "slots": [
+              {
+                "slot": "CPU1_H1",
+                "label": "H1",
+                "position": 0,
+                "state": "ok",
+                "serial": "55C12A"
+              },
+              {
+                "slot": "CPU1_H2",
+                "label": "H2",
+                "position": 1,
+                "state": "empty"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "slots": 32,
+    "populated": 16
+  },
+  "ranking": [
+    {
+      "n": 1,
+      "slot": "CPU0_C1",
+      "dimm": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "serial": "3B9C56",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "present": true,
+      "ce": 1231,
+      "ue": 1,
+      "mode": "row",
+      "mode_text": "row",
+      "faults": 1,
+      "trend": [
+        45,
+        55,
+        76,
+        67,
+        115,
+        116,
+        135,
+        129,
+        168,
+        207
+      ],
+      "direction": "rising",
+      "grade": "replace-now",
+      "grade_text": "replace now",
+      "rules": [
+        "R-UE-01",
+        "R-ROW-03",
+        "R-REP-02"
+      ],
+      "confidence": 91
+    },
+    {
+      "n": 2,
+      "slot": "CPU1_D1",
+      "dimm": {
+        "dimm_uid": "d6abde8014f7764becd7",
+        "serial": "2AEB41",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "present": true,
+      "ce": 53,
+      "ue": 0,
+      "mode": "single-bit",
+      "mode_text": "single-bit",
+      "faults": 1,
+      "trend": [
+        4,
+        0,
+        2,
+        6,
+        1,
+        2,
+        1,
+        2,
+        2,
+        0
+      ],
+      "direction": "falling",
+      "grade": "observe",
+      "grade_text": "observe",
+      "rules": [
+        "R-SOFT-01"
+      ],
+      "confidence": 65
+    }
+  ],
+  "quiet": 14,
+  "sources": [
+    {
+      "kind": "synth",
+      "origin": "synth:demo",
+      "status": "ok",
+      "status_text": "ok",
+      "records": 1297,
+      "events": 1285,
+      "actions": 8,
+      "skipped": 0,
+      "grade": "A",
+      "first": "2026-08-03T13:53:44.241999Z",
+      "last": "2026-11-12T23:49:30.494127Z"
+    }
+  ]
+}

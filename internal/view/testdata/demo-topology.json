@@ -1,0 +1,59 @@
+{
+  "total": 1232,
+  "levels": [
+    {
+      "name": "rank",
+      "known": true,
+      "segments": [
+        {
+          "label": "rank0",
+          "parent": -1,
+          "errors": 1232,
+          "share": 1
+        }
+      ]
+    },
+    {
+      "name": "device",
+      "known": true,
+      "segments": [
+        {
+          "label": "dev7",
+          "parent": 0,
+          "errors": 1232,
+          "share": 1
+        }
+      ]
+    },
+    {
+      "name": "bank",
+      "known": true,
+      "segments": [
+        {
+          "label": "bg0 bank3",
+          "parent": 0,
+          "errors": 1232,
+          "share": 1
+        }
+      ]
+    },
+    {
+      "name": "row",
+      "known": true,
+      "segments": [
+        {
+          "label": "0x1a2f",
+          "parent": 0,
+          "errors": 1206,
+          "share": 0.9788961038961039
+        },
+        {
+          "label": "0x1a30",
+          "parent": 0,
+          "errors": 26,
+          "share": 0.021103896103896104
+        }
+      ]
+    }
+  ]
+}

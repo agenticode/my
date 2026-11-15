@@ -84,6 +84,11 @@ type Fault struct {
 	members []int32
 }
 
+// Where names the place of the fault in the words the findings use, for
+// example "rank0 dev7 bg0 bank3 row 0x1a2f". It is empty for a fault that
+// covers several banks of several devices: such a fault has no single place.
+func (f *Fault) Where() string { return where(f) }
+
 // modeExtent orders modes by how much of a DIMM they cover.
 func modeExtent(m model.FaultMode) int {
 	for i, x := range model.FaultModes {

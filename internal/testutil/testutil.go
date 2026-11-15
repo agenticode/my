@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	_ "modernc.org/sqlite" // the driver the fixtures are built with
@@ -66,4 +67,48 @@ func BuildSQLite(tb testing.TB, scriptPath, name string) string {
 		tb.Fatalf("build %s from %s: %v", name, scriptPath, err)
 	}
 	return path
+}
+
+// UpdateGoldenEnv names the environment variable that makes Golden write
+// the files it would otherwise compare with:
+//
+//	UPDATE_GOLDEN=1 go test ./internal/term/
+const UpdateGoldenEnv = "UPDATE_GOLDEN"
+
+// Golden compares got with the file testdata/<name> next to the test. With
+// UPDATE_GOLDEN set it writes the file instead, so that a change of the
+// output is reviewed as a diff of the golden files.
+func Golden(tb testing.TB, name string, got []byte) {
+	tb.Helper()
+	path := filepath.Join("testdata", filepath.FromSlash(name))
+	if os.Getenv(UpdateGoldenEnv) != "" {
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			tb.Fatal(err)
+		}
+		if err := os.WriteFile(path, got, 0o644); err != nil {
+			tb.Fatal(err)
+		}
+		return
+	}
+	want, err := os.ReadFile(path)
+	if err != nil {
+		tb.Fatalf("%v (run the test with %s=1 to write it)", err, UpdateGoldenEnv)
+	}
+	if string(want) == string(got) {
+		return
+	}
+	// Point at the first line that differs: the whole output can be long.
+	w, g := strings.Split(string(want), "\n"), strings.Split(string(got), "\n")
+	for i := 0; i < len(w) || i < len(g); i++ {
+		var wl, gl string
+		if i < len(w) {
+			wl = w[i]
+		}
+		if i < len(g) {
+			gl = g[i]
+		}
+		if wl != gl {
+			tb.Fatalf("%s differs at line %d:\n want %q\n got  %q\n(run the test with %s=1 after checking the change)", path, i+1, wl, gl, UpdateGoldenEnv)
+		}
+	}
 }
