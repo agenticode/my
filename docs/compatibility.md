@@ -77,6 +77,10 @@ Adapter `sel`, package `internal/adapter/sel`. A SEL is the log to read when the
 
 A file written by `ipmitool sel save` is refused with a message: it holds the events without their times.
 
+A scan of a copy of a host's files reads the listing sos saves under `sos_commands/ipmitool`: the output of `sel elist` if it is there, else of `sel list -v`, else of `sel list`. One listing is read, because the same record from two of them would count twice. A saved file that holds the error message of ipmitool is reported as not read.
+
+A scan of a live host does not ask the BMC. Reading the event log needs root and can take minutes; save it with `ipmitool sel elist > file` and import the file.
+
 ### What is read
 
 Records of the Memory sensor type (0Ch). Records of other sensors, OEM records and the kernel panic record are counted in the report and left out.

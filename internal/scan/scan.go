@@ -17,6 +17,7 @@
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
 //	GPU memory   on a live host, what "nvidia-smi -q -x" prints
+//	BMC log      in a copy of a host's files, a saved "ipmitool sel" listing
 //
 // The same code reads a copy of a host's files (a directory with var, sys
 // and proc below it): only files are read then, no commands are run.
@@ -29,6 +30,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
@@ -37,6 +39,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
+	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
@@ -204,7 +207,45 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	}
 	out = append(out, sm)
 	out = append(out, gpuMemory(&opts)...)
+	out = append(out, bmcLog(&opts)...)
 	return out
+}
+
+// SELDir is where a copy of a host's files keeps the output of ipmitool, as
+// sos saves it. SELListings are the endings of the file names of the event
+// log listings there, in order of preference; sos puts the options of the
+// command into the name ("ipmitool_sel_elist", "ipmitool_-I_usb_sel_elist").
+// The listing with sensor names comes first: on most boards the sensor name
+// is all that names the DIMM.
+const SELDir = "sos_commands/ipmitool"
+
+var SELListings = []string{"sel_elist", "sel_list_-v", "sel_list"}
+
+// bmcLog picks the BMC event log of a copy of a host's files: the first
+// saved listing that is found. One listing is read, because the same
+// record from two of them would count twice. A tree without a listing gets
+// no entry.
+//
+// A live host is not asked for its event log. Reading it through the BMC
+// needs root and can take minutes; a listing saved with "ipmitool sel
+// elist" is read by an import.
+func bmcLog(opts *Options) []adapter.Adapter {
+	if opts.Live {
+		return nil
+	}
+	entries, err := os.ReadDir(opts.path(SELDir))
+	if err != nil {
+		return nil
+	}
+	for _, ending := range SELListings {
+		for _, e := range entries {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ending) {
+				continue
+			}
+			return []adapter.Adapter{sel.NewFile(filepath.Join(opts.path(SELDir), e.Name()), sel.Options{Location: opts.Location})}
+		}
+	}
+	return nil
 }
 
 // NvidiaSMIFiles lists where saved output of "nvidia-smi -q" is looked for
