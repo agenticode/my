@@ -153,6 +153,13 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 
 	r := &reader{ctx: ctx, db: db, sink: sink, path: a.path, rep: &rep}
+	if has := tableSet(tables); has["mce_record"] {
+		if err := r.loadClock(); err != nil {
+			rep.Status = model.SourceError
+			rep.Detail = fmt.Sprintf("table mce_record: %v", err)
+			return rep
+		}
+	}
 	// mc_event first: machine check records are matched against it.
 	order := []struct {
 		table string
@@ -169,10 +176,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		{"cxl_overflow_event", r.cxlOverflow},
 		{"memory_failure_event", r.memoryFailure},
 	}
-	has := map[string]bool{}
-	for _, t := range tables {
-		has[t] = true
-	}
+	has := tableSet(tables)
 	for _, step := range order {
 		if !has[step.table] {
 			continue
@@ -190,6 +194,13 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	if r.notMemory > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("mce_record: %d machine checks are not memory errors and were left out", r.notMemory))
+	}
+	if r.moved > 0 {
+		span := fmt.Sprintf("%d s", r.aheadMin)
+		if r.aheadMax != r.aheadMin {
+			span = fmt.Sprintf("%d to %d s", r.aheadMin, r.aheadMax)
+		}
+		rep.Notes = append(rep.Notes, fmt.Sprintf("rasdaemon's clock was off against the kernel's by %s (its time minus the time the kernel put into the machine check records): %d records carry the kernel's time", span, r.moved))
 	}
 	if r.badCPER > 0 {
 		rep.Notes = append(rep.Notes, fmt.Sprintf("extlog_event: %d records have a CPER blob that could not be decoded; they were kept without location", r.badCPER))
@@ -244,6 +255,131 @@ func listTables(ctx context.Context, db *sql.DB) ([]string, error) {
 		out = append(out, n)
 	}
 	return out, rows.Err()
+}
+
+func tableSet(tables []string) map[string]bool {
+	has := make(map[string]bool, len(tables))
+	for _, t := range tables {
+		has[t] = true
+	}
+	return has
+}
+
+// clockSample is one machine check record's view of rasdaemon's clock.
+type clockSample struct {
+	at    int64 // rasdaemon's time of the record, seconds
+	ahead int64 // rasdaemon's time minus the kernel's, seconds
+}
+
+// Limits of the clock correction.
+const (
+	// minWalltime is the earliest kernel time that is believed: a host
+	// whose clock was never set counts from 1970 or from the date its
+	// firmware was built.
+	minWalltime = 946684800 // 2000-01-01
+	// clockJitter is how far rasdaemon's time of a record lies from the
+	// kernel's without its clock being off: rasdaemon counts in ticks of the
+	// uptime clock and rounds down.
+	clockJitter = 1
+	// clockReach is how far in time a machine check record speaks for the
+	// records of other tables. The error of rasdaemon's clock changes when
+	// rasdaemon is started again, which the database does not record.
+	clockReach = 600
+)
+
+// loadClock reads what the machine check records say about rasdaemon's
+// clock.
+//
+// rasdaemon stamps a record with the uptime of its trace event plus the
+// difference between the wall clock and the uptime that it measured when it
+// started. When the clock is set afterwards, as NTP does at boot on a host
+// whose hardware clock was off, every later stamp is wrong by that step
+// until rasdaemon starts again. A machine check record also carries the
+// time the kernel itself gave the error (walltime); the difference of the
+// two is the error of rasdaemon's clock at that moment. The kernel log
+// dates the same errors with the kernel's time, so a record that keeps
+// rasdaemon's time is not recognised as the same error there.
+func (r *reader) loadClock() error {
+	rows, err := r.db.QueryContext(r.ctx, `SELECT * FROM "mce_record" ORDER BY rowid`)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	names, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+	rw := &row{table: "mce_record", names: names, index: make(map[string]int, len(names))}
+	for i, n := range names {
+		rw.index[n] = i
+	}
+	if _, ok := rw.index["walltime"]; !ok {
+		return nil
+	}
+	ptrs := make([]any, len(names))
+	for rows.Next() {
+		rw.vals = make([]any, len(names))
+		for i := range rw.vals {
+			ptrs[i] = &rw.vals[i]
+		}
+		if err := rows.Scan(ptrs...); err != nil {
+			return err
+		}
+		t, _, ok := parseTimestamp(rw.str("timestamp"))
+		wall, wok := rw.int("walltime")
+		if !ok || !wok || wall < minWalltime {
+			continue
+		}
+		r.clock = append(r.clock, clockSample{at: t.Unix(), ahead: t.Unix() - wall})
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	sort.SliceStable(r.clock, func(i, j int) bool { return r.clock[i].at < r.clock[j].at })
+	return nil
+}
+
+// kernelTime turns rasdaemon's time of a record into the kernel's, where a
+// machine check record near it shows that rasdaemon's clock was off.
+func (r *reader) kernelTime(t time.Time) time.Time {
+	if len(r.clock) == 0 {
+		return t
+	}
+	u := t.Unix()
+	i := sort.Search(len(r.clock), func(i int) bool { return r.clock[i].at >= u })
+	best, bestDist := -1, int64(clockReach+1)
+	for _, j := range []int{i - 1, i} {
+		if j < 0 || j >= len(r.clock) {
+			continue
+		}
+		d := r.clock[j].at - u
+		if d < 0 {
+			d = -d
+		}
+		if d < bestDist {
+			best, bestDist = j, d
+		}
+	}
+	if best < 0 {
+		return t
+	}
+	return r.moveBy(t, r.clock[best].ahead)
+}
+
+// moveBy takes the error of rasdaemon's clock out of a time and counts the
+// correction.
+func (r *reader) moveBy(t time.Time, ahead int64) time.Time {
+	if ahead >= -clockJitter && ahead <= clockJitter {
+		return t
+	}
+	if r.moved == 0 || ahead < r.aheadMin {
+		r.aheadMin = ahead
+	}
+	if r.moved == 0 || ahead > r.aheadMax {
+		r.aheadMax = ahead
+	}
+	r.moved++
+	return t.Add(-time.Duration(ahead) * time.Second)
 }
 
 // sinkError marks an error returned by the Sink, as opposed to one of the
@@ -364,6 +500,13 @@ type reader struct {
 	mcIndex []mcEntry
 	sorted  bool
 
+	// clock holds what the machine check records say about rasdaemon's
+	// clock, by time; moved counts the records whose time was corrected and
+	// aheadMin, aheadMax span the corrections in seconds.
+	clock              []clockSample
+	moved              int
+	aheadMin, aheadMax int64
+
 	// What the CXL tables say beyond their events: the devices they name,
 	// poison list entries already seen, and remarks for the report.
 	cxlDevs    map[string]*cxlDevice
@@ -447,13 +590,28 @@ func (r *reader) base(rw *row, e *model.Event) bool {
 		return false
 	}
 	e.Kind = model.KindError
-	e.ErrorDT, e.UTCOffset, e.TimeQuality = t, off, model.TimeExact
+	e.ErrorDT, e.UTCOffset, e.TimeQuality = r.rowTime(rw, t), off, model.TimeExact
 	e.Source = Kind + "/" + rw.table
 	e.RawRef = ref
 	e.Raw = rw.raw()
 	e.Count = 1
+	// The fingerprint keeps rasdaemon's time: it names the row, and a row
+	// read again must give the same fingerprint.
 	e.Fingerprint = fingerprint(rw.table, id, t)
 	return true
+}
+
+// rowTime returns the time of a row as the kernel knew it. A machine check
+// record carries that time itself; any other row takes the correction of
+// the machine check record nearest to it.
+func (r *reader) rowTime(rw *row, t time.Time) time.Time {
+	if rw.table == "mce_record" {
+		if wall, ok := rw.int("walltime"); ok && wall >= minWalltime {
+			return r.moveBy(t, t.Unix()-wall)
+		}
+		return t
+	}
+	return r.kernelTime(t)
 }
 
 func fingerprint(table string, id int64, t time.Time) string {
@@ -555,7 +713,10 @@ func (r *reader) mcEvent(rw *row) error {
 		return err
 	}
 	_, id := r.ref(rw)
-	ent := mcEntry{unix: e.ErrorDT.Unix(), id: id, hasAddr: hasAddr, top: int(top), mid: int(mid)}
+	// The index keeps rasdaemon's time: machine check records are matched
+	// against it by the time rasdaemon gave both.
+	stamp, _, _ := parseTimestamp(rw.str("timestamp"))
+	ent := mcEntry{unix: stamp.Unix(), id: id, hasAddr: hasAddr, top: int(top), mid: int(mid)}
 	if hasAddr {
 		ent.addrLine = uint64(addr) >> 6
 	}
@@ -665,7 +826,8 @@ func (r *reader) mceRecord(rw *row) error {
 		e.Rank = model.Some(v)
 	}
 
-	if ent := r.findMC(e.ErrorDT.Unix(), uint64(addr)>>6, hasAddr, channel, csrow); ent != nil {
+	stamp, _, _ := parseTimestamp(rw.str("timestamp"))
+	if ent := r.findMC(stamp.Unix(), uint64(addr)>>6, hasAddr, channel, csrow); ent != nil {
 		ent.used = true
 		e.DupOfFingerprint = fingerprint("mc_event", ent.id, time.Unix(ent.unix, 0))
 	}
@@ -726,7 +888,7 @@ func (r *reader) memoryFailure(rw *row) error {
 		return nil
 	}
 	a := &model.Action{
-		At: t, TimeQuality: model.TimeExact, Kind: model.ActionPageOffline, Method: "hard",
+		At: r.kernelTime(t), TimeQuality: model.TimeExact, Kind: model.ActionPageOffline, Method: "hard",
 		OsPhysicalAddress: model.Some(pfn << 12),
 		Detail:            strings.TrimSpace(rw.str("page_type") + ": " + rw.str("action_result")),
 		Source:            Kind + "/" + rw.table, RawRef: ref, Raw: rw.raw(),
