@@ -1,0 +1,17 @@
+host lab-arm  QEMU lab-arm  2026-11-15 to 2026-11-15  CE 34, UE 3  observation grade A
+host finding: replace now
+
+    DIMM 0
+    ██
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
+ 1 slot, 1 DIMM
+
+ #  SLOT    SERIAL    CE  UE  MODE  TREND 30D     FINDING      RULES
+ 1  DIMM 0  LAB00A64  34   3  row   ▁▁▁▁▁▁▁▁▁█ ?  replace now  R-UE-01 R-SCRUB-01
+
+ sources  hostinfo 2 records, rasdaemon 11 records, klog 75 records, edac-sysfs 2 records, smbios 1
+          record, slot-map 1 record, time-align 11 records
+
+ my dimm DIMM 0: examination of this DIMM   my why DIMM 0: what the finding rests on
+ my bundle -o case.mycase: write a case bundle   my help: how to read the figures

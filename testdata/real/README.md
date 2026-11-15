@@ -14,6 +14,7 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `7.3.0-mce-rasdaemon-1.0` | the same guest, rasdaemon 1.0.0 | the machine checks of `7.3.0-mce` |
 | `7.3.0-cxl` | the same guest with an emulated CXL memory device, rasdaemon 1.0.0 | 11 corrected and 1 uncorrected error of the device, a health record, 2 poison ranges |
 | `6.19.10-ghes` | aarch64 guest with a firmware error source | 24 corrected and 2 uncorrected errors on one DIMM, as firmware error records with row and column |
+| `6.19.10-ghes-clock-step` | the same guest in its next boot, clock set back after rasdaemon started | 10 corrected and 1 uncorrected error; rasdaemon's times are 10 seconds ahead and no record holds the kernel's time |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 

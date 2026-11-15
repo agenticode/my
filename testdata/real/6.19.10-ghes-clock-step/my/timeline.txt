@@ -1,0 +1,11 @@
+host lab-arm  2026-11-15 to 2026-11-15  1 day
+
+
+ DIMM 0    █  peak 34/day
+ events    UOB
+           │└┼ 3 pages offline on 2026-11-15
+           └─┼ 3 UE on 2026-11-15
+             └ 2026-11-15 reboot
+
+ 34 corrected and 3 uncorrected errors from 2026-11-15 to 2026-11-15
+ 11 of them since the boot of 2026-11-15: a counter that restarts at every boot shows only those

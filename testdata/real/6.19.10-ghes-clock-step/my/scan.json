@@ -1,0 +1,185 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-arm",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": {
+      "name": "lab-arm",
+      "system": "QEMU lab-arm",
+      "from": "2026-11-15T10:37:07.616233Z",
+      "to": "2026-11-15T12:22:44.829582Z",
+      "ce": 34,
+      "ue": 3,
+      "records": 39,
+      "grade_a": 37,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "replace-now",
+      "grade_text": "replace now",
+      "boots": 2,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-15T12:22:38.935552Z",
+        "privileged": true,
+        "tool_version": "cae9978"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "DIMM 0",
+                  "label": "DIMM 0",
+                  "state": "replace-now",
+                  "serial": "LAB00A64",
+                  "ce": 34,
+                  "ue": 3
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 1,
+      "populated": 1
+    },
+    "ranking": [
+      {
+        "n": 1,
+        "slot": "DIMM 0",
+        "dimm": {
+          "dimm_uid": "d7fb322c36ad9aeb826f",
+          "serial": "LAB00A64",
+          "manufacturer": "Lab Memory",
+          "part_number": "LABDDR4-8G",
+          "kind": "RAM 8 GB",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 34,
+        "ue": 3,
+        "mode": "row",
+        "mode_text": "row",
+        "faults": 5,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          37
+        ],
+        "direction": "unknown",
+        "grade": "replace-now",
+        "grade_text": "replace now",
+        "rules": [
+          "R-UE-01",
+          "R-SCRUB-01"
+        ],
+        "confidence": 79
+      }
+    ],
+    "quiet": 0,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 11,
+        "events": 11,
+        "actions": 0,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-15T12:20:40Z",
+        "last": "2026-11-15T12:21:31Z"
+      },
+      {
+        "kind": "klog",
+        "origin": "journalctl -o json _TRANSPORT=kernel",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 75,
+        "events": 66,
+        "actions": 3,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-15T11:09:38.541538Z",
+        "last": "2026-11-15T12:21:21.597617Z",
+        "notes": [
+          "1593 lines read"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 1,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 3.0",
+          "1 memory slots, 1 populated"
+        ]
+      },
+      {
+        "kind": "slot-map",
+        "origin": "lab-arm",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 1,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "all 1 EDAC DIMM positions are tied to SMBIOS slots"
+        ]
+      },
+      {
+        "kind": "time-align",
+        "origin": "lab-arm",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 11,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "rasdaemon stamped 11 records of one boot 10s ahead of the kernel's clock: they are dated by the kernel's time, which the kernel log gives for 11 of the errors"
+        ]
+      }
+    ]
+  }
+}
