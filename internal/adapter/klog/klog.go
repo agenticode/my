@@ -330,8 +330,11 @@ type parser struct {
 	fr     framer
 	tally  adapter.Tally
 
-	lineNo        int
-	records       int
+	lineNo  int
+	records int
+	// seen counts the records of each stamp and text, to tell equal
+	// lines apart.
+	seen          map[string]int
 	injected      int
 	injectors     map[string]bool
 	otherXID      map[int]int
@@ -538,14 +541,30 @@ func (p *parser) refRange(first *line, lastN int) string {
 
 // fingerprint identifies a record by the kernel's own stamp and text, so
 // that the same line read from dmesg and from the journal is one record.
+//
+// The same text with the same stamp again is another record: a cell that
+// fails six times within a second gives six equal lines, and the forms
+// that date a line to the second (dmesg -T, syslog) give them equal stamps
+// as well. Such lines are told apart by their order.
 func (p *parser) fingerprint(class string, l *line, extra string) string {
+	var fp string
 	switch {
 	case l.hasMono:
-		return model.Fingerprint(Kind, class, "m", strconv.FormatInt(int64(l.mono/time.Microsecond), 10), l.msg, extra)
+		fp = model.Fingerprint(Kind, class, "m", strconv.FormatInt(int64(l.mono/time.Microsecond), 10), l.msg, extra)
 	case !l.wall.IsZero():
-		return model.Fingerprint(Kind, class, "w", strconv.FormatInt(l.wall.Unix(), 10), l.msg, extra)
+		fp = model.Fingerprint(Kind, class, "w", strconv.FormatInt(l.wall.Unix(), 10), l.msg, extra)
+	default:
+		return model.Fingerprint(Kind, class, "n", p.origin, strconv.Itoa(l.n), l.msg, extra)
 	}
-	return model.Fingerprint(Kind, class, "n", p.origin, strconv.Itoa(l.n), l.msg, extra)
+	if p.seen == nil {
+		p.seen = map[string]int{}
+	}
+	n := p.seen[fp]
+	p.seen[fp] = n + 1
+	if n > 0 {
+		return model.Fingerprint(fp, "again", strconv.Itoa(n))
+	}
+	return fp
 }
 
 func (p *parser) dispatch(l *line) error {
