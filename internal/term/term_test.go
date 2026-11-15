@@ -3,6 +3,7 @@ package term
 import (
 	"bytes"
 	"context"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -466,5 +467,50 @@ func TestTableDropsColumnsThatDoNotFit(t *testing.T) {
 	}
 	if strings.Contains(narrow, "RULES") || !strings.Contains(narrow, "FINDING") || !strings.Contains(narrow, "CPU0_C1") {
 		t.Errorf("at 60 columns the table should drop the rules and keep the finding:\n%s", narrow)
+	}
+}
+
+func TestDetect(t *testing.T) {
+	env := func(kv map[string]string) func(string) string {
+		return func(k string) string { return kv[k] }
+	}
+	for _, tt := range []struct {
+		name     string
+		st       Style
+		color    string
+		terminal bool
+		columns  int
+		env      map[string]string
+		want     Style
+	}{
+		{"a terminal gets colour and its width", Style{}, ColorAuto, true, 132, nil, Style{Color: true, Width: 132}},
+		{"a pipe gets neither", Style{}, ColorAuto, false, 0, nil, Style{}},
+		{"NO_COLOR turns colour off", Style{}, ColorAuto, true, 80, map[string]string{"NO_COLOR": "1"}, Style{Width: 80}},
+		{"a dumb terminal has no colour", Style{}, ColorAuto, true, 80, map[string]string{"TERM": "dumb"}, Style{Width: 80}},
+		{"always wins over NO_COLOR and a pipe", Style{}, ColorAlways, false, 0, map[string]string{"NO_COLOR": "1"}, Style{Color: true}},
+		{"never wins over a terminal", Style{}, ColorNever, true, 80, nil, Style{Width: 80}},
+		{"a width that was asked for stays", Style{Width: 70}, ColorAuto, true, 132, nil, Style{Color: true, Width: 70}},
+		{"COLUMNS sets the width of a pipe", Style{}, ColorAuto, false, 0, map[string]string{"COLUMNS": "90"}, Style{Width: 90}},
+		{"the C locale gets ASCII", Style{}, ColorAuto, false, 0, map[string]string{"LANG": "C"}, Style{ASCII: true}},
+		{"LC_ALL decides before LANG", Style{}, ColorAuto, false, 0, map[string]string{"LANG": "C", "LC_ALL": "en_US.UTF-8"}, Style{}},
+		{"a legacy Korean character set gets ASCII glyphs", Style{}, ColorAuto, false, 0, map[string]string{"LANG": "ko_KR.eucKR"}, Style{ASCII: true}},
+		{"utf8 without the dash", Style{}, ColorAuto, false, 0, map[string]string{"LC_CTYPE": "en_US.utf8"}, Style{}},
+		{"ASCII that was asked for stays", Style{ASCII: true}, ColorAuto, false, 0, map[string]string{"LANG": "ko_KR.UTF-8"}, Style{ASCII: true}},
+	} {
+		if got := Detect(tt.st, tt.color, tt.terminal, tt.columns, env(tt.env)); got != tt.want {
+			t.Errorf("%s: %+v, want %+v", tt.name, got, tt.want)
+		}
+	}
+	// A file is not a terminal.
+	f, err := os.CreateTemp(t.TempDir(), "out")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if _, terminal := Size(f); terminal {
+		t.Error("a file was taken for a terminal")
+	}
+	if _, terminal := Size(nil); terminal {
+		t.Error("no file was taken for a terminal")
 	}
 }

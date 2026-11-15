@@ -15,6 +15,8 @@ import (
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
+	"github.com/agenticode/my/internal/term"
+	"github.com/agenticode/my/internal/view"
 )
 
 // analyzeCommand runs the analysis engine over a ledger and prints the
@@ -39,15 +41,7 @@ var labels = i18n.Catalog{
 	"no.host":    {EN: "no host named {host} in the ledger", KO: "원장에 {host} 호스트 없음"},
 	"quiet":      {EN: "{n} {n|DIMM|DIMMs} without errors", KO: "오류 없는 DIMM {n}개"},
 	"gone":       {EN: "no longer in the host", KO: "호스트에서 빠짐"},
-	"finding":    {EN: "finding", KO: "판정"},
-	"evidence":   {EN: "evidence", KO: "근거"},
-	"checks":     {EN: "checks", KO: "반례"},
-	"missing":    {EN: "missing", KO: "부족"},
-	"next":       {EN: "next", KO: "다음"},
 	"confidence": {EN: "confidence {level}, {n}", KO: "신뢰도 {level}, {n}"},
-	"supports":   {EN: "supports", KO: "뒷받침"},
-	"weakens":    {EN: "weakens", KO: "약화"},
-	"open":       {EN: "open", KO: "미확인"},
 	"loose":      {EN: "{n} {n|error|errors} of this host {n|is|are} tied to no DIMM", KO: "이 호스트의 오류 {n}건은 어느 DIMM에도 묶이지 않음"},
 	"saved":      {EN: "faults and findings stored in {file}", KO: "고장과 소견을 {file}에 저장"},
 }
@@ -200,11 +194,13 @@ func printResult(w io.Writer, lg i18n.Lang, res *engine.Result, all bool) {
 	// Labels are padded to the same width in display columns; a Korean
 	// syllable takes two.
 	width := 0
+	// The words of the card are the ones the screens use.
+	card := func(code string) string { return view.Messages.Text(lg, "card."+code, nil) }
 	for _, code := range []string{"finding", "evidence", "checks", "missing", "next"} {
-		width = max(width, displayWidth(say(code)))
+		width = max(width, term.Width(card(code)))
 	}
 	line := func(label, text string) {
-		fmt.Fprintf(w, "  %s%s  %s\n", label, strings.Repeat(" ", width-displayWidth(label)), text)
+		fmt.Fprintf(w, "  %s%s  %s\n", label, strings.Repeat(" ", width-term.Width(label)), text)
 	}
 	for i, h := range res.Hosts {
 		if i > 0 {
@@ -241,36 +237,36 @@ func printResult(w io.Writer, lg i18n.Lang, res *engine.Result, all bool) {
 			}
 			fmt.Fprintln(w, head)
 			conf := say("confidence", "level", engine.Messages.Text(lg, "confidence."+engine.ConfidenceLevel(v.Confidence), nil), "n", v.Confidence)
-			line(say("finding"), fmt.Sprintf("%s (%s, %s)  %s", engine.GradeText(lg, v.Grade), engine.Messages.Text(lg, "label.finding", nil), conf, strings.Join(v.Rules, " ")))
-			label := say("evidence")
+			line(card("finding"), fmt.Sprintf("%s (%s, %s)  %s", engine.GradeText(lg, v.Grade), engine.Messages.Text(lg, "label.finding", nil), conf, strings.Join(v.Rules, " ")))
+			label := card("evidence")
 			for _, e := range v.Evidence {
 				line(label, fmt.Sprintf("[%s] %s", e.Rule, engine.Text(lg, e.Statement)))
 				label = ""
 			}
-			label = say("checks")
+			label = card("checks")
 			for _, c := range v.CounterEvidence {
-				line(label, fmt.Sprintf("%s: %s", say(c.Effect), engine.Text(lg, c.Statement)))
+				line(label, fmt.Sprintf("%s: %s", view.Messages.Text(lg, "effect."+c.Effect, nil), engine.Text(lg, c.Statement)))
 				label = ""
 			}
-			label = say("missing")
+			label = card("missing")
 			for _, m := range v.Missing {
 				line(label, engine.Text(lg, m))
 				label = ""
 			}
 			if v.NextAction.Code != "" {
-				line(say("next"), engine.Text(lg, v.NextAction))
+				line(card("next"), engine.Text(lg, v.NextAction))
 			}
 		}
 		for _, g := range h.GPUs {
 			v := g.Verdict
 			fmt.Fprintf(w, "\nGPU %s\n", g.Key)
-			line(say("finding"), fmt.Sprintf("%s (%s)  %s", engine.GradeText(lg, v.Grade), engine.Messages.Text(lg, "label.finding", nil), strings.Join(v.Rules, " ")))
-			label := say("evidence")
+			line(card("finding"), fmt.Sprintf("%s (%s)  %s", engine.GradeText(lg, v.Grade), engine.Messages.Text(lg, "label.finding", nil), strings.Join(v.Rules, " ")))
+			label := card("evidence")
 			for _, e := range v.Evidence {
 				line(label, fmt.Sprintf("[%s] %s", e.Rule, engine.Text(lg, e.Statement)))
 				label = ""
 			}
-			line(say("next"), engine.Text(lg, v.NextAction))
+			line(card("next"), engine.Text(lg, v.NextAction))
 		}
 		if quiet > 0 {
 			fmt.Fprintf(w, "\n%s\n", say("quiet", "n", quiet))
@@ -283,18 +279,4 @@ func printResult(w io.Writer, lg i18n.Lang, res *engine.Result, all bool) {
 			fmt.Fprintln(w, say("loose", "n", loose))
 		}
 	}
-}
-
-// displayWidth returns the number of terminal columns a string takes:
-// two for Hangul syllables and other wide characters, one otherwise.
-func displayWidth(s string) int {
-	n := 0
-	for _, r := range s {
-		if r >= 0x1100 && (r <= 0x115f || (r >= 0x2e80 && r <= 0xa4cf) || (r >= 0xac00 && r <= 0xd7a3) || (r >= 0xf900 && r <= 0xfaff) || (r >= 0xff00 && r <= 0xff60)) {
-			n += 2
-		} else {
-			n++
-		}
-	}
-	return n
 }

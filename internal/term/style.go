@@ -208,3 +208,27 @@ func heatColor(level int) string {
 	}
 	return cRed
 }
+
+// Glyphs returns the drawing characters of the style by name, for texts
+// that explain a figure: g0 to g4 are the five densities, hold the mark of
+// a hold finding, ue the mark of an uncorrected error, up, flat and down
+// the trend arrows.
+func (st Style) Glyphs() map[string]any {
+	g := st.g()
+	return map[string]any{
+		"g0": g.shade[0], "g1": g.shade[1], "g2": g.shade[2], "g3": g.shade[3], "g4": g.shade[4],
+		"hold": g.hold, "ue": g.ue, "up": g.up, "flat": g.flat, "down": g.down, "zero": g.spark[0],
+	}
+}
+
+// Wrap breaks text into lines of at most the width of the style less
+// indent, and puts indent spaces before each.
+func (st Style) Wrap(text string, indent int) []string {
+	lines := wrap(text, st.width()-indent)
+	for i, l := range lines {
+		if l != "" {
+			lines[i] = strings.Repeat(" ", indent) + l
+		}
+	}
+	return lines
+}

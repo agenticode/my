@@ -1,0 +1,222 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"strings"
+
+	"github.com/agenticode/my/internal/cli"
+	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/term"
+	"github.com/agenticode/my/internal/view"
+)
+
+// words holds the texts of the commands: usage, flags, errors and hints.
+var words = i18n.Catalog{
+	// Errors in the command line.
+	"err.see_help":      {EN: "run \"{cmd}\" for usage", KO: "사용법은 \"{cmd}\""},
+	"err.extra":         {EN: "unexpected argument \"{arg}\"", KO: "불필요한 인자 \"{arg}\""},
+	"err.one_dimm":      {EN: "name one DIMM by its slot or serial number", KO: "DIMM 하나를 슬롯 이름이나 시리얼로 지정해야 함"},
+	"err.color":         {EN: "--color {value}: want auto, always or never", KO: "--color {value}: auto, always, never 중 하나여야 함"},
+	"err.width":         {EN: "--width {value}: want a number of columns", KO: "--width {value}: 칸 수여야 함"},
+	"err.bank":          {EN: "--bank {value}: want a bank (3) or a bank group and a bank (0/3)", KO: "--bank {value}: bank 번호(3) 또는 bank group과 bank(0/3)여야 함"},
+	"err.rows":          {EN: "--rows {value}: want a range of rows such as 0x1a00-0x1aff", KO: "--rows {value}: 0x1a00-0x1aff 같은 row 범위여야 함"},
+	"err.days":          {EN: "--days {value}: want a number of days", KO: "--days {value}: 일수여야 함"},
+	"err.not_dir":       {EN: "not a directory", KO: "디렉터리가 아님"},
+	"err.empty":         {EN: "the ledger holds no host", KO: "원장에 호스트 없음"},
+	"err.no_host":       {EN: "no host named {host} in the ledger (hosts: {hosts})", KO: "원장에 {host} 호스트 없음 (호스트: {hosts})"},
+	"err.several_hosts": {EN: "the ledger holds several hosts: name one with --host ({hosts})", KO: "원장에 호스트가 여럿임: --host로 하나를 지정 ({hosts})"},
+	"err.empty_slot":    {EN: "slot {slot} holds no DIMM", KO: "슬롯 {slot}에 DIMM 없음"},
+	"err.no_dimm":       {EN: "no slot or DIMM \"{ref}\" in host {host}.", KO: "호스트 {host}에 \"{ref}\" 슬롯이나 DIMM 없음."},
+	"err.with_findings": {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
+	"err.open_file":     {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
+	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, 또는 생략하면 개요)"},
+
+	// What to run next.
+	"hint.dimm": {EN: "examination of this DIMM", KO: "이 DIMM 진찰 화면"},
+	"hint.why":  {EN: "what the finding rests on", KO: "판정 근거"},
+	"hint.help": {EN: "how to read the figures", KO: "판독법"},
+
+	// Help.
+	"help.usage":   {EN: "Usage:", KO: "사용법:"},
+	"help.flags":   {EN: "Flags:", KO: "옵션:"},
+	"help.reading": {EN: "How to read the output", KO: "출력 판독법"},
+	"help.exit":    {EN: "Exit code: the grade of what was shown (0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement); 64 for a wrong command line, 70 when the command failed.", KO: "종료 코드: 보여준 대상의 등급(0 정상, 1 관찰, 2 교체 고려, 3 즉시 교체, 4 교체 보류). 명령줄 오류는 64, 실행 실패는 70."},
+	"help.source":  {EN: "The command scans this host on every run and keeps nothing. To look at a stored case instead, put \"my open FILE\" in front: my open case.mycase {cmd}", KO: "이 명령은 실행할 때마다 이 호스트를 스캔하며 남기는 것이 없습니다. 저장된 케이스를 보려면 앞에 \"my open FILE\"을 붙입니다: my open case.mycase {cmd}"},
+	"help.common": {
+		EN: "--lang en|ko      language of the output (default: from the locale, English otherwise)\n" +
+			"--json            print the data behind the figure as JSON\n" +
+			"--ascii           draw with ASCII characters only\n" +
+			"--color WHEN      auto (on a terminal, unless NO_COLOR is set), always or never\n" +
+			"--width N         columns to fill (default: the terminal, 100 otherwise)\n" +
+			"--host NAME       the host to show, when the ledger holds several\n" +
+			"--config FILE     read thresholds from FILE (key = value lines)\n" +
+			"--set KEY=VALUE   change one threshold; \"my help thresholds\" lists them",
+		KO: "--lang en|ko      출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
+			"--json            그림의 데이터를 JSON으로 출력\n" +
+			"--ascii           ASCII 문자만으로 그림\n" +
+			"--color WHEN      auto(터미널일 때, NO_COLOR가 없을 때), always, never\n" +
+			"--width N         출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)\n" +
+			"--host NAME       원장에 호스트가 여럿일 때 볼 호스트\n" +
+			"--config FILE     임계값 파일 (key = value 줄)\n" +
+			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"",
+	},
+	"help.scan": {
+		EN: "--ledger FILE     keep the scan in the ledger FILE and add to it on every run\n" +
+			"--root DIR        read a copy of a host's files below DIR instead of this host",
+		KO: "--ledger FILE     스캔을 원장 FILE에 남기고 실행할 때마다 누적\n" +
+			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음",
+	},
+
+	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
+	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. Sources it may not read as this user are named on the \"missing\" line with what root would add.", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다."},
+	"help.overview.flags": {EN: "--all             list every DIMM, also those without errors", KO: "--all             오류 없는 DIMM도 모두 나열"},
+
+	"help.dimm.usage": {EN: "my dimm <slot|serial> [flags]", KO: "my dimm <슬롯|시리얼> [옵션]"},
+	"help.dimm.text":  {EN: "The examination of one DIMM: its finding, the branch its errors sit on, the address map of the bank with the most errors, and its timeline. A DIMM is named by its slot, by its serial number or the end of it, or by the EDAC label of its slot.", KO: "DIMM 하나의 진찰 화면: 판정 카드, 오류가 몰린 가지, 오류가 가장 많은 bank의 주소 맵, 타임라인. DIMM은 슬롯 이름, 시리얼(끝자리만 써도 됨), 슬롯의 EDAC 라벨로 지정합니다."},
+
+	"help.why.usage": {EN: "my why [slot|serial] [--oneline] [flags]", KO: "my why [슬롯|시리얼] [--oneline] [옵션]"},
+	"help.why.text":  {EN: "The finding and everything it rests on: the rules that fired, the ledger records behind each statement, the checks against other explanations, the missing data, the steps of the confidence and the faults. Without a DIMM it prints this for every DIMM that has errors or a finding, the worst first.", KO: "판정과 그 근거 전체: 발동한 규칙, 문장마다의 원장 기록, 다른 설명과 견준 점검, 부족한 데이터, 신뢰도 계산 단계, 고장 목록. DIMM을 지정하지 않으면 오류나 소견이 있는 모든 DIMM을 위험한 순서로 출력합니다."},
+	"help.why.flags": {
+		EN: "--oneline         one line per DIMM, for a ticket\n" +
+			"--all             also the DIMMs without errors",
+		KO: "--oneline         DIMM마다 한 줄 (티켓에 붙이는 용도)\n" +
+			"--all             오류 없는 DIMM도 포함",
+	},
+
+	"help.map.usage": {EN: "my map <slot|serial> [--bank N] [--rows A-B] [flags]", KO: "my map <슬롯|시리얼> [--bank N] [--rows A-B] [옵션]"},
+	"help.map.text":  {EN: "The address map of one bank of a DIMM: errors by row and column. Without --bank it draws the bank with the most errors and names the other banks that have errors.", KO: "DIMM의 bank 하나를 row x column 주소 맵으로 그립니다. --bank가 없으면 오류가 가장 많은 bank를 그리고 오류가 있는 다른 bank를 알려 줍니다."},
+	"help.map.flags": {
+		EN: "--bank N          the bank to draw: a bank address (3), or bank group and bank (0/3)\n" +
+			"--rank N          narrow the choice to a rank\n" +
+			"--device N        narrow the choice to a device\n" +
+			"--rows A-B        draw this range of rows (0x1a00-0x1aff)",
+		KO: "--bank N          그릴 bank: bank 번호(3) 또는 bank group과 bank(0/3)\n" +
+			"--rank N          rank로 범위를 좁힘\n" +
+			"--device N        device로 범위를 좁힘\n" +
+			"--rows A-B        이 row 범위를 그림 (0x1a00-0x1aff)",
+	},
+
+	"help.timeline.usage": {EN: "my timeline [slot|serial] [--days N] [flags]", KO: "my timeline [슬롯|시리얼] [--days N] [옵션]"},
+	"help.timeline.text":  {EN: "Errors per day with boots, repairs, pages taken offline, slot changes and uncorrected errors, for one DIMM or, without one, for every DIMM of the host that has errors.", KO: "일별 오류에 부팅, 리페어, page offline, 슬롯 이동, UE를 표시합니다. DIMM을 지정하지 않으면 오류가 있는 모든 DIMM을 줄마다 그립니다."},
+	"help.timeline.flags": {EN: "--days N          draw the last N days only", KO: "--days N          최근 N일만 그림"},
+
+	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline ...] [flags]", KO: "my open FILE [dimm|why|map|timeline ...] [옵션]"},
+	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
+
+	"help.rules.title":      {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
+	"help.thresholds.title": {EN: "Thresholds, with their defaults. Change one with --set KEY=VALUE or a --config file.", KO: "임계값과 기본값. --set KEY=VALUE 또는 --config 파일로 바꿉니다."},
+	"help.topics":           {EN: "More: my help reading (every figure), my help rules, my help thresholds.", KO: "더 보기: my help reading (모든 그림), my help rules, my help thresholds."},
+}
+
+// guides lists, per command, the reading guides of the figures it draws.
+var guides = map[string][]string{
+	"overview": {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
+	"dimm":     {"guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades"},
+	"why":      {"guide.card", "guide.grades", "guide.obs"},
+	"map":      {"guide.map", "guide.obs"},
+	"timeline": {"guide.timeline"},
+	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
+	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades", "guide.obs"},
+}
+
+// printGuides writes reading guides, each as a paragraph.
+func printGuides(w io.Writer, lang i18n.Lang, st term.Style, codes []string) {
+	for i, code := range codes {
+		if i > 0 {
+			fmt.Fprintln(w)
+		}
+		for _, line := range st.Wrap(view.Messages.Text(lang, code, st.Glyphs()), 2) {
+			fmt.Fprintln(w, line)
+		}
+	}
+}
+
+// printHelp writes the help of a command: usage, what it does, its flags,
+// the exit code, and how to read what it prints.
+func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *source) int {
+	w := env.Stdout
+	st.Lang = lang
+	fmt.Fprintf(w, "%s %s\n\n", say(lang, "help.usage"), say(lang, "help."+topic+".usage"))
+	for _, line := range st.Wrap(say(lang, "help."+topic+".text"), 0) {
+		fmt.Fprintln(w, line)
+	}
+	fmt.Fprintf(w, "\n%s\n", say(lang, "help.flags"))
+	blocks := []string{"help." + topic + ".flags"}
+	if topic != "open" {
+		blocks = append(blocks, "help.scan")
+	}
+	blocks = append(blocks, "help.common")
+	for _, code := range blocks {
+		if !words.Has(code) {
+			continue
+		}
+		for _, line := range strings.Split(say(lang, code), "\n") {
+			fmt.Fprintln(w, "  "+line)
+		}
+	}
+	fmt.Fprintln(w)
+	for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
+		fmt.Fprintln(w, line)
+	}
+	if topic != "open" && topic != "overview" {
+		fmt.Fprintln(w)
+		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
+			fmt.Fprintln(w, line)
+		}
+	}
+	if g := guides[topic]; len(g) > 0 {
+		fmt.Fprintf(w, "\n%s\n\n", say(lang, "help.reading"))
+		printGuides(w, lang, st, g)
+	}
+	fmt.Fprintf(w, "\n%s\n", say(lang, "help.topics"))
+	return cli.ExitOK
+}
+
+// topicCommand is a help topic that is not a command: "my help reading".
+func topicCommand(name string, print func(w io.Writer, lang i18n.Lang, st term.Style)) *cli.Command {
+	return &cli.Command{Name: name, Hidden: true, Run: func(_ context.Context, env *cli.Env, args []string) int {
+		o := newOptions(env, "my help "+name, &source{})
+		_, lang, code, done := o.parse(env, args)
+		if done {
+			return code
+		}
+		print(env.Stdout, lang, o.style(env, lang))
+		return cli.ExitOK
+	}}
+}
+
+func printReading(w io.Writer, lang i18n.Lang, st term.Style) {
+	st.Lang = lang
+	fmt.Fprintf(w, "%s\n\n", say(lang, "help.reading"))
+	printGuides(w, lang, st, guides["reading"])
+}
+
+func printRuleList(w io.Writer, lang i18n.Lang, st term.Style) {
+	fmt.Fprintf(w, "%s\n\n", say(lang, "help.rules.title"))
+	idW, gradeW := 0, 0
+	for _, r := range engine.Rules {
+		idW = max(idW, term.Width(r.ID))
+		gradeW = max(gradeW, term.Width(engine.GradeText(lang, r.Grade)))
+	}
+	st.Lang = lang
+	for _, r := range engine.Rules {
+		grade := engine.GradeText(lang, r.Grade)
+		lines := st.Wrap(engine.Messages.Text(lang, r.Condition, nil), idW+gradeW+6)
+		for i, line := range lines {
+			if i == 0 {
+				fmt.Fprintf(w, "  %-*s  %s%s  %s\n", idW, r.ID, grade, strings.Repeat(" ", gradeW-term.Width(grade)), strings.TrimLeft(line, " "))
+			} else {
+				fmt.Fprintln(w, line)
+			}
+		}
+	}
+}
+
+func printThresholdList(w io.Writer, lang i18n.Lang, _ term.Style) {
+	fmt.Fprintf(w, "%s\n\n", say(lang, "help.thresholds.title"))
+	cfg := engine.DefaultConfig()
+	printThresholds(w, &cfg)
+}

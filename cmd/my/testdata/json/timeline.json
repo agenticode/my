@@ -1,0 +1,235 @@
+{
+  "view": "timeline",
+  "version": 1,
+  "lang": "en",
+  "host": "r12-n034",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": "r12-n034",
+    "slot": "CPU0_C1",
+    "dimm": {
+      "dimm_uid": "d878e1a15b6e30a44057",
+      "serial": "3B9C56",
+      "manufacturer": "Example Memory",
+      "part_number": "EXM64G48R2X4-A",
+      "kind": "DDR5 RDIMM 64 GB 2Rx4",
+      "identity": "serial"
+    },
+    "from": "2026-07-31T00:00:00Z",
+    "to": "2026-11-12T00:00:00Z",
+    "days": 105,
+    "series": [
+      {
+        "label": "CPU0_C1",
+        "serial": "3B9C56",
+        "ce": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          3,
+          7,
+          5,
+          3,
+          6,
+          11,
+          10,
+          8,
+          17,
+          13,
+          19,
+          8,
+          13,
+          14,
+          18,
+          20,
+          25,
+          10,
+          25,
+          26,
+          25,
+          22,
+          22,
+          23,
+          34,
+          44,
+          37,
+          39,
+          36,
+          41,
+          34,
+          50,
+          51,
+          41,
+          42,
+          46,
+          49,
+          64,
+          55,
+          73,
+          65,
+          68
+        ],
+        "total": 1231,
+        "peak": 73
+      }
+    ],
+    "markers": [
+      {
+        "kind": "boot",
+        "letter": "B",
+        "days": [
+          26,
+          61,
+          89
+        ],
+        "count": 3,
+        "text": {
+          "code": "tl.boot.many",
+          "args": {
+            "n": 3
+          },
+          "text": "3 reboots"
+        }
+      },
+      {
+        "kind": "hppr",
+        "letter": "P",
+        "days": [
+          89
+        ],
+        "count": 1,
+        "text": {
+          "code": "tl.action.one",
+          "args": {
+            "kind": "hard PPR",
+            "when": "2026-10-28"
+          },
+          "text": "2026-10-28 hard PPR"
+        }
+      },
+      {
+        "kind": "page-offline",
+        "letter": "O",
+        "days": [
+          103,
+          104
+        ],
+        "count": 7,
+        "text": {
+          "code": "tl.offline.many",
+          "args": {
+            "days": 2,
+            "first": "2026-11-11",
+            "last": "2026-11-12",
+            "n": 7
+          },
+          "text": "7 pages offline, 2026-11-11 to 2026-11-12"
+        }
+      },
+      {
+        "kind": "ue",
+        "letter": "U",
+        "days": [
+          104
+        ],
+        "count": 1,
+        "text": {
+          "code": "tl.ue.one_how",
+          "args": {
+            "how": "demand read",
+            "when": "2026-11-12"
+          },
+          "text": "2026-11-12 UE (demand read)"
+        }
+      }
+    ],
+    "ce": 1231,
+    "ue": 1,
+    "since_boot": {
+      "at": "2026-10-28T01:30:00Z",
+      "ce": 789,
+      "ue": 1
+    },
+    "notes": [
+      {
+        "code": "tl.total",
+        "args": {
+          "ce": 1231,
+          "from": "2026-07-31",
+          "to": "2026-11-12",
+          "ue": 1
+        },
+        "text": "1,231 corrected and 1 uncorrected error from 2026-07-31 to 2026-11-12"
+      },
+      {
+        "code": "tl.since_boot",
+        "args": {
+          "n": 790,
+          "when": "2026-10-28"
+        },
+        "text": "790 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those"
+      }
+    ]
+  }
+}

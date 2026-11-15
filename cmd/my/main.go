@@ -14,17 +14,61 @@ import (
 
 func app() *cli.App {
 	return &cli.App{
-		Name:     "my",
-		Synopsis: "MemorY reads memory error records from a Linux server. It never changes system state.",
+		Name:             "my",
+		Synopsis:         "MemorY reads the memory error records of a Linux server and shows which DIMM is failing, how, and what it rests on.\nIt never changes system state.",
+		SynopsisKO:       "MemorY는 Linux 서버의 메모리 오류 기록을 읽어 어느 DIMM이 어떤 고장 모드로 실패하는지, 그 근거가 무엇인지 보여줍니다.\n시스템 상태를 바꾸지 않습니다.",
+		DefaultSummary:   "the same as \"my scan\"",
+		DefaultSummaryKO: "\"my scan\"과 같음",
+		Default:          &cli.Command{Name: "scan", Run: live(runOverview)},
 		Commands: []*cli.Command{
 			{
-				Name:    "version",
-				Summary: "print version and build information",
+				Name:      "scan",
+				Summary:   "scan this host: slot map and DIMMs ranked by risk",
+				SummaryKO: "이 호스트를 스캔: 슬롯 맵과 위험 순위",
+				Run:       live(runOverview),
+			},
+			{
+				Name:      "dimm",
+				Summary:   "examine one DIMM: finding, topology, address map, timeline",
+				SummaryKO: "DIMM 하나의 진찰 화면: 판정 카드, 토폴로지, 주소 맵, 타임라인",
+				Run:       live(runDIMM),
+			},
+			{
+				Name:      "why",
+				Summary:   "the finding and what it rests on; --oneline for a ticket",
+				SummaryKO: "판정 근거: 규칙, 기록, 반례, 부족한 데이터. --oneline은 티켓용 한 줄",
+				Run:       live(runWhy),
+			},
+			{
+				Name:      "map",
+				Summary:   "address map of one bank: errors by row and column",
+				SummaryKO: "bank 하나의 주소 맵: row x column",
+				Run:       live(runMap),
+			},
+			{
+				Name:      "timeline",
+				Summary:   "errors per day with boots, repairs and uncorrected errors",
+				SummaryKO: "일별 오류와 부팅, 리페어, UE",
+				Run:       live(runTimeline),
+			},
+			{
+				Name:      "open",
+				Summary:   "show a stored case (a .mycase bundle or a ledger) with the same commands",
+				SummaryKO: "저장된 케이스(.mycase 번들 또는 원장)를 같은 명령으로 보기",
+				Run:       runOpen,
+			},
+			{
+				Name:      "version",
+				Summary:   "print version and build information",
+				SummaryKO: "버전과 빌드 정보",
 				Run: func(_ context.Context, env *cli.Env, _ []string) int {
 					fmt.Fprintln(env.Stdout, buildinfo.String())
 					return cli.ExitOK
 				},
 			},
+			topicCommand("reading", printReading),
+			topicCommand("rules", printRuleList),
+			topicCommand("thresholds", printThresholdList),
 			synthCommand(),
 			analyzeCommand(),
 			evalCommand(),

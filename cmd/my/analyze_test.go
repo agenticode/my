@@ -299,11 +299,3 @@ func TestAnalyzeListsRulesAndThresholds(t *testing.T) {
 		"rule.row.min_errors          = 10\n    R-ROW-03:",
 	)
 }
-
-func TestDisplayWidth(t *testing.T) {
-	for s, want := range map[string]int{"": 0, "finding": 7, "판정": 4, "근거 A": 6, "ＡＢ": 4} {
-		if got := displayWidth(s); got != want {
-			t.Errorf("displayWidth(%q) = %d, want %d", s, got, want)
-		}
-	}
-}

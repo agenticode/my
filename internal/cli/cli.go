@@ -7,11 +7,13 @@ package cli
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
+
+	"github.com/agenticode/my/internal/i18n"
 )
 
 // Exit codes. Codes 1 to 4 are reserved for verdict grades (observe, consider
@@ -40,8 +42,10 @@ func OSEnv() *Env {
 type Command struct {
 	// Name is the word typed after "my".
 	Name string
-	// Summary is the one-line description shown in the command list.
-	Summary string
+	// Summary is the one-line description shown in the command list, and
+	// SummaryKO the same in Korean.
+	Summary   string
+	SummaryKO string
 	// Hidden commands run normally but are left out of the command list.
 	// They exist for tests, demos and development.
 	Hidden bool
@@ -52,9 +56,19 @@ type Command struct {
 
 // App is a named set of commands.
 type App struct {
-	Name     string
-	Synopsis string
-	Commands []*Command
+	Name string
+	// Synopsis says in one or two lines what the program is, and
+	// SynopsisKO the same in Korean.
+	Synopsis   string
+	SynopsisKO string
+	Commands   []*Command
+	// Default runs when no command is named: with no arguments at all, or
+	// when the first argument is a flag.
+	Default *Command
+	// DefaultSummary describes what running the program without a command
+	// does, for the usage text.
+	DefaultSummary   string
+	DefaultSummaryKO string
 }
 
 // Lookup returns the command with the given name, or nil.
@@ -67,36 +81,144 @@ func (a *App) Lookup(name string) *Command {
 	return nil
 }
 
-// Run dispatches args (without the program name) to a command.
-func (a *App) Run(ctx context.Context, env *Env, args []string) int {
-	if len(args) == 0 {
-		a.usage(env.Stderr)
-		return ExitUsage
+// Lang returns the language the environment asks for: MY_LANG, or the
+// locale (LC_ALL, LC_MESSAGES, LANG) when it names a supported language,
+// and English otherwise.
+func Lang(env *Env) i18n.Lang {
+	for _, name := range []string{"MY_LANG", "LC_ALL", "LC_MESSAGES", "LANG"} {
+		v := env.Getenv(name)
+		if v == "" {
+			continue
+		}
+		if l, err := i18n.ParseLang(v); err == nil {
+			return l
+		}
+		if name != "MY_LANG" {
+			break // the locale is set, to a language without a translation
+		}
 	}
-	switch args[0] {
-	case "-h", "-help", "--help", "help":
-		a.usage(env.Stdout)
-		return ExitOK
-	}
-	if strings.HasPrefix(args[0], "-") {
-		fmt.Fprintf(env.Stderr, "%s: unknown flag %s\n\n", a.Name, args[0])
-		a.usage(env.Stderr)
-		return ExitUsage
-	}
-	cmd := a.Lookup(args[0])
-	if cmd == nil {
-		fmt.Fprintf(env.Stderr, "%s: unknown command %q\n\n", a.Name, args[0])
-		a.usage(env.Stderr)
-		return ExitUsage
-	}
-	return cmd.Run(ctx, env, args[1:])
+	return i18n.EN
 }
 
-func (a *App) usage(w io.Writer) {
-	if a.Synopsis != "" {
-		fmt.Fprintf(w, "%s\n\n", a.Synopsis)
+// Parse parses the flags in args and returns the other arguments. Unlike
+// flag.FlagSet.Parse it lets flags follow positional arguments, as in
+// "my map CPU0_C1 --bank 3". Everything after "--" is positional.
+func Parse(fs *flag.FlagSet, args []string) ([]string, error) {
+	var pos, rest []string
+	for i, a := range args {
+		if a == "--" {
+			args, rest = args[:i], args[i+1:]
+			break
+		}
 	}
-	fmt.Fprintf(w, "Usage:\n  %s <command> [arguments]\n\nCommands:\n", a.Name)
+	for {
+		if err := fs.Parse(args); err != nil {
+			return nil, err
+		}
+		args = fs.Args()
+		if len(args) == 0 {
+			break
+		}
+		pos, args = append(pos, args[0]), args[1:]
+	}
+	return append(pos, rest...), nil
+}
+
+// IsHelp reports whether an argument asks for help. "?" does: it is what
+// the screens name as the key for the reading guide.
+func IsHelp(arg string) bool {
+	switch arg {
+	case "-h", "-help", "--help", "?", "-?":
+		return true
+	}
+	return false
+}
+
+// Run dispatches args (without the program name) to a command.
+func (a *App) Run(ctx context.Context, env *Env, args []string) int {
+	if len(args) > 0 {
+		switch {
+		case args[0] == "help":
+			return a.help(ctx, env, args[1:])
+		case IsHelp(args[0]):
+			a.usage(env.Stdout, Lang(env))
+			return ExitOK
+		case !strings.HasPrefix(args[0], "-"):
+			cmd := a.Lookup(args[0])
+			if cmd == nil {
+				fmt.Fprintf(env.Stderr, "%s: unknown command %q\n\n", a.Name, args[0])
+				a.usage(env.Stderr, Lang(env))
+				return ExitUsage
+			}
+			return cmd.Run(ctx, env, args[1:])
+		}
+	}
+	if a.Default != nil {
+		return a.Default.Run(ctx, env, args)
+	}
+	if len(args) > 0 {
+		fmt.Fprintf(env.Stderr, "%s: unknown flag %s\n\n", a.Name, args[0])
+	}
+	a.usage(env.Stderr, Lang(env))
+	return ExitUsage
+}
+
+// help prints the command list, or the help of one command. A --lang flag
+// among the arguments chooses the language and is handed on to the command.
+func (a *App) help(ctx context.Context, env *Env, args []string) int {
+	lang := Lang(env)
+	var names, langArgs []string
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		name, value, hasValue := strings.Cut(strings.TrimLeft(arg, "-"), "=")
+		switch {
+		case !strings.HasPrefix(arg, "-"):
+			names = append(names, arg)
+			continue
+		case name != "lang":
+			continue
+		case !hasValue && i+1 < len(args):
+			i++
+			value = args[i]
+		}
+		if l, err := i18n.ParseLang(value); err == nil {
+			lang = l
+		}
+		langArgs = []string{"--lang", value}
+	}
+	if len(names) == 0 {
+		a.usage(env.Stdout, lang)
+		return ExitOK
+	}
+	cmd := a.Lookup(names[0])
+	if cmd == nil {
+		fmt.Fprintf(env.Stderr, "%s help: unknown command %q\n\n", a.Name, names[0])
+		a.usage(env.Stderr, lang)
+		return ExitUsage
+	}
+	return cmd.Run(ctx, env, append([]string{"--help"}, langArgs...))
+}
+
+func (a *App) usage(w io.Writer, lang i18n.Lang) {
+	ko := lang == i18n.KO
+	pick := func(en, kor string) string {
+		if ko && kor != "" {
+			return kor
+		}
+		return en
+	}
+	if s := pick(a.Synopsis, a.SynopsisKO); s != "" {
+		fmt.Fprintf(w, "%s\n\n", s)
+	}
+	usage, commands, more := "Usage:", "Commands:", "Run \"%s help <command>\" for the flags of a command and for how to read what it prints.\n"
+	if ko {
+		usage, commands, more = "사용법:", "명령:", "\"%s help <명령>\"은 그 명령의 옵션과 출력 판독법을 보여줍니다.\n"
+	}
+	fmt.Fprintf(w, "%s\n", usage)
+	if a.Default != nil {
+		fmt.Fprintf(w, "  %s [flags]%s%s\n", a.Name, strings.Repeat(" ", 14), pick(a.DefaultSummary, a.DefaultSummaryKO))
+	}
+	fmt.Fprintf(w, "  %s <command> [arguments]\n\n%s\n", a.Name, commands)
 	var visible []*Command
 	width := 0
 	for _, c := range a.Commands {
@@ -108,9 +230,8 @@ func (a *App) usage(w io.Writer) {
 			width = len(c.Name)
 		}
 	}
-	sort.SliceStable(visible, func(i, j int) bool { return visible[i].Name < visible[j].Name })
 	for _, c := range visible {
-		fmt.Fprintf(w, "  %-*s  %s\n", width, c.Name, c.Summary)
+		fmt.Fprintf(w, "  %-*s  %s\n", width, c.Name, pick(c.Summary, c.SummaryKO))
 	}
-	fmt.Fprintf(w, "\nRun \"%s <command> -h\" for the flags of a command.\n", a.Name)
+	fmt.Fprintf(w, "\n"+more, a.Name)
 }
