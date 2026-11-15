@@ -293,6 +293,19 @@ func TestTimeline(t *testing.T) {
 	check(t, "system-channel-timeline-host", en, open(t, "system-channel", "", en).timeline(""))
 }
 
+func TestTimelineOfAQuietHost(t *testing.T) {
+	// A host nothing is on record about: one day, no errors, no events.
+	tl := &view.Timeline{Host: "h", From: now, To: now, Days: 1, Series: []view.Series{}, Markers: []view.MarkerGroup{},
+		Notes: []view.Text{{Text: "0 corrected and 0 uncorrected errors from 2026-11-13 to 2026-11-13"}}}
+	var b bytes.Buffer
+	if err := Timeline(&b, tl, en.st); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := b.String(), "host h  2026-11-13 to 2026-11-13  1 day\n\n no errors and no events in this period\n"; got != want {
+		t.Errorf("timeline of a quiet host:\n%q\nwant\n%q", got, want)
+	}
+}
+
 func TestHosts(t *testing.T) {
 	s := open(t, "demo", "", en)
 	rows := append(s.c.Hosts(), view.HostRow{Name: "r12-n035", Grade: "ok", GradeText: "ok", DIMMs: 16})

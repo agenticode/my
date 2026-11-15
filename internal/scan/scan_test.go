@@ -153,6 +153,12 @@ func TestScanOfNothing(t *testing.T) {
 	if k := source(t, res.Sources, "klog"); !strings.Contains(k.Detail, "no kernel log file found") {
 		t.Errorf("kernel log detail = %q", k.Detail)
 	}
+	// The usual state of a host nobody has set up: the inventory says what
+	// the missing database means.
+	if r := source(t, res.Sources, "rasdaemon"); !strings.Contains(r.Detail, "rasdaemon is not installed or has stored nothing") ||
+		!strings.HasSuffix(r.Origin, filepath.FromSlash(RasdaemonPaths[0])) {
+		t.Errorf("rasdaemon entry = %+v", r)
+	}
 	if res.Host != "localhost" || res.Events != 0 {
 		t.Errorf("host %q, %d events", res.Host, res.Events)
 	}
@@ -342,6 +348,11 @@ func TestJournalErrors(t *testing.T) {
 	j := &journal{prog: fakeJournalctl(t, "echo 'Failed to open journal: No such file or directory' >&2; exit 1", "exit 1")}
 	if status, detail := j.probe(ctx); status != model.SourceError || !strings.Contains(detail, "Failed to open journal") {
 		t.Errorf("probe = %s, %q", status, detail)
+	}
+	// No journal file may be opened by this user: closed, not broken.
+	j = &journal{prog: fakeJournalctl(t, "echo 'No journal files were opened due to insufficient permissions.' >&2; exit 1", "exit 1")}
+	if status, detail := j.probe(ctx); status != model.SourceUnreadable || !strings.Contains(detail, "readable as root") {
+		t.Errorf("probe of a closed journal = %s, %q", status, detail)
 	}
 	j = &journal{prog: fakeJournalctl(t, "echo '-- No entries --'", "true")}
 	if status, _ := j.probe(ctx); status != model.SourceAbsent {

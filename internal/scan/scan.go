@@ -24,6 +24,8 @@ package scan
 
 import (
 	"context"
+	"errors"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -165,16 +167,27 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	info, _ := hi.Read()
 	out := []adapter.Adapter{hi}
 
-	// rasdaemon: the first database that exists, or the usual path, so
-	// that the inventory says it is not there.
-	db := opts.path(RasdaemonPaths[0])
+	// rasdaemon: the first database that is there. One that is there and
+	// closed to this user is for the adapter to report. When there is none,
+	// the inventory says what that means: it is the usual state of a host
+	// nobody has set up for this.
+	db, there := "", false
 	for _, rel := range RasdaemonPaths {
-		if p := opts.path(rel); exists(p) {
-			db = p
-			break
+		p := opts.path(rel)
+		_, err := os.Stat(p)
+		if err == nil || !errors.Is(err, fs.ErrNotExist) {
+			db, there = p, true
+			if err == nil {
+				break
+			}
 		}
 	}
-	out = append(out, rasdaemon.New(db, rasdaemon.Options{TempDir: opts.TempDir}))
+	if there {
+		out = append(out, rasdaemon.New(db, rasdaemon.Options{TempDir: opts.TempDir}))
+	} else {
+		out = append(out, report{kind: rasdaemon.Kind, origin: opts.path(RasdaemonPaths[0]), status: model.SourceAbsent,
+			detail: "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only"})
+	}
 
 	out = append(out, kernelLog(ctx, &opts, info)...)
 

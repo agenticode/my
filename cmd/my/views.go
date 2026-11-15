@@ -80,8 +80,16 @@ func runOverview(ctx context.Context, env *cli.Env, args []string, src *source) 
 // hints names the commands that go on from the overview.
 func (s *session) hints(ov *view.Overview) []term.Hint {
 	var out []term.Hint
+	// The DIMM to look at next: the subject of the case when it has one,
+	// else the DIMM at the top of the ranking.
+	slot := ""
 	if len(ov.Ranking) > 0 {
-		slot := ov.Ranking[0].Slot
+		slot = ov.Ranking[0].Slot
+	}
+	if s.src != nil && s.src.manifest != nil && s.src.manifest.Subject != nil && s.src.manifest.Subject.Slot != "" {
+		slot = s.src.manifest.Subject.Slot
+	}
+	if slot != "" {
 		out = append(out,
 			term.Hint{Command: s.prefix + " dimm " + slot, Text: say(s.lang, "hint.dimm")},
 			term.Hint{Command: s.prefix + " why " + slot, Text: say(s.lang, "hint.why")})

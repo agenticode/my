@@ -157,7 +157,7 @@ A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksu
 
 ## Status
 
-Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, and case bundles. Not merged yet: the HTML report, the Prometheus exporter and the vendor analyzer plugin contract. The commands have been tested on synthetic hosts and fixtures; validation on real hosts is the next step.
+Early development. In this tree: the ledger, the input adapters, the analysis engine, the commands above with their terminal figures, and case bundles. Not merged yet: the HTML report, the Prometheus exporter and the vendor analyzer plugin contract. The commands are tested on synthetic hosts and fixtures, and CI scans its own machine, a virtual machine without memory controllers, as a normal user and as root. Hosts with EDAC drivers and rasdaemon have not been validated yet.
 
 ## Build
 

@@ -456,3 +456,41 @@ func TestSnapshot(t *testing.T) {
 		t.Errorf("snapshot of a read-only ledger: %v", err)
 	}
 }
+
+func TestUpsertHostKeepsVendorAndProductApart(t *testing.T) {
+	s := newStore(t)
+	host := func() model.Host {
+		t.Helper()
+		hosts, err := s.Hosts(ctx)
+		if err != nil || len(hosts) != 1 {
+			t.Fatalf("hosts = %+v, %v", hosts, err)
+		}
+		return hosts[0]
+	}
+	up := func(h model.Host) {
+		t.Helper()
+		h.Name = "h1"
+		mustUpdate(t, s, func(w *Writer) error { return w.UpsertHost(&h) })
+	}
+	// /sys/class/dmi knows vendor and product; the kernel log then names
+	// the machine in one string. The two stay apart.
+	up(model.Host{SystemVendor: "Microsoft Corporation", SystemProduct: "Virtual Machine"})
+	up(model.Host{SystemProduct: "Microsoft Corporation Virtual Machine/Virtual Machine"})
+	if h := host(); h.SystemVendor != "Microsoft Corporation" || h.SystemProduct != "Virtual Machine" {
+		t.Errorf("host = %+v", h)
+	}
+	// Another product is another product.
+	up(model.Host{SystemProduct: "Example Systems R650/0PYXKY"})
+	if h := host(); h.SystemProduct != "Example Systems R650/0PYXKY" {
+		t.Errorf("host = %+v", h)
+	}
+	// A source that names vendor and product replaces what is there.
+	up(model.Host{SystemVendor: "Example Systems", SystemProduct: "R650"})
+	if h := host(); h.SystemVendor != "Example Systems" || h.SystemProduct != "R650" {
+		t.Errorf("host = %+v", h)
+	}
+	up(model.Host{SystemProduct: "Example Systems R650/0PYXKY"})
+	if h := host(); h.SystemProduct != "R650" {
+		t.Errorf("host = %+v", h)
+	}
+}
