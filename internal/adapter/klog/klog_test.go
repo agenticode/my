@@ -798,3 +798,50 @@ func TestHostNameOfAJournal(t *testing.T) {
 		t.Errorf("short-monotonic: actions %+v", c.Actions)
 	}
 }
+
+// Six corrected errors at one cell within a second, as ghes_edac printed
+// them on the lab guest (kernel 6.19.10): six equal lines. dmesg -T dates a
+// line to the second, so four of them carry one stamp and two the next.
+// They are six records in every form.
+func TestEqualLinesOfOneSecond(t *testing.T) {
+	const msg = "EDAC MC0: 1 CE single-bit ECC on BANK 0 DIMM 0 (node:0 card:0 module:0 rank:1 bank_group:0 bank_address:1 device:3 row:1110 column:200 " +
+		"bit_position:2 DIMM location: BANK 0 DIMM 0 page:0x180045 offset:0x640 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 " +
+		"bank_group:0 bank_address:1 device:3 row:1110 column:200 bit_position:2 DIMM location: BANK 0 DIMM 0 status(0x0000000000000000): reserved)"
+	forms := map[string][]string{
+		"dmesg":    {"[ 2004.798547] ", "[ 2004.950190] ", "[ 2005.103138] ", "[ 2005.254299] ", "[ 2005.408256] ", "[ 2005.564157] "},
+		"dmesg -T": {"[Sun Nov 15 11:10:32 2026] ", "[Sun Nov 15 11:10:32 2026] ", "[Sun Nov 15 11:10:32 2026] ", "[Sun Nov 15 11:10:32 2026] ", "[Sun Nov 15 11:10:33 2026] ", "[Sun Nov 15 11:10:33 2026] "},
+		"syslog":   {"Nov 15 11:10:32 lab-arm kernel: ", "Nov 15 11:10:32 lab-arm kernel: ", "Nov 15 11:10:32 lab-arm kernel: ", "Nov 15 11:10:32 lab-arm kernel: ", "Nov 15 11:10:33 lab-arm kernel: ", "Nov 15 11:10:33 lab-arm kernel: "},
+		// A clock too coarse to tell two lines apart.
+		"dmesg, one stamp": {"[ 2004.798547] ", "[ 2004.798547] ", "[ 2004.798547] ", "[ 2004.798547] ", "[ 2004.798547] ", "[ 2004.798547] "},
+	}
+	for name, stamps := range forms {
+		t.Run(name, func(t *testing.T) {
+			var b strings.Builder
+			for _, st := range stamps {
+				b.WriteString(st + msg + "\n")
+			}
+			opts := Options{CapturedAt: utc(2026, 11, 15, 11, 11, 33)}
+			c, rep := collectText(t, b.String(), opts)
+			if rep.Status != model.SourceOK || len(c.Events) != 6 {
+				t.Fatalf("report = %+v, %d events; want 6", rep, len(c.Events))
+			}
+			fps := map[string]bool{}
+			for _, e := range c.Events {
+				fps[e.Fingerprint] = true
+				if e.Row != some(1110) || e.Column != some(200) || e.OsPhysicalAddress != addr(0x180045640) || e.Label != "BANK 0 DIMM 0" {
+					t.Errorf("event: %+v", *e)
+				}
+			}
+			if len(fps) != 6 {
+				t.Errorf("%d fingerprints for 6 records: equal lines would be stored once", len(fps))
+			}
+			// Read again, the lines are the same six records.
+			again, _ := collectText(t, b.String(), opts)
+			for i, e := range again.Events {
+				if e.Fingerprint != c.Events[i].Fingerprint {
+					t.Errorf("record %d has another fingerprint on a second reading", i+1)
+				}
+			}
+		})
+	}
+}
