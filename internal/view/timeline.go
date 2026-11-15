@@ -94,6 +94,27 @@ type MarkerGroup struct {
 	Count int `json:"count"`
 	// Text describes the group in one line.
 	Text Text `json:"text"`
+	// Marks are the events of the group one by one, the oldest first.
+	// A group with more than MaxMarks events lists the latest of them.
+	Marks []Mark `json:"marks,omitzero"`
+}
+
+// MaxMarks bounds MarkerGroup.Marks.
+const MaxMarks = 100
+
+// Mark is one event of a marker group.
+type Mark struct {
+	// Day is the day of the event, as an offset from Timeline.From.
+	Day int       `json:"day"`
+	At  time.Time `json:"at"`
+	// Count is what the event stands for: the pages of a page offline, the
+	// errors of a record of uncorrected errors, and 1 otherwise.
+	Count int  `json:"count"`
+	Text  Text `json:"text"`
+	// Record points at the ledger record of the event. A boot and a slot
+	// change have none: the ledger keeps them as facts, without an
+	// original record.
+	Record *model.RecordRef `json:"record,omitzero"`
 }
 
 // MaxSeries is the number of DIMMs a host timeline draws a row for. The
@@ -268,11 +289,12 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		at   time.Time
 		n    int
 		text Text
+		ref  *model.RecordRef
 	}
 	var marks []mark
-	add := func(kind string, at time.Time, n int, text Text) {
+	add := func(kind string, at time.Time, n int, text Text, ref *model.RecordRef) {
 		if i, ok := index(at); ok {
-			marks = append(marks, mark{kind, i, at, n, text})
+			marks = append(marks, mark{kind, i, at, n, text, ref})
 		}
 	}
 	when := func(t time.Time) string { return t.UTC().Format("2006-01-02") }
@@ -303,7 +325,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		// The boot that was running when the period began is not a reboot
 		// within it.
 		if b.StartedAt.After(h.ObservedFrom) {
-			add(MarkBoot, b.StartedAt, 1, c.say("tl.boot.one", "when", when(b.StartedAt)))
+			add(MarkBoot, b.StartedAt, 1, c.say("tl.boot.one", "when", when(b.StartedAt)), nil)
 		}
 	}
 
@@ -323,7 +345,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 			code = "tl.ue.one_how"
 			args = append(args, "how", Messages.Text(c.Lang, "how."+string(e.ErrorScrubType), nil))
 		}
-		add(MarkUE, e.ErrorDT, n, slotOf(e.Slot, c.say(code, args...)))
+		add(MarkUE, e.ErrorDT, n, slotOf(e.Slot, c.say(code, args...)), &model.RecordRef{Kind: model.RecordEvent, ID: e.ID, RawRef: e.RawRef})
 	}
 
 	af := store.ActionFilter{Host: h.Host, From: tl.From, To: end}
@@ -370,7 +392,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		default:
 			t = c.say("tl.action.one", "when", when(a.At), "kind", kind)
 		}
-		add(string(a.Kind), a.At, n, slotOf(a.Slot, t))
+		add(string(a.Kind), a.At, n, slotOf(a.Slot, t), &model.RecordRef{Kind: model.RecordAction, ID: a.ID, RawRef: a.RawRef})
 	}
 
 	uid := ""
@@ -399,7 +421,7 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		if p.Host != q.Host {
 			from, to = p.Host+" "+p.Slot, q.Host+" "+q.Slot
 		}
-		add(MarkMove, q.FirstSeen, 1, c.say("tl.move.one", "when", when(q.FirstSeen), "from", from, "to", to))
+		add(MarkMove, q.FirstSeen, 1, c.say("tl.move.one", "when", when(q.FirstSeen), "from", from, "to", to), nil)
 	}
 
 	// One group per kind. A group of one keeps the words of its event.
@@ -424,6 +446,10 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		g.Count += mk.n
 		if n := len(g.Days); n == 0 || g.Days[n-1] != mk.day {
 			g.Days = append(g.Days, mk.day)
+		}
+		g.Marks = append(g.Marks, Mark{Day: mk.day, At: mk.at, Count: mk.n, Text: mk.text, Record: mk.ref})
+		if len(g.Marks) > MaxMarks {
+			g.Marks = g.Marks[1:]
 		}
 	}
 	for _, kind := range kinds {

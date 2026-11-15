@@ -69,6 +69,10 @@ type Evidence struct {
 	Records int    `json:"records,omitzero"`
 	First   string `json:"first,omitzero"`
 	Last    string `json:"last,omitzero"`
+	// Cited points at the ledger records themselves, in time order. When a
+	// statement rests on many records, these are the first and the last of
+	// them (threshold evidence.max_records in all).
+	Cited []model.RecordRef `json:"cited,omitzero"`
 }
 
 // Check is the outcome of one test of a finding against another
@@ -124,7 +128,7 @@ func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMRes
 		card.Rules = []string{}
 	}
 	for _, e := range v.Evidence {
-		ev := Evidence{Rule: e.Rule, Text: c.statement(e.Statement), Records: e.Total}
+		ev := Evidence{Rule: e.Rule, Text: c.statement(e.Statement), Records: e.Total, Cited: e.Records}
 		if n := len(e.Records); n > 0 {
 			ev.First, ev.Last = e.Records[0].RawRef, e.Records[n-1].RawRef
 			if ev.Records == 0 {
