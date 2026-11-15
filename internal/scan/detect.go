@@ -113,7 +113,10 @@ var hostTreeMarks = []string{"proc", "sys", "var/log", "var/lib/rasdaemon", "sos
 func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.Adapter, string, error) {
 	for _, m := range hostTreeMarks {
 		if fi, err := os.Stat(filepath.Join(dir, filepath.FromSlash(m))); err == nil && fi.IsDir() {
-			return Sources(ctx, Options{Root: dir, Now: opts.Now, Location: opts.Location, TempDir: opts.TempDir}), WhatHostTree, nil
+			// A copy says when it was made (its newest file). The time of
+			// the import is not handed on: read as of a later time, the
+			// counters of the copy would no longer line up with its records.
+			return Sources(ctx, Options{Root: dir, Location: opts.Location, TempDir: opts.TempDir}), WhatHostTree, nil
 		}
 	}
 	// A Redfish dump: some JSON file below the directory is a resource.
