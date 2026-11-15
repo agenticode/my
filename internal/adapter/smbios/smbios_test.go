@@ -99,6 +99,43 @@ func TestDmidecodeFullOutputOfAVirtualMachine(t *testing.T) {
 	}
 }
 
+// dmidecode 3.7 prints sizes with binary prefixes ("16 GiB"). The fixture is
+// the start of what it printed on a VMware guest of the lab: three modules,
+// an empty slot and an empty NVDIMM slot.
+func TestDmidecodeBinarySizeUnits(t *testing.T) {
+	var c adapter.Collected
+	rep := NewDmidecodeFile(testutil.Testdata(t, "smbios", "dmidecode-3.7-t17-vm.txt"), Options{Now: now}).Collect(ctx, &c)
+	if rep.Status != model.SourceOK || rep.Records != 5 || rep.Skipped != 0 || len(c.Modules) != 5 {
+		t.Fatalf("report = %+v, %d modules; want ok, 5 records, none skipped", rep, len(c.Modules))
+	}
+	if n := strings.Join(rep.Notes, "\n"); !strings.Contains(n, "5 memory slots, 3 populated") {
+		t.Errorf("notes: %s", n)
+	}
+	for i, m := range c.Modules[:3] {
+		if want := "RAM slot #" + string(rune('0'+i)); m.Locator != want || !m.Populated || m.DIMM.SizeBytes != 16<<30 ||
+			m.DIMM.Serial != "" || m.DIMM.Manufacturer != "" {
+			t.Errorf("module %d: %+v", i, *m)
+		}
+	}
+	if m := c.Modules[4]; m.Locator != "NVD #0" || m.Populated {
+		t.Errorf("NVDIMM slot: %+v", *m)
+	}
+
+	for text, want := range map[string]int64{
+		"512 MiB": 512 << 20, "512 MB": 512 << 20, "2 TiB": 2 << 40, "2 TB": 2 << 40,
+		"1048576 kiB": 1 << 30, "1048576 KiB": 1 << 30, "1048576 kB": 1 << 30, "64GiB": 64 << 30,
+	} {
+		if got, populated, ok := parseSize(text); !ok || !populated || got != want {
+			t.Errorf("parseSize(%q) = %d, %v, %v; want %d", text, got, populated, ok, want)
+		}
+	}
+	for _, text := range []string{"16 Gi", "16 GiBB", "16 iB", "GiB", "16 PiB"} {
+		if _, _, ok := parseSize(text); ok {
+			t.Errorf("parseSize(%q) was accepted", text)
+		}
+	}
+}
+
 func TestDmidecodeInputsWithoutMemoryDevices(t *testing.T) {
 	tests := []struct {
 		name   string

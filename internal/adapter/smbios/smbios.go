@@ -196,9 +196,11 @@ func newDmidecode(origin string, opts Options, open func() (io.ReadCloser, error
 
 var (
 	handleRE = regexp.MustCompile(`^Handle 0x([0-9A-Fa-f]+), DMI type (\d+), (\d+) bytes`)
-	sizeRE   = regexp.MustCompile(`^(\d+) ?(kB|KB|MB|GB|TB)$`)
-	numRE    = regexp.MustCompile(`^(\d+)`)
-	mfgIDRE  = regexp.MustCompile(`^Bank (\d+), Hex 0x([0-9A-Fa-f]{2})$`)
+	// dmidecode up to 3.6 prints "16 GB"; from 3.7 on it prints the binary
+	// prefix it always meant, "16 GiB".
+	sizeRE  = regexp.MustCompile(`^(\d+) ?([kKMGT])i?B$`)
+	numRE   = regexp.MustCompile(`^(\d+)`)
+	mfgIDRE = regexp.MustCompile(`^Bank (\d+), Hex 0x([0-9A-Fa-f]{2})$`)
 )
 
 // dmidecode parses the text dmidecode prints: one block per structure, a
@@ -311,7 +313,7 @@ func parseSize(s string) (bytes int64, populated, ok bool) {
 	if err != nil {
 		return 0, false, false
 	}
-	shift := map[string]uint{"kB": 10, "KB": 10, "MB": 20, "GB": 30, "TB": 40}[m[2]]
+	shift := map[string]uint{"k": 10, "K": 10, "M": 20, "G": 30, "T": 40}[m[2]]
 	// A size beyond 1 PiB is not a DIMM, and shifting it would overflow.
 	if n > (1<<50)>>shift {
 		return 0, false, false
