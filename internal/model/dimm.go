@@ -161,6 +161,10 @@ type Module struct {
 	Locator     string
 	BankLocator string
 	Handle      Opt[int]
+	// Aliases are other names the source has for the slot: the service
+	// label of a BMC next to its device locator, the Id of its resource.
+	// Records that name the slot by one of them are tied to it.
+	Aliases []string
 	// Socket, Channel and Position are set by inventory sources that number
 	// the place of the slot themselves (a BMC, a firmware log): the socket,
 	// the channel within the socket and the position on the channel, in the

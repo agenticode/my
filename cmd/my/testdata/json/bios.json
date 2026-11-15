@@ -99,10 +99,10 @@
           {
             "code": "note.adddc_width_unknown",
             "args": {
-              "n": 5,
-              "total": 5
+              "n": 4,
+              "total": 4
             },
-            "text": "the device width (x4 or x8) of 5 of 5 DIMMs is not known: ADDDC has an effect on x4 DIMMs only"
+            "text": "the device width (x4 or x8) of 4 of 4 DIMMs is not known: ADDDC has an effect on x4 DIMMs only"
           }
         ]
       },
@@ -345,8 +345,8 @@
             {
               "code": "note.adddc_width_unknown",
               "args": {
-                "n": 5,
-                "total": 5
+                "n": 4,
+                "total": 4
               },
               "text": ""
             }

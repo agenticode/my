@@ -164,13 +164,25 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	// Slots, DIMM identities and placements from what this run observed,
 	// then the mapping between EDAC positions and SMBIOS slots from
 	// everything the ledger knows.
-	if err := s.Update(ctx, func(w *store.Writer) error { return recordInventory(w, host, modules) }); err != nil {
+	taken, err := inventoryLabels(ctx, s, host)
+	if err != nil {
 		return nil, fmt.Errorf("ingest: inventory: %w", err)
+	}
+	if err := s.Update(ctx, func(w *store.Writer) error { return recordInventory(w, host, modules, taken) }); err != nil {
+		return nil, fmt.Errorf("ingest: inventory: %w", err)
+	}
+	// Two inventories of one board (SMBIOS and the BMC) are joined before
+	// EDAC positions are tied to slots, so that they are tied to the slots
+	// that remain.
+	joined, err := joinInventories(ctx, s, host)
+	if err != nil {
+		return nil, fmt.Errorf("ingest: inventories: %w", err)
 	}
 	slots, err := remapSlots(ctx, s, host)
 	if err != nil {
 		return nil, fmt.Errorf("ingest: slots: %w", err)
 	}
+	slots.notes = append(joined.notes(), slots.notes...)
 	if len(slots.notes) > 0 {
 		src := model.Source{ScanID: res.Scan.ID, Kind: SlotMapKind, Origin: host, Status: model.SourceOK,
 			Records: slots.mapped + slots.unmapped, Skipped: slots.unmapped, Notes: slots.notes}

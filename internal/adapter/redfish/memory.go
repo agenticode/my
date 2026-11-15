@@ -29,6 +29,39 @@ func locator(o object) string {
 	return str(o, "Id")
 }
 
+// otherNames returns the names a memory resource has for its slot beside
+// the one the ledger uses: the service label, and the Id and the Name of
+// the resource when they tell slots apart. A log entry or a second
+// inventory that calls the slot by one of them means this slot.
+func otherNames(o object, name string) []string {
+	var out []string
+	seen := map[string]bool{model.NormalizeLabel(name): true}
+	add := func(s string, numbered bool) {
+		k := model.NormalizeLabel(s)
+		if k == "" || seen[k] {
+			return
+		}
+		letters, digits := false, false
+		for _, r := range k {
+			letters = letters || r >= 'A' && r <= 'Z'
+			digits = digits || r >= '0' && r <= '9'
+		}
+		// A bare number could mean anything. An Id or a Name without a
+		// number ("DIMM Slot", "Memory") is the same for every module.
+		if !letters || numbered && (!digits || len(k) < 3) {
+			return
+		}
+		seen[k] = true
+		out = append(out, s)
+	}
+	if pl := child(child(o, "Location"), "PartLocation"); pl != nil {
+		add(str(pl, "ServiceLabel"), false)
+	}
+	add(str(o, "Id"), true)
+	add(str(o, "Name"), true)
+	return out
+}
+
 // memoryType turns a MemoryDeviceType into the short name the ledger uses:
 // "DDR4_SDRAM" and "DDR4" are both DDR4.
 func memoryType(t string) string {
@@ -109,7 +142,7 @@ func (r *run) module(sink adapter.Sink, res *resource, marks map[string]int) (po
 		populated = capacity > 0 || model.UsableSerial(serial)
 	}
 
-	m := &model.Module{ObservedAt: r.now, Locator: name, Populated: populated, Source: Kind, RawRef: res.ref}
+	m := &model.Module{ObservedAt: r.now, Locator: name, Populated: populated, Source: Kind, RawRef: res.ref, Aliases: otherNames(o, name)}
 	if p, ok := memoryPlace(o); ok && !r.shared[p] {
 		m.Socket, m.Channel, m.Position = model.Some(p[0]), model.Some(p[1]), model.Some(p[2])
 		r.places[p] = name

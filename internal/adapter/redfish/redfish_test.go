@@ -134,7 +134,8 @@ func TestTree(t *testing.T) {
 	}
 	a1 := c.Modules[0]
 	want := model.Module{ObservedAt: now, Locator: "DIMM_A1", Socket: model.Some(0), Channel: model.Some(0), Position: model.Some(0), Populated: true,
-		Source: "redfish", RawRef: a1.RawRef,
+		// The Id tells the modules apart; the Name, "DIMM Slot", does not.
+		Source: "redfish", RawRef: a1.RawRef, Aliases: []string{"dimm0"},
 		DIMM: model.DIMM{Manufacturer: "Example Memory", PartNumber: "EXM64G48R2X4-A", Serial: "80A1B0", ManufacturerID: "0x2C80", SizeBytes: 64 << 30,
 			MemoryType: "DDR5", ModuleType: "RDIMM", Technology: "DRAM", Ranks: model.Some(2), DataWidth: model.Some(64), TotalWidth: model.Some(80),
 			SpeedMTs: model.Some(5600), ConfiguredSpeedMTs: model.Some(4800), MfgDate: "2025-W25"}}

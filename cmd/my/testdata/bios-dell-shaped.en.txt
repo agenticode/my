@@ -9,7 +9,7 @@ profile built-in, mapping for Dell (by the system manufacturer)
                       pending: Disabled (off); it takes effect after a reboot
                       the pending value is not what the profile expects (on)
  ADDDC                on           -         reported          AdddcSetting = Enabled
-                      the device width (x4 or x8) of 5 of 5 DIMMs is not known: ADDDC has an effect
+                      the device width (x4 or x8) of 4 of 4 DIMMs is not known: ADDDC has an effect
                       on x4 DIMMs only
  memory mode          independent  -         reported          MemOpMode = OptimizerMode
  CE logging           on           on        as expected       CorrEccSmi = Enabled
