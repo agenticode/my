@@ -141,6 +141,57 @@ func TestCopyIsReadAsOfItsOwnTime(t *testing.T) {
 	}
 }
 
+// A copy that lost the times of its files still says when it was made,
+// when it holds /proc/uptime next to /proc/stat. A checkout of a
+// repository and an archive unpacked without times give every file the
+// time of today.
+func TestCopyWithUptimeSaysWhenItWasMade(t *testing.T) {
+	root, ds := tree(t, synth.FlavorIntel)
+	boot := ds.Boots[len(ds.Boots)-1].StartedAt
+	up := ds.Scenario.End.Sub(boot)
+	write(t, filepath.Join(root, "proc", "uptime"), fmt.Sprintf("%.2f %.2f\n", up.Seconds(), up.Seconds()*31.4), 0o644)
+	// Every file is touched: the copy travelled without its times.
+	today := time.Now()
+	err := filepath.WalkDir(root, func(p string, d os.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			err = os.Chtimes(p, today, today)
+		}
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := ledger(t)
+	res, err := Run(ctx, s, Options{Root: root, TempDir: t.TempDir()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !res.Scan.StartedAt.Equal(ds.Scenario.End.Truncate(time.Second)) {
+		t.Errorf("scan time = %v, want boot time plus uptime, %v", res.Scan.StartedAt, ds.Scenario.End)
+	}
+	totals, err := s.Totals(ctx, store.EventFilter{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var n int64
+	for _, x := range totals {
+		n += x.CE + x.UE
+	}
+	if n != 1285 {
+		t.Errorf("%d errors, want 1,285", n)
+	}
+
+	// An uptime that cannot be read leaves the answer to the files.
+	for _, bad := range []string{"", "soon\n", "-5 0\n", "1e300 0\n"} {
+		write(t, filepath.Join(root, "proc", "uptime"), bad, 0o644)
+		os.Chtimes(filepath.Join(root, "proc", "uptime"), today, today)
+		opts := Options{Root: root}
+		if got := treeTime(&opts); got.Sub(today).Abs() > time.Second {
+			t.Errorf("uptime %q: tree time %v, want the time of the files", bad, got)
+		}
+	}
+}
+
 func TestScanOfNothing(t *testing.T) {
 	root := t.TempDir()
 	res, err := Run(ctx, ledger(t), Options{Root: root, Now: time.Date(2026, 11, 13, 0, 0, 0, 0, time.UTC)})

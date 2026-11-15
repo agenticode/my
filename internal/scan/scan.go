@@ -30,6 +30,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -58,8 +59,10 @@ type Options struct {
 	Privileged bool
 	// Now is the time of the scan. Zero means the current time on a live
 	// host. For a copy of a host's files zero means the time the copy was
-	// made, taken from the newest of the files that are read: counters and
-	// seconds since boot in the copy count back from that moment.
+	// made: its boot time plus its uptime when it holds /proc/stat and
+	// /proc/uptime, else the newest time of the files that are read.
+	// Counters and seconds since boot in the copy count back from that
+	// moment.
 	Now time.Time
 	// Host names the host in the ledger; empty takes the name the host
 	// gives itself.
@@ -132,10 +135,18 @@ func exists(path string) bool {
 	return err == nil && !fi.IsDir()
 }
 
-// treeTime returns when a copy of a host's files was made: the newest
-// modification time among the files a scan reads. A copy cannot be older
-// than its newest file.
+// treeTime returns when a copy of a host's files was made.
+//
+// A copy that holds /proc/stat and /proc/uptime says so itself: the boot
+// time plus the uptime, both read at the moment of the copy. That holds
+// however the copy travelled. Without them the answer is the newest
+// modification time among the files a scan reads, which is right as long
+// as the copy kept the times of its files: an archive unpacked without
+// them, or a checkout of a repository, gives every file the time of today.
 func treeTime(opts *Options) time.Time {
+	if t := uptimeTime(opts); !t.IsZero() {
+		return t
+	}
 	var newest time.Time
 	see := func(path string) {
 		if fi, err := os.Stat(path); err == nil && !fi.IsDir() && fi.ModTime().After(newest) {
@@ -158,6 +169,29 @@ func treeTime(opts *Options) time.Time {
 		return nil
 	})
 	return newest
+}
+
+// uptimeTime returns the boot time of a copy plus its uptime, or the zero
+// time when the copy does not hold both.
+func uptimeTime(opts *Options) time.Time {
+	info, _ := hostinfo.NewRoot(opts.root(), hostinfo.Options{}).Read()
+	if info.BootTime.IsZero() {
+		return time.Time{}
+	}
+	b, err := os.ReadFile(opts.path("proc/uptime"))
+	if err != nil {
+		return time.Time{}
+	}
+	// "82.54 1234.56": seconds since boot, and idle time summed over the CPUs.
+	fields := strings.Fields(string(b))
+	if len(fields) == 0 {
+		return time.Time{}
+	}
+	up, err := strconv.ParseFloat(fields[0], 64)
+	if err != nil || up < 0 || up > 100*365*24*3600 {
+		return time.Time{}
+	}
+	return info.BootTime.Add(time.Duration(up * float64(time.Second))).Truncate(time.Second)
 }
 
 // Sources returns the adapters of a scan, in the order they are read.
