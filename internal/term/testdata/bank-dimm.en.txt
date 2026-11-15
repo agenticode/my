@@ -1,0 +1,55 @@
+CPU1_A1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 01EAE2
+in this slot since 2026-07-31  0 slot changes
+
+ finding   consider replacement (finding, confidence medium)                                R-ROW-03
+ evidence  [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 164 errors in the last 7 days, 2.0 times
+           the daily rate of the 30 days before
+           [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 461 new places in the last 30 days, 600
+           in total
+ checks    open: no other DIMM on this channel: there is nothing to compare with
+           open: no slot move or reseat on record: a cause in the board is not ruled out
+ missing   no ECS counters
+           no DIMM temperature history
+ baseline  own history: 23.4 errors a day over the last 7 days, percentile 100 of the 30 days before
+           same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 1 of
+           them with errors
+ next      Plan a replacement for the next maintenance window and watch the fault until then.
+
+ where the errors sit (width = share of the errors of this DIMM)
+ rank    |rank1 ██████████████████████████████████████████████████████████████████████████████ 100%|
+ device  |dev12 ██████████████████████████████████████████████████████████████████████████████ 100%|
+ bank    |bg1 bank1 ██████████████████████████████████████████████████████████████████████████ 100%|
+ row     |596 rows ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 100%|
+
+ rank1 dev12 bg1 bank1  row by column  one cell = 32 columns by 4,096 rows
+ · 0   ░ 1-2   ▒ 3-9   ▓ 10-99   █ 100+   X uncorrected error
+
+ row       0x000                                                      0x7ff  (column)
+ 0x0       ·░··░·░·····░▒░·░···░··░░░░··░·░··░··░░·░·░░░░░░··░░·░·····░··░·
+ 0x1000    ·░···░░░░·░··░··░░▒·░░░░░····░░░░░░··░···░░······░░···░·▒░··░·░·
+ 0x2000    ░···░░··░·░·░·░░░···░░·░░░░░·░·····░·░░░·····░····░░░░░░░·░·░░·░
+ 0x3000    ···░░··░░·░░░···░░░··░░░░·░░░·······░·······░░·░░··░··░░░··░░░░·
+ 0x4000    ░··░·░░░··░·░░·░·░·░·░·░░░······░·······░░··░·░·░·····░▒·░··░░░░
+ 0x5000    ···░░░░····░░··░░░·░░·░░░░░··░░░···▒·░·░··░░······░░░···········
+ 0x6000    ░·░░░░··░░·░··░····░····░·░░···░··░·░·▒░··░░··░░·░·░░·░··░·····░
+ 0x7000    ░░·░▒·····░·░··░░·▒▒░··░░···░····░··░░░·░░····░·░·░··░·░░····░··
+ 0x8000    ·░·░░░░··░░·░··░·░░░░········░·░░·····░░░░·░░░···░░░·░░··░░·░·░·
+ 0x9000    ·░·····░······░··░··░░···░··░░·░░░···░·░░░··░····░░·░···░░···░░░
+ 0xa000    ··░·░····░░·░·····░···░·░·░···░▒░··░░░··░░▒··░·░·░·░·░·░····░░·░
+ 0xb000    ··░▒░··░·······░░░·░··░░····░··░···░··░░░░·░░·░░·░···░··░░··░·░·
+ 0xc000    ░░░·░░····░░·░░·░░·░░░░░·░···░░░░·····░░···░··░·░·░·░░·░··░·░·░·
+ 0xd000    ·░··░░·░░··░···▒···░··░·░······░·░░·░····░··░······░·░░░·░··░░·░
+ 0xe000    ░·░░░··░···░·░·░·░···░░░▒···░░░·░·░░░··▒░░░··░··░░░░··░░░░···░·░
+ 0xf000    ····░··░░░·░······░·░·░░░·░··░░····░░░··░····░····░···▒▒·░·░····
+
+ bank fault at rank1 dev12 bg1 bank1: 600 errors, 236 columns in 596 rows, data lines DQ0, DQ1,
+   DQ2, DQ3, first 2026-09-06, latest 2026-11-12
+
+ errors per day and events
+           07-31     09-01     10-01     11-12
+ CPU1_A1   ▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▁▃▃▃▄▃▃▃▄▄▄▅▅▅▅▆▅▇█  peak 30/day
+ events              B         B
+                     └─────────┴ 2 reboots
+
+ 600 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
+ 539 of them since the boot of 2026-10-01: a counter that restarts at every boot shows only those

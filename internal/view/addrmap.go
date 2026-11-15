@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
 )
@@ -503,7 +504,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			mf.DQ = append(mf.DQ, q)
 		}
 		sort.Ints(mf.DQ)
-		args := []any{"mode", "@mode." + string(f.Mode), "where", where, "n", st.errors, "rows", len(st.rows), "columns", len(st.cols),
+		args := []any{"fault", FaultName(c.Lang, f.Mode, f.Estimated), "where", where, "n", st.errors, "rows", len(st.rows), "columns", len(st.cols),
 			"first", dayText(st.first), "last", dayText(st.last)}
 		code := "map.fault"
 		if len(mf.DQ) > 0 {
@@ -514,12 +515,12 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			}
 			args = append(args, "dq", strings.Join(dq, ", "))
 		}
-		mf.Text = c.sayMode(code, args...)
+		mf.Text = c.say(code, args...)
 		m.Faults = append(m.Faults, mf)
 
 		if f.Mode == model.ModeColumn && f.ColumnMin.Valid && f.ColumnMin == f.ColumnMax {
 			m.Marks = append(m.Marks, ColumnMark{Cell: f.ColumnMin.V / m.ColumnsPerCell, Column: f.ColumnMin.V,
-				Note: c.sayMode("map.note.fault", "mode", "@mode."+string(f.Mode))})
+				Note: c.say("map.note.fault", "fault", FaultName(c.Lang, f.Mode, f.Estimated))})
 		}
 	}
 	if m.Mode == MapRows {
@@ -541,12 +542,12 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			var note Text
 			switch f.Mode {
 			case model.ModeSingleBit, model.ModeMultiRow:
-				note = c.sayMode("map.note.fault", "mode", "@mode."+string(f.Mode))
+				note = c.say("map.note.fault", "fault", FaultName(c.Lang, f.Mode, f.Estimated))
 			case model.ModeRow:
 				if f.TopRow.Valid && f.TopRow.V != ln.Row {
-					note = c.sayMode("map.note.neighbour", "mode", "@mode."+string(f.Mode))
+					note = c.say("map.note.neighbour")
 				} else {
-					note = c.sayMode("map.note.fault", "mode", "@mode."+string(f.Mode))
+					note = c.say("map.note.fault", "fault", FaultName(c.Lang, f.Mode, f.Estimated))
 				}
 			default:
 				continue
@@ -557,15 +558,17 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	return m, nil
 }
 
-// sayMode renders a message of this package whose arguments may name a
-// fault mode of the engine ("@mode.row").
-func (c *Case) sayMode(code string, kv ...any) Text {
-	for i := 1; i < len(kv); i += 2 {
-		if s, ok := kv[i].(string); ok && strings.HasPrefix(s, "@mode.") {
-			kv[i] = engine.ModeText(c.Lang, model.FaultMode(strings.TrimPrefix(s, "@mode.")))
-		}
+// FaultName names a fault by its mode: "row fault", "system issue".
+func FaultName(lang i18n.Lang, mode model.FaultMode, estimated bool) string {
+	switch {
+	case mode == model.ModeSystemIssue:
+		return Messages.Text(lang, "fault.system", nil)
+	case mode == model.ModeUndetermined:
+		return Messages.Text(lang, "fault.undetermined", nil)
+	case estimated:
+		return Messages.Text(lang, "fault.estimated", map[string]any{"mode": engine.ModeText(lang, mode)})
 	}
-	return c.say(code, kv...)
+	return Messages.Text(lang, "fault.name", map[string]any{"mode": engine.ModeText(lang, mode)})
 }
 
 // dayText writes a day, or "?" for a time that is not known.

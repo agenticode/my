@@ -1,0 +1,5 @@
+2 hosts in this ledger. Name one with --host to see its figures.
+
+ HOST      FINDING      DIMM  FLAGGED     CE  UE  WORST SLOT  DATA UNTIL
+ r12-n034  replace now    16        2  1,284   1  CPU0_C1     2026-11-13
+ r12-n035  ok             16        0      0   0  -           -

@@ -1,0 +1,10 @@
+host synth-moved-dimm  CPU0_D1  S/N 880018  2026-07-31 to 2026-11-12  105 days
+
+           07-31     09-01     10-01     11-12
+ CPU0_D1   ▁▁▁▁▁▁▂▅█▆▆▅▅▆▄▅▇▇▄▆▄▆▅▅▆▄▄▅▅▆▇▇█▄▇  peak 6/day
+ events              B         BM
+                     │         │└ 2026-10-01 moved from CPU0_C1 to CPU0_D1
+                     └─────────┴─ 2 reboots
+
+ 240 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
+ 121 of them since the boot of 2026-10-01: a counter that restarts at every boot shows only those

@@ -1,0 +1,7 @@
+CPU0_A1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 5C331B
+in this slot since 2026-07-31  0 slot changes
+
+ finding   ok (finding, confidence high)
+ baseline  own history: 0 errors a day over the last 7 days, percentile 50 of the 30 days before
+           same part number (EXM64G48R2X4-A): percentile 44 among the 16 DIMMs in this ledger, 2 of
+           them with errors

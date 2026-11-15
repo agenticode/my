@@ -1,0 +1,1 @@
+r12-n034 CPU0_C1 S/N 3B9C56: replace now (finding, confidence high; R-UE-01, R-ROW-03, R-REP-02). 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. Replace the DIMM. Attach a case bundle of this DIMM to the return.

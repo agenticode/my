@@ -1,0 +1,35 @@
+host synth-system-channel  Example Systems R760  2026-07-31 to 2026-11-13  CE 353, UE 0
+observation grade A
+host finding: hold replacement
+
+        A1   B1   C1   D1   E1   F1   G1   H1
+ CPU0   ░░   ??   ░░   ░░   ▒▒   ▒▒   ▒▒   ░░
+ CPU1   ▒▒   ░░   ▒▒   ░░   ▒▒   ░░   ▒▒   ░░
+        A2   B2   C2   D2   E2   F2   G2   H2
+ CPU0   ░░   ??   ░░   ░░   ░░   ▒▒   ░░   ▒▒
+ CPU1   ▒▒   ░░   ▒▒   ░░   ░░   ░░   ▒▒   ░░
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
+ 32 slots, 32 DIMMs
+
+  #  SLOT     SERIAL   CE  UE  MODE          TREND 30D     FINDING           RULES
+  1  CPU0_B1  880018  181   0  system issue  ▆▅▄▅▇▆▇█▃▆ →  hold replacement  R-SYS-01
+  2  CPU0_B2  E7A387  160   0  system issue  ▆▄▇█▄▄▆▅▇▅ →  hold replacement  R-SYS-01
+  3  CPU0_E1  01EAE2    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  4  CPU0_F1  332238    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  5  CPU0_F2  A8A64B    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  6  CPU0_G1  B31D2C    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  7  CPU0_H2  7F782A    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  8  CPU1_A1  B41102    1   0  single-bit    ▁█▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+  9  CPU1_A2  C34D84    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+ 10  CPU1_C1  12AE34    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+ 11  CPU1_C2  098671    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+ 12  CPU1_E1  6A7388    1   0  single-bit    ▁▁█▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+ 13  CPU1_G1  BE334C    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+ 14  CPU1_G2  F6088C    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
+
+ 18 DIMMs without errors
+ sources  synth 356 records
+
+ my dimm CPU0_C1: examination   my why CPU0_C1: reasons   my bundle -o case.mycase: case bundle
+ my help: how to read the figures

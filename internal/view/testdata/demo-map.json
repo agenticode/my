@@ -327,7 +327,7 @@
       "note": {
         "code": "map.note.fault",
         "args": {
-          "mode": "row"
+          "fault": "row fault"
         },
         "text": "row fault"
       }
@@ -404,9 +404,6 @@
       "errors": 26,
       "note": {
         "code": "map.note.neighbour",
-        "args": {
-          "mode": "row"
-        },
         "text": "same fault"
       }
     },
@@ -641,9 +638,9 @@
         "args": {
           "columns": 9,
           "dq": "DQ2, DQ3",
+          "fault": "row fault",
           "first": "2026-09-24",
           "last": "2026-11-12",
-          "mode": "row",
           "n": 1232,
           "rows": 2,
           "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
