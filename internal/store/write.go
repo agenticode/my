@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -604,7 +605,7 @@ func (w *Writer) InsertAction(a *model.Action) (inserted bool, err error) {
 }
 
 // InsertCounterSample stores one counter reading. A reading of the same
-// counter at the same time is stored once.
+// counter of the same source at the same time is stored once.
 func (w *Writer) InsertCounterSample(host string, c *model.CounterSample) (inserted bool, err error) {
 	if host == "" {
 		return false, invalid("counter sample: host is empty")
@@ -612,14 +613,28 @@ func (w *Writer) InsertCounterSample(host string, c *model.CounterSample) (inser
 	if !validTime(c.ObservedAt) {
 		return false, invalid("counter sample: time %v is out of range", c.ObservedAt)
 	}
+	if c.CE > math.MaxInt64 || c.UE > math.MaxInt64 {
+		return false, invalid("counter sample: a count of %d corrected and %d uncorrected errors is out of range", c.CE, c.UE)
+	}
 	var resetAt time.Time
 	if c.SecondsSinceReset.Valid && c.SecondsSinceReset.V >= 0 {
 		resetAt = c.ObservedAt.Add(-time.Duration(c.SecondsSinceReset.V) * time.Second)
 	}
-	res, err := w.exec(`INSERT OR IGNORE INTO counter_sample (host, observed_at, mc, mc_name, dimm_index, location, label, ce, ue,
- reset_at, size_mb, mem_type, dev_type, edac_mode, source, raw_ref) VALUES (`+placeholders(16)+`)`,
-		host, ts(c.ObservedAt), c.MC, c.MCName, c.DIMMIndex, c.Location, c.Label, int64(c.CE), int64(c.UE),
-		ts(resetAt), optInt(c.SizeMB), c.MemType, c.DevType, c.EdacMode, c.Source, c.RawRef)
+	// A recent count says something only together with its window.
+	recent := func(n model.Opt[uint64], window time.Duration) (count, seconds any) {
+		if !n.Valid || window < time.Second || n.V > math.MaxInt64 {
+			return nil, nil
+		}
+		return int64(n.V), int64(window / time.Second)
+	}
+	rce, rceSec := recent(c.RecentCE, c.RecentCEWindow)
+	rue, rueSec := recent(c.RecentUE, c.RecentUEWindow)
+	res, err := w.exec(`INSERT OR IGNORE INTO counter_sample (host, observed_at, source, mc, mc_name, dimm_index, location, label, bank_locator,
+ "SocketId", "ChannelId", "ChannelSlotId", ce, ue, recent_ce, recent_ce_seconds, recent_ue, recent_ue_seconds,
+ reset_at, size_mb, mem_type, dev_type, edac_mode, raw_ref) VALUES (`+placeholders(24)+`)`,
+		host, ts(c.ObservedAt), c.Source, c.MC, c.MCName, c.DIMMIndex, c.Location, c.Label, c.BankLocator,
+		optInt(c.SocketId), optInt(c.ChannelId), optInt(c.ChannelSlotId), int64(c.CE), int64(c.UE), rce, rceSec, rue, rueSec,
+		ts(resetAt), optInt(c.SizeMB), c.MemType, c.DevType, c.EdacMode, c.RawRef)
 	if err != nil {
 		return false, fmt.Errorf("counter sample %s: %w", c.RawRef, err)
 	}

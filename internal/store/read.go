@@ -406,12 +406,15 @@ func (s *Store) Slots(ctx context.Context, host string) ([]model.Slot, error) {
 	return out, rows.Err()
 }
 
-// LatestCounterSamples returns the per-DIMM counter samples of the most
-// recent reading of a host: the EDAC DIMM objects that existed then.
+// LatestCounterSamples returns the per-DIMM samples of the most recent
+// reading of the EDAC counters of a host: the EDAC DIMM objects that
+// existed then. Counters of sources that place a DIMM by numbers are not
+// EDAC objects and are left out.
 func (s *Store) LatestCounterSamples(ctx context.Context, host string) ([]model.CounterSample, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT observed_at, mc, mc_name, dimm_index, location, label, ce, ue, size_mb, mem_type, dev_type, edac_mode, source, raw_ref
  FROM counter_sample
- WHERE host = ? AND dimm_index >= 0 AND observed_at = (SELECT MAX(observed_at) FROM counter_sample WHERE host = ? AND dimm_index >= 0)
+ WHERE host = ? AND dimm_index >= 0 AND "SocketId" IS NULL
+   AND observed_at = (SELECT MAX(observed_at) FROM counter_sample WHERE host = ? AND dimm_index >= 0 AND "SocketId" IS NULL)
  ORDER BY mc, dimm_index`, host, host)
 	if err != nil {
 		return nil, err
