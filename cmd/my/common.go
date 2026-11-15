@@ -50,8 +50,10 @@ type options struct {
 	host   string
 	ledger string
 	root   string
-	cf     engine.ConfigFlags
-	help   bool
+	// sf points a scan at the store of a fleet instead of at this host.
+	sf   fleetFlags
+	cf   engine.ConfigFlags
+	help bool
 }
 
 // newOptions registers the common flags of the command named name.
@@ -68,6 +70,7 @@ func newOptions(env *cli.Env, name string, src *source) *options {
 		// A scan can keep its ledger, and can read a copy of a host's files.
 		o.fs.StringVar(&o.ledger, "ledger", "", "")
 		o.fs.StringVar(&o.root, "root", "", "")
+		o.sf.register(o.fs)
 	}
 	o.cf.Register(o.fs)
 	o.fs.BoolVar(&o.help, "help", false, "")
@@ -211,6 +214,10 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 		ledger, scanned, err = o.scan(ctx, env, s, now)
 		if err != nil {
 			s.close()
+			var u usage
+			if errors.As(err, &u) {
+				return nil, o.usageError(env, lang, "%s", u.msg)
+			}
 			return nil, o.failure(env, err)
 		}
 		if host == "" {
@@ -222,6 +229,9 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 		}
 		if o.root != "" {
 			s.prefix = "my --root " + o.root
+		}
+		if o.sf.set() {
+			s.prefix = "my " + o.sf.args(o.host)
 		}
 	}
 	s.closers = append(s.closers, func() { ledger.Close() })
@@ -258,6 +268,12 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	path := filepath.Join(tmp, "ledger.db")
 	if o.ledger != "" {
 		path = o.ledger
+	}
+	if o.sf.set() {
+		return o.scanFleet(ctx, env, s.lang, path, now)
+	}
+	if o.sf.since != "" {
+		return nil, "", usage{say(s.lang, "err.since_alone")}
 	}
 	return scanInto(ctx, s.lang, path, o.root, tmp, now)
 }

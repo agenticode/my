@@ -11,8 +11,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/scan"
 	"github.com/agenticode/my/internal/store"
@@ -1128,5 +1130,44 @@ func TestCaseInAnotherLanguage(t *testing.T) {
 	b, _ := json.Marshal(got)
 	if string(a) != string(b) || got.GradeText != "즉시 교체" {
 		t.Errorf("the card of In(ko) differs from the card of a case opened in Korean:\n%s\n%s", b, a)
+	}
+}
+
+// TestHostsWorstFirst: a ledger that holds a fleet lists the hosts to look
+// at first: hold replacement, replace now, consider replacement, observe.
+func TestHostsWorstFirst(t *testing.T) {
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "fleet.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	// Stored in an order that is neither by name nor by grade. Each host
+	// gets its own seed: with one seed the hosts would hold DIMMs with the
+	// same serial numbers, which the ledger takes for the same DIMMs.
+	for i, name := range []string{"single-bit", "offline-growing", "demo", "system-channel", "row"} {
+		ds := testledger.Generate(t, name, uint64(i+1), nil)
+		if _, err := ingest.Run(ctx, s, []adapter.Adapter{ds.Adapter()}, ingest.Options{Kind: model.ScanSynthetic, Now: ds.Scenario.End}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c, err := Open(ctx, s, i18n.EN, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := c.Hosts()
+	var got []string
+	for i, r := range rows {
+		got = append(got, r.Name+" "+string(r.Grade))
+		if i > 0 {
+			prev := rows[i-1]
+			if prev.Grade.ExitCode() < r.Grade.ExitCode() ||
+				(prev.Grade == r.Grade && (prev.UE < r.UE || (prev.UE == r.UE && prev.CE < r.CE))) {
+				t.Errorf("%s (%s, UE %d, CE %d) is listed before %s (%s, UE %d, CE %d)", prev.Name, prev.Grade, prev.UE, prev.CE, r.Name, r.Grade, r.UE, r.CE)
+			}
+		}
+	}
+	if len(rows) != 5 || rows[0].Grade != model.VerdictHoldReplacement || rows[0].Name != "synth-system-channel" || rows[1].Name != "r12-n034" ||
+		rows[len(rows)-1].Grade != model.VerdictObserve {
+		t.Errorf("hosts: %q", got)
 	}
 }
