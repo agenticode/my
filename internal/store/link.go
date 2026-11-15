@@ -401,6 +401,18 @@ func bmcSource(source string) bool {
 	return strings.HasPrefix(source, "sel/") || strings.HasPrefix(source, "redfish/")
 }
 
+// reporter names what a record came through, for the rule that one error
+// is at most one record of each. It is the source, except for the CXL
+// tables of rasdaemon: a device reports an error as a DRAM event record or
+// as a general media event record, never as both, so records of these
+// tables are different errors however close they are in time.
+func reporter(source string) string {
+	if strings.HasPrefix(source, "rasdaemon/cxl_") {
+		return "rasdaemon/cxl"
+	}
+	return source
+}
+
 func sourceRank(source string) int {
 	switch {
 	case strings.HasPrefix(source, "rasdaemon/"):
@@ -429,8 +441,9 @@ func gradeRank(g model.Grade) int {
 // decoded from it); those declarations are applied as given. Records from
 // different sources are matched here: same severity class, same cache line
 // address (or same slot when neither has an address), times within the
-// tolerance, and at most one record per source in a group. The record with
-// the best observation grade stays; the others point at it through dup_of.
+// tolerance, and at most one record per source in a group. The CXL tables
+// of rasdaemon count as one source for this. The record with the best
+// observation grade stays; the others point at it through dup_of.
 //
 // A record of a BMC log is matched once more, because it has no address to
 // match on: it is a duplicate when the host's own logs hold a record of the
@@ -580,7 +593,7 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 			}
 			has := false
 			for _, m := range c.members {
-				if m.source == source {
+				if reporter(m.source) == reporter(source) {
 					has = true
 					break
 				}
