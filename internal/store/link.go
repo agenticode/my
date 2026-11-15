@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -724,20 +725,27 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 
 // DeriveCounterEvents turns the counter readings of a host into counter
 // events: one per reading and severity, carrying the growth since the
-// previous reading of the same counter, or since the counter started when
-// there is no earlier reading in the same counting period. The set of
-// counter events is rebuilt from all readings, so importing an older reading
-// later gives the same ledger as importing it first.
+// previous reading of the same counter of the same source, or since the
+// counter started when there is no earlier reading in the same counting
+// period. A reading that says how many of its errors are recent gives two
+// events per severity: the recent errors within their window, and the rest.
+// The set of counter events is rebuilt from all readings, so importing an
+// older reading later gives the same ledger as importing it first.
 func (s *Store) DeriveCounterEvents(ctx context.Context, host string) error {
 	type sample struct {
-		at, resetAt     time.Time
-		mc, dimm        int
-		location, label string
-		ce, ue          uint64
-		source, rawRef  string
+		at, resetAt               time.Time
+		source                    string
+		mc, dimm                  int
+		location, label           string
+		socket, channel, position model.Opt[int]
+		ce, ue                    uint64
+		recentCE, recentUE        model.Opt[uint64]
+		ceWindow, ueWindow        time.Duration
+		rawRef                    string
 	}
-	rows, err := s.db.QueryContext(ctx, `SELECT observed_at, reset_at, mc, dimm_index, location, label, ce, ue, source, raw_ref
- FROM counter_sample WHERE host = ? ORDER BY mc, dimm_index, observed_at`, host)
+	rows, err := s.db.QueryContext(ctx, `SELECT observed_at, reset_at, source, mc, dimm_index, location, label, "SocketId", "ChannelId", "ChannelSlotId",
+ ce, ue, recent_ce, recent_ce_seconds, recent_ue, recent_ue_seconds, raw_ref
+ FROM counter_sample WHERE host = ? ORDER BY source, mc, dimm_index, observed_at`, host)
 	if err != nil {
 		return fmt.Errorf("derive counter events: %w", err)
 	}
@@ -746,11 +754,20 @@ func (s *Store) DeriveCounterEvents(ctx context.Context, host string) error {
 		var sm sample
 		var at, reset sql.NullString
 		var ce, ue int64
-		if err := rows.Scan(&at, &reset, &sm.mc, &sm.dimm, &sm.location, &sm.label, &ce, &ue, &sm.source, &sm.rawRef); err != nil {
+		var socket, channel, position, rce, rceSec, rue, rueSec sql.NullInt64
+		if err := rows.Scan(&at, &reset, &sm.source, &sm.mc, &sm.dimm, &sm.location, &sm.label, &socket, &channel, &position,
+			&ce, &ue, &rce, &rceSec, &rue, &rueSec, &sm.rawRef); err != nil {
 			rows.Close()
 			return err
 		}
 		sm.at, sm.resetAt, sm.ce, sm.ue = parseTS(at), parseTS(reset), uint64(ce), uint64(ue)
+		sm.socket, sm.channel, sm.position = toOptInt(socket), toOptInt(channel), toOptInt(position)
+		if rce.Valid && rceSec.Valid && rce.Int64 >= 0 && rceSec.Int64 > 0 {
+			sm.recentCE, sm.ceWindow = model.Some(uint64(rce.Int64)), time.Duration(rceSec.Int64)*time.Second
+		}
+		if rue.Valid && rueSec.Valid && rue.Int64 >= 0 && rueSec.Int64 > 0 {
+			sm.recentUE, sm.ueWindow = model.Some(uint64(rue.Int64)), time.Duration(rueSec.Int64)*time.Second
+		}
 		samples = append(samples, sm)
 	}
 	rows.Close()
@@ -775,7 +792,7 @@ func (s *Store) DeriveCounterEvents(ctx context.Context, host string) error {
 	var prev *sample
 	for i := range samples {
 		cur := &samples[i]
-		if prev != nil && (prev.mc != cur.mc || prev.dimm != cur.dimm) {
+		if prev != nil && (prev.source != cur.source || prev.mc != cur.mc || prev.dimm != cur.dimm) {
 			prev = nil
 		}
 		// The previous reading belongs to the same counting period when the
@@ -790,27 +807,54 @@ func (s *Store) DeriveCounterEvents(ctx context.Context, host string) error {
 			dce, due = cur.ce, cur.ue
 			windowStart = cur.resetAt
 			if windowStart.IsZero() {
+				// A counter cannot have started before the boot it runs in.
 				windowStart = bootStart(cur.at)
 			}
 		}
-		for _, d := range []struct {
-			n   uint64
-			sev model.Severity
-		}{{dce, model.SevCE}, {due, model.SevUE}} {
-			if d.n == 0 {
-				continue
+		src := cur.source
+		if src == "" {
+			src = "counter"
+		}
+		emit := func(n uint64, sev model.Severity, from time.Time, part string) {
+			if n > math.MaxInt32 {
+				n = math.MaxInt32
 			}
-			src := cur.source
-			if src == "" {
-				src = "counter"
-			}
-			want = append(want, &model.Event{
-				Host: host, Kind: model.KindCounter, ErrorDT: cur.at, ErrorSeverity: d.sev,
+			e := &model.Event{
+				Host: host, Kind: model.KindCounter, ErrorDT: cur.at, ErrorSeverity: sev,
 				Source: src + "/counter", RawRef: cur.rawRef, Grade: model.GradeC,
-				Count: int(d.n), TimeQuality: model.TimeExact, WindowStart: windowStart,
-				EdacMC: model.Some(cur.mc), EdacLocation: cur.location, Label: cur.label,
-				Fingerprint: model.Fingerprint("counter", host, fmt.Sprint(cur.mc), fmt.Sprint(cur.dimm), cur.at.UTC().Format(timeLayout), string(d.sev)),
-			})
+				Count: int(n), TimeQuality: model.TimeExact, WindowStart: from, Label: cur.label,
+			}
+			if cur.socket.Valid {
+				e.SocketId, e.ChannelId, e.ChannelSlotId = cur.socket, cur.channel, cur.position
+			} else {
+				e.EdacMC, e.EdacLocation = model.Some(cur.mc), cur.location
+			}
+			id := []string{"counter", host, cur.source, fmt.Sprint(cur.mc), fmt.Sprint(cur.dimm), cur.at.UTC().Format(timeLayout), string(sev)}
+			if part != "" {
+				id = append(id, part)
+			}
+			e.Fingerprint = model.Fingerprint(id...)
+			want = append(want, e)
+		}
+		for _, d := range []struct {
+			n      uint64
+			sev    model.Severity
+			recent model.Opt[uint64]
+			window time.Duration
+		}{{dce, model.SevCE, cur.recentCE, cur.ceWindow}, {due, model.SevUE, cur.recentUE, cur.ueWindow}} {
+			rest := d.n
+			// The recent errors are told apart where their window is
+			// narrower than the one the growth was counted over.
+			if from := cur.at.Add(-d.window); d.recent.Valid && d.recent.V > 0 && d.window > 0 && (windowStart.IsZero() || from.After(windowStart)) {
+				recent := min(d.recent.V, rest)
+				if recent > 0 {
+					emit(recent, d.sev, from, "recent")
+				}
+				rest -= recent
+			}
+			if rest > 0 {
+				emit(rest, d.sev, windowStart, "")
+			}
 		}
 		prev = cur
 	}
@@ -861,32 +905,57 @@ func (s *Store) DeriveCounterEvents(ctx context.Context, host string) error {
 	})
 }
 
+// counterRank orders the sources of counter events for ReconcileCounters:
+// the counters of the kernel first, the counts other programs keep after
+// them in the order of their names.
+func counterRank(source string) int {
+	if source == "edac-sysfs/counter" {
+		return 0
+	}
+	return 1
+}
+
 // ReconcileCounters sets, for every counter event of a host, how many of its
-// errors located error records already account for: the errors of the same
-// severity class on the same slot inside the counting window. Totals count
-// only the remainder, so a host that has both a rasdaemon database and EDAC
-// counters is not counted twice, and errors that only the counter saw are
-// still counted.
+// errors the ledger already counts: the located error records of the same
+// severity class on the same slot inside the counting window, and what the
+// counters of another source count beyond those. Totals count only the
+// remainder, so a host that has both a rasdaemon database and EDAC counters
+// is not counted twice, a host that has the counters of two sources neither,
+// and errors that only a counter saw are still counted.
+//
+// The sources are taken in a fixed order, the counters of the kernel first.
+// What an earlier source counts beyond the located records covers the
+// events of a later source whose windows overlap its own, each error once
+// per later source. Two events of one source whose windows lie inside one
+// another (the recent errors of a reading and the rest of it, or two rank
+// counters of one DIMM) share the located records of the common window:
+// what covers the narrower event does not cover the wider one again.
 func (s *Store) ReconcileCounters(ctx context.Context, host string) error {
 	type counter struct {
 		id         int64
 		count      int
 		sev        model.Severity
 		slot       string
-		mc         sql.NullInt64
+		source     string
+		mc, socket sql.NullInt64
 		start, end time.Time
+		// located is how many of the errors located records account for,
+		// spare how many the event counts beyond everything before it, and
+		// taken how many of those a later source has been covered by.
+		located, spare int
+		taken          map[string]int
 	}
-	rows, err := s.db.QueryContext(ctx, `SELECT id, count, "ErrorSeverity", slot, edac_mc, window_start, "ErrorDT"
+	rows, err := s.db.QueryContext(ctx, `SELECT id, count, "ErrorSeverity", slot, source, edac_mc, "SocketId", window_start, "ErrorDT"
  FROM event WHERE host = ? AND kind = 'counter' ORDER BY "ErrorDT", id`, host)
 	if err != nil {
 		return fmt.Errorf("reconcile counters: %w", err)
 	}
-	var counters []counter
+	var counters []*counter
 	for rows.Next() {
-		var c counter
+		c := &counter{taken: map[string]int{}}
 		var sev string
 		var start, end sql.NullString
-		if err := rows.Scan(&c.id, &c.count, &sev, &c.slot, &c.mc, &start, &end); err != nil {
+		if err := rows.Scan(&c.id, &c.count, &sev, &c.slot, &c.source, &c.mc, &c.socket, &start, &end); err != nil {
 			rows.Close()
 			return err
 		}
@@ -897,8 +966,45 @@ func (s *Store) ReconcileCounters(ctx context.Context, host string) error {
 	if err := rows.Err(); err != nil {
 		return err
 	}
+	// Earlier sources first; within a source the narrower window first, so
+	// that what it took from the located records is known when the wider
+	// window around it is looked at.
+	length := func(c *counter) time.Duration {
+		if c.start.IsZero() {
+			return time.Duration(math.MaxInt64)
+		}
+		return c.end.Sub(c.start)
+	}
+	sort.SliceStable(counters, func(i, j int) bool {
+		a, b := counters[i], counters[j]
+		if ra, rb := counterRank(a.source), counterRank(b.source); ra != rb {
+			return ra < rb
+		}
+		if a.source != b.source {
+			return a.source < b.source
+		}
+		return length(a) < length(b)
+	})
+	// same reports whether two events count errors of the same place and
+	// severity class. Errors that are tied to no slot are told apart by
+	// their memory controller or socket within one source; across sources
+	// the two numberings do not compare, and such errors are one pool.
+	same := func(a, b *counter) bool {
+		if a.sev.Uncorrected() != b.sev.Uncorrected() || a.slot != b.slot {
+			return false
+		}
+		return a.slot != "" || a.source != b.source || (a.mc == b.mc && a.socket == b.socket)
+	}
+	// overlaps reports whether the windows of two events share some time.
+	overlaps := func(a, b *counter) bool {
+		return (a.start.IsZero() || a.start.Before(b.end)) && (b.start.IsZero() || b.start.Before(a.end))
+	}
+	// within reports whether the window of a lies inside the window of b.
+	within := func(a, b *counter) bool {
+		return !a.end.After(b.end) && (b.start.IsZero() || (!a.start.IsZero() && !a.start.Before(b.start)))
+	}
 	return s.Update(ctx, func(w *Writer) error {
-		for _, c := range counters {
+		for i, c := range counters {
 			sevs := `('CE')`
 			if c.sev.Uncorrected() {
 				sevs = `('Recoverable', 'UE', 'Fatal')`
@@ -909,9 +1015,13 @@ func (s *Store) ReconcileCounters(ctx context.Context, host string) error {
 			if !c.start.IsZero() {
 				q, args = q+` AND "ErrorDT" > ?`, append(args, ts(c.start))
 			}
-			if c.slot != "" {
+			switch {
+			case c.slot != "":
 				q, args = q+` AND slot = ?`, append(args, c.slot)
-			} else {
+			case c.socket.Valid:
+				// What a source that counts per socket could not place.
+				q, args = q+` AND slot = '' AND "SocketId" IS ?`, append(args, c.socket)
+			default:
 				// Controller-level counter of errors EDAC could not place.
 				q, args = q+` AND slot = '' AND edac_mc IS ?`, append(args, c.mc)
 			}
@@ -919,8 +1029,28 @@ func (s *Store) ReconcileCounters(ctx context.Context, host string) error {
 			if err := w.queryRow(q, args...).Scan(&located); err != nil {
 				return fmt.Errorf("reconcile counters: %w", err)
 			}
-			covered := min(located, c.count)
-			if _, err := w.exec(`UPDATE event SET covered = ? WHERE id = ?`, covered, c.id); err != nil {
+			for _, d := range counters[:i] {
+				if d.source == c.source && same(c, d) && within(d, c) {
+					located -= d.located
+				}
+			}
+			c.located = max(min(located, c.count), 0)
+			need := c.count - c.located
+			for _, d := range counters[:i] {
+				if need == 0 {
+					break
+				}
+				if d.source == c.source || !same(c, d) || !overlaps(c, d) {
+					continue
+				}
+				take := min(need, d.spare-d.taken[c.source])
+				if take > 0 {
+					d.taken[c.source] += take
+					need -= take
+				}
+			}
+			c.spare = need
+			if _, err := w.exec(`UPDATE event SET covered = ? WHERE id = ?`, c.count-need, c.id); err != nil {
 				return fmt.Errorf("reconcile counters: %w", err)
 			}
 		}
