@@ -1,0 +1,183 @@
+# Tests of my-findings.rules.yml: promtool test rules my-findings.rules.test.yml
+rule_files:
+  - my-findings.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: a finding that gets worse alerts for ten minutes
+    interval: 1m
+    input_series:
+      # ok for two hours, observe from minute 120, replace now from minute 200.
+      - series: 'my_dimm_verdict{host="r12-n034", slot="CPU0_C1", serial="3B9C56", instance="r12-n034:10163", job="memory"}'
+        values: '0x119 1x79 3x100'
+      # A DIMM whose finding does not change.
+      - series: 'my_dimm_verdict{host="r12-n034", slot="CPU1_D1", serial="2AEB41", instance="r12-n034:10163", job="memory"}'
+        values: '1x300'
+    alert_rule_test:
+      - eval_time: 119m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 120m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: r12-n034
+              slot: CPU0_C1
+              serial: 3B9C56
+              instance: r12-n034:10163
+              job: memory
+              finding: observe
+              severity: info
+            exp_annotations:
+              summary: 'r12-n034 CPU0_C1: the finding is now observe'
+              description: 'DIMM in slot CPU0_C1 of host r12-n034, serial number 3B9C56. Corrected errors without a growing fault. "my why CPU0_C1" on the host, or /api/dimm/CPU0_C1 of the exporter, shows what the finding rests on.'
+      - eval_time: 129m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: r12-n034
+              slot: CPU0_C1
+              serial: 3B9C56
+              instance: r12-n034:10163
+              job: memory
+              finding: observe
+              severity: info
+            exp_annotations:
+              summary: 'r12-n034 CPU0_C1: the finding is now observe'
+              description: 'DIMM in slot CPU0_C1 of host r12-n034, serial number 3B9C56. Corrected errors without a growing fault. "my why CPU0_C1" on the host, or /api/dimm/CPU0_C1 of the exporter, shows what the finding rests on.'
+      # Ten minutes on the alert has ended; the finding is still observe.
+      - eval_time: 130m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 199m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      # observe to replace now: a second alert, critical.
+      - eval_time: 200m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: r12-n034
+              slot: CPU0_C1
+              serial: 3B9C56
+              instance: r12-n034:10163
+              job: memory
+              finding: replace-now
+              severity: critical
+            exp_annotations:
+              summary: 'r12-n034 CPU0_C1: the finding is now replace now'
+              description: 'DIMM in slot CPU0_C1 of host r12-n034, serial number 3B9C56. An uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up. "my why CPU0_C1" on the host, or /api/dimm/CPU0_C1 of the exporter, shows what the finding rests on.'
+      - eval_time: 211m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+
+  - name: a finding that gets better, or stays, does not alert
+    interval: 1m
+    input_series:
+      # replace now, then observe after the DIMM was dealt with, then ok.
+      - series: 'my_dimm_verdict{host="h1", slot="A1", serial="S1"}'
+        values: '3x100 1x100 0x100'
+      # Corrected errors keep coming and the finding stays observe.
+      - series: 'my_dimm_verdict{host="h1", slot="B1", serial="S2"}'
+        values: '1x300'
+      - series: 'my_dimm_ce_total{host="h1", slot="B1", serial="S2"}'
+        values: '0+25x300'
+    alert_rule_test:
+      # The first values of both DIMMs alert: nothing is known from before
+      # the exporter was set up.
+      - eval_time: 5m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: h1
+              slot: A1
+              serial: S1
+              finding: replace-now
+              severity: critical
+            exp_annotations:
+              summary: 'h1 A1: the finding is now replace now'
+              description: 'DIMM in slot A1 of host h1, serial number S1. An uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up. "my why A1" on the host, or /api/dimm/A1 of the exporter, shows what the finding rests on.'
+          - exp_labels:
+              host: h1
+              slot: B1
+              serial: S2
+              finding: observe
+              severity: info
+            exp_annotations:
+              summary: 'h1 B1: the finding is now observe'
+              description: 'DIMM in slot B1 of host h1, serial number S2. Corrected errors without a growing fault. "my why B1" on the host, or /api/dimm/B1 of the exporter, shows what the finding rests on.'
+      - eval_time: 30m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 101m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 150m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 201m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 290m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+
+  - name: a DIMM that shows up with a finding alerts
+    interval: 1m
+    input_series:
+      # A host of a fleet appears with its first record, an uncorrected
+      # error: the series starts at 3. The store gives no serial number.
+      - series: 'my_dimm_verdict{host="db-07", slot="NODE 1 CPU1_DIMM_B1", serial=""}'
+        values: '_x60 3x100'
+      # A DIMM without errors that shows up does not alert.
+      - series: 'my_dimm_verdict{host="db-07", slot="NODE 1 CPU1_DIMM_B2", serial=""}'
+        values: '_x60 0x100'
+    alert_rule_test:
+      - eval_time: 59m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 60m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: db-07
+              slot: NODE 1 CPU1_DIMM_B1
+              finding: replace-now
+              severity: critical
+            exp_annotations:
+              summary: 'db-07 NODE 1 CPU1_DIMM_B1: the finding is now replace now'
+              description: 'DIMM in slot NODE 1 CPU1_DIMM_B1 of host db-07. An uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up. "my why NODE 1 CPU1_DIMM_B1" on the host, or /api/dimm/NODE 1 CPU1_DIMM_B1 of the exporter, shows what the finding rests on.'
+      - eval_time: 71m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+
+  - name: a gap in the scrapes does not alert again
+    interval: 1m
+    input_series:
+      # consider replacement, half an hour without samples (the exporter
+      # was down), then the same finding.
+      - series: 'my_dimm_verdict{host="h1", slot="A1", serial="S1"}'
+        values: '2x100 _x30 2x100'
+      # hold replacement: a cause outside the DIMM.
+      - series: 'my_dimm_verdict{host="h1", slot="C1", serial="S3"}'
+        values: '0x150 4x100'
+    alert_rule_test:
+      - eval_time: 132m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 140m
+        alertname: MemoryFindingWorse
+        exp_alerts: []
+      - eval_time: 152m
+        alertname: MemoryFindingWorse
+        exp_alerts:
+          - exp_labels:
+              host: h1
+              slot: C1
+              serial: S3
+              finding: hold-replacement
+              severity: warning
+            exp_annotations:
+              summary: 'h1 C1: the finding is now hold replacement'
+              description: 'DIMM in slot C1 of host h1, serial number S3. A cause outside the DIMM is suspected: check the channel, the slot and the contact before the DIMM is pulled. "my why C1" on the host, or /api/dimm/C1 of the exporter, shows what the finding rests on.'

@@ -139,6 +139,12 @@ The default address is `127.0.0.1:10163`, which only the host itself can reach. 
 
 Port 10163 is not registered in the Prometheus list of default port allocations.
 
+## Alerts, dashboard and services
+
+[contrib/](../contrib/README.md) holds files to take from: systemd units for the exporter of a host and of a fleet, a Prometheus scrape configuration, two alert rules with their rule tests, Alertmanager routes for them, and a Grafana dashboard.
+
+The alert about memory is `MemoryFindingWorse`. It fires when `my_dimm_verdict` of a DIMM is higher than in the hour before, and on nothing else: error counts raise no alert, and a finding that stays as it is raises none. The second rule, `MemoryFindingsStale`, is about the exporter: its findings have not been renewed for 30 minutes.
+
 ## Scrape configuration
 
 ```yaml
