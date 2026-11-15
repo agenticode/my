@@ -242,8 +242,16 @@ func (doc *Document) slotMapFigure(sm *view.SlotMap, anchors map[string]string, 
 	return s
 }
 
-// slotLegend lists what the cells of the slot map stand for.
-func (doc *Document) slotLegend(sm *view.SlotMap) *node {
+// pointerIcon is the mark that points at the subject of a case, as a
+// swatch for a legend.
+func pointerIcon() *node {
+	return el("svg", A{"class", "ic slot", "viewBox", "0 0 14 14", "width", "14", "height", "14", "aria-hidden", "true"},
+		el("path", A{"class", "pointer", "d", "M3 4h8l-4 6z"}))
+}
+
+// slotLegend lists what the cells of the slot map stand for. With subject
+// set it also says what the pointer above a cell means.
+func (doc *Document) slotLegend(sm *view.SlotMap, subject bool) *node {
 	ul := el("ul", A{"class", "legend"})
 	for _, g := range []model.VerdictGrade{model.VerdictReplaceNow, model.VerdictConsiderReplacement, model.VerdictObserve, model.VerdictOK, model.VerdictHoldReplacement} {
 		ul.add(el("li", icon(string(g), 14), engine.GradeText(doc.Lang, g)))
@@ -262,6 +270,9 @@ func (doc *Document) slotLegend(sm *view.SlotMap) *node {
 	}
 	if unknown {
 		ul.add(el("li", icon(view.SlotUnknown, 14), doc.say("slot.unknown")))
+	}
+	if subject {
+		ul.add(el("li", pointerIcon(), doc.say("sum.subject")))
 	}
 	return ul
 }

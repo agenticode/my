@@ -285,3 +285,73 @@ func TestReportAllFigures(t *testing.T) {
 		t.Errorf("%d DIMMs with figures, %d with --all; want 2 and 14", few, all)
 	}
 }
+
+// TestReportFigures checks --figures: the figures of the report as SVG
+// files of their own.
+func TestReportFigures(t *testing.T) {
+	ledger := demo(t)
+	dir := t.TempDir()
+	out, figs := filepath.Join(dir, "r.html"), filepath.Join(dir, "figures")
+	code, stdout, stderr := runEnv(fixed, "report", ledger, "-o", out, "--figures", figs)
+	if code != cli.ExitOK || stderr != "" {
+		t.Fatalf("exit code %d, stderr %q", code, stderr)
+	}
+	wantLines(t, stdout, "report written: "+out, "figures written: "+figs+" (8 SVG files)", "host r12-n034, finding: replace now")
+	names, _ := filepath.Glob(filepath.Join(figs, "*.svg"))
+	if len(names) != 8 {
+		t.Fatalf("%d files in %s", len(names), figs)
+	}
+	for _, want := range []string{"slotmap.svg", "timeline.svg", "CPU0_C1-map.svg", "CPU0_C1-topology.svg", "CPU0_C1-timeline.svg", "CPU1_D1-map.svg"} {
+		data, err := os.ReadFile(filepath.Join(figs, want))
+		if err != nil {
+			t.Errorf("%s: %v", want, err)
+			continue
+		}
+		if !bytes.HasPrefix(data, []byte(`<svg xmlns="http://www.w3.org/2000/svg"`)) || !bytes.HasSuffix(data, []byte("</svg>\n")) || bytes.Contains(data, []byte("href=")) {
+			t.Errorf("%s is not a picture of its own", want)
+		}
+	}
+	// A file that exists is kept unless --force is given, and then
+	// nothing is written at all.
+	other := filepath.Join(dir, "other.html")
+	code, stdout, stderr = runEnv(fixed, "report", ledger, "-o", other, "--figures", figs)
+	if code != cli.ExitUsage || stdout != "" || !strings.Contains(stderr, "slotmap.svg exists; --force replaces it") {
+		t.Errorf("figures that exist: exit code %d, stderr %q", code, stderr)
+	}
+	if _, err := os.Stat(other); err == nil {
+		t.Error("the report was written though its figures could not be")
+	}
+	if code, _, stderr = runEnv(fixed, "report", ledger, "-o", other, "--figures", figs, "--force"); code != cli.ExitOK {
+		t.Errorf("--force: exit code %d, stderr %q", code, stderr)
+	}
+
+	// Figures without a report, and in Korean.
+	only := filepath.Join(dir, "only")
+	code, stdout, stderr = runEnv(fixed, "report", ledger, "--figures", only, "--lang", "ko")
+	if code != cli.ExitOK || stderr != "" || !strings.Contains(stdout, "그림 저장: "+only+" (SVG 파일 8개)") || strings.Contains(stdout, "리포트 저장") {
+		t.Errorf("--figures alone: exit code %d, stderr %q\n%s", code, stderr, stdout)
+	}
+	if data, _ := os.ReadFile(filepath.Join(only, "slotmap.svg")); !bytes.Contains(data, []byte("슬롯 맵")) || !bytes.Contains(data, []byte("즉시 교체")) {
+		t.Error("the Korean slot map is not in Korean")
+	}
+
+	// --json names the files.
+	code, stdout, _ = runEnv(fixed, "report", ledger, "--figures", filepath.Join(dir, "j"), "--json")
+	var res struct {
+		Path    string   `json:"path"`
+		Figures []string `json:"figures"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &res); err != nil || code != cli.ExitOK || len(res.Figures) != 8 || res.Path != "" || !strings.HasSuffix(res.Figures[0], "slotmap.svg") {
+		t.Errorf("--json: exit code %d, %v, %+v", code, err, res)
+	}
+
+	// A file where the directory should be.
+	code, _, stderr = runEnv(fixed, "report", ledger, "--figures", out)
+	if code != cli.ExitUsage || !strings.Contains(stderr, "not a directory") {
+		t.Errorf("--figures FILE: exit code %d, stderr %q", code, stderr)
+	}
+	// Neither a report nor figures.
+	if code, _, stderr = run("report", ledger); code != cli.ExitUsage || !strings.Contains(stderr, "name the file to write with -o") {
+		t.Errorf("nothing to write: exit code %d, stderr %q", code, stderr)
+	}
+}

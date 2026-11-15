@@ -438,7 +438,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
-		{[]string{"report", "--help"}, "report", []string{"Usage: my report [FILE] -o OUT.html [--audience customer|fa]", "--audience WHO", "nothing is loaded from elsewhere", "Printing it from a browser gives a PDF", "The exit code is 0"}},
+		{[]string{"report", "--help"}, "report", []string{"Usage: my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR]", "--audience WHO", "--figures DIR", "nothing is loaded from elsewhere", "Printing it from a browser gives a PDF", "The exit code is 0"}},
 	} {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
 			args := append(append([]string{}, tt.args...), "--lang", string(lang))
@@ -547,6 +547,7 @@ func registerFlags(o *options, topic string) {
 	case "report":
 		o.fs.String("audience", "", "")
 		o.fs.Bool("all", false, "")
+		o.fs.String("figures", "", "")
 		o.fs.Bool("force", false, "")
 	}
 }

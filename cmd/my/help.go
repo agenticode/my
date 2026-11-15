@@ -39,6 +39,7 @@ var words = i18n.Catalog{
 	"err.exists":      {EN: "{file} exists; --force replaces it", KO: "{file}이 이미 있음. --force를 주면 덮어씀"},
 
 	"err.report_out":  {EN: "name the file to write with -o, for example -o report.html", KO: "저장할 파일을 -o로 지정해야 함 (예: -o report.html)"},
+	"report.figures":  {EN: "figures written: {dir} ({n} SVG {n|file|files})", KO: "그림 저장: {dir} (SVG 파일 {n}개)"},
 	"err.report_scan": {EN: "--root and --ledger go with a scan of the host; a case file is read as it is", KO: "--root와 --ledger는 호스트 스캔에 쓰는 옵션임. 케이스 파일은 그대로 읽음"},
 	"err.audience":    {EN: "--audience {value}: want customer or fa", KO: "--audience {value}: customer 또는 fa여야 함"},
 
@@ -249,7 +250,7 @@ var words = i18n.Catalog{
 			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"",
 	},
 
-	"help.report.usage": {EN: "my report [FILE] -o OUT.html [--audience customer|fa] [flags]", KO: "my report [FILE] -o OUT.html [--audience customer|fa] [옵션]"},
+	"help.report.usage": {EN: "my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR] [flags]", KO: "my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR] [옵션]"},
 	"help.report.text":  {EN: "Writes the findings of a case as one HTML file. FILE is a case bundle (.mycase) or a ledger file; without FILE this host is scanned. The file holds everything it shows: the figures are inline SVG and nothing is loaded from elsewhere, so it opens without network access and can be sent as it is. Printing it from a browser gives a PDF. It has eight sections: summary, slot map, the finding of every DIMM with errors, topology bars and address map, timeline, checks against a wrong diagnosis, data quality, and an appendix with the original records the figures point at. In a browser, a point of a figure opens the records behind it. The exit code is 0 when the report was written.", KO: "케이스의 소견을 HTML 파일 하나로 저장합니다. FILE은 케이스 번들(.mycase)이나 원장 파일이고, FILE이 없으면 이 호스트를 스캔합니다. 파일에는 보여주는 것이 모두 들어 있습니다. 그림은 인라인 SVG이고 밖에서 불러오는 것이 없어 네트워크 없이 열리며 그대로 보낼 수 있습니다. 브라우저에서 인쇄하면 PDF가 됩니다. 여덟 절로 나뉩니다: 요약, 슬롯 맵, 오류가 있는 DIMM별 판정, 토폴로지 막대와 주소 맵, 타임라인, 오진 점검표, 데이터 품질, 그림이 가리키는 원본 기록을 실은 부록. 브라우저에서 그림의 점을 누르면 그 뒤의 기록이 나옵니다. 리포트를 저장하면 종료 코드는 0입니다."},
 	"help.report.flags": {
 		EN: "-o OUT.html       the report to write; \"-\" writes it to standard output\n" +
@@ -258,14 +259,18 @@ var words = i18n.Catalog{
 			"                  when a vendor analyzer supplied it, its Level 2 output\n" +
 			"--all             draw the figures of every DIMM with errors, also of those with\n" +
 			"                  the finding \"observe\" and fewer than 10 errors\n" +
-			"--force           replace OUT.html when it exists",
+			"--figures DIR     also write each figure as an SVG file of its own into DIR,\n" +
+			"                  for use outside the report; it can be given without -o\n" +
+			"--force           replace OUT.html and the files in DIR when they exist",
 		KO: "-o OUT.html       저장할 리포트. \"-\"는 표준 출력\n" +
 			"--audience WHO    customer(기본): 공개 고장 모드까지의 소견\n" +
 			"                  fa: 신뢰도 계산 단계와 고장 목록을 더하고, 벤더 분석기가\n" +
 			"                  준 Level 2 결과가 있으면 함께 실음\n" +
 			"--all             오류가 있는 모든 DIMM의 그림을 그림. 소견이 \"관찰\"이고\n" +
 			"                  오류가 10건 미만인 DIMM도 포함\n" +
-			"--force           OUT.html이 있으면 덮어씀",
+			"--figures DIR     그림마다 SVG 파일 하나씩 DIR에 따로 저장. 리포트 밖에서\n" +
+			"                  쓰는 용도이며 -o 없이도 쓸 수 있음\n" +
+			"--force           OUT.html과 DIR의 파일이 있으면 덮어씀",
 	},
 
 	"help.rules.title":      {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
