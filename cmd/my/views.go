@@ -20,16 +20,17 @@ type viewFunc func(ctx context.Context, env *cli.Env, args []string, src *source
 
 // viewCommands are the commands that show findings, by name.
 var viewCommands = map[string]viewFunc{
-	"dimm":     runDIMM,
-	"why":      runWhy,
-	"map":      runMap,
-	"timeline": runTimeline,
-	"gpu":      runGPU,
-	"bios":     runBIOS,
-	"verify":   runVerify,
-	"export":   runExport,
-	"bundle":   runBundle,
-	"report":   runReport,
+	"dimm":      runDIMM,
+	"why":       runWhy,
+	"map":       runMap,
+	"timeline":  runTimeline,
+	"gpu":       runGPU,
+	"bios":      runBIOS,
+	"inventory": runInventory,
+	"verify":    runVerify,
+	"export":    runExport,
+	"bundle":    runBundle,
+	"report":    runReport,
 }
 
 func live(fn viewFunc) func(context.Context, *cli.Env, []string) int {

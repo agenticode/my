@@ -1,0 +1,24 @@
+host node-h  HPE ProLiant DL380 Gen10  BIOS U30 v2.90 (07/20/2023)  BMC iLO 5 v3.09
+4 DIMMs in 4 slots
+slot names and module data from the BMC (read 2026-11-13 09:30 UTC)
+memory RAS settings of the BIOS in effect for every DIMM: patrol scrub, ADDDC (width not known)
+
+ SLOT           SERIAL    MAKER           PART NUMBER      SIZE  ORG  SPEED      CE OS  CE BMC
+ PROC 1 DIMM 3  H1D30002  Example Memory  EXM32G29R2X4-B  32 GB  2R   2933/2933      -       2
+                DDR4 RDIMM; BMC: proc1dimm3
+                BMC log 2026-11-03 06:14 UTC: correctable ECC
+                BMC log 2026-11-09 17:45 UTC: correctable ECC
+ PROC 1 DIMM 1  H1D10001  Example Memory  EXM32G29R2X4-B  32 GB  2R   2933/2933      -       0
+                DDR4 RDIMM; BMC: proc1dimm1
+ PROC 2 DIMM 3  H2D30004  Example Memory  EXM32G29R2X4-B  32 GB  2R   2933/2933      -       0
+                DDR4 RDIMM; BMC: proc2dimm3
+ PROC 2 DIMM 1  H2D10003  Example Memory  EXM32G29R2X4-B  32 GB  2R   2933/2933      -       0
+                DDR4 RDIMM; BMC: proc2dimm1
+
+ ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
+ CE BMC counts the entries about corrected errors in the logs of the BMC. No source of the operating
+ system was read.
+ 4 of 4 DIMMs have no device width on record. SMBIOS and Redfish have no field for it; the EDAC
+ driver of the host reports it where it is loaded.
+
+ No source of the operating system was read, so there is nothing to set against the logs of the BMC.

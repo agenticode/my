@@ -473,3 +473,61 @@ func TestMetricsShapes(t *testing.T) {
 		t.Errorf("last reset = %s", c.BMCs[0].LastReset)
 	}
 }
+
+// One error that stands in two logs of the BMC is one error: the entry of
+// the second log is declared a second report of the entry of the first.
+// Two entries of one log are two errors, however close they are.
+func TestOneErrorInTwoLogs(t *testing.T) {
+	entry := func(log, id, created, dimm, text string) string {
+		return fmt.Sprintf(`{"@odata.id":"%s/Entries/%s","@odata.type":"#LogEntry.v1_6_0.LogEntry","Id":%q,"EntryType":"SEL","Created":%q,"SensorType":"Memory","Message":"%s %s"}`,
+			log, id, id, created, text, dimm)
+	}
+	log := func(path string, entries ...string) string {
+		return fmt.Sprintf(`{"@odata.id":"%s/Entries","Members@odata.count":%d,"Members":[%s]}`, path, len(entries), strings.Join(entries, ","))
+	}
+	const sel, mgr = "/redfish/v1/Systems/1/LogServices/SEL", "/redfish/v1/Managers/1/LogServices/EventLog"
+	fsys := tree(map[string]string{
+		"/redfish/v1/Systems/1/Memory/1": memoryA,
+		"/redfish/v1/Systems/1/Memory/2": memoryB,
+		sel + "/Entries": log(sel,
+			entry(sel, "1", "2026-11-01T00:00:00Z", "DIMM_A1", "Correctable ECC"),
+			entry(sel, "2", "2026-11-01T00:00:02Z", "DIMM_A1", "Correctable ECC"),   // a second error, two seconds later
+			entry(sel, "3", "2026-11-02T00:00:00Z", "DIMM_A2", "Correctable ECC"),   // another module
+			entry(sel, "4", "2026-11-03T00:00:00Z", "DIMM_A1", "Uncorrectable ECC"), // another severity
+			entry(sel, "5", "2026-11-04T00:00:00Z", "DIMM_A1", "Correctable ECC")),  // in no other log
+		mgr + "/Entries": log(mgr,
+			entry(mgr, "11", "2026-11-01T00:00:01Z", "DIMM_A1", "Correctable ECC"),  // the first error again
+			entry(mgr, "12", "2026-11-01T00:00:03Z", "DIMM_A1", "Correctable ECC"),  // the second error again
+			entry(mgr, "13", "2026-11-02T00:00:04Z", "DIMM_A2", "Correctable ECC"),  // the error of the other module
+			entry(mgr, "14", "2026-11-03T00:00:00Z", "DIMM_A1", "Correctable ECC"),  // corrected, where the other log has an uncorrected error
+			entry(mgr, "15", "2026-11-04T00:00:09Z", "DIMM_A1", "Correctable ECC")), // nine seconds off: another error
+	})
+	var c adapter.Collected
+	rep := NewFS(fsys, "dump", Options{Now: now}).Collect(ctx, &c)
+	if len(c.Events) != 10 {
+		t.Fatalf("%d events, want 10 (report %+v)", len(c.Events), rep)
+	}
+	byFingerprint := map[string]string{}
+	for _, e := range c.Events {
+		byFingerprint[e.Fingerprint] = e.RawRef[strings.LastIndex(e.RawRef, "/")+1:]
+	}
+	got := map[string]string{}
+	for _, e := range c.Events {
+		if e.DupOfFingerprint != "" {
+			got[byFingerprint[e.Fingerprint]] = byFingerprint[e.DupOfFingerprint]
+		}
+	}
+	// Which log comes first is the order of the dump; the pairs are what counts.
+	pairs := map[string]bool{}
+	for second, first := range got {
+		a, b := second, first
+		if a > b {
+			a, b = b, a
+		}
+		pairs[a+"="+b] = true
+	}
+	if want := map[string]bool{"1=11": true, "12=2": true, "13=3": true}; !reflect.DeepEqual(pairs, want) {
+		t.Errorf("entries declared to repeat another = %v, want %v", pairs, want)
+	}
+	wantNotes(t, rep, "3 error entries repeat an entry of another log of the same BMC: each such error is counted once")
+}

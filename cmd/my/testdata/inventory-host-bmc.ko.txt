@@ -1,0 +1,66 @@
+호스트 r12-n034  Example Systems R760  BIOS 1.4.2  BMC 2.14.0
+DIMM 16개. 빈 슬롯 16개는 생략 (--all로 표시)
+슬롯 이름과 모듈 정보의 출처: SMBIOS, EDAC, BMC 127.0.0.1 (2026-11-16 03:00 UTC에 읽음)
+설정 프로필에 이 BIOS의 매핑이 없어 RAS 열이 비어 있음. 자세한 내용은 my bios
+
+ 슬롯     시리얼  제조사          파트 넘버        용량  구성  속도       CE OS  CE BMC
+ CPU0_A1  5C331B  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.3, DIMM A3, DIMM3; EDAC: CPU_SrcID#0_MC#0_Chan#0_DIMM#0
+          BMC가 센 CE: 모듈 수명 전체 30건, 2026-11-10 00:00 UTC 리셋 이후 3건
+ CPU0_B1  DE7FF0  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.4, DIMM A4, DIMM4; EDAC: CPU_SrcID#0_MC#0_Chan#1_DIMM#0
+ CPU0_C1  3B9C56  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800    604       6
+          DDR5 RDIMM; BMC: BMC.Slot.1, DIMM A1, DIMM1; EDAC: CPU_SrcID#0_MC#1_Chan#0_DIMM#0
+          BMC가 센 CE: 모듈 수명 전체 10건, 2026-11-10 00:00 UTC 리셋 이후 1건
+          BMC 로그 2026-11-06 01:00 UTC: correctable ECC
+          BMC 로그 2026-11-07 01:00 UTC: correctable ECC
+ CPU0_D1  80D01E  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.5, DIMM A5, DIMM5; EDAC: CPU_SrcID#0_MC#1_Chan#1_DIMM#0
+ CPU0_E1  E2CD51  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.6, DIMM A6, DIMM6; EDAC: CPU_SrcID#0_MC#2_Chan#0_DIMM#0
+ CPU0_F1  2B6332  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.7, DIMM A7, DIMM7; EDAC: CPU_SrcID#0_MC#2_Chan#1_DIMM#0
+ CPU0_G1  382A8A  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.8, DIMM A8, DIMM8; EDAC: CPU_SrcID#0_MC#3_Chan#0_DIMM#0
+ CPU0_H1  4B3B31  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.9, DIMM A9, DIMM9; EDAC: CPU_SrcID#0_MC#3_Chan#1_DIMM#0
+ CPU1_A1  2C9305  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.10, DIMM A10, DIMM10; EDAC: CPU_SrcID#1_MC#0_Chan#0_DIMM#0
+ CPU1_B1  DBC9CE  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.11, DIMM A11, DIMM11; EDAC: CPU_SrcID#1_MC#0_Chan#1_DIMM#0
+ CPU1_C1  99B7F7  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.12, DIMM A12, DIMM12; EDAC: CPU_SrcID#1_MC#1_Chan#0_DIMM#0
+ CPU1_D1  2AEB41  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      4       0
+          DDR5 RDIMM; BMC: BMC.Slot.2, DIMM A2, DIMM2; EDAC: CPU_SrcID#1_MC#1_Chan#1_DIMM#0
+          BMC가 센 CE: 모듈 수명 전체 20건, 2026-11-10 00:00 UTC 리셋 이후 2건
+ CPU1_E1  02AC34  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.13, DIMM A13, DIMM13; EDAC: CPU_SrcID#1_MC#2_Chan#0_DIMM#0
+ CPU1_F1  848BE3  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.14, DIMM A14, DIMM14; EDAC: CPU_SrcID#1_MC#2_Chan#1_DIMM#0
+ CPU1_G1  D7A399  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.15, DIMM A15, DIMM15; EDAC: CPU_SrcID#1_MC#3_Chan#0_DIMM#0
+ CPU1_H1  55C12A  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM; BMC: BMC.Slot.16, DIMM A16, DIMM16; EDAC: CPU_SrcID#1_MC#3_Chan#1_DIMM#0
+
+ 구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s).
+ CE OS는 운영체제 기록의 CE 수, CE BMC는 BMC 로그의 CE 항목 수. 둘 다 양쪽 기록이 겹치는 기간인
+ 2026-11-02 01:00 UTC부터 2026-11-13 00:00 UTC까지를 셈.
+
+ 운영체제와 BMC 비교 기간: 2026-11-02 01:00 UTC부터 2026-11-13 00:00 UTC까지. 운영체제 기록은
+ 2026-08-03 13:53 UTC에, BMC 로그는 2026-11-02 01:00 UTC에 시작.
+ BMC 시계가 읽은 기기의 시계에 비해 2분 빠름. BMC 로그의 시각은 BMC가 적은 그대로임.
+ BMC의 수명 카운트는 모듈 수명 전체를 세고 운영체제의 EDAC 카운터는 부팅마다 다시 시작함. 두 값은
+ 함께 표시하되 비교하지 않음.
+   - CPU0_A1: 2026-11-10 00:00 UTC 리셋 이후 BMC 카운트는 CE 3건, 운영체제 기록은 0건
+   - CPU0_C1: 운영체제 기록 CE 604건, BMC 로그 6건. BMC 항목 1건은 운영체제 기록과 같은 시각
+   - CPU0_C1: 2026-11-10 00:00 UTC 리셋 이후 BMC 카운트는 CE 1건, 운영체제 기록은 206건
+   - CPU1_D1: 운영체제 기록 CE 4건, BMC 로그에는 없음
+   - CPU1_D1: 2026-11-10 00:00 UTC 리셋 이후 BMC 카운트는 CE 2건, 운영체제 기록은 0건
+
+ 운영체제에는 있고 BMC 로그에는 없는 오류. 원인 후보이며 확정된 것은 없음:
+   - BIOS의 임계값이나 leaky bucket 설정 때문에 CE가 BMC 로그에 남지 않을 수 있음. 이 BIOS의 해당
+     설정은 기록에 없음
+
+ 리셋 이후 카운트가 서로 다름. 원인 후보이며 확정된 것은 없음:
+   - BMC는 펌웨어가 정정한 오류를 세고, 운영체제 쪽에는 커널이 보고받아 소스에 남은 기록만 있음
+   - BMC의 현재 카운트는 지우면(ClearCurrentPeriod) 다시 시작하며, 그 시점이 리셋 이후일 수 있음
