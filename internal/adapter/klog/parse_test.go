@@ -290,7 +290,7 @@ func TestCoverageNote(t *testing.T) {
 		var c adapter.Collected
 		rep := NewReader(strings.NewReader(text), "log", opts).Collect(context.Background(), &c)
 		for _, n := range rep.Notes {
-			if strings.HasPrefix(n, "covers ") {
+			if strings.HasPrefix(n, "its lines run ") {
 				return n
 			}
 		}
@@ -304,20 +304,20 @@ func TestCoverageNote(t *testing.T) {
 	}{
 		{"dmesg of one boot, boot time unknown",
 			"[    0.000000] Linux version 6.8.0 (x)\n[  100.000000] usb 1-1: new device\n", Options{},
-			"covers 0 s to 100 s after boot"},
+			"its lines run from 0 s to 100 s after boot"},
 		{"the ring buffer of a live host that reaches back to the boot",
 			"6,0,0,-;Linux version 6.8.0 (x)\n6,9,86400000000,-;something\n", Options{BootTime: boot},
-			"covers 2026-07-11 08:00 to 2026-07-12 08:00 UTC"},
+			"its lines run from 2026-07-11 08:00 to 2026-07-12 08:00 UTC"},
 		{"a ring buffer that has wrapped",
 			"6,900,864000000000,-;something\n6,901,950400000000,-;more\n", Options{BootTime: boot},
-			"covers 2026-07-21 08:00 to 2026-07-22 08:00 UTC; it starts 10.0 days after boot, and what the kernel said before that is not in it"},
+			"its lines run from 2026-07-21 08:00 to 2026-07-22 08:00 UTC; the first is from 10.0 days after boot, and what the kernel said before that is not in it"},
 		{"a journal export",
 			`{"__REALTIME_TIMESTAMP":"1794700800000000","_TRANSPORT":"kernel","MESSAGE":"a","_SOURCE_MONOTONIC_TIMESTAMP":"5000000"}` + "\n" +
 				`{"__REALTIME_TIMESTAMP":"1794787200000000","_TRANSPORT":"kernel","MESSAGE":"b","_SOURCE_MONOTONIC_TIMESTAMP":"86405000000"}` + "\n", Options{},
-			"covers 2026-11-15 00:00 to 2026-11-16 00:00 UTC"},
+			"its lines run from 2026-11-15 00:00 to 2026-11-16 00:00 UTC"},
 		{"a syslog file with RFC 3339 times",
 			"2026-11-12T03:14:07.123456+09:00 host kernel: a\n2026-11-13T03:14:07.123456+09:00 host kernel: b\n", Options{},
-			"covers 2026-11-11 18:14 to 2026-11-12 18:14 UTC"},
+			"its lines run from 2026-11-11 18:14 to 2026-11-12 18:14 UTC"},
 		{"nothing that carries a time", "hello\nworld\n", Options{}, ""},
 		{"an empty input", "", Options{}, ""},
 	} {

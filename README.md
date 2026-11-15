@@ -261,6 +261,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `testdata` | fixtures for every adapter; `testdata/real` holds the captures of real hosts with their injection plans |
 | `contrib` | for the exporter: systemd units, Prometheus alert rules with their tests, Alertmanager routes, a Grafana dashboard |
 | `tools/lab` | the scripts that inject errors on a lab host and capture what it recorded |
+| `tools/validate` | runs the binary against the host it is on and records exit codes, time, memory and what was printed ([docs/validation.md](docs/validation.md)) |
 
 Three development commands are left out of the command list: `my synth` generates synthetic hosts (`my synth -list` names the scenarios), `my analyze` prints the engine result of a ledger, and `my eval` runs the comparison of [docs/evaluation.md](docs/evaluation.md).
 
