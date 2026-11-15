@@ -189,6 +189,11 @@ func readHead(path string) (head []byte, zipped bool, err error) {
 	}
 	head, err = io.ReadAll(io.LimitReader(r, sniffSize))
 	if err != nil && len(head) == 0 {
+		if zipped {
+			// The error of the decompressor alone ("unexpected EOF") does
+			// not say what is wrong with the file.
+			return nil, zipped, fmt.Errorf("%s: gzip: the compressed data is damaged or cut off: %w", path, err)
+		}
 		return nil, zipped, fmt.Errorf("%s: %w", path, err)
 	}
 	if isBinary(head) && len(head) == sniffSize {

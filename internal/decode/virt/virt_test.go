@@ -1,6 +1,9 @@
 package virt
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestFromDMI(t *testing.T) {
 	for _, tc := range []struct{ vendor, product, want string }{
@@ -80,6 +83,16 @@ func TestFromKernelLine(t *testing.T) {
 		"kvm: no hardware support":                        "",
 		"Hypervisor detected:":                            "",
 		"":                                                "",
+		// Text that is no name of the kernel's table. A carriage return
+		// in it reached the screen through the host header: found by
+		// FuzzNames.
+		"Hypervisor detected: H\r\xe5":                    "",
+		"Hypervisor detected: KVM\x1b[2J":                 "",
+		"Hypervisor detected: " + strings.Repeat("K", 41): "",
+		"Hypervisor detected: " + strings.Repeat("K", 40): strings.Repeat("K", 40),
+		"Hypervisor detected: ACRN":                       "ACRN",
+		"Hypervisor detected: Jailhouse":                  "Jailhouse",
+		"  Hypervisor detected: Xen PV  ":                 "Xen PV",
 	} {
 		if got := FromKernelLine(msg); got != want {
 			t.Errorf("FromKernelLine(%q) = %q, want %q", msg, got, want)
