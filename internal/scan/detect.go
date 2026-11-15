@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/rasdaemon"
@@ -41,12 +42,18 @@ type DetectOptions struct {
 	// alone since.
 	ModTime bool
 	// Location is the time zone of times that carry none: syslog files,
-	// dmesg -T, the text forms of a BMC event log and the timestamp of
-	// nvidia-smi output. Nil means UTC.
+	// dmesg -T, the text forms of a BMC event log, the timestamp of
+	// nvidia-smi output and times of an FMFM log written without a zone.
+	// Nil means UTC.
 	Location *time.Location
 	// TempDir is where a private copy of a rasdaemon database of a host
 	// tree is made; empty means the system temporary directory.
 	TempDir string
+	// Host names the host whose records are wanted from a log that may
+	// hold the records of several hosts (an FMFM log). Such a log is read
+	// for this host when it names it, and for the first host it names
+	// otherwise. Inputs that belong to one host do not look at it.
+	Host string
 }
 
 // What Detect calls the inputs it knows.
@@ -59,6 +66,7 @@ const (
 	WhatSEL       = "BMC event log (SEL)"
 	WhatRedfish   = "Redfish dump"
 	WhatNvidiaSMI = "nvidia-smi -q output"
+	WhatFMFM      = "FMFM log"
 )
 
 // ErrUnknownInput is returned by Detect, wrapped with what the input looks
@@ -79,8 +87,8 @@ const maxBinary = 16 << 20
 //     files and is read like a host;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
-//     output of dmidecode or of nvidia-smi -q, a BMC event log, or a
-//     Redfish resource.
+//     output of dmidecode or of nvidia-smi -q, a BMC event log, a Redfish
+//     resource, or an FMFM boot, runtime or crash log.
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -292,11 +300,20 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = redfish.New(path, redfish.Options{Now: opts.Now, ModTimeAsObserved: opts.ModTime})
 		}
 
+	case fmfm.Sniff(text):
+		what = WhatFMFM
+		fopts := fmfm.Options{HostID: opts.Host, Now: seen, Location: opts.Location}
+		if zipped {
+			a = fmfm.NewReader(stream(), path, fopts)
+		} else {
+			a = fmfm.NewFile(path, fopts)
+		}
+
 	case looksLikeJSON(text):
-		// JSON that is no journal and no Redfish resource: a list of event
-		// log entries names sensors.
+		// JSON that is no journal, no Redfish resource and no FMFM log: a
+		// list of event log entries names sensors.
 		if !bytes.Contains(bytes.ToLower(text), []byte("sensor")) {
-			return nil, "", fmt.Errorf("%w: JSON that is neither a journal export, a Redfish resource nor a list of event log entries", ErrUnknownInput)
+			return nil, "", fmt.Errorf("%w: JSON that is neither a journal export, a Redfish resource, an FMFM log nor a list of event log entries", ErrUnknownInput)
 		}
 		what = WhatSEL
 		if zipped {

@@ -40,9 +40,11 @@ func aliasTopo(socket, imc, channel, position int) string {
 // aliasPlace is the alias of a place numbered without a memory controller:
 // socket, channel within the socket, and position on the channel. Firmware
 // records and BMC inventories name places this way. Only an inventory that
-// numbers its slots defines these aliases: two sources that both use bare
-// numbers do not have to mean the same slot by them, so the numbers of an
-// error record alone never name a slot.
+// numbers its slots defines these aliases. A record that names its place by
+// such numbers and nothing else is tied to the inventory's slot when one
+// has the numbers, and to a slot of its own, named by the numbers,
+// otherwise. That slot has no alias: once an inventory names the place, the
+// records move to the inventory's slot and the numbered one is dropped.
 func aliasPlace(socket, channel, position int) string {
 	return fmt.Sprintf("place:%d:%d:%d", socket, channel, position)
 }
@@ -749,6 +751,11 @@ func unknownSlotName(k store.LocationKey) string {
 		return fmt.Sprintf("mc%d %s", k.EdacMC.V, k.EdacLocation)
 	case k.SocketId.Valid && k.IMC.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid:
 		return fmt.Sprintf("socket%d imc%d channel%d dimm%d", k.SocketId.V, k.IMC.V, k.ChannelId.V, k.ChannelSlotId.V)
+	case k.SocketId.Valid && k.ChannelId.Valid && k.ChannelSlotId.Valid && k.Records > k.Declared:
+		// Numbers without a memory controller. Records that are all second
+		// reports of records with a better name (a machine check next to
+		// its EDAC record) do not make a slot of their own.
+		return model.PlaceName(k.SocketId.V, k.ChannelId.V, k.ChannelSlotId.V)
 	case k.SMBIOSHandle.Valid:
 		return fmt.Sprintf("handle 0x%04X", k.SMBIOSHandle.V)
 	}

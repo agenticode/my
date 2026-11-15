@@ -70,6 +70,10 @@ func TestDetectFixtures(t *testing.T) {
 		{[]string{"nvidia", "nvidia-smi-q-legacy.txt"}, "nvidia-smi", WhatNvidiaSMI},
 		{[]string{"klog", "nvidia-xid.dmesg"}, "klog", WhatKernelLog},
 		{[]string{"klog", "nvidia-xid.messages"}, "klog", WhatKernelLog},
+		{[]string{"fmfm", "runtime.json"}, "fmfm", WhatFMFM},
+		{[]string{"fmfm", "boot.json"}, "fmfm", WhatFMFM},
+		{[]string{"fmfm", "crash.json"}, "fmfm", WhatFMFM},
+		{[]string{"fmfm", "combined.jsonl"}, "fmfm", WhatFMFM},
 		{[]string{"redfish", "sel-log.json"}, "redfish", WhatRedfish},
 		{[]string{"redfish", "registry-log.json"}, "redfish", WhatRedfish},
 		{[]string{"redfish", "vendor-text-log.json"}, "redfish", WhatRedfish},
@@ -211,6 +215,7 @@ func TestDetectReadsThroughGzip(t *testing.T) {
 		{[]string{"redfish", "registry-log.json"}, WhatRedfish},
 		{[]string{"nvidia", "nvidia-smi-q.xml"}, WhatNvidiaSMI},
 		{[]string{"nvidia", "nvidia-smi-q.txt"}, WhatNvidiaSMI},
+		{[]string{"fmfm", "combined.jsonl"}, WhatFMFM},
 	} {
 		plain := testutil.Testdata(t, c.path...)
 		zipped := filepath.Join(dir, c.path[len(c.path)-1]+".gz")
@@ -349,6 +354,18 @@ func TestDetectOptionsReachTheAdapters(t *testing.T) {
 	if c := collect(rf, DetectOptions{ModTime: true}); len(c.Modules) != 3 || !c.Modules[0].ObservedAt.Equal(saved) {
 		t.Errorf("Redfish with ModTime: seen %v", c.Modules[0].ObservedAt)
 	}
+
+	// An FMFM log with the records of two hosts: the host that is asked
+	// for is read, and the first one the log names otherwise. Times
+	// written without a zone follow the zone option.
+	fm := put("runtime.json", testutil.ReadTestdata(t, "fmfm", "runtime.json"))
+	first, other := collect(fm, DetectOptions{}), collect(fm, DetectOptions{Host: "r12-n035"})
+	if len(first.Events) != 6 || len(other.Events) != 1 || other.Events[0].ErrorDT.Equal(first.Events[0].ErrorDT) {
+		t.Errorf("FMFM log: %d events without a host, %d for the other host", len(first.Events), len(other.Events))
+	}
+	if d := first.Events[0].ErrorDT.Sub(collect(fm, DetectOptions{Location: kst}).Events[0].ErrorDT); d != 9*time.Hour {
+		t.Errorf("FMFM times differ by %v with the zone option, want 9h", d)
+	}
 }
 
 func TestDetectUnknownInputs(t *testing.T) {
@@ -360,7 +377,7 @@ func TestDetectUnknownInputs(t *testing.T) {
 		"empty":      {"", "the file is empty"},
 		"blank":      {"\n \n", "the file is empty"},
 		"prose":      {"Dear support,\nour server shows memory errors.\n", `text of no known kind (it starts "Dear support,")`},
-		"json":       {`{"hello": "world"}`, "JSON that is neither a journal export"},
+		"json":       {`{"hello": "world"}`, "JSON that is neither a journal export, a Redfish resource, an FMFM log nor a list of event log entries"},
 		"zip":        {"PK\x03\x04\x14\x00\x00\x00", "a zip archive"},
 		"binary":     {"\x00\x01\x02\x03\x04\x05", "binary data of no known kind"},
 		"sel-save":   {"0x04 0x0c 0x53 0x6f 0xa0 0xff 0x01 # Memory #0x53 Correctable ECC\n", "text of no known kind"},

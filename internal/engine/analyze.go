@@ -142,6 +142,12 @@ func (in *Input) until(t time.Time) *Input {
 			out.GPUs = append(out.GPUs, g)
 		}
 	}
+	out.ECS = nil
+	for _, e := range in.ECS {
+		if !e.ObservedAt.After(t) {
+			out.ECS = append(out.ECS, e)
+		}
+	}
 	return &out
 }
 

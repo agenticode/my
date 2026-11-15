@@ -1,0 +1,21 @@
+[
+  {
+    "HostID": "r12-n034",
+    "SystemCrashDT": "2026:11:12:03:14:09:000",
+    "OsCrashDT": "2026:11:12:03:14:07:000",
+    "Uptime": 191647,
+    "FatalError": "Command Address Parity",
+    "SocketId": 0, "ChannelId": 2, "ChannelSlotId": 0,
+    "PmicCrashRegisters": {"R04": 0, "R05": 0, "R06": 0}
+  },
+  {
+    "HostID": "r12-n034",
+    "SystemCrashDT": "2026-11-13T01:00:00Z",
+    "FatalError": false
+  },
+  {
+    "HostID": "r12-n034",
+    "SystemCrashDT": "",
+    "FatalError": true
+  }
+]

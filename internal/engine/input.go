@@ -26,6 +26,9 @@ type Input struct {
 	Scans      []model.Scan
 	Sources    []model.Source
 	GPUs       []model.GPUMem
+	// ECS holds the readings of the DDR5 error check and scrub registers.
+	// They are not errors: they say that a DIMM is watched from the inside.
+	ECS []model.ECSSample
 	// Places lists the names error records use for the place of an error,
 	// next to the slot the records were tied to.
 	Places []store.EventPlace
@@ -315,6 +318,9 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 			return fail("GPU memory records", err)
 		}
 		in.GPUs = append(in.GPUs, gpus...)
+	}
+	if in.ECS, err = s.ECS(ctx, store.ECSFilter{}); err != nil {
+		return fail("ECS readings", err)
 	}
 	return in, nil
 }
