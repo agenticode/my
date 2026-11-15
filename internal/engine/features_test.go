@@ -285,6 +285,30 @@ func TestStorm(t *testing.T) {
 	if s := storm(b); s.Peak != 150 || !s.Storm || !s.At.Equal(t0.Add(day+6*time.Second)) {
 		t.Errorf("150 errors in half an hour: %+v", s)
 	}
+	// That burst lies nine days back, outside the recent window of seven
+	// days: the recent part of the measurement is empty.
+	if s := storm(b); s.Recent || s.RecentPeak != 0 || !s.RecentAt.IsZero() {
+		t.Errorf("a burst nine days back counts as recent: %+v", s)
+	}
+	// A smaller burst within the recent window is measured next to the
+	// densest one, and counts as recent when it reaches the storm count.
+	b.spreadOver(cellA, 120, t0.Add(8*day), t0.Add(8*day+20*time.Minute))
+	if s := storm(b); s.Peak != 150 || !s.At.Equal(t0.Add(day+6*time.Second)) || !s.Recent || s.RecentPeak != 120 || !s.RecentAt.Equal(t0.Add(8*day+5*time.Second)) {
+		t.Errorf("a recent burst of 120 after one of 150: %+v", s)
+	}
+	b = newBuilder()
+	b.spreadOver(cellA, 150, t0.Add(day), t0.Add(day+30*time.Minute))
+	b.spreadOver(cellA, 60, t0.Add(8*day), t0.Add(8*day+20*time.Minute))
+	if s := storm(b); !s.Storm || s.Recent || s.RecentPeak != 60 {
+		t.Errorf("a recent burst of 60 after one of 150: %+v", s)
+	}
+	// Errors after the reference time are not there, and the window ends
+	// with the reference time.
+	b = newBuilder()
+	b.spreadOver(cellA, 150, t0.Add(10*day-10*time.Minute), t0.Add(10*day+20*time.Minute))
+	if s := storm(b); s.Peak != 50 || s.RecentPeak != 50 || s.Recent {
+		t.Errorf("a burst across the reference time: %+v", s)
+	}
 	b = newBuilder()
 	b.spreadOver(cellA, 150, t0.Add(day), t0.Add(day+3*time.Hour))
 	if s := storm(b); s.Peak < 49 || s.Peak > 52 || s.Storm {

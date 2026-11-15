@@ -474,10 +474,20 @@ func (j *judge) growing(fs *findings) {
 			}
 			fired = true
 		}
-		if f.Storm.Storm {
-			refs, total := j.eventRefs(f.members)
-			fs.add(RuleRow, statement("row.storm", "mode", modeArg(f), "where", j.where(f), "peak", f.Storm.Peak,
-				"minutes", cfg.StormMinutes, "when", stampText(f.Storm.At.UnixMicro())), refs, total)
+		// A burst counts while it is recent. One that lies further back is
+		// said with the errors of the DIMM and raises no finding: on a
+		// fleet log, servers whose fault had a burst weeks before failed no
+		// more often than servers without one (docs/evaluation.md).
+		if f.Storm.Recent {
+			var recent []int32
+			for _, i := range f.members {
+				if e := &evs[i]; !e.relative && e.at > fs.d.clk.recentFrom && e.at <= fs.d.clk.asOf {
+					recent = append(recent, i)
+				}
+			}
+			refs, total := j.eventRefs(recent)
+			fs.add(RuleRow, statement("row.storm", "mode", modeArg(f), "where", j.where(f), "peak", f.Storm.RecentPeak,
+				"minutes", cfg.StormMinutes, "when", stampText(f.Storm.RecentAt.UnixMicro())), refs, total)
 			fired = true
 		}
 		if !fired {
