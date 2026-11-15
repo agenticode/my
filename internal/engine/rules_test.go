@@ -347,6 +347,50 @@ func TestRuleGrowingFault(t *testing.T) {
 		wantVerdict(t, verdictOf(t, b, asOf, "d1"), model.VerdictObserve, RuleSoft)
 	})
 
+	// bankFault puts n errors at n places of one bank within n hours.
+	bankFault := func(b *builder, n int, start time.Time) {
+		for k := range n {
+			b.ce("d1", start.Add(time.Duration(k)*time.Hour), loc{0, 7, 0, 3, 1000 + k*977, 8 * ((k * 13) % 250)})
+		}
+	}
+
+	t.Run("a fault that covers a bank fires R-ROW-03 without growth", func(t *testing.T) {
+		b := ruleBuilder()
+		// 30 errors at 30 places 52 days back: no error in the recent
+		// window, no new place in the last 30 days, no burst.
+		bankFault(b, 30, t0.Add(8*day))
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictConsiderReplacement, RuleRow)
+		if got := codes(v); !equalStrings(got, []string{"R-ROW-03 row.area"}) {
+			t.Errorf("evidence = %q", got)
+		}
+		if e := evidenceOf(t, v, RuleRow); e.Args["mode"] != "@mode.bank" || e.Args["n"] != 30 || e.Args["cells"] != 30 || e.Args["from"] != "2026-10-09" || e.Total != 30 {
+			t.Errorf("evidence = %+v", e)
+		}
+	})
+
+	t.Run("a bank fault that grows is stated by its growth", func(t *testing.T) {
+		b := ruleBuilder()
+		bankFault(b, 30, asOf.Add(-3*day))
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictConsiderReplacement, RuleRow)
+		for _, c := range codes(v) {
+			if c == "R-ROW-03 row.area" {
+				t.Errorf("a growing fault is also stated as an area: %q", codes(v))
+			}
+		}
+	})
+
+	t.Run("a bank fault below the error minimum stays with R-SOFT-01", func(t *testing.T) {
+		b := ruleBuilder()
+		bankFault(b, 6, t0.Add(8*day))
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictObserve, RuleSoft)
+		if got := codes(v); !equalStrings(got, []string{"R-SOFT-01 soft.few"}) {
+			t.Errorf("evidence = %q", got)
+		}
+	})
+
 	t.Run("more than one failing data line is stated with it", func(t *testing.T) {
 		b := ruleBuilder()
 		for k := range 20 {

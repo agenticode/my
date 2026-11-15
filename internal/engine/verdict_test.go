@@ -26,7 +26,7 @@ func TestScenarioFindings(t *testing.T) {
 	tests := map[string][]want{
 		"scrub-ue":        {{grade: model.VerdictConsiderReplacement, rules: []string{RuleScrub}}},
 		"reseated":        {{grade: model.VerdictHoldReplacement, rules: []string{RuleReseat}}},
-		"fw-disabled":     {{grade: model.VerdictReplaceNow, rules: []string{RuleFirmware}}},
+		"fw-disabled":     {{grade: model.VerdictReplaceNow, rules: []string{RuleFirmware, RuleRow}}},
 		"repair-failed":   {{grade: model.VerdictReplaceNow, rules: []string{RuleRepairGone, RuleRow}}},
 		"offline-growing": {{grade: model.VerdictConsiderReplacement, rules: []string{RuleRow, RuleOffline}, also: []string{RuleOffline}}},
 		"single-bit":      {{grade: model.VerdictObserve, rules: []string{RuleSoft}}},

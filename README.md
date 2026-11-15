@@ -170,7 +170,7 @@ A command that shows findings exits with the grade of what it showed, the host o
 | --- | --- | --- |
 | 0 | ok | no DIMM has errors on record |
 | 1 | observe | corrected errors without a growing fault |
-| 2 | consider replacement | a fault is rising or spreading, pages keep being taken offline, the patrol scrubber found an uncorrected error, or errors came back after a repair |
+| 2 | consider replacement | a row or column fault is rising or spreading, a fault covers a bank or more, pages keep being taken offline, the patrol scrubber found an uncorrected error, or errors came back after a repair |
 | 3 | replace now | an uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up |
 | 4 | hold replacement | a cause outside the DIMM is suspected: the channel, the slot, the contact, or slot names that disagree |
 
