@@ -42,6 +42,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	out := o.fs.String("o", "", "")
 	capturedAt := o.fs.String("captured-at", "", "")
 	mtime := o.fs.Bool("mtime", false, "")
+	nvidiaQuery := o.fs.String("nvidia-query", "", "")
 	tz := o.fs.String("tz", "", "")
 	anonymize := o.fs.Bool("anonymize", false, "")
 	keyFile := o.fs.String("key-file", "", "")
@@ -65,7 +66,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	now := clock(env)
 	// A log that holds the records of several hosts is read for the host
 	// the case is about.
-	dopts := scan.DetectOptions{Now: now, ModTime: *mtime, Host: o.host}
+	dopts := scan.DetectOptions{Now: now, ModTime: *mtime, Host: o.host, NvidiaQuery: *nvidiaQuery}
 	if *capturedAt != "" {
 		t, err := parseTime(*capturedAt)
 		if err != nil {

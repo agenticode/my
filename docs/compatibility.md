@@ -28,7 +28,7 @@ The same fault shows more or less of itself depending on who handles the error a
 | Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
 | No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
 | Host that runs the mcelog daemon in place of rasdaemon | `mcelog --client` output, kernel log | C | the daemon keeps counts per DIMM and no records |
-| NVIDIA GPU memory | Xid lines, `nvidia-smi -q` | C | the driver reports no location |
+| NVIDIA GPU memory | Xid lines, `nvidia-smi -q` or its queries | C | the driver reports no location |
 
 These grades are what the adapters and decoders give on the fixtures and test cases of this repository. They have not been confirmed on real hosts of each kind.
 
@@ -47,6 +47,7 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
 | `NVSMI LOG` text or an `nvidia_smi_log` XML document | `nvidia-smi -q` output |
+| comma separated lines under a header with a GPU property (`gpu_uuid`, `pci.bus_id`, `remapped_rows.failure`), under the saved `nvidia-smi --query-gpu=...` command line, or with a GPU UUID among the values | output of an `nvidia-smi` query in CSV form |
 | a `SOCKET n CHANNEL n DIMM n` line, or a line of the page table of the mcelog daemon | `mcelog --client` output |
 | JSON with `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` or `OsCrashDT` among its field names | FMFM log |
 
@@ -62,6 +63,7 @@ What a file cannot say about itself is an option of the import:
 | capture time | `--captured-at` | a kernel log that has seconds since boot only |
 | modification time of the file as its capture time | `--mtime` | the same log, and inputs that carry no time: dmidecode output, the memory resources of a Redfish dump, an FMFM boot record without a boot time, `mcelog --client` output |
 | host | `--host` | a log that holds the records of several hosts (an FMFM log) |
+| fields of the query | `--nvidia-query` | output of an `nvidia-smi` query that was saved with `noheader` and without its command line |
 
 ## Which slot a record belongs to
 
@@ -516,7 +518,7 @@ A `ComputerSystem` resource gives the host name (`HostName`), the system vendor 
 
 ## NVIDIA GPU memory
 
-Two inputs describe the memory of a GPU: the Xid lines the driver writes to the kernel log, and the state `nvidia-smi -q` prints. Both go to the `gpu_mem` table of the ledger, keyed by the GPU serial number, and stay apart from the DIMM events.
+Two inputs describe the memory of a GPU: the Xid lines the driver writes to the kernel log, and the state `nvidia-smi` prints, in full with `-q` or as the columns of a query. Both go to the `gpu_mem` table of the ledger, keyed by the GPU serial number, and stay apart from the DIMM events.
 
 The driver does not report where in the memory of a GPU an error was. What can be read is a budget: rows remapped, a remap pending or failed, banks that still have spare rows. In the terms of the table at the top this is grade C.
 
@@ -573,6 +575,33 @@ The time of a snapshot is the `Timestamp` of the output, which is the local time
 
 On a live host the scan runs `nvidia-smi -q -x` when the program is in the path, with a limit of 30 seconds. The query only reads. A host without the program has no NVIDIA driver and gets no entry in the source inventory; a program that is there and fails (driver not loaded, no permission) is reported with its message. In a copy of a host's files the output is read from `sos_commands/nvidia/nvidia-smi_-q`.
 
+### nvidia-smi queries
+
+The same adapter reads the CSV output of `nvidia-smi --query-gpu=<properties> --format=csv` and of `--query-remapped-rows`. One line is one GPU and gives one snapshot. The columns are read by name, in any order and any subset. The names are those `nvidia-smi --help-query-gpu` lists; where a property has two names, both are read.
+
+| Value | Properties |
+| --- | --- |
+| identity | `uuid` or `gpu_uuid`, `serial` or `gpu_serial`, `pci.bus_id` or `gpu_bus_id`, `name` or `gpu_name`, `index` |
+| time | `timestamp` (`YYYY/MM/DD HH:MM:SS.msec`, local time of the host) |
+| ECC in use | `ecc.mode.current` |
+| ECC counts | `ecc.errors.corrected` and `ecc.errors.uncorrected`, each with `.volatile` and `.aggregate`, then `.dram` and `.sram` |
+| uncorrectable SRAM errors by check | `.sram.parity` and `.sram.secded`, added where the driver has no `.sram` column |
+| ECC counts of older GPUs | `.device_memory` is counted as DRAM where `.dram` is absent, and `.total` less the DRAM count as SRAM |
+| SRAM limit passed | `ecc.errors.uncorrected.aggregate.sram.thresholdExceeded` |
+| retired pages (older GPUs) | `retired_pages.single_bit_ecc.count` or `retired_pages.sbe`, `retired_pages.double_bit.count` or `retired_pages.dbe`, `retired_pages.pending` |
+| remapped rows | `remapped_rows.correctable` or `remapped_rows.sbe`, `remapped_rows.uncorrectable` or `remapped_rows.dbe`, `remapped_rows.pending`, `remapped_rows.failure` |
+| spare rows per bank | `remapped_rows.histogram.max`, `.high`, `.partial`, `.low`, `.none` |
+
+A value in square brackets (`[N/A]`, `[Not Supported]`) or a bare `N/A` means the GPU does not have it; the snapshot leaves it unset. The unit a header carries (`memory.total [MiB]`) and the units of values are ignored, so output with and without `nounits` reads alike. Columns about memory errors that have no place in a snapshot (the counts of single caches, `remapped_rows.correctable_inactive`) are named in a note of the source inventory.
+
+A snapshot is keyed by the UUID of its GPU, or by its serial number. Output that has neither column is not read, and the source inventory says so: the index of a GPU changes with a boot and its PCI address belongs to the slot, so such a row cannot be told from the row of another GPU in the same place later. In output that has the columns, a GPU that reports neither value is skipped and named in a note.
+
+Output saved with `noheader` does not name its columns. They are taken from the command line when it was saved with the output (a line with `nvidia-smi --query-gpu=...`), or from `my import --nvidia-query index,uuid,remapped_rows.failure`. Without either the input is reported as unreadable for that reason.
+
+A query that ran in a loop (`-l`) gives one snapshot per line when it has a `timestamp` column. Without one, the lines after the first for a GPU are skipped and counted. The other selective queries (`--query-retired-pages`, `--query-compute-apps`, `--query-accounted-apps`) list pages and processes one by one; they are recognised, named in the source inventory and not read.
+
+A reading saved once with `-q` and once as a query is one record: both forms give a snapshot the identity of GPU and second.
+
 ### One GPU under several names
 
 A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in which the driver did not print the identity knows the PCI address only. When GPU records are read from the ledger, a record without a UUID takes it from a record with the same PCI address, of the same boot if there is one and nearest in time otherwise; serial number, index and model follow the UUID. The stored rows stay as their sources gave them, so a snapshot imported later completes Xid records imported before it.
@@ -581,7 +610,9 @@ A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in
 
 - DCGM is not read.
 - The text of an Xid line is kept and not taken apart: the partition a double bit error names, for example, is not a field.
-- The default table of `nvidia-smi` (without `-q`) and the files of `nvidia-bug-report.sh` are not read.
+- The default table of `nvidia-smi` (without `-q` and without a query) and the files of `nvidia-bug-report.sh` are not read.
+- The list of `--query-retired-pages` (address, time and cause of each retired page) is not read; a snapshot has the counts.
+- The property names of the queries are those of the help text of drivers 470 to 610, and the reader was checked on published output of `--query-gpu` from three GPUs. The help text of `--query-remapped-rows` was not available; its columns are read by the same names, which a published sample of its output uses.
 - A GPU that was replaced in the same slot between two readings is told apart by its UUID; an Xid record with a PCI address only, between the two readings, goes to the nearer one.
 - GPUs of other vendors are not read.
 

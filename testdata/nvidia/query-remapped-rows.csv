@@ -1,0 +1,5 @@
+$ nvidia-smi --query-remapped-rows=gpu_name,gpu_bus_id,remapped_rows.failure,remapped_rows.pending,remapped_rows.correctable,remapped_rows.uncorrectable --format=csv
+gpu_name, gpu_bus_id, remapped_rows.failure, remapped_rows.pending, remapped_rows.correctable, remapped_rows.uncorrectable
+NVIDIA H200, 00000000:59:00.0, No, No, 0, 0
+[...]
+NVIDIA H200, 00000000:A5:00.0, No, No, 0, 0
