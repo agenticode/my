@@ -14,7 +14,7 @@ The command is `my`: one static binary that needs no configuration. It only read
 
 ## Why
 
-A server records memory errors in several places: the rasdaemon database, the kernel log, the EDAC counters, the event log of the BMC. Each has its own form. The counters start at zero with every boot, the logs rotate, and none of them shows where in a DIMM a fault sits or what shape it has.
+A server records memory errors in several places: the rasdaemon database, the kernel log, the EDAC counters, the event log of the BMC. Each has its own form. The counters start at zero with every boot and the logs rotate. A record names the place of one error; no record shows the fault that the errors of a DIMM add up to.
 
 What a person has to decide stays open: which DIMM it is, whether one cell, a row or the whole device fails, whether the DIMM is at fault or its slot, whether it is getting worse, whether a repair helped.
 
@@ -138,7 +138,7 @@ sudo my why CPU0_C1 --oneline    # the finding as one line for a ticket
 sudo my bundle -o case.mycase    # everything the scan read, as one file
 ```
 
-Root is not required. Without it the scan reads what the host leaves open and names what it could not read: the SMBIOS tables with the DIMM serial numbers, and on some hosts the kernel log.
+Root is not required. Without it the scan reads what the host leaves open and names what it could not read. On most hosts that is the SMBIOS tables with the DIMM serial numbers, and on some the kernel log or the rasdaemon database.
 
 On any machine, Linux or macOS:
 
@@ -180,7 +180,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 
 | Grade | Place known | What it allows |
 | --- | --- | --- |
-| A | bank, row and column | fault modes: single bit, row, multi-row, column, bank, device, DIMM |
+| A | bank, row and column | fault modes: single-bit, row, multi-row, column, bank, device, DIMM |
 | B | physical address or rank | repetition per page and trends; a row fault is an estimate |
 | C | the module, or a count only | trends and thresholds |
 
@@ -231,7 +231,7 @@ Exit code 64 is a wrong command line and 70 a command that failed. A scan that c
 
 The grade of a host is the worst grade among its DIMMs, its GPUs and the host finding, which speaks about errors and page offlines that the records tie to no DIMM. On a virtual machine every finding notes that a guest is shown little of the errors of the machine it runs on.
 
-A grade is a finding. The thresholds behind it are defaults. They have been compared with the failure tickets of one public fleet dataset, with the results in [docs/evaluation.md](docs/evaluation.md): there a server with "consider replacement" got a failure ticket within 30 days about ten times as often as a server with "observe", in 2.5% of the cases. They have not been compared with failure analysis results. [docs/rules.md](docs/rules.md) lists the 15 rules with their conditions and thresholds, and `--set key=value` or `--config FILE` changes a threshold.
+A grade is a finding. The thresholds behind it are defaults. They have been compared with the failure tickets of one public fleet dataset, with the results in [docs/evaluation.md](docs/evaluation.md): there a server with "consider replacement" got a failure ticket within 30 days about ten times as often as a server with "observe", in 2.5% of the cases. They have not been compared with failure analysis results. [docs/rules.md](docs/rules.md) lists every rule with its conditions and thresholds, and `--set key=value` or `--config FILE` changes a threshold.
 
 ## Case bundles
 
@@ -241,7 +241,11 @@ A case travels as one file, from the person at the server to the person who read
 2. The file is sent, or attached to the return of the DIMM. `ssh HOST sudo my bundle -o - > case.mycase` fetches it without leaving a file on the host.
 3. The receiver runs `my open case.mycase` and sees the screens the sender saw, or `my report case.mycase -o report.html` for a document.
 
-A bundle is a ZIP archive with the ledger, a manifest, the source inventory and a `README.txt` that says what is inside.
+A bundle is a ZIP archive with the ledger, a manifest, the source inventory and a `README.txt` that says what is inside. `my open` never changes it, and it computes the findings again from the records: a receiver with a newer version reads an older case. `my diff before.mycase after.mycase` compares two cases of one host ([docs/diff.md](docs/diff.md)), and [docs/bundle-format.md](docs/bundle-format.md) describes the format.
+
+## Privacy
+
+MemorY has no telemetry and contacts no server of the project. It uses the network in three cases, each asked for on the command line: `--fleet` reads the database server that the rasdaemons of a fleet write to, `my collect redfish` asks a BMC, and `my serve` listens for Prometheus. What leaves a host is a bundle, when a person sends it.
 
 | A bundle holds | A bundle never holds |
 | --- | --- |
@@ -251,11 +255,11 @@ A bundle is a ZIP archive with the ledger, a manifest, the source inventory and 
 | the slots of the board, and which DIMM sat where and when | kernel log lines that are not about memory errors, page offlining, machine checks or the boot banner |
 | boots: time, kernel release, BIOS version, kernel command line | |
 | the host name, its architecture and system product | |
-| readings of the error counters per DIMM, GPU memory records, ECS readings | |
-| every source that was looked for and what it yielded | |
+| readings of the error counters per DIMM, GPU memory records, ECS readings, what a BMC reported | |
+| every source that was looked for, with the path it was read from, and what it yielded | |
 | the findings of the sender's run | |
 
-`--anonymize` replaces host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line with words made from a keyed hash, and prints the replaced names for the sender to keep. DIMM serial numbers stay, because a return is about them. [docs/bundle-format.md](docs/bundle-format.md) describes the format.
+`--anonymize` replaces host names, IP addresses, MAC addresses, the disk identifiers of the kernel command line and the names of home directories in file paths with words made from a keyed hash, and prints the replaced host names for the sender to keep. DIMM serial numbers stay, because a return is about them. `unzip -p case.mycase manifest.json` shows what a given file holds before it is sent.
 
 ## Vendor analyzers
 
@@ -289,7 +293,7 @@ Early development; no version is tagged.
 - A first tagged release with archives for linux/amd64, linux/arm64 and darwin/arm64 ([docs/release.md](docs/release.md)).
 - Thresholds compared with failure analysis results.
 - ECS readings of DDR5 and the repair budget of a DIMM as figures.
-- An interactive terminal view.
+- A run of the analyzer of a memory vendor against the plugin contract.
 
 ## Documentation
 
@@ -299,7 +303,8 @@ Early development; no version is tagged.
 | [docs/rules.md](docs/rules.md) | every rule with its condition, its thresholds and what the finding says |
 | [docs/compatibility.md](docs/compatibility.md) | every input: what is read, which observation grade, what is missing |
 | [docs/data-model.md](docs/data-model.md) | the ledger: tables, identities, how records of several sources become one history |
-| [docs/bundle-format.md](docs/bundle-format.md) | the case bundle: members, manifest, anonymizing |
+| [docs/bundle-format.md](docs/bundle-format.md) | the case bundle: members, manifest, what a reader checks, anonymizing |
+| [docs/diff.md](docs/diff.md) | comparing two cases of one host |
 | [docs/plugin-contract.md](docs/plugin-contract.md) | the vendor analyzer contract |
 | [docs/fmfm-mapping.md](docs/fmfm-mapping.md) | how records and findings map to the FMFM field names |
 | [docs/exporter.md](docs/exporter.md) | the metrics and the HTTP API |
