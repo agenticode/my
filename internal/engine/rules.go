@@ -18,7 +18,13 @@ const (
 	RuleSlot       = "R-SYS-02"   // the DIMM was moved and the errors stayed in the slot
 	RuleReseat     = "R-SYS-03"   // the errors stopped after a reseat
 	RuleMapping    = "R-MAP-01"   // the slot names of different sources disagree
+	RuleHostUE     = "R-HOST-01"  // uncorrected errors of the host that name no DIMM
+	RuleHostCE     = "R-HOST-02"  // corrected errors or page offlines of the host that name no DIMM
 )
+
+// HostRule reports whether a rule speaks about a host as a whole and not
+// about one DIMM or GPU.
+func HostRule(id string) bool { return id == RuleHostUE || id == RuleHostCE }
 
 // Rule describes one rule: its ID, the grade it gives, and the code of the
 // message that states its condition (see Text).
@@ -42,10 +48,12 @@ var Rules = []Rule{
 	{RuleRecurred, model.VerdictConsiderReplacement, "rule.R-REP-02"},
 	{RuleSoft, model.VerdictObserve, "rule.R-SOFT-01"},
 	{RuleQuiet, model.VerdictObserve, "rule.R-QUIET-01"},
+	{RuleHostCE, model.VerdictObserve, "rule.R-HOST-02"},
 	{RuleChannel, model.VerdictHoldReplacement, "rule.R-SYS-01"},
 	{RuleSlot, model.VerdictHoldReplacement, "rule.R-SYS-02"},
 	{RuleReseat, model.VerdictHoldReplacement, "rule.R-SYS-03"},
 	{RuleMapping, model.VerdictHoldReplacement, "rule.R-MAP-01"},
+	{RuleHostUE, model.VerdictHoldReplacement, "rule.R-HOST-01"},
 }
 
 // RuleByID returns the rule with the given ID.

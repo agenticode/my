@@ -27,4 +27,4 @@ What the sources hold:
 - No journal: the guest runs without systemd.
 - `sys/devices/system/edac`: no memory controller. QEMU emulates no memory controller of a Xeon, so `skx_edac` has nothing to bind to. The errors therefore carry an address and a channel and no DIMM.
 - `dmidecode.txt`: one memory device, `DIMM 0`, 4 GiB, manufacturer QEMU.
-- `my/`: "CE 7, UE 3, observation grade B", 10 errors tied to no DIMM, host finding ok, exit code 0.
+- `my/`: "CE 7, UE 3, observation grade B", 10 errors tied to no DIMM, host finding ok, exit code 0. That is what the tool printed when the capture was made. Since the host finding (R-HOST-01, R-HOST-02) the same records read "hold replacement", exit code 4.

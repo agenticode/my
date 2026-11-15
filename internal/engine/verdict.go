@@ -1029,6 +1029,7 @@ var baseConfidence = map[string]int{
 	RuleScrub: 80, RuleRecurred: 80, RuleRow: 75, RuleOffline: 70,
 	RuleQuiet: 70, RuleSoft: 65,
 	RuleSlot: 80, RuleMapping: 75, RuleChannel: 65, RuleReseat: 60,
+	RuleHostUE: 85, RuleHostCE: 70,
 }
 
 // confidence rates the finding from 0 to 100 and lists the steps.

@@ -1,4 +1,4 @@
-# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement.
+# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. An empty slot and serial carry the host finding, about errors and page offlines that are tied to no DIMM.
 # TYPE my_dimm_verdict gauge
 my_dimm_verdict{host="r12-n034",slot="CPU0_A1",serial="5C331B"} 0
 my_dimm_verdict{host="r12-n034",slot="CPU0_B1",serial="DE7FF0"} 0
@@ -56,7 +56,7 @@ my_dimm_ue_total{host="r12-n034",slot="CPU1_H1",serial="55C12A"} 0
 # TYPE my_dimm_faults gauge
 my_dimm_faults{host="r12-n034",slot="CPU0_C1",mode="row"} 1
 my_dimm_faults{host="r12-n034",slot="CPU1_D1",mode="single-bit"} 1
-# HELP my_dimm_offlined_pages Pages of the DIMM in the slot that were taken offline.
+# HELP my_dimm_offlined_pages Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM.
 # TYPE my_dimm_offlined_pages gauge
 my_dimm_offlined_pages{host="r12-n034",slot="CPU0_A1"} 0
 my_dimm_offlined_pages{host="r12-n034",slot="CPU0_B1"} 0

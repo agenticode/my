@@ -268,6 +268,27 @@ func printResult(w io.Writer, lg i18n.Lang, res *engine.Result, all bool) {
 			}
 			line(card("next"), engine.Text(lg, v.NextAction))
 		}
+		if v := h.Loose; v != nil {
+			// The host finding: about what the records tie to no DIMM.
+			fmt.Fprintf(w, "\n%s\n", view.Messages.Text(lg, "ov.host_finding", nil))
+			line(card("finding"), fmt.Sprintf("%s (%s)  %s", engine.GradeText(lg, v.Grade), engine.Messages.Text(lg, "label.finding", nil), strings.Join(v.Rules, " ")))
+			label := card("evidence")
+			for _, e := range v.Evidence {
+				line(label, fmt.Sprintf("[%s] %s", e.Rule, engine.Text(lg, e.Statement)))
+				label = ""
+			}
+			label = card("checks")
+			for _, k := range v.CounterEvidence {
+				line(label, view.Messages.Text(lg, "effect."+k.Effect, nil)+": "+engine.Text(lg, k.Statement))
+				label = ""
+			}
+			label = card("missing")
+			for _, m := range v.Missing {
+				line(label, engine.Text(lg, m))
+				label = ""
+			}
+			line(card("next"), engine.Text(lg, v.NextAction))
+		}
 		if quiet > 0 {
 			fmt.Fprintf(w, "\n%s\n", say("quiet", "n", quiet))
 		}

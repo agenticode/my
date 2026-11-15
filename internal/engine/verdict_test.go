@@ -307,13 +307,13 @@ func TestGradesAndExitCodes(t *testing.T) {
 		t.Errorf("empty input: %s", res.Grade())
 	}
 	// The rules of a finding are ordered by grade, hold first.
-	want := []string{RuleChannel, RuleSlot, RuleReseat, RuleMapping, RuleUE, RuleFirmware, RuleRepairGone, RuleRow, RuleOffline, RuleScrub, RuleRecurred, RuleSoft, RuleQuiet}
+	want := []string{RuleChannel, RuleSlot, RuleReseat, RuleMapping, RuleHostUE, RuleUE, RuleFirmware, RuleRepairGone, RuleRow, RuleOffline, RuleScrub, RuleRecurred, RuleSoft, RuleQuiet, RuleHostCE}
 	ids := make([]string, len(Rules))
 	for i, r := range Rules {
 		ids[i] = r.ID
 	}
 	sort.Slice(ids, func(i, j int) bool { return rulePosition(ids[i]) < rulePosition(ids[j]) })
-	if !equalStrings(ids, want) || len(Rules) != 13 || rulePosition("R-NONE-00") <= rulePosition(RuleQuiet) {
+	if !equalStrings(ids, want) || len(Rules) != 15 || rulePosition("R-NONE-00") <= rulePosition(RuleHostCE) {
 		t.Errorf("rule order = %v", ids)
 	}
 	if r, ok := RuleByID(RuleRow); !ok || r.Grade != con {

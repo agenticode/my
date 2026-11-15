@@ -634,15 +634,28 @@ func TestEveryScenarioDraws(t *testing.T) {
 	}
 }
 
-// TestOverviewSaysWhatNoFindingCovers: the grade of a host is the grade of
-// its worst DIMM. Where errors are tied to no DIMM, the line of the finding
-// says so, uncorrected errors by their number: "host finding: ok" alone
-// would be read as "no errors".
-func TestOverviewSaysWhatNoFindingCovers(t *testing.T) {
+// TestOverviewShowsTheHostFinding: errors and page offlines that are tied
+// to no DIMM have a finding of their own. The overview draws it below the
+// ranking: what it is about, its grade and rules, and its evidence.
+func TestOverviewShowsTheHostFinding(t *testing.T) {
+	card := func(lang i18n.Lang) *view.Card {
+		c := &view.Card{Scope: view.ScopeHost, Host: "h", CE: 7, UE: 3, Pages: 5, Grade: model.VerdictHoldReplacement,
+			GradeText: "hold replacement", Rules: []string{"R-HOST-01", "R-HOST-02"}}
+		texts := []string{"3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 05:20 UTC at address 0x12345000",
+			"7 corrected errors tied to no DIMM on 2026-11-15", "5 pages taken offline and tied to no DIMM, the last on 2026-11-15"}
+		if lang == i18n.KO {
+			c.GradeText = "교체 보류"
+			texts = []string{"DIMM 미확인 UE 3건, 최근 2026-11-15 05:20 UTC, address 0x12345000", "DIMM 미확인 CE 7건, 2026-11-15", "DIMM 미확인 페이지 offline 5개, 최근 2026-11-15"}
+		}
+		for i, text := range texts {
+			c.Evidence = append(c.Evidence, view.Evidence{Rule: c.Rules[min(i, 1)], Text: view.Text{Text: text}})
+		}
+		return c
+	}
 	ov := &view.Overview{
-		Host:         view.Header{Name: "h", CE: 7, UE: 3, GradeB: 10, Grade: model.VerdictOK, GradeText: "ok"},
+		Host:         view.Header{Name: "h", CE: 7, UE: 3, GradeB: 10, Grade: model.VerdictHoldReplacement, GradeText: "hold replacement"},
 		Ranking:      []view.Rank{},
-		Unattributed: 10, UnattributedUE: 3, LoosePages: 5,
+		Unattributed: 10, UnattributedUE: 3, LoosePages: 5, HostFinding: card(i18n.EN),
 	}
 	draw := func(st Style) string {
 		var b strings.Builder
@@ -653,24 +666,31 @@ func TestOverviewSaysWhatNoFindingCovers(t *testing.T) {
 	}
 	got := draw(Style{Lang: i18n.EN})
 	for _, want := range []string{
-		"host finding: ok; CE 7, UE 3 tied to no DIMM are in no finding\n",
-		" 10 errors of this host are tied to no DIMM\n",
-		" 5 page offlines of this host are tied to no DIMM\n",
+		"host finding: hold replacement\n",
+		" tied to no DIMM  CE 7, UE 3, 5 pages offline  hold replacement  R-HOST-01 R-HOST-02\n",
+		"     3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 05:20 UTC at address 0x12345000\n",
+		"     7 corrected errors tied to no DIMM on 2026-11-15\n",
+		"     5 pages taken offline and tied to no DIMM, the last on 2026-11-15\n",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("the overview lacks %q:\n%s", want, got)
 		}
 	}
-	ov.Host.GradeText = "정상"
-	if got := draw(Style{Lang: i18n.KO}); !strings.Contains(got, "호스트 소견: 정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음\n") ||
-		!strings.Contains(got, " 이 호스트의 page offline 5건은 어느 DIMM에도 묶이지 않음\n") {
+	if strings.Contains(got, "in no finding") {
+		t.Errorf("the overview still says that no finding covers them:\n%s", got)
+	}
+	ov.Host.GradeText, ov.HostFinding = "교체 보류", card(i18n.KO)
+	if got := draw(Style{Lang: i18n.KO}); !strings.Contains(got, "호스트 소견: 교체 보류\n") ||
+		!strings.Contains(got, " DIMM 미확인  CE 7, UE 3, 페이지 offline 5개  교체 보류  R-HOST-01 R-HOST-02\n") ||
+		!strings.Contains(got, "     DIMM 미확인 UE 3건, 최근 2026-11-15 05:20 UTC, address 0x12345000\n") {
 		t.Errorf("Korean:\n%s", got)
 	}
-	// A narrow terminal wraps the line of the finding, and the colour of
-	// the grade does not count as width.
+	// A narrow terminal wraps the lines, and the colour of the grade does
+	// not count as width.
 	for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
+		ov.HostFinding = card(lang)
 		narrow := draw(Style{Lang: lang, Width: 60, Color: true})
-		if !strings.Contains(narrow, "\x1b[") || !strings.Contains(strings.Join(strings.Fields(narrow), " "), "UE 3") {
+		if !strings.Contains(narrow, "\x1b[") || !strings.Contains(strings.Join(strings.Fields(narrow), " "), "R-HOST-01 R-HOST-02") {
 			t.Errorf("%s, 60 columns:\n%s", lang, narrow)
 		}
 		for _, line := range strings.Split(narrow, "\n") {
@@ -679,10 +699,27 @@ func TestOverviewSaysWhatNoFindingCovers(t *testing.T) {
 			}
 		}
 	}
-	// One page, and no errors: the plain line of the finding.
-	ov.Unattributed, ov.UnattributedUE, ov.LoosePages, ov.Host.GradeText = 0, 0, 1, "ok"
-	if got := draw(Style{Lang: i18n.EN}); !strings.Contains(got, "host finding: ok\n") || !strings.Contains(got, " 1 page offline of this host is tied to no DIMM\n") {
+	// Pages alone: no error counts in the line.
+	only := card(i18n.EN)
+	only.CE, only.UE, only.Pages, only.Grade, only.GradeText, only.Rules = 0, 0, 1, model.VerdictObserve, "observe", []string{"R-HOST-02"}
+	only.Evidence = only.Evidence[2:]
+	ov.HostFinding, ov.Host.GradeText = only, "observe"
+	if got := draw(Style{Lang: i18n.EN}); !strings.Contains(got, "host finding: observe\n") || !strings.Contains(got, " tied to no DIMM  1 page offline  observe  R-HOST-02\n") {
 		t.Errorf("one page:\n%s", got)
+	}
+	// The card of the host finding, as "my why" draws it, and its one line.
+	var b strings.Builder
+	if err := Why(&b, []*view.Card{card(i18n.EN)}, Style{Lang: i18n.EN}); err != nil {
+		t.Fatal(err)
+	}
+	if got := b.String(); !strings.HasPrefix(got, "host h  tied to no DIMM  CE 7, UE 3, 5 pages offline\n") || !strings.Contains(got, "[R-HOST-01] 3 uncorrected errors tied to no DIMM") {
+		t.Errorf("card:\n%s", got)
+	}
+	line := card(i18n.EN)
+	line.Label, line.ConfidenceText = "finding", "high"
+	line.Next = &view.Text{Text: "Do not pull a DIMM on these records: none of them names one."}
+	if got := Oneline(line, Style{Lang: i18n.EN}); got != "h: hold replacement (finding, confidence high; R-HOST-01, R-HOST-02). 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 05:20 UTC at address 0x12345000. Do not pull a DIMM on these records: none of them names one." {
+		t.Errorf("one line: %q", got)
 	}
 	// A host on record for one day names the day once.
 	day := time.Date(2026, 11, 15, 0, 0, 0, 0, time.UTC)

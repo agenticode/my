@@ -425,7 +425,8 @@ func findDIMM(ctx context.Context, c *view.Case, h *engine.HostResult, lang i18n
 
 // whyCards builds what "my why" shows: the finding card of one DIMM, or,
 // when d is nil, of every DIMM of the host that has errors or a finding
-// (with all set, of every DIMM), the worst first.
+// (with all set, of every DIMM), the worst first, and the card of the host
+// finding when the host has one.
 func whyCards(ctx context.Context, c *view.Case, h *engine.HostResult, d *engine.DIMMResult, all bool) ([]*view.Card, error) {
 	cards := []*view.Card{}
 	if d != nil {
@@ -444,6 +445,21 @@ func whyCards(ctx context.Context, c *view.Case, h *engine.HostResult, d *engine
 			return nil, err
 		}
 		cards = append(cards, card)
+	}
+	// The host finding, about what names no DIMM. It leads where it sets
+	// the grade of the host and follows the DIMMs otherwise.
+	hc, err := c.HostCard(ctx, h)
+	if err != nil {
+		return nil, err
+	}
+	if hc != nil {
+		leads := len(cards) == 0 || (hc.Grade.ExitCode() > cards[0].Grade.ExitCode() &&
+			!(hc.Grade == model.VerdictHoldReplacement && cards[0].Grade == model.VerdictReplaceNow))
+		if leads {
+			cards = append([]*view.Card{hc}, cards...)
+		} else {
+			cards = append(cards, hc)
+		}
 	}
 	return cards, nil
 }

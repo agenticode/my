@@ -510,9 +510,9 @@ func TestHelp(t *testing.T) {
 	_, out, _ = run("help", "reading", "--ascii", "--lang", "ko")
 	wantLines(t, flat(out), "슬롯 맵.", "## 즉시 교체", ":: 정상")
 	_, out, _ = run("help", "rules")
-	wantLines(t, out, "R-UE-01", "R-MAP-01", "hold replacement", "an uncorrected error on this DIMM")
-	if n := strings.Count(out, "\n  R-"); n != 13 {
-		t.Errorf("%d rules listed, want 13:\n%s", n, out)
+	wantLines(t, out, "R-UE-01", "R-MAP-01", "R-HOST-01", "R-HOST-02", "hold replacement", "an uncorrected error on this DIMM")
+	if n := strings.Count(out, "\n  R-"); n != 15 {
+		t.Errorf("%d rules listed, want 15:\n%s", n, out)
 	}
 	_, out, _ = run("help", "thresholds")
 	wantLines(t, out, "rule.row.min_errors", "trend.recent_days")

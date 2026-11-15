@@ -168,15 +168,15 @@ A command that shows findings exits with the grade of what it showed, the host o
 
 | Code | Grade | When |
 | --- | --- | --- |
-| 0 | ok | no DIMM has errors on record |
+| 0 | ok | no errors on record |
 | 1 | observe | corrected errors without a growing fault |
 | 2 | consider replacement | a row or column fault is rising or spreading, a fault covers a bank or more, pages keep being taken offline, the patrol scrubber found an uncorrected error, or errors came back after a repair |
 | 3 | replace now | an uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up |
-| 4 | hold replacement | a cause outside the DIMM is suspected: the channel, the slot, the contact, or slot names that disagree |
+| 4 | hold replacement | a cause outside the DIMM is suspected (the channel, the slot, the contact, slot names that disagree), or uncorrected errors name no DIMM |
 
-The grade of a host is the grade of its worst DIMM or GPU. Errors that the records tie to no DIMM, as on a host whose memory controller has no EDAC driver, are in no finding and leave the grade as it is. The overview, the lines `bundle` and `report` print, and the summary of the report say how many there are.
+The grade of a host is the worst grade among its DIMMs, its GPUs and the host finding. The host finding speaks about errors and page offlines that the records tie to no DIMM, as on a host whose memory controller has no EDAC driver: uncorrected errors hold replacement until the DIMM is known, corrected errors and pages taken offline are watched. `my why` shows it like the finding of a DIMM. A DIMM that is to be replaced on its own records stays "replace now" when other errors of the host name no DIMM.
 
-A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results. `my help rules` lists the 13 rules, `my help thresholds` the thresholds, and `--set key=value` or `--config FILE` changes them. [docs/evaluation.md](docs/evaluation.md) describes how findings are compared with the failure tickets of a public fleet dataset.
+A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results. `my help rules` lists the 15 rules, `my help thresholds` the thresholds, and `--set key=value` or `--config FILE` changes them. [docs/evaluation.md](docs/evaluation.md) describes how findings are compared with the failure tickets of a public fleet dataset.
 
 Platforms report different amounts of location detail, so every record has an observation grade and a finding only says what the grade allows: A (bank, row and column known: fault modes can be told), B (physical address or rank: a row is an estimate), C (a count per DIMM: trends only). [docs/compatibility.md](docs/compatibility.md) says what each input gives.
 
@@ -241,7 +241,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
-| `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 13 rules with fixed IDs to reach a finding per DIMM |
+| `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 15 rules with fixed IDs to reach a finding per DIMM and, for errors that name no DIMM, a finding for the host |
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text: colour, glyph density, ASCII, width |
 | `internal/report` | the HTML report: one file with inline SVG figures, the records behind them, and nothing loaded from elsewhere |

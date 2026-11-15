@@ -63,6 +63,7 @@ Each of these was wrong or missing before the capture showed it.
 - A CXL device reports an error as a DRAM event record or as a general media event record. Records of the two tables that followed each other within 5 seconds were taken for one error: "CE 8" for 11.
 - An anonymized bundle kept `root=UUID=...` of the kernel command line.
 - A copy of a host's files was dated by the newest of its files. A copy that lost the times of its files, as every checkout of `testdata/real` does, is now dated by its own boot time and uptime.
+- A host whose errors cannot be tied to a DIMM had no finding for them: findings were made per DIMM. On `7.3.0-mce` the tool said "ok", with exit code 0, next to "CE 7, UE 3", and did not mention the 5 pages. The host finding now speaks about such records (rules R-HOST-01 and R-HOST-02): the capture reads `host finding: hold replacement`, the exit code is 4, and `my why` shows the 3 uncorrected errors, the 7 corrected errors and the 5 pages with the records behind them. The captures of pages taken offline alone (`7.3.0-hwpoison`, `7.3.0-soft-offline`) read "observe". The files under `my/` of these captures are what the tool printed when they were made: "ok" and exit code 0.
 
 ## What the kernel and rasdaemon do that the hand-written fixtures did not show
 
@@ -94,8 +95,7 @@ Each of these was wrong or missing before the capture showed it.
 
 The captures raised these and did not settle them.
 
-- A host whose errors cannot be tied to a DIMM keeps the finding of its DIMMs: findings are made per DIMM, and no rule judges an error without one. On `7.3.0-mce` the overview now reads `host finding: ok; CE 7, UE 3 tied to no DIMM are in no finding` and counts the 10 errors and 5 page offlines that are tied to no DIMM. Before, it said "ok" next to "CE 7, UE 3" and did not mention the pages.
-- A page that a program asked the kernel to give up is marked, and still counts like any other offline.
+- A page that a program asked the kernel to give up is marked, and still counts like any other offline. The host finding says how many of its pages were asked for and loses confidence when all of them were; its grade stays "observe".
 
 ## Repeating it
 

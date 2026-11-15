@@ -117,6 +117,27 @@ func (doc *Document) conclusion() []*node {
 	if gpu != nil {
 		dimm = nil
 	}
+	// The host finding leads when nothing else has a finding, or when it
+	// sets the grade of the host and the case names no subject. A DIMM or
+	// GPU that is to be replaced on its own records stays in front of a
+	// hold of the host finding, as in the grade of the host.
+	host := doc.Host
+	if host != nil && (dimm != nil || gpu != nil) {
+		lead := model.VerdictOK
+		subject := false
+		if dimm != nil {
+			lead, subject = dimm.Card.Grade, dimm.Subject
+		} else {
+			lead = gpu.Grade
+		}
+		if subject || host.Grade.ExitCode() <= lead.ExitCode() ||
+			(host.Grade == model.VerdictHoldReplacement && lead == model.VerdictReplaceNow) {
+			host = nil
+		}
+	}
+	if host != nil {
+		dimm, gpu = nil, nil
+	}
 	var out []*node
 	p := el("p", A{"class", "conclusion"})
 	finish := func(evidence []view.Evidence, next *view.Text) {
@@ -139,20 +160,18 @@ func (doc *Document) conclusion() []*node {
 	case gpu != nil:
 		p.add(el("strong", "GPU "+gpu.Key), ": "+gpu.GradeText+". ")
 		finish(gpu.Evidence, gpu.Next)
-	default:
-		loose := doc.uncovered()
-		if loose == nil || doc.Overview.Unattributed == 0 {
-			out = append(out, el("p", A{"class", "conclusion"}, doc.say("sum.none")))
-			if loose != nil {
-				out = append(out, loose)
-			}
+	case host != nil:
+		// What names no DIMM leads: "no DIMM has errors" alone would read
+		// as "no errors".
+		p.add(el("strong", el("a", A{"href", "#" + hostAnchor}, doc.say("host.title"))), ": "+host.GradeText+
+			" ("+host.Label+", "+doc.vsay("card.confidence", "level", host.ConfidenceText)+"). ")
+		finish(host.Evidence, host.Next)
+		if len(doc.DIMMs) == 0 && len(doc.GPUs) == 0 {
+			out = append(out, el("p", doc.say("sum.none")))
 			return out
 		}
-		// Nothing has a finding and there are errors that are tied to no
-		// DIMM. They lead: "no DIMM has errors" alone would read as "no
-		// errors".
-		loose.set("class", "conclusion uncovered")
-		return []*node{loose, el("p", doc.say("sum.none"))}
+	default:
+		return []*node{el("p", A{"class", "conclusion"}, doc.say("sum.none"))}
 	}
 	var others []string
 	for _, o := range doc.DIMMs {
@@ -165,38 +184,29 @@ func (doc *Document) conclusion() []*node {
 			others = append(others, "GPU "+o.Key+" "+o.GradeText)
 		}
 	}
+	if doc.Host != nil && host == nil {
+		others = append(others, doc.say("host.other", "grade", doc.Host.GradeText))
+	}
 	if len(others) > 0 {
 		out = append(out, el("p", doc.say("sum.others", "n", len(others), "list", strings.Join(others, ", "))))
-	}
-	if loose := doc.uncovered(); loose != nil {
-		out = append(out, loose)
 	}
 	return out
 }
 
-// uncovered says what the findings leave out: the errors and the page
-// offlines of the host that are tied to no DIMM. The grade of the host is
-// the grade of its worst DIMM or GPU and says nothing about them, so the
-// summary has to. It returns nil when every record is tied to a DIMM.
-func (doc *Document) uncovered() *node {
-	ov := doc.Overview
-	if ov.Unattributed == 0 && ov.LoosePages == 0 {
-		return nil
+// hostAnchor is the name of the card of the host finding in links within
+// the report.
+const hostAnchor = "host-finding"
+
+// looseCounts writes how much the host finding is about.
+func (doc *Document) looseCounts(c *view.Card) string {
+	var parts []string
+	if c.CE+c.UE > 0 {
+		parts = append(parts, doc.vsay("ov.errors", "ce", c.CE, "ue", c.UE))
 	}
-	p := el("p", A{"class", "uncovered"})
-	if ov.Unattributed > 0 {
-		// The mark of an uncorrected error, when one is among them.
-		mark := swatch("ht2", false)
-		if ov.UnattributedUE > 0 {
-			mark = swatch("ue", true)
-		}
-		p.add(mark, " "+doc.say("sum.loose", "n", ov.Unattributed, "ce", ov.Unattributed-ov.UnattributedUE, "ue", ov.UnattributedUE)+" ")
+	if c.Pages > 0 {
+		parts = append(parts, doc.vsay("ov.host_pages", "n", c.Pages))
 	}
-	if ov.LoosePages > 0 {
-		p.add(doc.say("sum.loose_pages", "n", ov.LoosePages) + " ")
-	}
-	p.add(el("a", A{"href", "#s7"}, doc.say("sum.loose_see")))
-	return p
+	return strings.Join(parts, ", ")
 }
 
 // dimmName names a DIMM by its slot and serial number.
@@ -411,8 +421,11 @@ func (doc *Document) slotMap() *node {
 	if ov.Quiet > 0 {
 		s.add(el("p", doc.vsay("ov.quiet", "n", ov.Quiet)))
 	}
-	if ov.Unattributed > 0 {
-		s.add(el("p", doc.vsay("ov.loose", "n", ov.Unattributed)))
+	if c := doc.Host; c != nil {
+		// What names no DIMM is in no line of the ranking: it has a
+		// finding of its own.
+		s.add(el("p", A{"class", "hostline"}, el("a", A{"href", "#" + hostAnchor}, doc.say("host.title")), ": "+doc.looseCounts(c)+" ",
+			doc.badge(c.Grade), " ", el("span", A{"class", "rules"}, doc.ruleChips(c.Rules))))
 	}
 	if len(doc.GPUs) > 0 {
 		t, body := table("ranking", "GPU", doc.say("rank.finding"), doc.say("rank.rules"))
@@ -486,11 +499,14 @@ func (doc *Document) dimmHead(d *DIMM, tag string) *node {
 // or a finding.
 func (doc *Document) findings() *node {
 	s := doc.section(3)
-	if len(doc.DIMMs) == 0 && len(doc.GPUs) == 0 {
+	if len(doc.DIMMs) == 0 && len(doc.GPUs) == 0 && doc.Host == nil {
 		s.add(el("p", doc.vsay("ov.none")))
 		return s
 	}
 	fired := map[string]bool{}
+	if len(doc.DIMMs) == 0 {
+		s.add(el("p", doc.vsay("ov.none")))
+	}
 	for _, d := range doc.DIMMs {
 		c := d.Card
 		art := el("article", A{"id", d.Anchor, "class", classes("card", gradeClass(string(c.Grade)))}, doc.dimmHead(d, "h3"))
@@ -582,6 +598,13 @@ func (doc *Document) findings() *node {
 		s.add(art)
 	}
 
+	if c := doc.Host; c != nil {
+		s.add(doc.hostCard(c))
+		for _, id := range c.Rules {
+			fired[id] = true
+		}
+	}
+
 	if len(doc.GPUs) > 0 {
 		s.add(el("h3", doc.say("gpu.title")))
 		for _, g := range doc.GPUs {
@@ -619,6 +642,60 @@ func (doc *Document) findings() *node {
 		s.add(el("h3", doc.say("rules.title")), scroll(t))
 	}
 	return s
+}
+
+// hostCard is the card of the host finding: what the engine makes of the
+// errors and the page offlines that are tied to no DIMM.
+func (doc *Document) hostCard(c *view.Card) *node {
+	art := el("article", A{"id", hostAnchor, "class", classes("card", gradeClass(string(c.Grade)))},
+		el("h3", doc.say("host.title")))
+	art.add(el("p", A{"class", "sub"}, R(doc.say("host.sub", "host", c.Host, "counts", doc.looseCounts(c)))))
+	dl := el("dl", A{"class", "finding"})
+	row := func(code string, kids ...any) {
+		dl.add(el("div", el("dt", doc.vsay(code)), el("dd", kids...)))
+	}
+	conf := doc.vsay("card.confidence", "level", c.ConfidenceText)
+	if doc.Audience == FA {
+		conf += fmt.Sprintf(", %d", c.Confidence)
+	}
+	row("card.finding", doc.badge(c.Grade), " ("+c.Label+", "+conf+") ", el("span", A{"class", "rules"}, doc.ruleChips(c.Rules)))
+	if len(c.Evidence) > 0 {
+		ul := el("ul")
+		for i := range c.Evidence {
+			e := &c.Evidence[i]
+			ul.add(el("li", el("span", A{"class", "rule"}, e.Rule), R(" "+e.Text.Text+" "), doc.recordsLink(e)))
+		}
+		row("card.evidence", ul)
+	}
+	if len(c.Checks) > 0 {
+		ul := el("ul")
+		for _, k := range c.Checks {
+			ul.add(el("li", el("span", A{"class", "tag " + k.Effect}, k.EffectText), R(" "+k.Text.Text)))
+		}
+		row("card.checks", ul)
+	}
+	if len(c.Missing) > 0 {
+		ul := el("ul")
+		for _, it := range c.Missing {
+			ul.add(el("li", R(it.Text)))
+		}
+		row("card.missing", ul)
+	}
+	if c.Next != nil {
+		row("card.next", el("strong", R(c.Next.Text)))
+	}
+	if doc.Audience == FA && len(c.Factors) > 0 {
+		ol := el("ul", A{"class", "factors"})
+		for i, f := range c.Factors {
+			delta := fmt.Sprintf("%+d", f.Delta)
+			if i == 0 {
+				delta = strconv.Itoa(f.Delta)
+			}
+			ol.add(el("li", el("span", A{"class", "delta"}, delta), R(" "+f.Text.Text)))
+		}
+		row("card.factors", ol)
+	}
+	return art.add(dl)
 }
 
 // faultList lists the faults of a DIMM one by one: mode and place, counts,
@@ -1102,11 +1179,8 @@ func (doc *Document) quality() *node {
 	if doc.Undated > 0 {
 		notes.add(el("li", doc.say("q.undated", "n", doc.Undated)))
 	}
-	if n := doc.Overview.Unattributed; n > 0 {
-		notes.add(el("li", doc.say("q.loose", "n", n)))
-	}
-	if n := doc.Overview.LoosePages; n > 0 {
-		notes.add(el("li", doc.say("sum.loose_pages", "n", n)))
+	if c := doc.Host; c != nil {
+		notes.add(el("li", doc.say("q.loose", "counts", doc.looseCounts(c)), " ", el("a", A{"href", "#" + hostAnchor}, doc.say("host.title"))))
 	}
 	if doc.NoSerial > 0 {
 		notes.add(el("li", doc.say("q.no_serial", "n", doc.NoSerial)))
