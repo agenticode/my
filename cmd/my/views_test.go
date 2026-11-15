@@ -439,6 +439,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
 		{[]string{"gpu", "?"}, "gpu", []string{"Usage: my gpu [index|serial|uuid|pci-address] [--days N] [flags]", "--days N", "GPU memory. A GPU does not report where in its memory an error was", "my open case.mycase gpu"}},
 		{[]string{"help", "verify"}, "verify", []string{"Usage: my verify --expect PLAN [flags]", "--expect PLAN", "The command injects nothing and changes nothing", "The exit code is 0 when every injection was found as planned and 1 when one was not", "Verification. A plan lists what a test injected"}},
+		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm [-o FILE] [--records] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
@@ -537,6 +538,10 @@ func registerFlags(o *options, topic string) {
 		o.fs.Int("days", 0, "")
 	case "verify":
 		o.fs.String("expect", "", "")
+	case "export":
+		o.fs.Bool("records", false, "")
+		o.fs.Bool("all", false, "")
+		o.fs.Bool("force", false, "")
 	case "import":
 		o.fs.String("ledger", "", "")
 		o.fs.String("captured-at", "", "")

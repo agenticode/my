@@ -16,26 +16,31 @@ import (
 // words holds the texts of the commands: usage, flags, errors and hints.
 var words = i18n.Catalog{
 	// Errors in the command line.
-	"err.see_help":      {EN: "run \"{cmd}\" for usage", KO: "사용법은 \"{cmd}\""},
-	"err.extra":         {EN: "unexpected argument \"{arg}\"", KO: "불필요한 인자 \"{arg}\""},
-	"err.command_first": {EN: "the command comes before its flags: my {cmd} [flags]", KO: "명령을 옵션 앞에 써야 함: my {cmd} [옵션]"},
-	"err.one_dimm":      {EN: "name one DIMM by its slot or serial number", KO: "DIMM 하나를 슬롯 이름이나 시리얼로 지정해야 함"},
-	"err.color":         {EN: "--color {value}: want auto, always or never", KO: "--color {value}: auto, always, never 중 하나여야 함"},
-	"err.width":         {EN: "--width {value}: want a number of columns", KO: "--width {value}: 칸 수여야 함"},
-	"err.bank":          {EN: "--bank {value}: want a bank (3) or a bank group and a bank (0/3)", KO: "--bank {value}: bank 번호(3) 또는 bank group과 bank(0/3)여야 함"},
-	"err.rows":          {EN: "--rows {value}: want a range of rows such as 0x1a00-0x1aff", KO: "--rows {value}: 0x1a00-0x1aff 같은 row 범위여야 함"},
-	"err.days":          {EN: "--days {value}: want a number of days", KO: "--days {value}: 일수여야 함"},
-	"err.not_dir":       {EN: "not a directory", KO: "디렉터리가 아님"},
-	"err.empty":         {EN: "the ledger holds no host", KO: "원장에 호스트 없음"},
-	"err.no_host":       {EN: "no host named {host} in the ledger (hosts: {hosts})", KO: "원장에 {host} 호스트 없음 (호스트: {hosts})"},
-	"err.several_hosts": {EN: "the ledger holds several hosts: name one with --host ({hosts})", KO: "원장에 호스트가 여럿임: --host로 하나를 지정 ({hosts})"},
-	"err.empty_slot":    {EN: "slot {slot} holds no DIMM", KO: "슬롯 {slot}에 DIMM 없음"},
-	"err.no_dimm":       {EN: "no slot or DIMM \"{ref}\" in host {host}.", KO: "호스트 {host}에 \"{ref}\" 슬롯이나 DIMM 없음."},
-	"err.with_findings": {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
-	"err.no_gpu":        {EN: "no GPU \"{ref}\" with memory records in host {host}; name a GPU by its index, its serial number, its UUID or its PCI address", KO: "호스트 {host}에 메모리 기록이 있는 GPU \"{ref}\" 없음. GPU는 인덱스, 시리얼, UUID, PCI 주소로 지정"},
-	"err.expect":        {EN: "name the injection plan with --expect, for example --expect plan.yaml", KO: "주입 계획을 --expect로 지정해야 함 (예: --expect plan.yaml)"},
-	"err.open_file":     {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":  {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, verify, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, verify, 또는 생략하면 개요)"},
+	"err.see_help":       {EN: "run \"{cmd}\" for usage", KO: "사용법은 \"{cmd}\""},
+	"err.extra":          {EN: "unexpected argument \"{arg}\"", KO: "불필요한 인자 \"{arg}\""},
+	"err.command_first":  {EN: "the command comes before its flags: my {cmd} [flags]", KO: "명령을 옵션 앞에 써야 함: my {cmd} [옵션]"},
+	"err.one_dimm":       {EN: "name one DIMM by its slot or serial number", KO: "DIMM 하나를 슬롯 이름이나 시리얼로 지정해야 함"},
+	"err.color":          {EN: "--color {value}: want auto, always or never", KO: "--color {value}: auto, always, never 중 하나여야 함"},
+	"err.width":          {EN: "--width {value}: want a number of columns", KO: "--width {value}: 칸 수여야 함"},
+	"err.bank":           {EN: "--bank {value}: want a bank (3) or a bank group and a bank (0/3)", KO: "--bank {value}: bank 번호(3) 또는 bank group과 bank(0/3)여야 함"},
+	"err.rows":           {EN: "--rows {value}: want a range of rows such as 0x1a00-0x1aff", KO: "--rows {value}: 0x1a00-0x1aff 같은 row 범위여야 함"},
+	"err.days":           {EN: "--days {value}: want a number of days", KO: "--days {value}: 일수여야 함"},
+	"err.not_dir":        {EN: "not a directory", KO: "디렉터리가 아님"},
+	"err.empty":          {EN: "the ledger holds no host", KO: "원장에 호스트 없음"},
+	"err.no_host":        {EN: "no host named {host} in the ledger (hosts: {hosts})", KO: "원장에 {host} 호스트 없음 (호스트: {hosts})"},
+	"err.several_hosts":  {EN: "the ledger holds several hosts: name one with --host ({hosts})", KO: "원장에 호스트가 여럿임: --host로 하나를 지정 ({hosts})"},
+	"err.empty_slot":     {EN: "slot {slot} holds no DIMM", KO: "슬롯 {slot}에 DIMM 없음"},
+	"err.no_dimm":        {EN: "no slot or DIMM \"{ref}\" in host {host}.", KO: "호스트 {host}에 \"{ref}\" 슬롯이나 DIMM 없음."},
+	"err.with_findings":  {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
+	"err.no_gpu":         {EN: "no GPU \"{ref}\" with memory records in host {host}; name a GPU by its index, its serial number, its UUID or its PCI address", KO: "호스트 {host}에 메모리 기록이 있는 GPU \"{ref}\" 없음. GPU는 인덱스, 시리얼, UUID, PCI 주소로 지정"},
+	"err.expect":         {EN: "name the injection plan with --expect, for example --expect plan.yaml", KO: "주입 계획을 --expect로 지정해야 함 (예: --expect plan.yaml)"},
+	"err.export_format":  {EN: "name the format to write: my export fmfm", KO: "내보낼 형식을 지정해야 함: my export fmfm"},
+	"err.export_unknown": {EN: "unknown format \"{format}\"; the format this version writes is fmfm", KO: "알 수 없는 형식 \"{format}\". 이 버전이 쓰는 형식은 fmfm"},
+	"export.written":     {EN: "FMFM analysis log written: {file} ({size})", KO: "FMFM 분석 로그 저장: {file} ({size})"},
+	"export.holds":       {EN: "host {host}, finding {grade}: {dimms} {dimms|DIMM|DIMMs} analysed, {records} error {records|record|records} in the runtime log", KO: "호스트 {host}, 소견 {grade}: 분석한 DIMM {dimms}개, runtime 로그의 오류 기록 {records}건"},
+	"export.no_cpad":     {EN: "the log holds findings and suggestions for a person, and no action descriptor (CPAD)", KO: "로그에는 사람이 읽을 소견과 제안만 있고 조치 기술자(CPAD)는 없음"},
+	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
+	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, verify, export, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -225,6 +230,19 @@ var words = i18n.Catalog{
 			"                  count, address, row 등)이 든 텍스트 파일",
 	},
 
+	"help.export.usage": {EN: "my export fmfm [-o FILE] [--records] [flags]", KO: "my export fmfm [-o FILE] [--records] [옵션]"},
+	"help.export.text":  {EN: "Writes the findings of this host as an analysis log in the form of the OCP Fleet Memory Fault Management (FMFM) framework: one record per DIMM with its serial number, its place, the Level 1 fault mode, a risk and a severity class, a suggested action, and the finding of this tool with its rules and evidence. With --records the log also holds every error record with the field names of the FMFM runtime error log, so that records from a rasdaemon database, a kernel log or a BMC can be handed to an analyzer that reads that form. A field no source reported is left out; each record names the fields that are missing and the observation grade of its data. The log is JSON and goes to standard output, or into FILE with -o. It holds no action descriptor (CPAD): a suggestion is for a person, and nothing acts on it. docs/fmfm-mapping.md lists every field. The exit code is 0 when the log was written.", KO: "이 호스트의 소견을 OCP Fleet Memory Fault Management(FMFM) 프레임워크의 분석 로그 형식으로 내보냅니다. DIMM마다 기록 하나이며 시리얼, 위치, Level 1 고장 모드, 위험과 심각도 분류, 제안 조치, 그리고 이 도구의 소견과 규칙과 근거가 들어갑니다. --records를 주면 모든 오류 기록을 FMFM runtime 오류 로그의 필드명으로 함께 싣습니다. rasdaemon DB, 커널 로그, BMC에서 온 기록을 그 형식을 읽는 분석기에 넘길 수 있습니다. 어떤 소스도 보고하지 않은 필드는 비워 두고, 기록마다 빠진 필드와 데이터의 관측 등급을 적습니다. 로그는 JSON이며 표준 출력으로 나가고, -o를 주면 FILE에 저장합니다. 조치 기술자(CPAD)는 넣지 않습니다. 제안은 사람이 읽는 것이고 그것으로 실행되는 조치는 없습니다. 필드 목록은 docs/fmfm-mapping.md에 있습니다. 로그를 쓰면 종료 코드는 0입니다."},
+	"help.export.flags": {
+		EN: "-o FILE           write the log to FILE; without it, or with \"-\", to standard output\n" +
+			"--records         add the runtime log: every error record with FMFM field names\n" +
+			"--all             also the DIMMs without errors and without a finding\n" +
+			"--force           replace FILE when it exists",
+		KO: "-o FILE           로그를 FILE에 저장. 생략하거나 \"-\"를 주면 표준 출력\n" +
+			"--records         runtime 로그 추가: FMFM 필드명으로 쓴 모든 오류 기록\n" +
+			"--all             오류도 소견도 없는 DIMM까지 포함\n" +
+			"--force           FILE이 있으면 덮어씀",
+	},
+
 	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [옵션]"},
 	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
@@ -356,6 +374,7 @@ var guides = map[string][]string{
 	"open":     {"guide.slotmap", "guide.ranking", "guide.grades"},
 	"bundle":   nil,
 	"report":   nil,
+	"export":   nil,
 	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
 	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.gpu", "guide.grades", "guide.obs"},
 }
@@ -402,13 +421,13 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" {
+	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)
 		}
 	}
-	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" {
+	if topic != "open" && topic != "overview" && topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "export" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.source", "cmd", topic), 0) {
 			fmt.Fprintln(w, line)
