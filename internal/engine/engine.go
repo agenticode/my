@@ -29,7 +29,7 @@ import (
 // Version identifies the behaviour of the engine. It changes whenever a
 // change can give a different fault or finding for the same ledger. Stored
 // faults and findings carry the version that produced them.
-const Version = "1"
+const Version = "2"
 
 // Options select how the engine runs. The zero value uses the defaults.
 type Options struct {

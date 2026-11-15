@@ -81,6 +81,13 @@ type Storm struct {
 	At time.Time `json:"at,omitzero"`
 	// Storm is set when Peak reaches StormCount.
 	Storm bool `json:"storm"`
+	// RecentPeak and RecentAt describe the densest burst among the errors
+	// of the recent window of the trend, and Recent is set when it reaches
+	// StormCount. A burst that lies further back says how the fault once
+	// behaved; a recent one says that it is active now.
+	RecentPeak int64     `json:"recent_peak,omitzero"`
+	RecentAt   time.Time `json:"recent_at,omitzero"`
+	Recent     bool      `json:"recent,omitzero"`
 }
 
 // DataLines summarises which data lines (DQ) of a device failed, on
@@ -288,7 +295,8 @@ func slope(y []float64) float64 {
 }
 
 // storm finds the busiest window among the records idx, which must be in
-// time order. A counter record is spread evenly over its counting window.
+// time order, and the busiest window among those of the recent window. A
+// counter record is spread evenly over its counting window.
 func (m *measurer) storm(idx []int32) Storm {
 	w := int64(m.cfg.StormMinutes * float64(time.Minute/time.Microsecond))
 	if w <= 0 {
@@ -311,24 +319,41 @@ func (m *measurer) storm(idx []int32) Storm {
 		pts = append(pts, point{e.at, n})
 	}
 	sort.Slice(pts, func(i, j int) bool { return pts[i].at < pts[j].at })
-	var best, sum float64
-	var at int64
-	lo := 0
-	for hi := range pts {
-		sum += pts[hi].n
-		for pts[hi].at-pts[lo].at > w {
-			sum -= pts[lo].n
-			lo++
+	// busiest returns the largest sum of a window among pts and where the
+	// window starts.
+	busiest := func(pts []point) (peak int64, at int64) {
+		var best, sum float64
+		lo := 0
+		for hi := range pts {
+			sum += pts[hi].n
+			for pts[hi].at-pts[lo].at > w {
+				sum -= pts[lo].n
+				lo++
+			}
+			if sum > best {
+				best, at = sum, pts[lo].at
+			}
 		}
-		if sum > best {
-			best, at = sum, pts[lo].at
-		}
+		return int64(best + 0.5), at
 	}
-	s := Storm{Peak: int64(best + 0.5)}
-	if s.Peak > 0 {
+	var s Storm
+	var at int64
+	if s.Peak, at = busiest(pts); s.Peak > 0 {
 		s.At = timeOf(at)
 	}
 	s.Storm = s.Peak >= int64(m.cfg.StormCount) && m.cfg.StormCount > 0
+	// The recent window is the one the trend uses. Without a reference
+	// time there is no recent window.
+	if c := m.clk; !c.zero() {
+		first := sort.Search(len(pts), func(i int) bool { return pts[i].at > c.recentFrom })
+		last := sort.Search(len(pts), func(i int) bool { return pts[i].at > c.asOf })
+		if first < last {
+			if s.RecentPeak, at = busiest(pts[first:last]); s.RecentPeak > 0 {
+				s.RecentAt = timeOf(at)
+			}
+			s.Recent = s.RecentPeak >= int64(m.cfg.StormCount) && m.cfg.StormCount > 0
+		}
+	}
 	return s
 }
 
