@@ -78,6 +78,18 @@ if [ "$left" -ne 0 ]; then
   exit 1
 fi
 
+# A directory that holds nothing of a host is no host without errors: the
+# scan fails and names what it looked for.
+mkdir "$tmp/nothing"
+echo "--- $bin --root (an empty directory)"
+"$bin" --root "$tmp/nothing" > "$tmp/nothing.out" 2> "$tmp/nothing.err"
+code=$?
+cat "$tmp/nothing.err"
+if [ "$code" -ne 70 ] || [ -s "$tmp/nothing.out" ] || ! grep -q 'holds no source of error records' "$tmp/nothing.err"; then
+  echo "FAILED: a scan of an empty directory ended with exit code $code"
+  exit 1
+fi
+
 # The name of this machine must not be in an anonymized bundle.
 name=$(hostname)
 mkdir "$tmp/x" && unzip -q -d "$tmp/x" "$tmp/runner.mycase" || exit 1

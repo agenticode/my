@@ -27,6 +27,11 @@ var words = i18n.Catalog{
 	"err.days":           {EN: "--days {value}: want a number of days", KO: "--days {value}: 일수여야 함"},
 	"err.not_dir":        {EN: "not a directory", KO: "디렉터리가 아님"},
 	"err.empty":          {EN: "the ledger holds no host", KO: "원장에 호스트 없음"},
+	"err.not_linux":      {EN: "this is not a Linux host ({os}). A scan reads the records the Linux kernel and its tools keep about memory errors. A case from such a host is shown with \"my open FILE\" and built from its files with \"my import FILE...\"", KO: "이 시스템은 Linux 호스트가 아님({os}). 스캔은 Linux 커널과 그 도구가 남긴 메모리 오류 기록을 읽음. Linux 호스트의 케이스는 \"my open FILE\"로 열고, 그 호스트의 파일로는 \"my import FILE...\"로 케이스를 만듦"},
+	"err.blind_user":     {EN: "no source of error records can be read as this user, so the scan cannot say whether this host has memory errors:", KO: "이 사용자로는 오류 기록 소스를 하나도 읽지 못해 이 호스트에 메모리 오류가 있는지 알 수 없음:"},
+	"err.blind_live":     {EN: "no source of error records can be read on this host, so the scan cannot say whether it has memory errors:", KO: "이 호스트에서 오류 기록 소스를 하나도 읽지 못해 메모리 오류가 있는지 알 수 없음:"},
+	"err.blind_root":     {EN: "{dir} holds no source of error records of a host, so there is nothing to scan:", KO: "{dir}에 호스트의 오류 기록 소스가 없어 스캔할 것이 없음:"},
+	"err.blind_sudo":     {EN: "As root the scan reads the kernel log and the rasdaemon database: sudo my", KO: "root로 실행하면 커널 로그와 rasdaemon DB를 읽음: sudo my"},
 	"err.no_host":        {EN: "no host named {host} in the ledger (hosts: {hosts})", KO: "원장에 {host} 호스트 없음 (호스트: {hosts})"},
 	"err.several_hosts":  {EN: "the ledger holds several hosts: name one with --host ({hosts})", KO: "원장에 호스트가 여럿임: --host로 하나를 지정 ({hosts})"},
 	"err.empty_slot":     {EN: "slot {slot} holds no DIMM", KO: "슬롯 {slot}에 DIMM 없음"},
@@ -207,7 +212,7 @@ var words = i18n.Catalog{
 	},
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
-	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. Sources it may not read as this user are named on the \"missing\" line with what root would add.", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다."},
+	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. Sources it may not read as this user are named on the \"missing\" line with what root would add. A scan that can read no source of error records at all ends with exit code 70 and names what it looked for: it does not answer \"no errors on record\".", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다. 오류 기록 소스를 하나도 읽지 못하면 \"오류 기록 없음\"이라고 답하지 않고, 찾아본 소스를 적은 뒤 종료 코드 70으로 끝납니다."},
 	"help.overview.flags": {EN: "--all             list every DIMM, also those without errors", KO: "--all             오류 없는 DIMM도 모두 나열"},
 
 	"help.dimm.usage": {EN: "my dimm <slot|serial> [flags]", KO: "my dimm <슬롯|시리얼> [옵션]"},
