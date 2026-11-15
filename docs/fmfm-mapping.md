@@ -50,7 +50,7 @@ Each error is written once. Where two sources report one error (a kernel log lin
   "format": "fmfm-analysis-log",
   "format_version": 1,
   "OutputDT": "2026-11-13T09:30:00.000Z",
-  "Analyzer": { "Name": "MemorY", "Version": "...", "engine_version": "3", "level": 1 },
+  "Analyzer": { "Name": "MemorY", "Version": "...", "engine_version": "...", "level": 1 },
   "HostID": "r12-n034",
   "action_descriptors": "none",
   "AnalysisLog": [ ... ],
