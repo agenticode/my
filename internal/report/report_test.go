@@ -1512,7 +1512,7 @@ func TestFigures(t *testing.T) {
 	}
 
 	// Every scenario, in Korean: the pictures are written and well-formed.
-	for _, name := range synth.Names() {
+	for _, name := range scenarios() {
 		doc := build(t, name, "", i18n.KO, FA)
 		figs, err := doc.Figures()
 		if err != nil || len(figs) < 3 {
