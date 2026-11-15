@@ -114,6 +114,21 @@ func (s *server) get(path string) (int, string) {
 	return resp.StatusCode, string(b)
 }
 
+// ready waits for the first scan.
+func (s *server) ready() {
+	s.t.Helper()
+	deadline := time.Now().Add(120 * time.Second)
+	for {
+		if code, _ := s.get("/-/ready"); code == http.StatusOK {
+			return
+		}
+		if time.Now().After(deadline) {
+			s.t.Fatalf("the first scan did not finish:\n%s", s.log.String())
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+}
+
 // metrics waits for /metrics to satisfy ok and returns it parsed.
 func (s *server) metrics(ok func(x *testutil.Exposition) bool) *testutil.Exposition {
 	s.t.Helper()
@@ -303,19 +318,6 @@ func TestServeScansAgain(t *testing.T) {
 	}
 }
 
-func TestServeWithoutMetrics(t *testing.T) {
-	t.Setenv("TMPDIR", t.TempDir())
-	s := startServe(t, fixed, "--root", hostTree(t))
-	if code, _ := s.get("/metrics"); code != http.StatusNotFound {
-		t.Errorf("/metrics = %d without --metrics", code)
-	}
-	if code, body := s.get("/-/healthy"); code != http.StatusOK || body != "ok\n" {
-		t.Errorf("/-/healthy = %d %q", code, body)
-	}
-	s.end()
-	wantLines(t, s.log.String(), "/metrics is off; start with --metrics")
-}
-
 func TestServeMistakes(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "file")
 	if err := os.WriteFile(file, nil, 0o644); err != nil {
@@ -449,17 +451,25 @@ func TestServeAPI(t *testing.T) {
 	root := hostTree(t)
 	// No --metrics: the API does not depend on it.
 	s := startServe(t, fixed, "--root", root, "--interval", "1h")
-	deadline := time.Now().Add(60 * time.Second)
-	for {
-		if code, _ := s.get("/-/ready"); code == http.StatusOK {
-			break
-		}
-		if time.Now().After(deadline) {
-			t.Fatalf("the first scan did not finish:\n%s", s.log.String())
-		}
-		time.Sleep(20 * time.Millisecond)
+	s.ready()
+	if code, _ := s.get("/metrics"); code != http.StatusNotFound {
+		t.Errorf("/metrics = %d without --metrics", code)
+	}
+	if code, body := s.get("/-/healthy"); code != http.StatusOK || body != "ok\n" {
+		t.Errorf("/-/healthy = %d %q", code, body)
 	}
 
+	// The command scans the host once and keeps the scan; "my open" then
+	// prints from that ledger what the command prints on the host. A scan
+	// per comparison would take most of the time of this test.
+	kept := filepath.Join(t.TempDir(), "kept.db")
+	code, live, errOut := runEnv(fixed, "why", "CPU0_C1", "--root", root, "--ledger", kept, "--json")
+	if code != 3 || errOut != "" {
+		t.Fatalf("my why --json: exit code %d, stderr %q", code, errOut)
+	}
+	if _, body := s.get("/api/dimm/CPU0_C1"); body != live {
+		t.Errorf("GET /api/dimm/CPU0_C1 differs from my why CPU0_C1 --json on the host:\n%s\nwant:\n%s", body, live)
+	}
 	for path, args := range map[string][]string{
 		"/api/dimm/CPU0_C1":                 {"why", "CPU0_C1"},
 		"/api/dimm/3B9C56":                  {"why", "3B9C56"},
@@ -472,7 +482,7 @@ func TestServeAPI(t *testing.T) {
 		"/api/dimm/CPU0_C1?lang=ko_KR.UTF8": {"why", "CPU0_C1", "--lang", "ko"},
 	} {
 		code, body := s.get(path)
-		_, want, errOut := runEnv(fixed, append(args, "--root", root, "--json")...)
+		_, want, errOut := runEnv(fixed, append(append([]string{"open", kept}, args...), "--json")...)
 		if code != http.StatusOK || errOut != "" || body != want {
 			t.Errorf("GET %s = %d and differs from my %s --json (stderr %q):\n%s\nwant:\n%s", path, code, strings.Join(args, " "), errOut, body, want)
 		}
@@ -492,10 +502,9 @@ func TestServeAPI(t *testing.T) {
 		t.Fatal(err)
 	}
 	const quoted = "$ curl -s http://127.0.0.1:10163/api/dimm/CPU0_C1 | head -n 8\n"
-	_, c1 := s.get("/api/dimm/CPU0_C1")
 	if i := strings.Index(string(doc), quoted); i < 0 {
 		t.Error("docs/exporter.md does not quote the answer for CPU0_C1")
-	} else if want := strings.Join(strings.SplitAfter(c1, "\n")[:8], ""); !strings.HasPrefix(string(doc)[i+len(quoted):], want+"```") {
+	} else if want := strings.Join(strings.SplitAfter(live, "\n")[:8], ""); !strings.HasPrefix(string(doc)[i+len(quoted):], want+"```") {
 		t.Errorf("docs/exporter.md quotes other lines than the server sends:\n%s", want)
 	}
 
@@ -526,7 +535,7 @@ func TestServeAPI(t *testing.T) {
 			t.Errorf("GET %s = %d %q (%v), want %d and %q", path, code, body, err, want.code, want.text)
 		}
 		if want.args != nil {
-			if _, _, errOut := runEnv(fixed, append(want.args, "--root", root)...); !strings.Contains(errOut, doc.Error) {
+			if _, _, errOut := runEnv(fixed, append([]string{"open", kept}, want.args...)...); !strings.Contains(errOut, doc.Error) {
 				t.Errorf("GET %s says %q, the command says %q", path, doc.Error, errOut)
 			}
 		}
@@ -534,6 +543,7 @@ func TestServeAPI(t *testing.T) {
 	if code := s.end(); code != cli.ExitOK {
 		t.Errorf("exit code %d", code)
 	}
+	wantLines(t, s.log.String(), "/metrics is off; start with --metrics")
 }
 
 // TestServeAPIAmbiguousName: the end of a serial number that two DIMMs
@@ -548,16 +558,7 @@ func TestServeAPIAmbiguousName(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := startServe(t, fixed, "--root", root, "--interval", "1h", "--lang", "ko")
-	deadline := time.Now().Add(60 * time.Second)
-	for {
-		if code, _ := s.get("/-/ready"); code == http.StatusOK {
-			break
-		}
-		if time.Now().After(deadline) {
-			t.Fatalf("the first scan did not finish:\n%s", s.log.String())
-		}
-		time.Sleep(20 * time.Millisecond)
-	}
+	s.ready()
 	code, body := s.get("/api/dimm/XYZW")
 	if code != http.StatusBadRequest || !strings.Contains(body, "more than one DIMM matches") {
 		t.Errorf("GET /api/dimm/XYZW = %d %s", code, body)
