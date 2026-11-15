@@ -94,7 +94,7 @@ Each of these was wrong or missing before the capture showed it.
 
 The captures raised these and did not settle them.
 
-- A host whose errors cannot be tied to a DIMM gets the finding "ok" next to "CE 7, UE 3": findings are made per DIMM. The overview does not mention pages taken offline at all.
+- A host whose errors cannot be tied to a DIMM keeps the finding of its DIMMs: findings are made per DIMM, and no rule judges an error without one. On `7.3.0-mce` the overview now reads `host finding: ok; CE 7, UE 3 tied to no DIMM are in no finding` and counts the 10 errors and 5 page offlines that are tied to no DIMM. Before, it said "ok" next to "CE 7, UE 3" and did not mention the pages.
 - A page that a program asked the kernel to give up is marked, and still counts like any other offline.
 
 ## Repeating it
