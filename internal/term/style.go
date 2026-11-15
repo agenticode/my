@@ -180,6 +180,10 @@ func (st Style) gradeGlyph(state string) string {
 	case model.VerdictHoldReplacement:
 		return strings.Repeat(g.hold, 2)
 	}
+	if state == view.SlotUnknown {
+		// Not empty and not a module: the ledger does not know.
+		return "--"
+	}
 	return strings.Repeat(g.shade[level], 2)
 }
 
