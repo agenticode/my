@@ -234,7 +234,7 @@ func (o *options) checkTarget(env *cli.Env, lang i18n.Lang, path string, force b
 // binaryToTerminal ends a command that was asked to write a file to the
 // standard output while that is a terminal.
 func (o *options) binaryToTerminal(env *cli.Env, lang i18n.Lang) (code int, is bool) {
-	if f, ok := env.Stdout.(*os.File); ok {
+	if f := fileOf(env.Stdout); f != nil {
 		if _, terminal := term.Size(f); terminal {
 			return o.usageError(env, lang, "%s", say(lang, "err.terminal")), true
 		}
@@ -246,7 +246,7 @@ func (o *options) binaryToTerminal(env *cli.Env, lang i18n.Lang) (code int, is b
 func (o *options) style(env *cli.Env, lang i18n.Lang) term.Style {
 	st := term.Style{Lang: lang, ASCII: o.ascii, Width: o.width}
 	columns, terminal := 0, false
-	if f, ok := env.Stdout.(*os.File); ok {
+	if f := fileOf(env.Stdout); f != nil {
 		columns, terminal = term.Size(f)
 	}
 	return term.Detect(st, o.color, terminal, columns, env.Getenv)

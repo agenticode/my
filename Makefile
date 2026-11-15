@@ -65,6 +65,7 @@ FUZZ_TARGETS := \
 	./internal/bundle:FuzzReadManifest \
 	./internal/bundle:FuzzMembers \
 	./internal/plugin:FuzzResponse \
+	./internal/term:FuzzSafe \
 	./internal/redfish/client:FuzzParseTarget \
 	./internal/redfish/client:FuzzParseFingerprint \
 	./internal/redfish/client:FuzzResolve \

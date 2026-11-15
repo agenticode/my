@@ -56,6 +56,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | case bundle, as bytes | `internal/bundle` | `FuzzReadManifest` |
 | case bundle with a well-formed archive around arbitrary manifest, source inventory and ledger | `internal/bundle` | `FuzzMembers` |
 | response of a vendor analyzer | `internal/plugin` | `FuzzResponse` |
+| text on its way to a terminal | `internal/term` | `FuzzSafe` |
 | address of a BMC | `internal/redfish/client` | `FuzzParseTarget` |
 | certificate fingerprint | `internal/redfish/client` | `FuzzParseFingerprint` |
 | link inside a Redfish resource | `internal/redfish/client` | `FuzzResolve` |
@@ -74,6 +75,7 @@ A target fails on a panic, on a call that does not return, and when the code bre
 - The Redfish client sends GET requests, one login and one logout, to the BMC it was given and to no other host. It gives up after a bounded number of requests and pauses. Neither the password nor the session token is in an error, in the manifest or in a file of the collection, and no file is written outside the collection directory.
 - A response of a vendor analyzer is refused, or every text in it is short and free of control characters, every number is within its bounds, and the rows it names as neighbours are symmetric.
 - A case bundle is refused, or the ledger that was taken out of it opens with this build.
+- Text that goes to a terminal holds no control character but line breaks, tabs and the colour codes of the figures, whatever the text was and however the writes cut it up.
 
 ## What is not covered
 
