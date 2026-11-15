@@ -1,0 +1,53 @@
+# MemorY exporter for a fleet: one service that reads the store the
+# rasdaemons of all hosts write to (rasdaemon 1.0 with its mysql or
+# postgresql backend).
+#
+#   install -m 0755 my /usr/local/bin/my
+#   install -m 0600 rasdaemon.env /etc/my/rasdaemon.env
+#   install -m 0644 my-fleet-exporter.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now my-fleet-exporter
+#
+# /etc/my/rasdaemon.env holds the settings rasdaemon itself takes for the
+# store: RASDAEMON_DB_BACKEND and the RAS_MYSQL_* or RAS_PG_* variables. An
+# account that may only SELECT from the tables is enough. systemd reads the
+# file as root and hands the settings to the service, which runs as a user
+# that exists while it runs and owns nothing.
+
+[Unit]
+Description=MemorY exporter: memory error findings of a fleet for Prometheus
+Documentation=https://github.com/agenticode/my/blob/main/docs/exporter.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/my/rasdaemon.env
+ExecStart=/usr/local/bin/my serve --metrics --fleet ${RASDAEMON_DB_BACKEND} --listen 127.0.0.1:10163 --interval 5m
+Restart=on-failure
+RestartSec=30
+
+DynamicUser=yes
+CapabilityBoundingSet=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+UMask=0077
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

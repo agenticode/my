@@ -1,0 +1,44 @@
+# Alertmanager routing for the alerts of ../prometheus. An example: put the
+# two routes under the route of your own configuration and name your own
+# receivers.
+#
+# MemoryFindingWorse fires when the finding for a DIMM got worse, for ten
+# minutes, and then ends on its own. The finding has not gone away by then,
+# so its receiver sends no "resolved" message.
+route:
+  receiver: default
+  routes:
+    - matchers:
+        - alertname = MemoryFindingWorse
+      receiver: memory-findings
+      # One message per host: several DIMMs of a host often change together,
+      # as they do when the cause is the channel or the board.
+      group_by: [host]
+      group_wait: 1m
+      group_interval: 10m
+      # The alert lasts ten minutes. A repeat would say nothing new.
+      repeat_interval: 24h
+      routes:
+        # Replace now, and hold replacement, to the people who pull DIMMs.
+        - matchers:
+            - finding =~ "replace-now|hold-replacement"
+          receiver: memory-hardware
+    - matchers:
+        - alertname = MemoryFindingsStale
+      receiver: memory-exporter
+      group_by: [instance]
+
+receivers:
+  - name: default
+  - name: memory-findings
+    webhook_configs:
+      - url: http://127.0.0.1:9095/memory-findings
+        send_resolved: false
+  - name: memory-hardware
+    webhook_configs:
+      - url: http://127.0.0.1:9095/memory-hardware
+        send_resolved: false
+  - name: memory-exporter
+    webhook_configs:
+      - url: http://127.0.0.1:9095/memory-exporter
+        send_resolved: true
