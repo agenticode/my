@@ -259,19 +259,26 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	if o.ledger != "" {
 		path = o.ledger
 	}
+	return scanInto(ctx, s.lang, path, o.root, tmp, now)
+}
+
+// scanInto scans the host, or the copy of a host's files below root, into
+// the ledger at path, which is created when it is not there. It returns
+// the ledger and the name of the host.
+func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time) (*store.Store, string, error) {
 	ledger, err := store.Open(ctx, path, store.Create)
 	if err != nil {
 		return nil, "", err
 	}
 	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp}
-	if o.root != "" && filepath.Clean(o.root) != "/" {
+	if root != "" && filepath.Clean(root) != "/" {
 		// A copy of a host's files: only files are read.
-		if fi, err := os.Stat(o.root); err != nil || !fi.IsDir() {
+		if fi, err := os.Stat(root); err != nil || !fi.IsDir() {
 			ledger.Close()
-			return nil, "", fmt.Errorf("--root %s: %s", o.root, say(s.lang, "err.not_dir"))
+			return nil, "", fmt.Errorf("--root %s: %s", root, say(lang, "err.not_dir"))
 		}
 		// The copy says when it was made; the clock of this run does not.
-		opts.Root, opts.Live, opts.Now = o.root, false, time.Time{}
+		opts.Root, opts.Live, opts.Now = root, false, time.Time{}
 	}
 	res, err := scan.Run(ctx, ledger, opts)
 	if err != nil {

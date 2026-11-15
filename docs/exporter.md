@@ -1,0 +1,97 @@
+# Exporter
+
+`my serve --metrics` runs MemorY as a Prometheus exporter. It scans the host, serves what the scan found at `/metrics`, and scans again after a pause. It reads the sources `my` reads and changes nothing on the host.
+
+```
+$ my serve --metrics
+2026-11-15T05:25:59Z listening on http://127.0.0.1:10163
+2026-11-15T05:25:59Z scan took 156ms: host r12-n034, finding replace now, 16 DIMMs, 2 with errors or a finding
+```
+
+| Flag | Meaning |
+| --- | --- |
+| `--metrics` | serve `/metrics` |
+| `--listen ADDR` | where to listen. The default is `127.0.0.1:10163`; `:10163` listens on every interface |
+| `--interval TIME` | pause between the end of one scan and the start of the next, such as `30s` or `5m`. The default is `5m`, the minimum `1s` |
+| `--root DIR` | scan a copy of a host's files below `DIR` instead of this host |
+| `--config FILE`, `--set KEY=VALUE` | thresholds of the engine, as for the other commands |
+| `--lang en\|ko` | language of the log |
+
+The log goes to standard error. A scan is logged when it found something else than the scan before, and when it failed. SIGINT or SIGTERM stops the server with exit code 0. The exit code is 70 when the server cannot listen on its address.
+
+## Metrics
+
+Every series has a `host` label, the name of the machine the records belong to.
+
+| Metric | Type | Labels | Value |
+| --- | --- | --- | --- |
+| `my_dimm_verdict` | gauge | `host`, `slot`, `serial` | the finding for the DIMM: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. The numbers are the exit codes of the commands |
+| `my_dimm_ce_total` | counter | `host`, `slot`, `serial` | corrected errors on record for the DIMM |
+| `my_dimm_ue_total` | counter | `host`, `slot`, `serial` | uncorrected errors on record for the DIMM |
+| `my_dimm_faults` | gauge | `host`, `slot`, `mode` | faults of the DIMM by mode: `single-bit`, `row`, `multi-row`, `column`, `bank`, `device`, `dimm`, `system-issue`, `undetermined` |
+| `my_dimm_offlined_pages` | gauge | `host`, `slot` | pages of the DIMM that were taken offline |
+| `my_dimm_repairs_total` | counter | `host`, `slot`, `type` | repairs on record for the DIMM by type: `sppr`, `hppr`, `sparing`, `row-remap`. Attempts that failed count too |
+| `my_gpu_remap_banks` | gauge | `host`, `gpu`, `bucket` | memory banks of the GPU by the spare rows they have left for row remapping: `max`, `high`, `partial`, `low`, `none`, from the latest `nvidia-smi` state |
+| `my_gpu_remap_failure` | gauge | `host`, `gpu` | 1 when a row remapping of the GPU failed (XID 64 in the kernel log, or the flag in the `nvidia-smi` state), 0 when the GPU reports none |
+| `my_source_grade` | gauge | `host`, `source`, `status` | best observation grade of the errors a source gave in the latest scan: 3 A, 2 B, 1 C, 0 no errors. `status` says how reading the source went: `ok`, `partial`, `empty`, `absent`, `unreadable`, `error` |
+
+No metric has an address, a row, a column or a bank as a label. The number of series of a host is bounded by its DIMMs, GPUs and sources. Where in a DIMM a fault sits is what `my dimm`, `my map` and `my why` show.
+
+Which series exist:
+
+- A DIMM that is in the host has `my_dimm_verdict`, both totals and `my_dimm_offlined_pages`, also when nothing is on record about it. A counter that starts at 0 lets `increase()` see the first error.
+- A DIMM that was replaced has no series.
+- `my_dimm_faults` and `my_dimm_repairs_total` have one series per mode or type that occurs.
+- Errors that the records tie to a slot and to no DIMM are counted under an empty `serial`. Errors that name no place are counted under an empty `slot` as well. They belong to no finding.
+- A GPU has `my_gpu_remap_failure` when its remapping state is known: from an `nvidia-smi` state or from XID 64. A GPU that only logged other XIDs has none.
+- `serial` is empty when the scan could not read the SMBIOS tables, which need root. `gpu` is the serial number of the GPU, or its UUID, PCI address or index when the serial number is unknown.
+
+The totals are counted from error records, as in the commands. They last across a reboot as long as the source that holds the records does: the rasdaemon database does, the journal does until it rotates, and EDAC counters start again at boot. A total goes down when the DIMM is replaced or when the only source of its old records is gone. Prometheus treats that as a counter reset.
+
+## Metrics about the exporter
+
+| Metric | Type | Labels | Value |
+| --- | --- | --- | --- |
+| `my_exporter_build_info` | gauge | `version`, `revision`, `engine` | 1. `engine` is the version of the analysis engine: it changes when the same records can give another finding |
+| `my_exporter_last_scan_timestamp_seconds` | gauge | | when the scan behind the metrics finished, in seconds since the epoch |
+| `my_exporter_last_scan_duration_seconds` | gauge | | how long that scan took |
+| `my_exporter_scan_failures_total` | counter | | scans that failed since the exporter started |
+
+A scan that fails leaves the metrics of the scan before in place and adds one to `my_exporter_scan_failures_total`. `time() - my_exporter_last_scan_timestamp_seconds` is the age of the metrics. Until the first scan has succeeded `/metrics` answers 503, so the target shows as down.
+
+## How a scan runs
+
+Each scan reads the sources of the host into a new ledger in the temporary directory and removes the ledger of the scan before. The exporter keeps no file between scans or across a restart.
+
+A scan costs what `my` costs on the same host, and `my_exporter_last_scan_duration_seconds` shows it. A scan reads the journal of every boot on record and gives that up to two minutes. On a host with a long journal, choose an `--interval` that leaves room for it.
+
+The exporter reads what its user may read. As root it reads every source that is there. As another user it serves what that user can read, and the sources it could not read have `status="unreadable"` in `my_source_grade`.
+
+## Endpoints
+
+| Path | Answer |
+| --- | --- |
+| `/metrics` | the metrics, when `--metrics` is given. The body is gzip when the client accepts it |
+| `/-/healthy` | 200 while the process runs |
+| `/-/ready` | 200 once the first scan has succeeded, 503 before |
+| `/` | the list of these paths |
+
+The server answers GET and HEAD only.
+
+## Access
+
+The default address is `127.0.0.1:10163`, which only the host itself can reach. `--listen :10163` or `--listen 10.0.0.5:10163` opens it to the network. The server has no TLS and no authentication. The metrics name slots and DIMM serial numbers.
+
+Port 10163 is not registered in the Prometheus list of default port allocations.
+
+## Scrape configuration
+
+```yaml
+scrape_configs:
+  - job_name: memory
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['r12-n034:10163']
+```
+
+The values change once per scan at most. A scrape interval shorter than `--interval` reads the same values again.
