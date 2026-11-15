@@ -1,0 +1,21 @@
+A Example EX-2000, BMC firmware 2.14.0, BIOS 1.4.2, Redfish 1.17.0: 2 BMCs (node-a, node-c)
+B Contoso 3500, BMC firmware 1.45.455b66-rev4, BIOS P79 v1.45 (12/06/2017), Redfish 1.15.0: 1 BMC
+  (node-b)
+
+                       A            B
+service root           ok           ok
+system                 ok           ok
+memory modules         ok           ok
+memory metrics         ok           not offered
+BIOS settings          ok           ok
+pending BIOS settings  ok           ok
+attribute registry     ok           unsupported
+manager                ok           ok
+log services           ok           ok
+log entries            ok           ok
+firmware inventory     ok           ok
+chassis                ok           ok
+
+ok: every resource of the class came back. partial: some did. unsupported: the service answered 404,
+405, 410 or 501. denied: 401 or 403. not offered: the service links no such resource, so it was not
+asked for. skipped: left out on purpose. not reached: the run ended before.

@@ -86,6 +86,12 @@ func app() *cli.App {
 				Run:       runImport,
 			},
 			{
+				Name:      "collect",
+				Summary:   "ask a BMC over Redfish for memory, BIOS settings and logs; it only reads",
+				SummaryKO: "BMC에 Redfish로 메모리, BIOS 설정, 로그를 요청. 읽기만 함",
+				Run:       runCollect,
+			},
+			{
 				Name:      "serve",
 				Summary:   "run as a server: Prometheus metrics and the findings of this host over HTTP",
 				SummaryKO: "서버로 실행: 이 호스트의 Prometheus 지표와 소견을 HTTP로 제공",

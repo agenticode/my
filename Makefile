@@ -51,7 +51,9 @@ FUZZ_TARGETS := \
 	./internal/bundle:FuzzReadManifest \
 	./internal/redfish/client:FuzzParseTarget \
 	./internal/redfish/client:FuzzResolve \
-	./internal/redfish/client:FuzzScrub
+	./internal/redfish/client:FuzzScrub \
+	./internal/redfish/collect:FuzzFilePath \
+	./internal/redfish/collect:FuzzParseManifest
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 

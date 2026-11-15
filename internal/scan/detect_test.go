@@ -105,12 +105,13 @@ func TestDetectFixtures(t *testing.T) {
 func TestDetectKnowsEveryFixture(t *testing.T) {
 	root := testutil.Testdata(t)
 	// Fixtures that are parts of an input, not an input: files of a
-	// sysfs tree, raw tables, scripts that build a database, and the
-	// hexadecimal form of a binary dump.
+	// sysfs tree, raw tables, scripts that build a database, the
+	// hexadecimal form of a binary dump, and the notes and licences that
+	// lie next to fixtures.
 	skip := func(rel string) bool {
 		return strings.HasPrefix(rel, "edac-sysfs/") || strings.HasPrefix(rel, "smbios/tables-") || strings.HasSuffix(rel, ".sql") ||
 			strings.HasSuffix(rel, ".hex") || strings.HasPrefix(rel, "redfish/bmc-tree/") || strings.HasPrefix(rel, "real/") ||
-			strings.HasPrefix(rel, "dcbrain/") || strings.HasSuffix(rel, "/README.md")
+			strings.HasPrefix(rel, "dcbrain/") || strings.HasSuffix(rel, "/README.md") || strings.HasSuffix(rel, "/LICENSE.md")
 	}
 	n := 0
 	err := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
