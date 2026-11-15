@@ -1,0 +1,97 @@
+{
+  "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries",
+  "@odata.type": "#LogEntryCollection.LogEntryCollection",
+  "Name": "System Event Log Entries",
+  "Members@odata.count": 10,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/1",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "1", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Warning",
+      "Created": "2026-11-02T14:07:55+00:00",
+      "MessageId": "OpenBMC.0.1.MemoryECCCorrectable",
+      "Message": "Memory ECC correctable error. Socket=0 Channel=A DIMM=0 Rank=1.",
+      "MessageArgs": ["0", "A", "0", "1"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/2",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "2", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Warning",
+      "Created": "2026-11-09T22:41:03+00:00",
+      "MessageId": "OpenBMC.0.1.MemoryECCCorrectable",
+      "Message": "Memory ECC correctable error. Socket=0 Channel=A DIMM=0 Rank=1.",
+      "MessageArgs": [0, "A", 0, 1]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/3",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "3", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Critical",
+      "Created": "2026-11-12T03:14:07+00:00",
+      "MessageId": "OpenBMC.0.1.MemoryECCUncorrectable",
+      "Message": "Memory ECC uncorrectable error. Socket=0 Channel=B DIMM=0 Rank=0.",
+      "MessageArgs": ["0", "B", "0", "0"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/4",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "4", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Warning",
+      "Created": "2026-11-12T03:20:00+00:00",
+      "MessageId": "OpenBMC.0.1.SparingRedundancyDegraded",
+      "Message": "Sparing redundancy state degraded. Socket=0 Channel=B DIMM=0 Domain=rank Rank=1.",
+      "MessageArgs": ["0", "B", "0", "rank", "1"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/5",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "5", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "OK",
+      "Created": "2026-11-12T03:21:00+00:00",
+      "MessageId": "OpenBMC.0.1.PowerButtonPressed",
+      "Message": "Power Button Pressed.",
+      "MessageArgs": []
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/6",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "6", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Critical",
+      "Created": "2026-11-12T03:22:00+00:00",
+      "MessageId": "OpenBMC.0.1.MemoryParityNotKnown",
+      "Message": "Memory parity error. Socket=1 Channel=C DIMM=0 ChannelValid=0 DIMMValid=0.",
+      "MessageArgs": ["1", "C", "0", "0", "0"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/7",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "7", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "OK",
+      "Created": "2026-11-12T03:23:00+00:00",
+      "MessageId": "OpenBMC.0.1.MemoryRASModeEnabled",
+      "Message": "Memory RAS Mode Select Enabled. Prior Mode=None Selected Mode=Sparing.",
+      "MessageArgs": ["None", "Sparing"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/8",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "8", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "OK",
+      "Created": "2026-11-13T09:00:00+00:00",
+      "MessageId": "OpenBMC.0.1.SparingRedundancyFull",
+      "Message": "Sparing redundancy state fully redundant. Socket=0 Channel=B DIMM=0 Domain=rank Rank=1.",
+      "MessageArgs": ["0", "B", "0", "rank", "1"]
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/9",
+      "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+      "Id": "9", "Name": "CXL Event", "EntryType": "CXL", "CXLEntryType": "Warning", "Severity": "Warning",
+      "Created": "2026-11-13T10:00:00+00:00",
+      "Message": "601dcbb3729a4e83bf5c2a9c1c3a5fd1"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/system/LogServices/EventLog/Entries/10",
+      "@odata.type": "#LogEntry.v1_9_0.LogEntry",
+      "Id": "10", "Name": "System Event Log Entry", "EntryType": "Event", "Severity": "Warning",
+      "Created": "2026-11-13T11:00:00+00:00",
+      "MessageId": "ResourceEvent.1.3.ResourceErrorThresholdExceeded",
+      "Message": "The resource property CorrectableECCErrorCount has exceeded error threshold of value 100.",
+      "MessageArgs": ["CorrectableECCErrorCount", 100],
+      "Links": {"OriginOfCondition": {"@odata.id": "/redfish/v1/Systems/system/Memory/dimm2"}}
+    }
+  ]
+}

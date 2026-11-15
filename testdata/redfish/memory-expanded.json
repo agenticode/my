@@ -1,0 +1,44 @@
+{
+  "@odata.id": "/redfish/v1/Systems/1/Memory",
+  "@odata.type": "#MemoryCollection.MemoryCollection",
+  "Name": "Memory Modules Collection",
+  "Members@odata.count": 4,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc1dimm4",
+      "@odata.type": "#Memory.v1_7_1.Memory",
+      "Id": "proc1dimm4", "Name": "proc1dimm4",
+      "DeviceLocator": "PROC 1 DIMM 4",
+      "MemoryLocation": {"Socket": 1, "MemoryController": 2, "Channel": 4, "Slot": 4},
+      "CapacityMiB": 32768,
+      "MemoryType": "DRAM", "MemoryDeviceType": "DDR4", "BaseModuleType": "RDIMM",
+      "Manufacturer": "Example Memory", "PartNumber": "EXM32G32R2X4-A", "SerialNumber": "11AA04",
+      "RankCount": 2, "OperatingSpeedMhz": 3200,
+      "Status": {"State": "Enabled", "Health": "OK"}
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc1dimm5",
+      "@odata.type": "#Memory.v1_12_0.Memory",
+      "Id": "proc1dimm5", "Name": "proc1dimm5",
+      "DeviceLocator": "PROC 1 DIMM 5",
+      "CapacityMiB": 32768,
+      "MemoryType": "NVDIMM_N", "MemoryDeviceType": "DDR4_SDRAM", "BaseModuleType": "SO_DIMM",
+      "Manufacturer": "Example Memory", "PartNumber": "EXM32G32R2X4-A", "SerialNumber": "11AA05",
+      "Enabled": false,
+      "Status": {"State": "Enabled", "Health": "OK"}
+    },
+    {
+      "Id": "proc1dimm6",
+      "DeviceLocator": "PROC 1 DIMM 6",
+      "CapacityMiB": 0,
+      "MemoryDeviceType": "DDR4",
+      "SerialNumber": "NOT AVAILABLE"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/Memory/proc1dimm7/MemoryMetrics",
+      "@odata.type": "#MemoryMetrics.v1_4_0.MemoryMetrics",
+      "Id": "MemoryMetrics",
+      "LifeTime": {"CorrectableECCErrorCount": 12, "UncorrectableECCErrorCount": 0}
+    }
+  ]
+}

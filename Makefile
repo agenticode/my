@@ -29,6 +29,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/klog:FuzzCollect \
 	./internal/decode/ipmi:FuzzParseRecord \
 	./internal/adapter/sel:FuzzCollect \
+	./internal/adapter/redfish:FuzzCollect \
 	./internal/adapter/dcbrain:FuzzTables \
 	./internal/engine:FuzzConfigRead \
 	./internal/i18n:FuzzFormat

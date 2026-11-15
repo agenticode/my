@@ -108,3 +108,83 @@ Redfish log entries of type SEL are read by the Redfish adapter.
 - A BMC clock that differs from the host clock by more than the tolerance leaves SEL records and host records of the same error both counted.
 - A `disable` imported from one dump stays in the ledger when a later dump of the same log shows the module back in use. The withdrawal only works within one dump.
 - The text forms of other tools (vendor utilities, web interface exports) are not read.
+
+## Redfish
+
+Adapter `redfish`, package `internal/adapter/redfish`. It reads what a BMC serves over Redfish from files and does not talk to a BMC.
+
+### Accepted forms
+
+- One JSON file: a resource, a collection with its members expanded, an array of resources, or several JSON documents one after the other.
+- A directory tree, as a mockup recorder or a crawl of the service leaves it. Every file that holds JSON is read, whatever its name. A resource that is in the tree twice is read once.
+
+Three kinds of resource are read, recognised by `@odata.type`: `LogEntry`, `Memory` and `ComputerSystem`. A log entry or memory resource saved without its type is recognised by its properties. Vendor extensions under `Oem` are not interpreted. The whole resource, `Oem` included, is kept as the raw record of what was made from it.
+
+### Memory resources
+
+Each `Memory` resource is one slot.
+
+| Property | Use |
+| --- | --- |
+| `DeviceLocator` | name of the slot; without it the service label, `Name` or `Id` |
+| `Manufacturer`, `PartNumber`, `SerialNumber` | identity of the DIMM |
+| `CapacityMiB`, `MemoryDeviceType`, `BaseModuleType`, `MemoryType`, `RankCount`, `DataWidthBits`, `BusWidthBits`, `OperatingSpeedMhz`, `AllowedSpeedsMHz`, `ModuleManufacturerID` | description of the DIMM |
+| `ProductionDate` | manufacturing week |
+| `MemoryLocation` | `Socket`, `Channel` and `Slot` become the place of the slot; `MemoryController` is left out |
+| `Status.State` | `Absent` is an empty slot |
+| `Status`, `Enabled` | marks, see below |
+
+The mark a BMC puts on a module is the fact rule R-FW-01 reads:
+
+| Status | Ledger record |
+| --- | --- |
+| `State` is `Disabled` or `UnavailableOffline`, or `Enabled` is false | action `disable`, method `bmc` |
+| `Health` is `Critical` | action `mark-failed`, method `bmc` |
+| `Health` is `Warning` | informational event |
+
+A memory resource carries no time. The mark is recorded at the time of the dump (`redfish.Options.Now`, or the modification time of the files with `ModTimeAsObserved`), once per DIMM: reading the same state again adds nothing.
+
+### Log entries
+
+An entry is read in the first of these vocabularies that fits. Every state is mapped through the states of the IPMI memory sensor, so an event reads the same whether it came from a SEL dump or from Redfish.
+
+| Vocabulary | How it is recognised | Read |
+| --- | --- | --- |
+| SEL | `EntryType` is `SEL` and `SensorType` is `Memory` | the event bytes in `MessageId` (`0xNNaabbcc`), or the name of the state in `Message`; `EntryCode` gives the direction, `GeneratorId` who logged it |
+| OpenBMC registry | `MessageId` is `OpenBMC.x.y.Name` | `MemoryECCCorrectable`, `MemoryECCUncorrectable`, `MemoryParityCommandAndAddress`, `MemoryParityNotKnown`, `SparingRedundancyDegraded`, `MemoryThermTrip`; the arguments give socket, channel, DIMM and rank |
+| `MEMnnnn` message IDs | `MessageId` ends in `MEM` and four digits | `MEM0000` to `MEM0010` follow the states of the IPMI memory sensor, `MEM0701` and `MEM0702` are a corrected error rate above a limit; the module comes from the arguments or from the text after "at location" |
+| text | `Message` holds the name of an IPMI memory state, or names the module as `(Processor 1, Memory Module 4)` with "Uncorrectable Memory Error" or "Corrected Memory Error threshold exceeded" | the state and the module |
+
+The states map to ledger records as in the SEL section above.
+
+An entry that is about memory and fits no vocabulary is kept as an informational event with its message, and the report lists its message ID. An entry is taken to be about memory when its `OriginOfCondition` is a memory resource or its message mentions memory, a DIMM or ECC.
+
+Entries of type `CXL` are counted and not read.
+
+### Grade
+
+C for most entries: they name a module at best. An OpenBMC registry entry that carries the rank has grade B.
+
+### Which module
+
+1. `Links.OriginOfCondition`, when it points at a memory resource. The label is the `DeviceLocator` of that resource if the dump holds it, and the last segment of the URI otherwise.
+2. A DIMM name in the message or its arguments.
+3. Socket, channel and DIMM numbers of an OpenBMC registry entry. They are matched with the `MemoryLocation` of the memory resources of the same dump; the numbers are also kept on the event.
+4. For SEL entries, event data 3 when the event bytes mark it as the module number.
+
+### Times
+
+`Created`, then `EventTimestamp`. A time without a zone is read as UTC. An entry about memory without a readable time is skipped and named in the report.
+
+### Host
+
+A `ComputerSystem` resource gives the host name (`HostName`), the system vendor and the model.
+
+### Known gaps
+
+- `MemoryMetrics` resources (error counts per module) are counted in the report and not read.
+- The diagnostic data of an entry (`DiagnosticData`, CPER records) and the event record in an entry of type `CXL` are not decoded.
+- Message registries of other vendors are not known. Their entries about memory are kept as informational events and listed in the report by message ID, so a missing class is visible.
+- `MEM0008` ("is spare memory") is read as a spare taking over, like the IPMI state it follows.
+- The mark on a module has the time of the dump, which is later than the time the BMC set it.
+- A `disable` in a log is withdrawn by a later deasserted entry for the same module only within one dump.
