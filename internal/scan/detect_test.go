@@ -65,6 +65,11 @@ func TestDetectFixtures(t *testing.T) {
 		{[]string{"sel", "ipmitool-elist-zone.txt"}, "sel", WhatSEL},
 		{[]string{"sel", "ipmi-sel.txt"}, "sel", WhatSEL},
 		{[]string{"sel", "sel.json"}, "sel", WhatSEL},
+		{[]string{"nvidia", "nvidia-smi-q.txt"}, "nvidia-smi", WhatNvidiaSMI},
+		{[]string{"nvidia", "nvidia-smi-q.xml"}, "nvidia-smi", WhatNvidiaSMI},
+		{[]string{"nvidia", "nvidia-smi-q-legacy.txt"}, "nvidia-smi", WhatNvidiaSMI},
+		{[]string{"klog", "nvidia-xid.dmesg"}, "klog", WhatKernelLog},
+		{[]string{"klog", "nvidia-xid.messages"}, "klog", WhatKernelLog},
 		{[]string{"redfish", "sel-log.json"}, "redfish", WhatRedfish},
 		{[]string{"redfish", "registry-log.json"}, "redfish", WhatRedfish},
 		{[]string{"redfish", "vendor-text-log.json"}, "redfish", WhatRedfish},
@@ -183,7 +188,12 @@ func yield(t *testing.T, a adapter.Adapter) (events, actions, modules int, first
 		e := c.Events[0]
 		first = e.ErrorDT.UTC().Format(time.RFC3339) + " " + string(e.ErrorSeverity) + " " + e.Label + " " + string(e.TimeQuality)
 	}
-	return len(c.Events), len(c.Actions), len(c.Modules), first, rep
+	if len(c.GPUs) > 0 {
+		g := c.GPUs[0]
+		first += " " + g.ObservedAt.UTC().Format(time.RFC3339) + " " + g.GPUSerial + " " + g.Fingerprint
+	}
+	// GPU snapshots are counted with the modules: both are inventory.
+	return len(c.Events), len(c.Actions), len(c.Modules) + len(c.GPUs), first, rep
 }
 
 // A file compressed with gzip gives the records of the file itself.
@@ -199,6 +209,8 @@ func TestDetectReadsThroughGzip(t *testing.T) {
 		{[]string{"sel", "ipmitool-elist.txt"}, WhatSEL},
 		{[]string{"sel", "sel.json"}, WhatSEL},
 		{[]string{"redfish", "registry-log.json"}, WhatRedfish},
+		{[]string{"nvidia", "nvidia-smi-q.xml"}, WhatNvidiaSMI},
+		{[]string{"nvidia", "nvidia-smi-q.txt"}, WhatNvidiaSMI},
 	} {
 		plain := testutil.Testdata(t, c.path...)
 		zipped := filepath.Join(dir, c.path[len(c.path)-1]+".gz")

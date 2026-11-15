@@ -1,0 +1,145 @@
+
+==============NVSMI LOG==============
+
+Timestamp                                 : Fri Nov 13 09:30:00 2026
+Driver Version                            : 550.54.15
+CUDA Version                              : 12.4
+
+Attached GPUs                             : 2
+GPU 00000000:3B:00.0
+    Product Name                          : Example GPU 80GB
+    Product Brand                         : Example
+    Product Architecture                  : Ampere
+    Display Mode                          : Disabled
+    Display Active                        : Disabled
+    Persistence Mode                      : Enabled
+    MIG Mode
+        Current                           : Disabled
+        Pending                           : Disabled
+    Accounting Mode                       : Disabled
+    Accounting Mode Buffer Size           : 4000
+    Driver Model
+        Current                           : N/A
+        Pending                           : N/A
+    Serial Number                         : 1650000000412
+    GPU UUID                              : GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7
+    Minor Number                          : 3
+    VBIOS Version                         : 92.00.45.00.03
+    MultiGPU Board                        : No
+    Board ID                              : 0x3b00
+    Inforom Version
+        Image Version                     : G500.0212.00.02
+        OEM Object                        : 2.0
+        ECC Object                        : 6.16
+        Power Management Object           : N/A
+    PCI
+        Bus                               : 0x3B
+        Device                            : 0x00
+        Domain                            : 0x0000
+        Device Id                         : 0x20B210DE
+        Bus Id                            : 00000000:3B:00.0
+        Sub System Id                     : 0x147F10DE
+        GPU Link Info
+            PCIe Generation
+                Max                       : 4
+                Current                   : 4
+            Link Width
+                Max                       : 16x
+                Current                   : 16x
+    Fan Speed                             : N/A
+    Performance State                     : P0
+    FB Memory Usage
+        Total                             : 81920 MiB
+        Reserved                          : 562 MiB
+        Used                              : 0 MiB
+        Free                              : 81357 MiB
+    Compute Mode                          : Default
+    Utilization
+        Gpu                               : 0 %
+        Memory                            : 0 %
+    ECC Mode
+        Current                           : Enabled
+        Pending                           : Enabled
+    ECC Errors
+        Volatile
+            SRAM Correctable              : 0
+            SRAM Uncorrectable            : 0
+            DRAM Correctable              : 0
+            DRAM Uncorrectable            : 2
+        Aggregate
+            SRAM Correctable              : 0
+            SRAM Uncorrectable            : 0
+            DRAM Correctable              : 31
+            DRAM Uncorrectable            : 2
+    Retired Pages
+        Single Bit ECC                    : N/A
+        Double Bit ECC                    : N/A
+        Pending Page Blacklist            : N/A
+    Remapped Rows
+        Correctable Error                 : 0
+        Uncorrectable Error               : 2
+        Pending                           : No
+        Remapping Failure Occurred        : No
+        Bank Remap Availability Histogram
+            Max                           : 638 bank(s)
+            High                          : 2 bank(s)
+            Partial                       : 0 bank(s)
+            Low                           : 0 bank(s)
+            None                          : 0 bank(s)
+    Temperature
+        GPU Current Temp                  : 34 C
+        GPU Shutdown Temp                 : 92 C
+    Processes                             : None
+
+GPU 00000000:86:00.0
+    Product Name                          : Example GPU 80GB
+    Product Brand                         : Example
+    Product Architecture                  : Ampere
+    Serial Number                         : 1650000000977
+    GPU UUID                              : GPU-5a1c2b3d-4e5f-6071-8293-a4b5c6d7e8f9
+    Minor Number                          : 5
+    PCI
+        Bus                               : 0x86
+        Device                            : 0x00
+        Domain                            : 0x0000
+        Bus Id                            : 00000000:86:00.0
+    ECC Mode
+        Current                           : Enabled
+        Pending                           : Enabled
+    ECC Errors
+        Volatile
+            SRAM Correctable              : 0
+            SRAM Uncorrectable Parity     : 1
+            SRAM Uncorrectable SEC-DED    : 2
+            DRAM Correctable              : 0
+            DRAM Uncorrectable            : 1
+        Aggregate
+            SRAM Correctable              : 4
+            SRAM Uncorrectable Parity     : 1
+            SRAM Uncorrectable SEC-DED    : 2
+            DRAM Correctable              : 0
+            DRAM Uncorrectable            : 1
+            SRAM Threshold Exceeded       : Yes
+        Aggregate Uncorrectable SRAM Sources
+            SRAM L2                       : 3
+            SRAM SM                       : 0
+            SRAM Microcontroller          : 0
+            SRAM PCIE                     : 0
+            SRAM Other                    : 0
+    Retired Pages
+        Single Bit ECC                    : N/A
+        Double Bit ECC                    : N/A
+        Pending Page Blacklist            : N/A
+    Remapped Rows
+        Correctable Error                 : 0
+        Uncorrectable Error               : 1
+        Pending                           : Yes
+        Remapping Failure Occurred        : Yes
+        Bank Remap Availability Histogram
+            Max                           : 640 bank(s)
+            High                          : 0 bank(s)
+            Partial                       : 0 bank(s)
+            Low                           : 0 bank(s)
+            None                          : 0 bank(s)
+    Processes                             : None
+

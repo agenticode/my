@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/klog"
+	"github.com/agenticode/my/internal/adapter/nvidia"
 	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/engine"
@@ -107,5 +109,62 @@ func TestSELDisableReachesTheRules(t *testing.T) {
 	// The spare that took over for DIMM_F1 is a repair resource used up.
 	if f1 := got["DIMM_F1"]; f1 == nil || !slices.Contains(f1.Rules, engine.RuleRepairGone) {
 		t.Errorf("DIMM_F1 = %+v", f1)
+	}
+}
+
+// TestGPUInputsReachTheRules reads the Xid lines of a kernel log and a
+// snapshot of nvidia-smi. The Xid line after a reboot names its GPU by the
+// PCI address only; the snapshot says which GPU that is, and the finding
+// about the failed remap is under the serial number.
+func TestGPUInputsReachTheRules(t *testing.T) {
+	s := newStore(t)
+	now := time.Date(2026, 11, 14, 12, 0, 0, 0, time.UTC)
+	adapters := []adapter.Adapter{
+		klog.NewFile(testutil.Testdata(t, "klog", "nvidia-xid.messages"), klog.Options{}),
+		nvidia.NewFile(testutil.Testdata(t, "nvidia", "nvidia-smi-q.xml"), nvidia.Options{}),
+	}
+	run, err := Run(ctx, s, adapters, Options{Host: "gpu-01", Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if run.Samples != 5 || run.Sources[0].Samples != 3 || run.Sources[1].Samples != 2 || run.Sources[1].Kind != "nvidia-smi" {
+		t.Errorf("samples: run %d, sources %+v", run.Samples, run.Sources)
+	}
+	gpus, err := s.GPUMem(ctx, "gpu-01")
+	if err != nil || len(gpus) != 5 {
+		t.Fatalf("GPU records = %d, %v", len(gpus), err)
+	}
+	for _, g := range gpus {
+		if g.PCIBus == "0000:3b:00.0" && (g.GPUSerial != "1650000000412" || g.GPUUUID != "GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7") {
+			t.Errorf("record %s of the GPU at 3b:00.0 has serial %q, UUID %q", g.RawRef, g.GPUSerial, g.GPUUUID)
+		}
+		if g.Kind == model.GPUXID && !g.GPUIndex.Valid {
+			t.Errorf("Xid record %s did not take the index of its GPU", g.RawRef)
+		}
+	}
+
+	res, err := engine.Run(ctx, s, engine.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := res.Host("gpu-01")
+	if h == nil {
+		t.Fatal("no result for the host")
+	}
+	got := map[string][]string{}
+	for _, g := range h.GPUs {
+		got[g.Key] = g.Verdict.Rules
+		if g.Verdict.Grade != model.VerdictReplaceNow {
+			t.Errorf("GPU %s: grade %s", g.Key, g.Verdict.Grade)
+		}
+	}
+	// One GPU logged Xid 64, the other reports a failed remap in its state.
+	for _, serial := range []string{"1650000000412", "1650000000977"} {
+		if !slices.Contains(got[serial], engine.RuleRepairGone) {
+			t.Errorf("GPU %s: rules %v", serial, got[serial])
+		}
+	}
+	if len(got) != 2 {
+		t.Errorf("findings for GPUs %v, want the two serial numbers", got)
 	}
 }

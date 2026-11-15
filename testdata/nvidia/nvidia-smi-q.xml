@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<!DOCTYPE nvidia_smi_log SYSTEM "nvsmi_device_v12.dtd">
+<nvidia_smi_log>
+	<timestamp>Fri Nov 13 09:30:00 2026</timestamp>
+	<driver_version>550.54.15</driver_version>
+	<cuda_version>12.4</cuda_version>
+	<attached_gpus>2</attached_gpus>
+	<gpu id="00000000:3B:00.0">
+		<product_name>Example GPU 80GB</product_name>
+		<product_brand>Example</product_brand>
+		<product_architecture>Ampere</product_architecture>
+		<display_mode>Disabled</display_mode>
+		<mig_mode>
+			<current_mig>Disabled</current_mig>
+			<pending_mig>Disabled</pending_mig>
+		</mig_mode>
+		<serial>1650000000412</serial>
+		<uuid>GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7</uuid>
+		<minor_number>3</minor_number>
+		<vbios_version>92.00.45.00.03</vbios_version>
+		<pci>
+			<pci_bus>3B</pci_bus>
+			<pci_device>00</pci_device>
+			<pci_domain>0000</pci_domain>
+			<pci_device_id>20B210DE</pci_device_id>
+			<pci_bus_id>00000000:3B:00.0</pci_bus_id>
+		</pci>
+		<fb_memory_usage>
+			<total>81920 MiB</total>
+			<reserved>562 MiB</reserved>
+			<used>0 MiB</used>
+			<free>81357 MiB</free>
+		</fb_memory_usage>
+		<ecc_mode>
+			<current_ecc>Enabled</current_ecc>
+			<pending_ecc>Enabled</pending_ecc>
+		</ecc_mode>
+		<ecc_errors>
+			<volatile>
+				<sram_correctable>0</sram_correctable>
+				<sram_uncorrectable>0</sram_uncorrectable>
+				<dram_correctable>0</dram_correctable>
+				<dram_uncorrectable>2</dram_uncorrectable>
+			</volatile>
+			<aggregate>
+				<sram_correctable>0</sram_correctable>
+				<sram_uncorrectable>0</sram_uncorrectable>
+				<dram_correctable>31</dram_correctable>
+				<dram_uncorrectable>2</dram_uncorrectable>
+			</aggregate>
+		</ecc_errors>
+		<retired_pages>
+			<multiple_single_bit_retirement>
+				<retired_count>N/A</retired_count>
+				<retired_pagelist>N/A</retired_pagelist>
+			</multiple_single_bit_retirement>
+			<double_bit_retirement>
+				<retired_count>N/A</retired_count>
+				<retired_pagelist>N/A</retired_pagelist>
+			</double_bit_retirement>
+			<pending_blacklist>N/A</pending_blacklist>
+			<pending_retirement>N/A</pending_retirement>
+		</retired_pages>
+		<remapped_rows>
+			<remapped_row_corr>0</remapped_row_corr>
+			<remapped_row_unc>2</remapped_row_unc>
+			<remapped_row_pending>No</remapped_row_pending>
+			<remapped_row_failure>No</remapped_row_failure>
+			<row_remapper_histogram>
+				<row_remapper_histogram_max>638 bank(s)</row_remapper_histogram_max>
+				<row_remapper_histogram_high>2 bank(s)</row_remapper_histogram_high>
+				<row_remapper_histogram_partial>0 bank(s)</row_remapper_histogram_partial>
+				<row_remapper_histogram_low>0 bank(s)</row_remapper_histogram_low>
+				<row_remapper_histogram_none>0 bank(s)</row_remapper_histogram_none>
+			</row_remapper_histogram>
+		</remapped_rows>
+		<temperature>
+			<gpu_temp>34 C</gpu_temp>
+		</temperature>
+		<processes>
+		</processes>
+	</gpu>
+	<gpu id="00000000:86:00.0">
+		<product_name>Example GPU 80GB</product_name>
+		<product_brand>Example</product_brand>
+		<product_architecture>Ampere</product_architecture>
+		<serial>1650000000977</serial>
+		<uuid>GPU-5a1c2b3d-4e5f-6071-8293-a4b5c6d7e8f9</uuid>
+		<minor_number>5</minor_number>
+		<pci>
+			<pci_bus_id>00000000:86:00.0</pci_bus_id>
+		</pci>
+		<ecc_mode>
+			<current_ecc>Enabled</current_ecc>
+			<pending_ecc>Enabled</pending_ecc>
+		</ecc_mode>
+		<ecc_errors>
+			<volatile>
+				<sram_correctable>0</sram_correctable>
+				<sram_uncorrectable_parity>1</sram_uncorrectable_parity>
+				<sram_uncorrectable_secded>2</sram_uncorrectable_secded>
+				<dram_correctable>0</dram_correctable>
+				<dram_uncorrectable>1</dram_uncorrectable>
+			</volatile>
+			<aggregate>
+				<sram_correctable>4</sram_correctable>
+				<sram_uncorrectable_parity>1</sram_uncorrectable_parity>
+				<sram_uncorrectable_secded>2</sram_uncorrectable_secded>
+				<dram_correctable>0</dram_correctable>
+				<dram_uncorrectable>1</dram_uncorrectable>
+				<sram_threshold_exceeded>Yes</sram_threshold_exceeded>
+			</aggregate>
+			<aggregate_uncorrectable_sram_sources>
+				<sram_l2>3</sram_l2>
+				<sram_sm>0</sram_sm>
+				<sram_microcontroller>0</sram_microcontroller>
+				<sram_pcie>0</sram_pcie>
+				<sram_other>0</sram_other>
+			</aggregate_uncorrectable_sram_sources>
+		</ecc_errors>
+		<retired_pages>
+			<multiple_single_bit_retirement>
+				<retired_count>N/A</retired_count>
+				<retired_pagelist>N/A</retired_pagelist>
+			</multiple_single_bit_retirement>
+			<double_bit_retirement>
+				<retired_count>N/A</retired_count>
+				<retired_pagelist>N/A</retired_pagelist>
+			</double_bit_retirement>
+			<pending_blacklist>N/A</pending_blacklist>
+			<pending_retirement>N/A</pending_retirement>
+		</retired_pages>
+		<remapped_rows>
+			<remapped_row_corr>0</remapped_row_corr>
+			<remapped_row_unc>1</remapped_row_unc>
+			<remapped_row_pending>Yes</remapped_row_pending>
+			<remapped_row_failure>Yes</remapped_row_failure>
+			<row_remapper_histogram>
+				<row_remapper_histogram_max>640 bank(s)</row_remapper_histogram_max>
+				<row_remapper_histogram_high>0 bank(s)</row_remapper_histogram_high>
+				<row_remapper_histogram_partial>0 bank(s)</row_remapper_histogram_partial>
+				<row_remapper_histogram_low>0 bank(s)</row_remapper_histogram_low>
+				<row_remapper_histogram_none>0 bank(s)</row_remapper_histogram_none>
+			</row_remapper_histogram>
+		</remapped_rows>
+	</gpu>
+</nvidia_smi_log>

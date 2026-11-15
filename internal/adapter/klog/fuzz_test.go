@@ -35,6 +35,7 @@ func FuzzCollect(f *testing.F) {
 	f.Add("9,9,99999999999999999999,-;EDAC MC0: 1 UE on a (b page:0xffffffffffffffff offset:0xfff grain:9)\n", false)
 	f.Add("[9999999999.000000] EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)\n", true)
 	f.Add(`{"MESSAGE":"EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)","_TRANSPORT":"kernel","__REALTIME_TIMESTAMP":"9223372036854775807"}`+"\n", false)
+	f.Add("[99999999999.000000] NVRM: Xid (PCI:0000:3b:00): 9999, pid=1, name=x, text\n[1.000000] NVRM: GPU Board Serial Number: 1\n", true)
 	f.Fuzz(func(t *testing.T, text string, anchored bool) {
 		opts := Options{}
 		if anchored {
@@ -51,6 +52,14 @@ func FuzzCollect(f *testing.F) {
 			}
 			if e.Fingerprint == "" || !e.ErrorSeverity.Valid() || !e.Grade.Valid() || e.Count < 1 {
 				t.Errorf("malformed event from fuzz input: %+v", e)
+			}
+		}
+		for _, g := range c.GPUs {
+			if y := g.ObservedAt.UTC().Year(); y < 1970 || y > 9999 {
+				t.Errorf("Xid time %v is out of range", g.ObservedAt)
+			}
+			if _, memory := MemoryXIDs[g.XID.V]; g.Fingerprint == "" || !g.XID.Valid || !memory || g.PCIBus == "" || g.TimeQuality == "" {
+				t.Errorf("malformed Xid record from fuzz input: %+v", g)
 			}
 		}
 	})
