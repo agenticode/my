@@ -1,0 +1,1151 @@
+{
+  "view": "dimm",
+  "version": 1,
+  "lang": "en",
+  "host": "r12-n034",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "card": {
+      "host": "r12-n034",
+      "slot": "CPU0_C1",
+      "dimm": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "serial": "3B9C56",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "present": true,
+      "since": "2026-07-31T11:10:00Z",
+      "moves": 0,
+      "ce": 1231,
+      "ue": 1,
+      "grade": "replace-now",
+      "grade_text": "replace now",
+      "label": "finding",
+      "confidence": 91,
+      "confidence_level": "high",
+      "confidence_text": "high",
+      "rules": [
+        "R-UE-01",
+        "R-ROW-03",
+        "R-REP-02"
+      ],
+      "evidence": [
+        {
+          "rule": "R-UE-01",
+          "code": "ue.located",
+          "args": {
+            "n": 1,
+            "when": "2026-11-12 03:14 UTC",
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x238"
+          },
+          "text": "1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
+          "records": 1,
+          "first": "synth:demo#event1228",
+          "last": "synth:demo#event1228"
+        },
+        {
+          "rule": "R-ROW-03",
+          "code": "row.rising",
+          "args": {
+            "base": 30,
+            "days": 7,
+            "mode": "@mode.row",
+            "ratio": "2.3",
+            "recent": 421,
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+          },
+          "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before",
+          "records": 421,
+          "first": "synth:demo#event863",
+          "last": "synth:demo#event1285"
+        },
+        {
+          "rule": "R-ROW-03",
+          "code": "row.spreading_line",
+          "args": {
+            "columns": 9,
+            "days": 30,
+            "mode": "@mode.row",
+            "new": 13,
+            "rows": 2,
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+          },
+          "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows",
+          "records": 1232,
+          "first": "synth:demo#event30",
+          "last": "synth:demo#event1285"
+        },
+        {
+          "rule": "R-ROW-03",
+          "code": "row.multi_dq",
+          "args": {
+            "lines": 2,
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+          },
+          "text": "errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device"
+        },
+        {
+          "rule": "R-REP-02",
+          "code": "rep.recurred",
+          "args": {
+            "kind": "@kind.hppr",
+            "n": 764,
+            "when": "2026-10-28",
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+          },
+          "text": "764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28",
+          "records": 765,
+          "first": "synth:demo#action1",
+          "last": "synth:demo#event1285"
+        }
+      ],
+      "checks": [
+        {
+          "effect": "open",
+          "effect_text": "open",
+          "code": "check.channel_alone",
+          "text": "no other DIMM on this channel: there is nothing to compare with"
+        },
+        {
+          "effect": "open",
+          "effect_text": "open",
+          "code": "check.no_cross_test",
+          "text": "no slot move or reseat on record: a cause in the board is not ruled out"
+        },
+        {
+          "effect": "supports",
+          "effect_text": "supports",
+          "code": "check.host_clean",
+          "args": {
+            "n": 15
+          },
+          "text": "the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely"
+        }
+      ],
+      "missing": [
+        {
+          "code": "missing.ecs",
+          "text": "no ECS counters"
+        },
+        {
+          "code": "missing.temperature",
+          "text": "no DIMM temperature history"
+        }
+      ],
+      "next": {
+        "code": "next.replace",
+        "text": "Replace the DIMM. Attach a case bundle of this DIMM to the return."
+      },
+      "baseline": [
+        {
+          "code": "base.own",
+          "args": {
+            "base": 30,
+            "days": 7,
+            "pct": 100,
+            "recent": 60.1
+          },
+          "text": "own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before"
+        },
+        {
+          "code": "base.peers",
+          "args": {
+            "n": 16,
+            "part": "EXM64G48R2X4-A",
+            "pct": 97,
+            "with": 2
+          },
+          "text": "same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of them with errors"
+        }
+      ],
+      "confidence_factors": [
+        {
+          "delta": 90,
+          "code": "conf.rule",
+          "args": {
+            "rule": "R-UE-01"
+          },
+          "text": "the grade rests on R-UE-01"
+        },
+        {
+          "delta": 5,
+          "code": "conf.supports",
+          "args": {
+            "n": 1
+          },
+          "text": "1 check supports the finding"
+        },
+        {
+          "delta": -4,
+          "code": "conf.open",
+          "args": {
+            "n": 2
+          },
+          "text": "2 checks could not be made"
+        }
+      ],
+      "faults": [
+        {
+          "mode": "row",
+          "mode_text": "row",
+          "where": "rank0 dev7 bg0 bank3 row 0x1a2f",
+          "grade": "A",
+          "ce": 1231,
+          "ue": 1,
+          "first": "2026-09-24T23:27:41.565992Z",
+          "last": "2026-11-12T23:49:30.494127Z",
+          "rows": 2,
+          "columns": 9,
+          "banks": 1,
+          "direction": "rising",
+          "recurring": true,
+          "confined": true
+        }
+      ],
+      "engine_version": "1",
+      "as_of": "2026-11-13T00:00:00Z"
+    },
+    "topology": {
+      "total": 1232,
+      "levels": [
+        {
+          "name": "rank",
+          "known": true,
+          "segments": [
+            {
+              "label": "rank0",
+              "parent": -1,
+              "errors": 1232,
+              "share": 1
+            }
+          ]
+        },
+        {
+          "name": "device",
+          "known": true,
+          "segments": [
+            {
+              "label": "dev7",
+              "parent": 0,
+              "errors": 1232,
+              "share": 1
+            }
+          ]
+        },
+        {
+          "name": "bank",
+          "known": true,
+          "segments": [
+            {
+              "label": "bg0 bank3",
+              "parent": 0,
+              "errors": 1232,
+              "share": 1
+            }
+          ]
+        },
+        {
+          "name": "row",
+          "known": true,
+          "segments": [
+            {
+              "label": "0x1a2f",
+              "parent": 0,
+              "errors": 1206,
+              "share": 0.9788961038961039
+            },
+            {
+              "label": "0x1a30",
+              "parent": 0,
+              "errors": 26,
+              "share": 0.021103896103896104
+            }
+          ]
+        }
+      ]
+    },
+    "address_map": {
+      "host": "r12-n034",
+      "slot": "CPU0_C1",
+      "dimm": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "serial": "3B9C56",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "bank": {
+        "Rank": 0,
+        "DeviceId": 7,
+        "BankGroup": 0,
+        "Bank": 3,
+        "label": "rank0 dev7 bg0 bank3",
+        "errors": 1232
+      },
+      "banks": [
+        {
+          "Rank": 0,
+          "DeviceId": 7,
+          "BankGroup": 0,
+          "Bank": 3,
+          "label": "rank0 dev7 bg0 bank3",
+          "errors": 1232
+        }
+      ],
+      "bank_count": 1,
+      "located": 1232,
+      "unlocated": 0,
+      "mode": "rows",
+      "rows_per_line": 1,
+      "columns_per_cell": 32,
+      "columns": 2048,
+      "scale": [
+        1,
+        3,
+        10,
+        100
+      ],
+      "lines": [
+        {
+          "row": 6700,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 6701,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 6702,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 6703,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            568,
+            0,
+            0,
+            0,
+            0,
+            0,
+            158,
+            0,
+            10,
+            0,
+            0,
+            388,
+            0,
+            0,
+            0,
+            0,
+            49,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            4,
+            0,
+            0,
+            0,
+            5,
+            0
+          ],
+          "ue": [
+            17
+          ],
+          "errors": 1206,
+          "note": {
+            "code": "map.note.fault",
+            "args": {
+              "fault": "row fault"
+            },
+            "text": "row fault"
+          }
+        },
+        {
+          "row": 6704,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            9,
+            0,
+            0,
+            0,
+            0,
+            0,
+            7,
+            0,
+            1,
+            0,
+            0,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "errors": 26,
+          "note": {
+            "code": "map.note.neighbour",
+            "text": "same fault"
+          }
+        },
+        {
+          "row": 6705,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 6706,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "row": 6707,
+          "rows": 1,
+          "cells": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "faults": [
+        {
+          "mode": "row",
+          "mode_text": "row",
+          "where": "rank0 dev7 bg0 bank3 row 0x1a2f",
+          "errors": 1232,
+          "ue": 1,
+          "rows": 2,
+          "columns": 9,
+          "dq": [
+            2,
+            3
+          ],
+          "first": "2026-09-24T23:27:41.565992Z",
+          "last": "2026-11-12T23:49:30.494127Z",
+          "text": {
+            "code": "map.fault_dq",
+            "args": {
+              "columns": 9,
+              "dq": "DQ2, DQ3",
+              "fault": "row fault",
+              "first": "2026-09-24",
+              "last": "2026-11-12",
+              "n": 1232,
+              "rows": 2,
+              "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+            },
+            "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2, DQ3, first 2026-09-24, latest 2026-11-12"
+          }
+        }
+      ]
+    },
+    "timeline": {
+      "host": "r12-n034",
+      "slot": "CPU0_C1",
+      "dimm": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "serial": "3B9C56",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "from": "2026-07-31T00:00:00Z",
+      "to": "2026-11-12T00:00:00Z",
+      "days": 105,
+      "series": [
+        {
+          "label": "CPU0_C1",
+          "serial": "3B9C56",
+          "ce": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            2,
+            2,
+            2,
+            3,
+            7,
+            5,
+            3,
+            6,
+            11,
+            10,
+            8,
+            17,
+            13,
+            19,
+            8,
+            13,
+            14,
+            18,
+            20,
+            25,
+            10,
+            25,
+            26,
+            25,
+            22,
+            22,
+            23,
+            34,
+            44,
+            37,
+            39,
+            36,
+            41,
+            34,
+            50,
+            51,
+            41,
+            42,
+            46,
+            49,
+            64,
+            55,
+            73,
+            65,
+            68
+          ],
+          "total": 1231,
+          "peak": 73
+        }
+      ],
+      "markers": [
+        {
+          "kind": "boot",
+          "letter": "B",
+          "days": [
+            26,
+            61,
+            89
+          ],
+          "count": 3,
+          "text": {
+            "code": "tl.boot.many",
+            "args": {
+              "n": 3
+            },
+            "text": "3 reboots"
+          }
+        },
+        {
+          "kind": "hppr",
+          "letter": "P",
+          "days": [
+            89
+          ],
+          "count": 1,
+          "text": {
+            "code": "tl.action.one",
+            "args": {
+              "kind": "hard PPR",
+              "when": "2026-10-28"
+            },
+            "text": "2026-10-28 hard PPR"
+          }
+        },
+        {
+          "kind": "page-offline",
+          "letter": "O",
+          "days": [
+            103,
+            104
+          ],
+          "count": 7,
+          "text": {
+            "code": "tl.offline.many",
+            "args": {
+              "days": 2,
+              "first": "2026-11-11",
+              "last": "2026-11-12",
+              "n": 7
+            },
+            "text": "7 pages offline, 2026-11-11 to 2026-11-12"
+          }
+        },
+        {
+          "kind": "ue",
+          "letter": "U",
+          "days": [
+            104
+          ],
+          "count": 1,
+          "text": {
+            "code": "tl.ue.one_how",
+            "args": {
+              "how": "demand read",
+              "when": "2026-11-12"
+            },
+            "text": "2026-11-12 UE (demand read)"
+          }
+        }
+      ],
+      "ce": 1231,
+      "ue": 1,
+      "since_boot": {
+        "at": "2026-10-28T01:30:00Z",
+        "ce": 789,
+        "ue": 1
+      },
+      "notes": [
+        {
+          "code": "tl.total",
+          "args": {
+            "ce": 1231,
+            "from": "2026-07-31",
+            "to": "2026-11-12",
+            "ue": 1
+          },
+          "text": "1,231 corrected and 1 uncorrected error from 2026-07-31 to 2026-11-12"
+        },
+        {
+          "code": "tl.since_boot",
+          "args": {
+            "n": 790,
+            "when": "2026-10-28"
+          },
+          "text": "790 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those"
+        }
+      ]
+    }
+  }
+}

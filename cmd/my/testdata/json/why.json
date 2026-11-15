@@ -1,0 +1,111 @@
+{
+  "view": "why",
+  "version": 1,
+  "lang": "en",
+  "host": "r12-n034",
+  "grade": "observe",
+  "exit_code": 1,
+  "data": [
+    {
+      "host": "r12-n034",
+      "slot": "CPU1_D1",
+      "dimm": {
+        "dimm_uid": "d6abde8014f7764becd7",
+        "serial": "2AEB41",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "present": true,
+      "since": "2026-07-31T11:10:00Z",
+      "moves": 0,
+      "ce": 53,
+      "ue": 0,
+      "grade": "observe",
+      "grade_text": "observe",
+      "label": "finding",
+      "confidence": 65,
+      "confidence_level": "medium",
+      "confidence_text": "medium",
+      "rules": [
+        "R-SOFT-01"
+      ],
+      "evidence": [
+        {
+          "rule": "R-SOFT-01",
+          "code": "soft.cell",
+          "args": {
+            "days": 7,
+            "from": "2026-08-03",
+            "n": 53,
+            "recent": 2,
+            "where": "rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110"
+          },
+          "text": "one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days",
+          "records": 53,
+          "first": "synth:demo#event1",
+          "last": "synth:demo#event971"
+        }
+      ],
+      "checks": [],
+      "missing": [],
+      "next": {
+        "code": "next.observe",
+        "text": "No action. Look again when the count grows or a new place appears."
+      },
+      "baseline": [
+        {
+          "code": "base.own",
+          "args": {
+            "base": 30,
+            "days": 7,
+            "pct": 60,
+            "recent": 0.3
+          },
+          "text": "own history: 0.3 errors a day over the last 7 days, percentile 60 of the 30 days before"
+        },
+        {
+          "code": "base.peers",
+          "args": {
+            "n": 16,
+            "part": "EXM64G48R2X4-A",
+            "pct": 91,
+            "with": 2
+          },
+          "text": "same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2 of them with errors"
+        }
+      ],
+      "confidence_factors": [
+        {
+          "delta": 65,
+          "code": "conf.rule",
+          "args": {
+            "rule": "R-SOFT-01"
+          },
+          "text": "the grade rests on R-SOFT-01"
+        }
+      ],
+      "faults": [
+        {
+          "mode": "single-bit",
+          "mode_text": "single-bit",
+          "where": "rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110",
+          "grade": "A",
+          "ce": 53,
+          "ue": 0,
+          "first": "2026-08-03T13:53:44.241999Z",
+          "last": "2026-11-08T06:17:56.204859Z",
+          "rows": 1,
+          "columns": 1,
+          "banks": 1,
+          "direction": "falling",
+          "recurring": true,
+          "confined": true
+        }
+      ],
+      "engine_version": "1",
+      "as_of": "2026-11-13T00:00:00Z"
+    }
+  ]
+}

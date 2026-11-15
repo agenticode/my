@@ -349,7 +349,20 @@ func (ds *Dataset) WriteHostTree(root string, fl Flavor) error {
 			return err
 		}
 	}
-	return ds.rasdaemonDB(filepath.Join(root, "var", "lib", "rasdaemon", "ras-mc_event.db"), fl)
+	db := filepath.Join(root, "var", "lib", "rasdaemon", "ras-mc_event.db")
+	if err := ds.rasdaemonDB(db, fl); err != nil {
+		return err
+	}
+	// The files are what the host held at the end of the scenario, so they
+	// carry that time: a reader of the tree takes it as the time of the
+	// copy, and the counters count back from it.
+	for name := range files {
+		p := filepath.Join(root, filepath.FromSlash(name))
+		if err := os.Chtimes(p, sc.End, sc.End); err != nil {
+			return err
+		}
+	}
+	return os.Chtimes(db, sc.End, sc.End)
 }
 
 // edacSysfs adds the EDAC counter files of the running boot.

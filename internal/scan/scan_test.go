@@ -102,6 +102,45 @@ func TestScanOfAHostTree(t *testing.T) {
 	}
 }
 
+func TestCopyIsReadAsOfItsOwnTime(t *testing.T) {
+	// No clock is given: the copy says when it was made. The counters of
+	// the running boot count back from that moment; read as of today they
+	// would no longer line up with the located records, and errors would
+	// be counted twice.
+	root, ds := tree(t, synth.FlavorIntel)
+	s := ledger(t)
+	res, err := Run(ctx, s, Options{Root: root, TempDir: t.TempDir()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !res.Scan.StartedAt.Equal(ds.Scenario.End) {
+		t.Errorf("scan time = %v, want the time of the files, %v", res.Scan.StartedAt, ds.Scenario.End)
+	}
+	totals, err := s.Totals(ctx, store.EventFilter{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var n int64
+	for _, x := range totals {
+		n += x.CE + x.UE
+	}
+	if n != 1285 {
+		t.Errorf("%d errors, want 1,285", n)
+	}
+	// Reading the copy again adds nothing.
+	if _, err := Run(ctx, s, Options{Root: root, TempDir: t.TempDir()}); err != nil {
+		t.Fatal(err)
+	}
+	totals, _ = s.Totals(ctx, store.EventFilter{})
+	n = 0
+	for _, x := range totals {
+		n += x.CE + x.UE
+	}
+	if n != 1285 {
+		t.Errorf("%d errors after a second scan, want 1,285", n)
+	}
+}
+
 func TestScanOfNothing(t *testing.T) {
 	root := t.TempDir()
 	res, err := Run(ctx, ledger(t), Options{Root: root, Now: time.Date(2026, 11, 13, 0, 0, 0, 0, time.UTC)})
