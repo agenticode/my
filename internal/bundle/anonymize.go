@@ -45,6 +45,10 @@ const (
 	// dimmUID: a DIMM identity; the placeholder ones are hashes over the
 	// host name.
 	dimmUID
+	// commandLine: a kernel command line. Besides hosts and addresses it
+	// names the disks of the machine (root=UUID=..., rd.luks.uuid=...) and
+	// may carry its machine ID.
+	commandLine
 )
 
 // columns says how every text column of the ledger is treated. A text
@@ -57,7 +61,7 @@ var columns = map[string]treatment{
 	"action.detail": freeText, "action.source": keep, "action.raw_ref": freeText, "action.raw": freeText, "action.fingerprint": derived,
 
 	"boot.host": hostName, "boot.boot_id": bootID, "boot.started_at": keep, "boot.start_quality": keep, "boot.last_seen": keep,
-	"boot.kernel": keep, "boot.bios": keep, "boot.bmc": keep, "boot.cmdline": freeText, "boot.source": keep, "boot.raw_ref": freeText,
+	"boot.kernel": keep, "boot.bios": keep, "boot.bmc": keep, "boot.cmdline": commandLine, "boot.source": keep, "boot.raw_ref": freeText,
 
 	"counter_sample.host": hostName, "counter_sample.observed_at": keep, "counter_sample.mc_name": keep, "counter_sample.location": keep,
 	"counter_sample.label": keep, "counter_sample.reset_at": keep, "counter_sample.mem_type": keep, "counter_sample.dev_type": keep,
@@ -388,6 +392,32 @@ func (a *anonymizer) ipv6(s string) string {
 	return b.String()
 }
 
+// What a kernel command line holds that names the machine's disks and the
+// machine itself: UUIDs of file systems, partitions and encrypted volumes,
+// the UUID of a software RAID array, and a machine ID.
+var (
+	diskUUIDRE  = regexp.MustCompile(`[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}`)
+	raidUUIDRE  = regexp.MustCompile(`[0-9A-Fa-f]{8}(?::[0-9A-Fa-f]{8}){3}`)
+	machineIDRE = regexp.MustCompile(`(machine[_-]id=)([0-9A-Fa-f]{32})\b`)
+)
+
+// cmdline anonymizes a kernel command line: what free text gets, and the
+// identifiers of disks and of the machine. The same identifier gives the
+// same word, so two boots of one host still show the same root.
+func (a *anonymizer) cmdline(s string) string {
+	if s == "" {
+		return s
+	}
+	id := func(m string) string { return a.word("uuid-", asciiLower(m), 8) }
+	s = diskUUIDRE.ReplaceAllStringFunc(s, id)
+	s = raidUUIDRE.ReplaceAllStringFunc(s, id)
+	s = machineIDRE.ReplaceAllStringFunc(s, func(m string) string {
+		sub := machineIDRE.FindStringSubmatch(m)
+		return sub[1] + a.word("id-", asciiLower(sub[2]), 8)
+	})
+	return a.text(s)
+}
+
 // uid rewrites a DIMM identity. The identity of a DIMM with a serial
 // number does not depend on the host and stays; a placeholder ("s" and
 // 19 digits) is a hash over the host name.
@@ -414,6 +444,8 @@ func (a *anonymizer) apply(t treatment, v string) string {
 		return a.host(v)
 	case freeText:
 		return a.text(v)
+	case commandLine:
+		return a.cmdline(v)
 	case derived:
 		if v == "" {
 			return v
