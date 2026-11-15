@@ -306,6 +306,65 @@ func TestTimelineOfAQuietHost(t *testing.T) {
 	}
 }
 
+// A period shorter than its list of events: every kind of event keeps its
+// letter and its line. On a host's first day the uncorrected error, the
+// offline of its page and the reboot fall on one column.
+func TestTimelineWithMoreEventsThanDays(t *testing.T) {
+	group := func(kind, letter, text string, days ...int) view.MarkerGroup {
+		return view.MarkerGroup{Kind: kind, Letter: letter, Days: days, Count: len(days), Text: view.Text{Text: text}}
+	}
+	day := &view.Timeline{Host: "h", From: now, To: now, Days: 1,
+		Series: []view.Series{{Label: "no DIMM", CE: []int64{7}, Total: 7, Peak: 7}},
+		Markers: []view.MarkerGroup{
+			group(view.MarkUE, "U", "3 UE, 2026-11-13", 0),
+			group("page-offline", "O", "5 pages offline, 2026-11-13", 0),
+			group(view.MarkBoot, "B", "2026-11-13 reboot", 0),
+		},
+		Notes: []view.Text{{Text: "7 corrected and 3 uncorrected errors from 2026-11-13 to 2026-11-13"}}}
+	var b bytes.Buffer
+	if err := Timeline(&b, day, en.st); err != nil {
+		t.Fatal(err)
+	}
+	got := b.String()
+	want := `host h  2026-11-13 to 2026-11-13  1 day
+
+
+ no DIMM   █  peak 7/day
+ events    UOB
+           │└┼ 5 pages offline, 2026-11-13
+           └─┼ 3 UE, 2026-11-13
+             └ 2026-11-13 reboot
+
+ 7 corrected and 3 uncorrected errors from 2026-11-13 to 2026-11-13
+`
+	if got != want {
+		t.Errorf("one day, three kinds of events:\n%s\nwant\n%s", got, want)
+	}
+
+	// Two days and four letters: the letters of the second day move right,
+	// none is dropped, and they stay in the order of their days.
+	two := *day
+	two.To, two.Days = now.AddDate(0, 0, 1), 2
+	two.Series = []view.Series{{Label: "no DIMM", CE: []int64{7, 0}, Total: 7, Peak: 7}}
+	two.Markers = []view.MarkerGroup{
+		group(view.MarkUE, "U", "2 UE", 0, 1),
+		group("page-offline", "O", "1 page offline", 1),
+		group(view.MarkBoot, "B", "1 reboot", 0),
+	}
+	b.Reset()
+	if err := Timeline(&b, &two, en.st); err != nil {
+		t.Fatal(err)
+	}
+	if got := b.String(); !strings.Contains(got, " events    UBUO\n") {
+		t.Errorf("two days, four letters:\n%s", got)
+	}
+	for _, text := range []string{"2 UE", "1 page offline", "1 reboot"} {
+		if !strings.Contains(b.String(), text) {
+			t.Errorf("%q is not on the timeline:\n%s", text, b.String())
+		}
+	}
+}
+
 func TestHosts(t *testing.T) {
 	s := open(t, "demo", "", en)
 	rows := append(s.c.Hosts(), view.HostRow{Name: "r12-n035", Grade: "ok", GradeText: "ok", DIMMs: 16})

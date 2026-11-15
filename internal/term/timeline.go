@@ -118,14 +118,19 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 			}
 		}
 		sort.SliceStable(marks, func(i, j int) bool { return marks[i].day < marks[j].day })
-		if len(marks) > cols {
-			marks = marks[len(marks)-cols:] // more letters than columns: the latest stay
+		// A short period has fewer day columns than events: on the first
+		// day of a host an uncorrected error, the offline of its page and
+		// the reboot share one column. The row of letters then runs past
+		// the last day, so that no kind of event goes unmentioned.
+		mcols := max(cols, min(len(marks), chart))
+		if len(marks) > mcols {
+			marks = marks[len(marks)-mcols:] // more letters than the chart is wide: the latest stay
 		}
 		for i := 1; i < len(marks); i++ {
 			marks[i].col = max(marks[i].col, marks[i-1].col+1)
 		}
 		for i := len(marks) - 1; i >= 0; i-- {
-			limit := cols - 1
+			limit := mcols - 1
 			if i+1 < len(marks) {
 				limit = marks[i+1].col - 1
 			}
@@ -137,7 +142,7 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 			taken[mk.col] = mk.group
 			placed[mk.group] = append(placed[mk.group], mk.col)
 		}
-		row := []rune(strings.Repeat(" ", cols))
+		row := []rune(strings.Repeat(" ", mcols))
 		maxCol := 0
 		for c, gi := range taken {
 			row[c] = []rune(tl.Markers[gi].Letter)[0]
