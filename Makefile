@@ -37,7 +37,7 @@ FUZZ_TARGETS := \
 	./internal/bundle:FuzzText \
 	./internal/bundle:FuzzReadManifest
 
-.PHONY: all build test test-race fuzz lint fmt fmt-check vet cross clean
+.PHONY: all build test test-race golden fuzz lint fmt fmt-check vet cross clean
 
 all: lint test build
 
@@ -50,6 +50,11 @@ test:
 # The race detector needs cgo; the product build stays CGO_ENABLED=0.
 test-race:
 	CGO_ENABLED=1 $(GO) test -race -p $(JOBS) ./...
+
+# The figures are pinned by golden files. After an intended change of the
+# output, rewrite them and review the diff.
+golden:
+	UPDATE_GOLDEN=1 $(GO) test -p $(JOBS) ./internal/view/ ./internal/term/ ./cmd/my/
 
 fuzz:
 	@set -e; for t in $(FUZZ_TARGETS); do \

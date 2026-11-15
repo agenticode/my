@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"math"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +14,8 @@ import (
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/scan"
+	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/synth"
 	"github.com/agenticode/my/internal/testledger"
 	"github.com/agenticode/my/internal/testutil"
@@ -745,5 +749,79 @@ func TestMessages(t *testing.T) {
 		for p := range set {
 			t.Errorf("%s: English uses {%s}, Korean does not", code, p)
 		}
+	}
+}
+
+// TestOverviewSaysWhatRootWouldAdd scans a live host as a user who may not
+// read the SMBIOS tables: the overview names the source, why it could not
+// be read, and what a scan as root would add.
+func TestOverviewSaysWhatRootWouldAdd(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root reads everything")
+	}
+	ds := testledger.Generate(t, "demo", 1, nil)
+	root := filepath.Join(t.TempDir(), "root")
+	if err := ds.WriteHostTree(root, synth.FlavorIntel); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(filepath.Join(root, "sys", "firmware", "dmi", "tables", "DMI"), 0); err != nil {
+		t.Fatal(err)
+	}
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "ledger.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	// Live, without a journal and without a ring buffer: the log file is read.
+	if _, err := scan.Run(ctx, s, scan.Options{Root: root, Live: true, Now: ds.Scenario.End, Journalctl: "-", TempDir: t.TempDir()}); err != nil {
+		t.Fatal(err)
+	}
+	c, err := Open(ctx, s, i18n.EN, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h, err := c.Host("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ov, err := c.Overview(ctx, h, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ov.Host.Scan == nil || ov.Host.Scan.Kind != model.ScanLive || ov.Host.Scan.Privileged {
+		t.Fatalf("scan = %+v", ov.Host.Scan)
+	}
+	if len(ov.Missing) != 1 || !strings.Contains(ov.Missing[0].Text, "smbios: not readable (permission denied; the SMBIOS tables are readable as root") {
+		t.Errorf("missing = %+v", ov.Missing)
+	}
+	if ov.Root == nil || ov.Root.Text != "This scan ran without root privileges. As root it also reads the SMBIOS tables (slot names and DIMM serial numbers)." {
+		t.Errorf("root = %+v", ov.Root)
+	}
+	// The errors are found and graded all the same, by slot instead of by
+	// serial number, and the finding says what that costs.
+	if h.Grade != model.VerdictReplaceNow || len(ov.Ranking) != 2 || ov.Ranking[0].DIMM.Serial != "" {
+		t.Errorf("grade %s, ranking %+v", h.Grade, ov.Ranking)
+	}
+	card, err := c.Card(ctx, h, h.DIMMs[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, m := range card.Missing {
+		found = found || strings.Contains(m.Text, "smbios: not readable")
+	}
+	if !found {
+		t.Errorf("the finding does not name the source it lacked: %+v", card.Missing)
+	}
+
+	// The same in Korean.
+	k, err := Open(ctx, s, i18n.KO, engine.Options{Now: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	hk, _ := k.Host("")
+	kov, err := k.Overview(ctx, hk, false)
+	if err != nil || kov.Root == nil || !strings.Contains(kov.Root.Text, "root로 실행하면 추가로 읽는 것: SMBIOS 테이블(슬롯 이름과 DIMM 시리얼).") {
+		t.Errorf("Korean root line = %+v, %v", kov.Root, err)
 	}
 }
