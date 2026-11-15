@@ -115,6 +115,8 @@ In the address map a horizontal line is a row fault, a vertical line a column fa
 
 A scan needs no configuration and no root. It looks for the rasdaemon database, the systemd journal (or `/dev/kmsg`, or a log file under `/var/log`), the EDAC counters and the SMBIOS tables. A source it may not read is named on a "missing" line together with what a scan as root would add. A scan keeps nothing on the host unless `--ledger FILE` asks it to.
 
+Where rasdaemon 1.0 writes to a MySQL, MariaDB or PostgreSQL server, `--fleet mysql` or `--fleet postgresql` reads that store in place of this host. Without `--host` the overview lists every host of the fleet with its finding, the worst first. With `--host NAME` the commands above show that host. The connection settings are the variables rasdaemon itself takes (`RAS_MYSQL_*`, `RAS_PG_*`), from the environment or from the file named with `--fleet-env`. [docs/compatibility.md](docs/compatibility.md#store-on-a-database-server) says what such a store holds.
+
 `--lang en|ko` chooses the language; the default follows the locale. `--json` prints the data behind a figure. `--ascii` draws with ASCII characters, and a grade is always told by the density of a glyph as well as by its colour. By default colour is used on a terminal only, and not when `NO_COLOR` is set.
 
 ```
@@ -181,7 +183,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 | `cmd/my` | the binary and its commands |
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
+| `internal/adapter` | readers for the rasdaemon database (the SQLite file of a host, and the store on a MySQL or PostgreSQL server that the hosts of a fleet share), the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |

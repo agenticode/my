@@ -46,6 +46,14 @@ var words = i18n.Catalog{
 	"err.listen":   {EN: "--listen {value}: want an address such as 127.0.0.1:10163 or :10163", KO: "--listen {value}: 127.0.0.1:10163이나 :10163 같은 주소여야 함"},
 	"err.interval": {EN: "--interval {value}: want a time of at least 1s, such as 30s or 5m", KO: "--interval {value}: 30s나 5m처럼 1s 이상의 시간이어야 함"},
 
+	"err.fleet_root":     {EN: "--fleet reads a store and --root a copy of a host's files: give one of the two", KO: "--fleet은 저장소를, --root는 호스트 파일 사본을 읽음: 둘 중 하나만 지정"},
+	"err.fleet_host":     {EN: "no host named {host} in {store} ({n} {n|host|hosts}: {hosts})", KO: "{store}에 {host} 호스트 없음 (호스트 {n}개: {hosts})"},
+	"err.fleet_one_host": {EN: "the store holds {n} hosts: name one with --host ({hosts})", KO: "저장소에 호스트가 {n}개임: --host로 하나를 지정 ({hosts})"},
+	"err.fleet_empty":    {EN: "{store} holds no rows of a named host", KO: "{store}에 호스트 이름이 있는 행이 없음"},
+	"err.since":          {EN: "--since {value}: want a date (2026-10-01), a time (2026-10-01T06:00:00Z), or days or hours back (30d, 72h)", KO: "--since {value}: 날짜(2026-10-01), 시각(2026-10-01T06:00:00Z), 또는 며칠이나 몇 시간 전(30d, 72h)이어야 함"},
+	"err.since_alone":    {EN: "--since goes with --fleet", KO: "--since는 --fleet과 함께 써야 함"},
+	"fleet.unnamed":      {EN: "{n} {n|row|rows} of the store {n|carries|carry} no host name and {n|was|were} not read; RASDAEMON_HOSTNAME gives rasdaemon the name of its host", KO: "저장소의 행 {n}개에 호스트 이름이 없어 읽지 않음. rasdaemon에 RASDAEMON_HOSTNAME으로 호스트 이름을 줄 수 있음"},
+
 	// What "my serve" writes to its log.
 	"serve.listening":   {EN: "listening on {url}", KO: "{url}에서 요청을 받음"},
 	"serve.no_metrics":  {EN: "/metrics is off; start with --metrics to serve Prometheus metrics. /api/dimm is served", KO: "/metrics 꺼짐. Prometheus 지표를 내려면 --metrics로 시작. /api/dimm은 제공"},
@@ -127,9 +135,19 @@ var words = i18n.Catalog{
 	},
 	"help.scan": {
 		EN: "--ledger FILE     keep the scan in the ledger FILE and add to it on every run\n" +
-			"--root DIR        read a copy of a host's files below DIR instead of this host",
+			"--root DIR        read a copy of a host's files below DIR instead of this host\n" +
+			"--fleet KIND      read the store the rasdaemons of a fleet write to, mysql or postgresql,\n" +
+			"                  instead of this host. Without --host the overview lists every host\n" +
+			"--fleet-env FILE  settings of that store: the environment file rasdaemon is started with\n" +
+			"                  (RAS_MYSQL_*, RAS_PG_*). Without it they come from the environment\n" +
+			"--since TIME      with --fleet: read rows from then on (2026-10-01, or 30d for 30 days back)",
 		KO: "--ledger FILE     스캔을 원장 FILE에 남기고 실행할 때마다 누적\n" +
-			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음",
+			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음\n" +
+			"--fleet KIND      플릿의 rasdaemon이 함께 쓰는 저장소(mysql 또는 postgresql)를 읽음.\n" +
+			"                  이 호스트는 스캔하지 않음. --host가 없으면 개요에 모든 호스트를 나열\n" +
+			"--fleet-env FILE  그 저장소의 접속 설정: rasdaemon을 띄울 때 쓰는 환경 파일.\n" +
+			"                  없으면 환경 변수(RAS_MYSQL_*, RAS_PG_*)에서 읽음\n" +
+			"--since TIME      --fleet과 함께: 그 시각 이후의 행만 읽음 (2026-10-01, 최근 30일은 30d)",
 	},
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},

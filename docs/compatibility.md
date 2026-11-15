@@ -126,6 +126,31 @@ The same adapter reads such a store, one host at a time, with the code that read
 
 With an empty host the server on the same machine is reached through its Unix socket.
 
+`--fleet mysql` or `--fleet postgresql` points a command at the store in place of the host it runs on:
+
+| Command | What it reads |
+| --- | --- |
+| `my --fleet mysql` | every host of the store: the list of hosts with the finding for each, the worst first |
+| `my --fleet mysql --host web-01` | the rows of one host: its overview |
+| `my dimm <slot> --fleet mysql --host web-01` | the same host; `why`, `map`, `timeline` and `bundle` take the two flags alike |
+| `my --fleet mysql --ledger fleet.db` | every host, kept in a ledger that `my open fleet.db` shows without the server |
+
+`--fleet-env FILE` names a file with the settings above; what the file does not set is taken from the environment. With the file alone, the backend is its `RASDAEMON_DB_BACKEND`. `--since 2026-10-01` or `--since 30d` reads rows from then on, which bounds what a large store sends. A command that shows one host asks for `--host` before it reads any row when the store holds several hosts.
+
+The output below is from the store the tests of the commands use: three hosts made from the fixtures of this adapter, on a stand-in for the server.
+
+```
+$ my --fleet mysql
+3 hosts in this ledger. Name one with --host to see its figures.
+
+ HOST    FINDING               DIMM  FLAGGED  CE  UE  WORST SLOT                      DATA UNTIL
+ web-02  replace now              6        6   6   3  mc#0csrow#2channel#1            2026-11-13
+ db-07   replace now              2        2   4   3  NODE 1 CPU1_DIMM_B1             2026-11-13
+ web-01  consider replacement     2        2   6   1  CPU_SrcID#0_MC#0_Chan#1_DIMM#0  2026-11-13
+```
+
+A store is read as it is now, so the findings are as of the time of the command: a host whose last record is a month old has been quiet for a month.
+
 The rows of a host are read in one read-only transaction at the isolation level repeatable read, so the tables are seen as of one moment. Every statement the reader sends is a SELECT; an account that may only SELECT from the tables is enough. A record refers to its row by the store, the table and the row number, without the account: `mysql://db.example:3306/rasdaemon#mc_event/1234`.
 
 What a store does not hold:
