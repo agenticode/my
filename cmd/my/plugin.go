@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/agenticode/my/internal/buildinfo"
@@ -106,4 +107,31 @@ func level2(res *plugin.Result) []report.Level2 {
 		out = append(out, l)
 	}
 	return out
+}
+
+// analyzerInfo names the vendor analyzer of the run for the JSON envelope,
+// or returns nil when none took part.
+func (s *session) analyzerInfo() *analyzerInfo {
+	a := s.analyzer
+	if a == nil {
+		return nil
+	}
+	return &analyzerInfo{Name: a.Analyzer.Name, Version: a.Analyzer.Version, Vendor: a.Analyzer.Vendor, Notes: a.Notes}
+}
+
+// analyzerLines says on a screen that a vendor analyzer took part, with
+// its remarks: it can change which rows count as one fault.
+func (s *session) analyzerLines(w io.Writer) {
+	a := s.analyzer
+	if a == nil {
+		return
+	}
+	for _, line := range s.st.Wrap(analyzerLine(s.lang, a), 0) {
+		fmt.Fprintln(w, line)
+	}
+	for _, n := range a.Notes {
+		for _, line := range s.st.Wrap(say(s.lang, "plugin.note", "note", n), 2) {
+			fmt.Fprintln(w, line)
+		}
+	}
 }

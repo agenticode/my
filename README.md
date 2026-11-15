@@ -147,6 +147,7 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my export fmfm [-o FILE]` | write the findings as an analysis log in the form of the OCP FMFM framework (JSON); `--records` adds every error record with FMFM field names ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
+| `my diff BEFORE AFTER` | set two cases of one host side by side, before and after a reseat, a slot swap, a replacement or a firmware update: what changed, the errors of every DIMM on both sides, and whether they moved with the DIMM or stayed with the slot ([docs/diff.md](docs/diff.md)) |
 | `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi` output (`-q`, or a query in CSV form), `mcelog --client` output, FMFM logs, a copy of a host's files |
 | `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>`; with `--fleet`, one exporter for every host of a rasdaemon store ([docs/exporter.md](docs/exporter.md), [contrib/](contrib/README.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
