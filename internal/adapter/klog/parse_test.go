@@ -1,9 +1,12 @@
 package klog
 
 import (
+	"context"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -261,6 +264,65 @@ func TestHas64KPages(t *testing.T) {
 	} {
 		if got := has64KPages(rel); got != want {
 			t.Errorf("has64KPages(%q) = %v, want %v", rel, got, want)
+		}
+	}
+}
+
+func TestMachineName(t *testing.T) {
+	for in, want := range map[string]string{
+		"Dell Inc. PowerEdge R740/0923K0":                                       "Dell Inc. PowerEdge R740/0923K0",
+		"QEMU Standard PC (Q35 + ICH9, 2009)":                                   "QEMU Standard PC (Q35 + ICH9, 2009)",
+		"VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform": "VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform",
+		// A board that repeats the product, as one cloud reports it.
+		"ExampleCloud mi1-g3;MICRO/mi1-g3;MICRO": "ExampleCloud mi1-g3;MICRO",
+		"KVM/KVM":                                "KVM",
+		"Example Systems X1/":                    "Example Systems X1",
+		"":                                       "",
+	} {
+		if got := machineName(in); got != want {
+			t.Errorf("machineName(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestCoverageNote(t *testing.T) {
+	note := func(text string, opts Options) string {
+		var c adapter.Collected
+		rep := NewReader(strings.NewReader(text), "log", opts).Collect(context.Background(), &c)
+		for _, n := range rep.Notes {
+			if strings.HasPrefix(n, "covers ") {
+				return n
+			}
+		}
+		return ""
+	}
+	boot := time.Date(2026, 7, 11, 8, 0, 0, 0, time.UTC)
+	for _, tc := range []struct {
+		name, text string
+		opts       Options
+		want       string
+	}{
+		{"dmesg of one boot, boot time unknown",
+			"[    0.000000] Linux version 6.8.0 (x)\n[  100.000000] usb 1-1: new device\n", Options{},
+			"covers 0 s to 100 s after boot"},
+		{"the ring buffer of a live host that reaches back to the boot",
+			"6,0,0,-;Linux version 6.8.0 (x)\n6,9,86400000000,-;something\n", Options{BootTime: boot},
+			"covers 2026-07-11 08:00 to 2026-07-12 08:00 UTC"},
+		{"a ring buffer that has wrapped",
+			"6,900,864000000000,-;something\n6,901,950400000000,-;more\n", Options{BootTime: boot},
+			"covers 2026-07-21 08:00 to 2026-07-22 08:00 UTC; it starts 10.0 days after boot, and what the kernel said before that is not in it"},
+		{"a journal export",
+			`{"__REALTIME_TIMESTAMP":"1794700800000000","_TRANSPORT":"kernel","MESSAGE":"a","_SOURCE_MONOTONIC_TIMESTAMP":"5000000"}` + "\n" +
+				`{"__REALTIME_TIMESTAMP":"1794787200000000","_TRANSPORT":"kernel","MESSAGE":"b","_SOURCE_MONOTONIC_TIMESTAMP":"86405000000"}` + "\n", Options{},
+			"covers 2026-11-15 00:00 to 2026-11-16 00:00 UTC"},
+		{"a syslog file with RFC 3339 times",
+			"2026-11-12T03:14:07.123456+09:00 host kernel: a\n2026-11-13T03:14:07.123456+09:00 host kernel: b\n", Options{},
+			"covers 2026-11-11 18:14 to 2026-11-12 18:14 UTC"},
+		{"nothing that carries a time", "hello\nworld\n", Options{}, ""},
+		{"an empty input", "", Options{}, ""},
+	} {
+		if got := note(tc.text, tc.opts); got != tc.want {
+			t.Errorf("%s:\n got  %q\n want %q", tc.name, got, tc.want)
 		}
 	}
 }

@@ -71,6 +71,9 @@ type Adapter struct {
 	origin string
 	opts   Options
 	read   func(ctx context.Context) (data []byte, status model.SourceStatus, detail string)
+	// asked is set when the adapter asks the daemon itself, so that an
+	// empty answer is the daemon's and not a file that was saved empty.
+	asked bool
 }
 
 func (a *Adapter) Kind() string   { return Kind }
@@ -122,7 +125,7 @@ func NewCommand(prog string, timeout time.Duration, opts Options) *Adapter {
 	if timeout <= 0 {
 		timeout = DefaultTimeout
 	}
-	return &Adapter{origin: name + " --client", opts: opts, read: func(ctx context.Context) ([]byte, model.SourceStatus, string) {
+	return &Adapter{origin: name + " --client", opts: opts, asked: true, read: func(ctx context.Context) ([]byte, model.SourceStatus, string) {
 		path := prog
 		if path == "" {
 			p, err := exec.LookPath("mcelog")
@@ -471,8 +474,12 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 			_, rep.Status, rep.Detail = failure(msg)
 		case len(bytes.TrimSpace(data)) == 0:
 			// The daemon prints nothing as long as it has no DIMM in its
-			// table: it runs and has seen no memory error.
+			// table: it runs and has seen no memory error. That is what
+			// mcelog 201 answers on a host without errors.
 			rep.Status, rep.Detail = model.SourceEmpty, "no output: the daemon lists no DIMM, or its answer was not saved"
+			if a.asked {
+				rep.Detail = "the daemon answered and lists no DIMM: it has counted no memory error since it started"
+			}
 		case doc.sawDIMMs || doc.sawPages:
 			rep.Status, rep.Detail = model.SourceEmpty, "the daemon lists no DIMM"
 			rep.Records, rep.Skipped = doc.tally.Total(), doc.tally.Total()

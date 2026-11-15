@@ -148,9 +148,9 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	for _, s := range ov.Sources {
 		switch s.Status {
 		case model.SourceOK, model.SourcePartial:
-			read = append(read, st.say("ov.source", "kind", s.Kind, "n", s.Records))
+			read = append(read, st.say("ov.source", "kind", sourceName(s), "n", s.Records))
 		case model.SourceEmpty:
-			read = append(read, st.say("ov.source_empty", "kind", s.Kind))
+			read = append(read, st.say("ov.source_empty", "kind", sourceName(s)))
 		}
 	}
 	if len(read) > 0 {
@@ -176,6 +176,15 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		}
 	}
 	return p.writeTo(w)
+}
+
+// sourceName is what a source is called in a line: its name, or its kind
+// in a view that was built without names.
+func sourceName(s view.Source) string {
+	if s.Name != "" {
+		return s.Name
+	}
+	return s.Kind
 }
 
 // slotMap draws the slots of the board: one line per socket, one column
