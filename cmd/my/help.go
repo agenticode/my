@@ -218,13 +218,15 @@ var words = i18n.Catalog{
 	},
 
 	"help.import.usage": {EN: "my import <file|directory>... [-o FILE] [flags]", KO: "my import <파일|디렉터리>... [-o FILE] [옵션]"},
-	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, nvidia-smi -q output, the answer of the mcelog daemon to its client, an FMFM log, or a directory that is a copy of a host's files. An input that is not recognised stops the import. All inputs are taken to be one host. From a log that holds the records of several hosts, the records of the host named with --host are read. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, nvidia-smi -q 출력, mcelog 데몬이 클라이언트에 답한 출력, FMFM 로그, 호스트 파일 사본 디렉터리. 알아보지 못한 입력이 있으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. 여러 호스트의 기록이 든 로그에서는 --host로 지정한 호스트의 기록을 읽습니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
+	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, nvidia-smi output (-q, or a query in CSV form), the answer of the mcelog daemon to its client, an FMFM log, or a directory that is a copy of a host's files. An input that is not recognised stops the import. All inputs are taken to be one host. From a log that holds the records of several hosts, the records of the host named with --host are read. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, nvidia-smi 출력(-q 또는 CSV 형식 쿼리), mcelog 데몬이 클라이언트에 답한 출력, FMFM 로그, 호스트 파일 사본 디렉터리. 알아보지 못한 입력이 있으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. 여러 호스트의 기록이 든 로그에서는 --host로 지정한 호스트의 기록을 읽습니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
 	"help.import.flags": {
 		EN: "-o FILE             write the case as a bundle (case.mycase)\n" +
 			"--host NAME         the host the files come from, when they do not say\n" +
 			"--captured-at TIME  when a kernel log without dates was captured (2026-11-12T03:14:00Z)\n" +
 			"--mtime             take the modification time of such a file as its capture time\n" +
 			"--tz ZONE           the time zone of times that carry none (default UTC)\n" +
+			"--nvidia-query LIST the fields of an nvidia-smi query that was saved without its\n" +
+			"                    header line (index,uuid,remapped_rows.failure)\n" +
 			"--ledger FILE       keep the import in the ledger FILE and add to it on every run\n" +
 			"--anonymize         with -o: replace host names and network addresses\n" +
 			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
@@ -235,6 +237,8 @@ var words = i18n.Catalog{
 			"--captured-at TIME  날짜 없는 커널 로그를 받은 시각 (2026-11-12T03:14:00Z)\n" +
 			"--mtime             그런 파일의 수정 시각을 받은 시각으로 사용\n" +
 			"--tz ZONE           시간대 표기가 없는 시각의 시간대 (기본 UTC)\n" +
+			"--nvidia-query LIST 헤더 줄 없이 저장한 nvidia-smi 쿼리 출력의 필드 목록\n" +
+			"                    (index,uuid,remapped_rows.failure)\n" +
 			"--ledger FILE       가져온 것을 원장 FILE에 남기고 실행할 때마다 누적\n" +
 			"--anonymize         -o와 함께: 호스트 이름과 네트워크 주소를 바꿈\n" +
 			"--key-file FILE     --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +

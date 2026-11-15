@@ -144,7 +144,7 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |
-| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi -q` output, `mcelog --client` output, FMFM logs, a copy of a host's files |
+| `my import <file\|directory>...` | build a case from files: a rasdaemon database, kernel logs, dmidecode output, BMC dumps, `nvidia-smi` output (`-q`, or a query in CSV form), `mcelog --client` output, FMFM logs, a copy of a host's files |
 | `my serve --metrics` | run as a Prometheus exporter: the finding and the error counts per DIMM over HTTP, and the finding for one DIMM as JSON at `/api/dimm/<slot\|serial>`; with `--fleet`, one exporter for every host of a rasdaemon store ([docs/exporter.md](docs/exporter.md), [contrib/](contrib/README.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
 

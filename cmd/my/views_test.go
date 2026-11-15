@@ -536,6 +536,7 @@ func registerFlags(o *options, topic string) {
 		o.fs.String("captured-at", "", "")
 		o.fs.Bool("mtime", false, "")
 		o.fs.String("tz", "", "")
+		o.fs.String("nvidia-query", "", "")
 		o.fs.Bool("anonymize", false, "")
 		o.fs.String("key-file", "", "")
 		o.fs.Bool("force", false, "")

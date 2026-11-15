@@ -55,6 +55,10 @@ type DetectOptions struct {
 	// for this host when it names it, and for the first host it names
 	// otherwise. Inputs that belong to one host do not look at it.
 	Host string
+	// NvidiaQuery is the field list of an nvidia-smi query whose output
+	// was saved without its header line. Output that names its columns
+	// itself does not look at it.
+	NvidiaQuery string
 }
 
 // What Detect calls the inputs it knows.
@@ -67,6 +71,7 @@ const (
 	WhatSEL       = "BMC event log (SEL)"
 	WhatRedfish   = "Redfish dump"
 	WhatNvidiaSMI = "nvidia-smi -q output"
+	WhatNvidiaCSV = "nvidia-smi query output"
 	WhatFMFM      = "FMFM log"
 	WhatMcelog    = "mcelog --client output"
 )
@@ -89,8 +94,9 @@ const maxBinary = 16 << 20
 //     files and is read like a host;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
-//     output of dmidecode, of nvidia-smi -q or of mcelog --client, a BMC
-//     event log, a Redfish resource, or an FMFM boot, runtime or crash log.
+//     output of dmidecode, of nvidia-smi (-q, or a selective query in CSV
+//     form) or of mcelog --client, a BMC event log, a Redfish resource, or
+//     an FMFM boot, runtime or crash log.
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -284,10 +290,13 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = klog.NewFile(path, kopts)
 		}
 
-	case nvidia.Sniff(text):
+	case nvidia.Sniff(text), nvidia.SniffCSV(text):
 		// The timestamp in the output is the local time of the host.
 		what = WhatNvidiaSMI
-		nopts := nvidia.Options{Now: seen, Location: opts.Location}
+		if !nvidia.Sniff(text) {
+			what = WhatNvidiaCSV
+		}
+		nopts := nvidia.Options{Now: seen, Location: opts.Location, Query: opts.NvidiaQuery}
 		if zipped {
 			a = nvidia.NewReader(stream(), path, nopts)
 		} else {
@@ -358,11 +367,39 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = klog.NewFile(path, kopts)
 		}
 
+	case opts.NvidiaQuery != "" && commaLines(text, strings.Count(opts.NvidiaQuery, ",")):
+		// Values alone, as many per line as the caller named fields: the
+		// output of an nvidia-smi query without its header.
+		what = WhatNvidiaCSV
+		nopts := nvidia.Options{Now: seen, Location: opts.Location, Query: opts.NvidiaQuery}
+		if zipped {
+			a = nvidia.NewReader(stream(), path, nopts)
+		} else {
+			a = nvidia.NewFile(path, nopts)
+		}
+
 	default:
 		first, _, _ := strings.Cut(string(text[:min(len(text), 80)]), "\n")
 		return nil, "", fmt.Errorf("%w: text of no known kind (it starts %q)", ErrUnknownInput, strings.TrimSpace(first))
 	}
 	return a, what, nil
+}
+
+// commaLines reports whether the first lines of text each have the given
+// number of commas.
+func commaLines(text []byte, commas int) bool {
+	seen := 0
+	for _, line := range bytes.SplitN(text, []byte("\n"), 5) {
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+		if bytes.Count(line, []byte(",")) != commas {
+			return false
+		}
+		seen++
+	}
+	return seen > 0
 }
 
 // looksLikeJSON tells a JSON document from text that starts with a

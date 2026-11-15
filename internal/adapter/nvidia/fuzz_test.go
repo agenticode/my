@@ -14,9 +14,12 @@ import (
 // reader must return a report, and every snapshot it emits must be one the
 // ledger accepts.
 func FuzzCollect(f *testing.F) {
-	for _, name := range []string{"nvidia-smi-q.txt", "nvidia-smi-q.xml", "nvidia-smi-q-legacy.txt"} {
+	for _, name := range []string{"nvidia-smi-q.txt", "nvidia-smi-q.xml", "nvidia-smi-q-legacy.txt",
+		"query-gpu-h200.csv", "query-gpu-rtx2080-470.csv", "query-remapped-rows.csv", "query-retired-pages-h200.csv"} {
 		f.Add(testutil.ReadTestdata(f, "nvidia", name))
 	}
+	f.Add([]byte("timestamp, gpu_uuid, gpu_serial, index, remapped_rows.failure, remapped_rows.histogram.none, ecc.errors.uncorrected.aggregate.sram.parity\n2026/11/13 09:30:00.000, GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7, 1650000000412, 70000, Yes, 99999999999999999999, [N/A]\n1601/01/01 00:00:00.000, [N/A], 1650000000977, -1, No, 1, 2\n"))
+	f.Add([]byte("$ nvidia-smi --query-gpu=uuid,,index --format=csv,noheader\nGPU-1, , 0\n, ,\n"))
 	f.Add([]byte("Timestamp : Mon Jan  1 00:00:00 1601\nGPU 00000000:3B:00.0\n    Remapped Rows\n        Pending : Yes\n      Odd indent : 1\n                    Deep : 2\n"))
 	f.Add([]byte(`<nvidia_smi_log><gpu id="FFFFFFFF:FF:1F.7"><gpu><uuid>GPU-1</uuid></gpu><ecc_errors><volatile><dram_correctable>99999999999999999999</dram_correctable></volatile></ecc_errors></gpu></nvidia_smi_log>`))
 	f.Add([]byte("<nvidia_smi_log><timestamp>x</timestamp>" + string(bytes.Repeat([]byte("<a>"), 40)) + "</nvidia_smi_log>"))
@@ -38,8 +41,11 @@ func FuzzCollect(f *testing.F) {
 		for _, g := range c.GPUs {
 			y := g.ObservedAt.UTC().Year()
 			if g.Kind != model.GPUSnapshot || g.Fingerprint == "" || g.Source != Kind || g.RawRef == "" || y < 1970 || y > 9999 ||
-				g.TimeQuality != model.TimeExact || !g.GPUIndex.Valid || (g.GPUUUID == "" && g.GPUSerial == "" && g.PCIBus == "") {
+				g.TimeQuality != model.TimeExact || (g.GPUUUID == "" && g.GPUSerial == "" && g.PCIBus == "") {
 				t.Errorf("snapshot the ledger would refuse: %+v", g)
+			}
+			if g.GPUIndex.Valid && g.GPUIndex.V < 0 {
+				t.Errorf("negative index in %+v", g)
 			}
 			for _, n := range []model.Opt[int]{g.DRAMCorrectable, g.DRAMUncorrectable, g.SRAMCorrectable, g.SRAMUncorrectable, g.RemapCorrectable,
 				g.RemapUncorrectable, g.BankMax, g.BankNone, g.RetiredSBE, g.RetiredDBE} {

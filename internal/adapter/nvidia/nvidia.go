@@ -1,6 +1,7 @@
 // Package nvidia reads the output of "nvidia-smi -q", as text and as XML
-// (-x): for each GPU its identity, the ECC error counts, the retired pages
-// of older GPUs and the row remapping state of newer ones.
+// (-x), and of its selective queries (--query-gpu, --query-remapped-rows
+// with --format=csv): for each GPU its identity, the ECC error counts, the
+// retired pages of older GPUs and the row remapping state of newer ones.
 //
 // The driver does not say where in the memory of a GPU an error was. What
 // it reports is a budget: how many rows were remapped, whether a remap is
@@ -39,6 +40,10 @@ type Options struct {
 	// Location is the time zone of the timestamp in the output, which is
 	// the local time of the host without a zone. Nil means UTC.
 	Location *time.Location
+	// Query is the field list of a selective query whose output was saved
+	// without its header line ("index,uuid,remapped_rows.failure"). Output
+	// with a header, or with its command line, names its columns itself.
+	Query string
 }
 
 // DefaultTimeout bounds a run of nvidia-smi.
@@ -48,7 +53,7 @@ const DefaultTimeout = 30 * time.Second
 // a few hundred kilobytes.
 const maxInput = 64 << 20
 
-// Adapter reads one output of nvidia-smi -q.
+// Adapter reads one output of nvidia-smi.
 type Adapter struct {
 	origin string
 	opts   Options
@@ -166,7 +171,8 @@ func firstLine(s, fallback string) string {
 }
 
 // Sniff reports whether data looks like the output of nvidia-smi -q in
-// either form. It is used to pick the adapter for a file by its content.
+// either form. It is used to pick the adapter for a file by its content;
+// SniffCSV does the same for the output of a selective query.
 func Sniff(data []byte) bool {
 	head := data
 	if len(head) > 64<<10 {
@@ -206,6 +212,10 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	data = bytes.TrimPrefix(data, []byte("\xef\xbb\xbf"))
 	var doc document
+	if !Sniff(data) && (SniffCSV(data) || a.opts.Query != "") {
+		a.collectCSV(data, sink, &rep)
+		return rep
+	}
 	if t := bytes.TrimLeft(data, " \t\r\n"); bytes.HasPrefix(t, []byte("<")) {
 		var err error
 		if doc, err = parseXML(data); err != nil {
