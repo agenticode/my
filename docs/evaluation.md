@@ -115,14 +115,14 @@ Findings and what followed, development period (cut-off days 60, 90, 120)
 
   By finding for the server:
     finding                              servers  UE ticket  CE ticket  misc ticket  type 0 ticket  types 1-3     UE
-    observe                                  325          0          0            0              0      0.00%  0.00%
-    consider replacement                      46          2          0            0              0      4.35%  4.35%
+    observe                                  312          0          0            0              0      0.00%  0.00%
+    consider replacement                      59          2          0            0              0      3.39%  3.39%
     replace now                                0          0          0            0              0          -      -
     hold replacement                          19          0          0            0              0      0.00%  0.00%
     all                                      390          2          0            0              0      0.51%  0.51%
     reference: error in the last 7 days       80          2          0            0              0      2.50%  2.50%
   replace now: no server
-  consider replacement, against a ticket of type 1, 2 or 3: precision 4.35% (2 of 46, 95% interval 1.20% to 14.53%); recall 100.00% (2 of 2, 95% interval 34.24% to 100.00%)
+  consider replacement, against a ticket of type 1, 2 or 3: precision 3.39% (2 of 59, 95% interval 0.93% to 11.54%); recall 100.00% (2 of 2, 95% interval 34.24% to 100.00%)
 ```
 
 A server counts once per cut-off at which it is in the population, so the 390 servers of the three cut-offs are 390 pairs of a server and a cut-off. "types 1-3" is the share of the row with a ticket of failure type 1, 2 or 3 in the window, and "UE" the share with a ticket for an uncorrectable error.

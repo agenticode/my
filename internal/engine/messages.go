@@ -65,7 +65,7 @@ var Messages = i18n.Catalog{
 	"rule.R-UE-01":    {EN: "an uncorrected error on this DIMM", KO: "이 DIMM에서 UE 발생"},
 	"rule.R-FW-01":    {EN: "the BMC or the BIOS marks the DIMM as failed or disabled", KO: "BMC나 BIOS가 DIMM을 failed 또는 disabled로 표시"},
 	"rule.R-REP-01":   {EN: "repair resources are used up: a PPR failed, sparing is in use, or a GPU row remap failed (XID 64)", KO: "리페어 자원 소진: PPR 실패, sparing 발동, GPU row remap 실패(XID 64)"},
-	"rule.R-ROW-03":   {EN: "the corrected errors of a row, column or bank fault, or of a wider one, are rising or came in a recent burst, or its extent is spreading", KO: "row, column, bank 고장(더 넓은 고장 포함)의 CE가 증가 추세이거나 최근에 폭주했거나 범위가 확산"},
+	"rule.R-ROW-03":   {EN: "the corrected errors of a row or column fault are rising or came in a recent burst, or its extent is spreading; or a fault covers a bank or more", KO: "row, column 고장의 CE가 증가 추세이거나 최근에 폭주했거나 범위가 확산, 또는 뱅크 하나 이상에 걸친 고장"},
 	"rule.R-OFF-02":   {EN: "the number of pages taken offline keeps growing", KO: "offline된 페이지 수가 계속 증가"},
 	"rule.R-SCRUB-01": {EN: "the patrol scrubber found an uncorrected error", KO: "패트롤 스크럽이 UE를 발견"},
 	"rule.R-REP-02":   {EN: "errors came back at the same place after a repair", KO: "리페어 뒤 같은 위치에서 재발"},
@@ -101,6 +101,7 @@ var Messages = i18n.Catalog{
 	"row.spreading_line": {EN: "{mode} fault at {where}: {new} new {new|place|places} in the last {days} days; it now covers {columns} {columns|column|columns} in {rows} {rows|row|rows}", KO: "{mode} 고장({where}): 최근 {days}일 새 위치 {new}곳, 현재 row {rows}개에 column {columns}개"},
 	"row.spreading_area": {EN: "{mode} fault at {where}: {new} new {new|place|places} in the last {days} days, {cells} in total", KO: "{mode} 고장({where}): 최근 {days}일 새 위치 {new}곳, 누적 {cells}곳"},
 	"row.storm":          {EN: "{mode} fault at {where}: {peak} errors within {minutes} minutes from {when}", KO: "{mode} 고장({where}): {when}부터 {minutes}분 동안 {peak}건"},
+	"row.area":           {EN: "{mode} fault at {where}: {n} errors scattered over {cells} places since {from}", KO: "{mode} 고장({where}): {from}부터 {n}건, {cells}곳에 흩어짐"},
 	"row.multi_dq":       {EN: "errors of the fault at {where} involve {lines} data lines of one device", KO: "{where} 고장의 오류에 한 디바이스의 DQ {lines}개가 관여"},
 
 	// R-OFF-02.

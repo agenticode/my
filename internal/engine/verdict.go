@@ -432,8 +432,14 @@ func wider(m model.FaultMode) bool {
 	return false
 }
 
+// area reports whether a mode covers a bank or more.
+func area(m model.FaultMode) bool {
+	return m == model.ModeBank || m == model.ModeDevice || m == model.ModeDIMM
+}
+
 // growing is R-ROW-03: a fault wider than a cell whose errors are rising or
-// whose places are spreading.
+// came in a recent burst or whose places are spreading, and any fault that
+// covers a bank or more.
 func (j *judge) growing(fs *findings) {
 	cfg, evs := j.cfg, j.in.events
 	for _, f := range fs.d.Faults {
@@ -488,6 +494,16 @@ func (j *judge) growing(fs *findings) {
 			refs, total := j.eventRefs(recent)
 			fs.add(RuleRow, statement("row.storm", "mode", modeArg(f), "where", j.where(f), "peak", f.Storm.RecentPeak,
 				"minutes", cfg.StormMinutes, "when", stampText(f.Storm.RecentAt.UnixMicro())), refs, total)
+			fired = true
+		}
+		// A fault that covers a bank or more does not have to grow. No row
+		// repair reaches it, and on a fleet log servers with such a fault
+		// got a failure ticket as often without growth as the servers this
+		// rule names for a growing fault (docs/evaluation.md).
+		if !fired && area(f.Mode) {
+			refs, total := j.eventRefs(f.members)
+			fs.add(RuleRow, statement("row.area", "mode", modeArg(f), "where", j.where(f), "n", f.ErrorCount,
+				"cells", f.Shape.Cells, "from", faultDay(f, f.FirstSeen)), refs, total)
 			fired = true
 		}
 		if !fired {
