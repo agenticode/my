@@ -1,0 +1,16 @@
+{
+  "@odata.id": "/redfish/v1/Systems/system",
+  "@odata.type": "#ComputerSystem.v1_22_0.ComputerSystem",
+  "Id": "system",
+  "Name": "system",
+  "HostName": "r12-n034",
+  "Manufacturer": "Example Systems",
+  "Model": "R650",
+  "BiosVersion": "2.4.1",
+  "Memory": {"@odata.id": "/redfish/v1/Systems/system/Memory"},
+  "MemorySummary": {
+    "TotalSystemMemoryGiB": 192,
+    "Status": {"State": "Enabled", "HealthRollup": "Critical"}
+  },
+  "LogServices": {"@odata.id": "/redfish/v1/Systems/system/LogServices"}
+}

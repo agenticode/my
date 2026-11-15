@@ -1,0 +1,67 @@
+{
+  "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries",
+  "@odata.type": "#LogEntryCollection.LogEntryCollection",
+  "Name": "Log Entry Collection",
+  "Members@odata.count": 7,
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/1",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "1", "Name": "Log Entry 1", "EntryType": "SEL", "EntryCode": "Assert", "Severity": "Warning",
+      "Created": "2026-11-12T03:14:07+00:00",
+      "SensorType": "Memory", "SensorNumber": 83, "GeneratorId": "0x0033",
+      "MessageId": "0x6f30ff03", "Message": "Correctable ECC"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/2",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "2", "Name": "Log Entry 2", "EntryType": "SEL", "EntryCode": "Assert", "Severity": "Critical",
+      "Created": "2026-11-12T03:14:09+00:00",
+      "SensorType": "Memory", "SensorNumber": 0,
+      "MessageId": "0x6fa1ffff", "Message": "Uncorrectable ECC @DIMMB1(CPU1) - Assertion"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/3",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "3", "Name": "Log Entry 3", "EntryType": "SEL", "EntryCode": "Assert", "Severity": "Critical",
+      "Created": "2026-11-12T03:20:00+00:00",
+      "SensorType": "Memory", "SensorNumber": 84, "GeneratorId": "0x0001",
+      "MessageId": "0x6f04ffff", "Message": "Memory Device Disabled",
+      "Links": {"OriginOfCondition": {"@odata.id": "/redfish/v1/Systems/1/Memory/DIMM_C1"}},
+      "Oem": {"Example": {"Raw": "0300020000000001000c546f04ffff"}}
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/4",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "4", "Name": "Log Entry 4", "EntryType": "SEL", "EntryCode": "Upper Critical - going high", "Severity": "Critical",
+      "Created": "2026-11-12T03:25:00+00:00",
+      "SensorType": "Temperature", "SensorNumber": 48,
+      "MessageId": "0x01595f5a", "Message": "CPU0 Temp upper critical going high"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/5",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "5", "Name": "Log Entry 5", "EntryType": "SEL", "EntryCode": "Deassert", "Severity": "OK",
+      "Created": "2026-11-12T03:40:00+00:00",
+      "SensorType": "Memory", "SensorNumber": 84, "GeneratorId": "0x0001",
+      "MessageId": "0xef04ffff", "Message": "Memory Device Disabled",
+      "Links": {"OriginOfCondition": {"@odata.id": "/redfish/v1/Systems/1/Memory/DIMM_C1"}}
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/6",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "6", "Name": "Log Entry 6", "EntryType": "SEL", "EntryCode": "Assert", "Severity": "Warning",
+      "Created": "0000-00-00T00:00:00+00:00",
+      "SensorType": "Memory", "SensorNumber": 83,
+      "MessageId": "0x6f30ff03", "Message": "Correctable ECC"
+    },
+    {
+      "@odata.id": "/redfish/v1/Managers/1/LogServices/SEL/Entries/7",
+      "@odata.type": "#LogEntry.v1_4_0.LogEntry",
+      "Id": "7", "Name": "Log Entry 7", "EntryType": "SEL", "EntryCode": "Assert", "Severity": "Warning",
+      "Created": "2026-11-12T04:00:00",
+      "SensorType": "Memory",
+      "Message": "DIMM_A1: Correctable ECC logging limit reached"
+    }
+  ]
+}

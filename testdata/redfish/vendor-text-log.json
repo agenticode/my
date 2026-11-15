@@ -1,0 +1,31 @@
+{
+  "Members": [
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/12",
+      "@odata.type": "#LogEntry.v1_1_0.LogEntry",
+      "Id": "12", "Name": "Integrated Management Log", "EntryType": "Oem", "Severity": "Critical",
+      "Created": "2026-11-09T04:55:37Z",
+      "Message": "Uncorrectable Memory Error (Processor 1, Memory Module 4)",
+      "Oem": {"Example": {"Class": 3, "Code": 1, "Count": 1}}
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/13",
+      "@odata.type": "#LogEntry.v1_1_0.LogEntry",
+      "Id": "13", "Name": "Integrated Management Log", "EntryType": "Oem", "Severity": "Warning",
+      "Created": "2026-11-09T05:10:00Z",
+      "Message": "Corrected Memory Error threshold exceeded (Processor 2, Memory Module 12)"
+    },
+    {
+      "@odata.id": "/redfish/v1/Systems/1/LogServices/IML/Entries/14",
+      "@odata.type": "#LogEntry.v1_1_0.LogEntry",
+      "Id": "14", "Name": "Integrated Management Log", "EntryType": "Oem", "Severity": "OK",
+      "Created": "2026-11-09T05:20:00Z",
+      "Message": "Server reset"
+    },
+    {
+      "EntryType": "Oem", "Id": "15", "Severity": "Warning",
+      "Created": "2026-11-09T05:30:00Z",
+      "Message": "Memory training took longer than expected (Processor 2, Memory Module 12)"
+    }
+  ]
+}

@@ -117,8 +117,8 @@ func TestSensorLabel(t *testing.T) {
 		"DIMM_A1 DIMM_A2": "",
 		"CPU1 Temp":       "",
 	} {
-		if got := sensorLabel(name); got != want {
-			t.Errorf("sensorLabel(%q) = %q, want %q", name, got, want)
+		if got := ipmi.SensorModule(name); got != want {
+			t.Errorf("SensorModule(%q) = %q, want %q", name, got, want)
 		}
 	}
 }

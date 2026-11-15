@@ -15,7 +15,7 @@ Early development. This tree holds the data model, the SQLite ledger, the input 
 | `cmd/my` | the binary |
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS, host facts and the BMC event log, and for the dcbrain DRAM error dataset; [docs/compatibility.md](docs/compatibility.md) says what each input gives |
+| `internal/adapter` | readers for the rasdaemon database, the kernel log, EDAC sysfs, SMBIOS, host facts, the BMC event log and Redfish dumps, and for the dcbrain DRAM error dataset; [docs/compatibility.md](docs/compatibility.md) says what each input gives |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 13 rules with fixed IDs to reach a finding per DIMM |

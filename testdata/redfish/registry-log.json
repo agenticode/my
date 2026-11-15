@@ -1,0 +1,71 @@
+[
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/101",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "101", "Name": "Log Entry 101", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Warning",
+    "Created": "2026-11-05T13:02:44-06:00",
+    "MessageId": "MEM0701",
+    "Message": "Correctable memory error rate exceeded for DIMM_A1.",
+    "MessageArgs": ["DIMM_A1"]
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/102",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "102", "Name": "Log Entry 102", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Critical",
+    "Created": "2026-11-05T13:40:10-06:00",
+    "MessageId": "EXM.2.9.MEM0001",
+    "Message": "Multi-bit memory errors detected on a memory device at location(s) DIMM_A1, DIMM_A2.",
+    "MessageArgs": ["DIMM_A1, DIMM_A2"]
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/103",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "103", "Name": "Log Entry 103", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Critical",
+    "Created": "2026-11-05T13:41:00-06:00",
+    "MessageId": "MEM0004",
+    "Message": "Memory device at location DIMM_A1 is disabled."
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/104",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "104", "Name": "Log Entry 104", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "OK",
+    "Created": "2026-11-06T08:00:00-06:00",
+    "MessageId": "MEM0016",
+    "Message": "Memory device at location(s) DIMM_B3 is operating correctly.",
+    "MessageArgs": ["DIMM_B3"]
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/105",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "105", "Name": "Log Entry 105", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "OK",
+    "Created": "2026-11-06T08:05:00-06:00",
+    "MessageId": "MEM9999",
+    "Message": "Memory self-test completed on DIMM_A1."
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/106",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "106", "Name": "Log Entry 106", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Critical",
+    "Created": "2026-11-06T08:06:00-06:00",
+    "MessageId": "PSU0001",
+    "Message": "Power supply 1 failed."
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/107",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "107", "Name": "Log Entry 107", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "OK",
+    "Created": "2026-11-06T08:07:00-06:00",
+    "MessageId": "MEM0006",
+    "Message": "Memory device at location DIMM_B3 is present.",
+    "MessageArgs": ["DIMM_B3"]
+  },
+  {
+    "@odata.id": "/redfish/v1/Managers/bmc/LogServices/Lclog/Entries/108",
+    "@odata.type": "#LogEntry.v1_6_1.LogEntry",
+    "Id": "108", "Name": "Log Entry 108", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Warning",
+    "Created": "2026-11-06T09:00:00-06:00",
+    "MessageId": "MEM0008",
+    "Message": "Memory device at location DIMM_B3 is spare memory.",
+    "MessageArgs": ["DIMM_B3"]
+  }
+]

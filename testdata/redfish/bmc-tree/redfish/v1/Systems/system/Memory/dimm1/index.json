@@ -1,0 +1,28 @@
+{
+  "@odata.id": "/redfish/v1/Systems/system/Memory/dimm1",
+  "@odata.type": "#Memory.v1_17_0.Memory",
+  "Id": "dimm1",
+  "Name": "DIMM Slot",
+  "DeviceLocator": "DIMM_B1",
+  "MemoryLocation": {"Socket": 0, "MemoryController": 0, "Channel": 1, "Slot": 0},
+  "CapacityMiB": 65536,
+  "MemoryType": "DRAM",
+  "MemoryDeviceType": "DDR5",
+  "BaseModuleType": "RDIMM",
+  "Manufacturer": "Example Memory",
+  "PartNumber": "EXM64G48R2X4-A",
+  "SerialNumber": "80A1C3",
+  "RankCount": 2,
+  "OperatingSpeedMhz": 4800,
+  "Status": {
+    "State": "Disabled",
+    "Health": "Critical",
+    "Conditions": [
+      {
+        "MessageId": "ResourceEvent.1.3.ResourceErrorsDetected",
+        "Message": "The resource property DIMM_B1 has detected errors of type 'uncorrectable ECC'.",
+        "Severity": "Critical"
+      }
+    ]
+  }
+}
