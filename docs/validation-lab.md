@@ -52,7 +52,7 @@ The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The erro
 Each of these was wrong or missing before the capture showed it.
 
 - `dmidecode` 3.7 prints `Size: 16 GiB`. The reader accepted `GB` only and saw no populated memory device in such an output.
-- rasdaemon dates a record by the uptime of its trace event plus an offset it measured when it started. chronyd set the clock of the lab host back by 6.7 to 10.8 seconds on seven boots, a few seconds after rasdaemon had started. The kernel log dates the same errors by the kernel's clock, and two records more than 5 seconds apart were not taken for one error: every error of such a boot counted twice. A machine check record is now dated by the time the kernel put into it, and the rows of other tables next to it move by the same amount.
+- rasdaemon dates a record by the uptime of its trace event plus an offset it measured when it started. chronyd set the clock of the lab host back by 6.7 to 10.8 seconds on seven boots, a few seconds after rasdaemon had started. The kernel log dates the same errors by the kernel's clock, and two records more than 5 seconds apart were not taken for one error: every error of such a boot counted twice. A machine check record is now dated by the time the kernel put into it, and the rows of other tables next to it move by the same amount. A database without machine check records, as on the aarch64 guest, is compared with the kernel log of the same boot: the difference in time that the errors in both agree on is the step.
 - The journal files the first kernel messages of a boot, 1,318 of 1,486 on the lab host, under the host name `localhost`. An import of a journal export was stored under that name. The name now comes from the end of the file.
 - `journalctl -o short-monotonic` puts `host kernel:` between the stamp and the message. The boot banner was not recognised behind it.
 - The kernel announces a page that a program asked it to give up (`Injecting memory failure for pfn ...`). Such a page is now marked in the ledger and counted in the source report. A boot in which `mce-inject` or EINJ was set up is named.
@@ -94,7 +94,6 @@ The captures raised these and did not settle them.
 
 - A host whose errors cannot be tied to a DIMM gets the finding "ok" next to "CE 7, UE 3": findings are made per DIMM. The overview does not mention pages taken offline at all.
 - A page that a program asked the kernel to give up is marked, and still counts like any other offline.
-- A rasdaemon database without machine check records, as on ARM servers, gives no way to see that rasdaemon's clock was off.
 
 ## Repeating it
 

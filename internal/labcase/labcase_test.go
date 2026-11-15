@@ -48,6 +48,10 @@ type capture struct {
 	notes []string
 	// journal says that the capture holds journalctl -k -o json.
 	journal bool
+	// clock is what the ledger adds to the times of the rasdaemon records:
+	// on a host without machine check records whose clock was set after
+	// rasdaemon started. The other captures must be left as they are.
+	clock time.Duration
 	// reports are the sources that hold the injections of the plan, in a
 	// scan of the copy.
 	reports []string
@@ -359,6 +363,13 @@ func TestCopyOfTheHost(t *testing.T) {
 				if !hasNote(res.Sources, n) {
 					t.Errorf("no source says %q", n)
 				}
+			}
+			var moved time.Duration
+			for _, cl := range res.Clocks {
+				moved += cl.Offset
+			}
+			if moved != c.clock || len(res.Clocks) > 1 {
+				t.Errorf("the ledger moved rasdaemon records: %+v, want by %s", res.Clocks, c.clock)
 			}
 			if got := stateOf(t, s, c.host); got != c.want() {
 				t.Errorf("ledger: %+v\n  want: %+v", got, c.want())

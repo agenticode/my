@@ -111,6 +111,10 @@ rasdaemon dates a record by the uptime of its trace event plus the difference be
 
 A machine check record also holds the time the kernel gave the error (`walltime`). Where the two times differ by more than a second, the record is dated by the kernel's time. Rows of other tables within ten minutes of such a record are moved by the same amount: the EDAC report of the same error, the page the kernel gave up after it. The source report says how far rasdaemon's clock was off and how many records were corrected.
 
+A database without machine check records (ARM servers, firmware-first error handling) has no such time. There the ledger compares the rasdaemon records of a boot with the kernel log of the same boot, when the log carries dates (a journal, a syslog file). Two records are compared when they have the same cache line and severity class, or the same slot where neither has an address. A difference in time at which every such record has its kernel log line is taken for the step, and the rasdaemon records of the boot are moved by it, errors and page offlines alike. An error that repeats at one address also pairs with its other occurrences; the first and the last record of the boot rule those pairings out.
+
+Records that lie within two seconds of their kernel log line are left where they are. A later scan of the same boot therefore moves only the records it added, and a boot in which rasdaemon was started again after the step is corrected up to the restart. One or two errors are believed up to a difference of two minutes. A larger difference, up to 15 hours, needs three errors that agree. The `time-align` entry of the source inventory says how far rasdaemon's clock was off and how many records were moved.
+
 ### Store on a database server
 
 rasdaemon 1.0 can write to a MySQL or MariaDB database, or to a schema of a PostgreSQL database, in place of the SQLite file. Every host of a fleet then writes to the same tables. They are the tables of the SQLite file with one more column, `hostname`, after the first, and with the time of a row in a time type of the server.
@@ -168,7 +172,8 @@ The reader is tested against MySQL 8.4, MariaDB 11.4 and PostgreSQL 17, on table
 ### Known gaps
 
 - Rows that rasdaemon itself wrote to a MySQL or PostgreSQL server have not been read yet. The layout is taken from the source of rasdaemon 1.0.0.
-- A database without machine check records (ARM servers, firmware-first error handling) gives no way to see that rasdaemon's clock was off. Its records keep rasdaemon's time.
+- A database without machine check records is corrected against a kernel log with dates only. Next to a kernel log saved with `dmesg`, or to none, its records keep rasdaemon's time.
+- Where the database and the kernel log hold no error in common, nothing shows how far rasdaemon's clock was off.
 - The page type in `memory_failure_event` is rasdaemon's reading of a number the kernel traces, through a table that rasdaemon 0.8.0 took from an older kernel. On kernel 7.3 it writes `dirty unevictable LRU page` for what the kernel log calls `dirty LRU page`. The kernel log has the kernel's own words; the result column of rasdaemon is right. rasdaemon 1.0.0 names the type as the kernel does.
 - The vendor records in `non_standard_event` and the processor records in `arm_event` are not read, so the vendor decoding rasdaemon does for some ARM servers is not used.
 - rasdaemon stores what it traced while it ran. Errors from before it was started, and from a boot in which it did not run, are in the kernel log only.
