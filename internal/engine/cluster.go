@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"container/heap"
 	"sort"
 	"time"
 
@@ -237,54 +238,148 @@ func (l *line) better(o *line) bool {
 	return l.index < o.index
 }
 
+// lineCount is a row or a column of a bank with the number of cells on it
+// that no line has taken yet.
+type lineCount struct {
+	n     int
+	index int32
+}
+
+// lineHeap orders rows (or columns) by the number of cells on them, the
+// fullest first and, among equals, the lowest index first. Counts only
+// fall while lines are taken out of a bank. A changed count is pushed as a
+// new entry and the old one is dropped when it comes to the top.
+type lineHeap []lineCount
+
+func (h lineHeap) Len() int { return len(h) }
+func (h lineHeap) Less(i, j int) bool {
+	if h[i].n != h[j].n {
+		return h[i].n > h[j].n
+	}
+	return h[i].index < h[j].index
+}
+func (h lineHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+func (h *lineHeap) Push(x any)   { *h = append(*h, x.(lineCount)) }
+func (h *lineHeap) Pop() any {
+	old := *h
+	x := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return x
+}
+
+// top returns the fullest row or column that still has two or more cells,
+// dropping entries whose count is out of date.
+func (h *lineHeap) top(current map[int32]int) (lineCount, bool) {
+	for h.Len() > 0 {
+		e := (*h)[0]
+		if e.n >= 2 && current[e.index] == e.n {
+			return e, true
+		}
+		heap.Pop(h)
+	}
+	return lineCount{}, false
+}
+
 // extractLines takes the rows and columns of one bank that hold more cells
 // than scatter of the bank's cells explains, strongest first. It returns
 // the lines and the cells on none of them.
+//
+// The strongest line of a round is the one with the smallest chance of
+// being an accident; among equal chances the one with more cells, and a
+// row before a column. The chance of a row falls as the number of cells
+// on it grows, and so does the chance of a column, so a round only has to
+// compare the fullest row with the fullest column. Taking a line changes
+// the counts of the lines that cross it and of no others. A bank with
+// thousands of lines therefore costs one pass over its cells, not one
+// pass per line.
 func (cl *clusterer) extractLines(cells []*cell, sp space) (rows, cols []*line, loose []*cell) {
-	rest := append([]*cell(nil), cells...)
-	for len(rest) >= 2 {
-		byRow, byCol := map[int32][]*cell{}, map[int32][]*cell{}
-		for _, c := range rest {
-			byRow[c.row] = append(byRow[c.row], c)
-			byCol[c.col] = append(byCol[c.col], c)
+	taken := make([]bool, len(cells))
+	// The cells of every row and column, by position in cells, which keeps
+	// them in the order of cells.
+	byRow, byCol := map[int32][]int32{}, map[int32][]int32{}
+	for i, c := range cells {
+		byRow[c.row] = append(byRow[c.row], int32(i))
+		byCol[c.col] = append(byCol[c.col], int32(i))
+	}
+	rowLeft, colLeft := make(map[int32]int, len(byRow)), make(map[int32]int, len(byCol))
+	var rowHeap, colHeap lineHeap
+	for idx, cs := range byRow {
+		rowLeft[idx] = len(cs)
+		if len(cs) >= 2 {
+			rowHeap = append(rowHeap, lineCount{len(cs), idx})
 		}
-		var best *line
-		consider := func(isRow bool, idx int32, cs []*cell, bins float64) {
-			if len(cs) < 2 {
-				return
-			}
-			l := &line{isRow: isRow, index: idx, cells: cs, chance: sp.chance(len(cs), len(rest), bins)}
-			if l.better(best) {
-				best = l
-			}
+	}
+	for idx, cs := range byCol {
+		colLeft[idx] = len(cs)
+		if len(cs) >= 2 {
+			colHeap = append(colHeap, lineCount{len(cs), idx})
 		}
-		for idx, cs := range byRow {
-			consider(true, idx, cs, sp.rows)
-		}
-		for idx, cs := range byCol {
-			consider(false, idx, cs, sp.cols)
-		}
-		if best == nil || best.chance >= cl.cfg.LineChance {
+	}
+	heap.Init(&rowHeap)
+	heap.Init(&colHeap)
+
+	for rest := len(cells); rest >= 2; {
+		r, hasRow := rowHeap.top(rowLeft)
+		c, hasCol := colHeap.top(colLeft)
+		if !hasRow && !hasCol {
 			break
 		}
-		if best.isRow {
-			rows = append(rows, best)
-		} else {
-			cols = append(cols, best)
+		var rowChance, colChance float64
+		if hasRow {
+			rowChance = sp.chance(r.n, rest, sp.rows)
 		}
-		taken := map[*cell]bool{}
-		for _, c := range best.cells {
-			taken[c] = true
+		if hasCol {
+			colChance = sp.chance(c.n, rest, sp.cols)
 		}
-		kept := rest[:0]
-		for _, c := range rest {
-			if !taken[c] {
-				kept = append(kept, c)
+		isRow := hasRow
+		if hasRow && hasCol {
+			switch {
+			case rowChance != colChance:
+				isRow = rowChance < colChance
+			case r.n != c.n:
+				isRow = r.n > c.n
 			}
 		}
-		rest = kept
+		best := &line{isRow: isRow, index: c.index, chance: colChance}
+		members, crossing, crossHeap := byCol[c.index], rowLeft, &rowHeap
+		if isRow {
+			best.index, best.chance = r.index, rowChance
+			members, crossing, crossHeap = byRow[r.index], colLeft, &colHeap
+		}
+		if best.chance >= cl.cfg.LineChance {
+			break
+		}
+		for _, i := range members {
+			if taken[i] {
+				continue
+			}
+			taken[i] = true
+			best.cells = append(best.cells, cells[i])
+			// The line that crosses this one at the cell loses the cell.
+			x := cells[i].col
+			if !isRow {
+				x = cells[i].row
+			}
+			crossing[x]--
+			if n := crossing[x]; n >= 2 {
+				heap.Push(crossHeap, lineCount{n, x})
+			}
+		}
+		rest -= len(best.cells)
+		if isRow {
+			rowLeft[r.index] = 0
+			rows = append(rows, best)
+		} else {
+			colLeft[c.index] = 0
+			cols = append(cols, best)
+		}
 	}
-	return rows, cols, rest
+	for i, c := range cells {
+		if !taken[i] {
+			loose = append(loose, c)
+		}
+	}
+	return rows, cols, loose
 }
 
 // classifyBank finds the line faults of one bank of one device. It returns
