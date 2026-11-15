@@ -315,6 +315,7 @@ func candidate(raw string) bool {
 		strings.Contains(raw, "offlin") ||
 		strings.Contains(raw, "Linux version ") ||
 		strings.Contains(raw, "DMI: ") ||
+		strings.Contains(raw, "Hypervisor detected: ") ||
 		strings.Contains(raw, "ommand line: ") ||
 		strings.Contains(raw, "setting system clock to ") ||
 		strings.Contains(raw, "NVRM: ") ||

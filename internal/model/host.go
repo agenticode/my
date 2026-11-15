@@ -4,13 +4,18 @@ import "time"
 
 // Host describes a machine whose records are in the ledger.
 type Host struct {
-	Name          string    `json:"host"`
-	Arch          string    `json:"arch,omitzero"`
-	SystemVendor  string    `json:"system_vendor,omitzero"`
-	SystemProduct string    `json:"system_product,omitzero"`
-	Board         string    `json:"board,omitzero"`
-	FirstSeen     time.Time `json:"first_seen,omitzero"`
-	LastSeen      time.Time `json:"last_seen,omitzero"`
+	Name          string `json:"host"`
+	Arch          string `json:"arch,omitzero"`
+	SystemVendor  string `json:"system_vendor,omitzero"`
+	SystemProduct string `json:"system_product,omitzero"`
+	Board         string `json:"board,omitzero"`
+	// Virtual names the hypervisor the host runs under ("KVM", "VMware",
+	// "Hyper-V"), or is "hypervisor" where one is known to be there and
+	// not known by name. It is empty for a host that is not known to be a
+	// virtual machine.
+	Virtual   string    `json:"virtual,omitzero"`
+	FirstSeen time.Time `json:"first_seen,omitzero"`
+	LastSeen  time.Time `json:"last_seen,omitzero"`
 }
 
 // Boot is one boot of a host.

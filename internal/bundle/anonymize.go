@@ -90,7 +90,7 @@ var columns = map[string]treatment{
 	"gpu_mem.pci_bus": keep, "gpu_mem.model": keep, "gpu_mem.xid_text": freeText, "gpu_mem.boot_id": bootID, "gpu_mem.source": keep,
 	"gpu_mem.raw_ref": freeText, "gpu_mem.raw": freeText, "gpu_mem.fingerprint": derived, "gpu_mem.time_quality": keep,
 
-	"host.name": hostName, "host.arch": keep, "host.system_vendor": keep, "host.system_product": keep, "host.board": keep,
+	"host.name": hostName, "host.arch": keep, "host.system_vendor": keep, "host.system_product": keep, "host.board": keep, "host.virtual": keep,
 	"host.first_seen": keep, "host.last_seen": keep,
 
 	"meta.key": freeText, "meta.value": freeText,

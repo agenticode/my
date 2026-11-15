@@ -634,6 +634,42 @@ func TestEveryScenarioDraws(t *testing.T) {
 	}
 }
 
+// TestOverviewNotes: what limits the reach of the records stands under its
+// own label, below the sources and what is missing.
+func TestOverviewNotes(t *testing.T) {
+	ov := &view.Overview{
+		Host:    view.Header{Name: "guest", Grade: model.VerdictOK, GradeText: "ok", Virtual: "KVM"},
+		Ranking: []view.Rank{},
+		Sources: []view.Source{{Kind: "klog", Name: "klog", Status: model.SourceEmpty}},
+		Missing: []view.Text{{Text: "rasdaemon: not present"}},
+		Notes: []view.Text{{Text: "this host is a virtual machine (KVM): a guest is not shown the corrected errors of the machine it runs on, " +
+			"and of the uncorrected ones at most those that hit its own memory"}},
+	}
+	var b strings.Builder
+	if err := Overview(&b, ov, Style{Lang: i18n.EN, Width: 100}, nil); err != nil {
+		t.Fatal(err)
+	}
+	got := b.String()
+	for _, want := range []string{
+		" sources  klog without records\n",
+		" missing  rasdaemon: not present\n",
+		" note     This host is a virtual machine (KVM): a guest is not shown the corrected errors of the\n" +
+			"          machine it runs on, and of the uncorrected ones at most those that hit its own memory\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("the overview lacks %q:\n%s", want, got)
+		}
+	}
+	b.Reset()
+	ov.Notes[0].Text = "이 호스트는 가상 머신임(KVM): 게스트에는 장비의 CE가 보이지 않고, UE도 게스트 메모리에 난 것까지만 보임"
+	if err := Overview(&b, ov, Style{Lang: i18n.KO, Width: 100}, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := b.String(); !strings.Contains(got, " 참고  이 호스트는 가상 머신임(KVM): ") {
+		t.Errorf("Korean:\n%s", got)
+	}
+}
+
 // TestOverviewShowsTheHostFinding: errors and page offlines that are tied
 // to no DIMM have a finding of their own. The overview draws it below the
 // ranking: what it is about, its grade and rules, and its evidence.

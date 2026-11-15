@@ -487,6 +487,11 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 			break
 		}
 	}
+	for i := range in.Hosts {
+		if in.Hosts[i].Name == name {
+			hf.virtual = in.Hosts[i].Virtual
+		}
+	}
 	for _, sl := range in.Slots {
 		if sl.Host == name && (sl.Locator != "" || sl.SMBIOSHandle.Valid) {
 			hf.inventory = true

@@ -199,6 +199,14 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 					p("%s", line)
 				}
 			}
+			for _, n := range ov.Notes {
+				for i, line := range s.st.Wrap(say(lang, "bundle.note", "what", n.Text), 4) {
+					if i == 0 {
+						line = "  " + strings.TrimLeft(line, " ")
+					}
+					p("%s", line)
+				}
+			}
 		}
 	}
 	if w.Manifest.Anonymized {

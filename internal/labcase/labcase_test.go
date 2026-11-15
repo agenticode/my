@@ -66,6 +66,9 @@ type capture struct {
 	reports []string
 	// noDIMM counts the errors that are tied to no DIMM.
 	noDIMM int64
+	// virtual is the hypervisor the host of the capture runs under: every
+	// host of the lab is a virtual machine.
+	virtual string
 	// loose are the rules of the host finding, which speaks about the
 	// errors and the pages taken offline that are tied to no DIMM. A
 	// capture whose records all name a DIMM has no host finding. asked
@@ -101,13 +104,13 @@ type forms struct {
 
 var captures = []capture{
 	{
-		dir: "7.3.0-baseline", host: "lab-vm", journal: true,
+		dir: "7.3.0-baseline", host: "lab-vm", virtual: "VMware", journal: true,
 		sources: []string{"hostinfo ok", "rasdaemon empty", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictOK,
 		notes:   []string{"smbios: 128 memory slots, 3 populated"},
 	},
 	{
-		dir: "7.3.0-hwpoison", host: "lab-vm", journal: true, hard: 4,
+		dir: "7.3.0-hwpoison", host: "lab-vm", virtual: "VMware", journal: true, hard: 4,
 		reports: []string{"klog/offline", "rasdaemon/memory_failure_event"},
 		forms:   &forms{actions: 4, kernel: "7.3.0-ras", note: "klog: 4 page offlines were asked for by a program"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
@@ -119,7 +122,7 @@ var captures = []capture{
 	{
 		// The second boot of the host: the database still holds the four
 		// pages of the boot before.
-		dir: "7.3.0-soft-offline", host: "lab-vm", journal: true, soft: 3, earlier: 4,
+		dir: "7.3.0-soft-offline", host: "lab-vm", virtual: "VMware", journal: true, soft: 3, earlier: 4,
 		// The kernel traces no soft offline: rasdaemon has nothing of this boot.
 		reports: []string{"klog/offline"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
@@ -132,7 +135,7 @@ var captures = []capture{
 		// No EDAC driver and one virtual DIMM: the errors have addresses
 		// and no DIMM. They are in the finding of no DIMM; the host finding
 		// holds replacement for the uncorrected ones.
-		dir: "7.3.0-mce", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
+		dir: "7.3.0-mce", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		// The kernel log has no machine check record: a logged record is
 		// not printed by default.
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
@@ -143,7 +146,7 @@ var captures = []capture{
 	{
 		// With mce=print_all the kernel log holds every record too: each
 		// error is in two sources and counts once.
-		dir: "7.3.0-mce-print-all", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
+		dir: "7.3.0-mce-print-all", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
@@ -151,7 +154,7 @@ var captures = []capture{
 	{
 		// The clock was set back by 10 seconds after rasdaemon started: its
 		// times are ahead of the kernel's for the whole run.
-		dir: "7.3.0-mce-clock-step", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
+		dir: "7.3.0-mce-clock-step", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
@@ -160,7 +163,7 @@ var captures = []capture{
 	{
 		// rasdaemon 1.0.0 built from source: 39 tables, more columns in
 		// mce_record, and the signals the kernel sent in a table of their own.
-		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
+		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
@@ -169,7 +172,7 @@ var captures = []capture{
 	{
 		// An emulated CXL memory device, recorded by rasdaemon 1.0.0. The
 		// device is the DIMM: its serial number is its identity.
-		dir: "7.3.0-cxl", host: "lab-guest", ce: 11, ue: 1, gradeA: 9, gradeB: 3,
+		dir: "7.3.0-cxl", host: "lab-guest", virtual: "QEMU", ce: 11, ue: 1, gradeA: 9, gradeB: 3,
 		reports: []string{"rasdaemon/cxl_dram_event", "rasdaemon/cxl_general_media_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictReplaceNow,
@@ -181,7 +184,7 @@ var captures = []capture{
 		// and in the EDAC line after it, and counts once. The kernel of
 		// this guest traces no memory failure, so the two pages are in
 		// the kernel log only.
-		dir: "6.19.10-ghes", host: "lab-arm", journal: true, ce: 24, ue: 2, gradeA: 26, hard: 2,
+		dir: "6.19.10-ghes", host: "lab-arm", virtual: "QEMU", journal: true, ce: 24, ue: 2, gradeA: 26, hard: 2,
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
 		finding: model.VerdictReplaceNow,
@@ -194,7 +197,7 @@ var captures = []capture{
 		// check record that holds the kernel's time: the ledger learns
 		// the step from the errors that the kernel log holds too. The
 		// journal of the guest still had the boot before.
-		dir: "6.19.10-ghes-clock-step", host: "lab-arm", journal: true, ce: 10, ue: 1, gradeA: 11, hard: 1,
+		dir: "6.19.10-ghes-clock-step", host: "lab-arm", virtual: "QEMU", journal: true, ce: 10, ue: 1, gradeA: 11, hard: 1,
 		clock:   -10 * time.Second,
 		before:  state{ce: 24, ue: 2, gradeA: 26, hard: 2},
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
@@ -436,6 +439,12 @@ func TestCopyOfTheHost(t *testing.T) {
 			}
 			if loose != c.noDIMM {
 				t.Errorf("%d errors without a DIMM, want %d", loose, c.noDIMM)
+			}
+			// The host of every capture is a virtual machine, and the
+			// ledger knows which hypervisor it runs under.
+			hosts, err := s.Hosts(ctx)
+			if err != nil || len(hosts) != 1 || hosts[0].Virtual != c.virtual || c.virtual == "" {
+				t.Errorf("hypervisor of the host: %+v, %v; want %q", hosts, err, c.virtual)
 			}
 			// What names no DIMM has the host finding, and nothing else has one.
 			v := out.Hosts[0].Loose

@@ -336,6 +336,21 @@ Adapter `hostinfo`, package `internal/adapter/hostinfo`. It reads what a running
 
 The boot time dates kernel log lines that carry seconds since boot. The host name is the name of the case unless one is given.
 
+### Virtual machines
+
+A guest is not shown the corrected errors of the machine it runs on: the hypervisor host handles them. Of the uncorrected ones it is told at most about those that hit its own memory. A scan of a guest that finds nothing therefore says nothing about the DIMMs of the machine, and the tool says so: the overview has a `note` line, a report states it next to the grade, and every finding lists it among what it did not have. The host finding of a guest names the hypervisor host as the place to look for the DIMM.
+
+A host counts as a virtual machine when one of these says so:
+
+| Sign | Where | Gives |
+| --- | --- | --- |
+| the DMI system vendor and product name are those a hypervisor fills in (QEMU, KVM, VMware, Hyper-V, Xen, VirtualBox, Parallels, OpenStack, oVirt, KubeVirt, Nutanix AHV, Amazon EC2 except `metal` instances, Google Compute Engine, DigitalOcean, Hetzner vServer, Apple Virtualization, Bochs, bhyve) | `/sys/class/dmi/id`, or the `DMI:` line of a kernel log | the name |
+| `Hypervisor detected: <name>` | the kernel log of an x86 boot | the name |
+| `/sys/hypervisor/type` is `xen` | sysfs | Xen |
+| the `hypervisor` flag of the CPU | `/proc/cpuinfo` on x86 | that there is one, without a name |
+
+The name from the kernel log stands before the name from the DMI strings. A cloud whose DMI strings are the same on virtual and bare metal instances is not in the list; on x86 the CPU flag still tells. On other architectures a guest whose DMI strings name no known hypervisor is taken for a physical host.
+
 ## BMC event log (SEL)
 
 Adapter `sel`, package `internal/adapter/sel`. A SEL is the log to read when the host cannot be reached, and it holds the error that took a host down before the operating system could record it.

@@ -238,7 +238,7 @@ The binary is pure Go and statically linked (`CGO_ENABLED=0`). `my version` prin
 | `internal/model` | ledger records; the error event uses the FMFM runtime error log field names |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
 | `internal/adapter` | readers for the rasdaemon database (the SQLite file of a host, and the store on a MySQL or PostgreSQL server that the hosts of a fleet share), the kernel log, EDAC sysfs, the counts of the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output and FMFM logs, and for the dcbrain DRAM error dataset |
-| `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events |
+| `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, and the signs by which a machine tells that it is a virtual one |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | the analysis engine: groups the errors of a DIMM into faults with a mode (single bit, row, multi-row, column, bank, device, DIMM, system issue), measures trend, spread and baselines, and applies 15 rules with fixed IDs to reach a finding per DIMM and, for errors that name no DIMM, a finding for the host |

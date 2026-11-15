@@ -1601,10 +1601,16 @@ func TestReportHasTheHostFinding(t *testing.T) {
 		t.Fatalf("capture: host finding %+v, %d DIMMs described, grade %s", doc.Host, len(doc.DIMMs), doc.Overview.Host.Grade)
 	}
 	root, v, text := parts(doc)
+	// The capture is a guest: the next step names the hypervisor host, and
+	// the summary says next to the grade what a guest is not shown.
 	lead := "Records tied to no DIMM: hold replacement (finding, confidence high). 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340. " +
-		"Do not pull a DIMM on these records: none of them names one. Find the DIMM first, from the EDAC driver of the memory controller or the event log of the BMC, then scan again."
-	if !strings.Contains(text, lead+" No DIMM of this host has errors on record.") {
+		"Do not pull a DIMM on these records: none of them names one, and a virtual machine has no DIMM of its own to name. The DIMM is found by a scan of the hypervisor host."
+	if !strings.Contains(text, lead+" No DIMM of this host has errors on record. This host is a virtual machine (QEMU): a guest is not shown the corrected errors of the machine it runs on, "+
+		"and of the uncorrected ones at most those that hit its own memory.") {
 		t.Errorf("summary:\n%s", text)
+	}
+	if n := len(v.find("p.reach")); n != 1 {
+		t.Errorf("%d notes about the reach of the records next to the grade", n)
 	}
 	if p := v.find("p.conclusion"); len(p) != 1 || len(p[0].find("a")) != 1 || p[0].find("a")[0].attrs["href"] != "#"+hostAnchor {
 		t.Errorf("the summary does not lead with the host finding, or does not link to its card:\n%s", text)
@@ -1647,6 +1653,7 @@ func TestReportHasTheHostFinding(t *testing.T) {
 		"R-HOST-02 observe corrected errors or page offlines of the host that no record ties to a DIMM",
 		"Records tied to no DIMM: CE 7, UE 3, 5 pages offline hold replacement R-HOST-01 R-HOST-02",
 		"Tied to no DIMM: CE 7, UE 3, 5 pages offline. No slot, serial number or fault mode is known for these records.",
+		"this host is a virtual machine (QEMU): a guest is not shown the corrected errors",
 	} {
 		if !strings.Contains(whole, want) {
 			t.Errorf("the report lacks %q", want)
@@ -1710,10 +1717,13 @@ func TestReportHasTheHostFinding(t *testing.T) {
 		t.Errorf("a DIMM to replace and loose uncorrected errors:\n%s", text)
 	}
 
-	// Nothing loose, nothing said.
+	// Nothing loose, nothing said; and the demo host is no virtual machine.
 	root, _, _ = parts(build(t, "demo", "", i18n.EN, Customer))
 	if len(byID(root, "article", hostAnchor)) != 0 || len(root.find("p.hostline")) != 0 || strings.Contains(root.content(), "tied to no DIMM") {
 		t.Error("the demo report speaks of records without a DIMM")
+	}
+	if len(root.find("p.reach")) != 0 || strings.Contains(root.content(), "virtual machine") {
+		t.Error("the demo report speaks of a virtual machine")
 	}
 }
 

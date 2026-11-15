@@ -1407,6 +1407,56 @@ func TestOverviewHasTheHostFinding(t *testing.T) {
 	}
 }
 
+// TestOverviewOfAVirtualMachine: the header names the hypervisor, and a
+// note says what a guest is not shown, also when nothing else is on record.
+func TestOverviewOfAVirtualMachine(t *testing.T) {
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "guest.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	at := time.Date(2026, 11, 15, 8, 0, 0, 0, time.UTC)
+	err = s.Update(ctx, func(w *store.Writer) error {
+		if err := w.UpsertHost(&model.Host{Name: "guest", SystemVendor: "QEMU", SystemProduct: "KVM Virtual Machine", Virtual: "KVM"}); err != nil {
+			return err
+		}
+		return w.InsertScan(&model.Scan{Host: "guest", Kind: model.ScanLive, StartedAt: at, FinishedAt: at})
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for lang, want := range map[i18n.Lang]string{
+		i18n.EN: "this host is a virtual machine (KVM): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory",
+		i18n.KO: "이 호스트는 가상 머신임(KVM): 게스트에는 장비의 CE가 보이지 않고, UE도 게스트 메모리에 난 것까지만 보임",
+	} {
+		c, err := Open(ctx, s, lang, engine.Options{Now: now})
+		if err != nil {
+			t.Fatal(err)
+		}
+		h, err := c.Host("")
+		if err != nil {
+			t.Fatal(err)
+		}
+		ov, err := c.Overview(ctx, h, false)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ov.Host.Virtual != "KVM" || len(ov.Notes) != 1 || ov.Notes[0].Text != want || ov.Notes[0].Code != "missing.virtual" {
+			t.Errorf("%s: virtual %q, notes %+v", lang, ov.Host.Virtual, ov.Notes)
+		}
+		b, err := json.Marshal(ov)
+		if err != nil || !strings.Contains(string(b), `"virtual":"KVM"`) || !strings.Contains(string(b), `"notes":[{`) {
+			t.Errorf("%s: JSON %v\n%s", lang, err, b)
+		}
+	}
+	// A physical host has no such note.
+	demo, hd := open(t, "demo", "", i18n.EN)
+	ov, err := demo.Overview(ctx, hd, false)
+	if err != nil || ov.Host.Virtual != "" || len(ov.Notes) != 0 {
+		t.Errorf("demo: virtual %q, notes %+v, %v", ov.Host.Virtual, ov.Notes, err)
+	}
+}
+
 // TestOneDayIsNamedOnce: a history of one day is what a host has on the
 // day its errors begin. Its period is that day, not "from the day to the
 // same day".

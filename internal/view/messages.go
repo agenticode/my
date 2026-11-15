@@ -77,6 +77,7 @@ var Messages = i18n.Catalog{
 	"ov.obs":          {EN: "observation grade {grades}", KO: "관측 등급 {grades}"},
 	"ov.finding":      {EN: "host finding: {grade}", KO: "호스트 소견: {grade}"},
 	"ov.sources":      {EN: "sources", KO: "소스"},
+	"ov.note":         {EN: "note", KO: "참고"},
 	"ov.source":       {EN: "{kind} {n} {n|record|records}", KO: "{kind} {n}건"},
 	"ov.source_empty": {EN: "{kind} without records", KO: "{kind} 기록 없음"},
 	"src.journal":     {EN: "journal", KO: "저널"},

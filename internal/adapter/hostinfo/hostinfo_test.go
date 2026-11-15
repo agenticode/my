@@ -138,3 +138,48 @@ func TestSinkErrorAndCancel(t *testing.T) {
 		t.Errorf("cancelled: %+v", rep)
 	}
 }
+
+// A virtual machine is named by the strings its hypervisor fills in, by
+// the Xen directory of sysfs, or only known through the flag of its CPU.
+func TestVirtualMachine(t *testing.T) {
+	flags := "processor\t: 0\nflags\t\t: fpu vme de pse tsc msr pae mce hypervisor lahf_lm\n"
+	for _, tc := range []struct {
+		name string
+		set  func(fstest.MapFS)
+		want string
+	}{
+		{"a physical host", func(fstest.MapFS) {}, ""},
+		{"a physical host with its CPU flags", func(fs fstest.MapFS) {
+			fs["proc/cpuinfo"] = file("processor\t: 0\nflags\t\t: fpu vme de pse tsc msr pae mce lahf_lm\n")
+		}, ""},
+		{"QEMU with KVM on arm64", func(fs fstest.MapFS) {
+			fs["sys/class/dmi/id/sys_vendor"], fs["sys/class/dmi/id/product_name"] = file("QEMU\n"), file("KVM Virtual Machine\n")
+		}, "KVM"},
+		{"VMware", func(fs fstest.MapFS) {
+			fs["sys/class/dmi/id/sys_vendor"], fs["sys/class/dmi/id/product_name"] = file("VMware, Inc.\n"), file("VMware Virtual Platform\n")
+			fs["proc/cpuinfo"] = file(flags)
+		}, "VMware"},
+		{"a cloud whose names say nothing, on a CPU that reports a hypervisor", func(fs fstest.MapFS) {
+			fs["sys/class/dmi/id/sys_vendor"], fs["sys/class/dmi/id/product_name"] = file("ExampleCloud\n"), file("mi1-g3;MICRO\n")
+			fs["proc/cpuinfo"] = file(flags)
+		}, "hypervisor"},
+		{"a Xen guest", func(fs fstest.MapFS) { fs["sys/hypervisor/type"] = file("xen\n") }, "Xen"},
+	} {
+		fsys := liveHost()
+		tc.set(fsys)
+		a := New(fsys, "/", Options{Now: now})
+		if info, _ := a.Read(); info.Virtual != tc.want {
+			t.Errorf("%s: Virtual = %q, want %q", tc.name, info.Virtual, tc.want)
+		}
+		var c adapter.Collected
+		if rep := a.Collect(ctx, &c); rep.Status != model.SourceOK || len(c.Hosts) != 1 || c.Hosts[0].Virtual != tc.want {
+			t.Errorf("%s: host record %+v", tc.name, c.Hosts)
+		}
+	}
+	// A cpuinfo of many CPUs: the flags of the first one are enough.
+	fsys := liveHost()
+	fsys["proc/cpuinfo"] = file(strings.Repeat(flags+"\n", 2000))
+	if info, _ := New(fsys, "/", Options{Now: now}).Read(); info.Virtual != "hypervisor" {
+		t.Errorf("a long cpuinfo: Virtual = %q", info.Virtual)
+	}
+}

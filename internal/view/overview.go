@@ -44,6 +44,10 @@ type Overview struct {
 	// Root says what a scan as root would add, when the scan ran without
 	// root privileges and that kept a source from being read.
 	Root *Text `json:"root,omitzero"`
+	// Notes say what a reader has to know about the reach of the records
+	// before reading "no errors": that the host is a virtual machine,
+	// which is shown little of the errors of the machine it runs on.
+	Notes []Text `json:"notes,omitzero"`
 }
 
 // Loose counts the corrected and the uncorrected errors of a host that
@@ -60,6 +64,10 @@ type Header struct {
 	Name string `json:"name"`
 	// System is the vendor and product name of the machine.
 	System string `json:"system,omitzero"`
+	// Virtual names the hypervisor of a host that is a virtual machine
+	// ("KVM", "VMware"), or is "hypervisor" where one is known to be there
+	// and not known by name.
+	Virtual string `json:"virtual,omitzero"`
 	// From and To bound the time the ledger knows something about the host.
 	From time.Time `json:"from,omitzero"`
 	To   time.Time `json:"to,omitzero"`
@@ -239,6 +247,7 @@ func (c *Case) header(ctx context.Context, h *engine.HostResult) (Header, *model
 	for _, x := range hosts {
 		if x.Name == h.Host {
 			hd.System = strings.TrimSpace(x.SystemVendor + " " + x.SystemProduct)
+			hd.Virtual = x.Virtual
 		}
 	}
 	totals, err := c.store.Totals(ctx, store.EventFilter{Host: h.Host})
@@ -361,6 +370,9 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 		}
 		t := c.say("root.adds", "what", strings.Join(what, "; "))
 		ov.Root = &t
+	}
+	if hd.Virtual != "" {
+		ov.Notes = append(ov.Notes, c.statement(engine.VirtualStatement(hd.Virtual)))
 	}
 	return ov, nil
 }
