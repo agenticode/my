@@ -154,6 +154,55 @@ func TestImportMistakes(t *testing.T) {
 	}
 }
 
+// An import records the path of each file as it was given. Files below a
+// home directory carry the name of an account in that path, and an
+// anonymized bundle must not.
+func TestImportAnonymizesHomeDirectories(t *testing.T) {
+	log, err := os.ReadFile(filepath.Join(hostTree(t), "var", "log", "dmesg"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	home := filepath.Join(dir, "home", "alice", "cases")
+	if err := os.MkdirAll(home, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	file := filepath.Join(home, "dmesg")
+	if err := os.WriteFile(file, log, 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	plain := filepath.Join(dir, "plain.mycase")
+	if code, _, errOut := runEnv(fixed, "import", file, "-o", plain); code != cli.ExitOK {
+		t.Fatalf("exit code %d, stderr %q", code, errOut)
+	}
+	if src, err := bundle.ReadSources(plain); err != nil || !strings.Contains(src.Scans[0].Sources[0].Origin, "/home/alice/") {
+		t.Fatalf("the test is vacuous: the plain bundle does not record the path: %+v, %v", src, err)
+	}
+
+	out := filepath.Join(dir, "anon.mycase")
+	code, text, errOut := runEnv(fixed, "import", file, "-o", out, "--anonymize")
+	if code != cli.ExitOK || !strings.Contains(text, "replaced in the paths of the files that were read") {
+		t.Fatalf("exit code %d, stderr %q\n%s", code, errOut, text)
+	}
+	m, err := bundle.ReadManifest(out)
+	if err != nil || m.Anonymization == nil || m.Anonymization.Users < 1 {
+		t.Fatalf("manifest = %+v, %v", m, err)
+	}
+	src, err := bundle.ReadSources(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if origin := src.Scans[0].Sources[0].Origin; strings.Contains(origin, "alice") || !strings.Contains(origin, "/home/user-") || !strings.HasSuffix(origin, "/cases/dmesg") {
+		t.Errorf("origin = %q", origin)
+	}
+	// The findings still point at their records, under the new path.
+	code, why, errOut := runEnv(fixed, "open", out, "why")
+	if errOut != "" || strings.Contains(why, "alice") || !strings.Contains(why, "/cases/dmesg#L") {
+		t.Errorf("exit code %d, stderr %q\n%s", code, errOut, why)
+	}
+}
+
 // TestImportDatesAKernelLogByTheDatabase imports the two files a host most
 // often yields: the rasdaemon database and a kernel log saved with dmesg.
 // The log has no dates. The errors both report must be counted once, and

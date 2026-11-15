@@ -226,6 +226,9 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 			fmt.Fprintln(says, say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
 		}
 		fmt.Fprintf(says, "  %s\n", say(lang, "import.finding", "host", h.Host, "grade", findingText(lang, h)))
+		if a := w.Manifest.Anonymization; a != nil && a.Users > 0 {
+			fmt.Fprintf(says, "  %s\n", say(lang, "bundle.anon_users", "n", a.Users))
+		}
 		for name, word := range w.Names {
 			fmt.Fprintf(says, "    %s -> %s\n", name, word)
 		}
