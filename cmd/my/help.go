@@ -39,6 +39,12 @@ var words = i18n.Catalog{
 	"export.written":     {EN: "FMFM analysis log written: {file} ({size})", KO: "FMFM 분석 로그 저장: {file} ({size})"},
 	"export.holds":       {EN: "host {host}, finding {grade}: {dimms} {dimms|DIMM|DIMMs} analysed, {records} error {records|record|records} in the runtime log", KO: "호스트 {host}, 소견 {grade}: 분석한 DIMM {dimms}개, runtime 로그의 오류 기록 {records}건"},
 	"export.no_cpad":     {EN: "the log holds findings and suggestions for a person, and no action descriptor (CPAD)", KO: "로그에는 사람이 읽을 소견과 제안만 있고 조치 기술자(CPAD)는 없음"},
+	"err.plugin_alone":   {EN: "--plugin-timeout and --plugin-logs go with --plugin", KO: "--plugin-timeout과 --plugin-logs는 --plugin과 함께 써야 함"},
+	"err.plugin_timeout": {EN: "--plugin-timeout {value}: want a time of at least 100ms, such as 5s or 2m", KO: "--plugin-timeout {value}: 5s나 2m처럼 100ms 이상의 시간이어야 함"},
+	"err.plugin_logs":    {EN: "--plugin-logs {value}: want a number of records", KO: "--plugin-logs {value}: 기록 수여야 함"},
+	"plugin.used":        {EN: "vendor analyzer {name}: analyses of {dimms} {dimms|DIMM|DIMMs}", KO: "벤더 분석기 {name}: DIMM {dimms}개 분석"},
+	"plugin.note":        {EN: "analyzer: {note}", KO: "분석기: {note}"},
+	"plugin.failed":      {EN: "Nothing was analysed. Without --plugin the findings are those of the open core.", KO: "분석하지 않았습니다. --plugin 없이 실행하면 공개 코어의 소견이 나옵니다."},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
 	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, verify, export, 또는 생략하면 개요)"},
 
@@ -141,7 +147,11 @@ var words = i18n.Catalog{
 			"--width N         columns to fill (default: the terminal, 100 otherwise)\n" +
 			"--host NAME       the host to show, when the ledger holds several\n" +
 			"--config FILE     read thresholds from FILE (key = value lines)\n" +
-			"--set KEY=VALUE   change one threshold; \"my help thresholds\" lists them",
+			"--set KEY=VALUE   change one threshold; \"my help thresholds\" lists them\n" +
+			"--plugin PROGRAM  run a vendor analyzer on the error records before the engine\n" +
+			"                  (docs/plugin-contract.md); --plugin-timeout TIME bounds its run\n" +
+			"                  (default 10s), --plugin-logs N sets the previous records sent\n" +
+			"                  per DIMM (default 1000)",
 		KO: "--lang en|ko      출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
 			"--json            그림의 데이터를 JSON으로 출력\n" +
 			"--ascii           ASCII 문자만으로 그림\n" +
@@ -149,7 +159,11 @@ var words = i18n.Catalog{
 			"--width N         출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)\n" +
 			"--host NAME       원장에 호스트가 여럿일 때 볼 호스트\n" +
 			"--config FILE     임계값 파일 (key = value 줄)\n" +
-			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"",
+			"--set KEY=VALUE   임계값 하나 변경. 목록은 \"my help thresholds\"\n" +
+			"--plugin PROGRAM  엔진 실행 전에 벤더 분석기에 오류 기록을 넘김\n" +
+			"                  (docs/plugin-contract.md). --plugin-timeout TIME은 실행 제한 시간\n" +
+			"                  (기본 10s), --plugin-logs N은 DIMM마다 보내는 이전 기록 수\n" +
+			"                  (기본 1000)",
 	},
 	"help.output": {
 		EN: "--lang en|ko        language of the output (default: from the locale, English otherwise)\n" +
@@ -158,14 +172,22 @@ var words = i18n.Catalog{
 			"--color WHEN        auto (on a terminal, unless NO_COLOR is set), always or never\n" +
 			"--width N           columns to fill (default: the terminal, 100 otherwise)\n" +
 			"--config FILE       read thresholds from FILE (key = value lines)\n" +
-			"--set KEY=VALUE     change one threshold; \"my help thresholds\" lists them",
+			"--set KEY=VALUE     change one threshold; \"my help thresholds\" lists them\n" +
+			"--plugin PROGRAM    run a vendor analyzer on the error records before the engine\n" +
+			"                    (docs/plugin-contract.md); --plugin-timeout TIME bounds its run\n" +
+			"                    (default 10s), --plugin-logs N sets the previous records sent\n" +
+			"                    per DIMM (default 1000)",
 		KO: "--lang en|ko        출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
 			"--json              결과를 JSON으로 출력\n" +
 			"--ascii             ASCII 문자만으로 그림\n" +
 			"--color WHEN        auto(터미널일 때, NO_COLOR가 없을 때), always, never\n" +
 			"--width N           출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)\n" +
 			"--config FILE       임계값 파일 (key = value 줄)\n" +
-			"--set KEY=VALUE     임계값 하나 변경. 목록은 \"my help thresholds\"",
+			"--set KEY=VALUE     임계값 하나 변경. 목록은 \"my help thresholds\"\n" +
+			"--plugin PROGRAM    엔진 실행 전에 벤더 분석기에 오류 기록을 넘김\n" +
+			"                    (docs/plugin-contract.md). --plugin-timeout TIME은 실행 제한 시간\n" +
+			"                    (기본 10s), --plugin-logs N은 DIMM마다 보내는 이전 기록 수\n" +
+			"                    (기본 1000)",
 	},
 	"help.scan": {
 		EN: "--ledger FILE     keep the scan in the ledger FILE and add to it on every run\n" +

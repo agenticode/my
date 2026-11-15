@@ -7,6 +7,7 @@ A case of a synthetic host, and what `my report` makes of it. The host, `r12-n03
 | `demo.mycase` | the case bundle, with `CPU0_C1` as its subject |
 | `demo-report.html` | the report of the case; download it and open it in a browser |
 | `figures/*.svg` | the figures of the report as files of their own |
+| `plugin/` | an example vendor analyzer, with a request and its response ([plugin/README.md](plugin/README.md)) |
 
 Look at the case with the commands of the tool:
 

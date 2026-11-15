@@ -26,7 +26,14 @@ import (
 	_ "modernc.org/sqlite" // to build a ledger of an old schema by hand
 )
 
-func TestMain(m *testing.M) { testledger.Main(m) }
+// TestMain runs the tests, or, when the test binary was started as a
+// vendor analyzer (see plugin_test.go), plays that part.
+func TestMain(m *testing.M) {
+	if mode := os.Getenv(fakeAnalyzerEnv); mode != "" {
+		os.Exit(fakeAnalyzer(mode))
+	}
+	testledger.Main(m)
+}
 
 // runEnv runs the binary with an environment.
 func runEnv(env map[string]string, args ...string) (code int, stdout, stderr string) {

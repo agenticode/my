@@ -154,7 +154,12 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	if err != nil {
 		return o.usageError(env, lang, "%v", err)
 	}
-	c, err := view.Open(ctx, ledger, lang, engine.Options{Config: &cfg, Now: now})
+	eopts := engine.Options{Config: &cfg, Now: now}
+	analyzer, code, ok := o.analyze(ctx, env, lang, ledger, &eopts, now)
+	if !ok {
+		return code
+	}
+	c, err := view.Open(ctx, ledger, lang, eopts)
 	if err != nil {
 		return o.failure(env, err)
 	}
@@ -175,6 +180,9 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 			importLine(w, lang, st, src)
 		}
 		fmt.Fprintln(w, say(lang, "import.total", "host", res.Host, "events", res.Events, "actions", res.Actions, "dup", res.Duplicates))
+		if analyzer != nil {
+			fmt.Fprintln(w, analyzerLine(lang, analyzer))
+		}
 	}
 
 	if *out != "" {

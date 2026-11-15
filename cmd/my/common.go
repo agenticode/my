@@ -18,6 +18,7 @@ import (
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/outfile"
+	"github.com/agenticode/my/internal/plugin"
 	"github.com/agenticode/my/internal/scan"
 	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/term"
@@ -52,7 +53,9 @@ type options struct {
 	ledger string
 	root   string
 	// sf points a scan at the store of a fleet instead of at this host.
-	sf   fleetFlags
+	sf fleetFlags
+	// pf names a vendor analyzer to run before the engine.
+	pf   pluginFlags
 	cf   engine.ConfigFlags
 	help bool
 }
@@ -74,6 +77,7 @@ func newOptions(env *cli.Env, name string, src *source) *options {
 		o.sf.register(o.fs)
 	}
 	o.cf.Register(o.fs)
+	o.pf.register(o)
 	o.fs.BoolVar(&o.help, "help", false, "")
 	o.fs.BoolVar(&o.help, "h", false, "")
 	return o
@@ -94,8 +98,11 @@ type session struct {
 	// scanned says that the data comes from a scan of this run.
 	scanned bool
 	// src is the case that was opened, or nil.
-	src     *source
-	closers []func()
+	src *source
+	// analyzer is the response of the vendor analyzer, when one was asked
+	// for with --plugin.
+	analyzer *plugin.Result
+	closers  []func()
 }
 
 func (s *session) close() {
@@ -292,7 +299,14 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 	}
 	s.closers = append(s.closers, func() { ledger.Close() })
 
-	s.c, err = view.Open(ctx, ledger, lang, engine.Options{Config: &cfg, Now: now})
+	eopts := engine.Options{Config: &cfg, Now: now}
+	var ok bool
+	var code int
+	if s.analyzer, code, ok = o.analyze(ctx, env, lang, ledger, &eopts, now); !ok {
+		s.close()
+		return nil, code
+	}
+	s.c, err = view.Open(ctx, ledger, lang, eopts)
 	if err != nil {
 		s.close()
 		return nil, o.failure(env, err)
@@ -450,7 +464,9 @@ type envelope struct {
 	ExitCode int                `json:"exit_code"`
 	// Case describes the bundle the data comes from, when it comes from one.
 	Case *caseInfo `json:"case,omitzero"`
-	Data any       `json:"data"`
+	// Analyzer names the vendor analyzer the run used (--plugin).
+	Analyzer *analyzerInfo `json:"analyzer,omitzero"`
+	Data     any           `json:"data"`
 }
 
 // jsonVersion is the version of the JSON output.
@@ -485,6 +501,9 @@ func (s *session) emitCode(name string, grade model.VerdictGrade, code int, data
 		}
 		e := newEnvelope(name, s.lang, host, grade, data)
 		e.ExitCode = code
+		if a := s.analyzer; a != nil {
+			e.Analyzer = &analyzerInfo{Name: a.Analyzer.Name, Version: a.Analyzer.Version, Vendor: a.Analyzer.Vendor, Notes: a.Notes}
+		}
 		if s.src != nil && s.src.manifest != nil {
 			m := s.src.manifest
 			e.Case = &caseInfo{CreatedAt: m.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"), Tool: m.Tool, Anonymized: m.Anonymized, Subject: m.Subject}
@@ -500,6 +519,18 @@ func (s *session) emitCode(name string, grade model.VerdictGrade, code int, data
 		if s.src != nil {
 			if note := s.storedNote(); note != "" {
 				for _, line := range s.st.Wrap(note, 0) {
+					fmt.Fprintln(s.env.Stdout, line)
+				}
+			}
+		}
+		// A vendor analyzer can change which rows count as one fault: a
+		// screen says when one took part.
+		if a := s.analyzer; a != nil {
+			for _, line := range s.st.Wrap(analyzerLine(s.lang, a), 0) {
+				fmt.Fprintln(s.env.Stdout, line)
+			}
+			for _, n := range a.Notes {
+				for _, line := range s.st.Wrap(say(s.lang, "plugin.note", "note", n), 2) {
 					fmt.Fprintln(s.env.Stdout, line)
 				}
 			}

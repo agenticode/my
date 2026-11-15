@@ -55,9 +55,11 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	if code, ok := s.needHost(); !ok {
 		return code
 	}
-	doc, err := fmfmlog.Build(ctx, s.c.Store(), s.h, fmfmlog.BuildOptions{
-		Lang: lang, Now: clock(env), Tool: "MemorY", Version: buildinfo.Version, All: *all, Records: *records,
-	})
+	bopts := fmfmlog.BuildOptions{Lang: lang, Now: clock(env), Tool: "MemorY", Version: buildinfo.Version, All: *all, Records: *records}
+	if a := s.analyzer; a != nil {
+		bopts.VendorAnalyzer = &fmfmlog.VendorAnalyzer{Name: a.Analyzer.Name, Version: a.Analyzer.Version, Vendor: a.Analyzer.Vendor}
+	}
+	doc, err := fmfmlog.Build(ctx, s.c.Store(), s.h, bopts)
 	if err != nil {
 		return o.failure(env, err)
 	}

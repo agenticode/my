@@ -50,7 +50,7 @@ Each error is written once. Where two sources report one error (a kernel log lin
   "format": "fmfm-analysis-log",
   "format_version": 1,
   "OutputDT": "2026-11-13T09:30:00.000Z",
-  "Analyzer": { "Name": "MemorY", "Version": "...", "engine_version": "1", "level": 1 },
+  "Analyzer": { "Name": "MemorY", "Version": "...", "engine_version": "3", "level": 1 },
   "HostID": "r12-n034",
   "action_descriptors": "none",
   "AnalysisLog": [ ... ],
@@ -59,6 +59,8 @@ Each error is written once. Where two sources report one error (a kernel log lin
 ```
 
 `AnalysisLog` has one record per DIMM that has errors or a finding (`--all`: every DIMM). `RuntimeLog` is there with `--records`. `level` is 1: the log holds the public fault classification and nothing a vendor keeps under NDA.
+
+When the run used a [vendor analyzer](plugin-contract.md) (`--plugin`), the document names it in `vendor_analyzer` (`name`, `version`, `vendor`): the rows it named neighbours can change which errors count as one fault. Its Level 2 output is not written.
 
 The framework document lists these items for the output of an analyzer (section 6, "Recommended SFA Log Output Data Format"). The names are this tool's, in the style of the runtime fields.
 
@@ -116,7 +118,7 @@ The document has three classes: high for a fault that no action in the field rec
 | other corrected errors | `Low Risk` |
 | hold replacement | left out |
 
-`Risk to SDC` is never written. Whether a fault pattern can pass the error correction of a platform unseen depends on its ECC scheme, which the open core does not know. A vendor analyzer is the place for it.
+`Risk to SDC` is never written. Whether a fault pattern can pass the error correction of a platform unseen depends on its ECC scheme, which the open core does not know. A [vendor analyzer](plugin-contract.md) is the place for it.
 
 ### Suggested action
 
