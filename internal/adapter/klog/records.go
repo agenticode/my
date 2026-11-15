@@ -215,6 +215,21 @@ var (
 	softRE = regexp.MustCompile(`[Ss]oft[ _]offline: (0x[0-9a-fA-F]+):? ?(.*)$`)
 )
 
+// A hard offline that a program asked for, not one that follows an error
+// the hardware reported. The kernel names the page just before it handles
+// it:
+//
+//	Injecting memory failure for pfn 0x64faa1 at process virtual address 0x7fea4881e000   madvise(MADV_HWPOISON)
+//	Injecting memory failure at pfn 0x64faa1                                              the hwpoison injector (debugfs)
+var injectRE = regexp.MustCompile(`Injecting memory failure (for|at) pfn (0x[0-9a-fA-F]+)`)
+
+// Injectors the kernel announces when they are set up. Records of a boot
+// that has one may come from a test.
+var injectorMarks = []struct{ mark, name string }{
+	{"Machine check injector initialized", "the machine check injector (mce-inject)"},
+	{"EINJ: Error INJection is initialized", "the ACPI error injection interface (EINJ)"},
+}
+
 // offline is a page offline message taken apart.
 type offline struct {
 	pfn    uint64
@@ -294,6 +309,9 @@ func candidate(raw string) bool {
 	return strings.Contains(raw, "EDAC MC") ||
 		strings.Contains(raw, "Hardware Error]") ||
 		strings.Contains(raw, "emory failure: ") ||
+		strings.Contains(raw, "Injecting memory failure") ||
+		strings.Contains(raw, "njector initialized") ||
+		strings.Contains(raw, "EINJ: ") ||
 		strings.Contains(raw, "offlin") ||
 		strings.Contains(raw, "Linux version ") ||
 		strings.Contains(raw, "DMI: ") ||
