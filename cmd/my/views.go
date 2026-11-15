@@ -24,6 +24,7 @@ var viewCommands = map[string]viewFunc{
 	"why":      runWhy,
 	"map":      runMap,
 	"timeline": runTimeline,
+	"bundle":   runBundle,
 }
 
 func live(fn viewFunc) func(context.Context, *cli.Env, []string) int {
@@ -84,6 +85,9 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 		out = append(out,
 			term.Hint{Command: s.prefix + " dimm " + slot, Text: say(s.lang, "hint.dimm")},
 			term.Hint{Command: s.prefix + " why " + slot, Text: say(s.lang, "hint.why")})
+	}
+	if s.src == nil {
+		out = append(out, term.Hint{Command: "my bundle -o case.mycase", Text: say(s.lang, "hint.bundle")})
 	}
 	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
 	return out

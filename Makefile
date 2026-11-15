@@ -33,7 +33,9 @@ FUZZ_TARGETS := \
 	./internal/adapter/nvidia:FuzzCollect \
 	./internal/adapter/dcbrain:FuzzTables \
 	./internal/engine:FuzzConfigRead \
-	./internal/i18n:FuzzFormat
+	./internal/i18n:FuzzFormat \
+	./internal/bundle:FuzzText \
+	./internal/bundle:FuzzReadManifest
 
 .PHONY: all build test test-race fuzz lint fmt fmt-check vet cross clean
 

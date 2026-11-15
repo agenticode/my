@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/store"
 )
@@ -28,6 +29,13 @@ func openCase(ctx context.Context, path string) (*source, error) {
 	f.Close()
 	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
 		return nil, fmt.Errorf("%s is a directory; a case is a ledger file or a .mycase bundle", path)
+	}
+	if bundle.IsBundle(path) {
+		c, err := bundle.Open(ctx, path, "")
+		if err != nil {
+			return nil, err
+		}
+		return &source{path: path, ledger: c.Ledger, manifest: &c.Manifest, cleanup: func() { c.Close() }}, nil
 	}
 	if !bytes.Equal(head[:n], sqliteMagic) {
 		return nil, fmt.Errorf("%s is neither a MemorY ledger nor a case bundle", path)
