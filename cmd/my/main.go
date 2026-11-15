@@ -50,6 +50,12 @@ func app() *cli.App {
 				Run:       live(runTimeline),
 			},
 			{
+				Name:      "gpu",
+				Summary:   "GPU memory as a repair budget: Xid records, remapped rows, spare rows per bank",
+				SummaryKO: "GPU 메모리를 리페어 예산으로: Xid 기록, remap된 row, bank별 spare row",
+				Run:       live(runGPU),
+			},
+			{
 				Name:      "bundle",
 				Summary:   "write the records of this host as one case file to send or attach",
 				SummaryKO: "이 호스트의 기록을 보내거나 첨부할 케이스 파일 하나로 저장",

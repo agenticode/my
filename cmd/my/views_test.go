@@ -437,6 +437,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"help", "why"}, "why", []string{"--oneline", "Finding. A grade is a finding"}},
 		{[]string{"map", "?"}, "map", []string{"--bank N", "--rows A-B", "A horizontal line is a row fault"}},
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
+		{[]string{"gpu", "?"}, "gpu", []string{"Usage: my gpu [index|serial|uuid|pci-address] [--days N] [flags]", "--days N", "GPU memory. A GPU does not report where in its memory an error was", "my open case.mycase gpu"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
@@ -531,7 +532,7 @@ func registerFlags(o *options, topic string) {
 		o.fs.Int("rank", -1, "")
 		o.fs.Int("device", -1, "")
 		o.fs.String("rows", "", "")
-	case "timeline":
+	case "timeline", "gpu":
 		o.fs.Int("days", 0, "")
 	case "import":
 		o.fs.String("ledger", "", "")

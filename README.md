@@ -141,6 +141,7 @@ The archives are reproducible: the same commit built with the same Go version gi
 | `my why [slot\|serial]` | the finding with the records, checks and confidence behind it; `--oneline` gives one line for a ticket |
 | `my map <slot\|serial>` | the address map of one bank; `--bank`, `--rank`, `--device` choose it, `--rows A-B` zooms |
 | `my timeline [slot\|serial]` | errors per day with boots, repairs, page offlines, slot changes and uncorrected errors |
+| `my gpu [gpu]` | GPU memory as a repair budget: Xid records, rows remapped, a remapping pending or failed, and the banks by the spare rows they have left |
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my report [FILE] -o report.html` | write the findings of a case, or of this host, as one HTML file with the figures as SVG; it prints to PDF, and `--audience fa` adds the detail failure analysis needs |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file instead of on this host |

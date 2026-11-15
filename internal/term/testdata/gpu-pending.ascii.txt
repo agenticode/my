@@ -1,0 +1,19 @@
+host gpu-01  1 GPU with memory records  Xid records of the 30 days to 2026-11-14
+no rule fired: only a failed row remapping has one (R-REP-01)
+
+ GPU  SERIAL    XID 30D  REMAP CE/UE  PENDING  FAILED  STATE           FINDING
+   2  ..001201  -        0 / 3        yes      no      repair pending  -
+
+ spare rows per bank (width = share of the banks of the GPU)
+ GPU 2  |max 636 .........................................|high 1 :|partial 2 +|low 1 *|  640 banks
+ . max   : high   + partial   * low   # none
+
+ GPU 2  S/N 1650000001201  GPU-11111111-2222-3333-4444-555555555501  Example GPU 80GB
+ PCI 0000:af:00.0  read 2026-11-14 08:00 UTC
+   state     repair pending
+   rows      0 remapped after correctable errors, 3 after uncorrectable errors
+   ECC       frame buffer memory: 12 corrected and 3 uncorrected errors in the life of the GPU, 0
+             and 1 since the driver was loaded
+   next      Reset the GPU, or reboot the host: the pending remapping takes effect then.
+   note      the latest reading (2026-11-14) does not carry every value; from earlier readings:
+             remapped rows of 2026-11-13, bank histogram of 2026-11-13

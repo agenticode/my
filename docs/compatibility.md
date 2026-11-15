@@ -602,6 +602,23 @@ A query that ran in a loop (`-l`) gives one snapshot per line when it has a `tim
 
 A reading saved once with `-q` and once as a query is one record: both forms give a snapshot the identity of GPU and second.
 
+### The repair budget
+
+`my gpu` reads these records as a budget. Every bank of the memory of a GPU has spare rows, a row that fails is remapped to one of them, and a bank without a spare row cannot take another failure. The command lists per GPU the Xid records of the last 30 days, the rows remapped after correctable and after uncorrectable errors, whether a remapping is pending or failed, and the banks by the spare rows they have left (`max`, `high`, `partial`, `low`, `none`, the buckets of the driver). `my gpu <index|serial|uuid|pci-address>` adds the ECC counts and the latest Xid records of one GPU.
+
+Each GPU has a state, the worst first:
+
+| State | When |
+| --- | --- |
+| repair failed | Xid 64 on record, or the failure flag of a reading |
+| repair pending | a remapping or a page retirement waits for a GPU reset |
+| little room | a bank at `low` or `none` |
+| repaired | rows remapped or pages retired, and room left |
+| errors | ECC counts or Xid records about memory, and no repair on record |
+| no errors | records, and none of the above |
+
+A state is a reading of the budget and no finding. One rule of the engine speaks about GPU memory: R-REP-01, replace now, when a row remapping failed. The exit code of `my gpu` is therefore 3 or 0. The failure flag stands for the life of the GPU: a later reading that does not carry it (a query without that column) takes nothing back, and where the latest reading lacks other values, those of the reading before it are shown with a note.
+
 ### One GPU under several names
 
 A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in which the driver did not print the identity knows the PCI address only. When GPU records are read from the ledger, a record without a UUID takes it from a record with the same PCI address, of the same boot if there is one and nearest in time otherwise; serial number, index and model follow the UUID. The stored rows stay as their sources gave them, so a snapshot imported later completes Xid records imported before it.
@@ -615,6 +632,7 @@ A snapshot knows serial number, UUID and PCI address. An Xid line from a boot in
 - The property names of the queries are those of the help text of drivers 470 to 610, and the reader was checked on published output of `--query-gpu` from three GPUs. The help text of `--query-remapped-rows` was not available; its columns are read by the same names, which a published sample of its output uses.
 - A GPU that was replaced in the same slot between two readings is told apart by its UUID; an Xid record with a PCI address only, between the two readings, goes to the nearer one.
 - GPUs of other vendors are not read.
+- No rule grades a pending remapping, a bank without spare rows or the `SRAM Threshold Exceeded` flag of the driver. `my gpu` shows them as states and notes; the exit code does not tell them from a GPU without errors.
 
 ## CXL memory devices
 

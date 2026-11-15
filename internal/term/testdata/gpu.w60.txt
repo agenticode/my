@@ -1,0 +1,60 @@
+host gpu-01  8 GPUs with memory records
+Xid records of the 30 days to 2026-11-14
+GPU finding: replace now
+
+ GPU  REMAP CE/UE  STATE           FINDING
+   0  0 / 2        repair failed   replace now R-REP-01
+   1  0 / 1        repair failed   replace now R-REP-01
+   2  0 / 3        repair pending  -
+   3  1 / 9        little room     -
+   4  2 / 0        repaired        -
+   7  3 / 1 pages  repaired        -
+   5  0 / 0        errors          -
+   6  0 / 0        no errors       -
+
+ spare rows per bank (width = share of the banks of the GPU)
+ GPU 0  |max 638 ·····················|high 2 ░|  640 banks
+ GPU 1  |max 640 ·······························|  640 banks
+ GPU 2  |max 636 ·|high 1 ░|partial 2 ▒|low 1 ▓|  640 banks
+ GPU 3  |max 637 ·|partial 1 ▒|low 1 ▓|none 1 █|  640 banks
+ GPU 4  |max 640 ·······························|  640 banks
+ GPU 5  |max 640 ·······························|  640 banks
+ GPU 6  |max 640 ·······························|  640 banks
+ · max   ░ high   ▒ partial   ▓ low   █ none
+
+ GPU 0  S/N 1650000000412  Example GPU 80GB
+ PCI 0000:3b:00.0  read 2026-11-13 09:30 UTC
+   state     repair failed
+   finding   replace now R-REP-01
+   evidence  [R-REP-01] row remapping failed: XID 64 on
+             2026-11-12 09:30 UTC
+   next      Return the GPU for repair or replace it: its
+             row remapping has failed.
+
+ GPU 1  S/N 1650000000977  Example GPU 80GB
+ PCI 0000:86:00.0  read 2026-11-13 09:30 UTC
+   state     repair failed
+   finding   replace now R-REP-01
+   evidence  [R-REP-01] the driver reports a row remapping
+             failure as of 2026-11-13 09:30 UTC
+   next      Return the GPU for repair or replace it: its
+             row remapping has failed.
+   note      the driver reports that the uncorrectable SRAM
+             errors passed the vendor's limit (SRAM
+             Threshold Exceeded); no rule grades this flag
+
+ GPU 2  S/N 1650000001201  Example GPU 80GB
+ PCI 0000:af:00.0  read 2026-11-14 08:00 UTC
+   state     repair pending
+   next      Reset the GPU, or reboot the host: the pending
+             remapping takes effect then.
+   note      the latest reading (2026-11-14) does not carry
+             every value; from earlier readings: remapped
+             rows of 2026-11-13, bank histogram of
+             2026-11-13
+
+ GPU 3  S/N 1650000001302  Example GPU 80GB
+ PCI 0000:d8:00.0  read 2026-11-13 09:30 UTC
+   state     little room
+   next      Plan a replacement: a bank without a spare row
+             cannot take another uncorrectable error.

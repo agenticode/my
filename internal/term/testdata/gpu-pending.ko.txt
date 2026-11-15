@@ -1,0 +1,18 @@
+호스트 gpu-01  메모리 기록이 있는 GPU 1개  2026-11-14까지 30일의 Xid 기록
+발동한 규칙 없음: row remap 실패에만 규칙이 있음(R-REP-01)
+
+ GPU  시리얼    XID 30일  REMAP CE/UE  대기  실패    상태         소견
+   2  ..001201  -         0 / 3        예    아니오  리페어 대기  -
+
+ bank별 남은 spare row (폭 = 이 GPU의 bank 중 비중)
+ GPU 2  |max 636 ········································|high 1 ░|partial 2 ▒|low 1 ▓|  bank 640개
+ · max   ░ high   ▒ partial   ▓ low   █ none
+
+ GPU 2  S/N 1650000001201  GPU-11111111-2222-3333-4444-555555555501  Example GPU 80GB
+ PCI 0000:af:00.0  읽은 시각 2026-11-14 08:00 UTC
+   상태  리페어 대기
+   row   correctable 오류로 remap 0개, uncorrectable 오류로 remap 3개
+   ECC   frame buffer 메모리: GPU 수명 동안 CE 12건, UE 3건. 드라이버 로드 이후 CE 0건, UE 1건
+   다음  GPU를 리셋하거나 호스트를 재부팅: 대기 중인 remap이 그때 적용됨.
+   참고  최근 읽기(2026-11-14)에 없는 값은 이전 읽기의 값: remap된 row 2026-11-13, bank 히스토그램
+         2026-11-13

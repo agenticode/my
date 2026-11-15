@@ -1,0 +1,3 @@
+host r12-n034
+
+ no GPU memory records: no Xid line about memory in the kernel log and no nvidia-smi output

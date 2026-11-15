@@ -1,0 +1,380 @@
+{
+  "view": "gpu",
+  "version": 1,
+  "lang": "en",
+  "host": "gpu-01",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": "gpu-01",
+    "as_of": "2026-11-14T08:00:00Z",
+    "days": 30,
+    "grade": "replace-now",
+    "grade_text": "replace now",
+    "gpus": [
+      {
+        "n": 1,
+        "gpu": "1650000000412",
+        "index": 0,
+        "serial": "1650000000412",
+        "uuid": "GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7",
+        "pci_bus": "0000:3b:00.0",
+        "model": "Example GPU 80GB",
+        "state": "failed",
+        "state_text": "repair failed",
+        "grade": "replace-now",
+        "grade_text": "replace now",
+        "rules": [
+          "R-REP-01"
+        ],
+        "evidence": [
+          {
+            "code": "gpu.xid64",
+            "args": {
+              "when": "2026-11-12 09:30 UTC"
+            },
+            "text": "[R-REP-01] row remapping failed: XID 64 on 2026-11-12 09:30 UTC"
+          }
+        ],
+        "next": {
+          "code": "next.gpu_replace",
+          "text": "Return the GPU for repair or replace it: its row remapping has failed."
+        },
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 0,
+        "remap_uncorrectable": 2,
+        "remap_pending": false,
+        "remap_failed": true,
+        "banks": {
+          "max": 638,
+          "high": 2,
+          "partial": 0,
+          "low": 0,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 31,
+        "dram_uncorrectable": 2,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 2,
+        "xids": [
+          {
+            "xid": 48,
+            "count": 1,
+            "name": "uncorrectable (double bit) ECC error"
+          },
+          {
+            "xid": 63,
+            "count": 1,
+            "name": "row remapping recorded"
+          },
+          {
+            "xid": 64,
+            "count": 1,
+            "name": "row remapping failed"
+          }
+        ],
+        "xid_total": 3,
+        "events": [
+          {
+            "at": "2026-11-12T09:30:00Z",
+            "time_quality": "exact",
+            "xid": 64,
+            "record": {
+              "kind": "gpu",
+              "id": 3,
+              "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L7"
+            }
+          },
+          {
+            "at": "2026-11-12T03:14:06Z",
+            "time_quality": "exact",
+            "xid": 63,
+            "text": "Row Remapper: New row marked for remapping, reset gpu to activate.",
+            "record": {
+              "kind": "gpu",
+              "id": 2,
+              "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L5"
+            }
+          },
+          {
+            "at": "2026-11-12T03:14:05.1002Z",
+            "time_quality": "exact",
+            "xid": 48,
+            "text": "An uncorrectable double bit error (DBE) has been detected on GPU in the framebuffer at partition 5, subpartition 0.",
+            "record": {
+              "kind": "gpu",
+              "id": 1,
+              "raw_ref": "/Users/alan/my-b/testdata/klog/nvidia-xid.messages#L3"
+            }
+          }
+        ],
+        "readings": 1
+      },
+      {
+        "n": 2,
+        "gpu": "1650000000977",
+        "index": 1,
+        "serial": "1650000000977",
+        "uuid": "GPU-5a1c2b3d-4e5f-6071-8293-a4b5c6d7e8f9",
+        "pci_bus": "0000:86:00.0",
+        "model": "Example GPU 80GB",
+        "state": "failed",
+        "state_text": "repair failed",
+        "grade": "replace-now",
+        "grade_text": "replace now",
+        "rules": [
+          "R-REP-01"
+        ],
+        "evidence": [
+          {
+            "code": "gpu.remap_failure",
+            "args": {
+              "when": "2026-11-13 09:30 UTC"
+            },
+            "text": "[R-REP-01] the driver reports a row remapping failure as of 2026-11-13 09:30 UTC"
+          }
+        ],
+        "next": {
+          "code": "next.gpu_replace",
+          "text": "Return the GPU for repair or replace it: its row remapping has failed."
+        },
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 0,
+        "remap_uncorrectable": 1,
+        "remap_pending": true,
+        "remap_failed": true,
+        "banks": {
+          "max": 640,
+          "high": 0,
+          "partial": 0,
+          "low": 0,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 0,
+        "dram_uncorrectable": 1,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 1,
+        "sram_threshold_exceeded": true,
+        "xid_total": 0,
+        "readings": 1,
+        "notes": [
+          {
+            "code": "gpu.note.sram",
+            "text": "the driver reports that the uncorrectable SRAM errors passed the vendor's limit (SRAM Threshold Exceeded); no rule grades this flag"
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "gpu": "1650000001201",
+        "index": 2,
+        "serial": "1650000001201",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555501",
+        "pci_bus": "0000:af:00.0",
+        "model": "Example GPU 80GB",
+        "state": "pending",
+        "state_text": "repair pending",
+        "grade": "ok",
+        "grade_text": "ok",
+        "next": {
+          "code": "gpu.next.pending",
+          "text": "Reset the GPU, or reboot the host: the pending remapping takes effect then."
+        },
+        "read_at": "2026-11-14T08:00:00Z",
+        "remap_correctable": 0,
+        "remap_uncorrectable": 3,
+        "remap_pending": true,
+        "remap_failed": false,
+        "banks": {
+          "max": 636,
+          "high": 1,
+          "partial": 2,
+          "low": 1,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 12,
+        "dram_uncorrectable": 3,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 1,
+        "xid_total": 0,
+        "readings": 2,
+        "notes": [
+          {
+            "code": "gpu.note.older",
+            "args": {
+              "parts": "remapped rows of 2026-11-13, bank histogram of 2026-11-13",
+              "when": "2026-11-14"
+            },
+            "text": "the latest reading (2026-11-14) does not carry every value; from earlier readings: remapped rows of 2026-11-13, bank histogram of 2026-11-13"
+          }
+        ]
+      },
+      {
+        "n": 4,
+        "gpu": "1650000001302",
+        "index": 3,
+        "serial": "1650000001302",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555502",
+        "pci_bus": "0000:d8:00.0",
+        "model": "Example GPU 80GB",
+        "state": "low",
+        "state_text": "little room",
+        "grade": "ok",
+        "grade_text": "ok",
+        "next": {
+          "code": "gpu.next.low",
+          "text": "Plan a replacement: a bank without a spare row cannot take another uncorrectable error."
+        },
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 1,
+        "remap_uncorrectable": 9,
+        "remap_pending": false,
+        "remap_failed": false,
+        "banks": {
+          "max": 637,
+          "high": 0,
+          "partial": 1,
+          "low": 1,
+          "none": 1,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 40,
+        "dram_uncorrectable": 9,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 0,
+        "xid_total": 0,
+        "readings": 1
+      },
+      {
+        "n": 5,
+        "gpu": "1650000001403",
+        "index": 4,
+        "serial": "1650000001403",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555503",
+        "pci_bus": "0000:18:00.0",
+        "model": "Example GPU 80GB",
+        "state": "repaired",
+        "state_text": "repaired",
+        "grade": "ok",
+        "grade_text": "ok",
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 2,
+        "remap_uncorrectable": 0,
+        "remap_pending": false,
+        "remap_failed": false,
+        "banks": {
+          "max": 640,
+          "high": 0,
+          "partial": 0,
+          "low": 0,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 7,
+        "dram_uncorrectable": 0,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 0,
+        "xid_total": 0,
+        "readings": 1
+      },
+      {
+        "n": 6,
+        "gpu": "0320000000716",
+        "index": 7,
+        "serial": "0320000000716",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555506",
+        "pci_bus": "0000:5f:00.0",
+        "model": "Example GPU 16GB",
+        "state": "repaired",
+        "state_text": "repaired",
+        "grade": "ok",
+        "grade_text": "ok",
+        "read_at": "2026-11-13T09:30:00Z",
+        "retired_sbe": 3,
+        "retired_dbe": 1,
+        "retired_pending": false,
+        "ecc_enabled": true,
+        "dram_correctable": 5,
+        "dram_uncorrectable": 1,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 0,
+        "xid_total": 0,
+        "readings": 1
+      },
+      {
+        "n": 7,
+        "gpu": "1650000001504",
+        "index": 5,
+        "serial": "1650000001504",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555504",
+        "pci_bus": "0000:19:00.0",
+        "model": "Example GPU 80GB",
+        "state": "errors",
+        "state_text": "errors",
+        "grade": "ok",
+        "grade_text": "ok",
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 0,
+        "remap_uncorrectable": 0,
+        "remap_pending": false,
+        "remap_failed": false,
+        "banks": {
+          "max": 640,
+          "high": 0,
+          "partial": 0,
+          "low": 0,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 31,
+        "dram_uncorrectable": 0,
+        "dram_correctable_volatile": 2,
+        "dram_uncorrectable_volatile": 0,
+        "xid_total": 0,
+        "readings": 1
+      },
+      {
+        "n": 8,
+        "gpu": "1650000001605",
+        "index": 6,
+        "serial": "1650000001605",
+        "uuid": "GPU-11111111-2222-3333-4444-555555555505",
+        "pci_bus": "0000:5e:00.0",
+        "model": "Example GPU 80GB",
+        "state": "quiet",
+        "state_text": "no errors",
+        "grade": "ok",
+        "grade_text": "ok",
+        "read_at": "2026-11-13T09:30:00Z",
+        "remap_correctable": 0,
+        "remap_uncorrectable": 0,
+        "remap_pending": false,
+        "remap_failed": false,
+        "banks": {
+          "max": 640,
+          "high": 0,
+          "partial": 0,
+          "low": 0,
+          "none": 0,
+          "read_at": "2026-11-13T09:30:00Z"
+        },
+        "ecc_enabled": true,
+        "dram_correctable": 0,
+        "dram_uncorrectable": 0,
+        "dram_correctable_volatile": 0,
+        "dram_uncorrectable_volatile": 0,
+        "xid_total": 0,
+        "readings": 1
+      }
+    ]
+  }
+}

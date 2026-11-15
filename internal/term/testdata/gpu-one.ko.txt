@@ -1,0 +1,22 @@
+호스트 gpu-01  메모리 기록이 있는 GPU 1개  2026-11-14까지 30일의 Xid 기록
+GPU 소견: 즉시 교체
+
+ GPU  시리얼    XID 30일        REMAP CE/UE  대기    실패  상태         소견
+   0  ..000412  48x1 63x1 64x1  0 / 2        아니오  예    리페어 실패  즉시 교체 R-REP-01
+
+ bank별 남은 spare row (폭 = 이 GPU의 bank 중 비중)
+ GPU 0  |max 638 ····························································|high 2 ░|  bank 640개
+ · max   ░ high   ▒ partial   ▓ low   █ none
+
+ GPU 0  S/N 1650000000412  GPU-b850f46d-d5ea-c752-ddf3-c4453e44d3f7  Example GPU 80GB
+ PCI 0000:3b:00.0  읽은 시각 2026-11-13 09:30 UTC
+   상태  리페어 실패
+   판정  즉시 교체 R-REP-01
+   근거  [R-REP-01] row remapping 실패: 2026-11-12 09:30 UTC XID 64
+   row   correctable 오류로 remap 0개, uncorrectable 오류로 remap 2개
+   ECC   frame buffer 메모리: GPU 수명 동안 CE 31건, UE 2건. 드라이버 로드 이후 CE 0건, UE 2건
+   Xid   2026-11-12 09:30 UTC 64
+         2026-11-12 03:14 UTC 63 Row Remapper: New row marked for remapping, reset gpu to activate.
+         2026-11-12 03:14 UTC 48 An uncorrectable double bit error (DBE) has been detected on GPU in
+         the framebuffer at partition 5, subpartition 0.
+   다음  GPU 수리 반품 또는 교체: row remapping 실패.
