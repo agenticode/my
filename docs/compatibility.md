@@ -49,6 +49,8 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 
 A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
 
+A copy of a host's files is read as of the moment it was made, because its counters and its seconds since boot count back from that moment. The moment is the boot time in `proc/stat` plus the uptime in `proc/uptime` when the copy holds both. Otherwise it is the newest modification time among the files that are read, which is right for a copy that kept the times of its files and wrong for one that did not (an archive unpacked without them, a checkout of a repository).
+
 What a file cannot say about itself is an option of the import:
 
 | Option | `my import` | Applies to |
