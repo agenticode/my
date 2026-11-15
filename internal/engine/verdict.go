@@ -57,6 +57,13 @@ type hostFacts struct {
 	// virtual names the hypervisor of a host that is a virtual machine, or
 	// is empty.
 	virtual string
+	// bios is what the BIOS settings on record say about how to read the
+	// records of the host. bmcSource is set when a BMC is among the
+	// sources of the latest scan, hostSource when a source of the host's
+	// own error records was read.
+	bios       biosFacts
+	bmcSource  bool
+	hostSource bool
 }
 
 func (j *judge) asOf(d *DIMMResult) int64 { return d.clk.asOf }
@@ -877,7 +884,12 @@ func (j *judge) check(fs *findings, grade model.VerdictGrade) {
 	fs.checks = append(fs.checks, fs.quietShort...)
 	if fs.has(RuleQuiet) || fs.has(RuleReseat) {
 		if _, ok := d.Features.Scrub.PatrolShare(); !ok || d.Features.Scrub.Patrol == 0 {
-			add(model.EffectOpen, statement("check.no_patrol"))
+			if b := j.hosts[d.Host].bios; b.patrolOff {
+				// The BIOS says why the scrubber found nothing.
+				add(model.EffectOpen, statement("check.patrol_off", "attribute", b.patrolAttr, "value", b.patrolValue))
+			} else {
+				add(model.EffectOpen, statement("check.no_patrol"))
+			}
 		}
 	}
 
@@ -945,6 +957,16 @@ func (j *judge) missing(fs *findings, grade model.VerdictGrade) []model.Statemen
 	}
 
 	ft := d.Features
+	// What the BIOS settings say about the log of a BMC. Where the BMC is
+	// the only witness, a DIMM without records rests on it too.
+	if b := hf.bios; hf.bmcSource && (ft.CE+ft.UE > 0 || !hf.hostSource) {
+		switch {
+		case b.ceOff:
+			add("missing.bmc_ce_off", "attribute", b.ceAttr, "value", b.ceValue)
+		case b.ceThreshold:
+			add("missing.bmc_threshold", "attribute", b.thresholdAttr, "value", b.thresholdValue)
+		}
+	}
 	if ft.CE+ft.UE == 0 {
 		return out
 	}
@@ -968,6 +990,9 @@ func (j *judge) missing(fs *findings, grade model.VerdictGrade) []model.Statemen
 	}
 	if _, ok := ft.Scrub.PatrolShare(); !ok {
 		add("missing.scrub")
+	}
+	if b := hf.bios; b.patrolOff {
+		add("missing.patrol_off", "attribute", b.patrolAttr, "value", b.patrolValue)
 	}
 	if ft.Trend.Direction == TrendUnknown && !d.clk.zero() {
 		add("missing.history", "days", int64(ft.Trend.PriorDays), "need", j.cfg.MinBaselineDays)

@@ -1,0 +1,562 @@
+{
+  "view": "bios",
+  "version": 1,
+  "lang": "en",
+  "host": "node-d",
+  "exit_code": 0,
+  "case": {
+    "created_at": "2026-11-13T09:30:00Z",
+    "tool": "my dev",
+    "anonymized": false
+  },
+  "data": {
+    "host": "node-d",
+    "machine": "Dell Inc. PowerEdge R740",
+    "bios_version": "2.12.2",
+    "bmc": {
+      "firmware": "4.40.00.00",
+      "read_at": "2026-11-13T09:30:00Z",
+      "live": false
+    },
+    "none": false,
+    "lead": [
+      {
+        "code": "check.read",
+        "args": {
+          "n": 12,
+          "when": "2026-11-13 09:30 UTC"
+        },
+        "text": "12 memory settings of the BIOS on record, read 2026-11-13 09:30 UTC"
+      },
+      {
+        "code": "check.registry",
+        "args": {
+          "registry": "BiosAttributeRegistry.v1_0_0"
+        },
+        "text": "attribute registry BiosAttributeRegistry.v1_0_0"
+      },
+      {
+        "code": "check.profile",
+        "args": {
+          "by": "@check.by.manufacturer",
+          "profile": "built-in",
+          "vendor": "Dell"
+        },
+        "text": "profile built-in, mapping for Dell (by the system manufacturer)"
+      }
+    ],
+    "columns": {
+      "setting": "SETTING",
+      "state": "STATE",
+      "value": "BIOS ATTRIBUTE = VALUE",
+      "expected": "EXPECTED",
+      "check": "CHECK"
+    },
+    "rows": [
+      {
+        "setting": "patrol-scrub",
+        "title": "patrol scrub",
+        "status": "ok",
+        "status_text": "as expected",
+        "state": "on",
+        "state_text": "on",
+        "attribute": "MemPatrolScrub",
+        "value": "Standard",
+        "expected": "on",
+        "expected_text": "on",
+        "lines": [
+          {
+            "code": "note",
+            "text": "the whole memory is scrubbed once in 24 hours"
+          },
+          {
+            "code": "line.pending",
+            "args": {
+              "state": "@state.off",
+              "value": "Disabled"
+            },
+            "text": "pending: Disabled (off); it takes effect after a reboot"
+          },
+          {
+            "code": "line.pending_bad",
+            "args": {
+              "expected": "@state.on"
+            },
+            "text": "the pending value is not what the profile expects (on)"
+          }
+        ]
+      },
+      {
+        "setting": "adddc",
+        "title": "ADDDC",
+        "status": "reported",
+        "status_text": "reported",
+        "state": "on",
+        "state_text": "on",
+        "attribute": "AdddcSetting",
+        "value": "Enabled",
+        "lines": [
+          {
+            "code": "note.adddc_width_unknown",
+            "args": {
+              "n": 5,
+              "total": 5
+            },
+            "text": "the device width (x4 or x8) of 5 of 5 DIMMs is not known: ADDDC has an effect on x4 DIMMs only"
+          }
+        ]
+      },
+      {
+        "setting": "memory-mode",
+        "title": "memory mode",
+        "status": "reported",
+        "status_text": "reported",
+        "state": "independent",
+        "state_text": "independent",
+        "attribute": "MemOpMode",
+        "value": "OptimizerMode"
+      },
+      {
+        "setting": "ce-logging",
+        "title": "CE logging",
+        "status": "ok",
+        "status_text": "as expected",
+        "state": "on",
+        "state_text": "on",
+        "attribute": "CorrEccSmi",
+        "value": "Enabled",
+        "expected": "on",
+        "expected_text": "on"
+      },
+      {
+        "setting": "ce-threshold",
+        "title": "CE threshold event",
+        "status": "reported",
+        "status_text": "reported",
+        "state": "on",
+        "state_text": "on",
+        "attribute": "CECriticalSEL",
+        "value": "Enabled"
+      },
+      {
+        "setting": "leaky-bucket",
+        "title": "leaky bucket",
+        "status": "unmapped",
+        "status_text": "not mapped"
+      },
+      {
+        "setting": "ppr",
+        "title": "post package repair",
+        "status": "absent",
+        "status_text": "not in this BIOS",
+        "attribute": "PostPackageRepair",
+        "lines": [
+          {
+            "code": "line.absent",
+            "text": "the settings of this BIOS on record do not list the attribute"
+          }
+        ]
+      },
+      {
+        "setting": "memory-frequency",
+        "title": "memory frequency",
+        "status": "reported",
+        "status_text": "reported",
+        "state": "limited",
+        "state_text": "limited",
+        "attribute": "MemFrequency",
+        "value": "2666MHz"
+      },
+      {
+        "setting": "refresh-rate",
+        "title": "refresh rate",
+        "status": "reported",
+        "status_text": "reported",
+        "state": "1x",
+        "state_text": "1x",
+        "attribute": "MemRefreshRate",
+        "value": "1x"
+      }
+    ],
+    "unmapped": [
+      {
+        "code": "check.unmapped",
+        "args": {
+          "reason": "no public document that was read gives a BIOS attribute for it",
+          "settings": "leaky bucket"
+        },
+        "text": "Not mapped (leaky bucket): no public document that was read gives a BIOS attribute for it."
+      }
+    ],
+    "speed": [
+      {
+        "code": "speed.lead",
+        "args": {
+          "known": 4,
+          "list": "A1, A2, B1, B2 at 2666, rated 2933",
+          "n": 4
+        },
+        "text": "4 of 4 DIMMs run below the speed they are rated for: A1, A2, B1, B2 at 2666, rated 2933"
+      },
+      {
+        "code": "speed.candidates",
+        "text": "What the records show that can be the reason. These are candidates; the records prove none of them:"
+      },
+      {
+        "code": "speed.bios",
+        "args": {
+          "attribute": "MemFrequency",
+          "value": "2666MHz"
+        },
+        "text": "the BIOS limits the memory frequency (MemFrequency = 2666MHz)"
+      },
+      {
+        "code": "speed.platform",
+        "args": {
+          "speed": "2666"
+        },
+        "text": "every DIMM with a known speed runs at 2666: the processor and the board are what is left, and the ledger holds no processor model to check that against"
+      }
+    ],
+    "related": [
+      {
+        "name": "MemTest",
+        "display_name": "System Memory Testing",
+        "value": "Disabled",
+        "has_value": true
+      },
+      {
+        "name": "NodeInterleave",
+        "display_name": "Node Interleaving",
+        "value": "Disabled",
+        "has_value": true
+      },
+      {
+        "name": "SysMemSize",
+        "display_name": "System Memory Size",
+        "value": "128 GB",
+        "has_value": true
+      },
+      {
+        "name": "SysMemSpeed",
+        "display_name": "System Memory Speed",
+        "value": "2666 Mhz",
+        "has_value": true
+      },
+      {
+        "name": "VideoMem",
+        "display_name": "Video Memory",
+        "value": "16 MB",
+        "has_value": true
+      }
+    ],
+    "related_head": {
+      "code": "check.related",
+      "args": {
+        "n": 5
+      },
+      "text": "5 other memory settings on record that the profile maps to nothing:"
+    },
+    "sources": [
+      {
+        "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+        "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+      },
+      {
+        "title": "Memory Errors and Dell EMC PowerEdge YX4X Server Memory RAS Features, Revision 1.0, 2020-01-03",
+        "url": "https://dl.dell.com/manuals/common/dellemc_poweredge_yx4x_memoryras_v1_0.pdf"
+      }
+    ],
+    "sources_head": {
+      "code": "check.sources",
+      "text": "Where the mappings and rules in use come from:"
+    },
+    "summary": [
+      {
+        "code": "check.summary_ok",
+        "args": {
+          "expected": 2
+        },
+        "text": "2 expectations of the profile, all met"
+      },
+      {
+        "code": "check.summary_pending",
+        "args": {
+          "n": 1
+        },
+        "text": "1 pending value will not be as expected after the next reboot"
+      }
+    ],
+    "mismatches": 0,
+    "pending_mismatches": 1,
+    "check": {
+      "profile": "built-in",
+      "vendor": "Dell",
+      "vendor_by": "manufacturer",
+      "manufacturer": "Dell Inc.",
+      "observed_at": "2026-11-13T09:30:00Z",
+      "registry": "BiosAttributeRegistry.v1_0_0",
+      "settings": 12,
+      "items": [
+        {
+          "setting": "patrol-scrub",
+          "status": "ok",
+          "attribute": "MemPatrolScrub",
+          "value": "Standard",
+          "pending": "Disabled",
+          "has_pending": true,
+          "state": "on",
+          "pending_state": "off",
+          "note": "the whole memory is scrubbed once in 24 hours",
+          "expected": "on",
+          "display_name": "Memory Patrol Scrub",
+          "allowed": [
+            "Standard",
+            "Extended",
+            "Disabled"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "adddc",
+          "status": "reported",
+          "attribute": "AdddcSetting",
+          "value": "Enabled",
+          "state": "on",
+          "display_name": "ADDDC Setting",
+          "allowed": [
+            "Enabled",
+            "Disabled"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          },
+          "notes": [
+            {
+              "code": "note.adddc_width_unknown",
+              "args": {
+                "n": 5,
+                "total": 5
+              },
+              "text": ""
+            }
+          ]
+        },
+        {
+          "setting": "memory-mode",
+          "status": "reported",
+          "attribute": "MemOpMode",
+          "value": "OptimizerMode",
+          "state": "independent",
+          "display_name": "Memory Operating Mode",
+          "allowed": [
+            "OptimizerMode",
+            "SingleRankSpareMode",
+            "MultiRankSpareMode",
+            "MirrorMode",
+            "FaultResilientMode"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "ce-logging",
+          "status": "ok",
+          "attribute": "CorrEccSmi",
+          "value": "Enabled",
+          "state": "on",
+          "expected": "on",
+          "display_name": "Correctable Memory ECC SMI",
+          "allowed": [
+            "Enabled",
+            "Disabled"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "ce-threshold",
+          "status": "reported",
+          "attribute": "CECriticalSEL",
+          "value": "Enabled",
+          "state": "on",
+          "display_name": "Correctable Error Logging",
+          "allowed": [
+            "Enabled",
+            "Disabled"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "leaky-bucket",
+          "status": "unmapped",
+          "registry": false,
+          "reason": "not-documented"
+        },
+        {
+          "setting": "ppr",
+          "status": "absent",
+          "attribute": "PostPackageRepair",
+          "registry": false,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "memory-frequency",
+          "status": "reported",
+          "attribute": "MemFrequency",
+          "value": "2666MHz",
+          "state": "limited",
+          "display_name": "Memory Frequency",
+          "allowed": [
+            "MaxPerf",
+            "MaxReliability",
+            "2933MHz",
+            "2666MHz",
+            "2400MHz",
+            "2133MHz"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        },
+        {
+          "setting": "refresh-rate",
+          "status": "reported",
+          "attribute": "MemRefreshRate",
+          "value": "1x",
+          "state": "1x",
+          "display_name": "Memory Refresh Rate",
+          "allowed": [
+            "1x",
+            "2x"
+          ],
+          "read_only": false,
+          "reset_required": true,
+          "registry": true,
+          "source": {
+            "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+            "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+          }
+        }
+      ],
+      "related": [
+        {
+          "name": "MemTest",
+          "display_name": "System Memory Testing",
+          "value": "Disabled",
+          "has_value": true
+        },
+        {
+          "name": "NodeInterleave",
+          "display_name": "Node Interleaving",
+          "value": "Disabled",
+          "has_value": true
+        },
+        {
+          "name": "SysMemSize",
+          "display_name": "System Memory Size",
+          "value": "128 GB",
+          "has_value": true
+        },
+        {
+          "name": "SysMemSpeed",
+          "display_name": "System Memory Speed",
+          "value": "2666 Mhz",
+          "has_value": true
+        },
+        {
+          "name": "VideoMem",
+          "display_name": "Video Memory",
+          "value": "16 MB",
+          "has_value": true
+        }
+      ],
+      "speed": {
+        "slow": [
+          {
+            "slot": "A1",
+            "operating": 2666,
+            "rated": 2933
+          },
+          {
+            "slot": "A2",
+            "operating": 2666,
+            "rated": 2933
+          },
+          {
+            "slot": "B1",
+            "operating": 2666,
+            "rated": 2933
+          },
+          {
+            "slot": "B2",
+            "operating": 2666,
+            "rated": 2933
+          }
+        ],
+        "known": 4,
+        "candidates": [
+          {
+            "code": "speed.bios",
+            "args": {
+              "attribute": "MemFrequency",
+              "value": "2666MHz"
+            },
+            "text": ""
+          },
+          {
+            "code": "speed.platform",
+            "args": {
+              "speed": "2666"
+            },
+            "text": ""
+          }
+        ]
+      },
+      "mismatches": 0,
+      "sources": [
+        {
+          "title": "Integrated Dell Remote Access Controller 9 Attribute Registry, 2020, Rev. A00",
+          "url": "https://dl.dell.com/topicspdf/idrac9-lifecycle-controller-v4x-series_Reference-Guide_en-us.pdf"
+        },
+        {
+          "title": "Memory Errors and Dell EMC PowerEdge YX4X Server Memory RAS Features, Revision 1.0, 2020-01-03",
+          "url": "https://dl.dell.com/manuals/common/dellemc_poweredge_yx4x_memoryras_v1_0.pdf"
+        }
+      ]
+    }
+  }
+}

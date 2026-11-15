@@ -56,6 +56,12 @@ func app() *cli.App {
 				Run:       live(runGPU),
 			},
 			{
+				Name:      "bios",
+				Summary:   "check the BIOS memory RAS settings a BMC reports against a settings profile",
+				SummaryKO: "BMC가 알려 준 BIOS 메모리 RAS 설정을 설정 프로필과 대조",
+				Run:       live(runBIOS),
+			},
+			{
 				Name:      "bundle",
 				Summary:   "write the records of this host as one case file to send or attach",
 				SummaryKO: "이 호스트의 기록을 보내거나 첨부할 케이스 파일 하나로 저장",
