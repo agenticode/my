@@ -165,7 +165,7 @@ var Messages = i18n.Catalog{
 	"check.sppr_volatile":      {EN: "the repair was a soft PPR and the host rebooted on {when} before the errors came back: a soft PPR is lost at power off", KO: "리페어가 sPPR이고 재발 전 {when}에 재부팅: sPPR은 전원이 꺼지면 사라짐"},
 	"check.repair_unlocated":   {EN: "{n} {n|repair names|repairs name} no place: whether errors came back at the repaired place is unknown", KO: "위치 정보 없는 리페어 기록 {n}건: 리페어한 위치의 재발 여부 확인 불가"},
 	"check.named_by_other":     {EN: "{n} error {n|record|records} tied to {slot} carry a {name} of this slot: some errors of {slot} may belong here", KO: "{slot}에 묶인 오류 기록 {n}건에 이 슬롯의 {name} 포함: {slot}의 오류 일부가 이 슬롯 것일 가능성"},
-	"check.host_no_place":      {EN: "{n} {n|error names|errors name} no socket, channel or slot: what recorded {n|it|them} decodes no DIMM", KO: "오류 {n}건에 소켓, 채널, 슬롯 정보 없음: 기록한 쪽이 DIMM을 해석하지 않음"},
+	"check.host_no_place":      {EN: "{n} {n|error names|errors name} no slot: what recorded {n|it|them} decodes no DIMM", KO: "오류 {n}건에 슬롯 정보 없음: 기록한 쪽이 DIMM을 해석하지 않음"},
 	"check.host_ambiguous":     {EN: "{n} {n|error|errors} in slot {slot} {n|falls|fall} between two DIMMs: the slot held another module before and after, and the time of the swap is not on record", KO: "슬롯 {slot}의 오류 {n}건은 두 DIMM 사이에 있음: 앞뒤로 다른 모듈이 꽂혀 있었고 교체 시점 기록이 없음"},
 	"check.host_asked":         {EN: "{n} of the pages {n|was|were} taken offline because a program asked the kernel to, as a test of that path does: no error of the hardware is behind {n|it|them}", KO: "페이지 {n}개는 프로그램이 커널에 요청해 offline됨(이 경로를 시험할 때 쓰는 방식): 하드웨어 오류에서 나온 것이 아님"},
 

@@ -1620,7 +1620,7 @@ func TestReportHasTheHostFinding(t *testing.T) {
 		"R-HOST-01 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340 3 records",
 		"R-HOST-02 7 corrected errors tied to no DIMM on 2026-11-15 7 records",
 		"R-HOST-02 5 pages taken offline and tied to no DIMM, the last on 2026-11-15",
-		"open 10 errors name no socket, channel or slot",
+		"open 10 errors name no slot",
 		"Do not pull a DIMM on these records",
 	} {
 		if !strings.Contains(card, want) {

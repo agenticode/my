@@ -55,7 +55,7 @@ The dataset does not have the DRAM device, the failing bits, a physical address,
 
 - A fault that spans several banks of one rank is reported as a device fault with the mode marked as estimated: it may lie in more than one device. A fault across both ranks is a DIMM fault.
 - A DIMM is identified by server and slot. A replaced DIMM cannot be told from the one before it.
-- Of the 13 rules, three can fire: R-ROW-03 (consider replacement), R-SOFT-01 (observe) and R-SYS-01 (hold replacement). No DIMM can reach "replace now", so that grade cannot be measured on this dataset.
+- Of the 15 rules, three can fire: R-ROW-03 (consider replacement), R-SOFT-01 (observe) and R-SYS-01 (hold replacement). No DIMM can reach "replace now", so that grade cannot be measured on this dataset.
 
 The place of a `memoryid` on the board is not in the description. The layout above is the one the scripts of the authors use. The report counts what the errors say about it: how many pairs of DIMMs that fail on one server share a channel or a socket, next to what chance would give among 24 slots.
 

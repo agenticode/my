@@ -58,7 +58,11 @@ func TestFleetOverview(t *testing.T) {
 				t.Fatalf("exit code %d, stderr %q\n%s", code, errOut, out)
 			}
 			wantLines(t, out, "3 hosts in this ledger", "web-02  replace now", "db-07   replace now", "web-01  consider replacement")
-			if a, b, c := strings.Index(out, "web-02 "), strings.Index(out, "db-07 "), strings.Index(out, "web-01 "); !(a < b && b < c) {
+			// Worst first: by finding, then by uncorrected and corrected
+			// errors, then by name. The errors of a host count whole, those
+			// that name no DIMM among them, so the two hosts to replace a
+			// DIMM in are level and stand by name.
+			if a, b, c := strings.Index(out, "db-07 "), strings.Index(out, "web-02 "), strings.Index(out, "web-01 "); !(a < b && b < c) {
 				t.Errorf("the hosts are not listed worst first:\n%s", out)
 			}
 			if len(*got) != 1 || (*got)[0].Backend != dialect || (*got)[0].User != "rasdaemon" || (*got)[0].Database != "rasdaemon" {
@@ -86,7 +90,7 @@ func TestFleetOverview(t *testing.T) {
 				} `json:"data"`
 			}
 			if err := json.Unmarshal([]byte(out), &doc); err != nil || code != 3 || doc.View != "hosts" || len(doc.Data) != 3 ||
-				doc.Data[0].Name != "web-02" || doc.Data[2].Name != "web-01" || doc.Data[2].Grade != "consider-replacement" {
+				doc.Data[0].Name != "db-07" || doc.Data[2].Name != "web-01" || doc.Data[2].Grade != "consider-replacement" {
 				t.Errorf("--json: exit code %d, %v, %+v", code, err, doc)
 			}
 
@@ -323,9 +327,10 @@ func TestFleetBundleAndLedger(t *testing.T) {
 	file := filepath.Join(dir, "db-07.mycase")
 	code, out, errOut := runEnv(fixed, "bundle", "-o", file, "--fleet", "postgresql", "--host", "db-07")
 	// The store holds 3 corrected errors of db-07 that name no DIMM. The
-	// line counts them with the errors of the host and says that no
-	// finding covers them.
-	if code != cli.ExitOK || errOut != "" || !strings.Contains(out, "host db-07: 2 DIMMs, CE 7, UE 3, finding: replace now; CE 3, UE 0 tied to no DIMM are in no finding") {
+	// line counts them with the errors of the host. The host finding
+	// watches them; a DIMM of the host is to be replaced, and that is the
+	// finding of the host.
+	if code != cli.ExitOK || errOut != "" || !strings.Contains(out, "host db-07: 2 DIMMs, CE 7, UE 3, finding: replace now\n") {
 		t.Fatalf("bundle: exit code %d, stderr %q\n%s", code, errOut, out)
 	}
 	code, out, _ = runEnv(fixed, "open", file)

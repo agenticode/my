@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/agenticode/my/internal/cli"
+	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/store"
 )
 
@@ -43,7 +44,7 @@ func TestAnalyzeDemo(t *testing.T) {
 		t.Fatalf("exit code %d, stderr %q", code, errOut)
 	}
 	wantLines(t, out,
-		"host r12-n034, as of 2026-11-13 00:00 UTC, engine 2",
+		"host r12-n034, as of 2026-11-13 00:00 UTC, engine 3",
 		"host finding: replace now",
 		"CPU0_C1  S/N 3B9C56  CE 1,231  UE 1  row",
 		"  finding   replace now (finding, confidence high, 91)  R-UE-01 R-ROW-03 R-REP-02",
@@ -69,7 +70,7 @@ func TestAnalyzeDemo(t *testing.T) {
 		t.Fatalf("ko: exit code %d", code)
 	}
 	wantLines(t, out,
-		"호스트 r12-n034, 기준 시각 2026-11-13 00:00 UTC, 엔진 2",
+		"호스트 r12-n034, 기준 시각 2026-11-13 00:00 UTC, 엔진 3",
 		"호스트 소견: 즉시 교체",
 		"  판정  즉시 교체 (소견, 신뢰도 높음, 91)  R-UE-01 R-ROW-03 R-REP-02",
 		"  근거  [R-UE-01] UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
@@ -166,7 +167,7 @@ func TestAnalyzeJSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &res); err != nil {
 		t.Fatalf("output is not JSON: %v\n%.400s", err, out)
 	}
-	if res.EngineVersion != "2" || res.Config["trend.recent_days"] != 7 || len(res.Hosts) != 1 || res.Hosts[0].Grade != "replace-now" || len(res.Hosts[0].DIMMs) != 16 {
+	if res.EngineVersion != "3" || res.Config["trend.recent_days"] != 7 || len(res.Hosts) != 1 || res.Hosts[0].Grade != "replace-now" || len(res.Hosts[0].DIMMs) != 16 {
 		t.Fatalf("result = %+v", res)
 	}
 	d := res.Hosts[0].DIMMs[0]
@@ -277,7 +278,7 @@ func TestAnalyzeUsage(t *testing.T) {
 
 func TestAnalyzeListsRulesAndThresholds(t *testing.T) {
 	code, out, _ := run("analyze", "-rules")
-	if code != cli.ExitOK || strings.Count(out, "\n") != 13 {
+	if code != cli.ExitOK || strings.Count(out, "\n") != len(engine.Rules) || len(engine.Rules) != 15 {
 		t.Fatalf("exit code %d, %d lines:\n%s", code, strings.Count(out, "\n"), out)
 	}
 	wantLines(t, out,

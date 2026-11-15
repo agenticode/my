@@ -70,7 +70,7 @@ A scan that fails leaves the metrics of the scan before in place and adds one to
 | --- | --- |
 | `GET /api/dimm/CPU0_C1` | the DIMM in slot `CPU0_C1` |
 | `GET /api/dimm/3B9C56` | the DIMM with that serial number. The last four or more characters of a serial number are enough when they fit one DIMM |
-| `GET /api/dimm` | every DIMM with errors or a finding, the worst first. `?all=1` lists every DIMM |
+| `GET /api/dimm` | every DIMM with errors or a finding, the worst first, and the host finding when the host has one: an entry with `"scope": "host"` and an empty `slot`. `?all=1` lists every DIMM |
 
 `?lang=en` or `?lang=ko` chooses the language of the sentences. Without it they are in the language of the server (`--lang`). The codes and arguments behind the sentences are in the document too.
 

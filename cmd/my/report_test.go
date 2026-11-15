@@ -364,20 +364,28 @@ func TestReportFigures(t *testing.T) {
 
 // TestErrorsThatNameNoDIMM runs the commands on a capture of a real guest
 // without a memory controller driver: 7 corrected and 3 uncorrected machine
-// checks that name no DIMM. No finding covers them, the grade of the host
-// stays "ok", and every line that names that grade says what it leaves out:
-// the overview, the line of a bundle (which read "CE 0, UE 0, finding: ok"
-// on the lab host) and the line and the summary of a report.
+// checks that name no DIMM, and 5 pages the kernel took offline. They are
+// in the finding of no DIMM. The host finding speaks about them: the grade
+// of the host is "hold replacement", the exit code 4, and the overview, the
+// card of "my why", the line of a bundle and the report show the finding.
+// The first run of the tool on that guest said "ok" and exit code 0.
 func TestErrorsThatNameNoDIMM(t *testing.T) {
 	root := filepath.Join(testutil.Testdata(t), "real", "7.3.0-mce")
-	const loose = "CE 7, UE 3 tied to no DIMM are in no finding"
+	const hold = 4
 
 	code, out, stderr := run("--root", root, "--color", "never")
-	if code != cli.ExitOK || stderr != "" {
+	if code != hold || stderr != "" {
 		t.Fatalf("scan: exit code %d, stderr %q", code, stderr)
 	}
-	wantLines(t, out, "  2026-11-15  CE 7, UE 3  observation grade B", "host finding: ok; "+loose,
-		" 10 errors of this host are tied to no DIMM", " 5 page offlines of this host are tied to no DIMM")
+	wantLines(t, out, "  2026-11-15  CE 7, UE 3  observation grade B", "host finding: hold replacement",
+		" tied to no DIMM  CE 7, UE 3, 5 pages offline  hold replacement  R-HOST-01 R-HOST-02",
+		"     3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340",
+		"     7 corrected errors tied to no DIMM on 2026-11-15",
+		"     5 pages taken offline and tied to no DIMM, the last on 2026-11-15",
+		" my --root "+root+" why: what the finding rests on")
+	if strings.Contains(out, "in no finding") {
+		t.Errorf("the overview says that no finding covers the errors:\n%s", out)
+	}
 
 	code, out, _ = run("--root", root, "--json")
 	var scan struct {
@@ -387,13 +395,49 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 			Unattributed   int64 `json:"unattributed"`
 			UnattributedUE int64 `json:"unattributed_ue"`
 			LoosePages     int   `json:"loose_pages"`
+			HostFinding    *struct {
+				Scope string   `json:"scope"`
+				Grade string   `json:"grade"`
+				Rules []string `json:"rules"`
+				CE    int64    `json:"ce"`
+				UE    int64    `json:"ue"`
+				Pages int      `json:"pages"`
+			} `json:"host_finding"`
 		} `json:"data"`
 	}
-	if err := json.Unmarshal([]byte(out), &scan); err != nil || code != cli.ExitOK {
+	if err := json.Unmarshal([]byte(out), &scan); err != nil || code != hold {
 		t.Fatalf("scan --json: exit code %d, %v", code, err)
 	}
-	if scan.Grade != "ok" || scan.ExitCode != 0 || scan.Data.Unattributed != 10 || scan.Data.UnattributedUE != 3 || scan.Data.LoosePages != 5 {
-		t.Errorf("scan --json: %+v", scan)
+	if hf := scan.Data.HostFinding; scan.Grade != "hold-replacement" || scan.ExitCode != hold || scan.Data.Unattributed != 10 || scan.Data.UnattributedUE != 3 ||
+		scan.Data.LoosePages != 5 || hf == nil || hf.Scope != "host" || hf.Grade != "hold-replacement" || hf.CE != 7 || hf.UE != 3 || hf.Pages != 5 ||
+		strings.Join(hf.Rules, " ") != "R-HOST-01 R-HOST-02" {
+		t.Errorf("scan --json: %+v, host finding %+v", scan, scan.Data.HostFinding)
+	}
+
+	// "my why" shows the card of the host finding, and one line of it.
+	code, out, _ = run("why", "--root", root)
+	if code != hold {
+		t.Errorf("why: exit code %d", code)
+	}
+	wantLines(t, out, "host lab-guest  tied to no DIMM  CE 7, UE 3, 5 pages offline", "hold replacement (finding, confidence high, 85)",
+		"[R-HOST-01] 3 uncorrected errors tied to no DIMM", "open: 10 errors name no slot",
+		"no EDAC driver reports a memory controller on this host", "Do not pull a DIMM on these records")
+	code, out, _ = run("why", "--oneline", "--root", root)
+	if code != hold || !strings.HasPrefix(out, "lab-guest: hold replacement (finding, confidence high; R-HOST-01, R-HOST-02). 3 uncorrected errors tied to no DIMM") {
+		t.Errorf("why --oneline: exit code %d, %q", code, out)
+	}
+	code, out, _ = run("why", "--json", "--root", root)
+	var why struct {
+		ExitCode int `json:"exit_code"`
+		Data     []struct {
+			Scope string `json:"scope"`
+			Slot  string `json:"slot"`
+			Grade string `json:"grade"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal([]byte(out), &why); err != nil || code != hold || why.ExitCode != hold || len(why.Data) != 1 ||
+		why.Data[0].Scope != "host" || why.Data[0].Slot != "" || why.Data[0].Grade != "hold-replacement" {
+		t.Errorf("why --json: exit code %d, %v, %+v", code, err, why)
 	}
 
 	dir := t.TempDir()
@@ -402,20 +446,24 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 	if code != cli.ExitOK || stderr != "" {
 		t.Fatalf("bundle: exit code %d, stderr %q", code, stderr)
 	}
-	wantLines(t, out, "  host lab-guest: 1 DIMM, CE 7, UE 3, finding: ok; "+loose)
+	wantLines(t, out, "  host lab-guest: 1 DIMM, CE 7, UE 3, finding: hold replacement")
+	// The receiver of the bundle sees the same finding.
+	if code, out, _ = run("open", file, "why", "--oneline"); code != hold || !strings.Contains(out, "\nlab-guest: hold replacement (finding, confidence high; R-HOST-01, R-HOST-02).") {
+		t.Errorf("my open of the bundle: exit code %d, %q", code, out)
+	}
 
 	page := filepath.Join(dir, "r.html")
 	code, out, stderr = run("report", file, "-o", page)
 	if code != cli.ExitOK || stderr != "" {
 		t.Fatalf("report: exit code %d, stderr %q", code, stderr)
 	}
-	wantLines(t, out, "  host lab-guest, finding: ok; "+loose)
+	wantLines(t, out, "  host lab-guest, finding: hold replacement")
 	b, err := os.ReadFile(page)
 	if err != nil {
 		t.Fatal(err)
 	}
 	text := strings.Join(strings.Fields(textOf(b)), " ")
-	wantLines(t, text, "10 errors of this host (CE 7, UE 3) are tied to no DIMM, and no finding covers them. 5 page offlines of this host are tied to no DIMM.",
+	wantLines(t, text, "hold replacement (finding, confidence high). 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340.",
 		"No DIMM of this host has errors on record.", "2026-11-15, 1 boot", "7 corrected and 3 uncorrected errors on 2026-11-15")
 	if strings.Contains(text, "2026-11-15 to 2026-11-15, 1 boot") {
 		t.Error("the report names a period of one day by two days")
@@ -425,5 +473,5 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 	if code != cli.ExitOK {
 		t.Fatalf("report --lang ko: exit code %d", code)
 	}
-	wantLines(t, out, "  호스트 lab-guest, 소견: 정상. 어느 DIMM에도 묶이지 않은 CE 7건, UE 3건은 소견에 들어가지 않음")
+	wantLines(t, out, "  호스트 lab-guest, 소견: 교체 보류")
 }
