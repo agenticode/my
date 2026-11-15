@@ -85,6 +85,15 @@ func TestBundleRoundTrip(t *testing.T) {
 			t.Errorf("my open FILE %v does not say what the case is:\n%s", args, opened)
 		}
 	}
+	// The next commands point at the subject of the case, also when another
+	// DIMM ranks above it.
+	second := filepath.Join(t.TempDir(), "second.mycase")
+	if code, _, errOut := runEnv(fixed, "bundle", "CPU1_D1", "-o", second, "--root", root); code != cli.ExitOK {
+		t.Fatalf("exit code %d, stderr %q", code, errOut)
+	}
+	_, out, _ = runEnv(fixed, "open", second)
+	wantLines(t, out, "subject CPU1_D1 S/N 2AEB41", "my open "+second+" dimm CPU1_D1: examination of this DIMM", "my open "+second+" why CPU1_D1:")
+
 	// --json carries what the case is.
 	_, out, _ = runEnv(fixed, "open", file, "why", "CPU0_C1", "--json")
 	var e struct {
