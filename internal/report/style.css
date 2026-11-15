@@ -10,6 +10,10 @@ p, li, dd, td { text-wrap-style: pretty; }
   h1, h2, h3, h4, caption, figcaption, legend, summary, th { text-wrap: balance; }
 }
 code, pre, .mono { word-break: normal; overflow-wrap: anywhere; text-wrap-style: auto; }
+/* A place inside a DIMM, an address: lines break between its parts only.
+   Next to a long file name a cell that may break anywhere is squeezed
+   until a number is cut in two. */
+.place { overflow-wrap: normal; }
 pre { white-space: pre-wrap; }
 .badge, .rule, .tag, .num, .delta, .nw, .id { white-space: nowrap; }
 
@@ -50,6 +54,10 @@ h3 .meta .badge { vertical-align: 1px; }
 .verdict .grade { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 6px; }
 .verdict .grade strong { font-size: 1.45rem; line-height: 1.2; font-weight: 700; white-space: nowrap; }
 .verdict .conclusion { font-size: 1.02rem; }
+/* What no finding covers: set off from the sentences about the findings. */
+.verdict .uncovered { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); }
+.verdict .grade + .uncovered { margin-top: 0; padding-top: 0; border-top: 0; }
+.verdict .uncovered svg.ic { margin-right: 3px; }
 .facts { margin: 0 0 10px; }
 .facts div { display: grid; grid-template-columns: 10.5em minmax(0, 1fr); gap: 12px; padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
 .facts dt { color: var(--ink2); }

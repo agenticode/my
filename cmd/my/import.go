@@ -195,7 +195,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		}
 		summary(env.Stdout)
 		fmt.Fprintln(env.Stdout, say(lang, "bundle.written", "file", w.Path, "size", sizeText(w.Bytes)))
-		fmt.Fprintf(env.Stdout, "  %s\n", say(lang, "import.finding", "host", h.Host, "grade", engine.GradeText(lang, h.Grade)))
+		fmt.Fprintf(env.Stdout, "  %s\n", say(lang, "import.finding", "host", h.Host, "grade", findingText(lang, h)))
 		for name, word := range w.Names {
 			fmt.Fprintf(env.Stdout, "    %s -> %s\n", name, word)
 		}

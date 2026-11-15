@@ -165,11 +165,13 @@ A command that shows findings exits with the grade of what it showed, the host o
 
 | Code | Grade | When |
 | --- | --- | --- |
-| 0 | ok | no errors on record |
+| 0 | ok | no DIMM has errors on record |
 | 1 | observe | corrected errors without a growing fault |
 | 2 | consider replacement | a fault is rising or spreading, pages keep being taken offline, the patrol scrubber found an uncorrected error, or errors came back after a repair |
 | 3 | replace now | an uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up |
 | 4 | hold replacement | a cause outside the DIMM is suspected: the channel, the slot, the contact, or slot names that disagree |
+
+The grade of a host is the grade of its worst DIMM or GPU. Errors that the records tie to no DIMM, as on a host whose memory controller has no EDAC driver, are in no finding and leave the grade as it is. The overview, the lines `bundle` and `report` print, and the summary of the report say how many there are.
 
 A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results. `my help rules` lists the 13 rules, `my help thresholds` the thresholds, and `--set key=value` or `--config FILE` changes them. [docs/evaluation.md](docs/evaluation.md) describes how findings are compared with the failure tickets of a public fleet dataset.
 

@@ -15,7 +15,16 @@ import (
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/view"
 )
+
+// findingText names the finding for a host in a line of text: its grade
+// and, where errors of the host are tied to no DIMM, that no finding
+// covers them.
+func findingText(lang i18n.Lang, h *engine.HostResult) string {
+	ce, ue := view.Loose(h)
+	return view.GradeWithLoose(lang, engine.GradeText(lang, h.Grade), ce, ue)
+}
 
 // toolName is how this binary names itself in what it writes: its version
 // and, where it is known, the commit it was built from.
@@ -145,7 +154,10 @@ func runBundle(ctx context.Context, env *cli.Env, args []string, src *source) in
 			}
 			ce, ue = ce+d.Features.CE, ue+d.Features.UE
 		}
-		p("  %s", say(lang, "bundle.host", "host", name, "dimms", dimms, "ce", ce, "ue", ue, "grade", engine.GradeText(lang, h.Grade)))
+		// The errors of the host, those that are tied to no DIMM among
+		// them: the line must not read "CE 0" for a host with errors.
+		looseCE, looseUE := view.Loose(h)
+		p("  %s", say(lang, "bundle.host", "host", name, "dimms", dimms, "ce", ce+looseCE, "ue", ue+looseUE, "grade", findingText(lang, h)))
 	}
 	if subject != nil {
 		text := subject.Slot
