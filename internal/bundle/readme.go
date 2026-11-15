@@ -63,7 +63,8 @@ func readme(m *Manifest) string {
 	}
 	p("")
 	if m.Anonymized {
-		p("Host names, IP addresses and MAC addresses were replaced before this bundle was written.")
+		p("Host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line")
+		p("were replaced before this bundle was written.")
 		p("DIMM serial numbers were kept: a return is about them.")
 	} else {
 		p("Host names and network addresses are in this bundle as the sources recorded them.")

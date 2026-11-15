@@ -339,7 +339,8 @@ func identifying(t *testing.T) *store.Store {
 		os.Chtimes(p, ds.Scenario.End, ds.Scenario.End)
 	}
 	put("proc/sys/kernel/hostname", "r12-n034.dc1.example.com\n")
-	put("proc/cmdline", "BOOT_IMAGE=/vmlinuz root=/dev/sda2 ip=10.20.30.40::10.20.30.1:255.255.255.0:r12-n034.dc1.example.com:eth0:none nameserver=2001:db8::53 "+
+	put("proc/cmdline", "BOOT_IMAGE=/vmlinuz root=UUID=15c26993-ac30-424a-9c4b-faec4434d234 rd.luks.uuid=luks-0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9 "+
+		"ip=10.20.30.40::10.20.30.1:255.255.255.0:r12-n034.dc1.example.com:eth0:none nameserver=2001:db8::53 "+
 		"BOOTIF=01-aa-bb-cc-dd-ee-ff nfsroot=192.168.7.9:/export ifname=bootnet:00:1B:44:11:3A:B7 gw6=fe80::1%eth0\n")
 	// The kernel log as a syslog file: every line carries the host name.
 	dmesg, err := os.ReadFile(filepath.Join(root, "var", "log", "dmesg"))
@@ -415,7 +416,8 @@ func allText(t *testing.T, path string) map[string][]string {
 
 func TestAnonymize(t *testing.T) {
 	src := identifying(t)
-	secrets := []string{"r12-n034", "example.com", "dc1.example", "10.20.30.40", "10.20.30.1", "192.168.7.9", "2001:db8::53", "fe80::1", "aa-bb-cc-dd-ee-ff", "00:1B:44:11:3A:B7", "00:1b:44:11:3a:b7"}
+	secrets := []string{"r12-n034", "example.com", "dc1.example", "10.20.30.40", "10.20.30.1", "192.168.7.9", "2001:db8::53", "fe80::1", "aa-bb-cc-dd-ee-ff", "00:1B:44:11:3A:B7", "00:1b:44:11:3a:b7",
+		"15c26993-ac30-424a-9c4b-faec4434d234", "0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9"}
 
 	// The ledger does hold what is to be removed: the test is not vacuous.
 	plain := write(t, src, Options{})
@@ -493,7 +495,7 @@ func TestAnonymize(t *testing.T) {
 				t.Errorf("%s still holds %q", name, s)
 			}
 		}
-		if name == readmeName && !strings.Contains(string(b), "Host names, IP addresses and MAC addresses were replaced") {
+		if name == readmeName && !strings.Contains(string(b), "Host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line\nwere replaced") {
 			t.Errorf("the README does not say that names were replaced")
 		}
 	}
@@ -618,6 +620,36 @@ func TestTextAnonymizing(t *testing.T) {
 	}
 	if a.apply(derived, "") != "" || a.apply(bootID, "6f1c0a8e2b7d4f0e9a3b5c7d9e1f2a3b") != "6f1c0a8e2b7d4f0e9a3b5c7d9e1f2a3b" || a.apply(keep, "x") != "x" {
 		t.Error("apply")
+	}
+}
+
+// A kernel command line names the disks of the machine. Seen on the lab
+// host: the anonymized bundle still held root=UUID=... of its root file
+// system.
+func TestCommandLineAnonymizing(t *testing.T) {
+	a, err := newAnonymizer([]byte("k"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.host("r12-n034")
+	a.learn()
+	id := func(s string) string { return a.word("uuid-", s, 8) }
+	for _, tt := range []struct{ in, want string }{
+		{"", ""},
+		{"ro quiet mce=print_all ras=cec_disable", "ro quiet mce=print_all ras=cec_disable"},
+		{"BOOT_IMAGE=(hd0,gpt3)/boot/vmlinuz-7.3.0-ras root=UUID=15c26993-ac30-424a-9c4b-faec4434d234 ro rootflags=subvol=root console=ttyS0,115200n8",
+			"BOOT_IMAGE=(hd0,gpt3)/boot/vmlinuz-7.3.0-ras root=UUID=" + id("15c26993-ac30-424a-9c4b-faec4434d234") + " ro rootflags=subvol=root console=ttyS0,115200n8"},
+		// Upper case names the same disk.
+		{"resume=PARTUUID=15C26993-AC30-424A-9C4B-FAEC4434D234", "resume=PARTUUID=" + id("15c26993-ac30-424a-9c4b-faec4434d234")},
+		{"rd.luks.uuid=luks-0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9 rd.md.uuid=0a1b2c3d:4e5f6a7b:8c9d0e1f:2a3b4c5d",
+			"rd.luks.uuid=luks-" + id("0f1e2d3c-4b5a-4978-8695-a4b3c2d1e0f9") + " rd.md.uuid=" + id("0a1b2c3d:4e5f6a7b:8c9d0e1f:2a3b4c5d")},
+		{"systemd.machine_id=f22d227bad9147f7b3e4a8d9577e2cb6 quiet", "systemd.machine_id=" + a.word("id-", "f22d227bad9147f7b3e4a8d9577e2cb6", 8) + " quiet"},
+		// What free text gets still applies.
+		{"ip=10.1.2.3 hostname=r12-n034", "ip=" + a.word("ip-", "10.1.2.3", 8) + " hostname=" + a.names["r12-n034"]},
+	} {
+		if got := a.apply(commandLine, tt.in); got != tt.want {
+			t.Errorf("command line %q\n got  %q\n want %q", tt.in, got, tt.want)
+		}
 	}
 }
 

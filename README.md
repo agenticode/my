@@ -154,7 +154,7 @@ case bundle written: case.mycase (163.4 kB)
 look at it: my open case.mycase
 ```
 
-A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksum of the ledger), `sources.json` (every source that was looked for and what it yielded), `ledger.db` (the SQLite ledger) and `README.txt`. It holds records about memory errors and never the contents of memory. `--anonymize` replaces host names, IP addresses and MAC addresses by words made from a keyed hash; DIMM serial numbers stay, because a return is about them.
+A bundle is a ZIP archive: `manifest.json` (what was collected, with the checksum of the ledger), `sources.json` (every source that was looked for and what it yielded), `ledger.db` (the SQLite ledger) and `README.txt`. It holds records about memory errors and never the contents of memory. `--anonymize` replaces host names, IP addresses, MAC addresses and the disk identifiers of the kernel command line (`root=UUID=...`) by words made from a keyed hash; DIMM serial numbers stay, because a return is about them.
 
 ## Status
 
