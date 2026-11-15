@@ -88,6 +88,55 @@ func TestFallbacksAndPlaceholders(t *testing.T) {
 	}
 }
 
+// A copy of a host's files holds whatever was put there. A boot time the
+// ledger cannot store went on to the ledger and was refused there: it is
+// no boot time. A host name file with a second line gave a host name with
+// a line break in it. A file far larger than the kernel writes is not
+// read into memory. Found by FuzzCollect.
+func TestValuesTheKernelNeverWrites(t *testing.T) {
+	for _, btime := range []string{"253402300800", "99999999999999999", "9223372036854775807", "0", "-5", "soon"} {
+		fsys := liveHost()
+		fsys["proc/stat"] = file("cpu  1 2 3\nbtime " + btime + "\n")
+		var c adapter.Collected
+		rep := New(fsys, "/", Options{Now: now}).Collect(ctx, &c)
+		if rep.Status != model.SourcePartial || rep.SinkErr != nil || len(c.Boots) != 0 || len(c.Hosts) != 1 ||
+			len(rep.Notes) != 1 || rep.Notes[0] != "could not read: boot time" {
+			t.Errorf("btime %s: report = %+v, %d boots", btime, rep, len(c.Boots))
+		}
+	}
+	// The last second the ledger stores is a boot time.
+	fsys := liveHost()
+	fsys["proc/stat"] = file("btime 253402300799\n")
+	var c adapter.Collected
+	if rep := New(fsys, "/", Options{Now: now}).Collect(ctx, &c); rep.Status != model.SourceOK || len(c.Boots) != 1 || c.Boots[0].StartedAt.Year() != 9999 {
+		t.Errorf("last second of the year 9999: report = %+v", rep)
+	}
+
+	// Host name files: more than a name, a megabyte, a zero byte.
+	for content, want := range map[string]string{
+		"web-7\nsecond line\n":            "web-7",
+		"  web-7.example.org  \n":         "web-7.example.org",
+		strings.Repeat("h", 253) + "\n":   strings.Repeat("h", 253),
+		strings.Repeat("h", 254) + "\n":   "",
+		strings.Repeat("h", 1<<20) + "\n": "",
+		"web\x007\n":                      "",
+		"\n":                              "",
+	} {
+		fsys := liveHost()
+		fsys["proc/sys/kernel/hostname"] = file(content)
+		if got := New(fsys, "/", Options{Now: now}).HostHint(); got != want {
+			t.Errorf("host name file of %d bytes: %q, want %q", len(content), got, want)
+		}
+	}
+	// A command line of a megabyte is left out; the boot is still read.
+	fsys = liveHost()
+	fsys["proc/cmdline"] = file(strings.Repeat("x", 1<<20))
+	c = adapter.Collected{}
+	if rep := New(fsys, "/", Options{Now: now}).Collect(ctx, &c); rep.Status != model.SourceOK || len(c.Boots) != 1 || c.Boots[0].Cmdline != "" {
+		t.Errorf("large command line: report = %+v", rep)
+	}
+}
+
 func TestArchFromKernelRelease(t *testing.T) {
 	for rel, want := range map[string]string{
 		"5.14.0-570.12.1.el9_6.x86_64":      "x86_64",
