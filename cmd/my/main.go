@@ -139,7 +139,9 @@ func app() *cli.App {
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	code := app().Run(ctx, cli.OSEnv(), os.Args[1:])
+	env := cli.OSEnv()
+	safeStreams(env, isTerminal)
+	code := app().Run(ctx, env, os.Args[1:])
 	stop()
 	os.Exit(code)
 }
