@@ -202,4 +202,6 @@ On a Linux host, with a build of the binary:
 python3 tools/validate/host.py --my ./my --out /tmp/my-test/out --sudo
 ```
 
+CI runs this on its own machine on every change, an Ubuntu runner that is a Hyper-V guest: 57 commands as a normal user and as root, with the `/dev/null` check and the exporter, on the change that added the script.
+
 `--sudo` adds the pass as root through `sudo -n`; started as root, `--as nobody` adds the pass as that user. `--devnull`, `--strace` and `--serve` add the checks that ran on some hosts only. The script needs Python 3.6 and installs nothing. It writes below `--out` and nowhere else, prints one line per command, and exits with 1 when a check failed. `results.json` holds the numbers of this page for the host it ran on.
