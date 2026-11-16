@@ -183,6 +183,23 @@ func (c *Case) CheckBIOS(ctx context.Context, h *engine.HostResult, opts BIOSOpt
 	return p.Check(memras.Input{Manufacturer: manufacturer, Settings: memras.Latest(all), Modules: modules}), nil
 }
 
+// biosWithoutMemory reports that the latest BMC of a host gave its BIOS
+// settings and none of them was kept: the BIOS has no attribute that bears
+// on memory, by its name or by its entry in the registry. "bios" is the
+// class of the Bios resource in the manifest of a collection.
+func biosWithoutMemory(bmcs []model.BMC) bool {
+	if len(bmcs) == 0 {
+		return false
+	}
+	b := bmcs[len(bmcs)-1]
+	for _, cl := range b.Classes {
+		if cl.Class == "bios" {
+			return cl.State == "ok" || cl.State == "partial" || cl.State == "present"
+		}
+	}
+	return b.BIOSRegistry != ""
+}
+
 // BIOS builds the check of the BIOS memory RAS settings of a host.
 func (c *Case) BIOS(ctx context.Context, h *engine.HostResult, opts BIOSOptions) (*BIOS, error) {
 	res, err := c.CheckBIOS(ctx, h, opts)
@@ -207,7 +224,11 @@ func (c *Case) BIOS(ctx context.Context, h *engine.HostResult, opts BIOSOptions)
 	}
 	if res.Settings == 0 {
 		v.None = true
-		v.Lead = append(v.Lead, c.ras("check.none"))
+		if biosWithoutMemory(bmcs) {
+			v.Lead = append(v.Lead, c.ras("check.none_memory"))
+		} else {
+			v.Lead = append(v.Lead, c.ras("check.none"))
+		}
 		v.Summary = []Text{c.ras("check.summary_none")}
 		return v, nil
 	}

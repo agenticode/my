@@ -75,6 +75,7 @@ type bmcSide struct {
 	widths   [2]int
 	logs     []model.BMCLog
 	offset   model.Opt[int64]
+	classes  []model.BMCClass
 	settings map[string]string
 	readings []model.BMCMemory
 	entries  []*model.Event
@@ -96,7 +97,7 @@ func (b bmcSide) adapter() adapter.Adapter {
 			}
 		}
 		if err := sink.BMC(&model.BMC{ObservedAt: sideRead, Address: "10.0.0.5", Firmware: "4.40", BIOSVersion: "2.12", Live: true, ClockOffset: b.offset,
-			Logs: b.logs, Source: "redfish/manifest", Fingerprint: "bmc"}); err != nil {
+			Classes: b.classes, Logs: b.logs, Source: "redfish/manifest", Fingerprint: "bmc"}); err != nil {
 			return err
 		}
 		for name, value := range b.settings {
@@ -401,6 +402,34 @@ func TestInventoryRAS(t *testing.T) {
 	if off.RASCommon != "" || !strings.Contains(fmt.Sprint(off.Lead), "none of the memory RAS settings the profile reads is on") {
 		t.Errorf("RAS common %q, lead %v", off.RASCommon, off.Lead)
 	}
+
+	// No settings: whether the BMC gave its BIOS settings and none of them
+	// is about memory, or the BIOS was not read.
+	for _, tt := range []struct {
+		classes []model.BMCClass
+		code    string
+	}{
+		{[]model.BMCClass{{Class: "bios", State: "ok"}}, "inv.ras_none_memory"},
+		{[]model.BMCClass{{Class: "bios", State: "timeout"}}, "inv.ras_none"},
+		{nil, "inv.ras_none"},
+	} {
+		v := inventoryOf(t, i18n.EN, bmcSide{classes: tt.classes}.adapter())
+		found := false
+		for _, l := range v.Lead {
+			found = found || l.Code == tt.code
+		}
+		if !found {
+			t.Errorf("classes %v: lead %v, want %s", tt.classes, v.Lead, tt.code)
+		}
+	}
+}
+
+// A clock that is days off is told in days.
+func TestSidesClockOffDays(t *testing.T) {
+	v := inventoryOf(t, i18n.EN, bmcSide{offset: model.Some[int64](-4266*86400 - 3600)}.adapter())
+	wantSaid(t, v.Sides, "The clock of the BMC was 4,266 days behind the machine that read it; it may never have been set.")
+	v = inventoryOf(t, i18n.EN, bmcSide{offset: model.Some[int64](2*86400 + 7200)}.adapter())
+	wantSaid(t, v.Sides, "The clock of the BMC was 2 days ahead of the machine that read it")
 }
 
 // Every message of the inventory exists in both languages.
