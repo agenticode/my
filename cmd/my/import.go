@@ -179,7 +179,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		for _, src := range extra {
 			importLine(w, lang, st, src)
 		}
-		fmt.Fprintln(w, say(lang, "import.total", "host", res.Host, "events", res.Events, "actions", res.Actions, "dup", res.Duplicates))
+		fmt.Fprintln(w, say(lang, "import.total", "host", res.Host, "events", res.Events-res.Informational, "actions", res.Actions, "dup", res.Duplicates))
 		if analyzer != nil {
 			fmt.Fprintln(w, analyzerLine(lang, analyzer))
 		}
@@ -275,12 +275,15 @@ func importLine(w io.Writer, lang i18n.Lang, st term.Style, src model.Source) {
 	if src.Records > 0 {
 		parts = append(parts, say(lang, "import.records", "n", src.Records))
 	}
-	if src.Events > 0 {
+	if n := src.Events - src.Informational; n > 0 {
 		grade := ""
 		if g := src.BestGrade(); g != "" {
 			grade = string(g)
 		}
-		parts = append(parts, say(lang, "import.events", "n", src.Events, "grade", grade))
+		parts = append(parts, say(lang, "import.events", "n", n, "grade", grade))
+	}
+	if src.Informational > 0 {
+		parts = append(parts, say(lang, "import.informational", "n", src.Informational))
 	}
 	if src.Actions > 0 {
 		parts = append(parts, say(lang, "import.actions", "n", src.Actions))
