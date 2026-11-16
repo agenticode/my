@@ -86,5 +86,6 @@ Documentation and help texts state what the tool does, with the command, the num
 | `tools/dist` | builds the release archives, the same bytes for the same commit |
 | `tools/lab` | scripts that inject errors on a lab host and capture what it recorded |
 | `tools/perf` | makes large synthetic inputs and measures time and peak memory of the commands on them ([docs/performance.md](docs/performance.md)) |
+| `tools/screenlen` | counts the lines and characters of the default screens on the lab captures, in English and Korean |
 | `tools/validate` | runs the binary against the host it is on ([docs/validation.md](docs/validation.md)) |
 | `docs` | the pages listed in the README |
