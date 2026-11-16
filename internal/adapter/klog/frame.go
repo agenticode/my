@@ -35,6 +35,9 @@ type line struct {
 	bootStart time.Time
 	host      string
 	kernel    bool // false for lines of other programs in a syslog file
+	// prog is the program a syslog line or a journal entry names
+	// ("kernel", "mcelog"), when the framing names one.
+	prog string
 }
 
 var (
@@ -132,9 +135,9 @@ func (f *framer) frame(n int, raw string) (l line, ok bool) {
 			switch {
 			case tm[2] == "kernel":
 				f.tagged = true
-				l.host, l.msg = tm[1], tm[3]
+				l.host, l.msg, l.prog = tm[1], tm[3], tm[2]
 			case f.tagged && looksLikeTag(tm[2]):
-				l.host, l.kernel, l.msg = tm[1], false, tm[3]
+				l.host, l.kernel, l.msg, l.prog = tm[1], false, tm[3], tm[2]
 			}
 		}
 		return l, true
@@ -165,9 +168,9 @@ func (f *framer) frame(n int, raw string) (l line, ok bool) {
 				switch {
 				case tm[2] == "kernel":
 					f.syslog = true
-					l.host, rest = tm[1], tm[3]
+					l.host, rest, l.prog = tm[1], tm[3], tm[2]
 				case f.syslog && looksLikeTag(tm[2]):
-					l.host, l.kernel, rest = tm[1], false, tm[3]
+					l.host, l.kernel, rest, l.prog = tm[1], false, tm[3], tm[2]
 				}
 			}
 			l.setMessage(rest)
@@ -176,7 +179,7 @@ func (f *framer) frame(n int, raw string) (l line, ok bool) {
 	}
 	if m := syslogRE.FindStringSubmatch(s); m != nil {
 		if t, ok := f.syslogTime(m[1], m[2], m[3]); ok {
-			l.wall, l.host = t, m[4]
+			l.wall, l.host, l.prog = t, m[4], m[5]
 			l.kernel = m[5] == "kernel"
 			l.setMessage(m[6])
 			return l, true
@@ -248,7 +251,7 @@ func frameJSON(n int, raw string) (l line, err error) {
 	// A journal holds the messages of every program. Kernel messages have
 	// transport "kernel"; an export made with -k holds nothing else.
 	l.kernel = e.Transport == "kernel" || (e.Transport == "" && (e.Ident == "kernel" || e.Ident == ""))
-	l.bootID, l.host = e.BootID, e.Hostname
+	l.bootID, l.host, l.prog = e.BootID, e.Hostname, e.Ident
 	if us, err := strconv.ParseInt(e.Realtime, 10, 64); err == nil && us > 0 {
 		l.wall = time.UnixMicro(us).UTC()
 	}

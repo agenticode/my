@@ -699,7 +699,8 @@ func TestOfflinesAskedForByAProgram(t *testing.T) {
 		detail string
 		result model.ActionResult
 	}{
-		{0x64faa1000, "dirty LRU page: Recovered; asked for through madvise", model.ResultOK},
+		// The kernel signalled the program whose page it was.
+		{0x64faa1000, "dirty LRU page: Recovered; SIGBUS to hwpoison:2309; asked for through madvise", model.ResultOK},
 		{0x11bae2000, "clean LRU page: Recovered; asked for through madvise", model.ResultOK},
 		{0x17bddb000, "free buddy page: Recovered; asked for through the hwpoison injector", model.ResultOK},
 		{0x106b26000, "dirty LRU page: Recovered", model.ResultOK},

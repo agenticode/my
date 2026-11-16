@@ -40,6 +40,11 @@ func FuzzCollect(f *testing.F) {
 	f.Add(mceBlockText(58.25, 0xbe00000000010090, 0x12345040, 1794739502)+"[ 58.260571] mce: [Hardware Error]: Machine check: Processor context corrupt\n[ 58.261381] Kernel panic - not syncing: Fatal machine check\n", false)
 	f.Add(fatalGHES(1, 100.5, 0x100010140)+"[ 100.51] GHES: Fatal hardware error but panic disabled\n[ 100.52][  C0] Kernel panic - not syncing: GHES: Fatal hardware error\n", true)
 	f.Add("mce: [Hardware Error]: Machine check: x\nmce: [Hardware Error]: Fake kernel panic: y\n---[ end Kernel panic - not syncing: z ]---\n", false)
+	// Lines of mcelog, sel-logger and QEMU, and the program an error
+	// reached (daemon.go).
+	f.Add(syslogBoot+"Nov 15 10:44:00 lab mcelog: Corrected memory errors on page 12345000 exceed threshold 10 in 24h: 10 in 24h\nNov 15 10:44:00 lab mcelog: Offlining page 12345000\nNov 15 10:44:00 lab kernel: [  250.000000] Memory failure: 0x12345: page migration failed 1, type 0\nNov 15 10:44:00 lab mcelog: Offlining page 12345000 failed: x\n", true)
+	f.Add("[ 300.0] mce: Uncorrected hardware memory error in user-access at 12345040\n[ 300.1] Memory failure: 0x12345: Sending SIGBUS to a b:1 due to hardware memory corruption\n[ 300.2] Memory failure: 0x12345: recovery action for dirty LRU page: Recovered\n", false)
+	f.Add("Nov 15 10:44:00 bmc sel-logger[3]: Failed adding this event: x\nNov 15 10:46:00 hv virtqemud[1]: Can't migrate this vm with hardware poisoned memory, please reboot the vm and try again\n", false)
 	f.Add("[99999999999.000000] NVRM: Xid (PCI:0000:3b:00): 9999, pid=1, name=x, text\n[1.000000] NVRM: GPU Board Serial Number: 1\n", true)
 	f.Fuzz(func(t *testing.T, text string, anchored bool) {
 		opts := Options{}

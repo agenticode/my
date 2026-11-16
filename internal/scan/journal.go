@@ -41,8 +41,13 @@ func (j *journal) sinceArgs() []string {
 // limit the output to the running boot.
 const journalMatch = "_TRANSPORT=kernel"
 
+// journalReads is what a read selects: the kernel's messages and those of
+// the mcelog daemon, which say why it took a page offline ("+" joins
+// matches with OR, journalctl(1)). The probe asks for kernel messages only.
+var journalReads = []string{journalMatch, "+", "SYSLOG_IDENTIFIER=mcelog"}
+
 func (j *journal) Kind() string   { return klog.Kind }
-func (j *journal) Origin() string { return "journalctl -o json " + journalMatch }
+func (j *journal) Origin() string { return "journalctl -o json " + strings.Join(journalReads, " ") }
 
 // journalctl says in two ways that the user may not read the system
 // journal: a hint when the user sees only their own messages, and an error
@@ -152,7 +157,7 @@ func (j *journal) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if timeout <= 0 {
 		timeout = DefaultJournalTimeout
 	}
-	rep, timedOut := j.pass(ctx, sink, timeout, append(j.sinceArgs(), journalMatch)...)
+	rep, timedOut := j.pass(ctx, sink, timeout, append(j.sinceArgs(), journalReads...)...)
 	if !j.since.IsZero() {
 		rep.Notes = append(rep.Notes, "read from "+j.since.UTC().Format("2006-01-02 15:04:05")+" UTC on: what came before is in the ledger")
 	}
@@ -162,7 +167,7 @@ func (j *journal) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	// The journal is read oldest boot first. When time ran out the running
 	// boot was not reached, and it is the one that matters most: it is
 	// read by itself. Records of both passes are stored once.
-	now, _ := j.pass(ctx, sink, time.Minute, "-b", "0", journalMatch)
+	now, _ := j.pass(ctx, sink, time.Minute, append([]string{"-b", "0"}, journalReads...)...)
 	rep.Records += now.Records
 	rep.Skipped += now.Skipped
 	rep.Status = model.SourcePartial
