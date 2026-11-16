@@ -83,6 +83,11 @@ func TestSetThreshold(t *testing.T) {
 		{"trend.recent_days", "-1", "trend.recent_days: -1 is not above zero"},
 		{"cluster.wider_share", "2", "cluster.wider_share: 2 is outside the range 0 to 1"},
 		{"cluster.row_window_bytes", "8", "is outside the range 64 to 1099511627776"},
+		// A whole number beyond the range of int converted to the smallest
+		// int on amd64, and was accepted ("storm.count=1e99", found by the
+		// fuzz job of CI).
+		{"storm.count", "1e99", `storm.count: "1e99" is larger than 9007199254740992`},
+		{"evidence.max_records", "9007199254740994", "is larger than 9007199254740992"},
 	} {
 		err := c.Set(tt.key, tt.value)
 		if err == nil || !strings.Contains(err.Error(), tt.want) {
@@ -91,6 +96,9 @@ func TestSetThreshold(t *testing.T) {
 	}
 	if c != before {
 		t.Error("a refused value changed the configuration")
+	}
+	if err := c.Set("storm.count", "9007199254740992"); err != nil || c.StormCount != 1<<53 {
+		t.Errorf("the largest whole number: %v, %d", err, c.StormCount)
 	}
 	if _, ok := c.Get("no.such.key"); ok {
 		t.Error("Get of an unknown key")
