@@ -32,6 +32,11 @@ type loop struct {
 	// copy of the host where it differs: a copy without the journal knows
 	// the boots its other files name.
 	window, copyWindow, stops int
+	// copyStops and copyWhere, when set, are what the copy of the host
+	// gives instead of the plan: a copy without the journal holds the
+	// last boot only, and the plan is checked on the kept ledger.
+	copyStops int
+	copyWhere string
 	// where says where the uncorrected errors of the window lie
 	// (engine.Recurrence.Where).
 	where string
@@ -47,6 +52,8 @@ var loops = []loop{
 	{dir: "6.19.10-mce-loop", host: "lab-x86", window: 4, stops: 3, where: "none", rule: "host.loop_address"},
 	{dir: "6.19.10-mce-loop-scatter", host: "lab-x86", window: 4, stops: 3, where: "none"},
 	{dir: "6.19.10-mce-loop-kdump", host: "lab-x86", window: 3, copyWindow: 2, stops: 1, where: "none"},
+	{dir: "6.19.10-bert-loop", host: "lab-x86", window: 4, copyWindow: 2, stops: 3, where: engine.RuleLoopPlace, dimmRule: engine.RuleLoopPlace,
+		copyStops: 1, copyWhere: "dimm"},
 }
 
 // loopBoot is one line of boots.jsonl: what was injected in a boot.
@@ -105,6 +112,20 @@ func TestLoops(t *testing.T) {
 			}
 			at := capturedAt(t, capture{dir: l.dir})
 			for name, s := range map[string]*store.Store{"kept ledger": kept, "copy": copied} {
+				if name == "copy" && l.copyStops > 0 {
+					out, err := engine.Run(ctx, s, engine.Options{Now: at})
+					if err != nil {
+						t.Fatal(err)
+					}
+					h := out.Host(l.host)
+					if h == nil || h.Recurrence == nil {
+						t.Fatalf("copy: no boots of %s", l.host)
+					}
+					if r := h.Recurrence; r.Window() != l.copyWindow || r.Stops != l.copyStops || r.Where != l.copyWhere {
+						t.Errorf("copy: window %d, stops %d, where %q; want %d, %d, %q", r.Window(), r.Stops, r.Where, l.copyWindow, l.copyStops, l.copyWhere)
+					}
+					continue
+				}
 				cmp, err := injection.Compare(ctx, s, l.host, p)
 				if err != nil {
 					t.Fatal(err)

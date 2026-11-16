@@ -1,0 +1,47 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: bert-loop
+summary: "a boot error region made by hand, which QEMU writes into the guest at every reset: each of three boots reads one fatal memory error of the boot before"
+method: "tools/lab/bertregion: one Generic Error Status Block with a Platform Memory section; QEMU -acpitable sig=BERT and -device loader at 0x20000000; memmap=4K$0x20000000 in the guest"
+kernel: 6.19.10-300.fc44.x86_64
+machine: "QEMU 10.2.2 q35, -cpu Skylake-Server, emulated without hardware virtualization"
+injections:
+  - id: before-boot-1
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x12345040
+    rank: 0
+    device: 7
+    bank_group: 0
+    bank: 3
+    row: 0x1a2f
+    column: 0x238
+    label: DIMM 0
+    note: "read by boot 1 (04b89820c98c4b4694ca649b611b2116) as the error of the boot before, which the cleaned journal does not hold"
+  - id: before-boot-2
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x12345040
+    rank: 0
+    device: 7
+    bank_group: 0
+    bank: 3
+    row: 0x1a2f
+    column: 0x238
+    label: DIMM 0
+    note: "read by boot 2 (49953d70ed584642b794004953a88ee9): the error of boot 1"
+  - id: before-boot-3
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x12345040
+    rank: 0
+    device: 7
+    bank_group: 0
+    bank: 3
+    row: 0x1a2f
+    column: 0x238
+    label: DIMM 0
+    note: "read by boot 3 (9d0567896f0a43528e84f777d90b4b39): the error of boot 2"

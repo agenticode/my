@@ -1,0 +1,1 @@
+BOOT_IMAGE=(hd0,gpt3)/boot/vmlinuz-6.19.10-300.fc44.x86_64 no_timer_check systemd.firstboot=off root=UUID=00000000-0000-4000-8000-000000000001 rootflags=subvol=root mce=print_all console=tty0 console=ttyS0,115200 systemd.default_device_timeout_sec=900 crashkernel=256M memmap=4K$0x20000000
