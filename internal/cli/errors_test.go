@@ -83,3 +83,22 @@ func TestFlagName(t *testing.T) {
 		}
 	}
 }
+
+func TestLangFlag(t *testing.T) {
+	for _, tt := range []struct {
+		args []string
+		want string
+	}{
+		{[]string{"--frob", "--lang", "ko"}, "ko"},
+		{[]string{"--lang=ko", "--frob"}, "ko"},
+		{[]string{"-lang", "en"}, "en"},
+		{[]string{"--language", "ko"}, ""},
+		{[]string{"--", "--lang", "ko"}, ""},
+		{[]string{"--lang"}, ""},
+		{[]string{"lang", "ko"}, ""},
+	} {
+		if got := LangFlag(tt.args); got != tt.want {
+			t.Errorf("LangFlag(%q) = %q, want %q", tt.args, got, tt.want)
+		}
+	}
+}

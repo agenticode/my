@@ -124,6 +124,28 @@ func Parse(fs *flag.FlagSet, args []string) ([]string, error) {
 	return append(pos, rest...), nil
 }
 
+// LangFlag returns the value of the first --lang (or -lang) among args, or
+// "". A command uses it when the flags could not be parsed, so that the
+// error is said in the language the reader asked for.
+func LangFlag(args []string) string {
+	for i, a := range args {
+		if a == "--" {
+			break
+		}
+		name, value, hasValue := strings.Cut(strings.TrimLeft(a, "-"), "=")
+		if !strings.HasPrefix(a, "-") || name != "lang" {
+			continue
+		}
+		if hasValue {
+			return value
+		}
+		if i+1 < len(args) {
+			return args[i+1]
+		}
+	}
+	return ""
+}
+
 // IsHelp reports whether an argument asks for help. "?" does: it is what
 // the screens name as the key for the reading guide.
 func IsHelp(arg string) bool {
