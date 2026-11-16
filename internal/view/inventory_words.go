@@ -54,6 +54,9 @@ var InventoryMessages = i18n.Catalog{
 	"inv.count.current_since": {EN: "{n} since the reset of {since}", KO: "{since} 리셋 이후 {n}건"},
 	"inv.line.count":          {EN: "corrected errors the BMC counts: {counts}", KO: "BMC가 센 CE: {counts}"},
 	"inv.line.event":          {EN: "BMC log {when}: {text}", KO: "BMC 로그 {when}: {text}"},
+	"inv.line.firmware":       {EN: "firmware: {marks}", KO: "펌웨어: {marks}"},
+	"inv.registry":            {EN: "registries: {prefix} {version} ({memory} memory messages, {mapped} in the table)", KO: "레지스트리: {prefix} {version} (메모리 메시지 {memory}개, 표에 {mapped}개)"},
+	"inv.registry_unmapped":   {EN: "registries: {prefix} {version} ({memory} memory messages, {mapped} in the table, {wording} by wording, {unmapped} not classed: my vendors --seen)", KO: "레지스트리: {prefix} {version} (메모리 메시지 {memory}개, 표에 {mapped}개, 문구로 {wording}개, 분류 못 함 {unmapped}개: my vendors --seen)"},
 
 	"sides.nothing":           {EN: "No source of error records was read on either side.", KO: "어느 쪽에서도 오류 기록 소스를 읽지 못함."},
 	"sides.no_bmc":            {EN: "No BMC was read: my inventory --bmc ADDRESS reads it in the same run.", KO: "BMC를 읽지 않음. my inventory --bmc ADDRESS가 같은 실행에서 BMC를 읽음."},

@@ -12,7 +12,15 @@ import (
 
 // repairKinds are the actions my_dimm_repairs_total counts, and the value
 // of its type label for each.
-var repairKinds = []model.ActionKind{model.ActionSPPR, model.ActionHPPR, model.ActionSparing, model.ActionRowRemap}
+var repairKinds = []model.ActionKind{model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionSparing, model.ActionDeviceSparing,
+	model.ActionRowRemap}
+
+// firmwareEvents are the common events my_dimm_firmware_events_total
+// counts: the families prediction, out of use, repair, sparing, mirror and
+// boot.
+var firmwareEvents = map[string]bool{"predicted-failure": true, "disabled": true, "ppr-scheduled": true, "ppr-done": true,
+	"ppr-failed": true, "sparing": true, "device-sparing": true, "spare-copy-started": true, "sparing-failed": true,
+	"mirror-failover": true, "mirror-lost": true, "training-failure": true, "config-error": true}
 
 // gradeValue is the value of my_source_grade for an observation grade.
 func gradeValue(g model.Grade) float64 {
@@ -94,9 +102,45 @@ func Host(ctx context.Context, s *store.Store, h *engine.HostResult) (*Set, erro
 		if a.At.After(h.AsOf) && a.TimeQuality != model.TimeRelative {
 			continue
 		}
+		// A repair that waits for the next boot is none yet.
+		if a.Result == model.ResultPending {
+			continue
+		}
 		if d := present[a.DIMMUID]; d != nil {
 			set.Add(DIMMRepairs, 1, host, d.Slot, string(a.Kind))
 		}
+	}
+
+	// Firmware records, by common event; one that repeats another one is
+	// left out with its event or action.
+	fws, err := s.FirmwareRecords(ctx, store.FirmwareFilter{Host: host})
+	if err != nil {
+		return nil, fmt.Errorf("metrics of %s: firmware records: %w", host, err)
+	}
+	dupActions := map[int64]bool{}
+	if all, err := s.Actions(ctx, store.ActionFilter{Host: host, Duplicates: true}); err == nil {
+		for _, a := range all {
+			dupActions[a.ID] = a.DupOf != 0
+		}
+	}
+	dupEvents := map[int64]bool{}
+	if evs, err := s.EventList(ctx, store.EventFilter{Host: host, WithDuplicates: true}); err == nil {
+		for _, e := range evs {
+			dupEvents[e.ID] = e.DupOf != 0
+		}
+	}
+	for _, f := range fws {
+		if !firmwareEvents[f.Common] || dupActions[f.ActionID] || dupEvents[f.EventID] || (f.At.After(h.AsOf)) {
+			continue
+		}
+		slot, serial := f.Slot, ""
+		if d := present[f.DIMMUID]; d != nil {
+			slot = d.Slot
+			if d.DIMM != nil {
+				serial = d.DIMM.Serial
+			}
+		}
+		set.Add(DIMMFirmwareEvents, 1, host, slot, serial, f.Common)
 	}
 
 	gpus, err := s.GPUMem(ctx, host)
@@ -303,6 +347,12 @@ func sourceMetrics(ctx context.Context, set *Set, s *store.Store, host string) e
 			}
 		}
 		set.Add(SourceGrade, gradeValue(grade), host, src.Kind, string(src.Status))
+		if src.Unread > 0 {
+			set.Add(SourceUnread, float64(src.Unread), host, src.Kind)
+		}
+		if src.Faults > 0 {
+			set.Add(SourceFaults, float64(src.Faults), host, src.Kind)
+		}
 	}
 	return nil
 }

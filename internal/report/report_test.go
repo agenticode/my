@@ -1940,3 +1940,75 @@ func TestSlotMapOfALongRow(t *testing.T) {
 		}
 	}
 }
+
+// TestFirmware checks what a report says of firmware records: section 7
+// names the tables that classed them and says once per table that it was
+// not checked on real hardware, and the appendix lists every record with
+// its message ID, its common event and how it was read.
+func TestFirmware(t *testing.T) {
+	for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
+		as, _, err := scan.Detect(ctx, testutil.Testdata(t, "redfish", "standard-log.json"), scan.DetectOptions{Now: now})
+		if err != nil {
+			t.Fatal(err)
+		}
+		s, err := store.Open(ctx, filepath.Join(t.TempDir(), "fw.db"), store.Create)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer s.Close()
+		if _, err := ingest.Run(ctx, s, as, ingest.Options{Kind: model.ScanImport, Now: now, Host: "fw-host"}); err != nil {
+			t.Fatal(err)
+		}
+		doc := buildFrom(t, s, options(lang, FA))
+		if len(doc.Firmware) == 0 {
+			t.Fatal("the report holds no firmware records")
+		}
+		raw, root := render(t, doc)
+		for _, bad := range checkHTML(root, raw) {
+			t.Error(bad)
+		}
+		secs := root.find("section.sec")
+		quality := secs[6].content()
+		tables := map[string]bool{}
+		for _, f := range doc.Firmware {
+			if f.MapRef != "" && (f.Mapping == model.MappingTable || f.Mapping == model.MappingIPMI) {
+				table, _, _ := strings.Cut(f.MapRef, ":")
+				tables[table] = true
+			}
+		}
+		if len(tables) == 0 {
+			t.Fatal("no record of the fixture was read through a table")
+		}
+		unchecked := map[i18n.Lang]string{i18n.EN: "not checked on real hardware", i18n.KO: "실물 장비에서 확인하지 않음"}[lang]
+		if n := strings.Count(quality, unchecked); n != len(tables) {
+			t.Errorf("%s: section 7 says %q %d times for %d tables:\n%s", lang, unchecked, n, len(tables), quality)
+		}
+		for table := range tables {
+			if !strings.Contains(quality, table) {
+				t.Errorf("%s: section 7 does not name the table %s", lang, table)
+			}
+		}
+		tabs := root.find("table.firmware")
+		if len(tabs) != 1 {
+			t.Fatalf("%s: %d firmware tables in the appendix", lang, len(tabs))
+		}
+		rows := tabs[0].find("tbody")[0].find("tr")
+		if len(rows) != len(doc.Firmware) {
+			t.Fatalf("%s: the appendix lists %d firmware records of %d", lang, len(rows), len(doc.Firmware))
+		}
+		for i, f := range doc.Firmware {
+			row := rows[i].content()
+			for _, want := range []string{f.VendorID, f.Common, f.Mapping} {
+				if !strings.Contains(row, want) {
+					t.Errorf("%s: row %d %q lacks %q", lang, i, row, want)
+				}
+			}
+		}
+	}
+
+	// A report without firmware records says nothing of them.
+	_, root := render(t, build(t, "demo", "", i18n.EN, FA))
+	if text := root.content(); strings.Contains(text, "Firmware records") || len(root.find("table.firmware")) != 0 {
+		t.Error("a report without firmware records speaks of them")
+	}
+}

@@ -211,6 +211,46 @@ func TestInventoryAsJSON(t *testing.T) {
 		t.Errorf("A1: %+v", a1)
 	}
 	testutil.Golden(t, "json/inventory.json", []byte(stdout))
+
+	// Every field of a firmware record is named in docs/data-model.md.
+	page, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), "docs", "data-model.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	at := strings.Index(string(page), "### Firmware records in the views")
+	if at < 0 {
+		t.Fatal("docs/data-model.md has no section on firmware records in the views")
+	}
+	section := string(page)[at:]
+	if end := strings.Index(section[4:], "\n#"); end > 0 {
+		section = section[:end+4]
+	}
+	var raw struct {
+		Data struct {
+			Rows []map[string]any `json:"rows"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal([]byte(stdout), &raw); err != nil {
+		t.Fatal(err)
+	}
+	seen := 0
+	for _, row := range raw.Data.Rows {
+		if _, ok := row["firmware_marks"]; ok && !strings.Contains(section, "`firmware_marks`") {
+			t.Error("docs/data-model.md does not name the field firmware_marks")
+		}
+		list, _ := row["firmware"].([]any)
+		for _, f := range list {
+			for k := range f.(map[string]any) {
+				seen++
+				if !strings.Contains(section, "`"+k+"`") {
+					t.Errorf("docs/data-model.md does not name the field %q of a firmware record", k)
+				}
+			}
+		}
+	}
+	if seen == 0 {
+		t.Error("no row of the inventory holds firmware records")
+	}
 }
 
 // The report has the table of "my inventory" in its section on data

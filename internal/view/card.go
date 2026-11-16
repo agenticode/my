@@ -27,6 +27,9 @@ type Card struct {
 	DIMM  DIMMInfo `json:"dimm"`
 	// Present is false for a DIMM that is no longer in the host.
 	Present bool `json:"present"`
+	// Firmware are what the BIOS and the BMC said about the DIMM, in the
+	// vendor's words and as the common events they were read as.
+	Firmware []FirmwareRecord `json:"firmware,omitzero"`
 	// Since is when the ledger first saw the DIMM in this slot, and Moves
 	// how often it changed slots after the ledger first saw it.
 	Since time.Time `json:"since,omitzero"`
@@ -142,6 +145,11 @@ func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMRes
 		EngineVersion: v.EngineVersion, AsOf: h.AsOf,
 		Stops: c.stops(h), Recurrence: h.Recurrence.DIMM(d.UID),
 	}
+	fw, err := c.FirmwareOf(ctx, h.Host, d.UID)
+	if err != nil {
+		return nil, err
+	}
+	card.Firmware = fw
 	if card.Rules == nil {
 		card.Rules = []string{}
 	}

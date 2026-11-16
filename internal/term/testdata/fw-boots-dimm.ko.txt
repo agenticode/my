@@ -1,0 +1,14 @@
+CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
+
+ 부팅         1  2  3  4  5  6  7  8   부팅        오류
+ 종료         -  -  -  H  H  H  H  -
+ 펌웨어       -  N  P  A  D  -  -  -
+ rank0 dev7 bg0 bank3 row 0x1a2f
+   col 0x238  ·  ·  ▒  X  X  X  X  ·   8회 중 5회  CE 60, UE 4
+
+ · 없음, CE ▒ 10-99, X 중단된 부팅의 UE; 종료: H 치명적 하드웨어 오류, - 기록 없음; 펌웨어: D 사용
+ 중지, N 트레이닝 실패, A 고장 예측, P 리페어 완료
+
+ 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두    R-LOOP-01
+ 치명적 하드웨어 오류로 끝남
+ my boots CPU0_C1: the places of this DIMM boot by boot

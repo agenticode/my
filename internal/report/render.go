@@ -1240,6 +1240,9 @@ func (doc *Document) quality() *node {
 	for _, n := range doc.modules() {
 		s.add(n)
 	}
+	for _, n := range doc.firmwareQuality() {
+		s.add(n)
+	}
 
 	s.add(el("h3", doc.say("q.missing")))
 	if len(doc.Overview.Missing) == 0 && doc.Overview.Root == nil {
@@ -1484,6 +1487,25 @@ func (doc *Document) appendix() (*node, error) {
 		s.add(el("p", A{"class", "sub"}, doc.say("app.listed", "n", len(doc.Records), "total", doc.TotalRecords)), scroll(t))
 	}
 
+	if len(doc.Firmware) > 0 {
+		s.add(el("h3", A{"id", "firmware"}, doc.say("app.firmware")), how(doc.say("cap.firmware")))
+		t, body := table("firmware", doc.say("fw.h_time"), doc.say("fw.h_slot"), doc.say("fw.h_id"), doc.say("fw.h_event"),
+			doc.say("fw.h_mapping"), doc.say("fw.h_text"))
+		for _, f := range doc.Firmware {
+			id := f.VendorID
+			if f.Registry != "" {
+				id = f.Registry + " " + id
+			}
+			mapping := f.Mapping
+			if f.MapRef != "" {
+				mapping += " " + f.MapRef
+			}
+			body.add(el("tr", el("td", A{"class", "mono"}, doc.timeText(f.At, model.TimeExact)), el("td", A{"class", "id"}, f.Slot),
+				el("td", A{"class", "mono"}, id), el("td", f.Common), el("td", A{"class", "mono"}, mapping), el("td", f.Text)))
+		}
+		s.add(scroll(t))
+	}
+
 	lines, n, err := doc.fmfmLines()
 	if err != nil {
 		return nil, err
@@ -1507,4 +1529,84 @@ func (doc *Document) panel() *node {
 			el("p", A{"id", "panel-label", "class", "panel-what"}),
 			el("button", A{"id", "panel-close", "type", "button", "title", doc.say("panel.hint")}, doc.say("panel.close"))),
 		scroll(t))
+}
+
+// firmwareQuality is the part of section 7 about firmware records: the
+// tables that classed them and how far each was checked, the message
+// registries the BMC published, and the records a reader did not
+// understand.
+func (doc *Document) firmwareQuality() []*node {
+	var out []*node
+	type use struct {
+		ref, basis string
+		n          int
+	}
+	uses := map[string]*use{}
+	var order []string
+	wording := 0
+	for _, f := range doc.Firmware {
+		switch {
+		case f.MapRef != "" && (f.Mapping == model.MappingTable || f.Mapping == model.MappingIPMI):
+			table, _, _ := strings.Cut(f.MapRef, ":")
+			u := uses[table]
+			if u == nil {
+				u = &use{ref: table, basis: f.Basis}
+				uses[table] = u
+				order = append(order, table)
+			}
+			u.n++
+		case f.Mapping == model.MappingWording || f.Mapping == model.MappingRegistry:
+			wording++
+		}
+	}
+	if len(order) > 0 || wording > 0 {
+		ul := el("ul", A{"class", "notes"})
+		for _, k := range order {
+			u := uses[k]
+			if u.basis != "capture" {
+				ul.add(el("li", doc.say("q.fw_table_unchecked", "table", u.ref, "basis", u.basis, "n", u.n)))
+			} else {
+				ul.add(el("li", doc.say("q.fw_table", "table", u.ref, "basis", u.basis, "n", u.n)))
+			}
+		}
+		if wording > 0 {
+			ul.add(el("li", doc.say("q.fw_wording", "n", wording)))
+		}
+		out = append(out, el("h3", doc.say("q.firmware")), ul)
+	}
+	if len(doc.Registries) > 0 {
+		ul := el("ul", A{"class", "notes"})
+		for _, r := range doc.Registries {
+			ul.add(el("li", doc.say("q.registry", "prefix", r.Prefix, "version", r.Version, "messages", r.Messages, "memory", r.Memory,
+				"mapped", r.Mapped, "wording", r.Wording, "unmapped", r.Memory-r.Mapped-r.Wording)))
+		}
+		out = append(out, el("h3", doc.say("q.registries")), ul)
+	}
+	var unread []*node
+	for _, src := range doc.Overview.Sources {
+		if src.Unread == 0 && src.Faults == 0 {
+			continue
+		}
+		reasons := map[string]int{}
+		var keys []string
+		for _, u := range src.UnreadRecords {
+			if reasons[u.Reason] == 0 {
+				keys = append(keys, u.Reason)
+			}
+			reasons[u.Reason]++
+		}
+		li := el("li", el("span", A{"class", "mono"}, src.Kind), ": "+doc.say("q.unread", "n", src.Unread, "faults", src.Faults))
+		for _, k := range keys {
+			li.add(el("br"), doc.say("q.unread_reason", "n", reasons[k], "reason", k))
+		}
+		unread = append(unread, li)
+	}
+	if len(unread) > 0 {
+		ul := el("ul", A{"class", "notes"})
+		for _, n := range unread {
+			ul.add(n)
+		}
+		out = append(out, el("h3", doc.say("q.unread_head")), ul)
+	}
+	return out
 }

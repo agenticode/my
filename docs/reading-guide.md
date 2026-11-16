@@ -211,14 +211,19 @@ The row of a DIMM draws its corrected errors per day, the oldest day at the left
 | `B` | boot |
 | `U` | uncorrected error |
 | `O` | page taken offline |
-| `P` | post package repair |
-| `S` | sparing |
+| `P` | post package repair: soft, hard, or of a kind the record does not name |
+| `S` | sparing, also device sparing (SDDC, ADDDC) |
 | `R` | row remap |
 | `T` | reseat |
 | `X` | replacement |
 | `M` | slot change |
 | `D` | disabled by firmware |
 | `F` | marked as failed by firmware |
+| `A` | the firmware predicts a failure of the module (PFA) |
+| `N` | the module failed memory training, the memory test or its initialisation at boot |
+| `V` | the mirror failed over from the module |
+
+The letters from `D` on, and `P` and `S` when a BIOS or a BMC wrote the record, come from firmware records. A mark that a later record took back, a prediction that ended for one, is drawn and its text says so; a step that another log of the same BMC reported as well is drawn once.
 
 Read it from left to right: when the errors began, whether they grow, and what happened after each event. Errors that go on after a repair are what R-REP-02 fires on; silence after it is R-QUIET-01. The last lines give the totals and say how many of the errors fall into the running boot: a counter that restarts at every boot, as the EDAC counters do, shows only those.
 
@@ -271,6 +276,8 @@ Below, one line per DIMM with errors in these boots, and a line `no DIMM` for un
 | `?` | `?` | the boot stopped and no record names a DIMM, so the DIMM is not cleared for that boot |
 | `-` | `-` | the DIMM was not in the host |
 
+When the BIOS or a BMC wrote about memory during these boots, a line `firmware` under `ended` gives each boot the letter of its record that weighs most, in this order: `D` a module disabled, `V` a mirror that failed over, `N` a training failure, `E` a repair or sparing that failed, `A` a failure predicted, `S` sparing, `P` a repair done. A record belongs to the boot that ran at its time. The legend lists the letters the grid uses. Marks taken back and steps reported twice give no letter.
+
 When more boots are on record than fit the width, the latest are drawn and a line says how many are left out; `--boots N` draws N of them. The ended row is left out when no boot drawn stopped or panicked. The overview adds the stops lines (the count and where) under the finding of the host and a row `stops` under each row of the slot map, with the number of stops of each slot: one number on one slot is one DIMM, ones along a socket are a spread.
 
 With a slot or a serial number, `my boots` draws the places of that DIMM boot by boot:
@@ -294,6 +301,14 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
 ```
 
 A line is a place at the finest level the records give: a cell under the line of its row, an address, or the DIMM when a record names nothing inside it. The letters of the line `ended` are `S` stop, `p` panic, `r` running and `-` not on record. The lines are sorted by the boots they had errors in; twelve are listed, the rest summed in one. Below the grid stand the statements of the R-LOOP rules on the finding of the DIMM. `my dimm` shows the same block, cut to five places, between the address map and the timeline, when the DIMM has errors in two or more boots. `my timeline` adds the grid of the host below the days when a boot of the window stopped.
+
+## Inventory
+
+`my inventory` lists every DIMM of the host with what SMBIOS, EDAC and the BMC say of it. Under the row of a DIMM, a line `firmware:` gives the marks the BIOS or a BMC put on the module, newest first: `PPR ok 11-03, PFA 11-09 +2` is a post package repair on 3 November, a predicted failure on 9 November, and two older marks. The words are `PPR ok`, `PPR failed`, `PPR pending`, `SDDC`, `ADDDC`, `device sparing`, `sparing`, `sparing failed`, `PFA`, `disabled`, `mirror` and `training`. `--json` gives every firmware record of the DIMM with its message ID and how its event was found ([data-model.md](data-model.md)).
+
+For a BMC that published its message registries, a note names each registry with the number of its messages about memory, how many a table of MemorY classes, how many it classes by their wording, and how many it cannot class. `my vendors --seen` lists those.
+
+The list of sources (`my --detail`) says of a source with records its reader did not understand how many there were. Such records are counted and do not stop the run; the text of those that name memory, a DIMM or ECC is kept, and the report lists them.
 
 ## GPU memory
 
@@ -322,4 +337,4 @@ Every record has an observation grade, which says how much of the place of an er
 
 ## The report
 
-`my report -o case.html` writes the same figures into one HTML file with eight sections: summary, slot map (with the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.
+`my report -o case.html` writes the same figures into one HTML file with eight sections: summary, slot map (with the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. When the BIOS or a BMC wrote about memory, the data quality section names each mapping table that classed records, with what it rests on and "not checked on real hardware" for a table no capture of a real BMC confirmed yet, the message registries the BMC published, and per source the records its reader did not understand with the reasons. The appendix then lists every firmware record: its time, slot, message ID, common event, how the event was found and its text. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.

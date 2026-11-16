@@ -33,7 +33,8 @@ Every series has a `host` label, the name of the machine the records belong to.
 | `my_dimm_ue_total` | counter | `host`, `slot`, `serial` | uncorrected errors on record for the DIMM |
 | `my_dimm_faults` | gauge | `host`, `slot`, `mode` | faults of the DIMM by mode: `single-bit`, `row`, `multi-row`, `column`, `bank`, `device`, `dimm`, `system-issue`, `undetermined` |
 | `my_dimm_offlined_pages` | gauge | `host`, `slot` | pages of the DIMM that were taken offline |
-| `my_dimm_repairs_total` | counter | `host`, `slot`, `type` | repairs on record for the DIMM by type: `sppr`, `hppr`, `sparing`, `row-remap`. Attempts that failed count too |
+| `my_dimm_repairs_total` | counter | `host`, `slot`, `type` | repairs on record for the DIMM by type: `sppr`, `hppr`, `ppr` (a post package repair the record does not call soft or hard), `sparing`, `device-sparing` (ADDDC, SDDC), `row-remap`. Attempts that failed count too; a repair that waits for the next boot does not |
+| `my_dimm_firmware_events_total` | counter | `host`, `slot`, `serial`, `event` | firmware records about the DIMM by common event ([data-model.md](data-model.md#firmware-records)) of the families prediction, out of use, repair, sparing, mirror and boot; a record that repeats another one is not counted |
 | `my_dimm_stop_boots` | gauge | `host`, `slot`, `serial` | boots of the window of the host (`loop.window_boots`) that stopped with an uncorrected error of the DIMM |
 | `my_host_stops` | gauge | `host`, `cause` | boots of the window that ended in a stop, by `cause`: `memory` (an uncorrected memory error is on record in the boot), `hardware-other` (a fatal hardware error without one), `panic` (a panic with no hardware error record) |
 | `my_host_stop_streak` | gauge | `host` | the latest boots in a row that a fatal hardware error ended |
@@ -41,6 +42,8 @@ Every series has a `host` label, the name of the machine the records belong to.
 | `my_gpu_remap_banks` | gauge | `host`, `gpu`, `bucket` | memory banks of the GPU by the spare rows they have left for row remapping: `max`, `high`, `partial`, `low`, `none`, from the latest `nvidia-smi` state |
 | `my_gpu_remap_failure` | gauge | `host`, `gpu` | 1 when a row remapping of the GPU failed (XID 64 in the kernel log, or the flag in the `nvidia-smi` state), 0 when the GPU reports none |
 | `my_source_grade` | gauge | `host`, `source`, `status` | best observation grade of the errors a source gave in the latest scan: 3 A, 2 B, 1 C, 0 no errors. `status` says how reading the source went: `ok`, `partial`, `empty`, `absent`, `unreadable`, `error` |
+| `my_source_unread_records` | gauge | `host`, `source` | records of the source that the latest scan did not understand |
+| `my_source_reader_faults` | gauge | `host`, `source` | faults of the reader of the source that the latest scan caught |
 
 No metric has an address, a row, a column or a bank as a label. The number of series of a host is bounded by its DIMMs, GPUs and sources. Where in a DIMM a fault sits is what `my dimm`, `my map` and `my why` show.
 

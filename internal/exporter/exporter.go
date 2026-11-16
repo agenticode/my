@@ -47,7 +47,13 @@ var (
 	DIMMOfflinedPages = &Desc{Name: "my_dimm_offlined_pages", Type: Gauge, Labels: []string{"host", "slot"},
 		Help: "Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM."}
 	DIMMRepairs = &Desc{Name: "my_dimm_repairs_total", Type: Counter, Labels: []string{"host", "slot", "type"},
-		Help: "Repairs on record for the DIMM in the slot by type: sppr, hppr, sparing, row-remap. Attempts that failed count too."}
+		Help: "Repairs on record for the DIMM in the slot by type: sppr, hppr, ppr (a post package repair the record does not call soft or hard), sparing, device-sparing (ADDDC, SDDC), row-remap. Attempts that failed count too; a repair that waits for the next boot does not."}
+	DIMMFirmwareEvents = &Desc{Name: "my_dimm_firmware_events_total", Type: Counter, Labels: []string{"host", "slot", "serial", "event"},
+		Help: "Firmware records about the DIMM by common event: predicted-failure, disabled, ppr-scheduled, ppr-done, ppr-failed, sparing, device-sparing, spare-copy-started, sparing-failed, mirror-failover, mirror-lost, training-failure, config-error. A record that repeats another one is not counted."}
+	SourceUnread = &Desc{Name: "my_source_unread_records", Type: Gauge, Labels: []string{"host", "source"},
+		Help: "Records of the source that the latest scan did not understand."}
+	SourceFaults = &Desc{Name: "my_source_reader_faults", Type: Gauge, Labels: []string{"host", "source"},
+		Help: "Faults of the reader of the source that the latest scan caught: a record whose reading failed, or the whole source."}
 	GPURemapBanks = &Desc{Name: "my_gpu_remap_banks", Type: Gauge, Labels: []string{"host", "gpu", "bucket"},
 		Help: "Memory banks of the GPU by the spare rows they have left for row remapping: max, high, partial, low, none."}
 	GPURemapFailure = &Desc{Name: "my_gpu_remap_failure", Type: Gauge, Labels: []string{"host", "gpu"},
@@ -78,9 +84,9 @@ var (
 
 // Descs lists every metric in the order they are written.
 var Descs = []*Desc{
-	DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs, DIMMStopBoots,
+	DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs, DIMMFirmwareEvents, DIMMStopBoots,
 	HostStops, HostStopStreak, HostCapture,
-	GPURemapBanks, GPURemapFailure, SourceGrade,
+	GPURemapBanks, GPURemapFailure, SourceGrade, SourceUnread, SourceFaults,
 	BuildInfo, LastScan, ScanDuration, ScanFailures,
 }
 

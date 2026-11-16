@@ -176,6 +176,11 @@ type Document struct {
 	// NoSerial counts the DIMMs of the host without a serial number.
 	NoSerial int
 
+	// Firmware are the firmware records of the host, Registries the
+	// message registries its BMCs published.
+	Firmware   []model.FirmwareRecord
+	Registries []model.RegistrySeen
+
 	records map[string]*Record
 }
 
@@ -287,6 +292,12 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 
 	var err error
 	if doc.Overview, err = c.Overview(ctx, h, false); err != nil {
+		return nil, err
+	}
+	if doc.Firmware, err = s.FirmwareRecords(ctx, store.FirmwareFilter{Host: h.Host}); err != nil {
+		return nil, err
+	}
+	if doc.Registries, err = s.RegistriesSeen(ctx, h.Host); err != nil {
 		return nil, err
 	}
 	if doc.Timeline, err = c.Timeline(ctx, h, nil, view.TimelineOptions{}); err != nil {

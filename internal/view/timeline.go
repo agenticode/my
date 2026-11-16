@@ -38,6 +38,9 @@ type Timeline struct {
 	// Undated counts errors known by seconds since boot only. They cannot
 	// be placed on the time axis.
 	Undated int64 `json:"undated,omitzero"`
+	// Firmware are the firmware records of the DIMM, on the timeline of
+	// one.
+	Firmware []FirmwareRecord `json:"firmware,omitzero"`
 	// Notes are the sentences below the figure.
 	Notes []Text `json:"notes"`
 	// Boots is the strip of the latest boots, drawn when one of them
@@ -87,6 +90,13 @@ var MarkerLetters = map[string]string{
 	string(model.ActionReplacement): "X",
 	string(model.ActionDisable):     "D",
 	string(model.ActionMarkFailed):  "F",
+	// Steps and marks of firmware: a repair of any kind is P, sparing of
+	// either kind S.
+	string(model.ActionPPR):              "P",
+	string(model.ActionDeviceSparing):    "S",
+	string(model.ActionPredictedFailure): "A",
+	string(model.ActionTrainingFailure):  "N",
+	string(model.ActionMirrorFailover):   "V",
 }
 
 // MarkerGroup is the events of one kind within the period.
@@ -149,6 +159,11 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	if d != nil {
 		info := dimmInfo(d.UID, d.DIMM)
 		tl.Slot, tl.DIMM, tl.Undated = d.Slot, &info, d.Features.Undated
+		fw, err := c.FirmwareOf(ctx, h.Host, d.UID)
+		if err != nil {
+			return nil, err
+		}
+		tl.Firmware = fw
 	} else {
 		for _, x := range h.DIMMs {
 			tl.Undated += x.Features.Undated
@@ -398,6 +413,8 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 			t = c.say("tl.offline.failed", "when", when(a.At), "n", n)
 		case a.Kind == model.ActionPageOffline:
 			t = c.say("tl.offline.one", "when", when(a.At), "n", n)
+		case a.WithdrawnBy != 0:
+			t = c.say("tl.action.withdrawn", "when", when(a.At), "kind", kind)
 		case a.Result == model.ResultFailed:
 			t = c.say("tl.action.failed", "when", when(a.At), "kind", kind)
 		case a.Result == model.ResultPending:
@@ -541,6 +558,15 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 				}
 			}
 			b.Rows, b.Quiet = rows, 0
+			// The firmware line of the strip is that of the DIMM.
+			fw, err := c.FirmwareOf(ctx, h.Host, d.UID)
+			if err != nil {
+				return nil, err
+			}
+			for i := range b.Boots {
+				b.Boots[i].Firmware = ""
+			}
+			firmwareBoots(b.Boots, fw)
 		}
 		tl.Boots = b
 	}

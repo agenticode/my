@@ -36,6 +36,9 @@ type Case struct {
 	Result *engine.Result
 	// Lang is the language sentences are written in.
 	Lang i18n.Lang
+
+	// fwByHost holds the firmware records of each host, once read.
+	fwByHost map[string][]model.FirmwareRecord
 }
 
 // Open runs the engine over the ledger and returns the Case the views are
