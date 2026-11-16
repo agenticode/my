@@ -141,7 +141,8 @@ func (st Style) endWord(end string) string {
 func (st Style) endLetter(end string) string {
 	switch end {
 	case model.BootStop:
-		return st.paint(cRed, "S")
+		// H, halted: S is sparing in the timeline.
+		return st.paint(cRed, "H")
 	case model.BootPanic:
 		return "p"
 	case "running":

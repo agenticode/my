@@ -62,10 +62,11 @@ func TestBundleRoundTrip(t *testing.T) {
 		if opened {
 			s = s[strings.Index(s, "\n")+1:] // the line that says what the case is
 		}
-		// The line of further commands names "my bundle" on a host only.
+		// The lines of further commands differ: a scan puts its flags after
+		// the command, and names "my bundle" on a host only.
 		var keep []string
 		for _, line := range strings.Split(s, "\n") {
-			if !strings.Contains(line, "MY dimm CPU0_C1:") && !strings.Contains(line, "my bundle -o") && !strings.Contains(line, "my help:") {
+			if !strings.HasPrefix(line, " my ") && !strings.HasPrefix(line, " MY ") {
 				keep = append(keep, line)
 			}
 		}

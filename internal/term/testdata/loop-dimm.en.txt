@@ -44,13 +44,13 @@ in this slot since 2026-07-31  0 slot changes
 
  boots of this DIMM
  boot         1  2  3  4  5  6  7  8   boots   errors
- ended        -  -  -  S  S  S  S  -
+ ended        -  -  -  H  H  H  H  -
  rank0 dev7 bg0 bank3 row 0x1a2f
    col 0x238  ·  ·  ▒  X  X  X  X  ·   5 of 8  CE 60, UE 4
 
  · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
  the boot stopped and no record names a DIMM, - not in the host
- ended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, -
+ ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, -
  not on record
 
  errors per day and events

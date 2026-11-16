@@ -87,8 +87,8 @@ func app() *cli.App {
 			},
 			{
 				Name:      "export",
-				Summary:   "write the findings as an FMFM analysis log (JSON): my export fmfm",
-				SummaryKO: "소견을 FMFM 분석 로그(JSON)로 내보내기: my export fmfm",
+				Summary:   "write the findings as an FMFM analysis log, or the slot names as a label file for rasdaemon",
+				SummaryKO: "소견을 FMFM 분석 로그로, 또는 슬롯 이름을 rasdaemon 라벨 파일로 내보내기",
 				Run:       live(runExport),
 			},
 			{

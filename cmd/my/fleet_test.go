@@ -101,7 +101,7 @@ func TestFleetOverview(t *testing.T) {
 				t.Fatalf("--host: exit code %d, stderr %q", code, errOut)
 			}
 			wantLines(t, out, "host db-07 ", "host finding: replace now", "NODE 1 CPU1_DIMM_B1", "sources  rasdaemon 11 records",
-				"my --fleet "+dialect+" --host db-07 dimm NODE 1 CPU1_DIMM_B1", "my --fleet "+dialect+" --host db-07 bundle -o case.mycase")
+				"my dimm 'NODE 1 CPU1_DIMM_B1' --fleet "+dialect+" --host db-07", "my bundle -o case.mycase --fleet "+dialect+" --host db-07")
 			// Only the rows of that host were read: a third of what the
 			// overview of the three hosts read, twice.
 			if n := rowReads(srv) - before; n == 0 || n*6 != before {

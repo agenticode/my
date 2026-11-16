@@ -60,7 +60,7 @@ in this slot since 2026-07-31  0 slot changes
 
  [2m· none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?[0m
  [2mthe boot stopped and no record names a DIMM, - not in the host[0m
- [2mended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, -[0m
+ [2mended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, -[0m
  [2mnot on record[0m
 
  errors per day and events

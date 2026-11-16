@@ -42,21 +42,21 @@ func (f *fleetFlags) set() bool { return f.backend != "" || f.envFile != "" }
 
 // args returns the flags as they were given, for the hints that name the
 // next command.
-func (f *fleetFlags) args(host string) string {
+func (f *fleetFlags) args(host string) []string {
 	var out []string
 	if f.backend != "" {
-		out = append(out, "--fleet "+f.backend)
+		out = append(out, "--fleet", f.backend)
 	}
 	if f.envFile != "" {
-		out = append(out, "--fleet-env "+f.envFile)
+		out = append(out, "--fleet-env", f.envFile)
 	}
 	if f.since != "" {
-		out = append(out, "--since "+f.since)
+		out = append(out, "--since", f.since)
 	}
 	if host != "" {
-		out = append(out, "--host "+host)
+		out = append(out, "--host", host)
 	}
-	return strings.Join(out, " ")
+	return out
 }
 
 // usage marks an error as a mistake in the command line.
