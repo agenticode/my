@@ -420,6 +420,13 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 	if code != hold {
 		t.Errorf("why: exit code %d", code)
 	}
+	wantLines(t, out, "host lab-guest  hold replacement  R-HOST-01  3 uncorrected errors tied to no DIMM",
+		"[R-HOST-02] 7 corrected errors tied to no DIMM", "Do not pull a DIMM on these records",
+		"confidence high, 1 check not made, 1 kind of data missing: --detail")
+	code, out, _ = run("why", "--root", root, "--detail")
+	if code != hold {
+		t.Errorf("why --detail: exit code %d", code)
+	}
 	wantLines(t, out, "host lab-guest  tied to no DIMM  CE 7, UE 3, 5 pages offline", "hold replacement (finding, confidence high, 85)",
 		"[R-HOST-01] 3 uncorrected errors tied to no DIMM", "open: 10 errors name no slot",
 		"this host is a virtual machine (QEMU): a guest is not shown the corrected errors",

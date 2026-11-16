@@ -118,6 +118,8 @@ func TestTextMatchesTheRenderer(t *testing.T) {
 		{"demo-dimm.w60.txt", []string{"dimm", "CPU0_C1", "--width", "60"}},
 		{"demo-dimm.color.txt", []string{"dimm", "CPU0_C1", "--color", "always"}},
 		{"demo-why.ko.txt", []string{"why", "--lang=ko", "CPU0_C1"}},
+		{"demo-why-detail.en.txt", []string{"why", "CPU0_C1", "--detail"}},
+		{"demo-dimm-detail.ko.txt", []string{"dimm", "CPU0_C1", "--detail", "--lang", "ko"}},
 		{"demo-map.ascii.txt", []string{"map", "CPU0_C1", "--ascii"}},
 		{"demo-timeline.en.txt", []string{"timeline", "CPU0_C1"}},
 		{"demo-timeline-host.ko.txt", []string{"timeline", "--lang", "ko"}},
@@ -443,8 +445,8 @@ func TestHelp(t *testing.T) {
 		want  []string
 	}{
 		{[]string{"scan", "--help"}, "overview", []string{"Usage: my [scan] [flags]", "--all", "--ledger FILE", "Slot map.", "Ranking.", "Grades and exit codes."}},
-		{[]string{"dimm", "--help"}, "dimm", []string{"Usage: my dimm <slot|serial> [flags]", "Topology bars.", "Address map.", "Timeline.", "my open case.mycase dimm"}},
-		{[]string{"help", "why"}, "why", []string{"--oneline", "Finding. A grade is a finding"}},
+		{[]string{"dimm", "--help"}, "dimm", []string{"Usage: my dimm <slot|serial> [--detail] [flags]", "--detail", "Topology bars.", "Address map.", "Timeline.", "my open case.mycase dimm"}},
+		{[]string{"help", "why"}, "why", []string{"--oneline", "--detail", "Finding. The first line is the decision", "A grade is a finding"}},
 		{[]string{"map", "?"}, "map", []string{"--bank N", "--rows A-B", "A horizontal line is a row fault"}},
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
 		{[]string{"boots", "--help"}, "boots", []string{"Usage: my boots [slot|serial] [--boots N]", "--boots N", "STOP a fatal hardware error ended it", "R-LOOP-03"}},
@@ -540,8 +542,11 @@ func registerFlags(o *options, topic string) {
 	case "overview":
 		o.fs.Bool("all", false, "")
 	case "why":
+		o.withDetail()
 		o.fs.Bool("oneline", false, "")
 		o.fs.Bool("all", false, "")
+	case "dimm":
+		o.withDetail()
 	case "map":
 		o.fs.String("bank", "", "")
 		o.fs.Int("rank", -1, "")

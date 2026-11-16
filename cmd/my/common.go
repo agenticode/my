@@ -67,6 +67,16 @@ type options struct {
 	pf   pluginFlags
 	cf   engine.ConfigFlags
 	help bool
+	// detail draws everything a screen has (--detail, on the commands
+	// that have a short form).
+	detail bool
+}
+
+// withDetail registers --detail: the command has a short form, and the flag
+// draws everything instead.
+func (o *options) withDetail() *options {
+	o.fs.BoolVar(&o.detail, "detail", false, "")
+	return o
 }
 
 // newOptions registers the common flags of the command named name.
@@ -320,7 +330,7 @@ func (o *options) binaryToTerminal(env *cli.Env, lang i18n.Lang) (code int, is b
 
 // style works out how to draw for this run.
 func (o *options) style(env *cli.Env, lang i18n.Lang) term.Style {
-	st := term.Style{Lang: lang, ASCII: o.ascii, Width: o.width}
+	st := term.Style{Lang: lang, ASCII: o.ascii, Width: o.width, Detail: o.detail}
 	columns, terminal := 0, false
 	if f := fileOf(env.Stdout); f != nil {
 		columns, terminal = term.Size(f)

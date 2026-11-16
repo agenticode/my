@@ -1,20 +1,12 @@
-CPU1_A1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 01EAE2
-in this slot since 2026-07-31  0 slot changes
+CPU1_A1  consider replacement  R-ROW-03  bank fault at rank1 dev12 bg1 bank1: 164 errors in the last
+                                         7 days, 2.0 times the daily rate of the 30 days before
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 01EAE2
 
- finding   consider replacement (finding, confidence medium)                                R-ROW-03
- evidence  [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 164 errors in the last 7 days, 2.0 times
-           the daily rate of the 30 days before
-           [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 461 new places in the last 30 days, 600
+ evidence  [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 461 new places in the last 30 days, 600
            in total
            [R-ROW-03] the fault at rank1 dev12 bg1 bank1 had errors in 2 of the last 3 boots
- checks    open: no other DIMM on this channel: there is nothing to compare with
-           open: no slot move or reseat on record: a cause in the board is not ruled out
- missing   no ECS counters
-           no DIMM temperature history
- baseline  own history: 23.4 errors a day over the last 7 days, percentile 100 of the 30 days before
-           same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 1 of
-           them with errors
  next      Plan a replacement for the next maintenance window and watch the fault until then.
+ confidence medium, 2 checks not made, 2 kinds of data missing: --detail
 
  where the errors sit (width = share of the errors of this DIMM)                              boots
  rank    |rank1 ██████████████████████████████████████████████████████████████████████ 100%|  2 of 3

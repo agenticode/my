@@ -53,27 +53,17 @@ DIMM 하나를 진찰한 화면입니다. 소견, 오류가 몰린 가지, 오�
 ```
 $ my open examples/demo.mycase dimm CPU0_C1
 2026-11-13 09:30 UTC 케이스 번들, 작성 도구 my dev; 대상 CPU0_C1 S/N 3B9C56
-CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
-이 슬롯 첫 관측 2026-07-31  슬롯 이동 0회
+CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col
+                             0x238
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
 
- 판정  즉시 교체 (소견, 신뢰도 높음)                                       R-UE-01 R-ROW-03 R-REP-02
- 근거  [R-UE-01] UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238
-       [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의
+ 근거  [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의
        2.3배
-       [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 30일 새 위치 13곳, 현재 row 2개에
-       column 9개
-       [R-ROW-03] rank0 dev7 bg0 bank3 row 0x1a2f 고장의 오류에 한 디바이스의 DQ 2개가 관여
-       [R-ROW-03] rank0 dev7 bg0 bank3 row 0x1a2f 고장: 최근 부팅 4회 중 3회에서 오류
        [R-REP-02] 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발
- 반례  미확인: 이 채널에 다른 DIMM 없음: 비교 대상 없음
-       미확인: 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함
        뒷받침: 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성
        낮음
- 부족  ECS 카운터 없음
-       DIMM 온도 이력 없음
- 기준  자체 이력: 최근 7일 하루 60.1건, 그 앞 30일의 100 백분위
-       같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
  다음  DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
+ 신뢰도 높음, 근거 3건 더, 확인 못 한 점검 2건, 빠진 데이터 2종: --detail
 
  오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)                                             부팅
  rank    |rank0 ██████████████████████████████████████████████████████████████████ 100%|  4회 중 3회
@@ -207,7 +197,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | --- | --- |
 | `my` 또는 `my scan` | 이 호스트를 스캔: 슬롯 맵과 위험 순위 |
 | `my dimm <슬롯\|시리얼>` | DIMM 하나를 진찰: 소견, 토폴로지 막대, 주소 맵, 타임라인 |
-| `my why [슬롯\|시리얼]` | 소견과 그 근거가 된 기록, 반례 점검, 신뢰도. `--oneline`은 티켓용 한 줄 |
+| `my why [슬롯\|시리얼]` | 결정과 그것을 받치는 문장 최대 3줄. `--detail`은 근거 기록, 반례 점검, 신뢰도 단계를 더하고 `--oneline`은 티켓용 한 줄 |
 | `my map <슬롯\|시리얼>` | bank 하나의 주소 맵. `--bank`, `--rank`, `--device`로 고르고 `--rows A-B`로 확대 |
 | `my timeline [슬롯\|시리얼]` | 일별 오류와 부팅, 리페어, page offline, 슬롯 이동, UE |
 | `my boots [슬롯\|시리얼]` | 최근 부팅마다 끝난 방식과, 그 부팅에 오류가 있던 DIMM 또는 DIMM 안의 위치([docs/reading-guide.md](docs/reading-guide.md#boots)) |

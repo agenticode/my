@@ -251,15 +251,18 @@ var words = i18n.Catalog{
 	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. With --bmc ADDRESS it also asks the BMC of the host over Redfish, with requests that only read, and joins what the BMC and the host say about each DIMM. Sources it may not read as this user are named on the \"missing\" line with what root would add. A scan that can read no source of error records at all ends with exit code 70 and names what it looked for: it does not answer \"no errors on record\".", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. --bmc ADDRESS를 주면 호스트의 BMC에도 Redfish로 읽기 요청만 보내고, BMC와 호스트가 DIMM마다 알려 준 내용을 합칩니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다. 오류 기록 소스를 하나도 읽지 못하면 \"오류 기록 없음\"이라고 답하지 않고, 찾아본 소스를 적은 뒤 종료 코드 70으로 끝납니다."},
 	"help.overview.flags": {EN: "--all             list every DIMM, also those without errors", KO: "--all             오류 없는 DIMM도 모두 나열"},
 
-	"help.dimm.usage": {EN: "my dimm <slot|serial> [flags]", KO: "my dimm <슬롯|시리얼> [옵션]"},
+	"help.dimm.usage": {EN: "my dimm <slot|serial> [--detail] [flags]", KO: "my dimm <슬롯|시리얼> [--detail] [옵션]"},
 	"help.dimm.text":  {EN: "The examination of one DIMM: its finding, the branch its errors sit on, the address map of the bank with the most errors, and its timeline. A DIMM is named by its slot, by its serial number or the end of it, or by the EDAC label of its slot.", KO: "DIMM 하나의 진찰 화면: 판정 카드, 오류가 몰린 가지, 오류가 가장 많은 bank의 주소 맵, 타임라인. DIMM은 슬롯 이름, 시리얼(끝자리만 써도 됨), 슬롯의 EDAC 라벨로 지정합니다."},
+	"help.dimm.flags": {EN: "--detail          the whole finding, as \"my why --detail\" prints it", KO: "--detail          판정 전체 (\"my why --detail\"과 같음)"},
 
-	"help.why.usage": {EN: "my why [slot|serial] [--oneline] [flags]", KO: "my why [슬롯|시리얼] [--oneline] [옵션]"},
-	"help.why.text":  {EN: "The finding and everything it rests on: the rules that fired, the ledger records behind each statement, the checks against other explanations, the missing data, the steps of the confidence and the faults. Without a DIMM it prints this for every DIMM that has errors or a finding, the worst first.", KO: "판정과 그 근거 전체: 발동한 규칙, 문장마다의 원장 기록, 다른 설명과 견준 점검, 부족한 데이터, 신뢰도 계산 단계, 고장 목록. DIMM을 지정하지 않으면 오류나 소견이 있는 모든 DIMM을 위험한 순서로 출력합니다."},
+	"help.why.usage": {EN: "my why [slot|serial] [--detail] [--oneline] [flags]", KO: "my why [슬롯|시리얼] [--detail] [--oneline] [옵션]"},
+	"help.why.text":  {EN: "The finding of a DIMM: the decision on the first line (slot, grade, the rule that set it and what that rule saw), at most three statements that bear on it, the next step, and a line that counts what could not be checked. With --detail, everything it rests on: the rules that fired, the ledger records behind each statement, the checks against other explanations, the missing data, the steps of the confidence and the faults. Without a DIMM it prints this for every DIMM that has errors or a finding, the worst first.", KO: "DIMM의 판정: 첫 줄에 결정(슬롯, 등급, 등급을 정한 규칙과 그 규칙이 본 것), 그 아래 결정에 영향을 주는 문장 최대 3줄, 다음 할 일, 확인하지 못한 점을 세는 한 줄. --detail을 주면 판정의 근거 전체: 발동한 규칙, 문장마다의 원장 기록, 다른 설명과 견준 점검, 빠진 데이터, 신뢰도 계산 단계, 고장 목록. DIMM을 지정하지 않으면 오류나 소견이 있는 모든 DIMM을 위험한 순서로 출력합니다."},
 	"help.why.flags": {
-		EN: "--oneline         one line per DIMM, for a ticket\n" +
+		EN: "--detail          everything the finding rests on\n" +
+			"--oneline         one line per DIMM, for a ticket\n" +
 			"--all             also the DIMMs without errors",
-		KO: "--oneline         DIMM마다 한 줄 (티켓에 붙이는 용도)\n" +
+		KO: "--detail          판정의 근거 전체\n" +
+			"--oneline         DIMM마다 한 줄 (티켓에 붙이는 용도)\n" +
 			"--all             오류 없는 DIMM도 포함",
 	},
 

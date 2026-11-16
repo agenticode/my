@@ -197,7 +197,7 @@ func TestImportAnonymizesHomeDirectories(t *testing.T) {
 		t.Errorf("origin = %q", origin)
 	}
 	// The findings still point at their records, under the new path.
-	code, why, errOut := runEnv(fixed, "open", out, "why")
+	code, why, errOut := runEnv(fixed, "open", out, "why", "--detail")
 	if errOut != "" || strings.Contains(why, "alice") || !strings.Contains(why, "/cases/dmesg#L") {
 		t.Errorf("exit code %d, stderr %q\n%s", code, errOut, why)
 	}

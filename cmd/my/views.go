@@ -138,7 +138,7 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 
 // runDIMM is "my dimm <slot|serial>": the examination of one DIMM.
 func runDIMM(ctx context.Context, env *cli.Env, args []string, src *source) int {
-	o := newOptions(env, cmdName("dimm", src), src)
+	o := newOptions(env, cmdName("dimm", src), src).withDetail()
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -171,7 +171,7 @@ func runDIMM(ctx context.Context, env *cli.Env, args []string, src *source) int 
 // runWhy is "my why [slot|serial]": the finding and what it rests on, for
 // one DIMM or for every DIMM that has one.
 func runWhy(ctx context.Context, env *cli.Env, args []string, src *source) int {
-	o := newOptions(env, cmdName("why", src), src)
+	o := newOptions(env, cmdName("why", src), src).withDetail()
 	oneline := o.fs.Bool("oneline", false, "")
 	all := o.fs.Bool("all", false, "")
 	pos, lang, code, done := o.parse(env, args)

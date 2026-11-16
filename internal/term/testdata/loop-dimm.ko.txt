@@ -1,21 +1,14 @@
-CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
-이 슬롯 첫 관측 2026-07-31  슬롯 이동 0회
+CPU0_C1  즉시 교체  R-UE-01  UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col
+                             0x238
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
 
- 판정  즉시 교체 (소견, 신뢰도 높음)                                               R-UE-01 R-LOOP-01
- 근거  [R-UE-01] UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238
-       [R-LOOP-01] 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅
+ 근거  [R-LOOP-01] 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅
        모두 치명적 하드웨어 오류로 끝남
- 반례  미확인: 이 채널에 다른 DIMM 없음: 비교 대상 없음
-       미확인: 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함
        뒷받침: 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성
        낮음
        뒷받침: 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음
-       뒷받침: UE가 DIMM의 한 위치에 머묾: 접촉이나 배선 고장이면 읽는 주소마다 오류가 남
- 부족  ECS 카운터 없음
-       DIMM 온도 이력 없음
- 기준  자체 이력: 최근 7일 하루 3.3건, 그 앞 30일의 93 백분위
-       같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
  다음  DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
+ 신뢰도 높음, 근거 1건 더, 확인 못 한 점검 2건, 빠진 데이터 2종: --detail
 
  오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)                                             부팅
  rank    |rank0 ██████████████████████████████████████████████████████████████████ 100%|  8회 중 5회

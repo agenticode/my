@@ -1,24 +1,14 @@
-CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
-in this slot since 2026-07-31  0 slot changes
+CPU0_C1  replace now  R-UE-01  4 uncorrected errors, the latest on 2026-11-12 10:10 UTC at rank0
+                               dev7 bg0 bank3 row 0x1a2f col 0x238
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
 
- finding   replace now (finding, confidence high)                                  R-UE-01 R-LOOP-01
- evidence  [R-UE-01] 4 uncorrected errors, the latest on 2026-11-12 10:10 UTC at rank0 dev7 bg0
-           bank3 row 0x1a2f col 0x238
-           [R-LOOP-01] uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the
+ evidence  [R-LOOP-01] uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the
            last 8 boots: each of these boots ended in a fatal hardware error
- checks    open: no other DIMM on this channel: there is nothing to compare with
-           open: no slot move or reseat on record: a cause in the board is not ruled out
            supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board
            is unlikely
            supports: no other DIMM of the host had an uncorrected error in these boots
-           supports: the uncorrected errors stay at one place of the DIMM: a fault of a contact or a
-           trace corrupts whatever address is read
- missing   no ECS counters
-           no DIMM temperature history
- baseline  own history: 3.3 errors a day over the last 7 days, percentile 93 of the 30 days before
-           same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of
-           them with errors
  next      Replace the DIMM. Attach a case bundle written from the kept ledger to the return.
+ confidence high, 1 more statement, 2 checks not made, 2 kinds of data missing: --detail
 
  where the errors sit (width = share of the errors of this DIMM)                              boots
  rank    |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  5 of 8

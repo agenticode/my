@@ -54,31 +54,17 @@ One DIMM, examined: the finding, the branch of the DIMM the errors sit on, the a
 ```
 $ my open examples/demo.mycase dimm CPU0_C1
 case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C56
-CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
-in this slot since 2026-07-31  0 slot changes
+CPU0_C1  replace now  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7
+                               bg0 bank3 row 0x1a2f col 0x238
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
 
- finding   replace now (finding, confidence high)                          R-UE-01 R-ROW-03 R-REP-02
- evidence  [R-UE-01] 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3
-           row 0x1a2f col 0x238
-           [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days,
+ evidence  [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days,
            2.3 times the daily rate of the 30 days before
-           [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30
-           days; it now covers 9 columns in 2 rows
-           [R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of
-           one device
-           [R-ROW-03] the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4
-           boots
            [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28
- checks    open: no other DIMM on this channel: there is nothing to compare with
-           open: no slot move or reseat on record: a cause in the board is not ruled out
            supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board
            is unlikely
- missing   no ECS counters
-           no DIMM temperature history
- baseline  own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before
-           same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of
-           them with errors
  next      Replace the DIMM. Attach a case bundle of this DIMM to the return.
+ confidence high, 3 more statements, 2 checks not made, 2 kinds of data missing: --detail
 
  where the errors sit (width = share of the errors of this DIMM)                              boots
  rank    |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4
@@ -213,7 +199,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | --- | --- |
 | `my` or `my scan` | scan this host: slot map and DIMMs ranked by risk |
 | `my dimm <slot\|serial>` | examine one DIMM: finding, topology bars, address map, timeline |
-| `my why [slot\|serial]` | the finding with the records, checks and confidence behind it; `--oneline` gives one line for a ticket |
+| `my why [slot\|serial]` | the decision and at most three statements that bear on it; `--detail` adds the records, checks and confidence behind it, `--oneline` gives one line for a ticket |
 | `my map <slot\|serial>` | the address map of one bank; `--bank`, `--rank`, `--device` choose it, `--rows A-B` zooms |
 | `my timeline [slot\|serial]` | errors per day with boots, repairs, page offlines, slot changes and uncorrected errors |
 | `my boots [slot\|serial]` | the latest boots: how each ended, and which DIMM, or which place of one DIMM, had errors in it ([docs/reading-guide.md](docs/reading-guide.md#boots)) |

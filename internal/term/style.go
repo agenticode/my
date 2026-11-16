@@ -26,6 +26,9 @@ type Style struct {
 	// Width is the number of columns to fill; values below MinWidth are
 	// raised to it, and 0 means DefaultWidth.
 	Width int
+	// Detail draws everything a screen has: every statement of a finding
+	// with the records behind it, and the notes a short screen counts.
+	Detail bool
 }
 
 // Widths of the output.

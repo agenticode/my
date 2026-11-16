@@ -19,7 +19,19 @@ func (st Style) dimmHead(p *page, c *view.Card) {
 		}
 		return
 	}
-	fields := []string{st.bold(c.Slot)}
+	fields := append([]string{st.bold(c.Slot)}, st.identity(c, true)...)
+	// Fields flow to the next line where the width ends; an empty field
+	// takes no room.
+	for _, line := range flow(fields, "  ", st.width()) {
+		p.add(line)
+	}
+}
+
+// identity returns what tells the DIMM of a card apart: the module, its
+// serial number and its stay in the slot. Without all, the stay is given
+// only for a DIMM that changed slots.
+func (st Style) identity(c *view.Card, all bool) []string {
+	var fields []string
 	add := func(s string) { fields = append(fields, s) }
 	add(c.DIMM.Kind)
 	add(strings.TrimSpace(c.DIMM.Manufacturer + " " + c.DIMM.PartNumber))
@@ -28,18 +40,168 @@ func (st Style) dimmHead(p *page, c *view.Card) {
 	} else {
 		add(st.say("dimm.no_serial"))
 	}
-	if !c.Since.IsZero() {
-		add(st.say("dimm.since", "when", c.Since.UTC().Format("2006-01-02")))
+	if all || c.Moves > 0 {
+		if !c.Since.IsZero() {
+			add(st.say("dimm.since", "when", c.Since.UTC().Format("2006-01-02")))
+		}
+		add(st.say("dimm.moves", "n", c.Moves))
 	}
-	add(st.say("dimm.moves", "n", c.Moves))
 	if !c.Present {
 		add(st.say("ov.gone"))
 	}
-	// Fields flow to the next line where the width ends; an empty field
-	// takes no room.
-	for _, line := range flow(fields, "  ", st.width()) {
-		p.add(line)
+	return fields
+}
+
+// BriefLines is the number of statements the short card shows below the
+// decision.
+const BriefLines = 3
+
+// brief draws the finding of a card in short. The first line is the
+// decision: the slot, the grade, the rule that set it and the statement of
+// that rule. Below it stand at most BriefLines statements that bear on the
+// decision, the next step, and one line with the confidence and what could
+// not be checked, which --detail shows.
+func (st Style) brief(p *page, c *view.Card) {
+	head := c.Slot
+	if c.Scope == view.ScopeHost {
+		head = st.say("card.host", "host", c.Host)
 	}
+	lead := []string{st.paint(gradeColor(string(c.Grade)), c.GradeText)}
+	reason := ""
+	if len(c.Evidence) > 0 {
+		lead = append(lead, c.Evidence[0].Rule)
+		reason = c.Evidence[0].Text.Text
+	} else if len(c.Rules) > 0 {
+		lead = append(lead, c.Rules[0])
+	}
+	// The reason wraps under itself when there is room, else under the
+	// grade.
+	indent := Width(head) + 2
+	text := strings.Join(lead, "  ")
+	first := st.bold(head) + "  " + text
+	used := indent + Width(text) + 2
+	if reason != "" {
+		at := used
+		if st.width()-at < 30 {
+			at = indent
+		}
+		lines := wrap(reason, st.width()-at)
+		if at == indent {
+			p.add(first)
+		} else {
+			p.add(first + "  " + lines[0])
+			lines = lines[1:]
+		}
+		for _, l := range lines {
+			p.add(strings.Repeat(" ", at) + l)
+		}
+	} else {
+		p.add(first)
+	}
+	if c.Scope != view.ScopeHost {
+		for _, l := range flow(st.identity(c, false), "  ", st.width()-indent) {
+			p.add(strings.Repeat(" ", indent) + st.dim(l))
+		}
+	}
+
+	shown := briefStatements(c)
+	lw := max(Width(st.say("card.evidence")), Width(st.say("card.next")))
+	if len(shown) > 0 || c.Next != nil {
+		p.blank()
+	}
+	label := st.say("card.evidence")
+	for _, s := range shown {
+		p.labelled(label, lw, s, "")
+		label = ""
+	}
+	if c.Next != nil {
+		p.labelled(st.say("card.next"), lw, c.Next.Text, "")
+	}
+
+	// What the short card leaves out, counted.
+	open := 0
+	for _, k := range c.Checks {
+		if k.Effect == "open" {
+			open++
+		}
+	}
+	rest := []string{st.say("card.confidence", "level", c.ConfidenceText)}
+	if n := len(c.Evidence) + len(c.Checks) - open - 1 - len(shown); n > 0 && len(c.Evidence) > 0 {
+		rest = append(rest, st.say("card.more", "n", n))
+	}
+	if open > 0 {
+		rest = append(rest, st.say("card.open_n", "n", open))
+	}
+	if n := len(c.Missing); n > 0 {
+		rest = append(rest, st.say("card.missing_n", "n", n))
+	}
+	for _, l := range wrap(strings.Join(rest, ", ")+": --detail", st.width()-2) {
+		p.add(" " + st.dim(l))
+	}
+}
+
+// briefStatements picks the statements the short card shows below the
+// decision, at most BriefLines: the checks that weaken the finding, the
+// next statement of the rule that set the grade, the first statement of
+// every other rule, the checks that support the finding, then further
+// statements of the rules. The first statement is the decision itself and
+// is not repeated.
+func briefStatements(c *view.Card) []string {
+	var out []string
+	add := func(s string) bool {
+		if len(out) < BriefLines {
+			out = append(out, s)
+		}
+		return len(out) < BriefLines
+	}
+	check := func(k view.Check) string { return k.EffectText + ": " + k.Text.Text }
+	evidence := func(e view.Evidence) string { return "[" + e.Rule + "] " + e.Text.Text }
+	for _, k := range c.Checks {
+		if k.Effect == "weakens" && !add(check(k)) {
+			return out
+		}
+	}
+	if len(c.Evidence) == 0 {
+		for _, k := range c.Checks {
+			if k.Effect == "supports" && !add(check(k)) {
+				return out
+			}
+		}
+		return out
+	}
+	used := make([]bool, len(c.Evidence))
+	used[0] = true
+	lead := c.Evidence[0].Rule
+	for i, e := range c.Evidence {
+		if !used[i] && e.Rule == lead {
+			used[i] = true
+			if !add(evidence(e)) {
+				return out
+			}
+			break
+		}
+	}
+	ruleShown := map[string]bool{lead: true}
+	for i, e := range c.Evidence {
+		if used[i] || ruleShown[e.Rule] {
+			continue
+		}
+		ruleShown[e.Rule], used[i] = true, true
+		if !add(evidence(e)) {
+			return out
+		}
+	}
+	for _, k := range c.Checks {
+		if k.Effect == "supports" && !add(check(k)) {
+			return out
+		}
+	}
+	for i, e := range c.Evidence {
+		if !used[i] && !add(evidence(e)) {
+			return out
+		}
+	}
+	return out
 }
 
 // card draws the finding of a DIMM. With detail it adds the records each
@@ -134,12 +296,19 @@ func (st Style) card(p *page, c *view.Card, detail bool) {
 	}
 }
 
-// Why draws the finding of one or more DIMMs with everything it rests on.
+// Why draws the finding of one or more DIMMs. In short it is the decision
+// and what bears on it. With st.Detail it is everything the finding rests
+// on: every statement with the records behind it, the checks, the missing
+// data, the steps of the confidence and the faults.
 func Why(w io.Writer, cards []*view.Card, st Style) error {
 	p := &page{st: st}
 	for i, c := range cards {
 		if i > 0 {
 			p.blank()
+		}
+		if !st.Detail {
+			st.brief(p, c)
+			continue
 		}
 		st.dimmHead(p, c)
 		p.blank()
