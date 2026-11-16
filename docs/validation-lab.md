@@ -149,6 +149,8 @@ $LAB/tools/loop.sh clean && $LAB/tools/loop.sh run $LAB/tools/loop-scatter.plan 
 $LAB/tools/loop.sh kdump && $LAB/tools/loop.sh run $LAB/tools/loop-kdump.plan && $LAB/tools/loop.sh capture kdump
 go run ./tools/lab/bertregion -o $LAB/loop/x86/bert && $LAB/tools/loop.sh stop
 BERT=$LAB/loop/x86/bert $LAB/tools/loop.sh boot && $LAB/tools/loop.sh bert    # then reboot the guest and capture bert
+$LAB/tools/loop-arm.sh disk && $LAB/tools/loop-arm.sh boot && $LAB/tools/loop-arm.sh prepare
+$LAB/tools/loop-arm.sh run $LAB/tools/loop-arm-spread.plan && $LAB/tools/loop-arm.sh capture spread    # set kernel.panic=30 first: see 6.19.10-ghes-loop-spread
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 
