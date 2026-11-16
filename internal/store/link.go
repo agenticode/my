@@ -734,6 +734,11 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 	}
 
+	// In the order of the rows. The pairs come in the order their groups
+	// closed, which goes back and forth over thousands of rows; in row
+	// order the rows of one page of the table are written one after the
+	// other. A record that is paired twice keeps the later pair, as before.
+	sort.SliceStable(updates, func(i, j int) bool { return updates[i].dup < updates[j].dup })
 	err = s.Update(ctx, func(w *Writer) error {
 		for _, u := range updates {
 			if _, err := w.exec(`UPDATE event SET dup_of = ? WHERE id = ?`, u.primary, u.dup); err != nil {
