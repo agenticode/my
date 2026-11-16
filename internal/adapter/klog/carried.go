@@ -90,6 +90,7 @@ func carryFingerprint(unix int64) string { return "carried " + strconv.FormatInt
 // holdRule2 keeps a record of rule 2 until the end of its boot.
 func (p *parser) holdRule2(e *model.Event, l *line, unix int64) error {
 	p.seg.held = append(p.seg.held, heldMCE{ev: e, line: *l, unix: unix})
+	p.noteHeld(e, l)
 	return nil
 }
 

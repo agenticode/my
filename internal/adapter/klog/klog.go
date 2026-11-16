@@ -231,6 +231,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if note := otherXIDNote(p.otherXID); note != "" {
 		rep.Notes = append(rep.Notes, note)
 	}
+	rep.Notes = append(rep.Notes, p.stopNotes()...)
 	rep.Notes = append(rep.Notes, p.tally.Notes()...)
 	switch {
 	case rep.Records == 0:
@@ -374,6 +375,11 @@ type segment struct {
 	// held are machine check records whose carry is known at the end of
 	// the boot (carried.go).
 	held []heldMCE
+
+	// last is the latest error record of the boot, stop how the kernel
+	// ended it (stop.go).
+	last *lastRecord
+	stop *stopRec
 }
 
 // injection is an announced software injection of a memory failure.
@@ -454,6 +460,8 @@ type parser struct {
 	relative      int
 	estimated     int
 	bigPages      string
+	// stops, panics and fakePanics count the ends of boots (stop.go).
+	stops, panics, fakePanics int
 
 	seg  *segment
 	segs int
@@ -747,6 +755,9 @@ func (p *parser) dispatch(l *line) error {
 	if err := p.flushAMD(); err != nil {
 		return err
 	}
+	if done, err := p.stopLine(l); done || err != nil {
+		return err
+	}
 
 	if strings.Contains(msg, "NVRM: ") {
 		return p.nvrmLine(l)
@@ -1030,6 +1041,7 @@ func (p *parser) flushGHES() error {
 
 // ghesEvents turns the memory error sections of a GHES block into events.
 func (p *parser) ghesEvents(b *ghesBlock) error {
+	p.forgetLast()
 	eventSev, sections := splitGHES(b.body)
 	for i := range sections {
 		s := &sections[i]
@@ -1211,6 +1223,10 @@ func (p *parser) hwLine(l *line, body string) error {
 		}
 	}
 
+	if isMCEStopBody(body) {
+		return p.mceStopLine(l, body)
+	}
+
 	// AMD decode block.
 	switch {
 	case isAMDStatusText(body):
@@ -1265,6 +1281,7 @@ func (p *parser) flushMCE() error {
 func (p *parser) mceEvent(b *mceBlock, lastN, vendor int, unix int64, socket model.Opt[int]) error {
 	p.records++
 	p.seg.records++
+	p.forgetLast()
 	ref := p.refRange(&b.first, lastN)
 	if !mce.Valid(b.status) {
 		p.tally.Skip(ref, "machine check status register is not valid")
@@ -1324,6 +1341,7 @@ func (p *parser) flushAMD() error {
 	}
 	p.records++
 	p.seg.records++
+	p.forgetLast()
 	ref := p.refRange(&b.first, b.lastN)
 	if !mce.Valid(b.status) {
 		p.tally.Skip(ref, "machine check status register is not valid")
@@ -1351,6 +1369,7 @@ func (p *parser) flushAMD() error {
 // of the boot otherwise.
 func (p *parser) emit(e *model.Event, a *model.Action, l *line) error {
 	seg := p.seg
+	p.noteLast(e)
 	switch {
 	case !l.wall.IsZero():
 		return p.send(e, a, l.wall, model.TimeExact, seg.bootID)
@@ -1400,6 +1419,9 @@ func (p *parser) closeSegment(last bool) error {
 	seg := p.seg
 	if seg == nil {
 		return nil
+	}
+	if err := p.closeStop(); err != nil {
+		return err
 	}
 	if err := p.flushGHES(); err != nil {
 		return err

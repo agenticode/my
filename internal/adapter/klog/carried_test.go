@@ -17,10 +17,14 @@ import (
 // in bank 1 of the other processors.
 func TestCarriedFromTheLab(t *testing.T) {
 	c, rep, _ := collectFile(t, "carried-lab.dmesg", Options{})
-	if len(c.Events) != 2 {
-		t.Fatalf("%d events, want the exception and the record left in the bank: %+v", len(c.Events), rep)
+	if errs := errorsOf(c.Events); len(errs) != 2 {
+		t.Fatalf("%d error records, want the exception and the record left in the bank: %+v", len(errs), rep)
 	}
 	exc, left := at(t, c, "L1-L3"), at(t, c, "L11-L14")
+	// The panic after the exception is the stop of the first boot (stop.go).
+	if stops, _ := stopsOf(c.Events); len(stops) != 1 || stops[0].CauseFingerprint != exc.Fingerprint {
+		t.Errorf("stops %+v", stops)
+	}
 	if exc.Carried || exc.ErrorSeverity != model.SevFatal || !exc.ErrorDT.Equal(time.Unix(1794798096, 0)) {
 		t.Errorf("the exception: %+v", exc)
 	}
@@ -87,12 +91,13 @@ func TestWhatIsNotCarried(t *testing.T) {
 		{"exception with TSC 0 and PCC, a boot that goes on a few seconds only", boot + mceText(4.3, true, fatal, 0, 1794798147) + later(8), false},
 	} {
 		c, _ := collectText(t, tt.text, Options{})
-		if len(c.Events) != 1 {
-			t.Errorf("%s: %d events", tt.name, len(c.Events))
+		errs := errorsOf(c.Events)
+		if len(errs) != 1 {
+			t.Errorf("%s: %d error records", tt.name, len(errs))
 			continue
 		}
-		if c.Events[0].Carried != tt.carried {
-			t.Errorf("%s: carried %v, want %v", tt.name, c.Events[0].Carried, tt.carried)
+		if errs[0].Carried != tt.carried {
+			t.Errorf("%s: carried %v, want %v", tt.name, errs[0].Carried, tt.carried)
 		}
 	}
 }
@@ -197,7 +202,7 @@ func TestTwoBootsEqualStamp(t *testing.T) {
 	exc := boot + mceText(1539.815789, true, fatal, 0x607c3d8fa8d, 1794798096) + "[ 1539.831142] Kernel panic - not syncing: Fatal machine check\n"
 	c, _ = collectText(t, exc, Options{})
 	want := model.Fingerprint(Kind, "mce", "m", "1539815789", "mce: [Hardware Error]: CPU 0: Machine Check Exception: 4 Bank 7: be00000000010090", "")
-	if len(c.Events) != 1 || c.Events[0].Fingerprint != want {
+	if errs := errorsOf(c.Events); len(errs) != 1 || errs[0].Fingerprint != want {
 		t.Errorf("fingerprint of the exception changed: %+v", c.Events)
 	}
 }

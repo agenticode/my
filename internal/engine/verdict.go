@@ -371,6 +371,11 @@ func (j *judge) uncorrected(fs *findings) {
 		} else {
 			fs.add(rule, statement(unlocated, "n", n, "when", when), refs, total)
 		}
+		// R-LOOP-01 and R-LOOP-02 say already that the boots of these
+		// errors stopped.
+		if st, refs, total, ok := j.stopped(idx); ok && !fs.has(RuleLoopPlace) && !fs.has(RuleLoopDIMM) {
+			fs.add(rule, st, refs, total)
+		}
 		if counted {
 			if fs.basis[rule] == nil {
 				fs.basis[rule] = &basis{}
@@ -380,6 +385,47 @@ func (j *judge) uncorrected(fs *findings) {
 	}
 	state(RuleUE, "ue.located", "ue.unlocated", demand)
 	state(RuleScrub, "scrub.located", "scrub.unlocated", patrol)
+}
+
+// stopped says which of the uncorrected errors idx stopped the host. The
+// statement comes after the one that counts them, under the same rule. Its
+// records are the errors and the kernel's lines of the stop.
+func (j *judge) stopped(idx []int32) (model.Statement, []model.RecordRef, int, bool) {
+	stops := j.in.stopsByEvent()
+	if len(stops) == 0 {
+		return model.Statement{}, nil, 0, false
+	}
+	evs := j.in.events
+	var hit []int32
+	for _, i := range idx {
+		if _, ok := stops[evs[i].id]; ok {
+			hit = append(hit, i)
+		}
+	}
+	if len(hit) == 0 {
+		return model.Statement{}, nil, 0, false
+	}
+	last := &evs[hit[0]]
+	for _, i := range hit {
+		if e := &evs[i]; !e.relative && (last.relative || e.at >= last.at) {
+			last = e
+		}
+	}
+	when := stampText(last.at)
+	if last.relative {
+		when = bootText(last.at)
+	}
+	refs, total := j.eventRefs(hit)
+	for _, i := range hit {
+		if st := stops[evs[i].id]; st.StopID != 0 {
+			refs = append(refs, model.RecordRef{Kind: model.RecordEvent, ID: st.StopID})
+			total++
+		}
+	}
+	if len(hit) == 1 {
+		return statement("ue.stopped", "when", when), refs, total, true
+	}
+	return statement("ue.stopped_many", "n", len(hit), "when", when), refs, total, true
 }
 
 // firmware is R-FW-01 and R-REP-01: what firmware says about the module,

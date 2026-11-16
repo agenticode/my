@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 7 in this release |
+| schema version | `PRAGMA user_version`, 8 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -112,6 +112,7 @@ An `event` row is one of two kinds. `kind = 'error'` is one report of a source t
 | `dimm_uid`, `dimm_link` | the DIMM the error is attributed to, and how |
 | `decoder` | the format the place was decoded from (`edac/skx-adxl`, `cper`), which tells a reader how to check it |
 | `carried`, `read_boot_id`, `not_before` | see [Records kept over a reset](#records-kept-over-a-reset) |
+| `cause_fingerprint` | on the record of a stop: the fingerprint of the error record printed just before it, see [How a boot ended](#how-a-boot-ended) |
 
 Every total is computed from this table by one rule:
 
@@ -140,14 +141,15 @@ A carried record has no time to compare. For it the duplicate rule takes the boo
 
 ### How a boot ended
 
-`boot.end` is `stop` when a hardware error stopped the boot, `panic` when a crash log shows a panic and no record shows a hardware error, and empty when nothing tells. A clean end is not claimed: the records do not tell a shutdown from a power loss. A pass after the duplicates (`BootOutcomes`) sets it from the records:
+`boot.end` is `stop` when a hardware error stopped the boot, `panic` when a kernel log or a crash log shows a panic and no record shows a hardware error, and empty when nothing tells. A clean end is not claimed: the records do not tell a shutdown from a power loss. A pass after the duplicates (`BootOutcomes`) sets it from the records:
 
 | Evidence | `end` |
 | --- | --- |
+| the kernel's panic lines of a fatal machine check or a fatal firmware error (`Kernel panic - not syncing: Fatal machine check`), in any kernel log or crash log | `stop` |
 | a carried record of an uncorrected error, or a fatal block of the boot error region, read in the next boot | `stop` |
-| a pstore dump written for a panic, or a kdump text log, and none of the above | `panic` |
+| a pstore dump written for a panic, a kdump text log, or a panic line of the kernel for another reason, and none of the above | `panic` |
 
-`end_ref` names the record (`event:<id>`), `end_source` its source and `end_at` its time when known. The panic of a crash log is kept as a record of severity `Informational` and type `panic`, which no total counts; it holds no text of the panic, whose message can be about anything on the host. The number of boots is a lower bound: a boot that stopped before its journal reached the disk and left nothing in pstore, the boot error region or a bank is not in the ledger.
+`end_ref` names the record (`event:<id>`), `end_source` its source and `end_at` its time when known. The kernel's panic lines are kept as a record of severity `Informational` and type `hardware stop` (source `klog/stop`) with the lines themselves; its `cause_fingerprint` is the fingerprint of the error record the kernel printed just before them in the same boot, the machine check or firmware record that was fatal. When there is such a record, `end_ref` names it, and `end_at` is the time of the panic line. A panic for another reason and the panic of a crash log are kept as a record of severity `Informational` and type `panic`; it holds no text of the panic, whose message can be about anything on the host. No total counts these records. The number of boots is a lower bound: a boot that stopped before its journal reached the disk and left nothing in pstore, the boot error region or a bank is not in the ledger.
 
 ### Counters
 
