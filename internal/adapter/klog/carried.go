@@ -127,6 +127,12 @@ const (
 	bertSkipped = "Skipped"
 )
 
+// maxBERTLines bounds the lines of one block of the boot error region. The
+// kernel prints at most five records of it (ACPI_BERT_PRINT_MAX_RECORDS in
+// drivers/acpi/apei/bert.c), each in a few dozen lines; every event of the
+// block keeps all its lines.
+const maxBERTLines = 256
+
 // bertBlock is what the kernel printed of the boot error region.
 type bertBlock struct {
 	first line
@@ -151,6 +157,10 @@ func (p *parser) bertLine(l *line) (bool, error) {
 	case strings.Contains(msg, bertTotal):
 		p.bert.raw = append(p.bert.raw, msg)
 		return true, p.flushBERT()
+	case strings.HasPrefix(msg, hwErrMark) && len(p.bert.raw) >= maxBERTLines:
+		// More than the kernel prints of a region: the block ends here,
+		// and the line is read as any other.
+		return false, p.flushBERT()
 	case strings.HasPrefix(msg, hwErrMark):
 		body := strings.TrimPrefix(msg, hwErrMark)
 		p.bert.raw = append(p.bert.raw, msg)
