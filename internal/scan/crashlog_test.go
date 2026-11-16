@@ -51,8 +51,9 @@ func TestCrashLogsOfACopy(t *testing.T) {
 		for _, src := range res.Sources {
 			if src.Origin == filepath.Join(root, place) {
 				found = true
-				// The fatal record, and the record of the panic.
-				if src.Status != model.SourceOK || src.Events != 2 {
+				// The fatal record, the kernel's lines of the stop, and
+				// the record of the panic.
+				if src.Status != model.SourceOK || src.Events != 3 {
 					t.Errorf("%s: %+v", place, src)
 				}
 			}
@@ -61,9 +62,10 @@ func TestCrashLogsOfACopy(t *testing.T) {
 			t.Errorf("%s is not in the inventory: %s", place, inventory(res.Sources))
 		}
 	}
-	// One error, and the panic as pstore and kdump show it: two texts.
-	if res.Events != 3 {
-		t.Errorf("%d events, want 3", res.Events)
+	// One error, the kernel's lines of the stop, and the panic as pstore
+	// and kdump show it: two texts.
+	if res.Events != 4 {
+		t.Errorf("%d events, want 4", res.Events)
 	}
 }
 
@@ -80,7 +82,7 @@ func TestCrashLogsOfALiveHost(t *testing.T) {
 		t.Fatal(err)
 	}
 	src := source(t, res.Sources, crashlog.KindPstore)
-	if src.Events != 2 || !Reads(src) {
+	if src.Events != 3 || !Reads(src) {
 		t.Errorf("pstore: %+v", src)
 	}
 	empty := model.Source{Kind: crashlog.KindPstore, Status: model.SourceEmpty}

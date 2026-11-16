@@ -215,8 +215,15 @@ Every kernel log source notes when its first and its last line were written ("it
 | `Memory failure: 0x...: recovery action for ...`, soft offline messages | action `page-offline`, method `hard` or `soft`, with the result |
 | `NVRM: Xid ...` | see "NVIDIA GPU memory" |
 | `Linux version ...`, `DMI: ...`, the command line | a boot, with kernel, board and BIOS |
+| `mce: [Hardware Error]: Machine check: <why>` and `Kernel panic - not syncing: Fatal machine check`, with the other reasons `mce_panic()` gives in `arch/x86/kernel/cpu/mce/core.c` | a record of type `hardware stop` (source `klog/stop`): the boot ended there, and the machine check record printed just before it in the same boot stopped the host |
+| `GHES: Fatal hardware error but panic disabled`, `Kernel panic - not syncing: GHES: Fatal hardware error` (Linux 7.3), `Kernel panic - not syncing: Fatal hardware error!` (up to 6.x) | the same, tied to the firmware error record printed just before |
+| `Kernel panic - not syncing: ...` for another reason | a record of type `panic` (source `klog/panic`) without the text of the panic |
 
 A line read from `dmesg` and the same line read from the journal are one record: a record is identified by the kernel's own stamp and its text.
+
+A stop or a panic is one record per boot, whatever number of its lines the log kept: the severity line, the panic line, the `---[ end Kernel panic` line. It counts in no total. [How a boot ended](data-model.md#how-a-boot-ended) says how the ledger uses it; the finding of the error that stopped the host says so, and the timeline marks the next boot as a reboot after a stop. A machine check that `mce_panic()` reports with `fake_panic` set (a debugfs setting for tests) prints `Fake kernel panic: ...` and the host goes on: no stop is recorded, and the source report counts such lines. A stop is tied to the record printed before it only when that record is an uncorrected memory error of the same boot, at most 100 lines earlier, and not carried over from the boot before. A fatal machine check that is no memory error is left out, and the stop then names no record.
+
+A page a program asked the kernel to give up is told from a page the kernel gave up after an error. The kernel announces the first kind (`Injecting memory failure for pfn ...` for `madvise`, `Injecting memory failure at pfn ...` for the hwpoison injector); the action then says "asked for through madvise" and the source report counts such pages. A boot in which the machine check injector (`mce-inject`) or the ACPI error injection interface (EINJ) was set up is named in the source report, because its records may come from a test.
 
 ### What the next boot prints of the boot before
 
@@ -230,8 +237,6 @@ Two kinds of record in a kernel log belong to the boot before the one that print
 The `TIME` field of a carried machine check record is the time the boot read the bank, not the time of the error. Its fingerprint takes that field in: two boots that print the same record left in a bank at the same stamp are two records. Records that are not carried keep the fingerprint they always had. The lines of the boot error region are a second report of the region when the region was read too: the region is counted.
 
 The lab guest shows the first rule on real kernel output (`testdata/klog/carried-lab.dmesg`: a fatal machine check, a panic, and the next boot printing the record from bank 7 as `CPU 0: Machine Check: 0 Bank 7: be00000000010090`, `TSC 0`). The second rule and the lines of the boot error region rest on the kernel source; QEMU clears `MCG_STATUS` at reset and builds no BERT table. On AMD processors with SMCA a poll logs any valid record (`smca_should_log_poll_error()`), so a polled uncorrected record with PCC could in principle come from the running boot; the decode block `mce_amd` prints does not say whether a record was polled and is never taken as carried.
-
-A page a program asked the kernel to give up is told from a page the kernel gave up after an error. The kernel announces the first kind (`Injecting memory failure for pfn ...` for `madvise`, `Injecting memory failure at pfn ...` for the hwpoison injector); the action then says "asked for through madvise" and the source report counts such pages. A boot in which the machine check injector (`mce-inject`) or the ACPI error injection interface (EINJ) was set up is named in the source report, because its records may come from a test.
 
 ### Host name
 
@@ -259,6 +264,7 @@ With none of them the records stay relative to their boot. They are then dated b
 - Records that were overwritten in the ring buffer or dropped by the rate limit are missing. The EDAC counters show how many errors are known as a count only.
 - A log file that starts in the middle of a boot has no boot banner for that boot.
 - Machine check decoding covers the memory errors of Intel and AMD processors. Other machine checks, and firmware error sections that are not about memory, are counted in the report and left out.
+- Panics of arm64 for an error that firmware did not handle first (`Asynchronous SError Interrupt`, a synchronous external abort) are read as panics for another reason: no stop is recorded.
 
 ## Crash logs (pstore, kdump)
 

@@ -58,6 +58,8 @@ A rule that compares DIMMs counts unconfined errors: errors outside faults that 
 
 An uncorrected error on the DIMM. Every record of an uncorrected error counts, fatal ones included, except an error the patrol scrubber found that was not fatal (R-SCRUB-01). A record that does not say how the error was found counts here.
 
+When a record shows that one of these errors stopped the host, a second line says so and names it with the record of the stop: the kernel's panic lines after the error record (`Kernel panic - not syncing: Fatal machine check`), or the next boot that read the record from a machine check bank or the boot error region. The grade is the same.
+
 Next step: replace the DIMM and attach a case bundle to the return.
 
 ### R-FW-01
@@ -159,7 +161,7 @@ Next step: before a DIMM is pulled, confirm which physical slot the errors belon
 
 ### R-HOST-01
 
-Uncorrected errors of the host that no record ties to a DIMM. It is a rule of the host finding.
+Uncorrected errors of the host that no record ties to a DIMM. It is a rule of the host finding. As under R-UE-01, a second line says which of them stopped the host.
 
 ### R-LOOP-03
 

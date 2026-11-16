@@ -254,6 +254,13 @@ type Event struct {
 	// known: the start of the boot it belongs to.
 	NotBefore time.Time `json:"not_before,omitzero"`
 
+	// CauseFingerprint is set on the record of a hardware stop
+	// (ErrorTypeStop): the fingerprint of the error record the source
+	// printed just before the stop, in the same boot, when there is one.
+	// The ledger keeps it as it is; store.BootOutcomes names that record
+	// as the end of the boot.
+	CauseFingerprint string `json:"-"`
+
 	// Raw is the original record text.
 	Raw string `json:"raw,omitzero"`
 	// Fingerprint identifies the original record so that importing the same

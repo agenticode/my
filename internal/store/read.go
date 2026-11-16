@@ -112,7 +112,7 @@ func scanEvent(r rowScanner, withRaw bool) (*model.Event, error) {
 		&e.ErrorVector, &addr, &e.Source, &e.RawRef, &grade, &bootID, &dimmUID, &e.DIMMLink,
 		&e.Count, &e.Covered, &dupOf, &e.DupOfFingerprint, &quality, &windowStart, &utcOff,
 		&imc, &edacMC, &e.EdacLocation, &handle, &e.Label, &e.Slot, &syndrome, &e.ErrorType, &e.Decoder, &e.Fingerprint, &scanID,
-		&carried, &readBoot, &notBefore,
+		&carried, &readBoot, &notBefore, &e.CauseFingerprint,
 	}
 	if withRaw {
 		dest = append(dest, &raw)

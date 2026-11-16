@@ -92,6 +92,10 @@ var Messages = i18n.Catalog{
 	"ue.unlocated":    {EN: "{n} uncorrected {n|error|errors}, the latest on {when}; the records carry no location", KO: "UE {n}건, 최근 {when}, 위치 정보 없음"},
 	"scrub.located":   {EN: "the patrol scrubber found {n} uncorrected {n|error|errors}, the latest on {when} at {where}", KO: "패트롤 스크럽이 UE {n}건 발견, 최근 {when}, {where}"},
 	"scrub.unlocated": {EN: "the patrol scrubber found {n} uncorrected {n|error|errors}, the latest on {when}; the records carry no location", KO: "패트롤 스크럽이 UE {n}건 발견, 최근 {when}, 위치 정보 없음"},
+	// A record shows that the uncorrected error stopped the host: the
+	// kernel's panic line after it, or the next boot that read it.
+	"ue.stopped":      {EN: "the uncorrected error of {when} stopped the host", KO: "{when}의 UE로 호스트가 중단됨"},
+	"ue.stopped_many": {EN: "{n} of these uncorrected errors stopped the host, the latest on {when}", KO: "이 UE 중 {n}건으로 호스트가 중단됨, 최근 {when}"},
 
 	// R-FW-01.
 	"fw.disabled":        {EN: "{who} took the DIMM out of use on {when}", KO: "{when} {who}가 DIMM 사용 중지"},

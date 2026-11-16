@@ -138,6 +138,37 @@ func (l *ledger) panics() []*model.Event {
 	return out
 }
 
+// stops returns the records of the kernel's lines that a hardware error
+// stops the host.
+func (l *ledger) stops() []*model.Event {
+	l.t.Helper()
+	var out []*model.Event
+	for _, e := range l.all() {
+		if e.ErrorSeverity == model.SevInformational && e.ErrorType == model.ErrorTypeStop {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
+// stoppedBy checks that the one boot of the ledger ended in a stop shown by
+// the error record e, through the kernel's lines of the dump.
+func (l *ledger) stoppedBy(e *model.Event) {
+	l.t.Helper()
+	st := l.stops()
+	if len(st) != 1 || st[0].Source != "klog/stop" || st[0].CauseFingerprint != e.Fingerprint ||
+		!strings.Contains(st[0].Raw, "Kernel panic - not syncing: Fatal machine check") {
+		l.t.Errorf("stop records %+v", st)
+	}
+	boots, err := l.Boots(context.Background(), "h1")
+	if err != nil {
+		l.t.Fatal(err)
+	}
+	if len(boots) != 1 || boots[0].End != model.BootStop || boots[0].EndRef != fmt.Sprintf("event:%d", e.ID) || boots[0].EndSource != "klog/stop" {
+		l.t.Errorf("boots %+v, want a stop shown by event %d", boots, e.ID)
+	}
+}
+
 func (l *ledger) all() []*model.Event {
 	l.t.Helper()
 	ev, err := l.EventList(context.Background(), store.EventFilter{WithDuplicates: true, WithRaw: true})
@@ -190,7 +221,8 @@ func TestEFIDump(t *testing.T) {
 	l := newLedger(t)
 	res := l.run(NewDir(KindPstore, dir, Options{ModTime: true}))
 	src := source(t, res, KindPstore)
-	if src.Status != model.SourceOK || src.Events != 2 {
+	// The error, the kernel's lines of the stop, the panic of the dump.
+	if src.Status != model.SourceOK || src.Events != 3 {
 		t.Fatalf("source %+v", src)
 	}
 	if p := l.panics(); len(p) != 1 || p[0].Raw != "" || p[0].Source != "pstore/panic" {
@@ -205,6 +237,7 @@ func TestEFIDump(t *testing.T) {
 	if e.ErrorSeverity != model.SevFatal && e.ErrorSeverity != model.SevUE {
 		t.Errorf("severity %s", e.ErrorSeverity)
 	}
+	l.stoppedBy(e)
 	if !e.ErrorDT.Equal(time.Unix(1794739502, 0)) || e.TimeQuality != model.TimeExact {
 		t.Errorf("time %s %s", e.ErrorDT, e.TimeQuality)
 	}
@@ -243,12 +276,15 @@ func TestSameAsTheConsole(t *testing.T) {
 	l := newLedger(t)
 	l.run(klog.NewFile(console, klog.Options{}))
 	res := l.run(NewDir(KindPstore, dir, Options{ModTime: true}))
-	// The dump adds the record of its panic and no error.
-	if src := source(t, res, KindPstore); src.Events != 2 || res.Events != 1 {
+	// The dump adds the record of its panic and no error; the error and the
+	// kernel's lines of the stop are those of the console.
+	if src := source(t, res, KindPstore); src.Events != 3 || res.Events != 1 {
 		t.Errorf("the dump added %d events (source %+v)", res.Events, src)
 	}
 	if ev := l.events(); len(ev) != 1 {
 		t.Errorf("%d events, want 1", len(ev))
+	} else {
+		l.stoppedBy(ev[0])
 	}
 }
 
@@ -275,8 +311,8 @@ func TestStoreAndArchive(t *testing.T) {
 	write(t, arch, sub+"/dmesg.txt", whole.String(), time.Unix(dumpTime+60, 0))
 	l := newLedger(t)
 	res := l.run(NewDir(KindPstore, live, Options{ModTime: true}), NewDir(KindPstore, arch, Options{}))
-	if res.Events != 2 || len(l.events()) != 1 || len(l.panics()) != 1 {
-		t.Errorf("%d events added, want the error and the panic", res.Events)
+	if res.Events != 3 || len(l.events()) != 1 || len(l.panics()) != 1 || len(l.stops()) != 1 {
+		t.Errorf("%d events added, want the error, the stop and the panic", res.Events)
 	}
 	var archSrc model.Source
 	for _, s := range res.Sources {
@@ -284,10 +320,10 @@ func TestStoreAndArchive(t *testing.T) {
 			archSrc = s
 		}
 	}
-	if archSrc.Events != 2 {
+	if archSrc.Events != 3 {
 		t.Errorf("archive source %+v", archSrc)
 	}
-	wantNote(t, archSrc.Notes, "1 dmesg.txt files that repeat the parts beside them: not read", "2 records were already in the ledger")
+	wantNote(t, archSrc.Notes, "1 dmesg.txt files that repeat the parts beside them: not read", "3 records were already in the ledger")
 	if boots, _ := l.Boots(context.Background(), "h1"); len(boots) != 1 {
 		t.Errorf("%d boots, want 1: %+v", len(boots), boots)
 	}
@@ -435,8 +471,9 @@ func TestKdump(t *testing.T) {
 	l := newLedger(t)
 	res := l.run(NewDir(KindKdump, root, Options{}))
 	src := source(t, res, KindKdump)
-	// Each log adds the record of its crash; the error is one record.
-	if src.Events != 4 || res.Events != 3 || len(l.panics()) != 2 {
+	// Each log adds the record of its crash; the error and the kernel's
+	// lines of the stop are one record each.
+	if src.Events != 6 || res.Events != 4 || len(l.panics()) != 2 {
 		t.Errorf("source %+v, %d events added", src, res.Events)
 	}
 	l.ended(1)
@@ -445,6 +482,7 @@ func TestKdump(t *testing.T) {
 	if len(ev) != 1 {
 		t.Fatalf("%d events", len(ev))
 	}
+	l.stoppedBy(ev[0])
 	// The RTC line dates the boot to the second.
 	if d := ev[0].ErrorDT.Sub(time.Unix(1794739502, 0)); d < -2*time.Second || d > 2*time.Second {
 		t.Errorf("time %s", ev[0].ErrorDT)

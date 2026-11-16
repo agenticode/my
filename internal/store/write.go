@@ -161,9 +161,9 @@ const eventColumns = `host, kind, "ErrorDT", "ErrorSeverity", "ErrorScrubType",
  "ErrorVector", "OsPhysicalAddress", source, raw_ref, grade, boot_id, dimm_uid, dimm_link,
  count, covered, dup_of, dup_fingerprint, time_quality, window_start, utc_offset,
  imc, edac_mc, edac_location, smbios_handle, label, slot, syndrome, error_type, decoder, fingerprint, scan_id,
- carried, read_boot_id, not_before`
+ carried, read_boot_id, not_before, cause_fingerprint`
 
-const eventColumnCount = 44
+const eventColumnCount = 45
 
 var insertEventSQL = `INSERT INTO event (` + eventColumns + `) VALUES (` + placeholders(eventColumnCount) + `)
  ON CONFLICT(fingerprint) DO NOTHING`
@@ -223,7 +223,7 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 		e.Count, e.Covered, dupOf, e.DupOfFingerprint, string(e.TimeQuality), ts(e.WindowStart), optInt(e.UTCOffset),
 		optInt(e.IMC), optInt(e.EdacMC), e.EdacLocation, optInt(e.SMBIOSHandle), e.Label, e.Slot,
 		optU64(e.Syndrome), e.ErrorType, e.Decoder, e.Fingerprint, scanID,
-		boolInt(e.Carried), nullStr(e.ReadBootID), ts(e.NotBefore))
+		boolInt(e.Carried), nullStr(e.ReadBootID), ts(e.NotBefore), e.CauseFingerprint)
 	if err != nil {
 		return false, fmt.Errorf("event %s: %w", e.RawRef, err)
 	}
