@@ -55,6 +55,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | any file given to `my import`, plain or gzip-compressed: what it is taken for, and the reader that was chosen | `internal/scan` | `FuzzDetect` |
 | injection plan of `my verify` | `internal/injection` | `FuzzRead` |
 | settings profile of `my bios` | `internal/memras` | `FuzzParse` |
+| a copy of a host's files that `my preflight --root` reads: kernel command line, processor, consoles, journald, systemd-pstore, kdump and unit files | `internal/preflight` | `FuzzHost` |
 | engine configuration file | `internal/engine` | `FuzzConfigRead` |
 | message template | `internal/i18n` | `FuzzFormat` |
 | text that goes through the anonymizer of a bundle | `internal/bundle` | `FuzzText` |
@@ -80,6 +81,7 @@ A target fails on a panic, on a call that does not return, and when the code bre
 - The Redfish client sends GET requests, one login and one logout, to the BMC it was given and to no other host. It gives up after a bounded number of requests and pauses. Neither the password nor the session token is in an error, in the manifest or in a file of the collection, and no file is written outside the collection directory.
 - A response of a vendor analyzer is refused, or every text in it is short and free of control characters, every number is within its bounds, and the rows it names as neighbours are symmetric.
 - A case bundle is refused, or the ledger that was taken out of it opens with this build.
+- `my preflight` on a copy of a host's files gives every check one of its five states and a sentence in both languages, writes its script, and changes nothing in the copy.
 - Text that goes to a terminal holds no control character but line breaks, tabs and the colour codes of the figures, whatever the text was and however the writes cut it up.
 
 ## What is not covered
