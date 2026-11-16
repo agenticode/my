@@ -66,7 +66,10 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 	if r := h.Recurrence; r != nil {
 		spread = r.spread
 	}
-	if len(ue) == 0 && len(ce) == 0 && off.Pages == 0 && len(spread) == 0 {
+	// Firmware records about memory that name no DIMM: a mirror that lost
+	// its redundancy, a sparing mode of the system.
+	unnamedN, unnamedKinds := j.unnamed(h.Host)
+	if len(ue) == 0 && len(ce) == 0 && off.Pages == 0 && len(spread) == 0 && unnamedN == 0 {
 		return nil
 	}
 
@@ -159,6 +162,9 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 		}
 	}
 
+	if unnamedN > 0 {
+		add(RuleHostCE, statement("host.fw_unnamed", "n", unnamedN, "kinds", strings.Join(unnamedKinds, ", ")), nil, unnamedN)
+	}
 	for _, st := range spread {
 		add(RuleLoopSpread, st, nil, 0)
 	}

@@ -23,6 +23,8 @@ const (
 	RuleLoopPlace  = "R-LOOP-01"  // uncorrected errors at one place of the DIMM in several boots
 	RuleLoopDIMM   = "R-LOOP-02"  // uncorrected errors on the DIMM in several boots, at places not the same or not known
 	RuleLoopSpread = "R-LOOP-03"  // uncorrected errors in several boots, spread over DIMMs
+	RuleFWPredict  = "R-FW-02"    // firmware predicts a failure of the DIMM
+	RuleFWTrain    = "R-FW-03"    // the DIMM failed training and shows no error of its own cells
 )
 
 // HostRule reports whether a rule speaks about a host as a whole and not
@@ -51,6 +53,7 @@ var Rules = []Rule{
 	{RuleOffline, model.VerdictConsiderReplacement, "rule.R-OFF-02"},
 	{RuleScrub, model.VerdictConsiderReplacement, "rule.R-SCRUB-01"},
 	{RuleRecurred, model.VerdictConsiderReplacement, "rule.R-REP-02"},
+	{RuleFWPredict, model.VerdictConsiderReplacement, "rule.R-FW-02"},
 	{RuleSoft, model.VerdictObserve, "rule.R-SOFT-01"},
 	{RuleQuiet, model.VerdictObserve, "rule.R-QUIET-01"},
 	{RuleHostCE, model.VerdictObserve, "rule.R-HOST-02"},
@@ -60,6 +63,7 @@ var Rules = []Rule{
 	{RuleMapping, model.VerdictHoldReplacement, "rule.R-MAP-01"},
 	{RuleHostUE, model.VerdictHoldReplacement, "rule.R-HOST-01"},
 	{RuleLoopSpread, model.VerdictHoldReplacement, "rule.R-LOOP-03"},
+	{RuleFWTrain, model.VerdictHoldReplacement, "rule.R-FW-03"},
 }
 
 // RuleByID returns the rule with the given ID.

@@ -35,6 +35,9 @@ type Input struct {
 	// Places lists the names error records use for the place of an error,
 	// next to the slot the records were tied to.
 	Places []store.EventPlace
+	// Firmware holds what the BIOS and the BMCs said about memory, in the
+	// vendor's words, tied to the events and actions made of it.
+	Firmware []model.FirmwareRecord
 	// Captures holds, per host, what "my preflight" found when the latest
 	// live scan ran: what a reset would lose there.
 	Captures []model.CaptureCheck
@@ -364,6 +367,9 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	if in.Settings, err = s.BIOSSettings(ctx, ""); err != nil {
 		return fail("BIOS settings", err)
+	}
+	if in.Firmware, err = s.FirmwareRecords(ctx, store.FirmwareFilter{}); err != nil {
+		return fail("firmware records", err)
 	}
 	for _, name := range in.hostNames {
 		cs, err := s.CaptureChecks(ctx, name)

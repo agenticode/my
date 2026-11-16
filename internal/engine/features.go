@@ -3,6 +3,7 @@ package engine
 import (
 	"math/bits"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/agenticode/my/internal/model"
@@ -145,9 +146,26 @@ type Mitigation struct {
 	// FaultErrorsAfter counts all errors of the fault after the step.
 	FaultErrorsAfter int64 `json:"fault_errors_after"`
 
+	// ModuleOnly says that the step names the module and no place in it:
+	// it stands for every fault of the module that had errors before it.
+	ModuleOnly bool `json:"module_only,omitzero"`
+	// BMCClock says that the step is dated by the clock of a BMC that was
+	// not compared with the host's.
+	BMCClock bool `json:"bmc_clock,omitzero"`
+
 	// after are the member records behind ErrorsAfter.
 	after []int32
 }
+
+// fromFirmware reports whether an action comes from a log of a BMC or the
+// BIOS: a firmware record.
+func fromFirmware(a *model.Action) bool {
+	return strings.HasPrefix(a.Source, "redfish/") || strings.HasPrefix(a.Source, "sel/") || strings.HasPrefix(a.Source, "vendorlog/")
+}
+
+// bmcStamped reports whether an action is dated by a BMC's own clock: it
+// comes from a BMC's log and its time was not moved to the host's.
+func bmcStamped(a *model.Action) bool { return fromFirmware(a) && a.TimeQuality == model.TimeExact }
 
 // Offline summarises the pages of a DIMM that were taken offline.
 type Offline struct {
@@ -503,7 +521,7 @@ func (m *measurer) scrub(idx []int32) Scrub {
 // repairKinds are the actions that repair a place inside a DIMM.
 func repairKind(k model.ActionKind) bool {
 	switch k {
-	case model.ActionSPPR, model.ActionHPPR, model.ActionRowRemap, model.ActionSparing:
+	case model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionRowRemap, model.ActionSparing, model.ActionDeviceSparing:
 		return true
 	}
 	return false
@@ -524,7 +542,12 @@ func (m *measurer) mitigations(f *Fault, actions []*model.Action) []Mitigation {
 		if at > m.clk.asOf || a.TimeQuality == model.TimeRelative {
 			continue
 		}
+		// A repair that waits for the next boot has repaired nothing yet.
+		if repairKind(a.Kind) && a.Result == model.ResultPending {
+			continue
+		}
 		var match func(e *event) bool
+		moduleOnly := false
 		switch {
 		case a.Kind == model.ActionPageOffline && a.OsPhysicalAddress.Valid:
 			host, ok := m.in.hostIdx[a.Host]
@@ -548,10 +571,27 @@ func (m *measurer) mitigations(f *Fault, actions []*model.Action) []Mitigation {
 				}
 				return same(a.Rank, int32(e.rank)) && same(a.DeviceId, int32(e.dev)) && same(a.BankGroup, int32(e.bg)) && same(a.Bank, int32(e.bank))
 			}
+		case repairKind(a.Kind) && a.Kind != model.ActionSparing && a.Kind != model.ActionRowRemap && fromFirmware(a):
+			// A repair that names the module only, as firmware records
+			// do: a mitigation of every fault of the module that had an
+			// error before it. A fault first seen after it is a new one.
+			before := false
+			for _, i := range f.members {
+				if e := &evs[i]; !e.relative && e.at <= at {
+					before = true
+					break
+				}
+			}
+			if !before {
+				continue
+			}
+			moduleOnly = true
+			match = func(*event) bool { return true }
 		default:
 			continue
 		}
-		mt := Mitigation{ActionID: a.ID, Kind: a.Kind, Method: a.Method, Result: a.Result, At: a.At, RawRef: a.RawRef, Where: actionWhere(a)}
+		mt := Mitigation{ActionID: a.ID, Kind: a.Kind, Method: a.Method, Result: a.Result, At: a.At, RawRef: a.RawRef, Where: actionWhere(a),
+			ModuleOnly: moduleOnly, BMCClock: bmcStamped(a)}
 		if repairKind(a.Kind) {
 			mt.Row = a.Row
 		}
