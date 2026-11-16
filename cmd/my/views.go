@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -116,6 +117,13 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 			bundle = s.prefix + " bundle -o case.mycase"
 		}
 		out = append(out, term.Hint{Command: bundle, Text: say(s.lang, "hint.bundle")})
+	}
+	if s.src == nil && s.o.root == "" && !s.o.sf.set() {
+		// The kept ledger of the boot harvest holds what this scan cannot
+		// see: the boots before that ended in a reset.
+		if fi, err := os.Stat(harvestLedger); err == nil && fi.Mode().IsRegular() {
+			out = append(out, term.Hint{Command: "my open " + harvestLedger, Text: say(s.lang, "hint.kept")})
+		}
 	}
 	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
 	return out

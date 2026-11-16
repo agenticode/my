@@ -978,3 +978,33 @@ func (w *Writer) PutCaptureChecks(scanID int64, host string, checks []model.Capt
 	}
 	return nil
 }
+
+// DropScan removes a scan that added nothing: its row, its source
+// inventory and capture checks, and the counter readings of the host taken
+// since the scan started, which repeat the readings before. A ledger that
+// is read at every boot would otherwise grow by those rows each time.
+func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
+	for _, q := range []struct {
+		sql  string
+		args []any
+	}{
+		{`DELETE FROM capture_check WHERE scan_id = ?`, []any{scanID}},
+		{`DELETE FROM source WHERE scan_id = ?`, []any{scanID}},
+		{`DELETE FROM counter_sample WHERE host = ? AND observed_at >= ?`, []any{host, ts(since)}},
+		{`DELETE FROM scan WHERE id = ?`, []any{scanID}},
+	} {
+		if q.sql == `DELETE FROM scan WHERE id = ?` {
+			// Records that name the scan and were there before it keep
+			// their row; they lose the reference.
+			for _, t := range []string{"event", "action", "gpu_mem", "ecs_sample", "bmc", "bios_setting", "bmc_memory"} {
+				if _, err := w.exec(`UPDATE `+t+` SET scan_id = NULL WHERE scan_id = ?`, scanID); err != nil {
+					return fmt.Errorf("drop scan %d: %w", scanID, err)
+				}
+			}
+		}
+		if _, err := w.exec(q.sql, q.args...); err != nil {
+			return fmt.Errorf("drop scan %d: %w", scanID, err)
+		}
+	}
+	return nil
+}

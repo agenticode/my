@@ -1094,3 +1094,21 @@ func (s *Store) CaptureChecks(ctx context.Context, host string) ([]model.Capture
 	}
 	return out, rows.Err()
 }
+
+// recordTables are the tables that hold what sources read; a run that adds
+// to none of them added nothing.
+var recordTables = []string{"event", "action", "boot", "placement", "gpu_mem", "ecs_sample", "bmc", "bmc_memory", "bios_setting"}
+
+// RecordCounts returns the number of rows of each table that holds what
+// sources read, for all hosts.
+func (s *Store) RecordCounts(ctx context.Context) (map[string]int64, error) {
+	out := map[string]int64{}
+	for _, t := range recordTables {
+		var n int64
+		if err := s.db.QueryRowContext(ctx, `SELECT count(*) FROM `+t).Scan(&n); err != nil {
+			return nil, err
+		}
+		out[t] = n
+	}
+	return out, nil
+}
