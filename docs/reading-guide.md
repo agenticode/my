@@ -87,6 +87,8 @@ in this slot since 2026-07-31  0 slot changes
  evidence    [R-SOFT-01] one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53
              errors since 2026-08-03, 2 in the last 7 days
              53 records: first synth:demo#event1, last synth:demo#event971
+             [R-SOFT-01] the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of
+             the last 4 boots
  baseline    own history: 0.3 errors a day over the last 7 days, percentile 60 of the 30 days before
              same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2
              of them with errors

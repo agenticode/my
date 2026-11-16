@@ -148,6 +148,16 @@
               "raw_ref": "synth:demo#event971"
             }
           ]
+        },
+        {
+          "rule": "R-SOFT-01",
+          "code": "loop.fault_boots",
+          "args": {
+            "n": 4,
+            "of": 4,
+            "where": "rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110"
+          },
+          "text": "the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of the last 4 boots"
         }
       ],
       "checks": [],
@@ -206,7 +216,7 @@
           "confined": true
         }
       ],
-      "engine_version": "4",
+      "engine_version": "5",
       "as_of": "2026-11-13T00:00:00Z"
     }
   ]
