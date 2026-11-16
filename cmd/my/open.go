@@ -28,7 +28,7 @@ func openCase(ctx context.Context, path string) (*source, error) {
 	n, _ := io.ReadFull(f, head)
 	f.Close()
 	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
-		return nil, fmt.Errorf("%s is a directory; a case is a ledger file or a .mycase bundle", path)
+		return nil, worded("err.case_dir", "path", path)
 	}
 	if bundle.IsBundle(path) {
 		c, err := bundle.Open(ctx, path, "")
@@ -38,7 +38,7 @@ func openCase(ctx context.Context, path string) (*source, error) {
 		return &source{path: path, ledger: c.Ledger, manifest: &c.Manifest, cleanup: func() { c.Close() }}, nil
 	}
 	if !bytes.Equal(head[:n], sqliteMagic) {
-		return nil, fmt.Errorf("%s is neither a MemorY ledger nor a case bundle", path)
+		return nil, worded("err.not_case", "path", path)
 	}
 	src := &source{path: path, ledger: path, cleanup: func() {}}
 	s, err := store.Open(ctx, path, store.ReadOnly)
@@ -108,7 +108,7 @@ func runOpen(ctx context.Context, env *cli.Env, args []string) int {
 	}
 	src, err := openCase(ctx, args[0])
 	if err != nil {
-		fmt.Fprintf(env.Stderr, "%s: %v\n", name, err)
+		fmt.Fprintf(env.Stderr, "%s: %s\n", name, errText(lang, err))
 		return cli.ExitFailure
 	}
 	defer src.cleanup()

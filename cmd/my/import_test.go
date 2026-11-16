@@ -130,7 +130,7 @@ func TestImportMistakes(t *testing.T) {
 		{"a bad time", []string{"import", root, "--captured-at", "yesterday"}, cli.ExitUsage, "--captured-at yesterday: want a date"},
 		{"a bad time zone", []string{"import", root, "--tz", "Mars/Olympus"}, cli.ExitUsage, "--tz Mars/Olympus: want a time zone name"},
 		{"an output that exists", []string{"import", root, "-o", taken}, cli.ExitUsage, "exists; --force replaces it"},
-		{"a scan flag", []string{"import", root, "--root", root}, cli.ExitUsage, "flag provided but not defined: -root"},
+		{"a scan flag", []string{"import", root, "--root", root}, cli.ExitUsage, "unknown flag --root"},
 	} {
 		code, out, errOut := runEnv(fixed, tt.args...)
 		if code != tt.code || !strings.Contains(errOut, tt.want) || out != "" {

@@ -48,7 +48,16 @@ func ParseLang(s string) (Lang, error) {
 			return l, nil
 		}
 	}
-	return "", fmt.Errorf("unknown language %q (supported: en, ko)", s)
+	return "", &LangError{Name: s}
+}
+
+// LangError is the error of ParseLang: Name is no supported language.
+type LangError struct {
+	Name string
+}
+
+func (e *LangError) Error() string {
+	return fmt.Sprintf("unknown language %q (supported: en, ko)", e.Name)
 }
 
 // Message is one sentence in every supported language.

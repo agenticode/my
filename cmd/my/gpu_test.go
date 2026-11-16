@@ -69,7 +69,7 @@ func TestGPUCommand(t *testing.T) {
 		{[]string{"gpu", "42"}, `no GPU "42" with memory records in host gpu-01; name a GPU by its index, its serial number, its UUID or its PCI address`},
 		{[]string{"gpu", "0", "1"}, `unexpected argument "1"`},
 		{[]string{"gpu", "--days", "-3"}, "--days -3: want a number of days"},
-		{[]string{"gpu", "--rows", "1"}, "flag provided but not defined"},
+		{[]string{"gpu", "--rows", "1"}, "unknown flag"},
 	} {
 		code, out, errOut := run(append([]string{"open", ledger}, tt.args...)...)
 		if code != cli.ExitUsage || out != "" || !strings.Contains(errOut, tt.want) || !strings.Contains(errOut, `run "my help gpu" for usage`) {

@@ -107,7 +107,7 @@ func TestPreflightCommandLine(t *testing.T) {
 		{[]string{"preflight", "--lang", "xx"}, cli.ExitUsage, "unknown language"},
 		{[]string{"preflight", "--color", "red"}, cli.ExitUsage, "--color red"},
 		{[]string{"preflight", "--width", "-3"}, cli.ExitUsage, "--width -3"},
-		{[]string{"preflight", "--nope"}, cli.ExitUsage, "flag provided but not defined"},
+		{[]string{"preflight", "--nope"}, cli.ExitUsage, "unknown flag"},
 	} {
 		code, _, errOut := run(tt.args...)
 		if code != tt.code || !strings.Contains(errOut, tt.err) {
