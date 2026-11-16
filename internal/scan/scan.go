@@ -89,6 +89,9 @@ type Options struct {
 	// JournalTimeout bounds the reading of the journal; zero means
 	// DefaultJournalTimeout.
 	JournalTimeout time.Duration
+	// JournalSince starts the reading of the journal at this time; zero
+	// reads every boot it holds.
+	JournalSince time.Time
 	// NvidiaSMI is the nvidia-smi program. Empty looks it up in PATH; "-"
 	// leaves GPU memory out.
 	NvidiaSMI string
@@ -219,13 +222,51 @@ func uptimeTime(opts *Options) time.Time {
 
 // Sources returns the adapters of a scan, in the order they are read.
 func Sources(ctx context.Context, opts Options) []adapter.Adapter {
+	var out []adapter.Adapter
+	for _, t := range sourceList(ctx, opts) {
+		out = append(out, t.a)
+	}
+	return out
+}
+
+// HarvestSources returns the sources of a live scan in the two phases of
+// "my harvest". Phase A is what the boot before left, which the next
+// reset could take away: the host facts of this boot, the pstore files
+// and their archive, the boot error region, the text logs of kdump, and
+// the ring buffer of this boot, which holds its first lines (records left
+// in the machine check banks, the lines the kernel printed of the boot
+// error region). Phase B is the rest of the scan: rasdaemon, the journal,
+// the counters, SMBIOS and the GPUs.
+func HarvestSources(ctx context.Context, opts Options) (a, b []adapter.Adapter) {
+	for _, t := range sourceList(ctx, opts) {
+		if t.early {
+			a = append(a, t.a)
+		} else {
+			b = append(b, t.a)
+		}
+	}
+	return a, b
+}
+
+// tagged is a source with the phase of the harvest it belongs to.
+type tagged struct {
+	a     adapter.Adapter
+	early bool
+}
+
+func sourceList(ctx context.Context, opts Options) []tagged {
 	now := opts.Now
 	if now.IsZero() && !opts.Live {
 		now = treeTime(&opts)
 	}
 	hi := hostinfo.NewRoot(opts.root(), hostinfo.Options{Now: now})
 	info, _ := hi.Read()
-	out := []adapter.Adapter{hi}
+	out := []tagged{{hi, true}}
+	add := func(early bool, as ...adapter.Adapter) {
+		for _, a := range as {
+			out = append(out, tagged{a, early})
+		}
+	}
 
 	// rasdaemon: the first database that is there. One that is there and
 	// closed to this user is for the adapter to report. When there is none,
@@ -243,18 +284,22 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 		}
 	}
 	if there {
-		out = append(out, rasdaemon.New(db, rasdaemon.Options{TempDir: opts.TempDir}))
+		add(false, rasdaemon.New(db, rasdaemon.Options{TempDir: opts.TempDir}))
 	} else {
-		out = append(out, report{kind: rasdaemon.Kind, origin: opts.path(RasdaemonPaths[0]), status: model.SourceAbsent,
+		add(false, report{kind: rasdaemon.Kind, origin: opts.path(RasdaemonPaths[0]), status: model.SourceAbsent,
 			detail: "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only"})
 	}
 
-	out = append(out, kernelLog(ctx, &opts, info)...)
-	out = append(out, CrashLogs(&opts)...)
-	out = append(out, bootErrors(&opts, now, info)...)
+	for _, k := range kernelLog(ctx, &opts, info) {
+		// The ring buffer of this boot holds its first lines.
+		_, ring := k.(*kmsg)
+		add(ring, k)
+	}
+	add(true, CrashLogs(&opts)...)
+	add(true, bootErrors(&opts, now, info)...)
 
-	out = append(out, edacsysfs.NewRoot(opts.root(), edacsysfs.Options{Now: now}))
-	out = append(out, daemonCounts(&opts, now)...)
+	add(false, edacsysfs.NewRoot(opts.root(), edacsysfs.Options{Now: now}))
+	add(false, daemonCounts(&opts, now)...)
 
 	sm := adapter.Adapter(smbios.NewRoot(opts.root(), smbios.Options{Now: now}))
 	if !opts.Live && !exists(opts.path(smbios.TablesDir+"/DMI")) {
@@ -265,9 +310,9 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 			}
 		}
 	}
-	out = append(out, sm)
-	out = append(out, gpuMemory(&opts)...)
-	out = append(out, bmcLog(&opts)...)
+	add(false, sm)
+	add(false, gpuMemory(&opts)...)
+	add(false, bmcLog(&opts)...)
 	return out
 }
 
@@ -441,7 +486,7 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 		// the same text in both and is stored once.
 		journalRead := false
 		if prog := journalctl(opts); prog != "" {
-			j := &journal{prog: prog, timeout: opts.JournalTimeout, opts: kopts}
+			j := &journal{prog: prog, timeout: opts.JournalTimeout, since: opts.JournalSince, opts: kopts}
 			switch status, detail := j.probe(ctx); status {
 			case model.SourceOK:
 				out = append(out, j)

@@ -126,6 +126,9 @@ type Options struct {
 // DefaultLedger is where "my harvest" keeps its ledger.
 const DefaultLedger = "/var/lib/my/ledger.db"
 
+// DefaultLedgerDoc is DefaultLedger for texts.
+const DefaultLedgerDoc = DefaultLedger
+
 // MinFree is the free space below which "my harvest" stores only what
 // the boot before left. It is a chosen floor; nothing was measured.
 const MinFree = 32 << 20

@@ -6,7 +6,7 @@ MemorY reads the memory error records a Linux server already keeps and shows whi
 
 It is for anyone who has to read memory errors and decide what to do: platform and datacenter engineers, SREs, field and support engineers of hardware vendors, system integrators, kernel and RAS developers.
 
-The command is `my`: one static binary that needs no configuration. It only reads. It never takes a page offline, starts a repair or resets a counter.
+The command is `my`: one static binary that needs no configuration. It only reads, with one exception that has to be asked for: `my harvest install` puts two systemd unit files on the host and enables them, and `my harvest uninstall` removes them. It never takes a page offline, starts a repair or resets a counter.
 
 ![Slot map of the example host: CPU0_C1 is marked replace now, CPU1_D1 observe](examples/figures/slotmap.svg)
 
@@ -209,6 +209,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | write the slot names as a DIMM label file for rasdaemon |
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded ([docs/verify.md](docs/verify.md)) |
+| `my harvest` | at every boot, read what the boot before left (pstore, the boot error region, kdump logs, records left in the machine check banks) into the kept ledger `/var/lib/my/ledger.db`; `install`, `uninstall`, `status` ([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my preflight` | what a reset right after a fatal memory error would leave on this host, and the settings that change it ([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my serve --metrics` | run as a Prometheus exporter ([docs/exporter.md](docs/exporter.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |

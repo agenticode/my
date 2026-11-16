@@ -271,12 +271,16 @@ func caseLine(lang i18n.Lang, m *bundle.Manifest) string {
 // this run computed: another engine version, or thresholds the sender
 // changed.
 func (s *session) storedNote() string {
+	cut := ""
+	if t := cutScans(s.ctx, s.c.Store()); t != "" {
+		cut = say(s.lang, "case.cut", "time", t)
+	}
 	if s.h == nil {
-		return ""
+		return cut
 	}
 	raw, err := s.c.Store().Meta(s.ctx, engine.MetaKey(s.h.Host))
 	if err != nil || raw == "" {
-		return ""
+		return cut
 	}
 	var rec struct {
 		EngineVersion string            `json:"engine_version"`
@@ -284,7 +288,7 @@ func (s *session) storedNote() string {
 		Grade         string            `json:"grade"`
 	}
 	if json.Unmarshal([]byte(raw), &rec) != nil {
-		return ""
+		return cut
 	}
 	var notes []string
 	if rec.EngineVersion != "" && rec.EngineVersion != engine.Version {
@@ -304,6 +308,9 @@ func (s *session) storedNote() string {
 	}
 	if g := model.VerdictGrade(rec.Grade); g.Valid() && g != s.h.Grade {
 		notes = append(notes, say(s.lang, "case.grade", "theirs", engine.GradeText(s.lang, g), "ours", engine.GradeText(s.lang, s.h.Grade)))
+	}
+	if cut != "" {
+		notes = append(notes, cut)
 	}
 	return strings.Join(notes, " ")
 }

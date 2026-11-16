@@ -83,3 +83,54 @@ A check is `kept`, `lost`, `none` (the platform does not offer it), `unknown` (a
 | `harvest` | `my-harvest.service` is enabled and its ledger has 32 MiB free | `my harvest install` | a unit file below `/etc/systemd/system` and a run at every boot |
 
 The paths of `/sys` and `/proc` the checks read were taken from the kernel source that creates them, and each is named in a comment of `internal/preflight`. They were read on the lab VM and on made trees in the tests; no bare-metal host was read.
+
+## my harvest
+
+`my harvest` is a scan of the running host into a kept ledger, `/var/lib/my/ledger.db` unless `--ledger` names another, made for the moment after a reset. It reads in two phases:
+
+| Phase | Sources | Then |
+| --- | --- | --- |
+| A | the host facts of this boot, `/sys/fs/pstore`, `/var/lib/systemd/pstore`, the boot error region, the kdump text logs below `/var/crash`, and `/dev/kmsg`, which holds the first lines of this boot: the records the kernel found in the machine check banks and the lines it printed of the boot error region | a checkpoint of the ledger: the ledger runs with `synchronous(NORMAL)`, which syncs the write-ahead log only at a checkpoint (`PRAGMA synchronous`, sqlite.org), so without one a reset seconds later could take phase A with it |
+| B | the journal, rasdaemon, the EDAC counters, the mcelog daemon, SMBIOS, the GPUs | the ledger passes: boots, carried records, duplicates, how each boot ended |
+
+Each phase writes one line to standard error: the sources it read, the records it added, the seconds since the start. Under systemd the journal keeps the lines.
+
+- One run at a time: a run takes a lock on `<ledger>.lock`; a second run ends at once with exit code 0 and says so.
+- The journal is read from the start of the boot during which the last finished run ran; the lines before are in the ledger. Without a finished run it is read in full.
+- A run that added no record removes its scan entry, its source inventory and the counter readings it took, and records the time of the run under `harvest.last_run` in `meta`. A ledger read at every boot does not grow by a scan entry per boot.
+- Below 32 MiB of free space on the file system of the ledger only phase A is read. The floor is a choice; nothing was measured.
+- A ledger that cannot be written (a read-only file system, a full one) ends the run with exit code 70 and the reason. SQLite rolls back the transaction that failed; what earlier transactions stored stays, and nothing else is written anywhere.
+- `--deadline` (10 minutes) bounds the reading. Sources not read by then are named, the passes run, and the exit code is 0.
+- A run that a reset cut leaves a scan entry without a finish time, and the passes did not run after it. `my harvest status` and `my open` on the ledger say that totals may count an error twice until a run completes.
+
+The harvest asks no BMC and has no network flags.
+
+### Install
+
+```
+sudo install -m 0755 my /usr/local/bin/my
+sudo my harvest install --timer --dry-run
+sudo my harvest install --timer
+```
+
+`my harvest install` is the one command of MemorY that changes the host. It writes `/etc/systemd/system/my-harvest.service`, and with `--timer` `/etc/systemd/system/my-harvest.timer`, runs `systemctl daemon-reload` and `systemctl enable` for what it wrote, and with `--now` starts the service. It prints every path and command before it acts; `--dry-run` prints them and stops. It refuses when it does not run as root, when systemd is not the init system (`/run/systemd/system` is not there), when the binary lies below `/home`, `/root`, `/tmp`, `/run` or `/var/tmp`, is not owned by root or is writable by others: the unit runs it as root at every boot. A unit file of that name that does not start with the line `# Written by "my harvest install"` is left alone, and nothing is installed.
+
+`my harvest uninstall` runs `systemctl disable --now` for the units it wrote, removes them and runs `systemctl daemon-reload`. The ledger stays, and the command prints its path. `my harvest status` says whether the units are installed and enabled, the size of the ledger and the boots it holds, and when the last run was.
+
+The same unit files are in [contrib/systemd](../contrib/systemd) for a person who installs them by hand; a test keeps them equal to what install writes. The service:
+
+| Setting | Why |
+| --- | --- |
+| `Type=oneshot`, `WantedBy=multi-user.target` | one run at every boot |
+| `After=local-fs.target systemd-journal-flush.service systemd-pstore.service rasdaemon.service` | after the journal is on disk and systemd-pstore has archived the dumps; ordering only, no `Requires=`, so the harvest runs on a host without any of them. Nothing is ordered after it, so it holds up no boot |
+| root with `CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_SYSLOG` | the boot error region and `/sys/fs/pstore` are readable by root only; with two capabilities and nothing else |
+| `StateDirectory=my`, `ProtectSystem=strict`, `ProtectHome=yes`, `PrivateTmp=yes` | the ledger directory is the one place it can write |
+| `PrivateNetwork=yes`, `RestrictAddressFamilies=AF_UNIX` | no network |
+| `Nice=10`, `IOSchedulingClass=idle`, `TimeoutStartSec=15min` | it gives way to the services of the host |
+
+`my-harvest.timer` (`OnBootSec=15min`, `OnUnitActiveSec=1h`) runs the harvest again during a long boot, so that counter readings and corrected errors of that boot are in the ledger before a reset. In a loop of short boots the run at boot is the one that matters.
+
+`my open /var/lib/my/ledger.db` shows the kept ledger with every command, and the overview of `my` names that command when the ledger is there.
+
+What MemorY never touches: kernel parameters, boot loader files, sysctls, files in `/sys` and `/proc`, the configuration of journald, systemd-pstore, kdump and rasdaemon, EFI variables, pstore files (removing one erases the record in the backend), the ERST and the boot error region. It never opens `/dev/mcelog`: a read hands the record over and clears it from ERST and from the kernel's buffer (`__mce_read_apei()`).
+

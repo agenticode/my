@@ -354,3 +354,20 @@ func (s *Store) Snapshot(ctx context.Context, path string) error {
 	}
 	return nil
 }
+
+// Durable makes what is committed safe from a power loss: a checkpoint
+// copies the write-ahead log into the database file and empties the log.
+// The ledger runs with synchronous(NORMAL), which syncs the log before a
+// checkpoint and the database file after it, and does not sync the log at
+// every commit ("PRAGMA synchronous", sqlite.org/pragma.html): without a
+// checkpoint, transactions of the last moments before a reset can be lost.
+func (s *Store) Durable(ctx context.Context) error {
+	var busy, logFrames, done int
+	if err := s.db.QueryRowContext(ctx, `PRAGMA wal_checkpoint(TRUNCATE)`).Scan(&busy, &logFrames, &done); err != nil {
+		return fmt.Errorf("ledger %s: checkpoint: %w", s.path, err)
+	}
+	if busy != 0 {
+		return fmt.Errorf("ledger %s: checkpoint: the ledger is in use by another connection", s.path)
+	}
+	return nil
+}

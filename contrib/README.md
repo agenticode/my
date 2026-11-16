@@ -1,12 +1,13 @@
 # contrib
 
-Files for running `my serve --metrics` in a monitoring setup. They are examples to take parts from. [docs/exporter.md](../docs/exporter.md) describes the exporter and its metrics.
+Files for running `my serve --metrics` in a monitoring setup, and the units of the boot harvest. They are examples to take parts from. [docs/exporter.md](../docs/exporter.md) describes the exporter and its metrics, [docs/crash-loop.md](../docs/crash-loop.md) the harvest.
 
 | File | What it is |
 | --- | --- |
 | `systemd/my-exporter.service` | the exporter for the host it runs on, as a service that can only read |
 | `systemd/my-fleet-exporter.service` | one exporter for a fleet: it reads the store the rasdaemons of all hosts write to |
 | `systemd/rasdaemon.env` | the settings of that store, in the variables rasdaemon takes |
+| `systemd/my-harvest.service`, `systemd/my-harvest.timer` | the boot harvest: at every boot, what the boot before left goes into the kept ledger `/var/lib/my/ledger.db`; the timer runs it again every hour of a long boot. `my harvest install` writes the same files |
 | `prometheus/scrape.yml` | scrape configuration for both setups |
 | `prometheus/my-findings.rules.yml` | the alert `MemoryFindingWorse`: the finding for a DIMM got worse |
 | `prometheus/my-exporter.rules.yml` | the alert `MemoryFindingsStale`: an exporter has stopped renewing its findings |

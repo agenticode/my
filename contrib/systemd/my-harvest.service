@@ -1,0 +1,66 @@
+# Written by "my harvest install"
+#
+# MemorY boot harvest: at every boot, read what the boot before left into
+# the kept ledger /var/lib/my/ledger.db and make it durable, then read the
+# rest of the host. A fatal memory error resets the host before the
+# journal or rasdaemon can store anything; the panic text in pstore, the
+# boot error region of the firmware, the text log of kdump and the records
+# the next boot finds in the machine check banks are what is left of it.
+#
+#   my harvest install         writes this file and enables it
+#   my harvest uninstall       disables it and removes it; the ledger stays
+#
+# or by hand:
+#
+#   install -m 0755 my /usr/local/bin/my
+#   install -m 0644 my-harvest.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable my-harvest.service
+#
+# The service reads, and writes its ledger and nothing else. It runs as
+# root, because the boot error region and the pstore file system are
+# readable by root only, with two capabilities: reading files whatever
+# their mode, and reading the kernel log. It has no network. Nothing is
+# ordered after it, so it holds up no boot.
+
+[Unit]
+Description=MemorY boot harvest: crash records of the boot before into a kept ledger
+Documentation=https://github.com/agenticode/my/blob/main/docs/crash-loop.md
+After=local-fs.target systemd-journal-flush.service systemd-pstore.service rasdaemon.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/my harvest
+TimeoutStartSec=15min
+Nice=10
+IOSchedulingClass=idle
+
+StateDirectory=my
+StateDirectoryMode=0700
+UMask=0077
+
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_SYSLOG
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+
+DevicePolicy=closed
+DeviceAllow=/dev/kmsg r
+
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

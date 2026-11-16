@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -22,7 +23,18 @@ import (
 type journal struct {
 	prog    string
 	timeout time.Duration
-	opts    klog.Options
+	// since starts the reading at a time: journalctl(1), --since, which
+	// takes "@" and seconds since the epoch (systemd.time(7)).
+	since time.Time
+	opts  klog.Options
+}
+
+// sinceArgs returns the options that start the reading at j.since.
+func (j *journal) sinceArgs() []string {
+	if j.since.IsZero() {
+		return nil
+	}
+	return []string{"--since", "@" + strconv.FormatInt(j.since.Unix(), 10)}
 }
 
 // journalMatch selects kernel messages of all boots. The -k option would
@@ -140,7 +152,10 @@ func (j *journal) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if timeout <= 0 {
 		timeout = DefaultJournalTimeout
 	}
-	rep, timedOut := j.pass(ctx, sink, timeout, journalMatch)
+	rep, timedOut := j.pass(ctx, sink, timeout, append(j.sinceArgs(), journalMatch)...)
+	if !j.since.IsZero() {
+		rep.Notes = append(rep.Notes, "read from "+j.since.UTC().Format("2006-01-02 15:04:05")+" UTC on: what came before is in the ledger")
+	}
 	if !timedOut || rep.SinkErr != nil || ctx.Err() != nil {
 		return rep
 	}
