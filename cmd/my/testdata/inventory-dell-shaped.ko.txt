@@ -7,8 +7,8 @@
  A1    D0A10001  Example Memory  EXM32G29R2X4-B  32 GB  2R    2666/2933      -       2
        DDR4 RDIMM; BMC: DIMM A1, DIMM.Socket.A1
        BMC가 센 CE: 모듈 수명 전체 1,250건, 2026-10-02 08:15 UTC 리셋 이후 3건
-       BMC 로그 2026-10-28 21:04 UTC: correctable ECC
-       BMC 로그 2026-11-05 02:41 UTC: correctable ECC
+       BMC 로그 2026-10-28 21:04 UTC: corrected-error limit passed
+       BMC 로그 2026-11-05 02:41 UTC: corrected-error limit passed
  A2    D0A20002  Example Memory  EXM32G29R2X4-B  32 GB  2R    2666/2933      -       0
        DDR4 RDIMM; BMC: DIMM A2, DIMM.Socket.A2
  B1    D0B10003  Example Memory  EXM32G29R2X4-B  32 GB  2R    2666/2933      -       0

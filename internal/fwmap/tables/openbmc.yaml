@@ -1,0 +1,105 @@
+format: 1
+table: openbmc
+version: 1
+vendor: OpenBMC
+basis: registry
+applies:
+  message-id-prefix: OpenBMC
+  # A company that changes the registry renames its prefix and keeps the
+  # names (read-me of the registry): the names hold under any prefix.
+  any-registry: yes
+key: message-id
+location: openbmc
+sources:
+  registry:
+    title: "OpenBMC message registry OpenBMC.0.5.0 (bmcweb redfish-core/include/registries/openbmc.json)"
+    url: https://github.com/openbmc/bmcweb/blob/3cdd1fa/redfish-core/include/registries/openbmc.json
+    read: 2026-11-16
+  hooks:
+    title: "intel-ipmi-oem src/ipmi_to_redfish_hooks.cpp: the SEL records of the BIOS behind these messages"
+    url: https://github.com/openbmc/intel-ipmi-oem/blob/b36a530/src/ipmi_to_redfish_hooks.cpp
+    read: 2026-11-16
+
+# Socket, channel (a letter from A) and DIMM lead the arguments of the
+# memory messages; the socket counts from 1 as the hooks write it.
+messages:
+  - id: MemoryECCCorrectable
+    event: ce
+    args: socket, channel, position, rank
+    severity: Warning
+    source: registry, hooks
+  - id: MemoryECCUncorrectable
+    event: ue
+    args: socket, channel, position, rank
+    severity: Critical
+    source: registry, hooks
+  - id: MemoryParityCommandAndAddress
+    event: ue
+    words: parity error
+    args: socket, channel, position, channel-valid, position-valid
+    severity: Critical
+    source: registry, hooks
+  - id: MemoryParityNotKnown
+    event: ue
+    words: parity error
+    args: socket, channel, position, channel-valid, position-valid
+    severity: Critical
+    source: registry, hooks
+  - id: ADDDCCorrectable
+    event: device-sparing
+    flags: adddc
+    args: socket, channel, position, rank
+    severity: Warning
+    source: registry, hooks
+  - id: SparingRedundancyDegraded
+    event: sparing
+    flags: rank
+    args: socket, channel, position, -, rank
+    severity: Warning
+    source: registry, hooks
+  - id: SparingRedundancyFull
+    event: cleared
+    clears: sparing
+    args: socket, channel, position, -, rank
+    severity: OK
+    source: registry, hooks
+  - id: MirroringRedundancyDegraded
+    event: mirror-failover
+    args: socket, channel, position, -, rank
+    severity: Warning
+    source: registry, hooks
+  - id: MirroringRedundancyFull
+    event: cleared
+    clears: mirror-failover
+    args: socket, channel, position, -, rank
+    severity: OK
+    source: registry, hooks
+  - id: MemoryRASConfigurationDisabled
+    event: config-state
+    args: -, -
+    severity: OK
+    source: registry, hooks
+  - id: MemoryRASConfigurationEnabled
+    event: config-state
+    args: -, -
+    severity: OK
+    source: registry, hooks
+  - id: MemoryRASModeDisabled
+    event: config-state
+    args: -, -
+    severity: OK
+    source: registry, hooks
+  - id: MemoryRASModeEnabled
+    event: config-state
+    args: -, -
+    severity: OK
+    source: registry, hooks
+  - id: MemoryThermTrip
+    event: thermal
+    args: -
+    severity: Critical
+    source: registry
+  - id: EventLogCleared
+    event: log-cleared
+    severity: OK
+    source: registry

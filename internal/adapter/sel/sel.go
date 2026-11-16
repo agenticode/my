@@ -27,6 +27,8 @@ import (
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/decode/ipmi"
+	"github.com/agenticode/my/internal/fwevent"
+	"github.com/agenticode/my/internal/fwmap"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -373,10 +375,11 @@ func (r *reader) readRaw(data []byte) {
 // emit turns the entries into ledger records.
 func (r *reader) emit(sink adapter.Sink, form string) error {
 	type out struct {
-		ev   *model.Event
-		act  *model.Action
-		e    *entry
-		name ipmi.MemoryEvent
+		ev    *model.Event
+		act   *model.Action
+		alone *model.FirmwareRecord
+		e     *entry
+		name  ipmi.MemoryEvent
 	}
 	var outs []out
 	source := Kind + "/" + form
@@ -432,6 +435,11 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 				return &model.Event{Kind: model.KindError, ErrorSeverity: model.SevInformational, ErrorType: text, Count: 1,
 					Source: source, Decoder: "ipmi/sel", RawRef: e.ref, Raw: e.raw, Fingerprint: fp}
 			}
+			fw := model.FirmwareRecord{Vendor: "IPMI", Origin: model.OriginSEL, Log: formName[form], Location: strings.Join(labels, ", "),
+				Text: strings.TrimSpace(e.desc), EntryKey: model.Fingerprint(e.id, e.wall)}
+			if e.rec != nil {
+				fw.VendorID = fmt.Sprintf("%02x%02x%02x%02x", e.rec.EventType|boolBit(e.rec.Deassert), e.rec.Data[0], e.rec.Data[1], e.rec.Data[2])
+			}
 
 			if ev == ipmi.MemUnknown {
 				// A memory sensor said something this reader has no class for.
@@ -454,11 +462,18 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 				if len(labels) == 1 {
 					x.Label = labels[0]
 				}
+				fw.Common, fw.Mapping = string(fwevent.Unclassified), model.MappingNone
+				x.Firmware = &fw
 				outs = append(outs, out{ev: x, e: e, name: ev})
 				return nil
 			}
 
-			m := ev.Meaning()
+			res := fwmap.Current().Classify(fwmap.Entry{IPMI: fmt.Sprintf("memory-%02x", int(ev))})
+			if !res.Event.Valid() {
+				res.Event, res.Mapping = fwevent.Unclassified, model.MappingNone
+			}
+			fw.Mapping, fw.MapRef, fw.Basis = res.Mapping, res.Ref, res.Basis
+			name, clears := res.Event, fwevent.Name("")
 			if e.deassert {
 				if ev == ipmi.MemDeviceDisabled {
 					// The module is in use again. A disable this log recorded
@@ -469,55 +484,52 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 							continue
 						}
 						was := info(ev.String() + " (enabled again later)")
-						was.RawRef, was.Raw, was.Label, was.Fingerprint = o.act.RawRef, o.act.Raw, o.act.Label, o.act.Fingerprint
+						was.RawRef, was.Raw, was.Label, was.Fingerprint, was.Firmware = o.act.RawRef, o.act.Raw, o.act.Label, o.act.Fingerprint, o.act.Firmware
 						o.ev, o.act = was, nil
 						r.cancelled++
 					}
-					x := info(ev.String() + " (deasserted: in use again)")
-					if len(labels) == 1 {
-						x.Label = labels[0]
-					}
-					outs = append(outs, out{ev: x, e: e, name: ev})
-					return nil
 				}
+				name, clears = fwevent.Cleared, res.Event
 				r.cleared++
-				return nil
 			}
-
-			switch m.Class {
-			case ipmi.ClassNone:
-				r.presence++
-			case ipmi.ClassError, ipmi.ClassInfo:
-				x := info(ev.String())
-				x.ErrorSeverity, x.ErrorScrubType = m.Severity, m.Scrub
-				switch len(labels) {
-				case 1:
-					x.Label = labels[0]
-				case 0:
-					if m.Class == ipmi.ClassError {
+			text := ev.String()
+			switch {
+			case name == fwevent.Cleared && ev == ipmi.MemDeviceDisabled:
+				text += " (deasserted: in use again)"
+			case name == fwevent.Cleared:
+				text += " (deasserted)"
+			}
+			rec := &fwevent.Record{Event: name, Flags: res.Flags, Clears: clears, Labels: labels, Decoder: "ipmi/sel", Method: e.generator,
+				Text: text, Source: source, RawRef: e.ref, Raw: e.raw, Fingerprint: fp, Firmware: fw}
+			// The time is set when the records are written.
+			rec.At = time.Unix(0, 0).UTC()
+			lo, err := rec.Ledger()
+			if err != nil {
+				return adapter.Unreadable("the record could not be read as a firmware record: %v", err)
+			}
+			for _, x := range lo.Events {
+				if x.ErrorSeverity.Class() != "" {
+					switch {
+					case len(labels) == 0:
 						r.unnamedModule++
+					case len(labels) > 1:
+						r.multiDIMM++
 					}
-				default:
-					// One record that names several modules is one error on
-					// one of them.
-					x.ErrorType += " on one of " + strings.Join(labels, ", ")
-					r.multiDIMM++
 				}
-				if ev == ipmi.MemLogLimit {
+				if name == fwevent.CELogLimit {
 					r.logLimit = append(r.logLimit, e.t)
 				}
 				outs = append(outs, out{ev: x, e: e, name: ev})
-			case ipmi.ClassAction:
-				targets := labels
-				if len(targets) == 0 {
-					targets = []string{""}
-					r.unnamedModule++
-				}
-				for n, label := range targets {
-					a := &model.Action{Kind: m.Action, Method: e.generator, Result: m.Result, Label: label, Detail: ev.String(),
-						Source: source, RawRef: e.ref, Raw: e.raw, Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}
-					outs = append(outs, out{act: a, e: e, name: ev})
-				}
+			}
+			if len(lo.Actions) > 0 && len(labels) == 0 {
+				r.unnamedModule++
+			}
+			for _, a := range lo.Actions {
+				outs = append(outs, out{act: a, e: e, name: ev})
+			}
+			if lo.Alone != nil {
+				r.presence++
+				outs = append(outs, out{alone: lo.Alone, e: e, name: ev})
 			}
 			return nil
 		}); err != nil {
@@ -540,6 +552,9 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 		case o.act != nil:
 			o.act.At, o.act.TimeQuality = o.e.t, q
 			err = sink.Action(o.act)
+		case o.alone != nil:
+			o.alone.At = o.e.t
+			err = sink.Firmware(o.alone)
 		}
 		if err != nil {
 			return err
@@ -598,7 +613,7 @@ func (r *reader) notes() []string {
 		add("%d presence records were left out", r.presence)
 	}
 	if r.cleared > 0 {
-		add("%d records only say that a state ended and were left out", r.cleared)
+		add("%d records only say that a state ended; they are kept as information", r.cleared)
 	}
 	if r.cancelled > 0 {
 		add("%d disable records were followed by the module coming back into use; they are kept as information, not as a disabled module", r.cancelled)
@@ -661,3 +676,10 @@ func (s stopped) Error() string { return s.err.Error() }
 // errNoRecords is returned by the JSON reader for a document without a
 // list of entries.
 var errNoRecords = errors.New("no list of log entries found")
+
+func boolBit(b bool) uint8 {
+	if b {
+		return 0x80
+	}
+	return 0
+}

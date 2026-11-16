@@ -50,7 +50,9 @@ func TestBMCDumpReachesTheRules(t *testing.T) {
 		t.Errorf("host = %q, want the name in the dump", run.Host)
 	}
 	src := run.Sources[0]
-	if src.Kind != "redfish" || src.Status != model.SourceOK || src.Events != 7 || src.Actions != 3 || src.GradeB != 3 || src.GradeC != 4 {
+	// The end of the sparing state is kept as information at its place
+	// (grade B); the RAS mode in effect is a firmware record alone.
+	if src.Kind != "redfish" || src.Status != model.SourceOK || src.Events != 7 || src.Actions != 3 || src.GradeB != 4 || src.GradeC != 3 {
 		t.Errorf("source inventory entry = %+v", src)
 	}
 

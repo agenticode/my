@@ -107,6 +107,8 @@ func TestElist(t *testing.T) {
 		{"L4", "Informational: correctable ECC logging limit reached", "DIMM_C1", "2026-11-09 22:41:03", ""},
 		{"L6", "UE: uncorrectable ECC", "DIMM_C1", "2026-11-12 03:14:07", ""},
 		{"L10", "Informational: configuration error", "DIMM_E1", "2026-11-12 03:19:45", ""},
+		// The end of a state is kept as information.
+		{"L12", "Informational: correctable ECC (deasserted)", "DIMM_C1", "2026-11-13 10:05:00", ""},
 		{"L13", "CE: correctable ECC", "", "2026-11-13 11:00:00", ""}, // a shared sensor names no module
 		{"L15", "CE: correctable ECC", "DIMM_A1", "boot+42s", "relative"},
 		{"L16", "Informational: Predictive Failure Asserted", "DIMM_B1", "2026-11-13 12:00:00", ""},
@@ -126,7 +128,7 @@ func TestElist(t *testing.T) {
 		`1 records of kind "OEM record e0" have a vendor format`,
 		`1 records of kind "Linux kernel panic"`,
 		"1 presence records were left out",
-		"1 records only say that a state ended",
+		"2 records only say that a state ended; they are kept as information",
 		"1 disable records were followed by the module coming back into use",
 		`1 memory sensor records say "Predictive Failure Asserted"`,
 		"1 memory records do not name a module",

@@ -101,8 +101,11 @@ func TestTree(t *testing.T) {
 		{"2", "CE: correctable ECC", "DIMM_A1", "2026-11-09 22:41:03", "B redfish/openbmc place 0/0/0 rank 1"},
 		{"3", "UE: uncorrectable ECC", "DIMM_B1", "2026-11-12 03:14:07", "B redfish/openbmc place 0/1/0 rank 0"},
 		{"6", "UE: parity error", "", "2026-11-12 03:22:00", "C redfish/openbmc place 1/-/- rank -"},
-		{"7", "Informational: Memory RAS Mode Select Enabled. Prior Mode=None Selected Mode=Sparing.", "", "2026-11-12 03:23:00", "C redfish/openbmc"},
-		{"10", "Informational: The resource property CorrectableECCErrorCount has exceeded error threshold of value 100.", "DIMM_C1", "2026-11-13 11:00:00", "C "},
+		// The end of a state is kept as information; the RAS mode in
+		// effect is a firmware record alone (c.Firmwares).
+		{"8", "Informational: spare (cleared)", "DIMM_B1", "2026-11-13 09:00:00", "B redfish/openbmc place 0/1/0 rank 1"},
+		// The threshold of the corrected errors of a memory resource.
+		{"10", "CE: corrected-error limit passed", "DIMM_C1", "2026-11-13 11:00:00", "C redfish/registry"},
 		{"dimm1", "action disable/ok: State Disabled; Health Critical; The resource property DIMM_B1 has detected errors of type 'uncorrectable ECC'.", "DIMM_B1", at, "by bmc"},
 		{"dimm1", "action mark-failed/ok: State Disabled; Health Critical; The resource property DIMM_B1 has detected errors of type 'uncorrectable ECC'.", "DIMM_B1", at, "by bmc"},
 		{"4", "action sparing/ok: spare", "DIMM_B1", "2026-11-12 03:20:00", "by bmc"},
@@ -121,10 +124,17 @@ func TestTree(t *testing.T) {
 		"1 log entries are not about memory",
 		"1 log entries of type CXL were not read",
 		"1 entries only say that a state ended",
-		`1 entries about memory say "OpenBMC.0.1.MemoryRASModeEnabled"`,
-		`1 entries about memory say "ResourceEvent.1.3.ResourceErrorThresholdExceeded"`,
 		"1 memory entries do not name a module",
 	)
+	if len(c.Firmwares) != 1 || c.Firmwares[0].Common != "config-state" || c.Firmwares[0].VendorID != "MemoryRASModeEnabled" ||
+		c.Firmwares[0].MapRef != "openbmc@1:MemoryRASModeEnabled" || c.Firmwares[0].Basis != "registry" {
+		t.Errorf("firmware records alone: %+v", c.Firmwares)
+	}
+	for _, e := range c.Events {
+		if e.Source == "redfish/log" && (e.Firmware == nil || e.Firmware.Origin != model.OriginBMCLog || e.Firmware.EntryKey == "") {
+			t.Errorf("event %s has no firmware record: %+v", e.RawRef, e.Firmware)
+		}
+	}
 
 	if len(c.Hosts) != 1 || c.Hosts[0].SystemVendor != "Example Systems" || c.Hosts[0].SystemProduct != "R650" {
 		t.Errorf("hosts = %+v", c.Hosts)
@@ -192,24 +202,34 @@ func TestSELDisableStands(t *testing.T) {
 func TestRegistryEntries(t *testing.T) {
 	c, rep := collect(t, "registry-log.json")
 	check(t, c, []got{
-		{"101", "CE: correctable ECC", "DIMM_A1", "2026-11-05 19:02:44", "C redfish/registry"},
+		// MEM0701 says that the corrected errors passed the firmware's rate.
+		{"101", "CE: corrected-error limit passed", "DIMM_A1", "2026-11-05 19:02:44", "C redfish/registry"},
 		{"102", "UE: uncorrectable ECC on one of DIMM_A1, DIMM_A2", "", "2026-11-05 19:40:10", "C redfish/registry"},
+		{"104", "Informational: state ended", "DIMM_B3", "2026-11-06 14:00:00", "C redfish/registry"},
 		{"105", "Informational: Memory self-test completed on DIMM_A1.", "DIMM_A1", "2026-11-06 14:05:00", "C redfish/registry"},
 		{"103", "action disable/ok: memory device disabled", "DIMM_A1", "2026-11-05 19:41:00", "by bmc"},
-		{"108", "action sparing/ok: spare", "DIMM_B3", "2026-11-06 15:00:00", "by bmc"},
 	})
 	if rep.Status != model.SourceOK || rep.Records != 8 {
 		t.Errorf("report = %+v", rep)
 	}
-	wantNotes(t, rep, "1 log entries are not about memory", "1 presence entries were left out", "1 entries only say that a state ended",
+	wantNotes(t, rep, "1 log entries are not about memory", "1 presence entries are kept apart", "1 entries only say that a state ended",
 		`1 entries about memory say "MEM9999"`, "1 error entries name more than one module")
+	// MEM0008 says that a module is the spare: a configuration, no sparing
+	// that took over. It and the presence entry are records alone.
+	var alone []string
+	for _, f := range c.Firmwares {
+		alone = append(alone, f.VendorID+" "+f.Common+" "+f.Location)
+	}
+	if strings.Join(alone, ", ") != "MEM0006 presence DIMM_B3, MEM0008 config-state DIMM_B3" {
+		t.Errorf("firmware records alone: %v", alone)
+	}
 }
 
 func TestVendorText(t *testing.T) {
 	c, rep := collect(t, "vendor-text-log.json")
 	check(t, c, []got{
 		{"12", "UE: uncorrectable ECC", "PROC 1 DIMM 4", "2026-11-09 04:55:37", "C redfish/text"},
-		{"13", "CE: correctable ECC", "PROC 2 DIMM 12", "2026-11-09 05:10:00", "C redfish/text"},
+		{"13", "CE: corrected-error limit passed", "PROC 2 DIMM 12", "2026-11-09 05:10:00", "C redfish/text"},
 		{"Members[3]", "Informational: Memory training took longer than expected (Processor 2, Memory Module 12)", "PROC 2 DIMM 12", "2026-11-09 05:30:00", "C redfish/text"},
 	})
 	if rep.Status != model.SourceOK || rep.Records != 4 {
