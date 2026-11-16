@@ -93,8 +93,8 @@ func app() *cli.App {
 			},
 			{
 				Name:      "export",
-				Summary:   "write the findings as an FMFM analysis log, or the slot names as a label file for rasdaemon",
-				SummaryKO: "소견을 FMFM 분석 로그로, 또는 슬롯 이름을 rasdaemon 라벨 파일로 내보내기",
+				Summary:   "write an FMFM analysis log, every record as a line of JSON, or a DIMM label file for rasdaemon",
+				SummaryKO: "FMFM 분석 로그, 기록마다 JSON 한 줄, 또는 rasdaemon용 DIMM 라벨 파일로 내보내기",
 				Run:       live(runExport),
 			},
 			{
