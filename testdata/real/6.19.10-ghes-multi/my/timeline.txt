@@ -1,0 +1,14 @@
+host lab-arm6  2026-11-14 to 2026-11-16  3 days
+
+
+ CPU0_E1   ███  peak 4/day
+ CPU0_D1   ▇▇█  peak 4/day
+ CPU0_B1   ▇▇█  peak 4/day
+ CPU0_A1   ███  peak 1/day
+ events    BBUO
+           │││└ CPU0_D1: 2026-11-16 page offline, 1 page
+           ││└─ CPU0_D1: 2026-11-16 UE (patrol scrub)
+           └┴── 2 reboots
+
+ 35 corrected and 1 uncorrected error from 2026-11-14 to 2026-11-16
+ 14 of them since the boot of 2026-11-16: a counter that restarts at every boot shows only those

@@ -1,0 +1,18 @@
+Memory controller events summary:
+	Corrected on DIMM Label(s): 'P0_Node0_Channel0_Dimm0 CPU0_A1' location: 0:0:-1:-1 errors: 3
+	Corrected on DIMM Label(s): 'P0_Node0_Channel1_Dimm0 CPU0_B1' location: 0:1:-1:-1 errors: 10
+	Corrected on DIMM Label(s): 'P0_Node0_Channel3_Dimm0 CPU0_D1' location: 0:3:-1:-1 errors: 10
+	Corrected on DIMM Label(s): 'P0_Node0_Channel4_Dimm0 CPU0_E1' location: 0:4:-1:-1 errors: 12
+	Uncorrected on DIMM Label(s): 'P0_Node0_Channel3_Dimm0 CPU0_D1' location: 0:3:-1:-1 errors: 1
+
+No PCIe AER errors.
+
+No ARM processor errors.
+
+No Extlog errors.
+
+No devlink errors.
+No disk errors.
+No Memory failure errors.
+
+No MCE errors.

@@ -1,0 +1,386 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-arm6",
+  "grade": "consider-replacement",
+  "exit_code": 2,
+  "data": {
+    "host": {
+      "name": "lab-arm6",
+      "system": "QEMU lab-arm6",
+      "virtual": "QEMU",
+      "from": "2026-11-14T01:46:03.972649Z",
+      "to": "2026-11-16T02:27:49.773081Z",
+      "ce": 35,
+      "ue": 1,
+      "records": 41,
+      "grade_a": 36,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "consider-replacement",
+      "grade_text": "consider replacement",
+      "boots": 3,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-16T02:27:41.481924Z",
+        "privileged": true,
+        "tool_version": "c4dc978"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "socket": 0,
+          "label": "CPU0",
+          "channels": [
+            {
+              "channel": 0,
+              "slots": [
+                {
+                  "slot": "CPU0_A1",
+                  "label": "A1",
+                  "position": 0,
+                  "state": "observe",
+                  "serial": "LABM0001",
+                  "ce": 3
+                }
+              ]
+            },
+            {
+              "channel": 1,
+              "slots": [
+                {
+                  "slot": "CPU0_B1",
+                  "label": "B1",
+                  "position": 0,
+                  "state": "consider-replacement",
+                  "serial": "LABM0002",
+                  "ce": 10
+                }
+              ]
+            },
+            {
+              "channel": 2,
+              "slots": [
+                {
+                  "slot": "CPU0_C1",
+                  "label": "C1",
+                  "position": 0,
+                  "state": "ok",
+                  "serial": "LABM0003"
+                }
+              ]
+            },
+            {
+              "channel": 3,
+              "slots": [
+                {
+                  "slot": "CPU0_D1",
+                  "label": "D1",
+                  "position": 0,
+                  "state": "consider-replacement",
+                  "serial": "LABM0004",
+                  "ce": 10,
+                  "ue": 1
+                }
+              ]
+            },
+            {
+              "channel": 4,
+              "slots": [
+                {
+                  "slot": "CPU0_E1",
+                  "label": "E1",
+                  "position": 0,
+                  "state": "consider-replacement",
+                  "serial": "LABM0005",
+                  "ce": 12
+                }
+              ]
+            },
+            {
+              "channel": 5,
+              "slots": [
+                {
+                  "slot": "CPU0_F1",
+                  "label": "F1",
+                  "position": 0,
+                  "state": "ok",
+                  "serial": "LABM0006"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 6,
+      "populated": 6
+    },
+    "ranking": [
+      {
+        "n": 1,
+        "slot": "CPU0_E1",
+        "dimm": {
+          "dimm_uid": "d364747a6100c98bd9b4",
+          "serial": "LABM0005",
+          "manufacturer": "Lab Memory",
+          "part_number": "LABDDR4-16G",
+          "kind": "DDR4 RDIMM 16 GB",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 12,
+        "ue": 0,
+        "mode": "bank",
+        "mode_text": "bank",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          12
+        ],
+        "direction": "unknown",
+        "grade": "consider-replacement",
+        "grade_text": "consider replacement",
+        "rules": [
+          "R-ROW-03"
+        ],
+        "confidence": 69
+      },
+      {
+        "n": 2,
+        "slot": "CPU0_D1",
+        "dimm": {
+          "dimm_uid": "d0d38226a76777745a65",
+          "serial": "LABM0004",
+          "manufacturer": "Lab Memory",
+          "part_number": "LABDDR4-16G",
+          "kind": "DDR4 RDIMM 16 GB",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 10,
+        "ue": 1,
+        "mode": "row",
+        "mode_text": "row",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          11
+        ],
+        "direction": "unknown",
+        "grade": "consider-replacement",
+        "grade_text": "consider replacement",
+        "rules": [
+          "R-ROW-03",
+          "R-SCRUB-01"
+        ],
+        "confidence": 69
+      },
+      {
+        "n": 3,
+        "slot": "CPU0_B1",
+        "dimm": {
+          "dimm_uid": "df283f5f171781d8167d",
+          "serial": "LABM0002",
+          "manufacturer": "Lab Memory",
+          "part_number": "LABDDR4-16G",
+          "kind": "DDR4 RDIMM 16 GB",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 10,
+        "ue": 0,
+        "mode": "column",
+        "mode_text": "column",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10
+        ],
+        "direction": "unknown",
+        "grade": "consider-replacement",
+        "grade_text": "consider replacement",
+        "rules": [
+          "R-ROW-03"
+        ],
+        "confidence": 69
+      },
+      {
+        "n": 4,
+        "slot": "CPU0_A1",
+        "dimm": {
+          "dimm_uid": "d6da6c787fb658ae96f9",
+          "serial": "LABM0001",
+          "manufacturer": "Lab Memory",
+          "part_number": "LABDDR4-16G",
+          "kind": "DDR4 RDIMM 16 GB",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 3,
+        "ue": 0,
+        "mode": "single-bit",
+        "mode_text": "single-bit",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        "direction": "unknown",
+        "grade": "observe",
+        "grade_text": "observe",
+        "rules": [
+          "R-SOFT-01"
+        ],
+        "confidence": 60
+      }
+    ],
+    "quiet": 2,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "name": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "name": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 36,
+        "events": 36,
+        "actions": 0,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-14T01:57:58Z",
+        "last": "2026-11-16T02:25:55Z"
+      },
+      {
+        "kind": "klog",
+        "name": "klog (journal)",
+        "origin": "journalctl -o json _TRANSPORT=kernel",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 82,
+        "events": 72,
+        "actions": 1,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-14T01:57:58.62991Z",
+        "last": "2026-11-16T02:25:55.769227Z",
+        "notes": [
+          "2262 lines read",
+          "its lines run from 2026-11-14 01:46 to 2026-11-16 02:25 UTC"
+        ]
+      },
+      {
+        "kind": "klog",
+        "name": "klog (ring buffer)",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 32,
+        "events": 28,
+        "actions": 1,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-16T02:24:55.144027Z",
+        "last": "2026-11-16T02:25:56.667711Z",
+        "notes": [
+          "777 lines read",
+          "its lines run from 2026-11-16 02:13 to 2026-11-16 02:25 UTC",
+          "29 records were already in the ledger"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "name": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 7,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "name": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 6,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 3.0",
+          "6 memory slots, 6 populated"
+        ]
+      },
+      {
+        "kind": "slot-map",
+        "name": "slot-map",
+        "origin": "lab-arm6",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 6,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "all 6 EDAC DIMM positions are tied to SMBIOS slots"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "code": "missing.virtual",
+        "args": {
+          "what": "QEMU"
+        },
+        "text": "this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory"
+      }
+    ]
+  }
+}

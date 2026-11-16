@@ -1,0 +1,34 @@
+lab-arm6
+disabled
+active
+my c4dc978 (c4dc978dc802) go1.26.4 linux/arm64
+/sys/devices/system/edac/mc/mc0/dimm0/dimm_label:P0_Node0_Channel0_Dimm0 CPU0_A1
+/sys/devices/system/edac/mc/mc0/dimm1/dimm_label:P0_Node0_Channel1_Dimm0 CPU0_B1
+/sys/devices/system/edac/mc/mc0/dimm2/dimm_label:P0_Node0_Channel2_Dimm0 CPU0_C1
+/sys/devices/system/edac/mc/mc0/dimm3/dimm_label:P0_Node0_Channel3_Dimm0 CPU0_D1
+/sys/devices/system/edac/mc/mc0/dimm4/dimm_label:P0_Node0_Channel4_Dimm0 CPU0_E1
+/sys/devices/system/edac/mc/mc0/dimm5/dimm_label:P0_Node0_Channel5_Dimm0 CPU0_F1
+Handle 0x1100, DMI type 17, 40 bytes
+	Locator: CPU0_A1
+	Bank Locator: P0_Node0_Channel0_Dimm0
+	Serial Number: LABM0001
+Handle 0x1101, DMI type 17, 40 bytes
+	Locator: CPU0_B1
+	Bank Locator: P0_Node0_Channel1_Dimm0
+	Serial Number: LABM0002
+Handle 0x1102, DMI type 17, 40 bytes
+	Locator: CPU0_C1
+	Bank Locator: P0_Node0_Channel2_Dimm0
+	Serial Number: LABM0003
+Handle 0x1103, DMI type 17, 40 bytes
+	Locator: CPU0_D1
+	Bank Locator: P0_Node0_Channel3_Dimm0
+	Serial Number: LABM0004
+Handle 0x1104, DMI type 17, 40 bytes
+	Locator: CPU0_E1
+	Bank Locator: P0_Node0_Channel4_Dimm0
+	Serial Number: LABM0005
+Handle 0x1105, DMI type 17, 40 bytes
+	Locator: CPU0_F1
+	Bank Locator: P0_Node0_Channel5_Dimm0
+	Serial Number: LABM0006

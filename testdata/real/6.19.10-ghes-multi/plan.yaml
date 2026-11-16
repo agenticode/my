@@ -1,0 +1,665 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: ghes-multi
+summary: "firmware error records in an aarch64 guest with six DIMMs over three boots a day apart: a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected errors and 1 uncorrected"
+method: "QMP inject-ghes-v2-error of QEMU: CPER memory error sections through the generic hardware error source"
+kernel: 6.19.10-300.fc44.aarch64
+rasdaemon: 0.8.0
+machine: "QEMU 10.2.2 virt, ras=on, emulated without hardware virtualization"
+injections:
+  - id: d1-row-1
+    time: 2026-11-14T01:57:58.418Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced052540
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0xa8
+    bit: 2
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-1
+    time: 2026-11-14T01:58:01.565Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x105e8d81c0
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x7a3
+    column: 0x38
+    bit: 5
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-1
+    time: 2026-11-14T01:58:04.645Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x4504a6e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x412
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: a1-cell-1
+    time: 2026-11-14T01:58:07.726Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x174bac7c0
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 1
+    device: 2
+    bank_group: 1
+    bank: 2
+    row: 0x4d2e
+    column: 0xf8
+    bit: 4
+    label: CPU0_A1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-2
+    time: 2026-11-14T01:58:10.802Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x10b9499780
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x1e52
+    column: 0x2f0
+    bit: 1
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-2
+    time: 2026-11-14T01:58:13.960Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced053600
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x2c0
+    bit: 6
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-2
+    time: 2026-11-14T01:58:17.038Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x4f1566e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x2c55
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-3
+    time: 2026-11-14T01:58:20.125Z
+    inject: error
+    severity: CE
+    scrub: Patrol
+    count: 1
+    address: 0x110f218880
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x33c8
+    column: 0x110
+    bit: 7
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 13 (scrub corrected error)"
+  - id: d1-row-3
+    time: 2026-11-14T01:58:23.202Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced052f80
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x1f0
+    bit: 2
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-3
+    time: 2026-11-14T01:58:26.284Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x5edea6e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x6b7a
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-4
+    time: 2026-11-14T01:58:29.358Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x1168659e40
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x4a19
+    column: 0x3c8
+    bit: 0
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-4
+    time: 2026-11-15T02:10:49.332Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x4a81e6e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x1a07
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-4
+    time: 2026-11-15T02:10:53.120Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced053880
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x310
+    bit: 4
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-5
+    time: 2026-11-15T02:10:56.220Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x11bc1d8680
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x5f07
+    column: 0xd0
+    bit: 3
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: a1-cell-2
+    time: 2026-11-15T02:10:59.351Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x174bac7c0
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 1
+    device: 2
+    bank_group: 1
+    bank: 2
+    row: 0x4d2e
+    column: 0xf8
+    bit: 4
+    label: CPU0_A1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-5
+    time: 2026-11-15T02:11:02.441Z
+    inject: error
+    severity: CE
+    scrub: Patrol
+    count: 1
+    address: 0xced052540
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0xa8
+    bit: 2
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 13 (scrub corrected error)"
+  - id: e1-bank-6
+    time: 2026-11-15T02:11:05.582Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x11f2119340
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x6c84
+    column: 0x268
+    bit: 6
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-5
+    time: 2026-11-15T02:11:08.681Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x6b0c66e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x9c31
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-7
+    time: 2026-11-15T02:11:11.796Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x1268ad8d00
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x8a2b
+    column: 0x1a0
+    bit: 2
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-6
+    time: 2026-11-15T02:11:14.874Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced053d40
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x3a8
+    bit: 5
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-6
+    time: 2026-11-15T02:11:17.945Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x4f1566e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x2c55
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-8
+    time: 2026-11-15T02:11:21.021Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x12b4419980
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0x9d10
+    column: 0x330
+    bit: 4
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-7
+    time: 2026-11-16T02:24:53.677Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced052ac0
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x158
+    bit: 1
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-9
+    time: 2026-11-16T02:24:56.780Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x12d39983c0
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0xa4e6
+    column: 0x78
+    bit: 6
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-7
+    time: 2026-11-16T02:24:59.856Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x538426e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x3e10
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-8
+    time: 2026-11-16T02:25:02.951Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced0531c0
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x238
+    bit: 7
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: a1-cell-3
+    time: 2026-11-16T02:25:06.121Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x174bac7c0
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 1
+    device: 2
+    bank_group: 1
+    bank: 2
+    row: 0x4d2e
+    column: 0xf8
+    bit: 4
+    label: CPU0_A1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-10
+    time: 2026-11-16T02:25:09.235Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x131fc59540
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0xb7f1
+    column: 0x2a8
+    bit: 1
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-8
+    time: 2026-11-16T02:25:12.318Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x5880e6e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x5203
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-9
+    time: 2026-11-16T02:25:15.414Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced053600
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x2c0
+    bit: 6
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-11
+    time: 2026-11-16T02:25:18.496Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x1364f58a80
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0xc93d
+    column: 0x150
+    bit: 5
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-9
+    time: 2026-11-16T02:25:21.571Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x640126e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0x8004
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-row-10
+    time: 2026-11-16T02:25:24.668Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0xced052300
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x60
+    bit: 0
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: b1-col-10
+    time: 2026-11-16T02:25:27.741Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x783a66e40
+    socket: 0
+    channel: 1
+    slot: 0
+    rank: 1
+    device: 5
+    bank_group: 0
+    bank: 3
+    row: 0xd0e9
+    column: 0x1c8
+    bit: 3
+    label: CPU0_B1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: e1-bank-12
+    time: 2026-11-16T02:25:30.819Z
+    inject: error
+    severity: CE
+    count: 1
+    address: 0x13c2899fc0
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 6
+    bank_group: 3
+    bank: 0
+    row: 0xe0a2
+    column: 0x3f8
+    bit: 2
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 2 (single-bit ECC)"
+  - id: d1-ue
+    time: 2026-11-16T02:25:55.285Z
+    inject: error
+    severity: Recoverable
+    scrub: Patrol
+    count: 1
+    address: 0xced052f80
+    socket: 0
+    channel: 3
+    slot: 0
+    rank: 0
+    device: 3
+    bank_group: 2
+    bank: 1
+    row: 0x2b41
+    column: 0x1f0
+    label: CPU0_D1
+    note: "firmware error record (CPER), memory error section, type 14 (scrub uncorrected error); the page is free; the kernel takes it offline"
+  - id: d1-ue-offline
+    inject: page-offline
+    how: hard
+    count: 1
+    address: 0xced052000
+    note: "by the kernel after d1-ue"
