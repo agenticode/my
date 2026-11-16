@@ -10,7 +10,7 @@ Some records do survive a reset:
 | --- | --- | --- |
 | the contents of the machine check banks, after a reset that keeps power | the processor | the next boot polls every bank when boot logging is on (`__mcheck_cpu_init_prepare_banks()`), and prints what it finds when nothing else handled it |
 | the panic text in pstore | `pstore_dump()` into EFI variables, the firmware's error record store (ERST) or reserved RAM | `/sys/fs/pstore/dmesg-<backend>-<id>`; `systemd-pstore` moves the files to `/var/lib/systemd/pstore` |
-| the machine check record in ERST | `mce_panic()` through `apei_write_mce()` | only a reader of `/dev/mcelog`, and the read clears it |
+| the machine check record in ERST | `mce_panic()` through `apei_write_mce()` | a reader of `/dev/mcelog`, and the read clears it; with ERST as the pstore backend also pstore, as `mce-erst-<id>` (`erst_reader()`), which `systemd-pstore` archives. MemorY reads neither |
 | the kernel log of the crashed boot | a crash kernel (kdump) | `vmcore-dmesg.txt` or `dmesg.<stamp>` below `/var/crash` |
 | boot error records of the firmware | firmware that handles errors before the operating system does | the BERT region, `/sys/firmware/acpi/tables/data/BERT` (readable as root); the kernel prints up to five records at boot |
 | the console | a serial console server, the serial log of the BMC, netconsole | a file outside the host |

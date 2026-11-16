@@ -40,6 +40,7 @@ type loop struct {
 
 var loops = []loop{
 	{dir: "6.19.10-mce-loop", host: "lab-x86", window: 4, stops: 3, where: "none", rule: "host.loop_address"},
+	{dir: "6.19.10-mce-loop-scatter", host: "lab-x86", window: 4, stops: 3, where: "none"},
 }
 
 // loopBoot is one line of boots.jsonl: what was injected in a boot.

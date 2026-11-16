@@ -1,0 +1,197 @@
+Panic#1 Part3
+<6>[    3.516478] pci 0000:00:01.0: vgaarb: bridge control possible
+<6>[    3.516478] pci 0000:00:01.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+<6>[    3.519616] vgaarb: loaded
+<6>[    3.524478] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+<6>[    3.525633] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+<6>[    3.533742] clocksource: Switched to clocksource tsc-early
+<5>[    3.560725] VFS: Disk quotas dquot_6.6.0
+<6>[    3.561671] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+<6>[    3.571466] pnp: PnP ACPI init
+<6>[    3.583180] system 00:05: [mem 0xb0000000-0xbfffffff window] has been reserved
+<6>[    3.592410] pnp: PnP ACPI: found 6 devices
+<6>[    3.681051] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+<6>[    3.684234] NET: Registered PF_INET protocol family
+<6>[    3.692896] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+<6>[    3.915070] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+<6>[    3.917006] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+<6>[    3.918754] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+<6>[    3.925991] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+<6>[    3.928023] TCP: Hash tables configured (established 32768 bind 32768)
+<6>[    3.933857] MPTCP token hash table entries: 4096 (order: 5, 98304 bytes, linear)
+<6>[    3.935416] UDP hash table entries: 2048 (order: 5, 131072 bytes, linear)
+<6>[    3.937377] UDP-Lite hash table entries: 2048 (order: 5, 131072 bytes, linear)
+<6>[    3.942687] NET: Registered PF_UNIX/PF_LOCAL protocol family
+<6>[    3.944607] NET: Registered PF_XDP protocol family
+<6>[    3.947416] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+<6>[    3.948043] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+<6>[    3.948328] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+<6>[    3.948937] pci_bus 0000:00: resource 7 [mem 0x80000000-0xafffffff window]
+<6>[    3.949249] pci_bus 0000:00: resource 8 [mem 0xc0000000-0xfebfffff window]
+<6>[    3.949660] pci_bus 0000:00: resource 9 [mem 0x180000000-0x97fffffff window]
+<6>[    3.951323] PCI: CLS 0 bytes, default 64
+<6>[    3.953191] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+<6>[    3.953538] software IO TLB: mapped [mem 0x000000007bfdc000-0x000000007ffdc000] (64MB)
+<6>[    3.965540] Trying to unpack rootfs image as initramfs...
+<5>[    4.230418] Initialise system trusted keyrings
+<5>[    4.237224] Key type blacklist registered
+<6>[    4.240303] workingset: timestamp_bits=36 max_order=20 bucket_order=0
+<5>[    4.275506] integrity: Platform Keyring initialized
+<5>[    4.277646] integrity: Machine keyring initialized
+<6>[    4.284161] cryptd: max_cpu_qlen set to 1000
+<6>[    4.436840] NET: Registered PF_ALG protocol family
+<6>[    4.439278] xor: automatically using best checksumming function   avx       
+<5>[    4.440256] Key type asymmetric registered
+<5>[    4.441202] Asymmetric key parser 'x509' registered
+<6>[    4.458828] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 244)
+<6>[    4.463973] io scheduler mq-deadline registered
+<6>[    4.464729] io scheduler kyber registered
+<6>[    4.466307] io scheduler bfq registered
+<6>[    4.509142] atomic64_test: passed for x86-64 platform with CX8 and with SSE
+<6>[    4.520582] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+<6>[    4.534142] ACPI: button: Power Button [PWRF]
+<6>[    4.557677] ERST: Error Record Serialization Table (ERST) support is initialized.
+<6>[    4.561217] pstore: Using crash dump compression: deflate
+<6>[    4.562199] pstore: Registered erst as persistent store backend
+<6>[    4.579070] ACPI: \_SB_.GSIH: Enabled at IRQ 23
+<6>[    4.602562] ACPI: \_SB_.GSIE: Enabled at IRQ 20
+<6>[    4.612673] ACPI: \_SB_.GSIF: Enabled at IRQ 21
+<6>[    4.619598] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+<6>[    4.634229] 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+<6>[    4.715319] Non-volatile memory driver v1.3
+<6>[    4.760994] Linux agpgart interface v0.103
+<6>[    4.769299] ACPI: bus type drm_connector registered
+<6>[    4.790575] virtio_blk virtio2: 4/0/0 default/read/poll queues
+<5>[    4.828872] virtio_blk virtio2: [vda] 33554432 512-byte logical blocks (17.2 GB/16.0 GiB)
+<6>[    4.883720]  vda: vda1 vda2 vda3
+<6>[    4.901417] ACPI: \_SB_.GSIA: Enabled at IRQ 16
+<6>[    4.915340] ahci 0000:00:1f.2: AHCI vers 0001.0000, 32 command slots, 1.5 Gbps, SATA mode
+<6>[    4.916699] ahci 0000:00:1f.2: 6/6 ports implemented (port mask 0x3f)
+<6>[    4.917509] ahci 0000:00:1f.2: flags: 64bit ncq only 
+<6>[    4.943284] scsi host0: ahci
+<6>[    4.952471] scsi host1: ahci
+<6>[    4.957916] scsi host2: ahci
+<6>[    4.961944] scsi host3: ahci
+<6>[    4.966417] scsi host4: ahci
+<6>[    4.967148] tsc: Refined TSC clocksource calibration: 3393.602 MHz
+<6>[    4.969427] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x30eab301ef8, max_idle_ns: 440795306820 ns
+<6>[    4.971506] clocksource: Switched to clocksource tsc
+<6>[    4.973232] scsi host5: ahci
+<6>[    4.975643] ata1: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7100 irq 31 lpm-pol 1
+<6>[    4.977376] ata2: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7180 irq 31 lpm-pol 1
+<6>[    4.977778] ata3: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7200 irq 31 lpm-pol 1
+<6>[    4.977843] ata4: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7280 irq 31 lpm-pol 1
+<6>[    4.979601] ata5: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7300 irq 31 lpm-pol 1
+<6>[    4.979971] ata6: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7380 irq 31 lpm-pol 1
+<6>[    4.990913] CAN device driver interface
+<6>[    5.003041] usbcore: registered new interface driver usbserial_generic
+<6>[    5.005160] usbserial: USB Serial support registered for generic
+<6>[    5.009327] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+<6>[    5.020750] serio: i8042 KBD port at 0x60,0x64 irq 1
+<6>[    5.022947] serio: i8042 AUX port at 0x60,0x64 irq 12
+<6>[    5.028133] mousedev: PS/2 mouse device common for all mice
+<6>[    5.033475] rtc_cmos 00:04: RTC can wake from S4
+<6>[    5.043519] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+<6>[    5.043977] rtc_cmos 00:04: registered as rtc0
+<6>[    5.046911] rtc_cmos 00:04: setting system clock to 2026-11-16T04:19:13 UTC (1794802753)
+<6>[    5.051135] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram
+<6>[    5.054623] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+<6>[    5.057451] device-mapper: uevent: version 1.0.3
+<6>[    5.060936] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+<6>[    5.067488] intel_pstate: CPU model not supported
+<6>[    5.072768] hid: raw HID events driver (C) Jiri Kosina
+<6>[    5.075542] usbcore: registered new interface driver usbhid
+<6>[    5.076800] usbhid: USB HID core driver
+<6>[    5.080614] drop_monitor: Initializing network drop monitor service
+<6>[    5.087262] Initializing XFRM netlink socket
+<6>[    5.089723] NET: Registered PF_INET6 protocol family
+<6>[    5.118628] Segment Routing with IPv6
+<6>[    5.119904] RPL Segment Routing with IPv6
+<6>[    5.120758] In-situ OAM (IOAM) with IPv6
+<6>[    5.122977] mip6: Mobile IPv6
+<6>[    5.125825] NET: Registered PF_PACKET protocol family
+<6>[    5.126481] can: controller area network core
+<6>[    5.128484] NET: Registered PF_CAN protocol family
+<6>[    5.141949] resctrl: No MBM correction factor available
+<6>[    5.144157] mce: [Hardware Error]: Machine check events logged
+<6>[    5.144864] IPI shorthand broadcast: enabled
+<0>[    5.146030] mce: [Hardware Error]: CPU 0: Machine Check: 0 Bank 7: be00000000010090
+<0>[    5.146654] mce: [Hardware Error]: TSC 0 ADDR a2b3040 MISC 86 
+<0>[    5.146776] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794802749 SOCKET 0 APIC 0 microcode 0
+<6>[    5.148746] mce: [Hardware Error]: Machine check events logged
+<0>[    5.149082] mce: [Hardware Error]: CPU 1: Machine Check: 0 Bank 1: a000000000000000
+<0>[    5.149867] mce: [Hardware Error]: TSC 0 
+<0>[    5.150078] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794802749 SOCKET 0 APIC 1 microcode 1
+<0>[    5.150738] mce: [Hardware Error]: CPU 2: Machine Check: 0 Bank 1: a000000000000000
+<0>[    5.150738] mce: [Hardware Error]: TSC 0 
+<0>[    5.151981] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794802749 SOCKET 0 APIC 2 microcode 1
+<0>[    5.152594] mce: [Hardware Error]: CPU 3: Machine Check: 0 Bank 1: a000000000000000
+<0>[    5.152889] mce: [Hardware Error]: TSC 0 
+<0>[    5.152889] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794802749 SOCKET 0 APIC 3 microcode 1
+<6>[    5.205518] sched_clock: Marking stable (5105222828, 99543242)->(5905736296, -700970226)
+<6>[    5.220531] registered taskstats version 1
+<5>[    5.239958] Loading compiled-in X.509 certificates
+<5>[    5.301159] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    5.302876] ata4: SATA link down (SStatus 0 SControl 300)
+<6>[    5.309640] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+<6>[    5.317409] ata5: SATA link down (SStatus 0 SControl 300)
+<6>[    5.318966] ata2: SATA link down (SStatus 0 SControl 300)
+<6>[    5.320173] ata1: SATA link down (SStatus 0 SControl 300)
+<6>[    5.321048] ata6: SATA link down (SStatus 0 SControl 300)
+<6>[    5.324884] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+<6>[    5.326348] ata3.00: applying bridge limits
+<6>[    5.331973] ata3.00: configured for UDMA/100
+<5>[    5.361696] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+<6>[    5.404976] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+<6>[    5.406738] cdrom: Uniform CD-ROM driver Revision: 3.20
+<7>[    5.439098] sr 2:0:0:0: Attached scsi CD-ROM sr0
+<5>[    5.443594] sr 2:0:0:0: Attached scsi generic sg0 type 5
+<6>[    5.739498] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input3
+<6>[    6.960906] Freeing initrd memory: 48172K
+<5>[    7.586572] Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+<6>[    7.684905] Demotion targets for Node 0: null
+<6>[    7.686026] page_owner is disabled
+<5>[    7.688833] Key type .fscrypt registered
+<5>[    7.689109] Key type fscrypt-provisioning registered
+<6>[    7.701152] Btrfs loaded, zoned=yes, fsverity=yes
+<5>[    7.704506] Key type big_key registered
+<5>[    7.719900] Key type encrypted registered
+<6>[    7.721986] ima: No TPM chip found, activating TPM-bypass!
+<5>[    7.722703] Loading compiled-in module X.509 certificates
+<5>[    7.725952] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    7.734902] ima: Allocated hash algorithm: sha256
+<6>[    7.763425] ima: No architecture policies found
+<6>[    7.766564] evm: Initialising EVM extended attributes:
+<6>[    7.766906] evm: security.selinux
+<6>[    7.767169] evm: security.SMACK64 (disabled)
+<6>[    7.768039] evm: security.SMACK64EXEC (disabled)
+<6>[    7.768260] evm: security.SMACK64TRANSMUTE (disabled)
+<6>[    7.768745] evm: security.SMACK64MMAP (disabled)
+<6>[    7.768958] evm: security.apparmor (disabled)
+<6>[    7.769158] evm: security.ima
+<6>[    7.769689] evm: security.capability
+<6>[    7.769927] evm: HMAC attrs: 0x1
+<6>[    7.811045] alg: No test for 842 (842-scomp)
+<6>[    7.969618] PM:   Magic number: 2:925:312
+<6>[    7.996699] RAS: Correctable Errors collector initialized.
+<6>[    8.074442] clk: Disabling unused clocks
+<6>[    8.076567] PM: genpd: Disabling unused power domains
+<6>[    8.202152] Freeing unused decrypted memory: 2028K
+<6>[    8.341823] Freeing unused kernel image (initmem) memory: 5204K
+<6>[    8.344025] Write protecting the kernel read-only data: 43008k
+<6>[    8.350911] Freeing unused kernel image (text/rodata gap) memory: 816K
+<6>[    8.354465] Freeing unused kernel image (rodata/data gap) memory: 588K
+<6>[    8.764566] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[    8.767475] x86/mm: Checking user space page tables
+<6>[    9.158610] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[    9.159945] Run /init as init process
+<7>[    9.160375]   with arguments:
+<7>[    9.160733]     /init
+<7>[    9.160791]   with environment:
+<7>[    9.160861]     HOME=/
+<7>[    9.160900]     TERM=linux
+<6>[   10.145077] fuse: init (API version 7.45)
+<30>[   10.439044] systemd[1]: Successfully made /usr/ read-only.
+<30>[   10.806597] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   10.808792] systemd[1]: Detected virtualization qemu.
+<30>[   10.810415] systemd[1]: Detected architecture x86-64.

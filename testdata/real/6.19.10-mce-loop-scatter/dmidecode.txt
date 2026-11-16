@@ -1,0 +1,28 @@
+# dmidecode 3.7
+Getting SMBIOS data from sysfs.
+SMBIOS 2.8 present.
+
+Handle 0x1100, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: 4 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM 0
+	Bank Locator: BANK 0
+	Type: RAM
+	Type Detail: Other
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LAB00X86
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-4G
+	Rank: Unknown
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+

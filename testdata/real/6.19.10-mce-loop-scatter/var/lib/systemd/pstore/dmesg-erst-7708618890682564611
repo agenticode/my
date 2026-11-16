@@ -1,0 +1,141 @@
+Panic#1 Part2
+<6>[   10.176896] x86/mm: Checking user space page tables
+<6>[   10.592676] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[   10.593744] Run /init as init process
+<7>[   10.594640]   with arguments:
+<7>[   10.594706]     /init
+<7>[   10.594872]   with environment:
+<7>[   10.594915]     HOME=/
+<7>[   10.594949]     TERM=linux
+<6>[   12.158872] fuse: init (API version 7.45)
+<30>[   13.109335] systemd[1]: Successfully made /usr/ read-only.
+<30>[   13.505266] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   13.507872] systemd[1]: Detected virtualization qemu.
+<30>[   13.509133] systemd[1]: Detected architecture x86-64.
+<30>[   13.509943] systemd[1]: Running in initrd.
+<30>[   13.544850] systemd[1]: Initializing machine ID from random generator.
+<30>[   13.552969] systemd[1]: No hostname configured, using default hostname.
+<30>[   13.559928] systemd[1]: Hostname set to <localhost>.
+<30>[   15.807394] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<28>[   19.384664] systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+<30>[   20.265667] systemd[1]: Queued start job for default target initrd.target.
+<30>[   22.717387] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[   22.732280] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000001.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000001...
+<30>[   22.738010] systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+<30>[   22.741591] systemd[1]: Reached target paths.target - Path Units.
+<30>[   22.746209] systemd[1]: Reached target slices.target - Slice Units.
+<30>[   22.750302] systemd[1]: Reached target swap.target - Swaps.
+<30>[   22.754194] systemd[1]: Reached target timers.target - Timer Units.
+<30>[   22.773027] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+<30>[   22.782388] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+<30>[   22.793486] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[   22.800259] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+<30>[   22.804203] systemd[1]: Reached target sockets.target - Socket Units.
+<30>[   23.058534] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[   23.068115] systemd[1]: memstrack.service - Memstrack Anylazing Service skipped, no trigger condition checks were met.
+<30>[   23.074935] systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+<30>[   23.247259] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[   23.402680] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[   23.412962] systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   23.415908] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[   23.561459] systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+<46>[   23.760302] systemd-journald[258]: Collecting audit messages is disabled.
+<30>[   23.935389] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<30>[   24.188712] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<30>[   24.368152] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[   24.507350] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[   24.942471] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<30>[   25.182511] systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+<30>[   25.329477] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+<30>[   25.929411] systemd[1]: Finished systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
+<30>[   25.941034] systemd[1]: Reached target local-fs-pre.target - Preparation for Local File Systems.
+<30>[   25.946918] systemd[1]: Reached target local-fs.target - Local File Systems.
+<30>[   26.411461] systemd[1]: Started systemd-journald.service - Journal Service.
+<6>[   59.383864] BTRFS: device label fedora devid 1 transid 108 /dev/vda3 (253:3) scanned by mount (492)
+<6>[   59.435442] BTRFS info (device vda3): first mount of filesystem 00000000-0000-4000-8000-000000000001
+<6>[   59.436378] BTRFS info (device vda3): using crc32c (crc32c-lib) checksum algorithm
+<6>[   59.579076] BTRFS info (device vda3): turning on async discard
+<6>[   59.581587] BTRFS info (device vda3): enabling free space tree
+<46>[   74.127051] systemd-journald[258]: Received SIGTERM from PID 1 (systemd).
+<5>[   76.546763] audit: type=1404 audit(1794802563.324:2): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295 enabled=1 old-enabled=1 lsm=selinux res=1
+<6>[   77.807987] SELinux:  Permission firmware_load in class system not defined in policy.
+<6>[   77.808804] SELinux:  Permission kexec_image_load in class system not defined in policy.
+<6>[   77.809299] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+<6>[   77.810090] SELinux:  Permission policy_load in class system not defined in policy.
+<6>[   77.810450] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+<6>[   77.812018] SELinux:  Permission allowed in class io_uring not defined in policy.
+<6>[   77.812527] SELinux:  Class memfd_file not defined in policy.
+<6>[   77.813326] SELinux: the above unknown classes and permissions will be allowed
+<6>[   77.876143] SELinux:  policy capability network_peer_controls=1
+<6>[   77.876995] SELinux:  policy capability open_perms=1
+<6>[   77.877386] SELinux:  policy capability extended_socket_class=1
+<6>[   77.878103] SELinux:  policy capability always_check_network=0
+<6>[   77.878748] SELinux:  policy capability cgroup_seclabel=1
+<6>[   77.878987] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[   77.879226] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[   77.879472] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[   77.880543] SELinux:  policy capability userspace_initial_context=0
+<6>[   77.880943] SELinux:  policy capability netlink_xperm=0
+<6>[   77.881166] SELinux:  policy capability netif_wildcard=0
+<6>[   77.881385] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[   77.882081] SELinux:  policy capability functionfs_seclabel=0
+<6>[   77.882407] SELinux:  policy capability memfd_class=0
+<5>[   78.914142] audit: type=1403 audit(1794802565.692:3): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[   78.977984] systemd[1]: Successfully loaded SELinux policy in 2.449237s.
+<6>[   80.932990] NET: Registered PF_VSOCK protocol family
+<30>[   82.229466] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 1.045695s.
+<30>[   82.677142] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   82.679258] systemd[1]: Detected virtualization qemu.
+<30>[   82.680943] systemd[1]: Detected architecture x86-64.
+<30>[   82.918221] systemd[1]: Hostname set to <lab-x86>.
+<30>[   85.256859] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[   88.190844] zram: Added device: zram0
+<30>[   97.341081] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[   97.355122] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[   97.444978] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[   97.475584] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[   97.500911] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[   97.524383] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[   97.548115] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[   97.571874] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[   97.586340] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[   97.595611] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[   97.624945] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[   97.632258] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000001.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000001...
+<30>[   97.639914] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0001.device - /dev/disk/by-uuid/0000-0001...
+<30>[   97.644958] systemd[1]: Expecting device dev-ttyS0.device - /dev/ttyS0...
+<30>[   97.651070] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+<30>[   97.657280] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[   97.665115] systemd[1]: Reached target imports.target - Image Downloads.
+<30>[   97.672228] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+<30>[   97.679222] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+<30>[   97.684418] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+<30>[   97.690049] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+<30>[   97.697164] systemd[1]: Reached target paths.target - Path Units.
+<30>[   97.701847] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+<30>[   97.706309] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+<30>[   97.710410] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+<30>[   97.715174] systemd[1]: Reached target slices.target - Slice Units.
+<30>[   97.720122] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+<30>[   97.745259] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+<30>[   97.788229] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+<30>[   97.845075] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+<30>[   97.907890] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+<30>[   97.949983] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+<30>[   98.002220] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+<30>[   98.033274] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+<30>[   98.088537] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+<30>[   98.115361] systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+<30>[   98.120967] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   98.123231] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   98.161937] systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+<30>[   98.181458] systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+<30>[   98.195104] systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+<30>[   98.225434] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[   98.248899] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+<30>[   98.268797] systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+<30>[   98.367618] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+<30>[   98.422418] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+<30>[   98.490308] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+<30>[   98.565821] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+<30>[   98.584889] systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1

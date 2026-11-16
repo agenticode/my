@@ -637,9 +637,13 @@ func (r *run) bert() Check {
 // erstMCE: where mce_panic leaves a copy of the record, and who reads it.
 //
 // arch/x86/kernel/cpu/mce/core.c, mce_panic, calls apei_write_mce
-// (arch/x86/kernel/cpu/mce/apei.c) for the records it prints. Only a
-// reader of /dev/mcelog takes them back out, and the read clears them
-// (dev-mcelog.c, __mce_read_apei). MemorY never opens /dev/mcelog.
+// (arch/x86/kernel/cpu/mce/apei.c) for the records it prints. A reader of
+// /dev/mcelog takes them back out, and the read clears them (dev-mcelog.c,
+// __mce_read_apei). With erst as the pstore backend, pstore lists them as
+// well: erst_reader (drivers/acpi/apei/erst.c) gives a record of section
+// type CPER_SECTION_TYPE_MCE the pstore type PSTORE_TYPE_MCE, whose files
+// are mce-erst-<id>; the lab showed systemd-pstore archiving them. MemorY
+// never opens /dev/mcelog and does not read those files.
 func (r *run) erstMCE() Check {
 	c := Check{Name: "erst-mce"}
 	if nc, not := r.notX86(c.Name); not {

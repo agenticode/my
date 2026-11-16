@@ -1,0 +1,95 @@
+Panic#1 Part1
+<30>[   78.530551] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+<30>[   78.673979] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[   78.742195] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[   78.817367] systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+<30>[   78.831290] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   78.896054] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+<30>[   78.921399] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   79.018622] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+<30>[   79.192959] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+<30>[   79.483147] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+<30>[   79.587892] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+<6>[   79.622833] BTRFS info (device vda3 state M): use zstd compression, level 1
+<30>[   79.627275] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+<30>[   79.727118] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+<46>[   79.739467] systemd-journald[757]: Collecting audit messages is enabled.
+<30>[   79.747924] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<5>[   79.757200] audit: type=1130 audit(1794802828.204:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=kmod-static-nodes comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   79.767054] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<5>[   79.773028] audit: type=1130 audit(1794802828.224:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=lvm2-monitor comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   79.779671] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+<30>[   79.799204] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<5>[   79.807848] audit: type=1130 audit(1794802828.258:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-modules-load comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   79.823731] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<5>[   79.830936] audit: type=1130 audit(1794802828.282:7): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-network-generator comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   79.865768] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<5>[   79.872705] audit: type=1130 audit(1794802828.324:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-remount-fs comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   79.897245] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<30>[   79.947668] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[   80.029292] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[   80.093888] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[   80.113303] audit: type=1130 audit(1794802828.565:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   80.174613] systemd[1]: Started systemd-journald.service - Journal Service.
+<5>[   80.194033] audit: type=1130 audit(1794802828.645:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   80.592012] audit: type=1130 audit(1794802829.043:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   80.897263] audit: type=1334 audit(1794802829.349:12): prog-id=48 op=LOAD
+<5>[   80.900321] audit: type=1334 audit(1794802829.352:13): prog-id=49 op=LOAD
+<4>[   85.560080] kauditd_printk_skb: 4 callbacks suppressed
+<5>[   85.560148] audit: type=1130 audit(1794802834.012:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   85.623813] audit: type=1334 audit(1794802834.076:19): prog-id=23 op=UNLOAD
+<5>[   85.625652] audit: type=1334 audit(1794802834.078:20): prog-id=22 op=UNLOAD
+<5>[   85.644580] audit: type=1334 audit(1794802834.096:21): prog-id=52 op=LOAD
+<5>[   85.648300] audit: type=1334 audit(1794802834.101:22): prog-id=53 op=LOAD
+<5>[   85.887907] audit: type=1130 audit(1794802834.339:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   87.848721] audit: type=1130 audit(1794802836.301:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[   90.821141] zram0: detected capacity change from 0 to 7991296
+<5>[   91.200849] audit: type=1130 audit(1794802839.649:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[   91.692911] Adding 3995644k swap on /dev/zram0.  Priority:100 extents:1 across:3995644k SSDsc
+<5>[   91.901525] audit: type=1334 audit(1794802840.354:26): prog-id=54 op=LOAD
+<5>[   91.904290] audit: type=1334 audit(1794802840.356:27): prog-id=55 op=LOAD
+<5>[   91.907243] audit: type=1334 audit(1794802840.360:28): prog-id=56 op=LOAD
+<5>[   92.539209] audit: type=1130 audit(1794802840.990:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   93.371347] audit: type=1130 audit(1794802841.823:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[   99.659342] parport_pc 00:02: reported by Plug and Play ACPI
+<6>[   99.677798] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+<6>[  100.547492] bochs-drm 0000:00:01.0: vgaarb: deactivate vga console
+<6>[  100.561573] Console: switching to colour dummy device 80x25
+<6>[  100.658314] [drm] Found bochs VGA, ID 0xb0c5.
+<6>[  100.658764] [drm] Framebuffer size 16384 kB @ 0xfd000000, mmio @ 0xfebd2000.
+<6>[  100.751936] bochs-drm 0000:00:01.0: [drm] Registered 1 planes with drm panic
+<6>[  100.757112] [drm] Initialized bochs-drm 1.0.0 for 0000:00:01.0 on minor 0
+<6>[  100.968448] i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+<6>[  100.984922] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+<6>[  101.091899] fbcon: bochs-drmdrmfb (fb0) is primary device
+<6>[  101.473206] Console: switching to colour frame buffer device 160x50
+<6>[  101.557078] bochs-drm 0000:00:01.0: [drm] fb0: bochs-drmdrmfb frame buffer device
+<46>[  102.376984] systemd-journald[757]: Received client request to flush runtime journal.
+<44>[  102.472848] systemd-journald[757]: File /var/log/journal/00000000000040008000000000000003/system.journal corrupted or uncleanly shut down, renaming and replacing.
+<5>[  102.809128] audit: type=1400 audit(1794802851.251:31): avc:  denied  { create } for  pid=853 comm="systemd-pstore" name="7708618890682564612" scontext=system_u:system_r:systemd_pstore_t:s0 tcontext=system_u:object_r:systemd_pstore_var_lib_t:s0 tclass=dir permissive=0
+<5>[  102.812566] audit: type=1300 audit(1794802851.251:31): arch=c000003e syscall=258 success=no exit=-13 a0=ffffff9c a1=7ffc35dd6800 a2=1ed a3=7ffc35dd6818 items=0 ppid=1 pid=853 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="systemd-pstore" exe="/usr/lib/systemd/systemd-pstore" subj=system_u:system_r:systemd_pstore_t:s0 key=(null)
+<5>[  102.823120] audit: type=1327 audit(1794802851.251:31): proctitle="/usr/lib/systemd/systemd-pstore"
+<5>[  102.825907] audit: type=1400 audit(1794802851.279:32): avc:  denied  { create } for  pid=853 comm="systemd-pstore" name="7708618890682564612" scontext=system_u:system_r:systemd_pstore_t:s0 tcontext=system_u:object_r:systemd_pstore_var_lib_t:s0 tclass=dir permissive=0
+<4>[  102.827968] FAT-fs (vda2): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+<5>[  102.840594] audit: type=1300 audit(1794802851.279:32): arch=c000003e syscall=258 success=no exit=-13 a0=ffffff9c a1=7ffc35dd6800 a2=1ed a3=7ffc35dd6818 items=0 ppid=1 pid=853 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="systemd-pstore" exe="/usr/lib/systemd/systemd-pstore" subj=system_u:system_r:systemd_pstore_t:s0 key=(null)
+<5>[  102.844971] audit: type=1327 audit(1794802851.279:32): proctitle="/usr/lib/systemd/systemd-pstore"
+<5>[  102.845921] audit: type=1400 audit(1794802851.288:33): avc:  denied  { create } for  pid=853 comm="systemd-pstore" name="7708618890682564612" scontext=system_u:system_r:systemd_pstore_t:s0 tcontext=system_u:object_r:systemd_pstore_var_lib_t:s0 tclass=dir permissive=0
+<5>[  102.848246] audit: type=1300 audit(1794802851.288:33): arch=c000003e syscall=258 success=no exit=-13 a0=ffffff9c a1=7ffc35dd6800 a2=1ed a3=7ffc35dd6818 items=0 ppid=1 pid=853 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="systemd-pstore" exe="/usr/lib/systemd/systemd-pstore" subj=system_u:system_r:systemd_pstore_t:s0 key=(null)
+<5>[  102.861839] audit: type=1327 audit(1794802851.288:33): proctitle="/usr/lib/systemd/systemd-pstore"
+<5>[  103.023839] audit: type=1130 audit(1794802851.474:34): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-pstore comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  103.302837] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+<6>[  105.577350] ppdev: user-space parallel port driver
+<6>[  106.048123] virtio_net virtio0 enp0s3: renamed from eth0
+<4>[  109.389221] kauditd_printk_skb: 8 callbacks suppressed
+<5>[  109.412670] audit: type=1130 audit(1794802857.841:43): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-vconsole-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  112.254972] audit: type=1130 audit(1794802860.707:44): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  112.868844] audit: type=1305 audit(1794802861.321:45): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+<4>[  116.394446] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  116.407462] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<0>[  181.767025] mce: [Hardware Error]: CPU 0: Machine Check Exception: 4 Bank 8: be00000000010091
+<0>[  181.767603] mce: [Hardware Error]: TSC 14f3da31071f ADDR 1c4d5080 MISC 86 
+<0>[  181.767996] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794802930 SOCKET 0 APIC 0 microcode 1
+<0>[  181.768738] mce: [Hardware Error]: Run the above through 'mcelog --ascii'
+<0>[  181.773768] mce: [Hardware Error]: Machine check: Processor context corrupt
+<0>[  181.774837] Kernel panic - not syncing: Fatal machine check
+<0>[  181.779043] Kernel Offset: 0x22800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
