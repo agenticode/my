@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/fwmap"
+	"github.com/agenticode/my/internal/term"
 	"github.com/agenticode/my/internal/testutil"
 )
 
@@ -94,5 +96,46 @@ messages:
 	}
 	if code, _, errOut := runEnv(fixed, "import", log, "--event-map", filepath.Join(dir, "none.yaml")); code != cli.ExitUsage || !strings.Contains(errOut, "none.yaml") {
 		t.Errorf("a missing table: exit code %d, stderr %q", code, errOut)
+	}
+}
+
+// TestVendorsHelp keeps the help of "my vendors" and its flags the same:
+// the command scans nothing and takes no flag that points a scan
+// somewhere, and its help names no such flag.
+func TestVendorsHelp(t *testing.T) {
+	o, _, _ := vendorsOptions(nil)
+	takes := map[string]bool{}
+	o.fs.VisitAll(func(f *flag.Flag) {
+		if f.Name != "h" && f.Name != "help" {
+			takes["--"+f.Name] = true
+		}
+	})
+	for _, lang := range []string{"en", "ko"} {
+		code, out, errOut := run("help", "vendors", "--lang", lang)
+		if code != cli.ExitOK || errOut != "" {
+			t.Fatalf("help vendors (%s): exit code %d, stderr %q", lang, code, errOut)
+		}
+		named := map[string]bool{}
+		for _, f := range flagRE.FindAllString(out, -1) {
+			named[f] = true
+			if !takes[f] {
+				t.Errorf("help of vendors (%s) names %s, which the command does not take", lang, f)
+			}
+		}
+		for f := range takes {
+			if !named[f] {
+				t.Errorf("help of vendors (%s) lacks %s", lang, f)
+			}
+		}
+		for _, line := range strings.Split(out, "\n") {
+			if term.Width(line) > term.DefaultWidth {
+				t.Errorf("help of vendors (%s): line wider than %d columns: %q", lang, term.DefaultWidth, line)
+			}
+		}
+	}
+	for _, f := range []string{"--root", "--bmc", "--plugin", "--set"} {
+		if code, _, errOut := run("vendors", f, "x"); code != cli.ExitUsage || !strings.Contains(errOut, "unknown flag "+f) {
+			t.Errorf("my vendors %s x: exit code %d, stderr %q", f, code, errOut)
+		}
 	}
 }

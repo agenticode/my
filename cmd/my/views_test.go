@@ -239,6 +239,7 @@ func TestCommandLineMistakes(t *testing.T) {
 		{"no scan flags on a case", []string{"open", ledger, "--root", "/tmp"}, cli.ExitUsage, "unknown flag --root"},
 		{"a word that is no command", []string{"CPU0_C1"}, cli.ExitUsage, `unknown command "CPU0_C1"`},
 		{"a command after the flags", []string{"--root", "/tmp", "why"}, cli.ExitUsage, "the command comes before its flags: my why [flags]"},
+		{"help after the flags", []string{"--lang", "en", "help", "scan"}, cli.ExitUsage, "the command comes before its flags: my help [flags]"},
 		{"an argument of a scan", []string{"--root", "/tmp", "CPU0_C1"}, cli.ExitUsage, `unexpected argument "CPU0_C1"`},
 		{"root that is no directory", []string{"--root", filepath.Join(testutil.RepoRoot(t), "go.mod")}, cli.ExitUsage, "not a directory"},
 	} {

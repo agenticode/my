@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -36,10 +37,11 @@ func useEventMaps(env *cli.Env, lang i18n.Lang, files eventMaps) error {
 	for _, f := range files {
 		b, err := os.ReadFile(f)
 		if err != nil {
-			return fmt.Errorf("--event-map %s: %w", f, err)
+			// The file error names the file.
+			return fmt.Errorf("--event-map %w", err)
 		}
 		if len(b) > 1<<20 {
-			return fmt.Errorf("--event-map %s: larger than 1 MiB", f)
+			return worded("err.event_map_large", "file", f)
 		}
 		data[f] = b
 	}
@@ -141,14 +143,31 @@ func tableOf(t *fwmap.Table, lines bool) vendorTable {
 // that map the messages of each vendor to common events, the lines of one,
 // a table as a file to start a user table from, or what the BMCs of a case
 // published and which of their messages no table classes.
-func runVendors(ctx context.Context, env *cli.Env, args []string, src *source) int {
-	o := newOptions(env, cmdName("vendors", src), src)
-	seen := o.fs.Bool("seen", false, "")
-	print := o.fs.String("print", "", "")
-	if src != nil {
-		// A scan command has the flag already.
-		o.fs.Var(&o.maps, "event-map", "")
+// vendorsOptions are the flags of "my vendors". The command scans nothing,
+// so it takes none of the flags that point a scan somewhere: the language,
+// JSON, the width, the tables of one's own, and for --seen the ledger and
+// its host.
+func vendorsOptions(src *source) (o *options, seen *bool, print *string) {
+	name := cmdName("vendors", src)
+	o = &options{name: name, fs: flag.NewFlagSet(name, flag.ContinueOnError), color: term.ColorNever}
+	o.fs.SetOutput(io.Discard) // errors and help are written in the reader's language
+	o.fs.StringVar(&o.lang, "lang", "", "")
+	o.fs.BoolVar(&o.asJSON, "json", false, "")
+	o.fs.IntVar(&o.width, "width", 0, "")
+	o.fs.StringVar(&o.host, "host", "", "")
+	if src == nil {
+		o.fs.StringVar(&o.ledger, "ledger", "", "")
 	}
+	o.fs.Var(&o.maps, "event-map", "")
+	seen = o.fs.Bool("seen", false, "")
+	print = o.fs.String("print", "", "")
+	o.fs.BoolVar(&o.help, "help", false, "")
+	o.fs.BoolVar(&o.help, "h", false, "")
+	return o, seen, print
+}
+
+func runVendors(ctx context.Context, env *cli.Env, args []string, src *source) int {
+	o, seen, print := vendorsOptions(src)
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -500,14 +519,23 @@ var vendorsWords = i18n.Catalog{
 	"help.vendors.flags": {
 		EN: "TABLE               the messages of one table by common event\n" +
 			"--print TABLE       write the table as a file and stop\n" +
-			"--seen              with a case or --ledger FILE: the registries the BMCs published and the IDs no table classes\n" +
+			"--seen              with a case or --ledger FILE: the registries the BMCs published and\n" +
+			"                    the message IDs no table classes\n" +
 			"--ledger FILE       the ledger --seen reads\n" +
-			"--event-map FILE    a table of one's own, asked before the shipped ones (repeatable)",
+			"--event-map FILE    a table of one's own, asked before the shipped ones (repeatable)\n" +
+			"--lang en|ko        language of the output (default: from the locale, English otherwise)\n" +
+			"--json              print the tables as JSON\n" +
+			"--width N           columns to fill (default: the terminal, 100 otherwise)\n" +
+			"--host NAME         with --seen: the host to show, when the ledger holds several",
 		KO: "TABLE               표 하나의 메시지를 공통 이벤트별로\n" +
 			"--print TABLE       표를 파일 형태로 출력하고 종료\n" +
 			"--seen              케이스나 --ledger FILE과 함께: BMC가 내놓은 레지스트리와 분류하지 못한 ID\n" +
 			"--ledger FILE       --seen이 읽을 원장\n" +
-			"--event-map FILE    내장 표보다 먼저 볼 직접 만든 표 (여러 번 줄 수 있음)",
+			"--event-map FILE    내장 표보다 먼저 볼 직접 만든 표 (여러 번 줄 수 있음)\n" +
+			"--lang en|ko        출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
+			"--json              표를 JSON으로 출력\n" +
+			"--width N           출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)\n" +
+			"--host NAME         --seen과 함께: 원장에 호스트가 여럿일 때 볼 호스트",
 	},
 	"vendors.h_table":           {EN: "table", KO: "표"},
 	"vendors.h_vendor":          {EN: "vendor or standard", KO: "벤더 또는 표준"},
@@ -531,6 +559,7 @@ var vendorsWords = i18n.Catalog{
 	"vendors.unclassified":      {EN: "records about memory that no table classes, by message ID:", KO: "어느 표도 분류하지 못한 메모리 기록 (메시지 ID별):"},
 	"vendors.none_unclassified": {EN: "every firmware record of the case about memory has a class", KO: "케이스의 메모리 관련 펌웨어 기록은 모두 분류됨"},
 	"err.vendors_table":         {EN: "no table {table}; the tables are {tables}", KO: "{table} 표가 없음. 있는 표: {tables}"},
+	"err.event_map_large":       {EN: "--event-map {file}: larger than 1 MiB", KO: "--event-map {file}: 크기가 1 MiB를 넘음"},
 	"err.vendors_seen":          {EN: "--seen reads a case: my open CASE vendors --seen, or --ledger FILE", KO: "--seen은 케이스를 읽음: my open CASE vendors --seen 또는 --ledger FILE"},
 }
 
