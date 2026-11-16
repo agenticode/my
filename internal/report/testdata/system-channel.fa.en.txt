@@ -88,6 +88,201 @@ section#s2.sec
     | 14 | CPU1_G2 | F6088C | 1 | 0 | single-bit | quiet | observe | R-SOFT-01
   p.how: DIMMs with errors or a finding, the worst first. CE and UE are corrected and uncorrected errors counted from the ledger, so the counts run across reboots. The trend draws the last 30 days in steps of 3 days, each line on its own scale.
   p: 18 DIMMs without errors
+  ### Boots
+  figure
+    svg.fig.boots: The latest 3 boots of synth-system-channel, and what each DIMM showed in each of them
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: CPU0_B1, boot 1: no errors
+      mark: CPU0_B1, boot 2: 73 corrected
+      mark: CPU0_B1, boot 3: 108 corrected
+      mark: CPU0_B2, boot 1: no errors
+      mark: CPU0_B2, boot 2: 62 corrected
+      mark: CPU0_B2, boot 3: 98 corrected
+      mark: CPU0_E1, boot 1: no errors
+      mark: CPU0_E1, boot 2: 1 corrected
+      mark: CPU0_E1, boot 3: no errors
+      mark: CPU0_F1, boot 1: no errors
+      mark: CPU0_F1, boot 2: no errors
+      mark: CPU0_F1, boot 3: 1 corrected
+      mark: CPU0_F2, boot 1: no errors
+      mark: CPU0_F2, boot 2: 1 corrected
+      mark: CPU0_F2, boot 3: no errors
+      mark: CPU0_G1, boot 1: 1 corrected
+      mark: CPU0_G1, boot 2: no errors
+      mark: CPU0_G1, boot 3: no errors
+      mark: CPU0_H2, boot 1: 1 corrected
+      mark: CPU0_H2, boot 2: no errors
+      mark: CPU0_H2, boot 3: no errors
+      mark: CPU1_A1, boot 1: no errors
+      mark: CPU1_A1, boot 2: no errors
+      mark: CPU1_A1, boot 3: 1 corrected
+      mark: CPU1_A2, boot 1: 1 corrected
+      mark: CPU1_A2, boot 2: no errors
+      mark: CPU1_A2, boot 3: no errors
+      mark: CPU1_C1, boot 1: no errors
+      mark: CPU1_C1, boot 2: 1 corrected
+      mark: CPU1_C1, boot 3: no errors
+      mark: CPU1_C2, boot 1: 1 corrected
+      mark: CPU1_C2, boot 2: no errors
+      mark: CPU1_C2, boot 3: no errors
+      mark: CPU1_E1, boot 1: no errors
+      mark: CPU1_E1, boot 2: no errors
+      mark: CPU1_E1, boot 3: 1 corrected
+      mark: CPU1_G1, boot 1: no errors
+      mark: CPU1_G1, boot 2: no errors
+      mark: CPU1_G1, boot 3: 1 corrected
+      mark: CPU1_G2, boot 1: 1 corrected
+      mark: CPU1_G2, boot 2: no errors
+      mark: CPU1_G2, boot 3: no errors
+      text: 1 | - | 2 | - | 3 | - | CPU0_B1 | · | 73 | 99+ | CPU0_B2 | · | 62 | 98 | CPU0_E1 | · | 1 | · | CPU0_F1 | · | · | 1 | CPU0_F2 | · | 1 | · | CPU0_G1 | 1 | · | · | CPU0_H2 | 1 | · | · | CPU1_A1 | · | · | 1 | CPU1_A2 | 1 | · | · | CPU1_C1 | · | 1 | · | CPU1_C2 | 1 | · | · | CPU1_E1 | · | · | 1 | CPU1_G1 | · | · | 1 | CPU1_G2 | 1 | · | ·
+    figcaption: number: corrected errors, U uncorrected, X uncorrected in a boot that stopped, ? not named, - not in the host
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC
+    | ran | 31 d | 29 d | 42 d
+    | CPU0_B1 |  | CE 73 | CE 108
+    | CPU0_B2 |  | CE 62 | CE 98
+    | CPU0_E1 |  | CE 1 | 
+    | CPU0_F1 |  |  | CE 1
+    | CPU0_F2 |  | CE 1 | 
+    | CPU0_G1 | CE 1 |  | 
+    | CPU0_H2 | CE 1 |  | 
+    | CPU1_A1 |  |  | CE 1
+    | CPU1_A2 | CE 1 |  | 
+    | CPU1_C1 |  | CE 1 | 
+    | CPU1_C2 | CE 1 |  | 
+    | CPU1_E1 |  |  | CE 1
+    | CPU1_G1 |  |  | CE 1
+    | CPU1_G2 | CE 1 |  | 
+  p.how: One column per boot, the oldest at the left, and the letter below its number says how it ended: S a fatal hardware error ended it, p another panic, r the boot of the latest scan, - not on record. A cell gives the corrected errors of the boot as a number, U an uncorrected error, X an uncorrected error in a boot that stopped, ? a boot that stopped with no record naming a DIMM, - a DIMM that was not in the host. The table below holds the same.
+  #### CPU0_B1: its places boot by boot
+  figure
+    svg.fig.boots: The places of CPU0_B1 in the latest 3 boots
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: rank0 dev0 bg0 bank2 row 0xaa97 col 0x7f8, boot 1: no errors
+      mark: rank0 dev0 bg0 bank2 row 0xaa97 col 0x7f8, boot 2: no errors
+      mark: rank0 dev0 bg0 bank2 row 0xaa97 col 0x7f8, boot 3: 1 corrected
+      mark: rank0 dev0 bg2 bank3 row 0xed59 col 0x318, boot 1: no errors
+      mark: rank0 dev0 bg2 bank3 row 0xed59 col 0x318, boot 2: no errors
+      mark: rank0 dev0 bg2 bank3 row 0xed59 col 0x318, boot 3: 1 corrected
+      mark: rank0 dev0 bg5 bank3 row 0x802e col 0x410, boot 1: no errors
+      mark: rank0 dev0 bg5 bank3 row 0x802e col 0x410, boot 2: no errors
+      mark: rank0 dev0 bg5 bank3 row 0x802e col 0x410, boot 3: 1 corrected
+      mark: rank0 dev1 bg5 bank2 row 0xbd9a col 0x90, boot 1: no errors
+      mark: rank0 dev1 bg5 bank2 row 0xbd9a col 0x90, boot 2: no errors
+      mark: rank0 dev1 bg5 bank2 row 0xbd9a col 0x90, boot 3: 1 corrected
+      mark: rank0 dev10 bg3 bank2 row 0x74fd col 0x2e0, boot 1: no errors
+      mark: rank0 dev10 bg3 bank2 row 0x74fd col 0x2e0, boot 2: no errors
+      mark: rank0 dev10 bg3 bank2 row 0x74fd col 0x2e0, boot 3: 1 corrected
+      mark: rank0 dev10 bg5 bank0 row 0x69e3 col 0x208, boot 1: no errors
+      mark: rank0 dev10 bg5 bank0 row 0x69e3 col 0x208, boot 2: 1 corrected
+      mark: rank0 dev10 bg5 bank0 row 0x69e3 col 0x208, boot 3: no errors
+      mark: rank0 dev10 bg5 bank2 row 0x542b col 0x308, boot 1: no errors
+      mark: rank0 dev10 bg5 bank2 row 0x542b col 0x308, boot 2: 1 corrected
+      mark: rank0 dev10 bg5 bank2 row 0x542b col 0x308, boot 3: no errors
+      mark: rank0 dev11 bg1 bank0 row 0xdf2d col 0x5f0, boot 1: no errors
+      mark: rank0 dev11 bg1 bank0 row 0xdf2d col 0x5f0, boot 2: 1 corrected
+      mark: rank0 dev11 bg1 bank0 row 0xdf2d col 0x5f0, boot 3: no errors
+      mark: rank0 dev11 bg1 bank1 row 0x170 col 0x450, boot 1: no errors
+      mark: rank0 dev11 bg1 bank1 row 0x170 col 0x450, boot 2: no errors
+      mark: rank0 dev11 bg1 bank1 row 0x170 col 0x450, boot 3: 1 corrected
+      mark: rank0 dev11 bg5 bank3 row 0xa2c5 col 0x540, boot 1: no errors
+      mark: rank0 dev11 bg5 bank3 row 0xa2c5 col 0x540, boot 2: no errors
+      mark: rank0 dev11 bg5 bank3 row 0xa2c5 col 0x540, boot 3: 1 corrected
+      mark: rank0 dev11 bg6 bank2 row 0xd262 col 0x5f8, boot 1: no errors
+      mark: rank0 dev11 bg6 bank2 row 0xd262 col 0x5f8, boot 2: 1 corrected
+      mark: rank0 dev11 bg6 bank2 row 0xd262 col 0x5f8, boot 3: no errors
+      mark: rank0 dev11 bg7 bank0 row 0x97dc col 0x540, boot 1: no errors
+      mark: rank0 dev11 bg7 bank0 row 0x97dc col 0x540, boot 2: 1 corrected
+      mark: rank0 dev11 bg7 bank0 row 0x97dc col 0x540, boot 3: no errors
+      mark: 169 other places, boot 1: no errors
+      mark: 169 other places, boot 2: 68 corrected
+      mark: 169 other places, boot 3: 101 corrected
+      text: 1 | - | 2 | - | 3 | - | rank0 dev0 bg0 bank2 row 0xaa97 col 0x7f8 | · | · | 1 | rank0 dev0 bg2 bank3 row 0xed59 col 0x318 | · | · | 1 | rank0 dev0 bg5 bank3 row 0x802e col 0x410 | · | · | 1 | rank0 dev1 bg5 bank2 row 0xbd9a col 0x90 | · | · | 1 | rank0 dev10 bg3 bank2 row 0x74fd col 0x2e0 | · | · | 1 | rank0 dev10 bg5 bank0 row 0x69e3 col 0x208 | · | 1 | · | rank0 dev10 bg5 bank2 row 0x542b col 0x308 | · | 1 | · | rank0 dev11 bg1 bank0 row 0xdf2d col 0x5f0 | · | 1 | · | rank0 dev11 bg1 bank1 row 0x170 col 0x450 | · | · | 1 | rank0 dev11 bg5 bank3 row 0xa2c5 col 0x540 | · | · | 1 | rank0 dev11 bg6 bank2 row 0xd262 col 0x5f8 | · | 1 | · | rank0 dev11 bg7 bank0 row 0x97dc col 0x540 | · | 1 | · | 169 other places | · | 68 | 99+
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC
+    | ran | 31 d | 29 d | 42 d
+    | rank0 dev0 bg0 bank2 row 0xaa97 col 0x7f8 |  |  | CE 1
+    | rank0 dev0 bg2 bank3 row 0xed59 col 0x318 |  |  | CE 1
+    | rank0 dev0 bg5 bank3 row 0x802e col 0x410 |  |  | CE 1
+    | rank0 dev1 bg5 bank2 row 0xbd9a col 0x90 |  |  | CE 1
+    | rank0 dev10 bg3 bank2 row 0x74fd col 0x2e0 |  |  | CE 1
+    | rank0 dev10 bg5 bank0 row 0x69e3 col 0x208 |  | CE 1 | 
+    | rank0 dev10 bg5 bank2 row 0x542b col 0x308 |  | CE 1 | 
+    | rank0 dev11 bg1 bank0 row 0xdf2d col 0x5f0 |  | CE 1 | 
+    | rank0 dev11 bg1 bank1 row 0x170 col 0x450 |  |  | CE 1
+    | rank0 dev11 bg5 bank3 row 0xa2c5 col 0x540 |  |  | CE 1
+    | rank0 dev11 bg6 bank2 row 0xd262 col 0x5f8 |  | CE 1 | 
+    | rank0 dev11 bg7 bank0 row 0x97dc col 0x540 |  | CE 1 | 
+    | 169 other places |  | CE 68 | CE 101
+  #### CPU0_B2: its places boot by boot
+  figure
+    svg.fig.boots: The places of CPU0_B2 in the latest 3 boots
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: rank0 dev0 bg0 bank0 row 0x30fc col 0x788, boot 1: no errors
+      mark: rank0 dev0 bg0 bank0 row 0x30fc col 0x788, boot 2: no errors
+      mark: rank0 dev0 bg0 bank0 row 0x30fc col 0x788, boot 3: 1 corrected
+      mark: rank0 dev0 bg5 bank3 row 0x2651 col 0x3b8, boot 1: no errors
+      mark: rank0 dev0 bg5 bank3 row 0x2651 col 0x3b8, boot 2: 1 corrected
+      mark: rank0 dev0 bg5 bank3 row 0x2651 col 0x3b8, boot 3: no errors
+      mark: rank0 dev0 bg6 bank0 row 0xe7b9 col 0x3b8, boot 1: no errors
+      mark: rank0 dev0 bg6 bank0 row 0xe7b9 col 0x3b8, boot 2: 1 corrected
+      mark: rank0 dev0 bg6 bank0 row 0xe7b9 col 0x3b8, boot 3: no errors
+      mark: rank0 dev0 bg6 bank3 row 0xbd06 col 0x5e0, boot 1: no errors
+      mark: rank0 dev0 bg6 bank3 row 0xbd06 col 0x5e0, boot 2: no errors
+      mark: rank0 dev0 bg6 bank3 row 0xbd06 col 0x5e0, boot 3: 1 corrected
+      mark: rank0 dev1 bg3 bank1 row 0xf14f col 0x308, boot 1: no errors
+      mark: rank0 dev1 bg3 bank1 row 0xf14f col 0x308, boot 2: no errors
+      mark: rank0 dev1 bg3 bank1 row 0xf14f col 0x308, boot 3: 1 corrected
+      mark: rank0 dev1 bg7 bank2 row 0x40b5 col 0x568, boot 1: no errors
+      mark: rank0 dev1 bg7 bank2 row 0x40b5 col 0x568, boot 2: no errors
+      mark: rank0 dev1 bg7 bank2 row 0x40b5 col 0x568, boot 3: 1 corrected
+      mark: rank0 dev11 bg0 bank0 row 0xa00a col 0x7a0, boot 1: no errors
+      mark: rank0 dev11 bg0 bank0 row 0xa00a col 0x7a0, boot 2: 1 corrected
+      mark: rank0 dev11 bg0 bank0 row 0xa00a col 0x7a0, boot 3: no errors
+      mark: rank0 dev11 bg1 bank0 row 0x8275 col 0x30, boot 1: no errors
+      mark: rank0 dev11 bg1 bank0 row 0x8275 col 0x30, boot 2: no errors
+      mark: rank0 dev11 bg1 bank0 row 0x8275 col 0x30, boot 3: 1 corrected
+      mark: rank0 dev11 bg4 bank1 row 0x7796 col 0x78, boot 1: no errors
+      mark: rank0 dev11 bg4 bank1 row 0x7796 col 0x78, boot 2: 1 corrected
+      mark: rank0 dev11 bg4 bank1 row 0x7796 col 0x78, boot 3: no errors
+      mark: rank0 dev11 bg4 bank2 row 0x6b1c col 0x558, boot 1: no errors
+      mark: rank0 dev11 bg4 bank2 row 0x6b1c col 0x558, boot 2: no errors
+      mark: rank0 dev11 bg4 bank2 row 0x6b1c col 0x558, boot 3: 1 corrected
+      mark: rank0 dev11 bg6 bank1 row 0xb968 col 0xe8, boot 1: no errors
+      mark: rank0 dev11 bg6 bank1 row 0xb968 col 0xe8, boot 2: 1 corrected
+      mark: rank0 dev11 bg6 bank1 row 0xb968 col 0xe8, boot 3: no errors
+      mark: rank0 dev12 bg0 bank2 row 0xd414 col 0x688, boot 1: no errors
+      mark: rank0 dev12 bg0 bank2 row 0xd414 col 0x688, boot 2: no errors
+      mark: rank0 dev12 bg0 bank2 row 0xd414 col 0x688, boot 3: 1 corrected
+      mark: 148 other places, boot 1: no errors
+      mark: 148 other places, boot 2: 57 corrected
+      mark: 148 other places, boot 3: 91 corrected
+      text: 1 | - | 2 | - | 3 | - | rank0 dev0 bg0 bank0 row 0x30fc col 0x788 | · | · | 1 | rank0 dev0 bg5 bank3 row 0x2651 col 0x3b8 | · | 1 | · | rank0 dev0 bg6 bank0 row 0xe7b9 col 0x3b8 | · | 1 | · | rank0 dev0 bg6 bank3 row 0xbd06 col 0x5e0 | · | · | 1 | rank0 dev1 bg3 bank1 row 0xf14f col 0x308 | · | · | 1 | rank0 dev1 bg7 bank2 row 0x40b5 col 0x568 | · | · | 1 | rank0 dev11 bg0 bank0 row 0xa00a col 0x7a0 | · | 1 | · | rank0 dev11 bg1 bank0 row 0x8275 col 0x30 | · | · | 1 | rank0 dev11 bg4 bank1 row 0x7796 col 0x78 | · | 1 | · | rank0 dev11 bg4 bank2 row 0x6b1c col 0x558 | · | · | 1 | rank0 dev11 bg6 bank1 row 0xb968 col 0xe8 | · | 1 | · | rank0 dev12 bg0 bank2 row 0xd414 col 0x688 | · | · | 1 | 148 other places | · | 57 | 91
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC
+    | ran | 31 d | 29 d | 42 d
+    | rank0 dev0 bg0 bank0 row 0x30fc col 0x788 |  |  | CE 1
+    | rank0 dev0 bg5 bank3 row 0x2651 col 0x3b8 |  | CE 1 | 
+    | rank0 dev0 bg6 bank0 row 0xe7b9 col 0x3b8 |  | CE 1 | 
+    | rank0 dev0 bg6 bank3 row 0xbd06 col 0x5e0 |  |  | CE 1
+    | rank0 dev1 bg3 bank1 row 0xf14f col 0x308 |  |  | CE 1
+    | rank0 dev1 bg7 bank2 row 0x40b5 col 0x568 |  |  | CE 1
+    | rank0 dev11 bg0 bank0 row 0xa00a col 0x7a0 |  | CE 1 | 
+    | rank0 dev11 bg1 bank0 row 0x8275 col 0x30 |  |  | CE 1
+    | rank0 dev11 bg4 bank1 row 0x7796 col 0x78 |  | CE 1 | 
+    | rank0 dev11 bg4 bank2 row 0x6b1c col 0x558 |  |  | CE 1
+    | rank0 dev11 bg6 bank1 row 0xb968 col 0xe8 |  | CE 1 | 
+    | rank0 dev12 bg0 bank2 row 0xd414 col 0x688 |  |  | CE 1
+    | 148 other places |  | CE 57 | CE 91
 section#s3.sec
   ## 3 Findings
   article#dimm-CPU0_B1.card.g-hold

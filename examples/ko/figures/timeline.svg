@@ -79,6 +79,19 @@ a.pt:hover rect, a.pt:focus rect, a.pt:hover circle, a.pt:focus circle { stroke:
 .notearrow { fill: none; stroke: var(--ink2); stroke-width: 1.2; stroke-linecap: round; }
 .caret { fill: var(--ink2); }
 
+/* Boots: a letter or a number in every cell; the colour repeats it. */
+.bt-none rect { fill: var(--h0); }
+.bt-ce1 rect { fill: var(--h1); }
+.bt-ce2 rect { fill: var(--h2); }
+.bt-ce3 rect { fill: var(--h3); }
+.bt-ue rect, .bt-stop rect { fill: var(--replace); }
+.bt-stop rect { stroke: var(--ink); stroke-width: 1.2; }
+.bt-unknown rect { fill: none; stroke: var(--ink3); stroke-width: 1; stroke-dasharray: 2 2; }
+.bt-absent rect { fill: none; stroke: var(--axis); stroke-width: 1; }
+.fig .bt-ce2 text, .fig .bt-ce3 text, .fig .bt-ue text, .fig .bt-stop text { fill: #fff; font-weight: 600; }
+.fig .stopmark { fill: var(--replace); font-weight: 700; }
+.multi { fill: none; stroke: var(--ink); stroke-width: 1.4; }
+
 /* Timeline. */
 .bars rect { fill: var(--series); }
 .mk { stroke: var(--surface); stroke-width: 2; paint-order: stroke; }

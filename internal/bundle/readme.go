@@ -43,6 +43,19 @@ func readme(m *Manifest) string {
 			line += ", " + h.First.UTC().Format("2006-01-02") + " to " + h.Last.UTC().Format("2006-01-02")
 		}
 		p("%s", line)
+		if h.Boots > 0 {
+			boots := fmt.Sprintf("    %d %s", h.Boots, plural(h.Boots, "boot", "boots"))
+			if h.Stops > 0 {
+				boots += fmt.Sprintf(", %d ended by a fatal hardware error", h.Stops)
+			}
+			if h.Panics > 0 {
+				boots += fmt.Sprintf(", %d in another panic", h.Panics)
+			}
+			p("%s", boots)
+		}
+		if len(h.Sources) > 0 {
+			p("    records from %s", strings.Join(h.Sources, ", "))
+		}
 	}
 	p("")
 	p("What the ledger holds")

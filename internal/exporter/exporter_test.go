@@ -172,9 +172,10 @@ func TestDescs(t *testing.T) {
 	name := regexp.MustCompile(`^my_[a-z0-9_]+$`)
 	label := regexp.MustCompile(`^[a-z_]+$`)
 	// The labels the design allows. A row, a column, a bank or an address
-	// as a label would make the number of series grow without bound.
+	// as a label would make the number of series grow without bound; the
+	// cause of a stop has three values and a check of preflight thirteen.
 	allowed := map[string]bool{"host": true, "slot": true, "serial": true, "mode": true, "type": true, "gpu": true, "bucket": true,
-		"source": true, "status": true, "version": true, "revision": true, "engine": true}
+		"source": true, "status": true, "version": true, "revision": true, "engine": true, "cause": true, "check": true}
 	seen := map[string]bool{}
 	for _, d := range Descs {
 		if !name.MatchString(d.Name) || seen[d.Name] {
@@ -197,7 +198,8 @@ func TestDescs(t *testing.T) {
 		}
 	}
 	for _, want := range []string{"my_dimm_verdict", "my_dimm_ce_total", "my_dimm_ue_total", "my_dimm_faults", "my_dimm_offlined_pages",
-		"my_dimm_repairs_total", "my_gpu_remap_banks", "my_gpu_remap_failure", "my_source_grade"} {
+		"my_dimm_repairs_total", "my_gpu_remap_banks", "my_gpu_remap_failure", "my_source_grade",
+		"my_host_stops", "my_host_stop_streak", "my_dimm_stop_boots", "my_host_capture"} {
 		if !seen[want] {
 			t.Errorf("metric %s is not defined", want)
 		}
@@ -727,4 +729,84 @@ func TestContribNamesRealMetrics(t *testing.T) {
 			t.Errorf("no panel of the dashboard shows %s", d.Name)
 		}
 	}
+}
+
+// TestStopMetrics: the stops of a crash loop, and a host without stops.
+func TestStopMetrics(t *testing.T) {
+	set, h := hostSet(t, testledger.Open(t, "crash-loop", 1, ""))
+	got, x := text(t, set)
+	testutil.Golden(t, "crash-loop.prom", []byte(got))
+	host := h.Host
+	for series, want := range map[string]float64{
+		`my_host_stops{host="` + host + `",cause="memory"}`:                                              4,
+		`my_host_stops{host="` + host + `",cause="hardware-other"}`:                                      0,
+		`my_host_stops{host="` + host + `",cause="panic"}`:                                               0,
+		`my_host_stop_streak{host="` + host + `"}`:                                                       0,
+		`my_dimm_stop_boots{host="` + host + `",slot="CPU0_C1",serial="` + serialOf(h, "CPU0_C1") + `"}`: 4,
+		`my_dimm_stop_boots{host="` + host + `",slot="CPU1_D1",serial="` + serialOf(h, "CPU1_D1") + `"}`: 0,
+	} {
+		if v, ok := x.Series[series]; !ok || v != want {
+			t.Errorf("%s = %v (present %v), want %v", series, v, ok, want)
+		}
+	}
+	if n := count(x, "my_dimm_stop_boots"); n != 16 {
+		t.Errorf("%d series of my_dimm_stop_boots for 16 DIMMs", n)
+	}
+	// A synthetic ledger has no live scan: no check of preflight.
+	if n := count(x, "my_host_capture"); n != 0 {
+		t.Errorf("%d series of my_host_capture without a live scan", n)
+	}
+
+	// The demo host has four boots and no stop: the series are there, at 0.
+	set, h = hostSet(t, testledger.Open(t, "demo", 1, ""))
+	_, x = text(t, set)
+	for _, cause := range []string{"memory", "hardware-other", "panic"} {
+		if v, ok := x.Series[`my_host_stops{host="`+h.Host+`",cause="`+cause+`"}`]; !ok || v != 0 {
+			t.Errorf("demo: my_host_stops %s = %v (present %v)", cause, v, ok)
+		}
+	}
+	if v, ok := x.Series[`my_host_stop_streak{host="`+h.Host+`"}`]; !ok || v != 0 {
+		t.Errorf("demo: my_host_stop_streak = %v (present %v)", v, ok)
+	}
+}
+
+// TestCaptureMetrics: kept is 1, lost is 0, the other states have no
+// series.
+func TestCaptureMetrics(t *testing.T) {
+	s := newLedgerWithCaptures(t, []model.CaptureCheck{
+		{Name: "journal", State: "kept"}, {Name: "pstore-backend", State: "lost"},
+		{Name: "kdump", State: "none"}, {Name: "bert", State: "unknown"}, {Name: "reset-kind", State: "info"},
+	})
+	res, err := engine.Run(ctx, s, engine.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	set, err := Host(ctx, s, res.Hosts[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, x := text(t, set)
+	host := res.Hosts[0].Host
+	if x.Series[`my_host_capture{host="`+host+`",check="journal"}`] != 1 || count(x, "my_host_capture") != 2 {
+		t.Errorf("captures: %v", x.Series)
+	}
+	if v, ok := x.Series[`my_host_capture{host="`+host+`",check="pstore-backend"}`]; !ok || v != 0 {
+		t.Errorf("a lost check: %v %v", v, ok)
+	}
+}
+
+// newLedgerWithCaptures is the ledger of a synthetic host whose scan
+// stored the given checks of preflight.
+func newLedgerWithCaptures(t *testing.T, checks []model.CaptureCheck) *store.Store {
+	t.Helper()
+	s := emptyLedger(t)
+	ds := testledger.Generate(t, "single-bit", 1, nil)
+	res, err := ingest.Run(ctx, s, []adapter.Adapter{ds.Adapter()}, ingest.Options{Kind: model.ScanSynthetic, Now: ds.Scenario.End})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Update(ctx, func(w *store.Writer) error { return w.PutCaptureChecks(res.Scan.ID, res.Host, checks) }); err != nil {
+		t.Fatal(err)
+	}
+	return s
 }

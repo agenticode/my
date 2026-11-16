@@ -1,0 +1,105 @@
+# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. An empty slot and serial carry the host finding, about errors and page offlines that are tied to no DIMM.
+# TYPE my_dimm_verdict gauge
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_A1",serial="8F2453"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_B1",serial="D6A738"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_C1",serial="BE8ED6"} 3
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_D1",serial="0149B5"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_E1",serial="3016FC"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_F1",serial="2BE334"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_G1",serial="CF6088"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU0_H1",serial="D849FD"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_A1",serial="B6446C"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_B1",serial="E17AA4"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_C1",serial="B5DAD6"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_D1",serial="21FD6F"} 1
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_E1",serial="EA1641"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_F1",serial="EF9E30"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_G1",serial="049F4B"} 0
+my_dimm_verdict{host="synth-crash-loop",slot="CPU1_H1",serial="2E671F"} 0
+# HELP my_dimm_ce_total Corrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ce_total counter
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_A1",serial="8F2453"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_B1",serial="D6A738"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_C1",serial="BE8ED6"} 60
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_D1",serial="0149B5"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_E1",serial="3016FC"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_F1",serial="2BE334"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_G1",serial="CF6088"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU0_H1",serial="D849FD"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_A1",serial="B6446C"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_B1",serial="E17AA4"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_C1",serial="B5DAD6"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_D1",serial="21FD6F"} 25
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_E1",serial="EA1641"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_F1",serial="EF9E30"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_G1",serial="049F4B"} 0
+my_dimm_ce_total{host="synth-crash-loop",slot="CPU1_H1",serial="2E671F"} 0
+# HELP my_dimm_ue_total Uncorrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ue_total counter
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_A1",serial="8F2453"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_B1",serial="D6A738"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_C1",serial="BE8ED6"} 4
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_D1",serial="0149B5"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_E1",serial="3016FC"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_F1",serial="2BE334"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_G1",serial="CF6088"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU0_H1",serial="D849FD"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_A1",serial="B6446C"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_B1",serial="E17AA4"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_C1",serial="B5DAD6"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_D1",serial="21FD6F"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_E1",serial="EA1641"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_F1",serial="EF9E30"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_G1",serial="049F4B"} 0
+my_dimm_ue_total{host="synth-crash-loop",slot="CPU1_H1",serial="2E671F"} 0
+# HELP my_dimm_faults Faults of the DIMM in the slot by fault mode. A fault is a group of errors with one cause.
+# TYPE my_dimm_faults gauge
+my_dimm_faults{host="synth-crash-loop",slot="CPU0_C1",mode="single-bit"} 1
+my_dimm_faults{host="synth-crash-loop",slot="CPU1_D1",mode="single-bit"} 1
+# HELP my_dimm_offlined_pages Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM.
+# TYPE my_dimm_offlined_pages gauge
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_A1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_B1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_C1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_D1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_E1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_F1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_G1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU0_H1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_A1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_B1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_C1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_D1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_E1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_F1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_G1"} 0
+my_dimm_offlined_pages{host="synth-crash-loop",slot="CPU1_H1"} 0
+# HELP my_dimm_stop_boots Boots of the window of the host that stopped with an uncorrected error of the DIMM in the slot.
+# TYPE my_dimm_stop_boots gauge
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_A1",serial="8F2453"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_B1",serial="D6A738"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_C1",serial="BE8ED6"} 4
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_D1",serial="0149B5"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_E1",serial="3016FC"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_F1",serial="2BE334"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_G1",serial="CF6088"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU0_H1",serial="D849FD"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_A1",serial="B6446C"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_B1",serial="E17AA4"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_C1",serial="B5DAD6"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_D1",serial="21FD6F"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_E1",serial="EA1641"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_F1",serial="EF9E30"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_G1",serial="049F4B"} 0
+my_dimm_stop_boots{host="synth-crash-loop",slot="CPU1_H1",serial="2E671F"} 0
+# HELP my_host_stops Boots of the window of the host (loop.window_boots) that ended in a stop, by cause: memory (an uncorrected memory error is on record in the boot), hardware-other (a fatal hardware error without one), panic (a panic with no hardware error record).
+# TYPE my_host_stops gauge
+my_host_stops{host="synth-crash-loop",cause="hardware-other"} 0
+my_host_stops{host="synth-crash-loop",cause="memory"} 4
+my_host_stops{host="synth-crash-loop",cause="panic"} 0
+# HELP my_host_stop_streak The latest boots of the host in a row that a fatal hardware error ended; a boot still running is passed over.
+# TYPE my_host_stop_streak gauge
+my_host_stop_streak{host="synth-crash-loop"} 0
+# HELP my_source_grade Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went.
+# TYPE my_source_grade gauge
+my_source_grade{host="synth-crash-loop",source="synth",status="ok"} 3

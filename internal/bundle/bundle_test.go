@@ -767,3 +767,26 @@ func FuzzReadManifest(f *testing.F) {
 		c.Close()
 	})
 }
+
+// TestReadmeOfACrashLoop: the boots of a host and how they ended are in
+// the manifest and in README.txt.
+func TestReadmeOfACrashLoop(t *testing.T) {
+	w := write(t, testledger.Open(t, "crash-loop", 1, ""), Options{})
+	if h := w.Manifest.Hosts[0]; h.Boots != 8 || h.Stops != 4 || h.Panics != 0 || strings.Join(h.Sources, " ") != "synth" {
+		t.Errorf("manifest host: %+v", h)
+	}
+	zr, err := zip.OpenReader(w.Path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer zr.Close()
+	b, err := readMember(&zr.Reader, readmeName, 1<<20)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"    8 boots, 4 ended by a fatal hardware error\n", "    records from synth\n", "and how a boot ended when a record shows it"} {
+		if !strings.Contains(string(b), want) {
+			t.Errorf("README lacks %q:\n%s", want, b)
+		}
+	}
+}

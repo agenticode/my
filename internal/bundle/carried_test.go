@@ -40,6 +40,13 @@ func TestCarriedRecordsAndChecks(t *testing.T) {
 		if err := w.InsertScan(sc); err != nil {
 			return err
 		}
+		for _, src := range []model.Source{{Kind: "pstore", Status: model.SourceOK, Records: 3}, {Kind: "bert", Status: model.SourceOK, Records: 1},
+			{Kind: "kdump", Status: model.SourceAbsent}, {Kind: "klog", Status: model.SourceOK, Records: 1}} {
+			src.ScanID = sc.ID
+			if err := w.InsertSource(&src); err != nil {
+				return err
+			}
+		}
 		return w.PutCaptureChecks(sc.ID, host, []model.CaptureCheck{{Name: "console", State: "kept",
 			Detail:   model.Statement{Code: "pf.console.serial", Args: map[string]any{"console": "ttyS0"}, Text: "a serial console (ttyS0) of " + host},
 			Evidence: []string{"/proc/cmdline: root=UUID=" + uuid + " console=ttyS0,115200", "/proc/sys/kernel/hostname: " + host}}})
@@ -64,6 +71,11 @@ func TestCarriedRecordsAndChecks(t *testing.T) {
 	}
 	if !strings.Contains(holds["capture_check"], "what a reset") || !strings.Contains(holds["boot"], "how a boot ended") {
 		t.Errorf("manifest: %q, %q", holds["capture_check"], holds["boot"])
+	}
+	// The kinds of the sources that gave records, a source without any
+	// left out; the boot that stopped.
+	if h := plain.Manifest.Hosts[0]; strings.Join(h.Sources, " ") != "bert klog pstore" || h.Boots != 2 || h.Stops != 1 {
+		t.Errorf("manifest host: %+v", h)
 	}
 	c, err := Open(ctx, plain.Path, t.TempDir())
 	if err != nil {
