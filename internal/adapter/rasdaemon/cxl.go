@@ -15,7 +15,8 @@ import (
 //	cxl_general_media_event   a media error, by channel, rank and device
 //	cxl_dram_event            a media error with the DRAM location
 //	cxl_memory_module_event   a change in the health of the device
-//	cxl_memory_sparing_event  a spare taking over a cacheline, row, bank or rank
+//	cxl_memory_sparing_event  a post package repair, or a spare taking over a
+//	                          cacheline, row, bank or rank
 //	cxl_poison_event          an entry of the poison list, or its injection or clearing
 //	cxl_overflow_event        records the device lost because its log was full
 //
@@ -346,10 +347,22 @@ const (
 	cxlSparingValidSubChannel
 )
 
+// Maintenance operation classes of the common record header (CXL r3.2
+// table 8-114): a device reports a post package repair or a sparing it
+// carried out with the class and subclass of that operation.
+const (
+	cxlMaintPPR     = 1 // subclass 0 soft PPR, 1 hard PPR
+	cxlMaintSparing = 2 // subclass 0 cacheline, 1 row, 2 bank, 3 rank
+)
+
 var cxlSparingKinds = []string{"cacheline", "row", "bank", "rank"}
 
-// cxlSparing turns a memory sparing event record into a sparing action: a
-// spare took over a cacheline, a row, a bank or a rank of the device.
+// cxlSparing turns a memory sparing event record into a repair of the
+// place it names. The header says which maintenance the device carried
+// out. A post package repair is a soft or hard PPR. A sparing took a spare
+// for a cacheline, a row, a bank or a rank: when the record says spares are
+// left it is memory sparing, a repair of that place; when none is left, or
+// the record does not say, it is sparing that took the last spare.
 func (r *reader) cxlSparing(rw *row) error {
 	ref, id := r.ref(rw)
 	t, _, ok := parseTimestamp(rw.str("timestamp"))
@@ -365,7 +378,9 @@ func (r *reader) cxlSparing(rw *row) error {
 	}
 	result, _ := rw.int("result")
 	valid, _ := rw.int("validity_flags")
+	class, _ := rw.int("hdr_maint_op_class")
 	sub, hasSub := rw.int("hdr_maint_op_sub_class")
+	left, hasLeft := rw.int("res_avail")
 	a := &model.Action{At: r.kernelTime(t), TimeQuality: model.TimeExact, Kind: model.ActionSparing, Method: "soft", Result: model.ResultOK,
 		Source: Kind + "/" + rw.table, RawRef: ref, Raw: rw.raw(), Fingerprint: fingerprint(rw.table, id, t)}
 	if flags&cxlSparingHard != 0 {
@@ -374,11 +389,24 @@ func (r *reader) cxlSparing(rw *row) error {
 	if dev := rw.str("memdev"); dev != "" {
 		a.Label = "cxl:" + dev
 	}
-	kind := "memory"
-	if hasSub {
-		kind = nameOf(cxlSparingKinds, sub)
+	var detail []string
+	switch {
+	case class == cxlMaintPPR && hasSub && (sub == 0 || sub == 1):
+		a.Kind, a.Method = model.ActionSPPR, "soft"
+		if sub == 1 {
+			a.Kind, a.Method = model.ActionHPPR, "hard"
+		}
+		detail = append(detail, a.Method+" post package repair")
+	default:
+		kind := "memory"
+		if hasSub {
+			kind = nameOf(cxlSparingKinds, sub)
+		}
+		detail = append(detail, kind+" sparing")
+		if hasLeft && left > 0 && result == 0 {
+			a.Kind = model.ActionMemorySparing
+		}
 	}
-	detail := []string{kind + " sparing"}
 	if flags&cxlSparingDevice != 0 {
 		detail = append(detail, "started by the device")
 	}
@@ -387,7 +415,7 @@ func (r *reader) cxlSparing(rw *row) error {
 		a.Result = model.ResultFailed
 		detail = append(detail, fmt.Sprintf("result code 0x%x", result))
 	}
-	if left, ok := rw.int("res_avail"); ok {
+	if hasLeft {
 		detail = append(detail, fmt.Sprintf("%d spare resources left", left))
 	}
 	a.Detail = strings.Join(detail, ", ")

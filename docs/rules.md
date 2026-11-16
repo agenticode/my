@@ -68,7 +68,7 @@ The BMC or the BIOS marks the DIMM as failed or disabled. The records are a "mem
 
 ### R-REP-01
 
-Repair resources are used up: a post package repair or a row remap failed, or sparing is in use, which leaves no spare. A repair the firmware reports as failed counts whether it names a place or the module only; so do device sparing (ADDDC, SDDC) that failed or has no spare left, and a copy to a spare that failed. Device sparing in use does not fire the rule: it takes a device out of use and leaves the rest of the module's spare capacity. For a GPU the rule fires when a row remapping failed: XID 64 in the kernel log, or the failure flag in the state `nvidia-smi` reports.
+Repair resources are used up: a post package repair or a row remap failed, or sparing is in use, which leaves no spare. A CXL memory device says with each sparing how many spare resources are left: sparing that leaves spares is memory sparing and fires no rule here. A repair the firmware reports as failed counts whether it names a place or the module only; so do device sparing (ADDDC, SDDC) that failed or has no spare left, and a copy to a spare that failed. Device sparing in use does not fire the rule: it takes a device out of use and leaves the rest of the module's spare capacity. For a GPU the rule fires when a row remapping failed: XID 64 in the kernel log, or the failure flag in the state `nvidia-smi` reports.
 
 ### R-LOOP-01
 
@@ -117,7 +117,7 @@ The patrol scrubber found an uncorrected error that was not fatal: the memory wa
 
 Errors came back at the place of a repair: at least one error at the repaired row, device or rank after a post package repair, a sparing or a row remap. When the repair was a soft PPR and the host restarted before the errors came back, a check says so: a soft PPR is lost at power off.
 
-A repair that a firmware record reports names the module and no row in most logs. Such a repair stands for every fault of the module that had errors before it, and errors of one of those faults after it fire the rule; a fault first seen after the repair is a new fault and no recurrence. A repair that does not say whether it was soft or hard adds an open check, and so does a repair dated by a BMC whose clock was not compared with the host's when the errors came less than 15 hours later. Device sparing that engaged at a place is a repair of that place.
+A repair that a firmware record reports names the module and no row in most logs. Such a repair stands for every fault of the module that had errors before it, and errors of one of those faults after it fire the rule; a fault first seen after the repair is a new fault and no recurrence. A repair that does not say whether it was soft or hard adds an open check, and so does a repair dated by a BMC whose clock was not compared with the host's when the errors came less than 15 hours later. Device sparing that engaged at a place is a repair of that place, and so is the memory sparing of a CXL device.
 
 ### R-FW-02
 

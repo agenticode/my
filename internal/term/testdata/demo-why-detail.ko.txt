@@ -22,6 +22,7 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
          DIMM 온도 이력 없음
  기준    자체 이력: 최근 7일 하루 60.1건, 그 앞 30일의 100 백분위
          같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
+ 리페어  2026-10-28 01:30 UTC rank0 dev7 bg0 bank3 row 0x1a2f hPPR: 이전 442건, 이후 764건
  다음    DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
  신뢰도  90 등급 근거 규칙: R-UE-01
          +5 소견을 뒷받침하는 점검 1건

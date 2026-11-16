@@ -102,7 +102,10 @@ func (st Style) brief(p *page, c *view.Card) {
 	}
 
 	lw := max(Width(st.say("card.evidence")), Width(st.say("card.next")))
-	if len(b.Lines) > 0 || c.Next != nil {
+	if len(c.Repairs) > 0 {
+		lw = max(lw, Width(st.say("card.repair")))
+	}
+	if len(b.Lines) > 0 || c.Next != nil || len(c.Repairs) > 0 {
 		p.blank()
 	}
 	label := st.say("card.evidence")
@@ -116,6 +119,7 @@ func (st Style) brief(p *page, c *view.Card) {
 		p.labelled(label, lw, text, "")
 		label = ""
 	}
+	st.repairLines(p, c, lw)
 	if c.Next != nil {
 		p.labelled(st.say("card.next"), lw, c.Next.Text, "")
 	}
@@ -136,14 +140,24 @@ func (st Style) brief(p *page, c *view.Card) {
 	}
 }
 
+// repairLines draws the repairs of the DIMM: what was repaired, when, and
+// the errors before and after.
+func (st Style) repairLines(p *page, c *view.Card, lw int) {
+	label := st.say("card.repair")
+	for _, r := range c.Repairs {
+		p.labelled(label, lw, r.Text.Text, "")
+		label = ""
+	}
+}
+
 // card draws the finding of a DIMM. With detail it adds the records each
 // statement rests on, the steps of the confidence and the faults.
 func (st Style) card(p *page, c *view.Card, detail bool) {
 	labels := map[string]string{}
 	lw := 0
-	for _, code := range []string{"card.finding", "card.evidence", "card.checks", "card.missing", "card.baseline", "card.next", "card.factors", "card.faults"} {
+	for _, code := range []string{"card.finding", "card.evidence", "card.checks", "card.missing", "card.baseline", "card.next", "card.factors", "card.faults", "card.repair"} {
 		labels[code] = st.say(code)
-		if detail || (code != "card.factors" && code != "card.faults") {
+		if (detail || (code != "card.factors" && code != "card.faults")) && (code != "card.repair" || len(c.Repairs) > 0) {
 			lw = max(lw, Width(labels[code]))
 		}
 	}
@@ -197,6 +211,7 @@ func (st Style) card(p *page, c *view.Card, detail bool) {
 		p.labelled(label, lw, b.Text, "")
 		label = ""
 	}
+	st.repairLines(p, c, lw)
 	if c.Next != nil {
 		p.labelled(labels["card.next"], lw, c.Next.Text, "")
 	}

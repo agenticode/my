@@ -60,8 +60,13 @@ func TestCXLTables(t *testing.T) {
 		{"cxl_poison_event/5", "Informational: CXL poison cleared at device address 0x40, 64 bytes", "cxl:mem0", "11-12 04:01", "C"},
 		// The device says it needs to be replaced: one mark, at the first record that says so.
 		{"cxl_memory_module_event/1", "action mark-failed/ok: the CXL device reports that it needs to be replaced", "cxl:mem1", "11-11 02:31", "device"},
-		{"cxl_memory_sparing_event/1", "action sparing/ok: row sparing, 3 spare resources left", "cxl:mem0", "11-10 08:10", "hard rank 1 bg 1 bank 2 row 6703"},
+		// A spare took over a row and spares are left: memory sparing, a
+		// repair of the row.
+		{"cxl_memory_sparing_event/1", "action memory-sparing/ok: row sparing, 3 spare resources left", "cxl:mem0", "11-10 08:10", "hard rank 1 bg 1 bank 2 row 6703"},
+		// A sparing that failed stays sparing, whatever is left.
 		{"cxl_memory_sparing_event/3", "action sparing/failed: bank sparing, started by the device, result code 0x1, 0 spare resources left", "cxl:mem1", "11-11 02:35", "soft rank - bg 0 bank 5 row -"},
+		// The header names the post package repair the device carried out.
+		{"cxl_memory_sparing_event/5", "action sppr/ok: soft post package repair, 1 spare resources left", "cxl:mem1", "11-12 05:00", "soft rank 0 bg 3 bank 1 row 3089"},
 	}
 	if got := cxlSummary(c); !reflect.DeepEqual(got, want) {
 		t.Errorf("records differ")
@@ -114,7 +119,7 @@ func TestCXLTables(t *testing.T) {
 		{"cxl:mem0", "0x1a2b3c4d5e", "CXL", "11-10 08:00"},
 		{"cxl:mem0", "0x1a2b3c4d5e", "CXL", "11-12 04:01"},
 		{"cxl:mem1", "0x5678", "CXL", "11-10 09:00"},
-		{"cxl:mem1", "0x5678", "CXL", "11-12 03:00"},
+		{"cxl:mem1", "0x5678", "CXL", "11-12 05:00"},
 	}
 	if !reflect.DeepEqual(mods, wantMods) {
 		t.Errorf("modules = %+v\n   want %+v", mods, wantMods)

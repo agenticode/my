@@ -69,6 +69,10 @@ type Card struct {
 	// Faults are the groups of errors the engine made out, the largest
 	// first.
 	Faults []FaultRow `json:"faults"`
+	// Repairs are the repairs of a place of the DIMM that the faults tie to
+	// their errors: what was repaired and when, the errors of the fault
+	// before it and those at the repaired place after it.
+	Repairs []Repair `json:"repairs,omitzero"`
 
 	// Stops sums up the stops of the window of the host, and Recurrence
 	// holds the boots of the window this DIMM had errors in, per place.
@@ -132,6 +136,67 @@ type FaultRow struct {
 	Confined  bool   `json:"confined"`
 }
 
+// Repair is one repair on the card of a DIMM. Where is empty for a repair
+// that names the module only. Before counts the errors of the faults it
+// stands for before it; After those at the repaired place since.
+type Repair struct {
+	Kind     model.ActionKind   `json:"kind"`
+	KindText string             `json:"kind_text"`
+	Method   string             `json:"method,omitzero"`
+	Result   model.ActionResult `json:"result"`
+	At       time.Time          `json:"at"`
+	Where    string             `json:"where,omitzero"`
+	Before   int64              `json:"before"`
+	After    int64              `json:"after"`
+	RawRef   string             `json:"raw_ref,omitzero"`
+	Text
+}
+
+// repairs lists the repairs the faults of a DIMM name, in time order. A
+// repair that stands for several faults is one entry with their errors
+// summed. A repair that failed or waits for the next boot is left out: the
+// rules speak about those.
+func (c *Case) repairs(d *engine.DIMMResult) []Repair {
+	var out []Repair
+	at := map[int64]int{}
+	for _, f := range d.Faults {
+		for _, m := range f.Mitigations {
+			if !RepairKind(m.Kind) || m.Result == model.ResultFailed || m.Result == model.ResultPending {
+				continue
+			}
+			before := int64(f.ErrorCount) - m.FaultErrorsAfter
+			if i, ok := at[m.ActionID]; ok {
+				out[i].Before += before
+				out[i].After += m.ErrorsAfter
+				continue
+			}
+			at[m.ActionID] = len(out)
+			out = append(out, Repair{Kind: m.Kind, KindText: engine.Messages.Text(c.Lang, "kind."+string(m.Kind), nil), Method: m.Method,
+				Result: m.Result, At: m.At, Where: m.Where, Before: before, After: m.ErrorsAfter, RawRef: m.RawRef})
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool { return out[i].At.Before(out[j].At) })
+	for i := range out {
+		r := &out[i]
+		code, args := "card.repair_line", []any{"kind", r.KindText, "where", r.Where}
+		if r.Where == "" {
+			code, args = "card.repair_dimm", []any{"kind", r.KindText}
+		}
+		args = append(args, "when", minuteText(r.At), "before", r.Before, "after", r.After)
+		r.Text = c.say(code, args...)
+	}
+	return out
+}
+
+// RepairKind reports whether an action repairs a place inside a DIMM.
+func RepairKind(k model.ActionKind) bool {
+	switch k {
+	case model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionRowRemap, model.ActionSparing, model.ActionDeviceSparing, model.ActionMemorySparing:
+		return true
+	}
+	return false
+}
+
 // Card builds the finding card of a DIMM.
 func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMResult) (*Card, error) {
 	v := d.Verdict
@@ -163,6 +228,7 @@ func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMRes
 			Direction: f.Trend.Direction, Recurring: f.Recurring, Confined: f.Confined,
 		})
 	}
+	card.Repairs = c.repairs(d)
 
 	// Where the DIMM has been.
 	places, err := c.store.Placements(ctx, "", d.UID)

@@ -193,6 +193,7 @@ section#s3.sec
     ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56
     판정 = 즉시 교체 R-UE-01 UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 1건
     근거 = R-ROW-03 row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의 2.3배 기록 421건 R-REP-02 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발 기록 765건 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음
+    리페어 = 2026-10-28 01:30 UTC rank0 dev7 bg0 bank3 row 0x1a2f hPPR: 이전 442건, 이후 764건
     다음 = DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
     p.sub: 신뢰도 높음, 근거 3건 더, 확인 못 한 점검 2건, 빠진 데이터 2종: 판정 전체
     p.links: 토폴로지 막대와 주소 맵 타임라인 점검표
@@ -815,6 +816,7 @@ section#s8.sec
     반례 = 미확인 이 채널에 다른 DIMM 없음: 비교 대상 없음 미확인 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음
     부족 = ECS 카운터 없음 DIMM 온도 이력 없음
     기준 = 자체 이력: 최근 7일 하루 60.1건, 그 앞 30일의 100 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
+    리페어 = 2026-10-28 01:30 UTC rank0 dev7 bg0 bank3 row 0x1a2f hPPR: 이전 442건, 이후 764건
     다음 = DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
     신뢰도 = 90 등급 근거 규칙: R-UE-01 +5 소견을 뒷받침하는 점검 1건 -4 하지 못한 점검 2건
     고장 = row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): CE 1,231건, UE 1건; 2026-09-24 ~ 2026-11-12; 증가; 나중에 다시 발생; 한 위치에 국한; row 2개, column 9개, bank 1개; 관측 등급 A

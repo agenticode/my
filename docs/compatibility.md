@@ -843,7 +843,7 @@ Read by the rasdaemon adapter from the `cxl_*` tables of a rasdaemon database, w
 | `cxl_dram_event` | error event with channel, sub-channel, rank, bank group, bank, row, column and nibble mask |
 | `cxl_general_media_event` | error event with channel, rank and device |
 | `cxl_memory_module_event` | informational event with the health flags, media status, life used, temperature and corrected error count; and an action `mark-failed` (method `device`) when the device says it needs to be replaced, once per device |
-| `cxl_memory_sparing_event` | action `sparing`: cacheline, row, bank or rank, `hard` or `soft`, with rank, bank group, bank and row where the record marks them valid |
+| `cxl_memory_sparing_event` | in the maintenance class of post package repair: action `sppr` or `hppr`; in the class of sparing (cacheline, row, bank or rank, `hard` or `soft`): action `memory-sparing` when the record says spares are left, `sparing` when none is left, the record does not say, or the operation failed; with rank, bank group, bank and row where the record marks them valid |
 | `cxl_poison_event` | informational event per poisoned range, and per injection and clearing |
 | `cxl_overflow_event` | a note in the report: how many records the device lost, and when |
 | `cxl_generic_event`, `cxl_aer_ue_event`, `cxl_aer_ce_event` | counted in the report, not read |

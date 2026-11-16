@@ -55,12 +55,13 @@ CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev
                              0x238
          DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
 
- 근거  [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의
-       2.3배
-       [R-REP-02] 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발
-       뒷받침: 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성
-       낮음
- 다음  DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
+ 근거    [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의
+         2.3배
+         [R-REP-02] 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발
+         뒷받침: 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성
+         낮음
+ 리페어  2026-10-28 01:30 UTC rank0 dev7 bg0 bank3 row 0x1a2f hPPR: 이전 442건, 이후 764건
+ 다음    DIMM 교체. 이 DIMM의 케이스 번들을 반품에 첨부.
  신뢰도 높음, 근거 3건 더, 확인 못 한 점검 2건, 빠진 데이터 2종: --detail
 
  rank0 dev7 bg0 bank3 안에서 오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)                 부팅

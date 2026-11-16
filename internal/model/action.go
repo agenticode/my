@@ -27,6 +27,11 @@ const (
 	// ActionDeviceSparing: ADDDC, SDDC, bank sparing or partial cache line
 	// sparing took a device, a bank or a part of a cache line out of use.
 	ActionDeviceSparing ActionKind = "device-sparing"
+	// ActionMemorySparing: a CXL memory device took a spare for a cache
+	// line, a row, a bank or a rank, and says that spares are left. It is a
+	// repair of the place it names; sparing that leaves no spare is
+	// ActionSparing.
+	ActionMemorySparing ActionKind = "memory-sparing"
 	// ActionPredictedFailure: firmware expects the module to fail. A mark.
 	ActionPredictedFailure ActionKind = "predicted-failure"
 	// ActionMirrorFailover: the memory mirror took over from the module.
@@ -40,7 +45,7 @@ const (
 func (k ActionKind) Valid() bool {
 	switch k {
 	case ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat,
-		ActionDisable, ActionMarkFailed, ActionPPR, ActionDeviceSparing, ActionPredictedFailure, ActionMirrorFailover,
+		ActionDisable, ActionMarkFailed, ActionPPR, ActionDeviceSparing, ActionMemorySparing, ActionPredictedFailure, ActionMirrorFailover,
 		ActionTrainingFailure:
 		return true
 	}
