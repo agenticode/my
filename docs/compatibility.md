@@ -634,7 +634,7 @@ Redfish has no property for the width of the DRAM devices (x4, x8). `DataWidthBi
 
 The `Bios` resource of a system lists every attribute of the system firmware. The settings that bear on memory are kept, in the ledger table `bios_setting`; the rest is not, because a ledger travels in a case bundle and a bundle holds no network configuration and no accounts.
 
-An attribute is kept when its name, its display name or its menu path holds a word of memory (`mem`, `dimm`, `ddr`, `ecc`, `scrub`, `ppr`, `adddc`, `sddc`, `spar`, `mirror`, `refresh`, `rank`, `correctable`, `uncorr`, `leaky`, `bucket`, `rowhammer`). It is never kept when its type is `Password` or its name holds `password`, `passphrase`, `secret`, `token`, `credential`, `key` or `pin`. At most 400 attributes are kept, and a value longer than 200 characters is left out.
+An attribute is kept when its name, its display name or its menu path holds a word of memory (`mem`, `dimm`, `ddr`, `ecc`, `scrub`, `ppr`, `adddc`, `sddc`, `spar`, `mirror`, `refresh`, `rank`, `correctable`, `uncorr`, `leaky`, `bucket`, `rowhammer`). It is never kept when its type is `Password`, when its name holds `password`, `passphrase`, `passwd`, `secret`, `token` or `credential`, or when `key` or `pin` is a word of its name or its end (`SetupPin`, `SETUPPIN`, `Tpm_Key`; `MemoryMapping` is kept). At most 400 attributes are kept, and a value longer than 200 characters is left out.
 
 | Source | Use |
 | --- | --- |

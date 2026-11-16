@@ -3,9 +3,11 @@ package redfish
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/memras"
@@ -29,7 +31,13 @@ var memoryWords = []string{"mem", "dimm", "ddr", "ecc", "scrub", "ppr", "adddc",
 	"rank", "correctable", "uncorr", "leaky", "bucket", "rowhammer"}
 
 // secretWords mark an attribute that is never kept, in lower case.
-var secretWords = []string{"password", "passphrase", "passwd", "secret", "token", "credential", "key", "pin"}
+// shortSecrets do the same as a word of the name of their own ("AdminPin",
+// "Tpm_Key"): inside a longer word they mean something else ("Mapping",
+// "Monkey").
+var (
+	secretWords  = []string{"password", "passphrase", "passwd", "secret", "token", "credential"}
+	shortSecrets = []string{"key", "pin"}
+)
 
 // Limits of what is kept of one Bios resource.
 const (
@@ -64,11 +72,61 @@ func hasWord(s string, words []string) bool {
 	return false
 }
 
+// secret reports whether the name of an attribute says that its value is
+// a secret.
+func secret(name string) bool {
+	if hasWord(name, secretWords) {
+		return true
+	}
+	lower := strings.ToLower(name)
+	for _, w := range shortSecrets {
+		// A name in capitals is one word: "SETUPPIN" ends with the word.
+		if strings.HasSuffix(lower, w) || strings.HasSuffix(lower, w+"s") {
+			return true
+		}
+	}
+	for _, w := range nameWords(name) {
+		if slices.Contains(shortSecrets, w) || slices.Contains(shortSecrets, strings.TrimSuffix(w, "s")) {
+			return true
+		}
+	}
+	return false
+}
+
+// nameWords splits the name of an attribute into its words, in lower case:
+// at characters that are no letter or digit, and where a lower case letter
+// or a digit is followed by an upper case one ("SetupPin" -> setup, pin).
+func nameWords(name string) []string {
+	var out []string
+	var cur []rune
+	prev := rune(0)
+	flush := func() {
+		if len(cur) > 0 {
+			out = append(out, strings.ToLower(string(cur)))
+			cur = cur[:0]
+		}
+	}
+	for _, r := range name {
+		switch {
+		case !unicode.IsLetter(r) && !unicode.IsDigit(r):
+			flush()
+		case unicode.IsUpper(r) && (unicode.IsLower(prev) || unicode.IsDigit(prev)):
+			flush()
+			cur = append(cur, r)
+		default:
+			cur = append(cur, r)
+		}
+		prev = r
+	}
+	flush()
+	return out
+}
+
 // about says how an attribute is about memory: 2 when its name says so or
 // a profile maps it, 1 when only its display name or its menu does, 0 when
 // it is not, or when it looks like a secret.
 func about(name string, e *registryEntry) int {
-	if hasWord(name, secretWords) || (e != nil && strings.EqualFold(e.typ, "Password")) {
+	if secret(name) || (e != nil && strings.EqualFold(e.typ, "Password")) {
 		return 0
 	}
 	if hasWord(name, memoryWords) || (ExtraAttributes != nil && ExtraAttributes(name)) {
