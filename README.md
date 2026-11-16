@@ -286,7 +286,8 @@ MemorY has no telemetry and contacts no server of the project. It uses the netwo
 | repairs and page offlines the host recorded | user accounts, credentials or keys |
 | DIMM identities: manufacturer, part number, serial number, size | network configuration |
 | the slots of the board, and which DIMM sat where and when | kernel log lines that are not about memory errors, page offlining, machine checks or the boot banner |
-| boots: time, kernel release, BIOS version, kernel command line | |
+| boots: time, kernel release, BIOS version, kernel command line, and how a boot ended when a record shows it | |
+| what `my preflight` found a reset would lose on the host, with the files it read | |
 | the host name, its architecture and system product | |
 | readings of the error counters per DIMM, GPU memory records, ECS readings, what a BMC reported | |
 | every source that was looked for, with the path it was read from, and what it yielded | |
@@ -316,6 +317,7 @@ Early development; no version is tagged.
 - Tested with synthetic hosts and fixtures: every fault mode, every rule and every input has tests.
 - Run on five real hosts, x86_64 and aarch64, as an unprivileged user and as root: [docs/validation.md](docs/validation.md). All five are virtual machines.
 - Checked against captures of a lab host with injected page offlines, machine checks, firmware error records and CXL event records, each compared with the plan of its injection: [docs/validation-lab.md](docs/validation-lab.md).
+- Crash loops, `my harvest` and `my boots` were run in emulated guests only, not on bare metal: whether a real board keeps a machine check record over the reset is not known to the tool ([docs/crash-loop.md](docs/crash-loop.md#what-the-lab-shows-and-what-it-does-not)).
 - Findings compared with the failure tickets of a public fleet dataset: [docs/evaluation.md](docs/evaluation.md).
 - Not validated yet: hosts with the EDAC driver of a real memory controller. The decoding of their records rests on fixtures written from kernel and rasdaemon sources.
 - No analyzer of a memory vendor has been run against the plugin contract.

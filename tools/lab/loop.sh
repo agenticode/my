@@ -26,6 +26,7 @@
 #   prepare   once per disk: packages, kernel parameters, this tool
 #   wait      wait until the guest answers
 #   kdump     once: a crash kernel in the guest, then a reboot
+#   bert      once, with BERT=DIR at boot: memmap= for the boot error region
 #   inject ID BANK STATUS ADDR MISC [MCGSTATUS]
 #             write one record into a bank of CPU 0 and raise the machine check
 #   run PLAN  one boot per line of PLAN: wait for the harvest, put the record
@@ -44,6 +45,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 PORT=${PORT:-2232}
 SEEDPORT=${SEEDPORT:-8002}
 FIRMWARE=${FIRMWARE:-bios}
+BERTADDR=${BERTADDR:-0x20000000}
 KEY=$X86/id_ed25519
 MON=$X86/mon.sock
 QMP=$X86/qmp.sock
@@ -125,6 +127,12 @@ boot)
 	fi
 	pgrep -f "[h]ttp.server $SEEDPORT" >/dev/null || (cd "$X86/seed" && nohup python3 -m http.server "$SEEDPORT" --bind 127.0.0.1 </dev/null >"$X86/http.log" 2>&1 &)
 	fw=()
+	# BERT=DIR: a boot error region made by hand (tools/lab/bertregion), and
+	# the table that points at it. The loader writes the region at every
+	# reset; the guest keeps the page out of its RAM (memmap=, see "bert").
+	if [ -n "${BERT:-}" ]; then
+		fw+=(-acpitable "sig=BERT,rev=1,oem_id=LABMY,data=$BERT/bert.bin" -device "loader,file=$BERT/region.bin,addr=$BERTADDR")
+	fi
 	if [ "$FIRMWARE" = efi ]; then
 		fw=(-drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd -drive if=pflash,format=raw,file="$X86/vars.fd")
 	else
@@ -170,6 +178,15 @@ prepare)
 	push "$LOOP/bin/my" root@127.0.0.1:/usr/local/bin/my
 	guest 'chown root:root /usr/local/bin/my && chmod 0755 /usr/local/bin/my && my version'
 	guest 'reboot' || true
+	;;
+
+bert)
+	# bert: keep the page of the boot error region out of the guest's RAM,
+	# so that bert_init may map it (drivers/acpi/apei/bert.c); then a
+	# reboot. GRUB expands "$" in kernel parameters: the backslash keeps it.
+	guest "grubby --update-kernel=ALL --args='memmap=4K\\\$$BERTADDR'"
+	guest 'grep -h memmap /boot/loader/entries/*.conf | head -1'
+	guest 'systemctl reboot' || true
 	;;
 
 kdump)
