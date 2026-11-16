@@ -42,6 +42,7 @@ var (
 // Limits of what is kept of one Bios resource.
 const (
 	maxSettings     = 400
+	maxSettingName  = 512
 	maxSettingValue = 200
 	maxAllowed      = 64
 )
@@ -309,6 +310,11 @@ func (r *run) settings(sink adapter.Sink) error {
 	var keep []kept
 	odd := 0
 	for _, name := range names {
+		if len(name) > maxSettingName {
+			// No BIOS names an attribute so; the ledger takes no such name.
+			r.tally.Skip(current.ref, fmt.Sprintf("attribute name longer than %d bytes", maxSettingName))
+			continue
+		}
 		if rank := about(name, entries[name]); rank > 0 {
 			keep = append(keep, kept{name, rank})
 		}
