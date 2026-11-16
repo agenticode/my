@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"strings"
+
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 )
@@ -350,8 +352,22 @@ func DetailText(lang i18n.Lang, detail string) string {
 		if ko, ok := sourceDetails[detail]; ok {
 			return ko
 		}
+		for _, p := range sourceDetailForms {
+			if len(detail) > len(p.en[0])+len(p.en[1]) && strings.HasPrefix(detail, p.en[0]) && strings.HasSuffix(detail, p.en[1]) {
+				return p.ko[0] + detail[len(p.en[0]):len(detail)-len(p.en[1])] + p.ko[1]
+			}
+		}
 	}
 	return detail
+}
+
+// sourceDetailForms translate the sentences of the adapters that carry a
+// value, the words of another program for one: the text before and after
+// the value. The value stays as it was written.
+var sourceDetailForms = []struct{ en, ko [2]string }{
+	{[2]string{"the mcelog daemon answers root only (", "); readable as root"}, [2]string{"mcelog 데몬은 root에만 답함(", "): root로 읽을 수 있음"}},
+	{[2]string{"no mcelog daemon is running on this host (", "): there are no counts to read"}, [2]string{"이 호스트에서 실행 중인 mcelog 데몬 없음(", "): 읽을 카운트 없음"}},
+	{[2]string{"mcelog --client failed: ", ""}, [2]string{"mcelog --client 실패: ", ""}},
 }
 
 // sourceDetails translates the fixed sentences the adapters write as the
@@ -370,11 +386,14 @@ var sourceDetails = map[string]string{
 	"no kdump text log":                      "kdump 텍스트 로그 없음",
 	"no SMBIOS tables exposed by the kernel": "커널이 내놓은 SMBIOS 테이블 없음",
 	"permission denied; the SMBIOS tables are readable as root. Without them DIMM serial numbers are unknown": "권한 없음: SMBIOS 테이블은 root로 읽을 수 있음. 없으면 DIMM 시리얼을 알 수 없음",
-	"permission denied; readable as root": "권한 없음: root로 읽을 수 있음",
-	"permission denied; the kernel ring buffer is readable as root (kernel.dmesg_restrict is set)": "권한 없음: 커널 링 버퍼는 root로 읽을 수 있음(kernel.dmesg_restrict 설정됨)",
-	"no /proc; not a running Linux system":                                                         "/proc 없음: 실행 중인 Linux 시스템이 아님",
-	"the daemon answered and lists no DIMM: it has counted no memory error since it started":       "데몬이 응답했지만 DIMM 목록이 비어 있음: 시작 이후 센 메모리 오류 없음",
-	"not read: the run reached its deadline":                                                       "읽지 않음: 실행 제한 시간에 걸림",
+	"permission denied; readable as root":                                                                                   "권한 없음: root로 읽을 수 있음",
+	"permission denied; the pstore file system is readable as root":                                                         "권한 없음: pstore 파일 시스템은 root로 읽을 수 있음",
+	"permission denied; the region is readable as root only":                                                                "권한 없음: 이 영역은 root만 읽을 수 있음",
+	"the journal shows this user no kernel messages; they are readable as root or as a member of the group systemd-journal": "저널이 이 사용자에게 커널 메시지를 보여 주지 않음: root나 systemd-journal 그룹 구성원은 읽을 수 있음",
+	"permission denied; the kernel ring buffer is readable as root (kernel.dmesg_restrict is set)":                          "권한 없음: 커널 링 버퍼는 root로 읽을 수 있음(kernel.dmesg_restrict 설정됨)",
+	"no /proc; not a running Linux system":                                                                                  "/proc 없음: 실행 중인 Linux 시스템이 아님",
+	"the daemon answered and lists no DIMM: it has counted no memory error since it started":                                "데몬이 응답했지만 DIMM 목록이 비어 있음: 시작 이후 센 메모리 오류 없음",
+	"not read: the run reached its deadline":                                                                                "읽지 않음: 실행 제한 시간에 걸림",
 }
 
 // GradeText returns the name of a grade in the given language.

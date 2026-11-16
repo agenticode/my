@@ -39,6 +39,9 @@ import (
 	"github.com/agenticode/my/internal/model"
 )
 
+// PstoreDenied is the detail of a pstore file system the user may not read.
+const PstoreDenied = "permission denied; the pstore file system is readable as root"
+
 // Kinds of source in the inventory.
 const (
 	KindPstore = "pstore"
@@ -177,7 +180,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if err != nil {
 		rep.Status, rep.Detail = adapter.StatusForError(err)
 		if rep.Status == model.SourceUnreadable && a.kind == KindPstore {
-			rep.Detail += "; the pstore file system is readable as root"
+			rep.Detail = PstoreDenied
 		}
 		return rep
 	}
