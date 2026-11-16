@@ -52,25 +52,22 @@ func (st Style) identity(c *view.Card, all bool) []string {
 	return fields
 }
 
-// BriefLines is the number of statements the short card shows below the
-// decision.
-const BriefLines = 3
-
 // brief draws the finding of a card in short. The first line is the
 // decision: the slot, the grade, the rule that set it and the statement of
 // that rule. Below it stand at most BriefLines statements that bear on the
 // decision, the next step, and one line with the confidence and what could
 // not be checked, which --detail shows.
 func (st Style) brief(p *page, c *view.Card) {
+	b := c.Brief()
 	head := c.Slot
 	if c.Scope == view.ScopeHost {
 		head = st.say("card.host", "host", c.Host)
 	}
 	lead := []string{st.paint(gradeColor(string(c.Grade)), c.GradeText)}
 	reason := ""
-	if len(c.Evidence) > 0 {
-		lead = append(lead, c.Evidence[0].Rule)
-		reason = c.Evidence[0].Text.Text
+	if b.Lead != nil {
+		lead = append(lead, b.Lead.Rule)
+		reason = b.Lead.Text.Text
 	} else if len(c.Rules) > 0 {
 		lead = append(lead, c.Rules[0])
 	}
@@ -104,14 +101,19 @@ func (st Style) brief(p *page, c *view.Card) {
 		}
 	}
 
-	shown := briefStatements(c)
 	lw := max(Width(st.say("card.evidence")), Width(st.say("card.next")))
-	if len(shown) > 0 || c.Next != nil {
+	if len(b.Lines) > 0 || c.Next != nil {
 		p.blank()
 	}
 	label := st.say("card.evidence")
-	for _, s := range shown {
-		p.labelled(label, lw, s, "")
+	for _, l := range b.Lines {
+		text := ""
+		if l.Evidence != nil {
+			text = "[" + l.Evidence.Rule + "] " + l.Evidence.Text.Text
+		} else {
+			text = l.Check.EffectText + ": " + l.Check.Text.Text
+		}
+		p.labelled(label, lw, text, "")
 		label = ""
 	}
 	if c.Next != nil {
@@ -119,89 +121,19 @@ func (st Style) brief(p *page, c *view.Card) {
 	}
 
 	// What the short card leaves out, counted.
-	open := 0
-	for _, k := range c.Checks {
-		if k.Effect == "open" {
-			open++
-		}
-	}
 	rest := []string{st.say("card.confidence", "level", c.ConfidenceText)}
-	if n := len(c.Evidence) + len(c.Checks) - open - 1 - len(shown); n > 0 && len(c.Evidence) > 0 {
-		rest = append(rest, st.say("card.more", "n", n))
+	if b.More > 0 {
+		rest = append(rest, st.say("card.more", "n", b.More))
 	}
-	if open > 0 {
-		rest = append(rest, st.say("card.open_n", "n", open))
+	if b.Open > 0 {
+		rest = append(rest, st.say("card.open_n", "n", b.Open))
 	}
-	if n := len(c.Missing); n > 0 {
-		rest = append(rest, st.say("card.missing_n", "n", n))
+	if b.Missing > 0 {
+		rest = append(rest, st.say("card.missing_n", "n", b.Missing))
 	}
 	for _, l := range wrap(strings.Join(rest, ", ")+": --detail", st.width()-2) {
 		p.add(" " + st.dim(l))
 	}
-}
-
-// briefStatements picks the statements the short card shows below the
-// decision, at most BriefLines: the checks that weaken the finding, the
-// next statement of the rule that set the grade, the first statement of
-// every other rule, the checks that support the finding, then further
-// statements of the rules. The first statement is the decision itself and
-// is not repeated.
-func briefStatements(c *view.Card) []string {
-	var out []string
-	add := func(s string) bool {
-		if len(out) < BriefLines {
-			out = append(out, s)
-		}
-		return len(out) < BriefLines
-	}
-	check := func(k view.Check) string { return k.EffectText + ": " + k.Text.Text }
-	evidence := func(e view.Evidence) string { return "[" + e.Rule + "] " + e.Text.Text }
-	for _, k := range c.Checks {
-		if k.Effect == "weakens" && !add(check(k)) {
-			return out
-		}
-	}
-	if len(c.Evidence) == 0 {
-		for _, k := range c.Checks {
-			if k.Effect == "supports" && !add(check(k)) {
-				return out
-			}
-		}
-		return out
-	}
-	used := make([]bool, len(c.Evidence))
-	used[0] = true
-	lead := c.Evidence[0].Rule
-	for i, e := range c.Evidence {
-		if !used[i] && e.Rule == lead {
-			used[i] = true
-			if !add(evidence(e)) {
-				return out
-			}
-			break
-		}
-	}
-	ruleShown := map[string]bool{lead: true}
-	for i, e := range c.Evidence {
-		if used[i] || ruleShown[e.Rule] {
-			continue
-		}
-		ruleShown[e.Rule], used[i] = true, true
-		if !add(evidence(e)) {
-			return out
-		}
-	}
-	for _, k := range c.Checks {
-		if k.Effect == "supports" && !add(check(k)) {
-			return out
-		}
-	}
-	for i, e := range c.Evidence {
-		if !used[i] && !add(evidence(e)) {
-			return out
-		}
-	}
-	return out
 }
 
 // card draws the finding of a DIMM. With detail it adds the records each

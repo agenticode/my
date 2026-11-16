@@ -8,17 +8,11 @@ section#s1.sec
   p.grade: replace now host r12-n034
   p.conclusion: CPU0_C1 S/N 3B9C56: replace now (finding, confidence high). 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. Replace the DIMM. Attach a case bundle of this DIMM to the return.
   p: 1 more with errors or a finding: CPU1_D1 observe.
-  Case ID = 0123456789ab the first 12 digits of the identity of the ledger
-  Host = r12-n034
   System = Example Systems R760
   Period on record = 2026-07-31 to 2026-11-13, 4 boots
   Errors = CE 1,284, UE 1
   Observation grade = A (bank, row and column known)
   DIMMs = 16 in 32 slots, 2 with errors or a finding
-  Collected = synthetic data set, 2026-11-13 00:00 UTC
-  Report = customer report, generated 2026-11-13 09:30 UTC by my test
-  Engine = version 7
-  p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
   li: 2 Slot map
   li: 3 Findings
   li: 4 Topology and address map
@@ -64,10 +58,8 @@ section#s2.sec
       mark: CPU1_H2: empty slot
       text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
     li: replace now
-    li: consider replacement
     li: observe
     li: ok
-    li: hold replacement
     li: empty slot
     figcaption: 32 slots, 16 DIMMs
   p.how: One cell per slot: a line per socket and a group per memory channel, in board order. The colour and the mark of a cell give the grade of the finding for the DIMM in that slot. A slot without a module is an outline. A cell leads to the finding of its DIMM.
@@ -199,23 +191,19 @@ section#s3.sec
   ## 3 Findings
   article#dimm-CPU0_C1.card.g-replace
     ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = replace now (finding, confidence high) R-UE-01 R-ROW-03 R-REP-02
-    evidence = R-UE-01 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 1 record R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before 421 records R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows 1,232 records R-ROW-03 errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device R-ROW-03 the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4 boots R-REP-02 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28 765 records
-    checks = open no other DIMM on this channel: there is nothing to compare with open no slot move or reseat on record: a cause in the board is not ruled out supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
-    missing = no ECS counters no DIMM temperature history
-    baseline = own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of them with errors
+    finding = replace now R-UE-01 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 1 record
+    evidence = R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before 421 records R-REP-02 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28 765 records supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
     next = Replace the DIMM. Attach a case bundle of this DIMM to the return.
+    p.sub: confidence high, 3 more statements, 2 checks not made, 2 kinds of data missing: the whole finding
     p.links: topology and address map timeline checks
   article#dimm-CPU1_D1.card.g-observe
     ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 2AEB41
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium) R-SOFT-01
-    evidence = R-SOFT-01 one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days 53 records R-SOFT-01 the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of the last 4 boots
-    baseline = own history: 0.3 errors a day over the last 7 days, percentile 60 of the 30 days before same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2 of them with errors
+    finding = observe R-SOFT-01 one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days 53 records
+    evidence = R-SOFT-01 the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of the last 4 boots
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
     p.links: topology and address map timeline checks
-  p.how: Evidence states what each rule saw and how many ledger records it rests on; the count leads to the records. Checks test the finding against other explanations: "supports" speaks for it, "weakens" speaks against it, "open" could not be tested. Missing lists data the finding did not have.
+  p.how: The finding line gives the grade, the rule that set it and what that rule saw. Below stand at most three statements that bear on the decision: what the other rules saw, and checks that speak for the finding ("supports") or against it ("weakens"). A count of records leads to the records. The last line gives the confidence and counts what the whole finding in the appendix adds: further statements, checks that could not be made, missing data.
   ### Rules named in this report
   table.rules
     | rule | grade it gives | fires when
@@ -308,11 +296,7 @@ section#s4.sec
     figure
       figcaption: rank0 dev17 bg5 bank3, row by column, one cell = 16 columns
       li: 0
-      li: 1-2
-      li: 3-9
       li: 10-99
-      li: 100+
-      li: uncorrected error
       li: outline: errors in two or more boots
       svg.fig.amap: Address map of CPU1_D1, rank0 dev17 bg5 bank3
         mark: row 0xa4e9, columns 0x110 to 0x11f: 53 errors in 53 records; first 2026-08-03, latest 2026-11-08; errors in 4 of the last 4 boots
@@ -816,6 +800,28 @@ section#s7.sec
   p: Every source that was looked for was read in full.
 section#s8.sec
   ## 8 Appendix
+  ### About this case
+  Case ID = 0123456789ab the first 12 digits of the identity of the ledger
+  Host = r12-n034
+  Collected = synthetic data set, 2026-11-13 00:00 UTC
+  Report = customer report, generated 2026-11-13 09:30 UTC by my test
+  Engine = version 7
+  p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
+  ### Findings in full
+  article#full-dimm-CPU0_C1.card.g-replace
+    #### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56
+    finding = replace now (finding, confidence high) R-UE-01 R-ROW-03 R-REP-02
+    evidence = R-UE-01 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 1 record R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before 421 records R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows 1,232 records R-ROW-03 errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device R-ROW-03 the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4 boots R-REP-02 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28 765 records
+    checks = open no other DIMM on this channel: there is nothing to compare with open no slot move or reseat on record: a cause in the board is not ruled out supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
+    missing = no ECS counters no DIMM temperature history
+    baseline = own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of them with errors
+    next = Replace the DIMM. Attach a case bundle of this DIMM to the return.
+  article#full-dimm-CPU1_D1.card.g-observe
+    #### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 2AEB41
+    finding = observe (finding, confidence medium) R-SOFT-01
+    evidence = R-SOFT-01 one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days 53 records R-SOFT-01 the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of the last 4 boots
+    baseline = own history: 0.3 errors a day over the last 7 days, percentile 60 of the 30 days before same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2 of them with errors
+    next = No action. Look again when the count grows or a new place appears.
   ### Records
   p.how: The ledger records this report refers to, in time order: the records the findings cite, every record of an uncorrected error or of a repair that a timeline marks, and the first and the latest record of the cells of the address maps. The original text of a record opens when its ID is chosen. The case holds every record. Records a finding cites are printed with their original text.
   p.sub: 41 of the 1,293 records of this host

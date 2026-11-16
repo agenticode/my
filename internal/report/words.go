@@ -86,7 +86,7 @@ var Words = i18n.Catalog{
 	"rank.rules":   {EN: "rules", KO: "규칙"},
 
 	// 3. Findings.
-	"cap.card":       {EN: "Evidence states what each rule saw and how many ledger records it rests on; the count leads to the records. Checks test the finding against other explanations: \"supports\" speaks for it, \"weakens\" speaks against it, \"open\" could not be tested. Missing lists data the finding did not have.", KO: "근거는 규칙마다 본 것과 그 바탕이 된 원장 기록 수입니다. 건수를 누르면 기록이 나옵니다. 반례는 소견을 다른 설명과 견준 점검입니다. \"뒷받침\"은 소견에 힘을 싣고, \"약화\"는 소견과 어긋나며, \"미확인\"은 하지 못한 점검입니다. 부족은 소견에 없던 데이터입니다."},
+	"cap.card":       {EN: "The finding line gives the grade, the rule that set it and what that rule saw. Below stand at most three statements that bear on the decision: what the other rules saw, and checks that speak for the finding (\"supports\") or against it (\"weakens\"). A count of records leads to the records. The last line gives the confidence and counts what the whole finding in the appendix adds: further statements, checks that could not be made, missing data.", KO: "판정 줄은 등급, 등급을 정한 규칙, 그 규칙이 본 것입니다. 그 아래에 결정에 영향을 주는 문장이 최대 3개 나옵니다: 다른 규칙이 본 것, 소견에 힘을 싣는(\"뒷받침\") 점검과 소견과 어긋나는(\"약화\") 점검. 기록 건수를 누르면 기록이 나옵니다. 마지막 줄은 신뢰도와, 부록의 판정 전체가 더하는 것(나머지 문장, 하지 못한 점검, 빠진 데이터)의 수를 적습니다."},
 	"card.to_where":  {EN: "topology and address map", KO: "토폴로지 막대와 주소 맵"},
 	"card.to_time":   {EN: "timeline", KO: "타임라인"},
 	"card.to_check":  {EN: "checks", KO: "점검표"},
@@ -247,6 +247,9 @@ var Words = i18n.Catalog{
 	"fig.grades":       {EN: "Errors of host {host} by observation grade", KO: "호스트 {host}의 관측 등급별 오류"},
 
 	// 8. Appendix.
+	"app.about":     {EN: "About this case", KO: "케이스 정보"},
+	"app.findings":  {EN: "Findings in full", KO: "판정 전체"},
+	"card.to_full":  {EN: "the whole finding", KO: "판정 전체"},
 	"app.records":   {EN: "Records", KO: "원시 이벤트 표"},
 	"cap.records":   {EN: "The ledger records this report refers to, in time order: the records the findings cite, every record of an uncorrected error or of a repair that a timeline marks, and the first and the latest record of the cells of the address maps. The original text of a record opens when its ID is chosen. The case holds every record.", KO: "이 리포트가 가리키는 원장 기록을 시간순으로 나열합니다: 소견이 인용한 기록, 타임라인에 표시한 UE와 리페어 기록, 주소 맵 칸마다 처음과 최근 기록. ID를 누르면 원본이 나옵니다. 모든 기록은 케이스에 들어 있습니다."},
 	"cap.cited":     {EN: "Records a finding cites are printed with their original text.", KO: "소견이 인용한 기록은 원본과 함께 인쇄됩니다."},
