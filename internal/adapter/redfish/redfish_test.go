@@ -170,16 +170,17 @@ func TestSELEntries(t *testing.T) {
 	check(t, c, []got{
 		{"1", "CE: correctable ECC", "sensor 0x53 module 3", "2026-11-12 03:14:07", "C redfish/sel"},
 		{"2", "UE: uncorrectable ECC", "P1-DIMMB1", "2026-11-12 03:14:09", "C redfish/sel"},
-		// Entry 5 says the module of entry 3 is in use again.
-		{"3", "Informational: memory device disabled (enabled again later)", "DIMM_C1", "2026-11-12 03:20:00", "C redfish/sel"},
+		// Entry 5 says the module of entry 3 is in use again: the ledger
+		// withdraws the mark (store.FirmwareWithdrawals).
 		{"5", "Informational: memory device disabled (deasserted: in use again)", "DIMM_C1", "2026-11-12 03:40:00", "C redfish/sel"},
 		{"7", "Informational: correctable ECC logging limit reached", "DIMM_A1", "2026-11-12 04:00:00", "C redfish/sel"},
+		{"3", "action disable/ok: memory device disabled", "DIMM_C1", "2026-11-12 03:20:00", "by bios"},
 	})
 	if rep.Status != model.SourcePartial || rep.Records != 7 || rep.Skipped != 1 {
 		t.Errorf("report = %+v", rep)
 	}
 	wantNotes(t, rep, "Entries/6: log entry about memory has no readable time", "1 log entries are not about memory",
-		"1 disable entries were followed by the module coming back into use", "the firmware stopped logging corrected errors 1 time(s), first on 2026-11-12 04:00 UTC")
+		"the firmware stopped logging corrected errors 1 time(s), first on 2026-11-12 04:00 UTC")
 }
 
 // TestSELDisableStands reads the same log without the entry that withdraws

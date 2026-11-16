@@ -127,6 +127,25 @@ errors = SUM(count - covered) over rows with dup_of IS NULL
 
 One error often reaches the ledger through several sources: the rasdaemon database, the kernel log, the event log of the BMC. An adapter marks two of its own records as one error where it knows that (a machine check record and the EDAC record decoded from it). Records of different sources are one error when they have the same severity class and the same cache line address, or the same slot where neither has an address, and their times lie within 5 seconds. The tolerance is 2 minutes when a time was worked out from seconds since boot, and 2 minutes between a BMC log and the logs of the host, which two clocks stamped. A group holds at most one record per source. The record with the best observation grade is counted; the others stay in the ledger and point at it.
 
+### Firmware records once
+
+A BMC writes one error in more than one place, and a log read twice gives its entries twice. Before the duplicates of all sources are found, a pass over the firmware records (`FirmwareDuplicates`) declares, from the rows on every run:
+
+| Case | Rule | Counted record |
+| --- | --- | --- |
+| the same entry read twice | equal entry key (`fw_record.entry_key`: log, entry ID, creation time) and repeat | the first by time |
+| a burst in one log | uncorrected records of one log that name the same module within 5 seconds | the first |
+| two logs or readers of one BMC | records of the same module and severity class within 5 seconds, at most one of each log | the one a table classed over one classed by its wording, then the one with more of the place |
+| actions | actions of the same kind and result for the same module within 5 seconds, from two logs or readers | the one with more of the place; the others get `action.dup_of` |
+
+Corrected records of one log are not folded: each is a report of its own. Views, rules and the exporter read actions with `dup_of IS NULL`.
+
+An entry that folds repeats (`fw_record.repeat`, such as an HPE IML entry with its count) is read again with a larger count as it grows. `FirmwareRepeats` gives each reading of one entry key the occurrences it added, so the entry counts its repeats once in total. `FirmwareWithdrawals` sets `action.withdrawn_by` on a `disable` or `predicted-failure` mark when a later record of the same module says that state ended (`cleared` with `clears`), also in a later dump; a withdrawn mark is history and holds no more.
+
+The clock of a BMC is its own. `AlignBMCClock` pairs the records of a BMC source with the host's records of the same slot and severity class. When at least 3 pairs agree on one difference within 2 seconds, the difference is between 60 seconds and 15 hours, and fewer than 2 pairs agree at zero, the times of all events and actions of that source are moved by it and marked `estimated`; the entry `time-align` of the source inventory says by how much and how many records moved. The stamp as the BMC wrote it stays in the raw text. Fewer pairs move nothing.
+
+These passes run in this order after the readers: slots, counter events, the slots of events and actions, boots, clocks (`AlignClocks`, then `AlignBMCClock`), times, carried records, DIMM attribution, `FirmwareRepeats`, `FirmwareWithdrawals`, `FirmwareDuplicates`, duplicates, boot outcomes, counter coverage. Each of the four firmware passes runs in a transaction of its own; one that fails is rolled back, the run goes on, and the entry `fw-passes` of the source inventory says which pass did not run and what that means for the counts.
+
 ### Records kept over a reset
 
 Some records outlive the reset that ended their boot: the contents of a machine check bank that the next boot polled, a record of the boot error region of the firmware. Such a record is `carried = 1`. Its source dates it to the boot that read it; the error happened in the boot before. A pass after the boots are set (`LinkCarried`) puts it there:

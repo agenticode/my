@@ -442,6 +442,10 @@ func (j *judge) firmware(fs *findings) {
 	}
 	var disabled, failed, sparing *model.Action
 	for _, a := range fs.d.actions {
+		// A mark a later record took back is history: it holds no more.
+		if a.WithdrawnBy != 0 {
+			continue
+		}
 		if a.Result == model.ResultFailed {
 			if repairKind(a.Kind) && a.Kind != model.ActionSparing {
 				refs := []model.RecordRef{actionRef(a.ID, a.RawRef)}

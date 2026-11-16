@@ -431,9 +431,10 @@ func TestSELWithInventory(t *testing.T) {
 		t.Fatal(err)
 	}
 	src := res.Sources[1]
-	// The end of a state is kept as information (one more event), the
-	// presence record as a firmware record alone (a sample).
-	if src.Kind != "sel" || src.Status != model.SourceOK || src.Events != 11 || src.Actions != 2 || src.GradeC != 11 || src.Records != 20 || src.Samples != 1 {
+	// The end of a state is kept as information, the presence record as a
+	// firmware record alone (a sample), and the disable of DIMM_G1 that a
+	// later record takes back as an action the ledger withdraws.
+	if src.Kind != "sel" || src.Status != model.SourceOK || src.Events != 10 || src.Actions != 3 || src.GradeC != 10 || src.Records != 20 || src.Samples != 1 {
 		t.Errorf("source inventory entry = %+v", src)
 	}
 
@@ -470,11 +471,17 @@ func TestSELWithInventory(t *testing.T) {
 	}
 
 	acts, err := s.Actions(ctx, store.ActionFilter{Host: "h1"})
-	if err != nil || len(acts) != 2 {
+	if err != nil || len(acts) != 3 {
 		t.Fatalf("actions = %+v, %v", acts, err)
 	}
 	got := map[model.ActionKind]string{}
 	for _, a := range acts {
+		if a.WithdrawnBy != 0 {
+			if a.Slot != "DIMM_G1" {
+				t.Errorf("withdrawn: %+v", a)
+			}
+			continue
+		}
 		got[a.Kind] = a.Slot + "/" + serialOf(a.DIMMUID)
 	}
 	if got[model.ActionDisable] != "DIMM_C1/SER-C1" || got[model.ActionSparing] != "DIMM_F1/SER-F1" {

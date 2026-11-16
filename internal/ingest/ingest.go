@@ -80,6 +80,28 @@ type Result struct {
 	// Clocks says which rasdaemon records were given the kernel's time
 	// (see store.AlignClocks).
 	Clocks []store.ClockAlignment
+	// BMCClocks says which BMC sources had their times moved by the
+	// difference of the BMC's clock (see store.AlignBMCClock).
+	BMCClocks []store.BMCClockAlignment
+}
+
+// FirmwarePassesKind is the source inventory entry that names a pass over
+// the firmware records that did not run.
+const FirmwarePassesKind = "fw-passes"
+
+// passFault, when set by a test, makes a firmware pass fail, or with
+// errSkipPass leaves it out.
+var passFault func(name string) error
+
+var errSkipPass = errors.New("left out")
+
+// passMeaning says what a firmware pass that did not run means for the
+// counts.
+var passMeaning = map[string]string{
+	"AlignBMCClock":       "the times of a BMC whose clock was off are as it stamped them, and its records may not be matched with the host's",
+	"FirmwareRepeats":     "an entry that folds repeats counts its repeats once per reading",
+	"FirmwareWithdrawals": "a mark that a later record took back still counts as holding",
+	"FirmwareDuplicates":  "one error that a BMC logged in two logs, or in a burst, may count more than once",
 }
 
 // HostHinter is implemented by adapters that can name the host before any
@@ -305,6 +327,33 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		res.Sources = append(res.Sources, src)
 	}
 
+	// The passes over firmware records each run in a transaction of their
+	// own. One that fails is rolled back and named in the inventory, and
+	// the run goes on: the counts are then those without it.
+	var failedPasses []string
+	fwPass := func(name string, fn func() error) {
+		err := func() (err error) {
+			if !adapter.DebugPanics() {
+				defer func() {
+					if v := recover(); v != nil {
+						err = fmt.Errorf("%v", v)
+					}
+				}()
+			}
+			if passFault != nil {
+				switch err := passFault(name); {
+				case errors.Is(err, errSkipPass):
+					return nil
+				case err != nil:
+					return err
+				}
+			}
+			return fn()
+		}()
+		if err != nil {
+			failedPasses = append(failedPasses, fmt.Sprintf("%s did not run (%v): %s", name, err, passMeaning[name]))
+		}
+	}
 	steps := []struct {
 		name string
 		fn   func() error
@@ -317,8 +366,16 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		{"boots", func() error { return s.LinkBoots(ctx, host) }},
 		{"clocks", func() (err error) {
 			// Before the records without a date are dated by the others.
-			if res.Clocks, err = s.AlignClocks(ctx, host); err != nil || len(res.Clocks) == 0 {
+			if res.Clocks, err = s.AlignClocks(ctx, host); err != nil {
 				return err
+			}
+			// The clock of a BMC, against the host's records.
+			fwPass("AlignBMCClock", func() (err error) {
+				res.BMCClocks, err = s.AlignBMCClock(ctx, host)
+				return err
+			})
+			if len(res.Clocks) == 0 && len(res.BMCClocks) == 0 {
+				return nil
 			}
 			return s.LinkBoots(ctx, host)
 		}},
@@ -333,6 +390,17 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		// that read them.
 		{"carried records", func() error { return s.LinkCarried(ctx, host) }},
 		{"DIMM attribution", func() error { return s.LinkDIMMs(ctx, host) }},
+		// What firmware records say once: an entry read twice, a burst, the
+		// same error in two logs of a BMC; repeats; marks taken back.
+		{"firmware records", func() error {
+			fwPass("FirmwareRepeats", func() error { return s.FirmwareRepeats(ctx, host) })
+			fwPass("FirmwareWithdrawals", func() error { return s.FirmwareWithdrawals(ctx, host) })
+			fwPass("FirmwareDuplicates", func() (err error) {
+				_, err = s.FirmwareDuplicates(ctx, host)
+				return err
+			})
+			return nil
+		}},
 		{"duplicates", func() (err error) {
 			res.Duplicates, err = s.MarkDuplicates(ctx, host, opts.Tolerance)
 			return err
@@ -350,13 +418,26 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		}
 	}
 
+	if len(failedPasses) > 0 {
+		src := model.Source{ScanID: res.Scan.ID, Kind: FirmwarePassesKind, Origin: host, Status: model.SourcePartial,
+			Detail: "a pass over the firmware records did not run; the counts are those without it", Notes: failedPasses}
+		if err := s.Update(ctx, func(w *store.Writer) error { return w.InsertSource(&src) }); err != nil {
+			return nil, fmt.Errorf("ingest: %w", err)
+		}
+		res.Sources = append(res.Sources, src)
+	}
+
 	// What was done to times is part of the inventory: it changes how
 	// records are counted.
-	if len(res.Aligned) > 0 || len(res.Clocks) > 0 {
+	if len(res.Aligned) > 0 || len(res.Clocks) > 0 || len(res.BMCClocks) > 0 {
 		src := model.Source{ScanID: res.Scan.ID, Kind: TimeAlignKind, Origin: host, Status: model.SourceOK}
 		for _, c := range res.Clocks {
 			src.Records += c.Records
 			src.Notes = append(src.Notes, clockNote(c))
+		}
+		for _, c := range res.BMCClocks {
+			src.Records += c.Records
+			src.Notes = append(src.Notes, bmcClockNote(c))
 		}
 		for _, a := range res.Aligned {
 			src.Records += a.Records
@@ -389,6 +470,17 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	}
 	res.Scan.FinishedAt = finished
 	return res, nil
+}
+
+// bmcClockNote says in a sentence what store.AlignBMCClock did.
+func bmcClockNote(c store.BMCClockAlignment) string {
+	side, by := "ahead of", -c.Offset
+	if c.Offset > 0 {
+		side, by = "behind", c.Offset
+	}
+	h, m := int(by.Hours()), int(by.Minutes())%60
+	return fmt.Sprintf("the clock of the BMC (%s) was %d h %02d min %s the host's, by %d errors both report; %d records were moved",
+		c.Source, h, m, side, c.Matched, c.Records)
 }
 
 // clockNote says in a sentence what store.AlignClocks did with a boot.

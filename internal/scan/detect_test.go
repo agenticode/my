@@ -301,7 +301,8 @@ func TestDetectBinaryEventLog(t *testing.T) {
 			t.Errorf("%s: %s, %q, %v", name, kinds(as), what, err)
 			continue
 		}
-		if e, _, _, _, rep := yield(t, as[0]); e != 5 || rep.Records != 9 {
+		// Record 3, a disable that record 9 takes back, is an action.
+		if e, _, _, _, rep := yield(t, as[0]); e != 4 || rep.Records != 9 {
 			t.Errorf("%s: %d events of %d records", name, e, rep.Records)
 		}
 	}
