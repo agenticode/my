@@ -308,7 +308,7 @@ The program gets the error records of each DIMM in FMFM field names on its stand
 
 ## Monitoring
 
-`my serve --metrics` runs the same scan on a schedule and serves the finding and the error counts per DIMM to Prometheus, with the finding of one DIMM as JSON at `/api/dimm/<slot|serial>`. With `--fleet` one exporter reads the store that the rasdaemons of a fleet write to. No metric has an address, a row or a column as a label. [contrib/](contrib/README.md) holds systemd units, an alert rule that fires when a finding gets worse, Alertmanager routes and a Grafana dashboard.
+`my serve --metrics` runs the same scan on a schedule and serves the finding and the error counts per DIMM to Prometheus, with the finding of one DIMM as JSON at `/api/dimm/<slot|serial>`. With `--fleet` one exporter reads the store that the rasdaemons of a fleet write to. No metric has an address, a row or a column as a label. [contrib/](contrib/README.md) holds systemd units, alert rules that fire when the finding of a DIMM gets worse or a row remapping of a GPU fails, Alertmanager routes and a Grafana dashboard.
 
 ## Status
 

@@ -59,6 +59,7 @@ route memory-hardware alertname=MemoryFindingWorse finding=replace-now
 route memory-hardware alertname=MemoryFindingWorse finding=hold-replacement
 route memory-findings alertname=MemoryFindingWorse finding=consider-replacement
 route memory-findings alertname=MemoryFindingWorse finding=observe
+route memory-hardware alertname=GPUMemoryRepairFailed finding=replace-now
 route memory-exporter alertname=MemoryFindingsStale
 route default alertname=SomethingElse
 

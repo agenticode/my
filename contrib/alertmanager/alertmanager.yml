@@ -2,14 +2,15 @@
 # two routes under the route of your own configuration and name your own
 # receivers.
 #
-# MemoryFindingWorse fires when the finding for a DIMM got worse, for ten
-# minutes, and then ends on its own. The finding has not gone away by then,
-# so its receiver sends no "resolved" message.
+# MemoryFindingWorse fires when the finding for a DIMM got worse, and
+# GPUMemoryRepairFailed when a GPU reports a failed row remapping, for ten
+# minutes, and then they end on their own. The finding has not gone away
+# by then, so their receiver sends no "resolved" message.
 route:
   receiver: default
   routes:
     - matchers:
-        - alertname = MemoryFindingWorse
+        - alertname =~ "MemoryFindingWorse|GPUMemoryRepairFailed"
       receiver: memory-findings
       # One message per host: several DIMMs of a host often change together,
       # as they do when the cause is the channel or the board.

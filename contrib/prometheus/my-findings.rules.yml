@@ -1,8 +1,10 @@
-# Alert rule for the findings of MemorY (my serve --metrics).
+# Alert rules for the findings of MemorY (my serve --metrics).
 #
-# One alert, and it fires on one thing: the finding for a DIMM got worse.
+# MemoryFindingWorse fires on one thing: the finding for a DIMM got worse.
 # It does not fire on error counts. A DIMM with corrected errors and a
-# steady finding is what the dashboard is for.
+# steady finding is what the dashboard is for. GPUMemoryRepairFailed fires
+# when a GPU reports a failed row remapping, the one GPU finding (rule
+# R-REP-01, replace now).
 #
 # my_dimm_verdict is 0 ok, 1 observe, 2 consider replacement, 3 replace now,
 # 4 hold replacement. The rule compares the value now with the highest value
@@ -48,3 +50,25 @@ groups:
             {{ if eq $value 4.0 }}Uncorrected errors are among them: find the DIMM before one is pulled.
             {{ else }}Corrected errors or pages taken offline.
             {{ end }}"my why" on the host shows what the finding rests on.{{ end }}
+
+      # The finding of a GPU: a row remapping failed (R-REP-01, replace now).
+      # my_gpu_remap_failure stays 1 once a failure is on record, so the
+      # rule compares with the hour before, as the rule above does.
+      - alert: GPUMemoryRepairFailed
+        expr: |
+          my_gpu_remap_failure
+            >
+          (
+              max_over_time(my_gpu_remap_failure[1h] offset 10m)
+            or
+              my_gpu_remap_failure * 0
+          )
+        labels:
+          finding: replace-now
+          severity: critical
+        annotations:
+          summary: >-
+            {{ $labels.host }} GPU {{ $labels.gpu }}: a row remapping failed, the finding is now replace now
+          description: >-
+            GPU {{ $labels.gpu }} of host {{ $labels.host }} reports a row remapping that failed (rule R-REP-01).
+            "my gpu" on the host shows its spare rows per bank and its Xid records.

@@ -84,14 +84,14 @@
     {
       "type": "stat",
       "title": "DIMMs: replace now",
-      "description": "DIMMs whose finding is \"replace now\" (my_dimm_verdict = 3).",
+      "description": "DIMMs whose finding is \"replace now\" (my_dimm_verdict = 3). The host finding, about records tied to no DIMM, is not counted here; the table below lists it with an empty slot.",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(my_dimm_verdict{host=~\"$host\"} == 3) or vector(0)",
+          "expr": "count(my_dimm_verdict{host=~\"$host\", slot!=\"\"} == 3) or vector(0)",
           "refId": "A",
           "editorMode": "code",
           "instant": true,
@@ -147,14 +147,14 @@
     {
       "type": "stat",
       "title": "DIMMs: hold replacement",
-      "description": "DIMMs whose finding is \"hold replacement\" (my_dimm_verdict = 4).",
+      "description": "DIMMs whose finding is \"hold replacement\" (my_dimm_verdict = 4). The host finding, about records tied to no DIMM, is not counted here; the table below lists it with an empty slot.",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(my_dimm_verdict{host=~\"$host\"} == 4) or vector(0)",
+          "expr": "count(my_dimm_verdict{host=~\"$host\", slot!=\"\"} == 4) or vector(0)",
           "refId": "A",
           "editorMode": "code",
           "instant": true,
@@ -210,14 +210,14 @@
     {
       "type": "stat",
       "title": "DIMMs: consider replacement",
-      "description": "DIMMs whose finding is \"consider replacement\" (my_dimm_verdict = 2).",
+      "description": "DIMMs whose finding is \"consider replacement\" (my_dimm_verdict = 2). The host finding, about records tied to no DIMM, is not counted here; the table below lists it with an empty slot.",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(my_dimm_verdict{host=~\"$host\"} == 2) or vector(0)",
+          "expr": "count(my_dimm_verdict{host=~\"$host\", slot!=\"\"} == 2) or vector(0)",
           "refId": "A",
           "editorMode": "code",
           "instant": true,
@@ -273,14 +273,14 @@
     {
       "type": "stat",
       "title": "DIMMs: observe",
-      "description": "DIMMs whose finding is \"observe\" (my_dimm_verdict = 1).",
+      "description": "DIMMs whose finding is \"observe\" (my_dimm_verdict = 1). The host finding, about records tied to no DIMM, is not counted here; the table below lists it with an empty slot.",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "count(my_dimm_verdict{host=~\"$host\"} == 1) or vector(0)",
+          "expr": "count(my_dimm_verdict{host=~\"$host\", slot!=\"\"} == 1) or vector(0)",
           "refId": "A",
           "editorMode": "code",
           "instant": true,
