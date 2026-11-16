@@ -29,6 +29,19 @@ func TestMemoryLimit(t *testing.T) {
 			"sys/fs/cgroup/memory.max": {Data: []byte("max\n")}}, 1 << 30},
 		"a control group that allows more than the machine has": {fstest.MapFS{"proc/meminfo": {Data: []byte("MemTotal: 4194304 kB\n")},
 			"sys/fs/cgroup/memory.max": {Data: []byte("9223372036854771712\n")}}, 1 << 30},
+		"a systemd unit with MemoryMax=512M": {fstest.MapFS{"proc/meminfo": {Data: []byte("MemTotal: 16777216 kB\n")},
+			"proc/self/cgroup":                                          {Data: []byte("0::/system.slice/my-exporter.service\n")},
+			"sys/fs/cgroup/system.slice/memory.max":                     {Data: []byte("max\n")},
+			"sys/fs/cgroup/system.slice/my-exporter.service/memory.max": {Data: []byte("536870912\n")}}, 512 << 20 / 4},
+		"a slice that allows less than its unit": {fstest.MapFS{"proc/meminfo": {Data: []byte("MemTotal: 16777216 kB\n")},
+			"proc/self/cgroup":                                        {Data: []byte("0::/work.slice/my-exporter.service\n")},
+			"sys/fs/cgroup/work.slice/memory.max":                     {Data: []byte("402653184\n")},
+			"sys/fs/cgroup/work.slice/my-exporter.service/memory.max": {Data: []byte("max\n")}}, 384 << 20 / 4},
+		"control groups of version 1": {fstest.MapFS{"proc/meminfo": {Data: []byte("MemTotal: 4194304 kB\n")},
+			"proc/self/cgroup": {Data: []byte("12:memory:/user.slice\n1:name=systemd:/user.slice/session-3.scope\n")}}, 1 << 30},
+		"a group path that climbs": {fstest.MapFS{"proc/meminfo": {Data: []byte("MemTotal: 4194304 kB\n")},
+			"proc/self/cgroup":         {Data: []byte("0::/../../etc\n")},
+			"sys/fs/cgroup/memory.max": {Data: []byte("268435456\n")}}, 64 << 20},
 	} {
 		debug.SetMemoryLimit(before)
 		got := setMemoryLimit(tc.fsys, none)
