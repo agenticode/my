@@ -20,13 +20,13 @@ func TestImportFMFMLogs(t *testing.T) {
 	}
 	wantLines(t, out,
 		runtime+": FMFM log",
-		"  fmfm: partly read, 14 records, 6 error records (grade A), 5 not usable",
+		"  fmfm: partly read, 14 records, 5 error records (grade A), 1 record that is no error, 5 not usable",
 		// The log holds a record of a second host. It is left out, and the
 		// import says so.
 		"records of other hosts left out: 1 (r12-n035); this run read the records of r12-n034",
 		boot+": FMFM log",
 		crash+": FMFM log",
-		"host r12-n034: 9 error records and 0 actions added",
+		"host r12-n034: 6 error records and 0 actions added",
 		"host finding: replace now",
 		" 1  CPU0_C1                 80A1C3   2   2  row ",
 		// A place the boot log does not list is named by its numbers.
@@ -61,6 +61,6 @@ func TestImportOneHostOfALog(t *testing.T) {
 	}
 	wantLines(t, out,
 		"records of other hosts left out: 1 (r12-n035); this run read the records of r12-n034, the",
-		"host web-12: 6 error records and 0 actions added",
+		"host web-12: 5 error records and 0 actions added",
 	)
 }

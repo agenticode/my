@@ -57,8 +57,12 @@ type Source struct {
 
 	Records int `json:"records"` // original records read
 	Events  int `json:"events"`  // events produced
-	Actions int `json:"actions"` // actions produced
-	Skipped int `json:"skipped"` // records that could not be used
+	// Informational counts the events among Events that are no error: the
+	// record of a stop of the host or of a panic. It is not kept in the
+	// ledger.
+	Informational int `json:"informational,omitzero"`
+	Actions       int `json:"actions"` // actions produced
+	Skipped       int `json:"skipped"` // records that could not be used
 	// Samples counts the readings produced that are neither events nor
 	// actions: GPU memory records and ECS register readings.
 	Samples int `json:"samples,omitzero"`

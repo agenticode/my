@@ -68,6 +68,9 @@ type Result struct {
 	Events  int
 	Actions int
 	Samples int
+	// Informational counts the records among Events that are no error:
+	// a stop of the host, a panic.
+	Informational int
 	// Duplicates is the number of records of the host that are marked as
 	// duplicates of another record after the run.
 	Duplicates int
@@ -229,6 +232,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 			src.Status = model.SourcePartial
 		}
 		res.Events += sk.newEvents
+		res.Informational += sk.newInformational
 		res.Actions += sk.newActions
 		res.Samples += sk.newSamples
 		modules = append(modules, sk.modules...)
@@ -386,11 +390,12 @@ type sink struct {
 	// what is not known.
 	fill bool
 
-	known      int
-	newEvents  int
-	newActions int
-	newSamples int
-	modules    []*model.Module
+	known            int
+	newEvents        int
+	newInformational int
+	newActions       int
+	newSamples       int
+	modules          []*model.Module
 }
 
 // refuse handles an error of the ledger about one record. A record with
@@ -428,6 +433,12 @@ func (k *sink) Event(e *model.Event) error {
 		return k.refuse(e.RawRef, err)
 	}
 	k.src.Events++
+	if e.ErrorSeverity == model.SevInformational {
+		k.src.Informational++
+		if inserted {
+			k.newInformational++
+		}
+	}
 	switch e.Grade {
 	case model.GradeA:
 		k.src.GradeA++

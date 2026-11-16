@@ -117,12 +117,13 @@ var words = i18n.Catalog{
 	"serve.fleet_grade": {EN: "{n} {grade}", KO: "{grade} {n}"},
 
 	// What "my import" says.
-	"import.records": {EN: "{n} {n|record|records}", KO: "기록 {n}건"},
-	"import.events":  {EN: "{n} error {n|record|records} (grade {grade})", KO: "오류 기록 {n}건({grade} 등급)"},
-	"import.actions": {EN: "{n} {n|action|actions}", KO: "조치 {n}건"},
-	"import.skipped": {EN: "{n} not usable", KO: "쓰지 못한 기록 {n}건"},
-	"import.total":   {EN: "host {host}: {events} error {events|record|records} and {actions} {actions|action|actions} added, {dup} reported by more than one source and counted once", KO: "호스트 {host}: 오류 기록 {events}건과 조치 {actions}건 추가, 여러 소스가 함께 보고한 {dup}건은 한 번만 계산"},
-	"import.finding": {EN: "host {host}, finding: {grade}", KO: "호스트 {host}, 소견: {grade}"},
+	"import.records":       {EN: "{n} {n|record|records}", KO: "기록 {n}건"},
+	"import.events":        {EN: "{n} error {n|record|records} (grade {grade})", KO: "오류 기록 {n}건({grade} 등급)"},
+	"import.informational": {EN: "{n} {n|record|records} that {n|is|are} no error", KO: "오류가 아닌 기록 {n}건"},
+	"import.actions":       {EN: "{n} {n|action|actions}", KO: "조치 {n}건"},
+	"import.skipped":       {EN: "{n} not usable", KO: "쓰지 못한 기록 {n}건"},
+	"import.total":         {EN: "host {host}: {events} error {events|record|records} and {actions} {actions|action|actions} added, {dup} reported by more than one source and counted once", KO: "호스트 {host}: 오류 기록 {events}건과 조치 {actions}건 추가, 여러 소스가 함께 보고한 {dup}건은 한 번만 계산"},
+	"import.finding":       {EN: "host {host}, finding: {grade}", KO: "호스트 {host}, 소견: {grade}"},
 
 	// What "my bundle" says.
 	"bundle.written":    {EN: "case bundle written: {file} ({size})", KO: "케이스 번들 저장: {file} ({size})"},
