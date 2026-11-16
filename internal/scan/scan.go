@@ -304,9 +304,15 @@ func sourceList(ctx context.Context, opts Options) []tagged {
 	add(false, daemonCounts(&opts, now)...)
 
 	sm := adapter.Adapter(smbios.NewRoot(opts.root(), smbios.Options{Now: now}))
-	if !opts.Live && !exists(opts.path(smbios.TablesDir+"/DMI")) {
+	if !opts.Live && !tablesReadable(opts.path(smbios.TablesDir+"/DMI")) {
 		for _, rel := range DmidecodeFiles {
 			if p := opts.path(rel); exists(p) {
+				// Tables that are there and hold no structure are listed;
+				// the text of dmidecode stands in for them.
+				if exists(opts.path(smbios.TablesDir + "/DMI")) {
+					add(false, report{kind: smbios.Kind, origin: opts.path(smbios.TablesDir + "/DMI"), status: model.SourceError,
+						detail: "the SMBIOS tables of the copy hold no structure that can be read; " + rel + " was read in their place"})
+				}
 				sm = smbios.NewDmidecodeFile(p, smbios.Options{Now: now})
 				break
 			}
@@ -627,3 +633,17 @@ func (r report) Collect(context.Context, adapter.Sink) adapter.Report {
 	return adapter.Report{Kind: r.kind, Origin: r.origin, Status: r.status, Detail: r.detail}
 }
 
+// tablesReadable reports whether the SMBIOS tables of a copy are there and
+// hold at least one structure.
+func tablesReadable(path string) bool {
+	fi, err := os.Stat(path)
+	if err != nil || fi.IsDir() || fi.Size() > 16<<20 {
+		return false
+	}
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	structs := adapter.Guard(func() []smbios.Structure { st, _ := smbios.ParseTable(b); return st })
+	return len(structs) > 0
+}
