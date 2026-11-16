@@ -141,8 +141,8 @@ func TestInventoryOfHostAlone(t *testing.T) {
 		"slot names and module data from SMBIOS, EDAC",
 		"no BIOS settings on record, so the RAS column is empty; my bios --bmc ADDRESS reads them",
 		" CPU0_C1  3B9C56  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800  1,231       -",
-		"CE OS counts the corrected errors in the records of the operating system. No BMC was read.",
-		"No BMC was read, so there is nothing to set against the records of the operating system.",
+		"CE OS counts the corrected errors in the records of the operating system.\n",
+		"No BMC was read: my inventory --bmc ADDRESS reads it in the same run.",
 		"  empty")
 	wide(t, "host alone", stdout)
 
