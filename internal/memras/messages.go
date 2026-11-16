@@ -71,7 +71,7 @@ var Messages = i18n.Catalog{
 	"speed.lead":        {EN: "{n} of {known} {known|DIMM runs|DIMMs run} below the speed {known|it is|they are} rated for: {list}", KO: "DIMM {known}개 중 {n}개가 정격 속도에 못 미치는 속도로 동작: {list}"},
 	"speed.item":        {EN: "{slots} at {operating}, rated {rated}", KO: "{slots} 동작 {operating}, 정격 {rated}"},
 	"speed.all_rated":   {EN: "all {known} {known|DIMM|DIMMs} with a known speed run at the speed they are rated for", KO: "속도를 아는 DIMM {known}개 모두 정격 속도로 동작"},
-	"speed.candidates":  {EN: "What the records show that can be the reason. These are candidates; the records prove none of them:", KO: "기록에서 보이는 원인 후보. 후보일 뿐이며 이 기록으로 확정되는 것은 없음:"},
+	"speed.candidates":  {EN: "Reasons the records point at, none of them proven:", KO: "기록이 가리키는 원인 후보(확정 아님):"},
 	"speed.none":        {EN: "the records show nothing that explains it", KO: "기록에는 원인으로 볼 만한 것이 없음"},
 	"speed.bios":        {EN: "the BIOS limits the memory frequency ({attribute} = {value})", KO: "BIOS가 메모리 주파수를 제한함 ({attribute} = {value})"},
 	"speed.per_channel": {EN: "{n} of these DIMMs share a channel with another DIMM ({slots}); the number of DIMMs on a channel is one of the things that set the memory frequency", KO: "이 중 DIMM {n}개가 다른 DIMM과 채널을 함께 씀({slots}). 채널당 DIMM 수는 메모리 주파수를 정하는 요소 중 하나임"},

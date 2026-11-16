@@ -79,9 +79,9 @@ var InventoryMessages = i18n.Catalog{
 	"sides.count.same":       {EN: "{slot}: since the reset of {since} the BMC counts {n} corrected {n|error|errors}, and the OS has as many", KO: "{slot}: {since} 리셋 이후 BMC 카운트와 운영체제 기록이 모두 CE {n}건"},
 	"sides.count.differ":     {EN: "{slot}: since the reset of {since} the BMC counts {bmc} corrected {bmc|error|errors}, the OS has {os}", KO: "{slot}: {since} 리셋 이후 BMC 카운트는 CE {bmc}건, 운영체제 기록은 {os}건"},
 
-	"sides.cand.os_only":  {EN: "Errors the OS has and the logs of the BMC lack. Candidates for the reason, none established:", KO: "운영체제에는 있고 BMC 로그에는 없는 오류. 원인 후보이며 확정된 것은 없음:"},
-	"sides.cand.bmc_only": {EN: "Entries of the BMC the OS has no record of. Candidates for the reason, none established:", KO: "BMC에는 있고 운영체제 기록에는 없는 항목. 원인 후보이며 확정된 것은 없음:"},
-	"sides.cand.count":    {EN: "Counts since the reset that differ. Candidates for the reason, none established:", KO: "리셋 이후 카운트가 서로 다름. 원인 후보이며 확정된 것은 없음:"},
+	"sides.cand.os_only":  {EN: "Errors the OS has and the logs of the BMC lack. Candidates for the reason, none established:", KO: "운영체제에는 있고 BMC 로그에는 없는 오류. 원인 후보(확정 아님):"},
+	"sides.cand.bmc_only": {EN: "Entries of the BMC the OS has no record of. Candidates for the reason, none established:", KO: "BMC에는 있고 운영체제 기록에는 없는 항목. 원인 후보(확정 아님):"},
+	"sides.cand.count":    {EN: "Counts since the reset that differ. Candidates for the reason, none established:", KO: "리셋 이후 카운트가 서로 다름. 원인 후보(확정 아님):"},
 
 	"cand.ce_logging_off":    {EN: "the BIOS does not log corrected errors to the BMC: {attribute} = {value}", KO: "BIOS가 CE를 BMC에 기록하지 않음: {attribute} = {value}"},
 	"cand.threshold":         {EN: "the BIOS logs an event to the BMC when corrected errors cross a threshold ({attribute} = {value}); errors below the threshold leave no entry", KO: "BIOS가 CE가 임계값을 넘을 때 BMC에 이벤트를 남김 ({attribute} = {value}). 임계값 아래의 오류는 항목이 남지 않음"},
