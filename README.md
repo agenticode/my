@@ -207,6 +207,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | write the slot names as a DIMM label file for rasdaemon |
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded ([docs/verify.md](docs/verify.md)) |
+| `my preflight` | what a reset right after a fatal memory error would leave on this host, and the settings that change it ([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my serve --metrics` | run as a Prometheus exporter ([docs/exporter.md](docs/exporter.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
 
@@ -319,6 +320,7 @@ Early development; no version is tagged.
 | [docs/plugin-contract.md](docs/plugin-contract.md) | the vendor analyzer contract |
 | [docs/fmfm-mapping.md](docs/fmfm-mapping.md) | how records and findings map to the FMFM field names |
 | [docs/exporter.md](docs/exporter.md) | the metrics and the HTTP API |
+| [docs/crash-loop.md](docs/crash-loop.md) | what a reset after a fatal memory error loses, and the settings that keep it |
 | [docs/verify.md](docs/verify.md) | comparing an injection plan with the records |
 | [docs/evaluation.md](docs/evaluation.md) | the comparison with a field dataset |
 | [docs/validation.md](docs/validation.md), [docs/validation-lab.md](docs/validation-lab.md) | runs on real hosts, and injected errors in a lab |

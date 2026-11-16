@@ -1,0 +1,32 @@
+host web-07  kernel 6.8.0-87-generic  x86_64  Intel family 6 model 143  booted 2026-11-16 05:01 UTC
+
+ what a reset right after a fatal memory error would leave on the host of this copy (/COPY)
+
+ lost     journal          the directory /var/log/journal does not exist and Storage= is not set:
+                           the journal is kept in memory and is gone after a reset
+ lost     pstore-backend   no backend is registered: the firmware has no ERST table; efi_pstore has
+                           pstore_disable=Y
+ lost     pstore-archive   systemd-pstore.service is not enabled: the files stay in /sys/fs/pstore,
+                           and a full store saves no later panic
+ kept     pstore-vs-kdump  no crash kernel is loaded: a panic goes to pstore
+ lost     kdump            no crash kernel is loaded and no crashkernel= is on the command line
+ kept     mce-bootlog      on by default for this processor (Intel family 6)
+ lost     mce-print        a record left in a bank goes to /dev/mcelog and is not printed, and no
+                           mcelog daemon runs
+ info     reset-kind       reboot mode cold, the same after a panic. With panic=0 the kernel waits
+                           after a panic, and after a fatal machine check it restarts in 30 s.
+                           Whether the banks keep their contents over the reset depends on the board
+                           and its BIOS; the first stop after my harvest is installed shows it
+ none     bert             the firmware provides no BERT table
+ none     erst-mce         the firmware provides no ERST table: mce_panic() keeps no copy of the
+                           record
+ lost     console          no console leaves the host (no console= on the command line): the last
+                           lines before a reset stay on its screen
+ lost     rasdaemon        rasdaemon is not installed: the corrected errors of a boot are kept only
+                           in its kernel log
+ lost     harvest *        my-harvest.service is not installed: what the boot before left is read
+                           only when someone runs my
+
+ 1 check reads the running host and is marked *: a copy of its files can only say what it holds
+ 8 of 13 checks would lose records. The commands, with what each costs and how to undo it:
+   my preflight --script --root /COPY

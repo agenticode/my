@@ -71,6 +71,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/bundle` | case bundles: format, checks, anonymizing |
 | `internal/outfile` | writes output files whole or not at all, and never in place of a device |
 | `internal/redfish` | the read-only Redfish client and the collection of `my collect redfish` |
+| `internal/preflight` | what a reset right after a fatal memory error would leave on a host, and the settings that change it (`my preflight`) |
 | `internal/memras` | the profile of BIOS settings that bear on memory errors, and the check of a host's settings against it (`my bios`) |
 | `internal/exporter`, `internal/serve` | the Prometheus metrics and the HTTP server of `my serve` |
 | `internal/eval` | replays a field dataset through the engine and compares the findings with the failure tickets |

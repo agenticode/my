@@ -110,6 +110,12 @@ func app() *cli.App {
 				Run:       runCollect,
 			},
 			{
+				Name:      "preflight",
+				Summary:   "what a reset after a fatal memory error would leave on this host, and the settings that change it",
+				SummaryKO: "치명적 메모리 오류 뒤 reset이 일어나면 이 호스트에 남는 것과 그것을 바꾸는 설정",
+				Run:       runPreflight,
+			},
+			{
 				Name:      "serve",
 				Summary:   "run as a server: Prometheus metrics and the findings of this host over HTTP",
 				SummaryKO: "서버로 실행: 이 호스트의 Prometheus 지표와 소견을 HTTP로 제공",
