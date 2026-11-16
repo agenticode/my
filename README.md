@@ -217,10 +217,10 @@ A command that shows findings exits with the grade of what it showed, the host o
 | Code | Grade | When |
 | --- | --- | --- |
 | 0 | ok | no errors on record |
-| 1 | observe | corrected errors without a growing fault |
-| 2 | consider replacement | a row or column fault is rising or spreading, a fault covers a bank or more, pages keep being taken offline, the patrol scrubber found an uncorrected error, or errors came back after a repair |
+| 1 | observe | corrected errors without a growing fault, or pages taken offline that name no DIMM |
+| 2 | consider replacement | a row or column fault is rising or spreading, a fault covers a bank or more, pages keep being taken offline, the patrol scrubber found an uncorrected error, errors came back after a repair, or firmware predicts a failure of the DIMM |
 | 3 | replace now | an uncorrected error, a DIMM that firmware marks as failed, or repair resources that are used up |
-| 4 | hold replacement | a cause outside the DIMM is suspected (the channel, the slot, the contact, slot names that disagree), or uncorrected errors name no DIMM |
+| 4 | hold replacement | a cause outside the DIMM is suspected (the channel, the slot, the contact, slot names that disagree, uncorrected errors of several boots spread over DIMMs, a memory training that failed), or uncorrected errors name no DIMM |
 
 Exit code 64 is a wrong command line and 70 a command that failed. A scan that could read no source of error records ends with 70 and names what it looked for: it does not answer "no errors on record".
 
