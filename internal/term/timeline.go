@@ -239,7 +239,7 @@ func (st Style) timeline(p *page, tl *view.Timeline, brief bool) {
 		p.blank()
 		p.add(" " + st.say("tl.boots"))
 		if !brief {
-			st.stopsLines(p, b.Stops)
+			st.stopsLines(p, b.Stops, st.Detail)
 		}
 		st.bootsGrid(p, b, 0)
 	}

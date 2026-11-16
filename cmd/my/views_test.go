@@ -554,6 +554,7 @@ func registerFlags(o *options, topic string) {
 		o.fs.String("rows", "", "")
 		o.fs.Bool("boots", false, "")
 	case "boots":
+		o.withDetail()
 		o.fs.Int("boots", 0, "")
 	case "timeline", "gpu":
 		o.fs.Int("days", 0, "")

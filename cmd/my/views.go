@@ -371,7 +371,7 @@ func runTimeline(ctx context.Context, env *cli.Env, args []string, src *source) 
 // each ended and which DIMM had errors in it, or the places of one DIMM
 // boot by boot.
 func runBoots(ctx context.Context, env *cli.Env, args []string, src *source) int {
-	o := newOptions(env, cmdName("boots", src), src)
+	o := newOptions(env, cmdName("boots", src), src).withDetail()
 	show := o.fs.Int("boots", 0, "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {

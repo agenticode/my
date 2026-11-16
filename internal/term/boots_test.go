@@ -44,14 +44,23 @@ func TestBoots(t *testing.T) {
 	}
 	got := open(t, "crash-loop", "", en).boots("", 0)
 	for _, want := range []string{
-		"stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC",
-		"4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)",
+		"stops: CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01)",
 		"ended    -       -       -       STOP    STOP    STOP    STOP    -",
 		"CPU0_C1  ·       ·       ▒       X       X       X       X       ·",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("the boots lack %q:\n%s", want, got)
 		}
+	}
+	// The grid shows how many boots stopped: the line that counts them
+	// comes with --detail.
+	if strings.Contains(got, "4 of the last 8 boots") {
+		t.Errorf("the short boots count the stops:\n%s", got)
+	}
+	s := open(t, "crash-loop", "", en)
+	s.st.Detail = true
+	if got := s.boots("", 0); !strings.Contains(got, "stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC") {
+		t.Errorf("--detail lacks the count of the stops:\n%s", got)
 	}
 	// More boots than fit: the latest stay, a line says how many are left
 	// out; --boots N draws N of them.

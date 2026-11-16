@@ -143,6 +143,7 @@ var Messages = i18n.Catalog{
 	"pf.head.booted":         {EN: "booted {time} UTC", KO: "부팅 {time} UTC"},
 	"pf.title":               {EN: "what a reset right after a fatal memory error would leave on this host", KO: "치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 남는 것"},
 	"pf.title.copy":          {EN: "what a reset right after a fatal memory error would leave on the host of this copy ({root})", KO: "치명적 메모리 오류 직후 reset이 일어나면 이 사본({root})의 호스트에 남는 것"},
+	"pf.copy.group":          {EN: "{n} {n|check reads|checks read} the running host, which a copy does not hold: {names}", KO: "실행 중인 호스트를 읽는 점검 {n}개, 사본으로는 알 수 없음: {names}"},
 	"pf.copy.note":           {EN: "{n} {n|check reads|checks read} the running host and {n|is|are} marked *: a copy of its files can only say what it holds", KO: "실행 중인 호스트를 읽는 점검 {n}개에는 *를 붙임. 파일 사본으로는 사본에 든 것만 알 수 있음"},
 	"pf.summary":             {EN: "{lost} of {n} checks would lose records. The commands, with what each costs and how to undo it:", KO: "점검 {n}개 중 {lost}개에서 기록을 잃음. 명령과 비용, 되돌리는 방법:"},
 	"pf.summary.none":        {EN: "No check would lose records.", KO: "기록을 잃는 점검 없음."},

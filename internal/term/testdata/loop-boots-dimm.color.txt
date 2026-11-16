@@ -10,5 +10,4 @@
 
  uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8       R-LOOP-01
  boots: each of these boots ended in a fatal hardware error
-
  [1mmy boots CPU0_C1[0m: the places of this DIMM boot by boot

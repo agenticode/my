@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -68,8 +69,22 @@ func TestPreflightCopy(t *testing.T) {
 	}
 	out = strings.ReplaceAll(out, root, "/COPY")
 	testutil.Golden(t, "preflight-copy.en.txt", []byte(out))
-	if !strings.Contains(out, "harvest *") || !strings.Contains(out, "my preflight --script --root /COPY") {
+	// This copy holds the files of every check: no check waits for the
+	// running host, and none is marked.
+	if strings.Contains(out, " *") || strings.Contains(out, "which a copy does not hold") || !strings.Contains(out, "my preflight --script --root /COPY") {
 		t.Errorf("copy screen:\n%s", out)
+	}
+	// A copy without them: the checks of the running host share a line.
+	_, out, _ = run("preflight", "--root", filepath.Join("..", "..", "testdata", "real", "6.19.10-mce-loop"))
+	if flat := strings.Join(strings.Fields(out), " "); !strings.Contains(flat, "unknown 10 checks read the running host, which a copy does not hold: journal, pstore-backend,") ||
+		strings.Contains(out, "unknown  journal") {
+		t.Errorf("copy screen of a capture:\n%s", out)
+	}
+	// With --detail every check has its line, those of the running host
+	// marked.
+	_, out, _ = run("preflight", "--root", root, "--detail")
+	if !strings.Contains(out, "harvest *") || !strings.Contains(out, "1 check reads the running host and is marked *") {
+		t.Errorf("copy screen with --detail:\n%s", out)
 	}
 }
 

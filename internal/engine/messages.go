@@ -193,11 +193,11 @@ var Messages = i18n.Catalog{
 	"loop.fault_boots":    {EN: "the fault at {where} had errors in {n} of the last {of} boots", KO: "{where} 고장: 최근 부팅 {of}회 중 {n}회에서 오류"},
 	"loop.stops":          {EN: "{n} of the last {of} boots ended in a fatal hardware error, the latest on {when} after {ran_n} {ran_unit}", KO: "최근 부팅 {of}회 중 {n}회가 치명적 하드웨어 오류로 끝남, 최근 {when}, 부팅 후 {ran_n}{ran_unit}"},
 	"loop.stops_when":     {EN: "{n} of the last {of} boots ended in a fatal hardware error, the latest on {when}", KO: "최근 부팅 {of}회 중 {n}회가 치명적 하드웨어 오류로 끝남, 최근 {when}"},
-	"loop.where_dimm":     {EN: "{n} of them had an uncorrected error of {slot} ({rule})", KO: "그중 {n}회에 {slot}의 UE({rule})"},
+	"loop.where_dimm":     {EN: "{slot} had an uncorrected error in {n} of the boots that stopped ({rule})", KO: "중단된 부팅 중 {n}회에 {slot}의 UE({rule})"},
 	"loop.where_spread":   {EN: "the uncorrected errors are spread over {dimms} DIMMs ({slots}), R-LOOP-03", KO: "UE가 DIMM {dimms}개({slots})에 흩어짐(R-LOOP-03)"},
 	"loop.where_one":      {EN: "uncorrected errors on {slot} in {n} {n|boot|boots}: too few for a rule of the boots", KO: "{slot}에서 UE, 부팅 {n}회: 부팅 반복 규칙에 미달"},
 	"loop.where_few":      {EN: "uncorrected errors on {dimms} DIMMs ({slots}): too few boots each for a rule of the boots", KO: "DIMM {dimms}개({slots})에서 UE: 각각 부팅 반복 규칙에 미달"},
-	"loop.where_none":     {EN: "no record of these boots names a DIMM", KO: "해당 부팅의 기록 중 DIMM을 지목한 것 없음"},
+	"loop.where_none":     {EN: "no record of the boots that stopped names a DIMM", KO: "중단된 부팅의 기록 중 DIMM을 지목한 것 없음"},
 
 	// Checks of a finding against other explanations.
 	"check.neighbors_clean":    {EN: "the other {n} {n|DIMM|DIMMs} of the channel ({slots}) {n|has|have} no errors: a cause in the slot or the channel is unlikely", KO: "같은 채널의 다른 DIMM {n}개({slots}) 오류 0건: 슬롯이나 채널 원인 가능성 낮음"},

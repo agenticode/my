@@ -78,7 +78,7 @@ section#s2.sec
   p.how: DIMMs with errors or a finding, the worst first. CE and UE are corrected and uncorrected errors counted from the ledger, so the counts run across reboots. The trend draws the last 30 days in steps of 3 days, each line on its own scale.
   p: 14 DIMMs without errors
   ### Boots
-  p.stops: stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC after 44 min. 4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01).
+  p.stops: stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC after 44 min. CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01).
   figure
     svg.fig.boots: The latest 8 boots of synth-crash-loop, and what each DIMM showed in each of them
       mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record

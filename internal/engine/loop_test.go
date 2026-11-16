@@ -102,7 +102,7 @@ func TestRuleLoopPlace(t *testing.T) {
 		}
 		want := []string{
 			"3 of the last 3 boots ended in a fatal hardware error, the latest on 2026-10-03 01:00 UTC after 60 min",
-			"3 of them had an uncorrected error of A1 (R-LOOP-01)",
+			"A1 had an uncorrected error in 3 of the boots that stopped (R-LOOP-01)",
 		}
 		if !equalStrings(lines, want) {
 			t.Errorf("stops lines = %q", lines)

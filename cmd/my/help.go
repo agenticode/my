@@ -281,9 +281,14 @@ var words = i18n.Catalog{
 			"--boots           칸마다 부팅 수를 셈: 최근 부팅 중 몇 회에 오류가 있었는지",
 	},
 
-	"help.boots.usage":    {EN: "my boots [slot|serial] [--boots N] [flags]", KO: "my boots [슬롯|시리얼] [--boots N] [옵션]"},
-	"help.boots.text":     {EN: "The latest boots of the host, at most loop.window_boots of them: when each started, how long it ran, how it ended, and per DIMM what it showed in each boot. With a DIMM named: the places of that DIMM boot by boot. A fatal memory error ends its boot, and on a hard fault every boot ends the same way. A timeline counts errors per day, and one day can hold several such boots. The kept ledger of my harvest holds the boots that a scan of the running host no longer sees.", KO: "호스트의 최근 부팅(최대 loop.window_boots회): 부팅마다 시작 시각, 실행 시간, 끝난 방식, 그리고 DIMM별로 그 부팅에 보인 오류. DIMM을 지정하면 그 DIMM의 위치별 부팅 기록을 보여 줍니다. 치명적 메모리 오류는 그 부팅을 끝내고, 고장이 굳으면 부팅마다 같은 식으로 끝납니다. 타임라인은 하루 단위로 오류를 세며, 하루에 이런 부팅이 여러 번 들어갈 수 있습니다. 실행 중인 호스트를 스캔해서는 더 보이지 않는 부팅은 my harvest의 보관 원장에 남아 있습니다."},
-	"help.boots.flags":    {EN: "--boots N         draw the latest N boots only", KO: "--boots N         최근 부팅 N회만 그림"},
+	"help.boots.usage": {EN: "my boots [slot|serial] [--boots N] [flags]", KO: "my boots [슬롯|시리얼] [--boots N] [옵션]"},
+	"help.boots.text":  {EN: "The latest boots of the host, at most loop.window_boots of them: when each started, how long it ran, how it ended, and per DIMM what it showed in each boot. With a DIMM named: the places of that DIMM boot by boot. A fatal memory error ends its boot, and on a hard fault every boot ends the same way. A timeline counts errors per day, and one day can hold several such boots. The kept ledger of my harvest holds the boots that a scan of the running host no longer sees.", KO: "호스트의 최근 부팅(최대 loop.window_boots회): 부팅마다 시작 시각, 실행 시간, 끝난 방식, 그리고 DIMM별로 그 부팅에 보인 오류. DIMM을 지정하면 그 DIMM의 위치별 부팅 기록을 보여 줍니다. 치명적 메모리 오류는 그 부팅을 끝내고, 고장이 굳으면 부팅마다 같은 식으로 끝납니다. 타임라인은 하루 단위로 오류를 세며, 하루에 이런 부팅이 여러 번 들어갈 수 있습니다. 실행 중인 호스트를 스캔해서는 더 보이지 않는 부팅은 my harvest의 보관 원장에 남아 있습니다."},
+	"help.boots.flags": {
+		EN: "--boots N         draw the latest N boots only\n" +
+			"--detail          also the line that counts the stops, which the grid shows",
+		KO: "--boots N         최근 부팅 N회만 그림\n" +
+			"--detail          중단 횟수를 세는 줄도 출력 (격자에도 나옴)",
+	},
 	"help.timeline.usage": {EN: "my timeline [slot|serial] [--days N] [flags]", KO: "my timeline [슬롯|시리얼] [--days N] [옵션]"},
 	"help.timeline.text":  {EN: "Errors per day with boots, repairs, pages taken offline, slot changes and uncorrected errors, for one DIMM or, without one, for every DIMM of the host that has errors.", KO: "일별 오류에 부팅, 리페어, page offline, 슬롯 이동, UE를 표시합니다. DIMM을 지정하지 않으면 오류가 있는 모든 DIMM을 줄마다 그립니다."},
 	"help.timeline.flags": {EN: "--days N          draw the last N days only", KO: "--days N          최근 N일만 그림"},
