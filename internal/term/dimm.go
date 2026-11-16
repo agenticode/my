@@ -6,6 +6,10 @@ import (
 	"github.com/agenticode/my/internal/view"
 )
 
+// DIMMPlaces is the number of places the boots block of an examination
+// lists before the rest is summed in one row.
+const DIMMPlaces = 5
+
 // Examination draws everything about one DIMM: the finding, the branch the
 // errors sit on, the address map of the bank with the most errors, and the
 // timeline.
@@ -21,6 +25,11 @@ func Examination(w io.Writer, x *view.Examination, st Style) error {
 	if x.AddressMap != nil && x.Card.CE+x.Card.UE > 0 {
 		p.blank()
 		st.addressMap(p, x.AddressMap)
+	}
+	if x.Boots != nil && len(x.Boots.Rows) > 0 {
+		p.blank()
+		p.add(" " + st.say("boots.title"))
+		st.placesGrid(p, x.Boots, 0, DIMMPlaces)
 	}
 	if x.Timeline != nil && x.Card.CE+x.Card.UE > 0 {
 		p.blank()

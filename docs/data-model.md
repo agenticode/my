@@ -186,7 +186,7 @@ These passes run after every read, in a fixed order (slots, counter events, the 
 
 | Field | Content |
 | --- | --- |
-| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `gpu`, `diff`, `verify`, `preflight` |
+| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `gpu`, `diff`, `verify`, `preflight` |
 | `version` | the version of this form, 1. It changes when a field is renamed or removed; new fields do not change it |
 | `lang` | the language of the sentences |
 | `host` | the host the data is about |
@@ -196,3 +196,22 @@ These passes run after every read, in a fixed order (slots, counter events, the 
 | `data` | the data of the screen |
 
 A statement in `data` carries its `code`, its `args` and the sentence in `text`, so that a program can read the finding without parsing sentences.
+
+### The view `boots`
+
+`my boots --json` holds the latest boots of a host (at most `loop.window_boots`), and `my boots SLOT --json` the places of one DIMM by boots:
+
+| Field | Content |
+| --- | --- |
+| `host`, `system` | the host and its vendor and product name |
+| `slot`, `dimm` | the DIMM, on the view of one DIMM |
+| `boots_on_record` | the number of boots of the host on record; `boots` holds the latest of them |
+| `boots[]` | one per boot, oldest first: `index` (from 1), `boot_id`, `started_at`, `start_quality`, `ran_seconds`, `end` (`stop`, `panic`, `running`, or empty when no record tells), `end_record`, `stop_slot` (the one DIMM with an uncorrected error in a boot that stopped) |
+| `rows[]` | per DIMM with errors in these boots, or per place of the one DIMM: `level` (`dimm`, `no-dimm`, `cell`, `address`, `dimm-only`), `dimm_uid`, `slot`, `serial`, `place`, `cells[]`, `boots_with_errors`, `boots_with_ue`, `ce`, `ue`, `stop_boots` |
+| `rows[].cells[]` | one per boot: `boot`, `ce`, `ue`, `stopped` (an uncorrected error in a boot that stopped), `known` (false when the boot stopped and no record names a DIMM), `absent` (the DIMM was not in the host) |
+| `others` | the places of the DIMM beyond the first 12, summed, with `places` their number |
+| `quiet` | the DIMMs of the host without errors in these boots |
+| `stops` | `stops`, `window`, `streak` (the latest boots in a row that stopped), `panics`, `where` (`R-LOOP-01`, `R-LOOP-02`, `R-LOOP-03`, `dimm`, `none`) and `lines[]`, the stops lines as statements |
+| `rules[]` | the statements of the R-LOOP rules on the finding of the DIMM |
+
+The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above, and the window as the engine sees it (per DIMM `cells`, `places` and the boots each had uncorrected errors in). The topology of `dimm` adds `window` and `boots` to the levels, the address map `window`, `boots` and `ue_boots`, and `my map --boots` per line the `boots` and `ue_boots` of each cell.

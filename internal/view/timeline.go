@@ -39,6 +39,10 @@ type Timeline struct {
 	Undated int64 `json:"undated,omitzero"`
 	// Notes are the sentences below the figure.
 	Notes []Text `json:"notes"`
+	// Boots is the strip of the latest boots, drawn when one of them
+	// ended in a stop: a day of the timeline can hold several short boots.
+	// On the timeline of one DIMM it holds the row of that DIMM only.
+	Boots *Boots `json:"boots,omitzero"`
 }
 
 // Series is the daily corrected error count of one DIMM.
@@ -485,6 +489,22 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		tl.Notes = append(tl.Notes, c.say("tl.since_boot", "n", sb.CE+sb.UE, "when", when(latest)))
 	}
 	undated()
+	if h.Recurrence != nil && h.Recurrence.Stops > 0 {
+		b, err := c.BootsView(ctx, h, nil)
+		if err != nil {
+			return nil, err
+		}
+		if d != nil {
+			var rows []BootRow
+			for _, r := range b.Rows {
+				if r.UID == d.UID {
+					rows = append(rows, r)
+				}
+			}
+			b.Rows, b.Quiet = rows, 0
+		}
+		tl.Boots = b
+	}
 	return tl, nil
 }
 

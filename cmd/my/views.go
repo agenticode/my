@@ -25,6 +25,7 @@ var viewCommands = map[string]viewFunc{
 	"why":       runWhy,
 	"map":       runMap,
 	"timeline":  runTimeline,
+	"boots":     runBoots,
 	"gpu":       runGPU,
 	"bios":      runBIOS,
 	"inventory": runInventory,
@@ -122,8 +123,11 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 		// The kept ledger of the boot harvest holds what this scan cannot
 		// see: the boots before that ended in a reset.
 		if fi, err := os.Stat(harvestLedger); err == nil && fi.Mode().IsRegular() {
-			out = append(out, term.Hint{Command: "my open " + harvestLedger, Text: say(s.lang, "hint.kept")})
+			out = append(out, term.Hint{Command: "my open " + harvestLedger + " boots", Text: say(s.lang, "hint.kept")})
 		}
+	}
+	if ov.Stops != nil {
+		out = append(out, term.Hint{Command: s.prefix + " boots", Text: say(s.lang, "hint.boots_host")})
 	}
 	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
 	return out
@@ -268,6 +272,7 @@ func runMap(ctx context.Context, env *cli.Env, args []string, src *source) int {
 	rank := o.fs.Int("rank", -1, "")
 	device := o.fs.Int("device", -1, "")
 	rows := o.fs.String("rows", "", "")
+	byBoots := o.fs.Bool("boots", false, "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -309,6 +314,7 @@ func runMap(ctx context.Context, env *cli.Env, args []string, src *source) int {
 		return code
 	}
 	mo.Cells = s.st.MapCells()
+	mo.Boots = *byBoots
 	m, err := s.c.AddressMap(ctx, s.h, d, mo)
 	if err != nil {
 		// A bank without errors is a wrong choice, not a failure.
@@ -356,4 +362,59 @@ func runTimeline(ctx context.Context, env *cli.Env, args []string, src *source) 
 		return o.failure(env, err)
 	}
 	return s.emit("timeline", grade, tl, func(w io.Writer) error { return term.Timeline(w, tl, s.st) })
+}
+
+// runBoots is "my boots [slot|serial]": the latest boots of the host, how
+// each ended and which DIMM had errors in it, or the places of one DIMM
+// boot by boot.
+func runBoots(ctx context.Context, env *cli.Env, args []string, src *source) int {
+	o := newOptions(env, cmdName("boots", src), src)
+	show := o.fs.Int("boots", 0, "")
+	pos, lang, code, done := o.parse(env, args)
+	if done {
+		return code
+	}
+	if o.help {
+		return printHelp(env, lang, o.style(env, lang), "boots", src)
+	}
+	if len(pos) > 1 {
+		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
+	}
+	if *show < 0 {
+		return o.usageError(env, lang, "%s", say(lang, "err.boots", "value", *show))
+	}
+	s, code := o.start(ctx, env, lang, src)
+	if s == nil {
+		return code
+	}
+	defer s.close()
+	if code, ok := s.needHost(); !ok {
+		return code
+	}
+	grade := s.h.Grade
+	var d *engine.DIMMResult
+	if len(pos) == 1 {
+		if d, code = s.find(pos[0]); d == nil {
+			return code
+		}
+		grade = d.Verdict.Grade
+	}
+	b, err := s.c.BootsView(ctx, s.h, d)
+	if err != nil {
+		return o.failure(env, err)
+	}
+	var hints []term.Hint
+	if d == nil {
+		// The DIMM to look at next: the one with the most boots with
+		// uncorrected errors.
+		for _, r := range b.Rows {
+			if r.Level == view.RowDIMM && r.Slot != "" {
+				hints = append(hints, term.Hint{Command: s.prefix + " boots " + r.Slot, Text: say(lang, "hint.boots")})
+				break
+			}
+		}
+	} else {
+		hints = append(hints, term.Hint{Command: s.prefix + " dimm " + d.Slot, Text: say(lang, "hint.dimm")})
+	}
+	return s.emit("boots", grade, b, func(w io.Writer) error { return term.Boots(w, b, s.st, *show, hints) })
 }

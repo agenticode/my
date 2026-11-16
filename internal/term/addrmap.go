@@ -3,6 +3,7 @@ package term
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/agenticode/my/internal/i18n"
@@ -49,6 +50,12 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 
 	// The scale: what each shade stands for.
 	legend := []string{st.paint(heatColor(0), g.shade[0]) + " 0"}
+	if m.ByBoots {
+		legend = nil
+		for _, l := range wrap(st.say("map.by_boots", "of", m.Window, "g0", g.shade[0], "ue", g.ue), st.width()-1) {
+			p.add(" " + l)
+		}
+	}
 	for i, lo := range m.Scale {
 		text := fmt.Sprintf("%d+", lo)
 		if i+1 < len(m.Scale) {
@@ -58,9 +65,14 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 				text = fmt.Sprint(lo)
 			}
 		}
+		if m.ByBoots {
+			break
+		}
 		legend = append(legend, st.paint(heatColor(i+1), g.shade[min(i+1, 4)])+" "+text)
 	}
-	legend = append(legend, st.paint(cBoldRed, g.ue)+" "+st.say("map.ue"))
+	if !m.ByBoots {
+		legend = append(legend, st.paint(cBoldRed, g.ue)+" "+st.say("map.ue"))
+	}
 	for _, line := range flow(legend, "   ", st.width()-1) {
 		p.add(" " + line)
 	}
@@ -104,6 +116,21 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 				glyph, color := g.shade[heatLevel(n, m.Scale)], heatColor(heatLevel(n, m.Scale))
 				if ue[i] {
 					glyph, color = g.ue, cBoldRed
+				}
+				if m.ByBoots && i < len(ln.Boots) {
+					// The number of boots with an error in the cell.
+					switch b, u := ln.Boots[i], ln.UEBoots[i]; {
+					case u >= 2:
+						glyph, color = g.ue, cBoldRed
+					case u == 1:
+						glyph, color = strings.ToLower(g.ue), cRed
+					case b == 0:
+						glyph, color = g.shade[0], heatColor(0)
+					case b > 9:
+						glyph, color = "+", heatColor(3)
+					default:
+						glyph, color = strconv.Itoa(b), heatColor(min(b, 3))
+					}
 				}
 				if color != runColor {
 					flush()
@@ -160,6 +187,9 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 	}
 	if m.Unlocated > 0 {
 		p.add(" " + st.say("map.unlocated", "n", m.Unlocated))
+	}
+	if m.Window > 0 && m.Boots >= 2 {
+		p.add(" " + st.say("map.boots", "n", m.Boots, "of", m.Window, "ue", m.UEBoots))
 	}
 }
 

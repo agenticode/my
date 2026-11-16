@@ -561,6 +561,27 @@ func (g *generator) fault(index int) error {
 	for _, t := range f.PatrolUE {
 		uncorrected(t, model.SevRecoverable, model.ScrubPatrol, "clean LRU page: Recovered")
 	}
+	// A fatal error stops its boot. The kernel panics before anything is
+	// logged; the bank keeps the record over the reset and the next boot
+	// polls it at bring-up (__mcheck_cpu_init_prepare_banks in
+	// arch/x86/kernel/cpu/mce/core.c): a carried record of the boot that
+	// read it, which the ledger moves to the boot before.
+	for _, t := range f.Stops {
+		b := g.bootAt(t)
+		if b+1 >= len(g.ds.Boots) {
+			return fmt.Errorf("fault %d: no boot follows the stop at %s", index, t.Format(time.RFC3339))
+		}
+		before := len(g.ds.Events)
+		if !emit(t.Truncate(time.Microsecond), model.SevFatal, model.ScrubDemand, draw(0)) {
+			continue
+		}
+		truth.UE++
+		next := &g.ds.Boots[b+1]
+		e := &g.ds.Events[before]
+		e.Carried, e.BootID, e.ErrorDT = true, next.BootID, next.StartedAt.Add(4*time.Second)
+		e.ErrorType = "memory read error (carried over the reset)"
+		g.ds.Boots[b].LastSeen = t
+	}
 	g.ds.Truth = append(g.ds.Truth, truth)
 	return nil
 }

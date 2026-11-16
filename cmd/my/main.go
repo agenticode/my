@@ -50,6 +50,12 @@ func app() *cli.App {
 				Run:       live(runTimeline),
 			},
 			{
+				Name:      "boots",
+				Summary:   "the latest boots: how each ended and which DIMM or place had errors in it",
+				SummaryKO: "최근 부팅: 부팅마다 어떻게 끝났고 어느 DIMM이나 위치에 오류가 있었는지",
+				Run:       live(runBoots),
+			},
+			{
 				Name:      "gpu",
 				Summary:   "GPU memory as a repair budget: Xid records, remapped rows, spare rows per bank",
 				SummaryKO: "GPU 메모리를 리페어 예산으로: Xid 기록, remap된 row, bank별 spare row",

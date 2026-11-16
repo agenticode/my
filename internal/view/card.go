@@ -67,6 +67,11 @@ type Card struct {
 	// first.
 	Faults []FaultRow `json:"faults"`
 
+	// Stops sums up the stops of the window of the host, and Recurrence
+	// holds the boots of the window this DIMM had errors in, per place.
+	Stops      *Stops            `json:"stops,omitzero"`
+	Recurrence *engine.DIMMBoots `json:"recurrence,omitzero"`
+
 	EngineVersion string    `json:"engine_version"`
 	AsOf          time.Time `json:"as_of,omitzero"`
 }
@@ -135,6 +140,7 @@ func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMRes
 		Confidence: v.Confidence, ConfidenceLevel: level, ConfidenceText: engine.Messages.Text(c.Lang, "confidence."+level, nil),
 		Rules: v.Rules, Evidence: []Evidence{}, Checks: []Check{}, Missing: []Text{}, Faults: []FaultRow{},
 		EngineVersion: v.EngineVersion, AsOf: h.AsOf,
+		Stops: c.stops(h), Recurrence: h.Recurrence.DIMM(d.UID),
 	}
 	if card.Rules == nil {
 		card.Rules = []string{}
@@ -271,7 +277,10 @@ type Examination struct {
 	Card       *Card       `json:"card"`
 	Topology   *Topology   `json:"topology"`
 	AddressMap *AddressMap `json:"address_map"`
-	Timeline   *Timeline   `json:"timeline"`
+	// Boots holds the places of the DIMM boot by boot, when it had errors
+	// in two or more boots of the window.
+	Boots    *Boots    `json:"boots,omitzero"`
+	Timeline *Timeline `json:"timeline"`
 }
 
 // Examine builds the examination of a DIMM. The address map shows the bank
@@ -288,8 +297,17 @@ func (c *Case) Examine(ctx context.Context, h *engine.HostResult, d *engine.DIMM
 	if x.AddressMap, err = c.AddressMap(ctx, h, d, MapOptions{Cells: cells, MaxLines: 16}); err != nil {
 		return nil, err
 	}
+	if db := h.Recurrence.DIMM(d.UID); db != nil && db.BootsWithErrors >= 2 {
+		if x.Boots, err = c.BootsView(ctx, h, d); err != nil {
+			return nil, err
+		}
+	}
 	if x.Timeline, err = c.Timeline(ctx, h, d, TimelineOptions{}); err != nil {
 		return nil, err
+	}
+	if x.Boots != nil {
+		// The boots block above the timeline says it already.
+		x.Timeline.Boots = nil
 	}
 	return x, nil
 }

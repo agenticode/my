@@ -224,6 +224,12 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 			}
 		}
 	}
+	if b := tl.Boots; b != nil && len(b.Boots) > 0 {
+		p.blank()
+		p.add(" " + st.say("tl.boots"))
+		st.stopsLines(p, b.Stops)
+		st.bootsGrid(p, b, 0)
+	}
 }
 
 // Timeline draws the timeline of a host or of one DIMM.
