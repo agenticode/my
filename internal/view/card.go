@@ -317,3 +317,104 @@ func (c *Case) ExamineWith(ctx context.Context, h *engine.HostResult, d *engine.
 	}
 	return x, nil
 }
+
+// BriefLines is the number of statements the short form of a finding
+// shows below its decision.
+const BriefLines = 3
+
+// Brief is the short form of a finding: the statement that carries the
+// decision, at most BriefLines statements that bear on it, and the count
+// of what the short form leaves out.
+type Brief struct {
+	// Lead is the first statement of the rule that set the grade; nil for
+	// a finding without statements.
+	Lead  *Evidence
+	Lines []BriefLine
+	// More counts the statements of the rules and the checks for or
+	// against the finding that are not shown, Open the checks that could
+	// not be made, and Missing the kinds of data the finding lacked.
+	More, Open, Missing int
+}
+
+// BriefLine is one statement of the short form: of a rule, or a check.
+type BriefLine struct {
+	Evidence *Evidence
+	Check    *Check
+}
+
+// Brief picks the short form of the finding. Below the decision come the
+// checks that weaken the finding, the next statement of the rule that set
+// the grade, the first statement of every other rule, the checks that
+// support the finding, then further statements of the rules, at most
+// BriefLines in all.
+func (c *Card) Brief() (b Brief) {
+	add := func(l BriefLine) bool {
+		if len(b.Lines) < BriefLines {
+			b.Lines = append(b.Lines, l)
+		}
+		return len(b.Lines) < BriefLines
+	}
+	checks := func(effect string) bool {
+		for i := range c.Checks {
+			if c.Checks[i].Effect == effect && !add(BriefLine{Check: &c.Checks[i]}) {
+				return false
+			}
+		}
+		return true
+	}
+	defer func() {
+		shown := 0
+		for _, k := range c.Checks {
+			if k.Effect == "open" {
+				b.Open++
+			} else {
+				shown++
+			}
+		}
+		if len(c.Evidence) > 0 {
+			shown += len(c.Evidence) - 1
+		}
+		b.More = shown - len(b.Lines)
+		b.Missing = len(c.Missing)
+	}()
+	if !checks("weakens") {
+		return b
+	}
+	if len(c.Evidence) == 0 {
+		checks("supports")
+		return b
+	}
+	b.Lead = &c.Evidence[0]
+	used := make([]bool, len(c.Evidence))
+	used[0] = true
+	lead := c.Evidence[0].Rule
+	for i := range c.Evidence {
+		if !used[i] && c.Evidence[i].Rule == lead {
+			used[i] = true
+			if !add(BriefLine{Evidence: &c.Evidence[i]}) {
+				return b
+			}
+			break
+		}
+	}
+	ruleShown := map[string]bool{lead: true}
+	for i := range c.Evidence {
+		e := &c.Evidence[i]
+		if used[i] || ruleShown[e.Rule] {
+			continue
+		}
+		ruleShown[e.Rule], used[i] = true, true
+		if !add(BriefLine{Evidence: e}) {
+			return b
+		}
+	}
+	if !checks("supports") {
+		return b
+	}
+	for i := range c.Evidence {
+		if !used[i] && !add(BriefLine{Evidence: &c.Evidence[i]}) {
+			return b
+		}
+	}
+	return b
+}
