@@ -14,6 +14,17 @@ The record is a Generic Error Status Block with one Generic Error Data Entry
 (revision 3.00) and a memory error section (UEFI 2.10, N.2.5). Only the
 fields given on the command line are marked valid in the section.
 
+With --address-base the physical address is made up from the location
+fields: BASE + ((row * 2 + rank) * 16 + bank_group * 4 + bank) * 8192 +
+column * 8, the layout of a 16 GiB DIMM with two ranks of DDR4 (4 bank
+groups of 4 banks, 65536 rows, 1024 columns of 8 bytes) placed at BASE
+without interleaving. Real controllers spread a DIMM over the address space;
+this layout only keeps every place of a DIMM at an address of its own.
+
+--clock-offset is the guest's clock minus this host's clock, in seconds. The
+time in the record and in the plan is the guest's: that is the time the
+sources of the guest give the error.
+
 One line of JSON is printed per call, in the form plan.py reads.
 """
 import argparse
@@ -136,6 +147,17 @@ def number(text):
     return int(text, 0)
 
 
+def linear(a):
+    """The address of the location of a at a.address_base (see the module text)."""
+    need = {"rank": a.rank, "bank-group": a.bank_group, "bank-address": a.bank_address, "row": a.row, "column": a.column}
+    missing = [k for k, v in need.items() if v is None]
+    if missing:
+        raise ValueError("--address-base needs --" + ", --".join(missing))
+    if not (0 <= a.rank < 2 and 0 <= a.bank_group < 4 and 0 <= a.bank_address < 4 and 0 <= a.row < 1 << 16 and 0 <= a.column < 1 << 10):
+        raise ValueError("location outside a 16 GiB DIMM of two ranks")
+    return a.address_base + ((a.row * 2 + a.rank) * 16 + a.bank_group * 4 + a.bank_address) * 8192 + a.column * 8
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--qmp", required=True, help="QMP socket of the guest's QEMU")
@@ -147,6 +169,8 @@ def main():
     ap.add_argument("--type", type=number, help="memory error type: 2 single-bit ECC, 3 multi-bit ECC, 13 scrub corrected, 14 scrub uncorrected")
     ap.add_argument("--status", type=number)
     ap.add_argument("--address", type=number)
+    ap.add_argument("--address-base", type=number, help="make the address up from the location, from this base")
+    ap.add_argument("--clock-offset", type=float, default=0.0, help="seconds the guest's clock is ahead of this host's")
     ap.add_argument("--mask", type=number)
     for name in ("node", "card", "module", "rank", "bank", "bank-group", "bank-address", "device", "chip", "row", "column", "bit", "handle"):
         ap.add_argument("--" + name, type=number)
@@ -155,8 +179,12 @@ def main():
     ap.add_argument("--note", default="")
     ap.add_argument("--dump", action="store_true", help="print the record in hexadecimal and send nothing")
     a = ap.parse_args()
+    if a.address_base is not None:
+        if a.address is not None:
+            ap.error("--address and --address-base exclude each other")
+        a.address = linear(a)
 
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=a.clock_offset)
     data = record(a, now)
     if a.dump:
         print(data.hex())
@@ -196,6 +224,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (OSError, RuntimeError) as err:
+    except (OSError, RuntimeError, ValueError) as err:
         print("ghes.py: %s" % err, file=sys.stderr)
         sys.exit(1)
