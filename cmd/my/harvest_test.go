@@ -375,7 +375,7 @@ func useUnitDir(t *testing.T) (unitDir string) {
 	unitDir, runDir := t.TempDir(), t.TempDir()
 	oldUnit, oldRun, oldCheck, oldProbe := harvestUnitDir, harvestRunDir, binaryCheck, installProbe
 	harvestUnitDir, harvestRunDir = unitDir, runDir
-	binaryCheck = func(string) string { return "" }
+	binaryCheck = func(string) (string, []any) { return "", nil }
 	installProbe = func(euid *int, binary *string) { *euid, *binary = 0, "/usr/local/bin/my" }
 	t.Cleanup(func() { harvestUnitDir, harvestRunDir, binaryCheck, installProbe = oldUnit, oldRun, oldCheck, oldProbe })
 	return unitDir
@@ -467,6 +467,21 @@ func TestHarvestInstallRefuses(t *testing.T) {
 	}
 	os.Remove(filepath.Join(unitDir, "my-harvest.service"))
 
+	// A ledger the unit could not write, or whose path ExecStart= would
+	// split: the service would fail at every boot.
+	for _, l := range []string{"/srv/my/ledger.db", "ledger.db", "/var/lib/my/a b.db", "/var/lib/my/%h.db", "/var/lib/mysql/ledger.db"} {
+		code, _, errOut := run("harvest", "install", "--ledger", l)
+		if code != cli.ExitUsage || !strings.Contains(errOut, "the unit may write below /var/lib/my only") || calls(t, log) != "" {
+			t.Errorf("--ledger %s: exit %d, %s, calls %q", l, code, errOut, calls(t, log))
+		}
+	}
+	if entries, _ := os.ReadDir(unitDir); len(entries) != 0 {
+		t.Errorf("a refused ledger left %d files", len(entries))
+	}
+	if code, out, errOut := run("harvest", "install", "--ledger", "/var/lib/my/other.db", "--dry-run"); code != 0 || !strings.Contains(out, "nothing was done") {
+		t.Errorf("a ledger below /var/lib/my: exit %d, %s %s", code, out, errOut)
+	}
+
 	installProbe = func(euid *int, binary *string) { *euid, *binary = 1000, "/usr/local/bin/my" }
 	if code, _, errOut := run("harvest", "install"); code != cli.ExitFailure || !strings.Contains(errOut, "as root") {
 		t.Errorf("not root: exit %d, %s", code, errOut)
@@ -482,7 +497,7 @@ func TestHarvestInstallRefuses(t *testing.T) {
 // one only root can replace.
 func TestInstallCheck(t *testing.T) {
 	for _, p := range []string{"/home/alice/bin/my", "/root/my", "/tmp/my", "/run/user/1000/my", "/var/tmp/my"} {
-		if why := installCheck(p); !strings.HasPrefix(why, "below") {
+		if why, _ := installCheck(p); why != "harvest.why_below" {
 			t.Errorf("%s: %q", p, why)
 		}
 	}
@@ -491,11 +506,14 @@ func TestInstallCheck(t *testing.T) {
 	os.WriteFile(open, []byte("x"), 0o777)
 	os.Chmod(open, 0o777)
 	if os.Geteuid() != 0 {
-		if why := installCheck(open); why != "not owned by root" && !strings.HasPrefix(why, "below") {
+		if why, _ := installCheck(open); why != "harvest.why_owner" && why != "harvest.why_below" {
 			t.Errorf("a file of this user: %q", why)
 		}
-	} else if why := installCheck(open); why != "writable by others than its owner" && !strings.HasPrefix(why, "below") {
+	} else if why, _ := installCheck(open); why != "harvest.why_writable" && why != "harvest.why_below" {
 		t.Errorf("a file writable by all: %q", why)
+	}
+	if why, _ := installCheck("/opt/My Tools/my"); why != "harvest.why_word" {
+		t.Errorf("a path with a space: %q", why)
 	}
 }
 
@@ -508,8 +526,8 @@ func TestHarvestUnitsInContrib(t *testing.T) {
 			t.Errorf("contrib/systemd/%s differs from what my harvest install writes", name)
 		}
 	}
-	svc := unitFiles("/usr/local/bin/my", "/srv/my/ledger.db", false)["my-harvest.service"]
-	if !strings.Contains(svc, "ExecStart=/usr/local/bin/my harvest --ledger /srv/my/ledger.db\n") {
+	svc := unitFiles("/usr/local/bin/my", "/var/lib/my/other.db", false)["my-harvest.service"]
+	if !strings.Contains(svc, "ExecStart=/usr/local/bin/my harvest --ledger /var/lib/my/other.db\n") {
 		t.Errorf("ExecStart with another ledger:\n%s", svc)
 	}
 	for _, line := range []string{"Type=oneshot", "PrivateNetwork=yes", "StateDirectory=my", "CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_SYSLOG", "After=local-fs.target systemd-journal-flush.service systemd-pstore.service rasdaemon.service"} {

@@ -22,6 +22,7 @@ import (
 	"github.com/agenticode/my/internal/preflight"
 	"github.com/agenticode/my/internal/scan"
 	"github.com/agenticode/my/internal/store"
+	"github.com/agenticode/my/internal/term"
 )
 
 // The kept ledger of the boot harvest, and the units that run it.
@@ -321,26 +322,48 @@ func unitFiles(binary, ledger string, timer bool) map[string]string {
 // binaryCheck is installCheck; tests, which run as a user, replace it.
 var binaryCheck = installCheck
 
-// installCheck says why the binary cannot be the one a unit runs, or "".
-// The unit protects /home and runs as root: a binary another user can
-// replace would run as root at the next boot.
-func installCheck(binary string) string {
+// installCheck says why the binary cannot be the one a unit runs, as the
+// code of a message and its arguments, or "". The unit protects /home and
+// runs as root: a binary another user can replace would run as root at the
+// next boot.
+func installCheck(binary string) (string, []any) {
 	for _, dir := range []string{"/home/", "/root/", "/tmp/", "/run/", "/var/tmp/"} {
 		if strings.HasPrefix(binary, dir) {
-			return "below " + strings.TrimSuffix(dir, "/")
+			return "harvest.why_below", []any{"dir", strings.TrimSuffix(dir, "/")}
 		}
+	}
+	if !unitWord(binary) {
+		return "harvest.why_word", nil
 	}
 	fi, err := os.Stat(binary)
 	if err != nil {
-		return err.Error()
+		return "harvest.why_other", []any{"why", cli.ErrorText(i18n.EN, err)}
 	}
 	if owner, ok := fileOwner(fi); ok && owner != 0 {
-		return "not owned by root"
+		return "harvest.why_owner", nil
 	}
 	if fi.Mode().Perm()&0o022 != 0 {
-		return "writable by others than its owner"
+		return "harvest.why_writable", nil
 	}
-	return ""
+	return "", nil
+}
+
+// unitWord reports whether a path can stand in ExecStart= as it is: the
+// line is split at white space and quotes, and % and $ start specifiers
+// and variables (systemd.service(5), "Command lines").
+func unitWord(p string) bool {
+	return p != "" && !strings.ContainsAny(p, " \t\n\"'\\%$;")
+}
+
+// installLedger returns the ledger a unit may keep, as an absolute path.
+// The unit runs with ProtectSystem=strict and may write below its state
+// directory, /var/lib/my, only.
+func installLedger(ledger string) (string, bool) {
+	abs, err := filepath.Abs(ledger)
+	if err != nil || !unitWord(abs) || !strings.HasPrefix(abs, filepath.Dir(preflight.DefaultLedger)+"/") {
+		return abs, false
+	}
+	return abs, true
 }
 
 // harvestInstall writes the unit files, reloads systemd and enables them.
@@ -362,9 +385,14 @@ func harvestInstall(env *cli.Env, lang i18n.Lang, o *options, in installOptions)
 	if _, err := os.Stat(harvestRunDir); err != nil {
 		return o.failure(env, errorText(say(lang, "harvest.no_systemd")))
 	}
-	if why := binaryCheck(binary); why != "" {
-		return o.failure(env, errorText(say(lang, "harvest.bad_binary", "binary", binary, "why", why)))
+	if why, args := binaryCheck(binary); why != "" {
+		return o.failure(env, errorText(say(lang, "harvest.bad_binary", "binary", binary, "why", say(lang, why, args...))))
 	}
+	ledger, ok := installLedger(in.Ledger)
+	if !ok {
+		return o.usageError(env, lang, "%s", say(lang, "harvest.bad_ledger", "ledger", ledger, "dir", filepath.Dir(preflight.DefaultLedger)))
+	}
+	in.Ledger = ledger
 	files := unitFiles(binary, in.Ledger, in.Timer)
 	names := []string{"my-harvest.service"}
 	if in.Timer {
@@ -508,11 +536,11 @@ func harvestStatus(ctx context.Context, env *cli.Env, lang i18n.Lang, o *options
 				state = "harvest.state.enabled"
 			}
 		}
-		fmt.Fprintf(w, "%-20s %s\n", n, say(lang, state))
+		fmt.Fprintf(w, "%s %s\n", statusLabel(n), say(lang, state))
 	}
 	fi, err := os.Stat(ledger)
 	if err != nil {
-		fmt.Fprintf(w, "%-20s %s\n", say(lang, "harvest.ledger"), say(lang, "harvest.no_ledger", "ledger", ledger))
+		fmt.Fprintf(w, "%s %s\n", statusLabel(say(lang, "harvest.ledger")), say(lang, "harvest.no_ledger", "ledger", ledger))
 		return cli.ExitOK
 	}
 	st, err := store.Open(ctx, ledger, store.ReadOnly)
@@ -520,18 +548,35 @@ func harvestStatus(ctx context.Context, env *cli.Env, lang i18n.Lang, o *options
 		return o.failure(env, err)
 	}
 	defer st.Close()
-	boots, _ := st.Boots(ctx, "")
+	all, _ := st.Boots(ctx, "")
+	// A boot whose start is known only relative to itself is no boot of
+	// the window my boots shows (engine.Recurrence): count as it counts.
+	var boots []model.Boot
+	for _, b := range all {
+		if b.StartQuality != model.TimeRelative {
+			boots = append(boots, b)
+		}
+	}
 	hosts, _ := st.Hosts(ctx)
-	fmt.Fprintf(w, "%-20s %s\n", say(lang, "harvest.ledger"), say(lang, "harvest.ledger_is", "ledger", ledger, "kib", fi.Size()>>10, "boots", len(boots), "hosts", len(hosts)))
+	fmt.Fprintf(w, "%s %s\n", statusLabel(say(lang, "harvest.ledger")), say(lang, "harvest.ledger_is", "ledger", ledger, "kib", fi.Size()>>10, "boots", len(boots), "hosts", len(hosts)))
 	last, _ := st.Meta(ctx, "harvest.last_run")
 	if last == "" {
 		last = say(lang, "harvest.never")
 	}
-	fmt.Fprintf(w, "%-20s %s\n", say(lang, "harvest.last"), last)
+	fmt.Fprintf(w, "%s %s\n", statusLabel(say(lang, "harvest.last")), last)
 	if cut := cutScans(ctx, st); cut != "" {
-		fmt.Fprintf(w, "%-20s %s\n", "", say(lang, "case.cut", "time", cut))
+		fmt.Fprintf(w, "%s %s\n", statusLabel(""), say(lang, "case.cut", "time", cut))
 	}
 	return cli.ExitOK
+}
+
+// statusLabel pads a label of "my harvest status" to its column by the
+// width on a terminal, which a Korean label has twice its letters of.
+func statusLabel(s string) string {
+	if w := term.Width(s); w < 20 {
+		s += strings.Repeat(" ", 20-w)
+	}
+	return s
 }
 
 // cutScans returns the start of the latest scan of a ledger that did not
