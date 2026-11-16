@@ -122,7 +122,7 @@ sudo my why CPU0_C1 --oneline    # the finding as one line for a ticket
 sudo my bundle -o case.mycase    # everything the scan read, as one file
 ```
 
-Root is not required. Without it the scan reads what the host leaves open and names what it could not read. On most hosts that is the SMBIOS tables with the DIMM serial numbers, and on some the kernel log or the rasdaemon database.
+Root is not required. Without it the scan reads what the host leaves open and names what it could not read: on most hosts the SMBIOS tables, which hold the DIMM serial numbers, and on some the kernel log or the rasdaemon database.
 
 On any machine, Linux or macOS:
 
@@ -258,7 +258,7 @@ MemorY has no telemetry and contacts no server of the project. It uses the netwo
 | every source that was looked for, with the path it was read from, and what it yielded | |
 | the findings of the sender's run | |
 
-`--anonymize` replaces host names, IP addresses, MAC addresses, the disk identifiers of the kernel command line and the names of home directories in file paths with words made from a keyed hash, and prints the replaced host names for the sender to keep. DIMM serial numbers stay, because a return is about them. `unzip -p case.mycase manifest.json` shows what a given file holds before it is sent.
+`--anonymize` replaces host names, IP addresses, MAC addresses, the disk identifiers of the kernel command line and the names of home directories in file paths with words made from a keyed hash, and prints the replaced host names for the sender to keep. DIMM serial numbers stay, because a return is about them. Two things stay as well: the other directory names of a path given to `my import`, and the name of another machine that a log line mentions ([docs/bundle-format.md](docs/bundle-format.md#anonymizing)). `unzip -p case.mycase manifest.json` shows what a given file holds before it is sent.
 
 ## Vendor analyzers
 

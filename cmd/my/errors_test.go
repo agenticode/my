@@ -68,6 +68,13 @@ func TestErrorsInTheReadersLanguage(t *testing.T) {
 			t.Errorf("%v in Korean: exit code %d, %q", tt.args, code, first)
 		}
 	}
+	// A --lang after the mistake counts: the parse stops at the mistake.
+	for _, args := range [][]string{{"--frobnicate", "--lang", "ko"}, {"dimm", "--width", "x", "--lang=ko"}, {"harvest", "status", "--frob", "--lang", "ko"}} {
+		code, _, stderr := runEnv(nil, args...)
+		if first, _, _ := strings.Cut(stderr, "\n"); code != cli.ExitUsage || !hangul.MatchString(first) {
+			t.Errorf("%v: exit code %d, %q", args, code, first)
+		}
+	}
 	if _, err := os.Stat(filepath.Join(dir, "c")); err == nil {
 		t.Error("a command line that was refused left a directory behind")
 	}

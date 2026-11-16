@@ -245,6 +245,10 @@ func (o *options) parse(env *cli.Env, args []string) (pos []string, lang i18n.La
 	}
 	pos, err := cli.Parse(o.fs, args)
 	lang = cli.Lang(env)
+	if err != nil && o.lang == "" {
+		// The parse stopped at the mistake: a --lang after it was not read.
+		o.lang = cli.LangFlag(args)
+	}
 	if o.lang != "" {
 		l, lerr := i18n.ParseLang(o.lang)
 		if lerr != nil && err == nil {
