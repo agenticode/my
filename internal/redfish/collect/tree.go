@@ -30,6 +30,11 @@ type tree struct {
 	// taken maps a file name in lower case to the URI it was written for:
 	// on a file system that ignores case two URIs can ask for one file.
 	taken map[string]string
+	// dirs maps each directory made so far, in lower case, to the way it
+	// was written. On such a file system /redfisH/v1/Managers would land
+	// in the directory redfish/v1, and the manifest would name a file that
+	// a copy on another file system does not have.
+	dirs map[string]string
 }
 
 func openTree(dir string) (*tree, error) {
@@ -37,7 +42,7 @@ func openTree(dir string) (*tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &tree{root: root, taken: map[string]string{}}, nil
+	return &tree{root: root, taken: map[string]string{}, dirs: map[string]string{}}, nil
 }
 
 func (t *tree) close() error { return t.root.Close() }
@@ -87,6 +92,14 @@ func (t *tree) write(uri string, data []byte) (string, error) {
 		return "", fmt.Errorf("the file name is taken by %s", other)
 	}
 	dir := strings.TrimSuffix(name, "/"+indexName)
+	for i := 0; i <= len(dir); i++ {
+		if i < len(dir) && dir[i] != '/' {
+			continue
+		}
+		if had, ok := t.dirs[strings.ToLower(dir[:i])]; ok && had != dir[:i] {
+			return "", fmt.Errorf("the directory %s differs from %s only in case", clipName(dir[:i]), clipName(had))
+		}
+	}
 	if err := t.root.MkdirAll(dir, 0o777); err != nil {
 		return "", err
 	}
@@ -94,7 +107,20 @@ func (t *tree) write(uri string, data []byte) (string, error) {
 		return "", err
 	}
 	t.taken[key] = uri
+	for i := 0; i <= len(dir); i++ {
+		if i == len(dir) || dir[i] == '/' {
+			t.dirs[strings.ToLower(dir[:i])] = dir[:i]
+		}
+	}
 	return name, nil
+}
+
+// clipName shortens a path for a message: its last 80 bytes.
+func clipName(p string) string {
+	if len(p) <= 80 {
+		return p
+	}
+	return "..." + p[len(p)-80:]
 }
 
 // writeTop stores a file at the top of the collection.

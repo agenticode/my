@@ -285,7 +285,7 @@ func New(cfg Config) (*Client, error) {
 		case len(via) >= maxRedirects:
 			return &refusal{"more than " + strconv.Itoa(maxRedirects) + " redirects"}
 		case origin(req.URL) != c.guard.origin:
-			return &refusal{"the BMC redirects to another host (" + req.URL.Host + "); a redirect is only followed on the BMC itself"}
+			return &refusal{"the BMC redirects to another host (" + clip(req.URL.Host, 80) + "); a redirect is only followed on the BMC itself"}
 		}
 		return nil
 	}}
@@ -427,7 +427,7 @@ func (g *guard) allow(method, target string) {
 
 func (g *guard) RoundTrip(req *http.Request) (*http.Response, error) {
 	if origin(req.URL) != g.origin {
-		return nil, &refusal{"a request to another host than the BMC (" + req.URL.Host + ")"}
+		return nil, &refusal{"a request to another host than the BMC (" + clip(req.URL.Host, 80) + ")"}
 	}
 	g.mu.Lock()
 	post, del := g.post, g.del

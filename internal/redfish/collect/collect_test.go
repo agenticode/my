@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 	"sync/atomic"
@@ -1027,5 +1028,46 @@ func TestSafeName(t *testing.T) {
 		if got := SafeName(in); got != want {
 			t.Errorf("SafeName(%q) = %q, want %q", in, got, want)
 		}
+	}
+}
+
+// Two URIs whose paths differ only in the case of a directory: on a file
+// system that ignores case the second would land in the directory of the
+// first, and the manifest would name a file a copy elsewhere does not
+// have. The second is refused, on every file system alike, and every file
+// on disk is the one its name says.
+func TestPathsThatDifferOnlyInCase(t *testing.T) {
+	dir := t.TempDir()
+	tr, err := openTree(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tr.close()
+	if _, err := tr.write("/redfish/v1", []byte(`{}`)); err != nil {
+		t.Fatal(err)
+	}
+	if name, err := tr.write("/redfisH/v1/Managers", []byte(`{"a":1}`)); err == nil || !strings.Contains(err.Error(), "differs from redfish only in case") {
+		t.Errorf("a directory in another case: %q, %v", name, err)
+	}
+	if name, err := tr.write("/redfish/V1/Systems", []byte(`{}`)); err == nil || !strings.Contains(err.Error(), "redfish/V1 differs from redfish/v1") {
+		t.Errorf("a deeper directory in another case: %q, %v", name, err)
+	}
+	if name, err := tr.write("/redfish/v1/Managers", []byte(`{"b":2}`)); err != nil || name != "redfish/v1/Managers/index.json" {
+		t.Fatalf("the same directory in the same case: %q, %v", name, err)
+	}
+	var files []string
+	filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err == nil && !d.IsDir() {
+			rel, _ := filepath.Rel(dir, p)
+			files = append(files, filepath.ToSlash(rel))
+		}
+		return nil
+	})
+	sort.Strings(files)
+	if want := []string{"redfish/v1/Managers/index.json", "redfish/v1/index.json"}; !reflect.DeepEqual(files, want) {
+		t.Errorf("files %v, want %v", files, want)
+	}
+	if b, _ := os.ReadFile(filepath.Join(dir, "redfish", "v1", "Managers", "index.json")); string(b) != `{"b":2}` {
+		t.Errorf("the file holds %s", b)
 	}
 }
