@@ -183,9 +183,15 @@ prepare)
 bert)
 	# bert: keep the page of the boot error region out of the guest's RAM,
 	# so that bert_init may map it (drivers/acpi/apei/bert.c); then a
-	# reboot. GRUB expands "$" in kernel parameters: the backslash keeps it.
-	guest "grubby --update-kernel=ALL --args='memmap=4K\\\\\\\$$BERTADDR'"
-	guest 'grep -h memmap /boot/loader/entries/*.conf | head -1'
+	# reboot. GRUB expands "$" in the options of a BLS entry, so the entry
+	# needs "memmap=4K\$ADDR"; grubby drops one level of backslashes, so
+	# the entries are edited directly. Without the backslash the kernel gets
+	# memmap=4K, keeps 4 KiB of RAM and does not boot.
+	fix=$(mktemp)
+	printf '%s\n' "for f in /boot/loader/entries/*.conf; do grep -q memmap= \"\$f\" || sed -i '/^options/ s/\$/ memmap=4K\\\\\$$BERTADDR/' \"\$f\"; done" >"$fix"
+	push "$fix" root@127.0.0.1:/root/bert-memmap.sh
+	rm -f "$fix"
+	guest 'sh /root/bert-memmap.sh && grep -h "^options" /boot/loader/entries/*.conf | grep -o "memmap=[^ ]*"'
 	guest 'systemctl reboot' || true
 	;;
 
