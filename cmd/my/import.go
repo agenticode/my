@@ -50,6 +50,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	force := o.fs.Bool("force", false, "")
 	all := o.fs.Bool("all", false, "")
 	strict := o.fs.Bool("strict", false, "")
+	withInputs := o.fs.Bool("with-inputs", false, "")
 	o.fs.Var(&o.maps, "event-map", "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
@@ -65,6 +66,10 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		return o.usageError(env, lang, "%s", say(lang, "err.key_without"))
 	case *anonymize && *out == "":
 		return o.usageError(env, lang, "%s", say(lang, "err.anonymize_out"))
+	case *withInputs && *out == "":
+		return o.usageError(env, lang, "%s", say(lang, "err.with_inputs_out"))
+	case *withInputs && *anonymize:
+		return o.usageError(env, lang, "%s", say(lang, "err.inputs_anonymize"))
 	}
 	if err := useEventMaps(env, lang, o.maps); err != nil {
 		return o.usageError(env, lang, "%s", errText(lang, err))
@@ -203,7 +208,11 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 		if err := c.Result.Save(ctx, ledger); err != nil {
 			return o.failure(env, err)
 		}
-		bopts := bundle.Options{Now: now, Tool: toolName(), Anonymize: *anonymize, Key: key, Force: *force}
+		files, err := inputFiles(ctx, pos)
+		if err != nil {
+			return o.failure(env, err)
+		}
+		bopts := bundle.Options{Now: now, Tool: toolName(), Anonymize: *anonymize, Key: key, Force: *force, Inputs: files, WithInputs: *withInputs}
 		var w *bundle.Written
 		// With "-o -" the bundle is the standard output, and what is said
 		// about it goes to the standard error.
@@ -330,4 +339,32 @@ func importLine(w io.Writer, lang i18n.Lang, st term.Style, src model.Source) {
 			fmt.Fprintln(w, l)
 		}
 	}
+}
+
+// inputFiles lists the files given to an import for the manifest of its
+// bundle: a file as it is, and the files below a directory as the reader
+// of a directory takes them. An input that is not there was reported when
+// it was read.
+func inputFiles(ctx context.Context, paths []string) ([]bundle.InputFile, error) {
+	var out []bundle.InputFile
+	for _, p := range paths {
+		fi, err := os.Stat(p)
+		if err != nil {
+			continue
+		}
+		switch {
+		case fi.Mode().IsRegular():
+			out = append(out, bundle.InputFile{Name: filepath.Base(p), Path: p})
+		case fi.IsDir():
+			w, err := scan.DirFiles(ctx, p)
+			if err != nil {
+				return nil, err
+			}
+			base := filepath.Base(filepath.Clean(p))
+			for _, f := range w.Files {
+				out = append(out, bundle.InputFile{Name: base + "/" + f.Rel, Path: f.Path})
+			}
+		}
+	}
+	return out, nil
 }

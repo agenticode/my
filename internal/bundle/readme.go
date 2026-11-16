@@ -35,7 +35,36 @@ func readme(m *Manifest) string {
 	p("  %-14s every source that was looked for, and what it yielded or why it could not be read", sourcesName)
 	p("  %-14s the ledger: a SQLite file (schema version %d)", ledgerName, m.Ledger.SchemaVersion)
 	p("  %-14s this text", readmeName)
+	travel := 0
+	for _, in := range m.Inputs {
+		if in.Member != "" {
+			travel++
+		}
+	}
+	if travel > 0 {
+		p("  %-14s the %d %s the records were read from, as %s given", inputsDir, travel, plural(travel, "file", "files"), plural(travel, "it was", "they were"))
+	}
 	p("")
+	if travel > 0 {
+		p("The files under %s are whole: a log of a BMC or of a vendor tool can hold logins, user", inputsDir)
+		p("names, network addresses and configuration, and nothing in them was replaced or left out.")
+		p("Look through them before the bundle goes further.")
+		p("")
+	}
+	if len(m.Inputs) > 0 {
+		// A directory gives many files: the first are listed, the
+		// manifest has every one.
+		const listed = 20
+		p("Files read")
+		for i, in := range m.Inputs {
+			if i == listed {
+				p("  and %d more, listed in %s", len(m.Inputs)-listed, manifestName)
+				break
+			}
+			p("  %s  %s bytes  sha256 %s", in.Name, i18n.Thousands(in.Bytes), in.SHA256)
+		}
+		p("")
+	}
 	p("Hosts")
 	for _, h := range m.Hosts {
 		line := fmt.Sprintf("  %s: %d %s, CE %s, UE %s", h.Name, h.DIMMs, plural(h.DIMMs, "DIMM", "DIMMs"), i18n.Thousands(h.CE), i18n.Thousands(h.UE))
@@ -75,7 +104,10 @@ func readme(m *Manifest) string {
 		p("  %s", n)
 	}
 	p("")
-	if m.Anonymized {
+	if travel > 0 {
+		p("Host names and network addresses are in the ledger as the sources recorded them, and in the")
+		p("files under %s as their writer put them.", inputsDir)
+	} else if m.Anonymized {
 		p("Host names, IP addresses, MAC addresses, the disk identifiers of the kernel command line")
 		p("and the names of home directories in file paths were replaced before this bundle was written.")
 		p("DIMM serial numbers were kept: a return is about them.")

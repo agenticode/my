@@ -14,6 +14,9 @@
 //	               placements, boots, actions, findings
 //	README.txt     the same in words, for a person who receives the file
 //
+// With Options.WithInputs the files the records were read from travel as
+// well, under inputs/.
+//
 // A bundle holds records about memory errors. It never holds the contents
 // of memory.
 //
@@ -76,7 +79,15 @@ var (
 	// ErrDamaged: a member is missing, or the ledger does not match its
 	// checksum.
 	ErrDamaged = errors.New("the bundle is damaged")
+	// ErrInputsAnonymized: the files of an import were asked for in an
+	// anonymized bundle. The anonymizer replaces names in the ledger; it
+	// cannot vouch for a whole vendor file.
+	ErrInputsAnonymized = errors.New("the files that were read cannot travel in an anonymized bundle: the anonymizer cannot vouch for a whole vendor file")
 )
+
+// inputsDir is the directory of the bundle that holds the files that were
+// read, with Options.WithInputs.
+const inputsDir = "inputs/"
 
 // Manifest says what a bundle is and what it holds.
 type Manifest struct {
@@ -97,6 +108,29 @@ type Manifest struct {
 	Collected []Item `json:"collected"`
 	// NotCollected names what a bundle never holds.
 	NotCollected []string `json:"not_collected"`
+	// Inputs are the files the records were read from, so that a bundle
+	// can be matched to the files a sender kept.
+	Inputs []Input `json:"inputs,omitzero"`
+}
+
+// Input is a file the records of a bundle were read from.
+type Input struct {
+	// Name is the file as it was given, without the directories above
+	// it: "sel.txt", or "dump/redfish/v1/Systems/1.json" for a file of a
+	// directory that was given.
+	Name   string `json:"name"`
+	Bytes  int64  `json:"bytes"`
+	SHA256 string `json:"sha256"`
+	// Member is the member of the bundle that holds the file, when it
+	// travels in the bundle.
+	Member string `json:"member,omitzero"`
+}
+
+// InputFile is a file to list in the manifest, and to put into the bundle
+// with Options.WithInputs.
+type InputFile struct {
+	Name string
+	Path string
 }
 
 // LedgerInfo describes the ledger member.
@@ -205,6 +239,13 @@ var NotCollected = []string{
 	"kernel log lines that are not about memory errors, page offlining, machine checks or the boot banner",
 }
 
+// NotCollectedWithInputs is what a bundle that carries the files that
+// were read never holds: those files hold whatever their writer put in.
+var NotCollectedWithInputs = []string{
+	"contents of memory or of processes",
+	"files other than those listed under inputs in the manifest",
+}
+
 // Options describe a bundle to write.
 type Options struct {
 	// Now is the creation time; zero means the current time.
@@ -224,6 +265,13 @@ type Options struct {
 	// TempDir is where the copy of the ledger is prepared; empty means the
 	// system temporary directory.
 	TempDir string
+	// Inputs are the files the records were read from: the manifest lists
+	// each with its size and checksum.
+	Inputs []InputFile
+	// WithInputs puts those files into the bundle. A vendor log holds
+	// logins, addresses and user names, which a bundle otherwise never
+	// holds; it cannot go with Anonymize.
+	WithInputs bool
 }
 
 // Written describes a bundle that was written.
@@ -295,15 +343,21 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 		now = time.Now()
 	}
 	now = now.UTC().Truncate(time.Second)
+	if opts.WithInputs && opts.Anonymize {
+		return nil, nil, nil, ErrInputsAnonymized
+	}
 
 	tmp, err := os.MkdirTemp(opts.TempDir, "my-bundle-")
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	cleanup = func() { os.RemoveAll(tmp) }
+	// An error return sets cleanup to nil: the copy is removed through a
+	// function of its own.
+	remove := func() { os.RemoveAll(tmp) }
+	cleanup = remove
 	defer func() {
 		if err != nil {
-			cleanup()
+			remove()
 		}
 	}()
 	ledger := filepath.Join(tmp, ledgerName)
@@ -315,10 +369,14 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 	m := &w.Manifest
 	m.Format, m.FormatVersion, m.CreatedAt, m.Tool = Format, Version, now, opts.Tool
 	m.NotCollected = NotCollected
+	if opts.WithInputs && len(opts.Inputs) > 0 {
+		m.NotCollected = NotCollectedWithInputs
+	}
 	if opts.Subject != nil {
 		sub := *opts.Subject
 		m.Subject = &sub
 	}
+	var anon *anonymizer
 	if opts.Anonymize {
 		a, aerr := newAnonymizer(opts.Key)
 		if aerr != nil {
@@ -327,6 +385,7 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 		if aerr := a.run(ctx, ledger); aerr != nil {
 			return nil, nil, nil, fmt.Errorf("anonymize: %w", aerr)
 		}
+		anon = a
 		m.Anonymized = true
 		m.Anonymization = &Anonymization{Hosts: len(a.names), Addresses: len(a.addresses), Users: len(a.users), Keyed: len(opts.Key) > 0}
 		w.Names = a.names
@@ -353,6 +412,10 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 		return nil, nil, nil, err
 	}
 	m.Ledger = LedgerInfo{File: ledgerName, SchemaVersion: m.Ledger.SchemaVersion, Bytes: size, SHA256: sum}
+	travel, err := listInputs(ctx, m, opts, anon)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	manifest, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -385,6 +448,11 @@ func prepare(ctx context.Context, s *store.Store, opts Options) (w *Written, emi
 				return err
 			}
 			if _, err := io.Copy(f, member.r); err != nil {
+				return err
+			}
+		}
+		for _, in := range travel {
+			if err := addInput(zw, in, now); err != nil {
 				return err
 			}
 		}
@@ -782,4 +850,86 @@ func copyContext(ctx context.Context, dst io.Writer, src io.Reader) (int64, erro
 			return total, err
 		}
 	}
+}
+
+// traveller is a file that goes into the bundle, with the size and
+// checksum the manifest gives for it.
+type traveller struct {
+	path, member string
+	bytes        int64
+	sum          string
+}
+
+// listInputs lists the files the records were read from in the manifest
+// and returns those that travel in the bundle. A name goes through the
+// anonymizer of the bundle when there is one.
+func listInputs(ctx context.Context, m *Manifest, opts Options, anon *anonymizer) ([]traveller, error) {
+	var travel []traveller
+	taken := map[string]bool{}
+	for _, in := range opts.Inputs {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		sum, size, err := checksum(in.Path)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", in.Name, err)
+		}
+		name := inputName(in.Name)
+		if anon != nil {
+			name = anon.text(name)
+		}
+		// Two files of the same name stay apart.
+		base := name
+		for i := 2; taken[name]; i++ {
+			name = fmt.Sprintf("%s-%d", base, i)
+		}
+		taken[name] = true
+		row := Input{Name: name, Bytes: size, SHA256: sum}
+		if opts.WithInputs {
+			row.Member = inputsDir + name
+			travel = append(travel, traveller{path: in.Path, member: row.Member, bytes: size, sum: sum})
+		}
+		m.Inputs = append(m.Inputs, row)
+	}
+	return travel, nil
+}
+
+// inputName makes a name of the manifest and of a member: slashes only,
+// no directory above the file, no element that climbs.
+func inputName(name string) string {
+	var parts []string
+	for _, p := range strings.Split(filepath.ToSlash(name), "/") {
+		switch p {
+		case "", ".", "..":
+			continue
+		}
+		parts = append(parts, p)
+	}
+	if len(parts) == 0 {
+		return "input"
+	}
+	return strings.Join(parts, "/")
+}
+
+// addInput writes a file into the bundle, and fails when it is no longer
+// the file the manifest describes.
+func addInput(zw *zip.Writer, in traveller, now time.Time) error {
+	f, err := os.Open(in.path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w, err := zw.CreateHeader(&zip.FileHeader{Name: in.member, Method: zip.Deflate, Modified: now})
+	if err != nil {
+		return err
+	}
+	h := sha256.New()
+	n, err := io.Copy(io.MultiWriter(w, h), f)
+	if err != nil {
+		return err
+	}
+	if n != in.bytes || hex.EncodeToString(h.Sum(nil)) != in.sum {
+		return fmt.Errorf("%s changed while the bundle was written", in.member)
+	}
+	return nil
 }

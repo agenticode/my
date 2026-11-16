@@ -99,7 +99,7 @@ type UnknownInputError struct {
 // UnknownInputs are the English texts of the codes of UnknownInputError.
 var UnknownInputs = map[string]string{
 	"not_regular": "not a regular file",
-	"dir":         "a directory that is neither a copy of a host's files (no proc, sys or var below it) nor a Redfish dump",
+	"dir":         "a directory that is neither a copy of a host's files (no proc, sys or var below it) nor a Redfish dump, and holds no file a reader recognises",
 	"empty":       "the file is empty",
 	"ledger":      "a MemorY ledger is the result of an import, not an input; show it with \"my open\"",
 	"gzip_db":     "a compressed database; unpack it first",
@@ -140,6 +140,7 @@ const maxBinary = 16 << 20
 //   - a directory with pstore files, the archive of systemd-pstore or the
 //     text logs of kdump below it holds crash logs;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
+//   - any other directory is read file by file (see DirFiles);
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
 //     output of dmidecode, of nvidia-smi (-q, or a selective query in CSV
 //     form) or of mcelog --client, a BMC event log, a Redfish resource, an
@@ -223,7 +224,8 @@ func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.A
 	if found {
 		return []adapter.Adapter{redfish.New(dir, redfish.Options{Now: opts.Now, ModTimeAsObserved: opts.ModTime})}, WhatRedfish, nil
 	}
-	return nil, "", &UnknownInputError{Path: dir, Code: "dir"}
+	// None of the known trees: an unpacked archive, a folder of logs.
+	return detectFiles(ctx, dir, opts)
 }
 
 // readHead returns the start of a file, decompressed when the file is

@@ -460,7 +460,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"boots", "--help"}, "boots", []string{"Usage: my boots [slot|serial] [--boots N]", "--boots N", "STOP a fatal hardware error ended it", "R-LOOP-03"}},
 		{[]string{"gpu", "?"}, "gpu", []string{"Usage: my gpu [index|serial|uuid|pci-address] [--days N] [flags]", "--days N", "GPU memory. A GPU does not report where in its memory an error was", "my open case.mycase gpu"}},
 		{[]string{"help", "verify"}, "verify", []string{"Usage: my verify --expect PLAN [flags]", "--expect PLAN", "The command injects nothing and changes nothing", "The exit code is 0 when every injection was found as planned and 1 when one was not", "Verification. A plan lists what a test injected"}},
-		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm|labels [-o FILE] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written", "--names WHICH", "/etc/ras/dimm_labels.d"}},
+		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm|events|labels [-o FILE] [flags]", "--records", "my-events/1", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written", "--names WHICH", "/etc/ras/dimm_labels.d"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
 		{[]string{"diff", "--help"}, "diff", []string{"Usage: my diff BEFORE AFTER [--at TIME] [--all] [flags]", "--at TIME", "--all", "no file is changed and this host is not scanned", "The exit code is the grade of the host in the later case", "Comparison. Two cases of one host", "Grades and exit codes."}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised is listed in the summary as such and the import goes on", "--strict"}},
@@ -576,6 +576,10 @@ func registerFlags(o *options, topic string) {
 		o.fs.Bool("records", false, "")
 		o.fs.Bool("all", false, "")
 		o.fs.Bool("force", false, "")
+		o.fs.Bool("raw", false, "")
+		if o.fs.Lookup("since") == nil {
+			o.fs.String("since", "", "")
+		}
 		for _, name := range []string{"names", "vendor", "model", "product"} {
 			o.fs.String(name, "", "")
 		}
@@ -590,6 +594,7 @@ func registerFlags(o *options, topic string) {
 		o.fs.Bool("force", false, "")
 		o.fs.Bool("all", false, "")
 		o.fs.Bool("strict", false, "")
+		o.fs.Bool("with-inputs", false, "")
 		o.fs.String("event-map", "", "")
 	case "vendors":
 		o.fs.Bool("seen", false, "")

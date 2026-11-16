@@ -161,6 +161,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | GPU memory | `nvidia-smi -q` and its queries | row remapping state and ECC counters per GPU |
 | FMFM logs | JSON files | runtime, boot and crash records, ECS readings |
 | Copy of a host's files | a directory with `proc`, `sys` and `var` below it (`--root`, `my import`) | the inputs above, as files |
+| Any other directory | an unpacked archive of a vendor tool, a folder of logs (`my import`) | each file below it that a reader recognises |
 
 A file is recognised by its content, so `my import` takes them in any mix. Platforms report different amounts of detail about the place of an error. Every record therefore has an observation grade, and a finding says only what the grade of its records allows:
 
@@ -193,6 +194,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my bios` | check the memory RAS settings of the BIOS against a profile ([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my vendors` | the tables that read the memory messages of each BMC and BIOS vendor, how far each was checked, and the messages of a case no table classes ([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
+| `my export events` | write every record of the host as one line of JSON in the schema `my-events/1`, for a log pipeline or a database ([docs/data-model.md](docs/data-model.md#the-event-stream)) |
 | `my export labels` | write the slot names as a DIMM label file for rasdaemon |
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded ([docs/verify.md](docs/verify.md)) |
 | `my harvest` | at every boot, read what the boot before left (pstore, the boot error region, kdump logs, records left in the machine check banks) into the kept ledger `/var/lib/my/ledger.db`; `install`, `uninstall`, `status` ([docs/crash-loop.md](docs/crash-loop.md)) |

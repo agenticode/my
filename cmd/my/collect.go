@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -92,6 +93,7 @@ type collectOptions struct {
 	targets  string
 	out      string
 	force    bool
+	inputs   bool
 	deadline string
 	maxLog   int
 	logs     list
@@ -107,6 +109,7 @@ func newCollectOptions() *collectOptions {
 	o.fs.StringVar(&o.targets, "targets", "", "")
 	o.fs.StringVar(&o.out, "o", "", "")
 	o.fs.BoolVar(&o.force, "force", false, "")
+	o.fs.BoolVar(&o.inputs, "with-inputs", false, "")
 	o.fs.StringVar(&o.deadline, "deadline", collect.DefaultDeadline.String(), "")
 	o.fs.IntVar(&o.maxLog, "max-log-entries", collect.DefaultMaxLogEntries, "")
 	o.fs.Var(&o.logs, "log", "")
@@ -415,6 +418,9 @@ func (o *collectOptions) redfish(ctx context.Context, env *cli.Env, lang i18n.La
 
 	// Where the answers go: a directory, or a case bundle.
 	asCase := strings.EqualFold(filepath.Ext(o.out), bundle.Extension)
+	if o.inputs && !asCase {
+		return o.usageError(env, lang, "%s", say(lang, "err.collect_inputs"))
+	}
 	work := o.out
 	if asCase {
 		if code, ok := o.checkTarget(env, lang, o.out, o.force); !ok {
@@ -719,6 +725,10 @@ func (o *collectOptions) writeCase(ctx context.Context, env *cli.Env, lang i18n.
 		hosts = append(hosts, host)
 	}
 	sort.Strings(hosts)
+	files, err := o.collectionFiles(ctx, results)
+	if err != nil {
+		return nil, nil, err
+	}
 	c, err := view.Open(ctx, ledger, lang, engine.Options{Now: now})
 	if err != nil {
 		return nil, nil, err
@@ -726,8 +736,47 @@ func (o *collectOptions) writeCase(ctx context.Context, env *cli.Env, lang i18n.
 	if err := c.Result.Save(ctx, ledger); err != nil {
 		return nil, nil, err
 	}
-	w, err := bundle.Write(ctx, ledger, o.out, bundle.Options{Now: now, Tool: toolName(), Force: o.force})
+	w, err := bundle.Write(ctx, ledger, o.out, bundle.Options{Now: now, Tool: toolName(), Force: o.force, Inputs: files, WithInputs: o.inputs})
 	return w, hosts, err
+}
+
+// collectionFiles are the files of the collections a bundle is made from:
+// the manifest of each collection, and with --with-inputs every answer as
+// well. A name starts with the name of the collection.
+func (o *collectOptions) collectionFiles(ctx context.Context, results []collected) ([]bundle.InputFile, error) {
+	var out []bundle.InputFile
+	for _, r := range results {
+		if r.Manifest == nil || r.Dir == "" {
+			continue
+		}
+		if !o.inputs {
+			out = append(out, bundle.InputFile{Name: r.Name + "/" + collect.ManifestName, Path: filepath.Join(r.Dir, collect.ManifestName)})
+			continue
+		}
+		// The collection is this run's own directory, bounded by the
+		// limits of the collector: every file of it is taken.
+		err := filepath.WalkDir(r.Dir, func(p string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if cerr := ctx.Err(); cerr != nil {
+				return cerr
+			}
+			if !d.Type().IsRegular() {
+				return nil
+			}
+			rel, err := filepath.Rel(r.Dir, p)
+			if err != nil {
+				return err
+			}
+			out = append(out, bundle.InputFile{Name: r.Name + "/" + filepath.ToSlash(rel), Path: p})
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
 }
 
 // support is "my collect support DIR...": which BMC gave which class of

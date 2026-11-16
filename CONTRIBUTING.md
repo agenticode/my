@@ -74,6 +74,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/term` | draws the figures as text |
 | `internal/report` | the HTML report: one file with inline SVG figures |
 | `internal/fmfmlog` | records and findings in the forms of the FMFM framework |
+| `internal/eventstream` | every record of a host as a line of JSON in the schema `my-events/1`, for `my export events` |
 | `internal/plugin` | the vendor analyzer contract: request, response, the run of the program, the checks |
 | `internal/bundle` | case bundles: format, checks, anonymizing |
 | `internal/outfile` | writes output files whole or not at all, and never in place of a device |

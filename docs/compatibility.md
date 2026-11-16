@@ -41,6 +41,7 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | directory with `proc`, `sys`, `var/log`, `var/lib/rasdaemon`, `usr/local/var/lib/rasdaemon` or `sos_commands` below it | copy of a host's files, read like a live host |
 | directory with pstore files, a `dmesg.txt` of systemd-pstore, or a kdump text log below it | crash logs |
 | directory with Redfish resources in JSON files | Redfish dump |
+| any other directory: an unpacked archive of a vendor tool, a folder of logs | read file by file: each file below it is recognised as a file given on its own would be (at most 2,000 files, 8 levels deep; files above 64 MiB are left out). The files no reader recognises are counted in one line, a source of the kind `unknown`; a directory in which no file is recognised is not read |
 | SQLite file | rasdaemon database |
 | lines with a kernel stamp, `/dev/kmsg` records, `dmesg -T` dates or syslog lines | kernel log |
 | JSON objects with `MESSAGE` and journal fields | kernel log from `journalctl -o json` |

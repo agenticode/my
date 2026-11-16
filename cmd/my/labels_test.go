@@ -208,8 +208,8 @@ func TestExportLabelsErrors(t *testing.T) {
 		{"unknown names", []string{"export", "labels", "--root", root, "--names", "edac"}, cli.ExitUsage, "--names edac: want slot"},
 		{"a name with a comma", []string{"export", "labels", "--root", root, "--model", "X13, rev B"}, cli.ExitFailure, "a label file reads a comma and a semicolon as the end of a name"},
 		{"an argument too many", []string{"export", "labels", "extra", "--root", root}, cli.ExitUsage, `unexpected argument "extra"`},
-		{"an unknown format", []string{"export", "csv", "--root", root}, cli.ExitUsage, "this version writes fmfm (an FMFM analysis log) and labels (a DIMM label file for rasdaemon)"},
-		{"no format", []string{"export", "--root", root}, cli.ExitUsage, "my export fmfm, or my export labels"},
+		{"an unknown format", []string{"export", "csv", "--root", root}, cli.ExitUsage, "events (every record as a JSON line) and labels (a DIMM label file for rasdaemon)"},
+		{"no format", []string{"export", "--root", root}, cli.ExitUsage, "my export fmfm, my export events, or my export labels"},
 	} {
 		code, stdout, stderr := runEnv(fixed, tt.args...)
 		if code != tt.code || stdout != "" || !strings.Contains(stderr, tt.want) {
