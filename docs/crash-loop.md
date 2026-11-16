@@ -28,15 +28,17 @@ host lab-vm  kernel 7.3.0-ras  x86_64  AMD family 23 model 1  booted 2026-11-15 
 
  what a reset right after a fatal memory error would leave on this host
 
+ lost     pstore-backend   no backend is registered: the firmware has no ERST table; the host did
+                           not boot through EFI
+ lost     kdump            no crash kernel is loaded and no crashkernel= is on the command line
+ lost     harvest          my-harvest.service is not installed: what the boot before left is read
+                           only when someone runs my
  kept     journal          on disk below /var/log/journal. A panic stops journald before it writes
                            the last lines, and lines below priority CRIT reach the disk every
                            SyncIntervalSec=5min
- lost     pstore-backend   no backend is registered: the firmware has no ERST table; the host did
-                           not boot through EFI
  kept     pstore-archive   systemd-pstore.service is enabled and moves the dumps to
                            /var/lib/systemd/pstore at boot
  kept     pstore-vs-kdump  no crash kernel is loaded: a panic goes to pstore
- lost     kdump            no crash kernel is loaded and no crashkernel= is on the command line
  kept     mce-bootlog      on by default for this processor (AMD family 23)
  kept     mce-print        on AMD a record left in a bank is printed: /dev/mcelog does not take it
                            away from the kernel log
@@ -51,18 +53,16 @@ host lab-vm  kernel 7.3.0-ras  x86_64  AMD family 23 model 1  booted 2026-11-15 
                            the last lines
  kept     rasdaemon        rasdaemon.service is enabled and records to
                            /var/lib/rasdaemon/ras-mc_event.db
- lost     harvest          my-harvest.service is not installed: what the boot before left is read
-                           only when someone runs my
 
  3 of 13 checks would lose records. The commands, with what each costs and how to undo it:
    my preflight --script
 ```
 
-A check is `kept`, `lost`, `none` (the platform does not offer it), `unknown` (a file that tells is not readable as this user, or is not in a copy of the host's files) or `info`. The exit code is 0 when no check is lost and 1 when one is; it is no grade. `--json` prints the same as data, with the files each check read under `evidence`.
+A check is `kept`, `lost`, `none` (the platform does not offer it), `unknown` (a file that tells is not readable as this user, or is not in a copy of the host's files) or `info`. The lost checks come first. Checks with the same state and the same finding share a line, and on a copy of a host's files (`--root`) the checks that need the running host are named on one line; `--detail` prints every check on a line of its own, in the order the checks are listed below. The exit code is 0 when no check is lost and 1 when one is; it is no grade. `--json` prints the same as data, with the files each check read under `evidence`.
 
 `my preflight --script` prints the fixes of the lost checks as a shell script on standard output. Above the commands of each fix stand what it does, what it costs, the public document that says so, and the commands that undo it. `my` never runs the script. The commands follow the distribution named in `/etc/os-release`: `grubby` on Fedora, RHEL and their relatives, a file in `/etc/default/grub.d` and `update-grub` on Debian and Ubuntu. On other distributions the script names the kernel parameter and says that the boot loader of the host sets it.
 
-`--root DIR` reads a copy of a host's files. The checks that read the running host (the free space of the harvest ledger, the list of processes, the consoles) are marked, and a check whose files the copy lacks is `unknown`.
+`--root DIR` reads a copy of a host's files. The checks that read the running host (the free space of the harvest ledger, the list of processes, the consoles) and whose files the copy lacks are `unknown`, named together on one line; with `--detail` each has its own line, marked `*`.
 
 ### The checks
 

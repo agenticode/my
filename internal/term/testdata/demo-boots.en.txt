@@ -4,11 +4,8 @@ host r12-n034  Example Systems R760  4 boots  2026-07-31 to 2026-10-28
  started  07-31   08-26   09-30   10-28
           11:00   02:00   02:00   01:30
  ran      25 d    34 d    27 d    15 d
- ended    -       -       -       -
-
  CPU0_C1  ·       ░       ▓       U
  CPU1_D1  ▒       ▒       ▒       ░
 
- · none, corrected ░ 1-9, ▒ 10-99, ▓ 100+, U uncorrected; ended: - not on record
-
+ · none, corrected ░ 1-9, ▒ 10-99, ▓ 100+, U uncorrected
  my boots CPU0_C1: the places of this DIMM boot by boot

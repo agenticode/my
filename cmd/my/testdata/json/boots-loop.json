@@ -209,7 +209,7 @@
             "rule": "R-LOOP-01",
             "slot": "CPU0_C1"
           },
-          "text": "4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)"
+          "text": "CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01)"
         }
       ]
     }

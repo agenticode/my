@@ -45,7 +45,7 @@ func Boots(w io.Writer, b *view.Boots, st Style, show int, hints []Hint) error {
 		return p.writeTo(w)
 	}
 	if b.DIMM == nil {
-		st.stopsLines(p, b.Stops)
+		st.stopsLines(p, b.Stops, st.Detail)
 		p.blank()
 		st.bootsGrid(p, b, show)
 	} else {
@@ -68,7 +68,6 @@ func Boots(w io.Writer, b *view.Boots, st Style, show int, hints []Hint) error {
 		}
 	}
 	if len(hints) > 0 {
-		p.blank()
 		fields := make([]string, len(hints))
 		for i, h := range hints {
 			fields[i] = st.bold(h.Command) + ": " + h.Text
@@ -81,14 +80,21 @@ func Boots(w io.Writer, b *view.Boots, st Style, show int, hints []Hint) error {
 }
 
 // stopsLines writes the stops lines of a host: how many boots of the
-// window stopped, and where the uncorrected errors lie.
-func (st Style) stopsLines(p *page, s *view.Stops) {
+// window stopped, and where the uncorrected errors lie. Without count, as
+// above a grid of the boots that shows the stops, only where.
+func (st Style) stopsLines(p *page, s *view.Stops, count bool) {
 	if s == nil {
 		return
 	}
 	label := st.say("boots.stops")
 	lw := Width(label)
-	for i, line := range s.Lines {
+	var lines []view.Text
+	for _, l := range s.Lines {
+		if count || !strings.HasPrefix(l.Code, "loop.stops") {
+			lines = append(lines, l)
+		}
+	}
+	for i, line := range lines {
 		lead := strings.Repeat(" ", lw)
 		if i == 0 {
 			lead = st.paint(cRed, label)
@@ -257,10 +263,31 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		}
 		p.add(s.String())
 	}
+	// Boots that all started on one day, which the head of the screen
+	// names, need only their times.
+	oneDay, firstDay := true, ""
+	for _, bc := range cols {
+		if bc.StartQuality == "unknown" {
+			continue
+		}
+		d := bc.StartedAt.UTC().Format("2006-01-02")
+		if firstDay == "" {
+			firstDay = d
+		}
+		oneDay = oneDay && d == firstDay
+	}
+	// A row of ends with no stop and no panic in it says nothing a
+	// reader acts on: in short it is left out.
+	showEnds := st.Detail
+	for _, bc := range cols {
+		showEnds = showEnds || bc.End == model.BootStop || bc.End == model.BootPanic
+	}
 	var keys gridKeys
 	var idx, day, clock, ran, ended []string
 	for _, bc := range cols {
-		keys.end(bc.End)
+		if showEnds {
+			keys.end(bc.End)
+		}
 		idx = append(idx, strconv.Itoa(bc.Index))
 		if bc.StartQuality == "unknown" {
 			day, clock = append(day, "?"), append(clock, "")
@@ -272,11 +299,21 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		ended = append(ended, st.endWord(bc.End))
 	}
 	line(heads[0], idx)
-	line(heads[1], day)
-	line("", clock)
+	if oneDay {
+		for i := range clock {
+			if day[i] == "?" {
+				clock[i] = "?"
+			}
+		}
+		line(heads[1], clock)
+	} else {
+		line(heads[1], day)
+		line("", clock)
+	}
 	line(heads[2], ran)
-	line(heads[3], ended)
-	p.blank()
+	if showEnds {
+		line(heads[3], ended)
+	}
 	for _, r := range b.Rows {
 		label := r.Slot
 		if r.Level == view.RowNoDIMM {

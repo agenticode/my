@@ -106,7 +106,7 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	for _, line := range wrap(st.say("ov.finding", "grade", grade), st.width()) {
 		p.add(line)
 	}
-	st.stopsLines(p, ov.Stops)
+	st.stopsLines(p, ov.Stops, true)
 	p.blank()
 
 	st.slotMap(p, &ov.SlotMap)

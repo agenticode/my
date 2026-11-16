@@ -1,14 +1,10 @@
 host lab-arm-loop  QEMU lab-arm-loop  5 boots  2026-11-16
- stops: 3 of the last 5 boots ended in a fatal hardware error, the latest on 2026-11-16 05:46 UTC
-        after 14 min
-        the uncorrected errors are spread over 3 DIMMs (CPU0_A1, CPU0_C1, CPU0_E1), R-LOOP-03
+ stops: the uncorrected errors are spread over 3 DIMMs (CPU0_A1, CPU0_C1, CPU0_E1), R-LOOP-03
 
  boot     1       2       3       4       5
- started  11-16   11-16   11-16   11-16   11-16
-          04:26   04:42   05:17   05:31   06:12
+ started  04:26   04:42   05:17   05:31   06:12
  ran      59 s    13 min  12 min  14 min  18 min
  ended    -       STOP    STOP    STOP    running
-
  CPU0_A1  ·       X       ·       ·       ·
  CPU0_C1  ·       ·       X       ·       ·
  CPU0_E1  ·       ·       ·       X       ·

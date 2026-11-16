@@ -237,26 +237,22 @@ A fatal memory error ends its boot: the kernel panics and the host resets. On a 
 $ my open examples/crash-loop.mycase boots
 case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N BE8ED6
 host synth-crash-loop  Example Systems R760  8 boots  2026-07-31 to 2026-11-12
- stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC
-        after 44 min
-        4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)
+ stops: CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01)
 
  boot     1       2       3       4       5       6       7       8
  started  07-31   09-01   10-01   11-12   11-12   11-12   11-12   11-12
           11:00   03:00   03:00   08:00   08:41   09:23   09:25   10:10
  ran      31 d    29 d    42 d    41 min  41 min  53 s    44 min  13 h
  ended    -       -       -       STOP    STOP    STOP    STOP    -
-
  CPU0_C1  ·       ·       ▒       X       X       X       X       ·
  CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
 
  · none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: STOP a fatal
  hardware error, - not on record
-
  my open examples/crash-loop.mycase boots CPU0_C1: the places of this DIMM boot by boot
 ```
 
-The stops lines count the boots that a fatal hardware error ended, give the time of the latest and how long that boot ran, and say where the uncorrected errors lie: at one place of one DIMM (R-LOOP-01), on one DIMM at places that differ (R-LOOP-02), spread over DIMMs (R-LOOP-03), or in records that name no DIMM. The head of the grid gives each boot its number, its start in UTC, how long it ran, and how it ended:
+The stops line says where the uncorrected errors of the boots that stopped lie: at one place of one DIMM (R-LOOP-01), on one DIMM at places that differ (R-LOOP-02), spread over DIMMs (R-LOOP-03), or in records that name no DIMM. The grid shows how many boots stopped and when; `--detail` adds the line that counts them, as the overview prints it. The head of the grid gives each boot its number, its start in UTC (the time only, when all the boots drawn started on one day), how long it ran, and how it ended:
 
 | Ended | Meaning |
 | --- | --- |
@@ -276,7 +272,7 @@ Below, one line per DIMM with errors in these boots, and a line `no DIMM` for un
 | `?` | `?` | the boot stopped and no record names a DIMM, so the DIMM is not cleared for that boot |
 | `-` | `-` | the DIMM was not in the host |
 
-When more boots are on record than fit the width, the latest are drawn and a line says how many are left out; `--boots N` draws N of them. The overview adds the stops lines under the finding of the host and a row `stops` under each row of the slot map, with the number of stops of each slot: one number on one slot is one DIMM, ones along a socket are a spread.
+When more boots are on record than fit the width, the latest are drawn and a line says how many are left out; `--boots N` draws N of them. The ended row is left out when no boot drawn stopped or panicked. The overview adds the stops lines (the count and where) under the finding of the host and a row `stops` under each row of the slot map, with the number of stops of each slot: one number on one slot is one DIMM, ones along a socket are a spread.
 
 With a slot or a serial number, `my boots` draws the places of that DIMM boot by boot:
 
@@ -295,7 +291,6 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
 
  uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8       R-LOOP-01
  boots: each of these boots ended in a fatal hardware error
-
  my open examples/crash-loop.mycase dimm CPU0_C1: examination of this DIMM
 ```
 

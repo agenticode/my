@@ -1,18 +1,14 @@
 host synth-crash-loop  Example Systems R760  8 boots  2026-07-31 to 2026-11-12
- stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC
-        after 44 min
-        4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)
+ stops: CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01)
 
  boot     1       2       3       4       5       6       7       8
  started  07-31   09-01   10-01   11-12   11-12   11-12   11-12   11-12
           11:00   03:00   03:00   08:00   08:41   09:23   09:25   10:10
  ran      31 d    29 d    42 d    41 min  41 min  53 s    44 min  13 h
  ended    -       -       -       STOP    STOP    STOP    STOP    -
-
  CPU0_C1  ·       ·       ▒       X       X       X       X       ·
  CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
 
  · none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: STOP a fatal
  hardware error, - not on record
-
  my boots CPU0_C1: the places of this DIMM boot by boot
