@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"github.com/agenticode/my/internal/i18n"
 	"sort"
 	"strconv"
 	"strings"
@@ -640,7 +641,6 @@ func (v *loopView) rules(j *judge, host string, r *Recurrence) {
 		latest := r.Boots[r.Latest-1]
 		// The time of the record that shows the stop, or the last time
 		// the boot was seen, and how long the boot ran until then.
-		ran := "@word.loop_ran_unknown"
 		when := latest.endAt
 		if when.IsZero() || when.Before(latest.StartedAt) {
 			when = latest.last
@@ -649,9 +649,11 @@ func (v *loopView) rules(j *judge, host string, r *Recurrence) {
 			when = latest.StartedAt
 		}
 		if s := int64(when.Sub(latest.StartedAt) / time.Second); s > 0 && latest.StartQuality != "unknown" {
-			ran = durationText(s)
+			n, unit := Duration(s)
+			r.Statements = append(r.Statements, statement("loop.stops", "n", r.Stops, "of", window, "when", stampText(when.UnixMicro()), "ran_n", n, "ran_unit", "@"+unit))
+		} else {
+			r.Statements = append(r.Statements, statement("loop.stops_when", "n", r.Stops, "of", window, "when", stampText(when.UnixMicro())))
 		}
-		r.Statements = append(r.Statements, statement("loop.stops", "n", r.Stops, "of", window, "when", stampText(when.UnixMicro()), "ran", ran))
 		switch r.Where {
 		case RuleLoopPlace, RuleLoopDIMM:
 			for _, db := range r.DIMMs {
@@ -943,17 +945,28 @@ func orNone(s string) string {
 	return s
 }
 
-// durationText writes a running time in the unit that fits it.
-func durationText(seconds int64) string {
+// Duration returns a running time in the unit that fits it: the number and
+// the code of the unit in Messages ("unit.min").
+func Duration(seconds int64) (n int64, unit string) {
 	switch {
 	case seconds >= 48*3600:
-		return strconv.FormatInt(seconds/86400, 10) + " d"
+		return seconds / 86400, "unit.d"
 	case seconds >= 2*3600:
-		return strconv.FormatInt(seconds/3600, 10) + " h"
+		return seconds / 3600, "unit.h"
 	case seconds >= 120:
-		return strconv.FormatInt(seconds/60, 10) + " min"
+		return seconds / 60, "unit.min"
 	}
-	return strconv.FormatInt(seconds, 10) + " s"
+	return seconds, "unit.s"
+}
+
+// DurationText writes a time span in the unit that fits it: "3 min" in
+// English, "3분" in Korean.
+func DurationText(lang i18n.Lang, seconds int64) string {
+	n, unit := Duration(seconds)
+	if lang == i18n.KO {
+		return i18n.Thousands(n) + Messages.Text(lang, unit, nil)
+	}
+	return i18n.Thousands(n) + " " + Messages.Text(lang, unit, nil)
 }
 
 // faultBoots adds to R-SOFT-01 or R-ROW-03 in how many boots the fault
