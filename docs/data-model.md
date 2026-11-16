@@ -216,7 +216,7 @@ A BMC or a BIOS says what happened to memory in the words of its vendor. Each su
 
 Flags narrow a name: `contained`, `fatal`, `soft`, `hard`, `runtime`, `boot`, `adddc`, `sddc`, `rank`, `bank`, `pcls`, `previous-boot`. A record that names several modules is one error tied to none of them, and one action per module. An entry that folds repeats (`fw_record.repeat`) counts each.
 
-`fw_record.mapping` says how the common event was found: `table` (a line of a mapping table, named in `map_ref` as table, version and key), `bmc-registry` (the text the BMC's own registry gives for the message), `wording` (the text of the entry), `ipmi` (the state of the IPMI memory sensor) or `none`. `basis` says how far the table was checked: `capture`, `sample`, `registry` or `documents`.
+`fw_record.mapping` says how the common event was found: `table` (a line of a mapping table, named in `map_ref` as table, version and key), `bmc-registry` (the text the BMC's own registry gives for the message), `wording` (the text of the entry), `ipmi` (the state of the IPMI memory sensor), `cper` (the memory section of CPER an entry carries) or `none`. `basis` says how far the table was checked: `capture`, `sample`, `registry` or `documents`.
 
 A record a reader could not use is counted in `source.unread`; its text is kept in `unread_record` only when it names memory, a DIMM or ECC. `source.faults` counts the faults of a reader that were caught.
 

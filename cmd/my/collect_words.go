@@ -66,6 +66,7 @@ var collectWords = i18n.Catalog{
 	"collect.class.log-entries":        {EN: "log entries", KO: "로그 항목"},
 	"collect.class.firmware-inventory": {EN: "firmware inventory", KO: "펌웨어 목록"},
 	"collect.class.chassis":            {EN: "chassis", KO: "섀시"},
+	"collect.class.message-registry":   {EN: "message registries", KO: "메시지 레지스트리"},
 
 	"collect.state.ok":          {EN: "ok", KO: "읽음"},
 	"collect.state.partial":     {EN: "partial", KO: "일부"},

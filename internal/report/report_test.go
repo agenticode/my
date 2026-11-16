@@ -1202,7 +1202,7 @@ func TestEveryFixtureInput(t *testing.T) {
 			return filepath.SkipDir
 		case d.IsDir() && (rel == "edac-sysfs" || rel == "dcbrain" || rel == "real" || strings.HasPrefix(rel, "smbios/tables-")):
 			return filepath.SkipDir
-		case d.IsDir(), strings.HasSuffix(rel, ".hex"), strings.HasSuffix(rel, ".md"):
+		case d.IsDir(), strings.HasSuffix(rel, ".hex"), strings.HasSuffix(rel, ".cperhex"), strings.HasSuffix(rel, ".md"):
 			return nil
 		case strings.HasSuffix(rel, ".sql"):
 			p = testutil.BuildSQLite(t, p, strings.TrimSuffix(filepath.Base(p), ".sql")+".db")

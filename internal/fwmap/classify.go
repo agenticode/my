@@ -223,7 +223,13 @@ var memoryText = regexp.MustCompile(`(?i)\bmemory\b|\bdimm\w*|\becc\b`)
 // shipped table; the wording of the BMC's own registry text; the wording
 // of the entry's text; unclassified when it is about memory.
 func (c *Classifier) Classify(e Entry) (r Result) {
-	return adapter.Guard(func() Result { return c.classify(e) })
+	r = adapter.Guard(func() Result { return c.classify(e) })
+	// The severity the BMC's own registry gives is the vendor's word for
+	// this BMC; a table says what the vendor uses in general.
+	if e.Registry != nil && e.Registry.Severity != "" {
+		r.Severity = e.Registry.Severity
+	}
+	return r
 }
 
 func (c *Classifier) classify(e Entry) (r Result) {
@@ -263,9 +269,6 @@ func (c *Classifier) classify(e Entry) (r Result) {
 				if e.Registry != nil && e.Registry.NArgs >= 0 && len(l.Args) > 0 && e.Registry.NArgs != len(l.Args) {
 					r.Roles = nil
 				}
-				if r.Severity == "" && e.Registry != nil {
-					r.Severity = e.Registry.Severity
-				}
 				return r
 			}
 			if t.memoryKey(r.Key) && r.Table == nil {
@@ -283,7 +286,6 @@ func (c *Classifier) classify(e Entry) (r Result) {
 		if e.Registry != nil && e.Registry.Text != "" {
 			if ev, clears, flags, rule, ok := c.wording.Read(e.Registry.Text); ok {
 				r.fromRule(ev, clears, flags, rule, model.MappingRegistry, c.wording.Version)
-				r.Severity = e.Registry.Severity
 				return r
 			}
 		}

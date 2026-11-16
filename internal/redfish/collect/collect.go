@@ -132,6 +132,11 @@ type run struct {
 	// resource from several places.
 	done map[string]bool
 	logs map[string]bool
+	// prefixes are the registry prefixes the message IDs of the log
+	// entries that were read use.
+	prefixes map[string]bool
+	// regMembers are the members of the Registries collection, once read.
+	regMembers []object
 }
 
 // Run collects from the BMC of opts into dir, which is created when it
@@ -334,9 +339,15 @@ func (r *run) crawl() {
 	if uri := link(root, "Chassis"); uri != "" && r.stopped == "" {
 		r.offered[ClassChassis] = true
 		for _, m := range r.collection(ClassChassis, uri, collOpts{max: maxChassis}) {
-			r.member(ClassChassis, m)
+			// Boards that keep the SEL with the chassis.
+			if ch, ok := r.member(ClassChassis, m); ok {
+				r.logServices(link(ch, "LogServices"))
+			}
 		}
 	}
+
+	// After the logs: the registries that say what their messages mean.
+	r.messageRegistries(registries)
 }
 
 // system reads what hangs below one ComputerSystem.
@@ -392,6 +403,7 @@ func (r *run) registry(name, registries string) {
 		return
 	}
 	members := r.collectionAs(ClassRegistry, registries, collOpts{max: maxMembers}, true)
+	r.regMembers = members
 	if r.stopped != "" || members == nil {
 		return
 	}
@@ -507,6 +519,9 @@ func (r *run) skipLog(svc object) string {
 // entries reads the entries of one log.
 func (r *run) entries(uri string) {
 	members := r.collection(ClassLogEntries, uri, collOpts{max: r.opts.MaxLogEntries, entries: true})
+	for _, m := range members {
+		r.notePrefix(m)
+	}
 	// A log that lists its entries as links: one request each, up to a
 	// bound.
 	single := 0
@@ -519,7 +534,114 @@ func (r *run) entries(uri string) {
 			break
 		}
 		single++
-		r.fetch(ClassLogEntries, str(m, "@odata.id"))
+		if e, ok := r.fetch(ClassLogEntries, str(m, "@odata.id")); ok {
+			r.notePrefix(e)
+		}
+	}
+}
+
+// notePrefix notes the registry prefix of the message ID of a log entry.
+func (r *run) notePrefix(e object) {
+	id := str(e, "MessageId")
+	prefix, _, ok := strings.Cut(id, ".")
+	if !ok || prefix == "" || len(prefix) > 64 {
+		return
+	}
+	if r.prefixes == nil {
+		r.prefixes = map[string]bool{}
+	}
+	r.prefixes[prefix] = true
+}
+
+// Bounds of the message registries one run fetches.
+const (
+	maxMessageRegistries     = 16
+	maxMessageRegistryBytes  = 64 << 20
+	standardRegistryPrefixes = "AccountSecurity AutomationNodeEvent Base Composition Device Environmental EthernetFabric EventService " +
+		"Fabric HeartbeatEvent JobEvent License LogService ManagerEvent NetworkDevice Platform Power ResourceEvent SensorEvent " +
+		"ServiceCommunications StorageDevice TaskEvent Telemetry Update"
+)
+
+// messageRegistries fetches the message registries the BMC holds a copy
+// of: those whose prefix a log entry of this run uses, and those that are
+// not a DMTF standard registry. The copy a registry file names on the BMC
+// is fetched; a copy at its PublicationUri lies on another host and is
+// never asked for.
+func (r *run) messageRegistries(registries string) {
+	r.reach(ClassMessageRegistry)
+	if registries == "" || r.stopped != "" || r.opts.MaxLogEntries < 0 {
+		return
+	}
+	standard := map[string]bool{}
+	for _, p := range strings.Fields(standardRegistryPrefixes) {
+		standard[p] = true
+	}
+	members := r.regMembers
+	if members == nil {
+		members = r.collectionAs(ClassMessageRegistry, registries, collOpts{max: maxMembers}, true)
+	}
+	fetched := 0
+	var bytes int64
+	for _, m := range members {
+		if r.stopped != "" {
+			return
+		}
+		id := str(m, "@odata.id")
+		seg := lastSegment(id)
+		prefix, _, _ := strings.Cut(seg, ".")
+		low := strings.ToLower(seg)
+		if prefix == "" || strings.Contains(low, "attributeregistry") || strings.Contains(low, "privilegeregistry") {
+			continue
+		}
+		if !r.prefixes[prefix] && standard[prefix] {
+			continue
+		}
+		r.offered[ClassMessageRegistry] = true
+		if fetched == maxMessageRegistries {
+			r.note("the BMC lists more message registries than the %d a run reads; %s and those after it were not read", maxMessageRegistries, seg)
+			return
+		}
+		if bytes >= maxMessageRegistryBytes {
+			r.note("the message registries read reach %d MiB; %s and those after it were not read", maxMessageRegistryBytes>>20, seg)
+			return
+		}
+		file, ok := r.fetchAs(ClassMessageRegistry, id, true)
+		if !ok {
+			continue
+		}
+		local, published, archive := "", "", ""
+		if locs, ok := file["Location"].([]any); ok {
+			for _, l := range locs {
+				lo, ok := l.(object)
+				if !ok {
+					continue
+				}
+				if p := str(lo, "PublicationUri"); p != "" && published == "" {
+					published = p
+				}
+				if a := str(lo, "ArchiveUri"); a != "" && archive == "" {
+					archive = a
+				}
+				if uri := str(lo, "Uri"); uri != "" && (local == "" || strings.HasPrefix(strings.ToLower(str(lo, "Language")), "en")) {
+					local = uri
+				}
+			}
+		}
+		if local == "" {
+			detail := "the registry file " + id + " names no copy on the BMC"
+			if archive != "" {
+				detail += "; it names an archive (" + clipText(archive, 200) + "), which this version does not read"
+			}
+			if published != "" {
+				detail += "; it is published at " + clipText(published, 200) + ", which is another host and was not asked"
+			}
+			r.record(Resource{URI: id, Class: ClassMessageRegistry, Status: StatusUnsupported, Detail: detail})
+			continue
+		}
+		fetched++
+		if _, ok := r.fetch(ClassMessageRegistry, local); ok {
+			bytes += int64(r.m.Resources[len(r.m.Resources)-1].Bytes)
+		}
 	}
 }
 

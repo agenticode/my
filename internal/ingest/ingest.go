@@ -562,6 +562,15 @@ func (k *sink) Firmware(f *model.FirmwareRecord) error {
 	return nil
 }
 
+// Registry records a message registry a BMC published.
+func (k *sink) Registry(r *model.RegistrySeen) error {
+	r.Host, r.ScanID = k.host, k.scanID
+	if r.Source == "" {
+		r.Source = k.src.Origin
+	}
+	return k.refuse(r.Prefix, k.w.PutRegistrySeen(r))
+}
+
 // sample counts a reading that is neither an event nor an action: a GPU
 // memory record, an ECS reading, or what a BMC says about itself, the BIOS
 // settings and a memory module.

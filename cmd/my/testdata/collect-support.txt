@@ -15,6 +15,7 @@ log services           ok           ok
 log entries            ok           ok
 firmware inventory     ok           ok
 chassis                ok           ok
+message registries     not offered  not offered
 
 ok: every resource of the class came back. partial: some did. unsupported: the service answered 404,
 405, 410 or 501. denied: 401 or 403. not offered: the service links no such resource, so it was not

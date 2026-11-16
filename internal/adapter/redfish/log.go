@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/decode/cper"
 	"github.com/agenticode/my/internal/decode/ipmi"
 	"github.com/agenticode/my/internal/fwevent"
 	"github.com/agenticode/my/internal/fwmap"
@@ -50,6 +51,7 @@ type decoded struct {
 	// labels are the modules the entry names.
 	labels    []string
 	place     fwmap.Place
+	handle    model.Opt[int]
 	generator string
 	text      string // the entry's own words
 }
@@ -216,7 +218,15 @@ func (r *run) decode(o object) (d decoded, memory bool) {
 		return d, true
 	}
 
-	d.res = fwmap.Current().Classify(fwmap.Entry{MessageID: msgID, Message: msg, Args: args(o), MemoryOrigin: originIsMemory})
+	d.res = fwmap.Current().Classify(fwmap.Entry{MessageID: msgID, Message: msg, Args: args(o), MemoryOrigin: originIsMemory,
+		Registry: r.registryOf(msgID)})
+	// A memory section of CPER in the entry says what and where, when the
+	// message itself does not.
+	mem, cperSeverity, hasCPER := cperPlace(o)
+	if hasCPER && (!d.res.Memory || d.res.Event == fwevent.Unclassified) {
+		d.res.Event, d.res.Flags = cperEvent(mem, cperSeverity)
+		d.res.Memory, d.res.Mapping = true, model.MappingCPER
+	}
 	if d.res.Skipped || !d.res.Memory {
 		return d, false
 	}
@@ -234,6 +244,15 @@ func (r *run) decode(o object) (d decoded, memory bool) {
 	}
 	a := args(o)
 	d.place = fwmap.PlaceOf(form, d.res.Roles, a)
+	if hasCPER {
+		p := &d.place
+		p.Address, p.Rank, p.Bank, p.Row, p.Column, p.Device = mem.PhysicalAddress, mem.Rank, mem.Bank, mem.Row, mem.Column, mem.Device
+		d.decoder, d.handle = "cper", mem.ModuleHandle
+		if d.res.Mapping == model.MappingCPER && !originIsMemory {
+			// The arguments of a generic message name no module.
+			return d, true
+		}
+	}
 	if originIsMemory {
 		return d, true
 	}
@@ -251,6 +270,32 @@ func (r *run) decode(o object) (d decoded, memory bool) {
 		}
 	}
 	return d, true
+}
+
+// cperEvent reads what a memory section of CPER says: the section's
+// severity, and its error type for a scrub.
+func cperEvent(m cper.MemError, severity int) (fwevent.Name, []fwevent.Flag) {
+	scrub := m.ErrorType.Valid && (m.ErrorType.V == 13 || m.ErrorType.V == 14)
+	switch {
+	case severity == 2 || (severity < 0 && m.ErrorType.Valid && (m.ErrorType.V == 2 || m.ErrorType.V == 4 || m.ErrorType.V == 13)):
+		if scrub {
+			return fwevent.ScrubCE, nil
+		}
+		return fwevent.CE, nil
+	case severity == 1:
+		return fwevent.UE, []fwevent.Flag{fwevent.Fatal}
+	case severity == 0:
+		if scrub {
+			return fwevent.ScrubUE, []fwevent.Flag{fwevent.Contained}
+		}
+		return fwevent.UE, []fwevent.Flag{fwevent.Contained}
+	case severity < 0 && m.ErrorType.Valid && (m.ErrorType.V == 3 || m.ErrorType.V == 5 || m.ErrorType.V == 14):
+		if scrub {
+			return fwevent.ScrubUE, nil
+		}
+		return fwevent.UE, nil
+	}
+	return fwevent.Unclassified, nil
 }
 
 // textLocations returns the modules a message names in its text: after
@@ -284,6 +329,8 @@ func (r *run) logs(sink adapter.Sink) error {
 	var notMemory, cxl, cleared, presence, withdrawn, multi, unnamed int
 	unclassified := map[string]int{}
 	var logLimit []time.Time
+	// overflow counts per log the entries the BMC says it could not keep.
+	overflow := map[string]int64{}
 
 	for i := range r.entries {
 		if i%1024 == 0 {
@@ -323,6 +370,9 @@ func (r *run) logs(sink adapter.Sink) error {
 			if !ok {
 				r.tally.Unread(res.ref, "log entry about memory has no readable time", raw(o))
 				return nil
+			}
+			if n, ok := integer(o, "OverflowErrorCount"); ok && n > 0 {
+				overflow[logPath(res)] += n
 			}
 			msgID := str(o, "MessageId")
 			fp := model.Fingerprint(Kind, "log", res.id, created, msgID, str(o, "Message"))
@@ -402,12 +452,12 @@ func (r *run) logs(sink adapter.Sink) error {
 			}
 			rec := &fwevent.Record{Event: ev, Flags: d.res.Flags, Clears: clears, At: at, Count: p.Count, Labels: d.labels,
 				SocketId: p.Socket, ChannelId: p.Channel, ChannelSlotId: p.Position, Rank: p.Rank, DeviceId: p.Device, Bank: p.Bank,
-				Row: p.Row, Column: p.Column, Address: p.Address, Decoder: d.decoder, Method: method, Text: text,
+				Row: p.Row, Column: p.Column, Address: p.Address, SMBIOSHandle: d.handle, Decoder: d.decoder, Method: method, Text: text,
 				Source: Kind + "/log", RawRef: res.ref, Raw: rawText, Fingerprint: fp,
 				Firmware: model.FirmwareRecord{Vendor: d.res.Vendor, VendorID: key, Registry: registry, RegistryVersion: version,
 					VendorSeverity: severity, Origin: model.OriginBMCLog, Log: lastSegment(logPath(res)), Location: location,
 					Args: p.Args, Text: d.text, EntryKey: model.Fingerprint(logPath(res), res.id, created), Mapping: d.res.Mapping,
-					MapRef: d.res.Ref, Basis: d.res.Basis}}
+					MapRef: d.res.Ref, Basis: d.res.Basis, Resolved: o["Resolved"] == true}}
 			lo, err := rec.Ledger()
 			if err != nil {
 				return adapter.Unreadable("the entry could not be read as a firmware record: %v", err)
@@ -547,6 +597,14 @@ func (r *run) logs(sink adapter.Sink) error {
 	}
 	if unnamed > 0 {
 		add("%d memory entries do not name a module", unnamed)
+	}
+	paths := make([]string, 0, len(overflow))
+	for p := range overflow {
+		paths = append(paths, p)
+	}
+	sort.Strings(paths)
+	for _, path := range paths {
+		add("the log %s says that %d entries were lost when it overflowed", lastSegment(path), overflow[path])
 	}
 	if n := len(logLimit); n > 0 {
 		add("the firmware stopped logging corrected errors %d time(s), first on %s: corrected errors after that are missing from this log",
