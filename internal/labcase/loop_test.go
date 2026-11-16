@@ -270,7 +270,8 @@ func parseHex(s string) int64 {
 }
 
 // keptLedger opens a copy of the kept ledger of a capture: a test must not
-// change the file of the checkout.
+// change the file of the checkout. The copy is opened for writing, so that
+// a ledger of an older schema is migrated, as my open does.
 func keptLedger(t *testing.T, l loop) *store.Store {
 	t.Helper()
 	src := testutil.Testdata(t, "real", l.dir, "var", "lib", "my", "ledger.db")
@@ -282,7 +283,7 @@ func keptLedger(t *testing.T, l loop) *store.Store {
 	if err := os.WriteFile(path, b, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	s, err := store.Open(ctx, path, store.ReadOnly)
+	s, err := store.Open(ctx, path, store.ReadWrite)
 	if err != nil {
 		t.Fatal(err)
 	}
