@@ -109,6 +109,10 @@ details[open] summary { margin-bottom: 6px; }
 .hold { padding: 8px 12px; border-left: 4px solid var(--hold); background: var(--wash); }
 .dimm { margin: 0 0 26px; }
 
+/* 7. Modules: the remarks of a module stand in a row below it. */
+table.modules tr.lead td { border-bottom: 0; }
+table.modules tr.more td { padding-top: 0; color: var(--ink2); font-size: 0.8rem; }
+
 /* 8. Appendix: records and their original text. */
 table.records { font-size: 0.8rem; }
 table.records th:nth-child(5) { width: 30%; }

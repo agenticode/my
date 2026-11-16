@@ -649,6 +649,49 @@ section#s7.sec
   table.sources
     | source | read from | status | records | errors | actions | not usable | grade | first to last record
     | synth | synth:demo | ok | 1,297 | 1,285 | 8 | 0 | A | 2026-08-03 to 2026-11-12
+  ### Modules
+  p.how: Every DIMM of the host on one line, with what SMBIOS, EDAC and the BMC say of it. A dash is a fact no source of this case gave: the table doubles as the list of what to ask for when a case starts.
+  p.sub: 16 DIMMs; the 16 empty slots are on the slot map.
+  p.sub: Slot names and module data from SMBIOS.
+  p.sub: No BIOS settings are on record, so the RAS column is empty. The BMC of the host reports them over Redfish.
+  table.modules
+    | SLOT | SERIAL | MAKER | PART NUMBER | SIZE | ORG | SPEED | CE OS | CE BMC
+    | CPU0_A1 | 5C331B | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_B1 | DE7FF0 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_C1 | 3B9C56 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 1,231 | -
+    |  | DDR5 RDIMM
+    | CPU0_D1 | 80D01E | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_E1 | E2CD51 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_F1 | 2B6332 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_G1 | 382A8A | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_H1 | 4B3B31 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_A1 | 2C9305 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_B1 | DBC9CE | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_C1 | 99B7F7 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_D1 | 2AEB41 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 53 | -
+    |  | DDR5 RDIMM
+    | CPU1_E1 | 02AC34 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_F1 | 848BE3 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_G1 | D7A399 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_H1 | 55C12A | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+  li: ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
+  li: CE OS counts the corrected errors in the records of the operating system. No BMC was read.
+  #### Operating system and BMC
+  p: No BMC was read, so there is nothing to set against the records of the operating system.
   ### Not read, or read in part
   p: Every source that was looked for was read in full.
 section#s8.sec
