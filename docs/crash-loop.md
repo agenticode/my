@@ -161,6 +161,6 @@ The lab of [validation-lab.md](validation-lab.md) runs crash loops in guests tha
 What the lab cannot show, and what MemorY has therefore not been checked against:
 
 - whether a real board keeps a record in its banks over the reset after a fatal error; `my preflight` says so as `info` and names the first stop after `my harvest install` as the test;
-- the boot error region of real firmware, and an ERST or EFI variable store of real firmware under repeated panics;
+- the boot error region of real firmware (the lab's region is made by hand, and the kernel read it), and an ERST or EFI variable store of real firmware under repeated panics;
 - the entries a BMC makes about a crash, and its serial log;
-- errors that name a DIMM on x86: the guest has no EDAC driver for its memory controller, so the loops of `lab-x86` give the host finding and not R-LOOP-01, R-LOOP-02 or R-LOOP-03. Those rules are tested on synthetic ledgers (`internal/engine`) and on the example `examples/crash-loop.mycase`.
+- machine check records that name a DIMM: the guest has no EDAC driver for its memory controller, so the machine check loops of `lab-x86` give the host finding. R-LOOP-01 fired in the lab on the boot error region made by hand, which names a DIMM (`testdata/real/6.19.10-bert-loop`); the rules are also tested on synthetic ledgers (`internal/engine`) and on `examples/crash-loop.mycase`.

@@ -48,6 +48,7 @@ The plan format and the comparison are in `internal/injection`. `my verify --exp
 | `6.19.10-ghes-multi` | 36 firmware error records on four of six DIMMs, over three boots a day apart: 10 in one row and 1 uncorrected found by the scrubber, 10 in one column, 12 scattered over one bank, 3 at one cell | the third boot: 14 firmware blocks, 14 EDAC lines, 1 `Memory failure` line; `journal-all.json` holds the three boots | 36 rows in `mc_event` from the three boots | CE 35, UE 1, grade A; a row, a column and a bank fault, "consider replacement", and a single-bit fault, "observe"; two DIMMs ok |
 | `6.19.10-mce-loop` | a fatal machine check at `0x12345040` in each of three boots of a guest with a disk of its own | per panic a pstore dump (ERST) with the record and `Kernel panic - not syncing: Fatal machine check`; the next boot prints the record left in bank 7 | nothing about the errors | 3 boots that stopped, UE 3 tied to no DIMM, one place in 3 of 4 boots |
 | `6.19.10-mce-loop-scatter` | the same at three addresses and channels, one per boot | the same | nothing about the errors | 3 boots that stopped, UE 3 at three places |
+| `6.19.10-bert-loop` | a boot error region made by hand (one fatal memory error of DIMM 0 with row and column), written by QEMU at every reset; three boots | per boot `BERT: Error records from previous boot:` and the record | nothing | 3 boots that stopped, UE 3 on DIMM 0 at one cell, R-LOOP-01, "replace now" |
 | `6.19.10-mce-loop-kdump` | one fatal machine check with a crash kernel loaded | `vmcore-dmesg.txt` of the crash kernel with the record and the panic; no pstore dump; the next boot prints the record left in bank 7 | nothing about the errors | the boot that panicked stopped, UE 1 |
 
 The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guests have the memory controller `ghes_edac` registers, with one DIMM, or six in `6.19.10-ghes-multi`, and their counters. QEMU gives every DIMM it describes the same serial number; `tools/lab/smbios17.py` gives each its own.
@@ -64,7 +65,9 @@ A fatal machine check panics the kernel, and 30 seconds later the kernel restart
 | The harvest of a boot ran 8.3 s, its phase A ended 4.5 s after the unit started, at 11.1 MiB peak | the journal of the guest, during the first loop |
 | With a crash kernel loaded (kdump-utils, `crashkernel=256M`) the panic went to the crash kernel before pstore: `/var/crash/<host>-<time>/` held `vmcore-dmesg.txt` and the crash kernel's own `kexec-dmesg.log`, and no `dmesg-erst-*` was written; `mce_panic()` had written `mce-erst-<id>` before. The bank kept the record through the crash kernel and the reset | `6.19.10-mce-loop-kdump` |
 
-The guest names no DIMM for a machine check: the errors of the loops are the host's. In `6.19.10-mce-loop` the host finding says that one address had uncorrected errors in 3 of the last 4 boots; in `6.19.10-mce-loop-scatter` it says nothing of the kind. R-LOOP-01, R-LOOP-02 and R-LOOP-03 need records that name a DIMM.
+No firmware of the lab writes a boot error region, so `tools/lab/bertregion` makes one: a Generic Error Status Block with a Platform Memory section, which QEMU writes into the guest at every reset (`-device loader`) and names in a BERT table (`-acpitable sig=BERT`). The guest keeps the page out of its RAM (`memmap=4K$ADDR`; GRUB needs `\$` in the entry) so that `bert_init()` can map it. The kernel printed the record at every boot, cleared its block status, and left the region in `/sys/firmware/acpi/tables/data/BERT` (`6.19.10-bert-loop`).
+
+The guest names no DIMM for a machine check: the errors of the machine check loops are the host's. In `6.19.10-mce-loop` the host finding says that one address had uncorrected errors in 3 of the last 4 boots; in `6.19.10-mce-loop-scatter` it says nothing of the kind. R-LOOP-01, R-LOOP-02 and R-LOOP-03 need records that name a DIMM; the region of `6.19.10-bert-loop` names one, and R-LOOP-01 fires on it.
 
 ## What the captures changed
 
@@ -141,6 +144,9 @@ $LAB/tools/ghes.sh multi         # another guest: six DIMMs, three boots a day a
 LOOP=$LAB/loop $LAB/tools/loop.sh image && $LAB/tools/loop.sh boot && $LAB/tools/loop.sh prepare
 $LAB/tools/loop.sh run $LAB/tools/loop-same.plan && $LAB/tools/loop.sh capture same
 $LAB/tools/loop.sh clean && $LAB/tools/loop.sh run $LAB/tools/loop-scatter.plan && $LAB/tools/loop.sh capture scatter
+$LAB/tools/loop.sh kdump && $LAB/tools/loop.sh run $LAB/tools/loop-kdump.plan && $LAB/tools/loop.sh capture kdump
+go run ./tools/lab/bertregion -o $LAB/loop/x86/bert && $LAB/tools/loop.sh stop
+BERT=$LAB/loop/x86/bert $LAB/tools/loop.sh boot && $LAB/tools/loop.sh bert    # then reboot the guest and capture bert
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 
