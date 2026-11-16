@@ -192,3 +192,19 @@ func TestFirmwareInTheInventory(t *testing.T) {
 		t.Errorf("a firmware line without firmware records:\n%s", got)
 	}
 }
+
+// TestFirmwareOnTheCard: the finding of a DIMM that firmware took out of
+// use, short and with --detail, and of one whose mirror failed over.
+func TestFirmwareOnTheCard(t *testing.T) {
+	for _, v := range []variant{en, ko, ascii, w60} {
+		s := fwScreen(t, v)
+		check(t, "fw-why", v, s.why("CPU1_D1"))
+		check(t, "fw-why-detail", v, s.detail().why("CPU1_D1"))
+	}
+	got := fwScreen(t, en).detail().why("CPU1_D1")
+	for _, want := range []string{"R-FW-01", "mirror"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("the finding of CPU1_D1 lacks %q:\n%s", want, got)
+		}
+	}
+}
