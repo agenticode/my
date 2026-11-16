@@ -39,8 +39,8 @@ var words = i18n.Catalog{
 	"err.with_findings":  {EN: "DIMMs with errors or a finding: {slots}", KO: "오류나 소견이 있는 DIMM: {slots}"},
 	"err.no_gpu":         {EN: "no GPU \"{ref}\" with memory records in host {host}; name a GPU by its index, its serial number, its UUID or its PCI address", KO: "호스트 {host}에 메모리 기록이 있는 GPU \"{ref}\" 없음. GPU는 인덱스, 시리얼, UUID, PCI 주소로 지정"},
 	"err.expect":         {EN: "name the injection plan with --expect, for example --expect plan.yaml", KO: "주입 계획을 --expect로 지정해야 함 (예: --expect plan.yaml)"},
-	"err.export_format":  {EN: "name the format to write: my export fmfm", KO: "내보낼 형식을 지정해야 함: my export fmfm"},
-	"err.export_unknown": {EN: "unknown format \"{format}\"; the format this version writes is fmfm", KO: "알 수 없는 형식 \"{format}\". 이 버전이 쓰는 형식은 fmfm"},
+	"err.export_format":  {EN: "name what to write: my export fmfm, or my export labels", KO: "내보낼 대상을 지정해야 함: my export fmfm 또는 my export labels"},
+	"err.export_unknown": {EN: "unknown format \"{format}\"; this version writes fmfm (an FMFM analysis log) and labels (a DIMM label file for rasdaemon)", KO: "알 수 없는 형식 \"{format}\". 이 버전은 fmfm(FMFM 분석 로그)과 labels(rasdaemon용 DIMM 라벨 파일)를 씀"},
 	"export.written":     {EN: "FMFM analysis log written: {file} ({size})", KO: "FMFM 분석 로그 저장: {file} ({size})"},
 	"export.holds":       {EN: "host {host}, finding {grade}: {dimms} {dimms|DIMM|DIMMs} analysed, {records} error {records|record|records} in the runtime log", KO: "호스트 {host}, 소견 {grade}: 분석한 DIMM {dimms}개, runtime 로그의 오류 기록 {records}건"},
 	"export.no_cpad":     {EN: "the log holds findings and suggestions for a person, and no action descriptor (CPAD)", KO: "로그에는 사람이 읽을 소견과 제안만 있고 조치 기술자(CPAD)는 없음"},
@@ -274,17 +274,27 @@ var words = i18n.Catalog{
 			"                  count, address, row 등)이 든 텍스트 파일",
 	},
 
-	"help.export.usage": {EN: "my export fmfm [-o FILE] [--records] [flags]", KO: "my export fmfm [-o FILE] [--records] [옵션]"},
-	"help.export.text":  {EN: "Writes the findings of this host as an analysis log in the form of the OCP Fleet Memory Fault Management (FMFM) framework: one record per DIMM with its serial number, its place, the Level 1 fault mode, a risk and a severity class, a suggested action, and the finding of this tool with its rules and evidence. With --records the log also holds every error record with the field names of the FMFM runtime error log, so that records from a rasdaemon database, a kernel log or a BMC can be handed to an analyzer that reads that form. A field no source reported is left out; each record names the fields that are missing and the observation grade of its data. The log is JSON and goes to standard output, or into FILE with -o. It holds no action descriptor (CPAD): a suggestion is for a person, and nothing acts on it. docs/fmfm-mapping.md lists every field. The exit code is 0 when the log was written.", KO: "이 호스트의 소견을 OCP Fleet Memory Fault Management(FMFM) 프레임워크의 분석 로그 형식으로 내보냅니다. DIMM마다 기록 하나이며 시리얼, 위치, Level 1 고장 모드, 위험과 심각도 분류, 제안 조치, 그리고 이 도구의 소견과 규칙과 근거가 들어갑니다. --records를 주면 모든 오류 기록을 FMFM runtime 오류 로그의 필드명으로 함께 싣습니다. rasdaemon DB, 커널 로그, BMC에서 온 기록을 그 형식을 읽는 분석기에 넘길 수 있습니다. 어떤 소스도 보고하지 않은 필드는 비워 두고, 기록마다 빠진 필드와 데이터의 관측 등급을 적습니다. 로그는 JSON이며 표준 출력으로 나가고, -o를 주면 FILE에 저장합니다. 조치 기술자(CPAD)는 넣지 않습니다. 제안은 사람이 읽는 것이고 그것으로 실행되는 조치는 없습니다. 필드 목록은 docs/fmfm-mapping.md에 있습니다. 로그를 쓰면 종료 코드는 0입니다."},
+	"help.export.usage": {EN: "my export fmfm|labels [-o FILE] [flags]", KO: "my export fmfm|labels [-o FILE] [옵션]"},
+	"help.export.text":  {EN: "Writes the findings of this host as an analysis log in the form of the OCP Fleet Memory Fault Management (FMFM) framework: one record per DIMM with its serial number, its place, the Level 1 fault mode, a risk and a severity class, a suggested action, and the finding of this tool with its rules and evidence. With --records the log also holds every error record with the field names of the FMFM runtime error log, so that records from a rasdaemon database, a kernel log or a BMC can be handed to an analyzer that reads that form. A field no source reported is left out; each record names the fields that are missing and the observation grade of its data. The log is JSON and goes to standard output, or into FILE with -o. It holds no action descriptor (CPAD): a suggestion is for a person, and nothing acts on it. docs/fmfm-mapping.md lists every field. The exit code is 0 when the log was written. \"my export labels\" writes something else: the names of the slots as a DIMM label file for rasdaemon. Each line ties the EDAC position of a DIMM (its memory controller and location) to the name of its slot, under the vendor and the model of the machine, in the form \"ras-mc-ctl --register-labels\" reads from /etc/ras/dimm_labels.d. With the labels loaded, the kernel log and rasdaemon name a DIMM as SMBIOS and the BMC do. The command installs nothing and changes no label of the running kernel. A position that only EDAC knows gets no label, and a name the EDAC driver cannot take is left out with the reason in a comment.", KO: "이 호스트의 소견을 OCP Fleet Memory Fault Management(FMFM) 프레임워크의 분석 로그 형식으로 내보냅니다. DIMM마다 기록 하나이며 시리얼, 위치, Level 1 고장 모드, 위험과 심각도 분류, 제안 조치, 그리고 이 도구의 소견과 규칙과 근거가 들어갑니다. --records를 주면 모든 오류 기록을 FMFM runtime 오류 로그의 필드명으로 함께 싣습니다. rasdaemon DB, 커널 로그, BMC에서 온 기록을 그 형식을 읽는 분석기에 넘길 수 있습니다. 어떤 소스도 보고하지 않은 필드는 비워 두고, 기록마다 빠진 필드와 데이터의 관측 등급을 적습니다. 로그는 JSON이며 표준 출력으로 나가고, -o를 주면 FILE에 저장합니다. 조치 기술자(CPAD)는 넣지 않습니다. 제안은 사람이 읽는 것이고 그것으로 실행되는 조치는 없습니다. 필드 목록은 docs/fmfm-mapping.md에 있습니다. 로그를 쓰면 종료 코드는 0입니다. \"my export labels\"는 다른 것을 씁니다. 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 내보냅니다. 줄마다 DIMM의 EDAC 위치(메모리 컨트롤러와 위치)에 슬롯 이름을 주고, 기기의 벤더와 모델 아래에 \"ras-mc-ctl --register-labels\"가 /etc/ras/dimm_labels.d에서 읽는 형식으로 적습니다. 라벨을 올리면 커널 로그와 rasdaemon이 SMBIOS, BMC와 같은 이름으로 DIMM을 부릅니다. 이 명령은 아무것도 설치하지 않고 실행 중인 커널의 라벨도 바꾸지 않습니다. EDAC만 아는 위치에는 라벨을 주지 않고, EDAC 드라이버가 받지 못하는 이름은 빼고 그 이유를 주석에 적습니다."},
 	"help.export.flags": {
 		EN: "-o FILE           write the log to FILE; without it, or with \"-\", to standard output\n" +
 			"--records         add the runtime log: every error record with FMFM field names\n" +
 			"--all             also the DIMMs without errors and without a finding\n" +
-			"--force           replace FILE when it exists",
+			"--force           replace FILE when it exists\n" +
+			"--names WHICH     labels: slot writes the slot names of the ledger (the default), bmc the\n" +
+			"                  service labels of the BMC where it has them\n" +
+			"--vendor NAME, --model NAME, --product NAME\n" +
+			"                  labels: the mainboard vendor and model and the product name the file is\n" +
+			"                  written for, as \"ras-mc-ctl --mainboard\" prints them (default: the ledger)",
 		KO: "-o FILE           로그를 FILE에 저장. 생략하거나 \"-\"를 주면 표준 출력\n" +
 			"--records         runtime 로그 추가: FMFM 필드명으로 쓴 모든 오류 기록\n" +
 			"--all             오류도 소견도 없는 DIMM까지 포함\n" +
-			"--force           FILE이 있으면 덮어씀",
+			"--force           FILE이 있으면 덮어씀\n" +
+			"--names WHICH     labels: slot은 원장의 슬롯 이름(기본), bmc는 BMC에 서비스 라벨이\n" +
+			"                  있으면 그 라벨을 씀\n" +
+			"--vendor NAME, --model NAME, --product NAME\n" +
+			"                  labels: 파일에 적을 메인보드 벤더와 모델, 제품명.\n" +
+			"                  \"ras-mc-ctl --mainboard\"가 출력하는 값 (기본: 원장의 값)",
 	},
 
 	"help.diff.usage": {EN: "my diff BEFORE AFTER [--at TIME] [--all] [flags]", KO: "my diff BEFORE AFTER [--at TIME] [--all] [옵션]"},

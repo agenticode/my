@@ -446,7 +446,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
 		{[]string{"gpu", "?"}, "gpu", []string{"Usage: my gpu [index|serial|uuid|pci-address] [--days N] [flags]", "--days N", "GPU memory. A GPU does not report where in its memory an error was", "my open case.mycase gpu"}},
 		{[]string{"help", "verify"}, "verify", []string{"Usage: my verify --expect PLAN [flags]", "--expect PLAN", "The command injects nothing and changes nothing", "The exit code is 0 when every injection was found as planned and 1 when one was not", "Verification. A plan lists what a test injected"}},
-		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm [-o FILE] [--records] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written"}},
+		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm|labels [-o FILE] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written", "--names WHICH", "/etc/ras/dimm_labels.d"}},
 		{[]string{"open", "--help"}, "open", []string{"Usage: my open FILE", "The file is not changed"}},
 		{[]string{"diff", "--help"}, "diff", []string{"Usage: my diff BEFORE AFTER [--at TIME] [--all] [flags]", "--at TIME", "--all", "no file is changed and this host is not scanned", "The exit code is the grade of the host in the later case", "Comparison. Two cases of one host", "Grades and exit codes."}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised stops the import"}},
@@ -471,7 +471,8 @@ func TestHelp(t *testing.T) {
 			// no flag the command does not take.
 			o := newOptions(&cli.Env{Getenv: func(string) string { return "" }}, "my", sourceFor(tt.topic))
 			registerFlags(o, tt.topic)
-			known := map[string]bool{"--help": true, "--force": true}
+			// Flags of ras-mc-ctl, which the help of "my export labels" names.
+			known := map[string]bool{"--help": true, "--force": true, "--register-labels": true, "--mainboard": true, "--print-labels": true}
 			o.fs.VisitAll(func(f *flag.Flag) {
 				if f.Name == "h" || f.Name == "help" {
 					return
@@ -553,6 +554,9 @@ func registerFlags(o *options, topic string) {
 		o.fs.Bool("records", false, "")
 		o.fs.Bool("all", false, "")
 		o.fs.Bool("force", false, "")
+		for _, name := range []string{"names", "vendor", "model", "product"} {
+			o.fs.String(name, "", "")
+		}
 	case "import":
 		o.fs.String("ledger", "", "")
 		o.fs.String("captured-at", "", "")

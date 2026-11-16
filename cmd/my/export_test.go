@@ -111,8 +111,8 @@ func TestExportCommandLine(t *testing.T) {
 		args []string
 		want string
 	}{
-		{[]string{"export"}, "name the format to write: my export fmfm"},
-		{[]string{"export", "cper"}, `unknown format "cper"; the format this version writes is fmfm`},
+		{[]string{"export"}, "name what to write: my export fmfm, or my export labels"},
+		{[]string{"export", "cper"}, `unknown format "cper"; this version writes fmfm (an FMFM analysis log) and labels`},
 		{[]string{"export", "fmfm", "more"}, `unexpected argument "more"`},
 		{[]string{"export", "fmfm", "--audience", "fa"}, "flag provided but not defined"},
 	} {
