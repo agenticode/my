@@ -571,7 +571,7 @@ section#s8.sec
   호스트 = synth-crash-loop
   수집 = 합성 데이터, 2026-11-13 00:00 UTC
   리포트 = FA용 리포트, 2026-11-13 09:30 UTC 생성, 도구 my test
-  엔진 = 버전 7
+  엔진 = 버전 8
   p.how: 등급은 소견입니다. 기준 임계값은 FA 결과와 대조하기 전의 기본값입니다.
   ### 판정 전체
   article#full-dimm-CPU0_C1.card.g-replace

@@ -278,7 +278,7 @@ func TestAnalyzeUsage(t *testing.T) {
 
 func TestAnalyzeListsRulesAndThresholds(t *testing.T) {
 	code, out, _ := run("analyze", "-rules")
-	if code != cli.ExitOK || strings.Count(out, "\n") != len(engine.Rules) || len(engine.Rules) != 18 {
+	if code != cli.ExitOK || strings.Count(out, "\n") != len(engine.Rules) || len(engine.Rules) != 20 {
 		t.Fatalf("exit code %d, %d lines:\n%s", code, strings.Count(out, "\n"), out)
 	}
 	wantLines(t, out,

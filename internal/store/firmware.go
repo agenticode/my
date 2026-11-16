@@ -217,13 +217,21 @@ func (s *Store) FirmwareRecords(ctx context.Context, f FirmwareFilter) ([]model.
 		}
 	}
 	if f.Alone {
-		conds = append(conds, `event_id IS NULL AND action_id IS NULL`)
+		conds = append(conds, `event_id IS NULL AND f.action_id IS NULL`)
 	}
-	q := `SELECT id, ` + fwColumns + ` FROM fw_record`
+	cols := "f.id"
+	for _, c := range strings.Split(fwColumns, ",") {
+		cols += ", f." + strings.TrimSpace(c)
+	}
+	q := `SELECT ` + cols + `, COALESCE(e.dimm_uid, a.dimm_uid, ''), COALESCE(e.slot, a.slot, '') FROM fw_record f
+ LEFT JOIN event e ON e.id = f.event_id LEFT JOIN action a ON a.id = f.action_id`
+	for i, c := range conds {
+		conds[i] = "f." + c
+	}
 	if len(conds) > 0 {
 		q += ` WHERE ` + strings.Join(conds, ` AND `)
 	}
-	rows, err := s.db.QueryContext(ctx, q+` ORDER BY at, id`, args...)
+	rows, err := s.db.QueryContext(ctx, q+` ORDER BY f.at, f.id`, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +246,7 @@ func (s *Store) FirmwareRecords(ctx context.Context, f FirmwareFilter) ([]model.
 		if err := rows.Scan(&fw.ID, &fw.Host, &scanID, &evID, &actID, &at, &fw.Common, &flags, &fw.Clears, &fw.Vendor, &fw.VendorID,
 			&fw.Registry, &fw.RegistryVersion, &fw.VendorSeverity, &fw.Origin, &fw.Log, &fw.Location, &argsText, &fw.Text,
 			&fw.Repeat, &lastAt, &resolved, &fw.EntryKey, &fw.Mapping, &fw.MapRef, &fw.Basis, &fw.Source, &fw.RawRef, &fp,
-			&fw.Raw); err != nil {
+			&fw.Raw, &fw.DIMMUID, &fw.Slot); err != nil {
 			return nil, err
 		}
 		fw.ScanID, fw.EventID, fw.ActionID = scanID.Int64, evID.Int64, actID.Int64

@@ -26,6 +26,8 @@ type judge struct {
 	hosts map[string]*hostFacts
 	// ecs names the DIMMs with ECS readings; it is built on first use.
 	ecs map[string]bool
+	// fwi indexes the firmware records; it is built on first use.
+	fwi *fwIndex
 }
 
 // hasECS reports whether the ledger holds ECS readings of the DIMM.
@@ -298,6 +300,9 @@ type findings struct {
 	// unlocated is set when R-SOFT-01 spoke about errors without rows and
 	// columns.
 	unlocated bool
+	// fwWording is set when the firmware record that decided the grade was
+	// classed by its wording.
+	fwWording bool
 }
 
 func (fs *findings) add(rule string, st model.Statement, refs []model.RecordRef, total int) {
@@ -447,7 +452,10 @@ func (j *judge) firmware(fs *findings) {
 			continue
 		}
 		if a.Result == model.ResultFailed {
-			if repairKind(a.Kind) && a.Kind != model.ActionSparing {
+			if j.failedRepair(fs, a, who) {
+				continue
+			}
+			if repairKind(a.Kind) && a.Kind != model.ActionSparing && a.Kind != model.ActionDeviceSparing {
 				refs := []model.RecordRef{actionRef(a.ID, a.RawRef)}
 				if w := actionWhere(a); w != "" {
 					fs.add(RuleRepairGone, statement("rep.failed", "kind", kindArg(a.Kind), "where", w, "when", actionWhen(a.At, a.TimeQuality)), refs, 1)
@@ -465,7 +473,8 @@ func (j *judge) firmware(fs *findings) {
 				failed = a // since the first
 			}
 		case model.ActionSparing:
-			if sparing == nil {
+			// Sparing that waits for its copy has not taken the spare yet.
+			if sparing == nil && a.Result != model.ResultPending {
 				sparing = a
 			}
 		}
@@ -486,6 +495,7 @@ func (j *judge) firmware(fs *findings) {
 	if sparing != nil {
 		fs.add(RuleRepairGone, statement("rep.sparing", "when", actionWhen(sparing.At, sparing.TimeQuality)), []model.RecordRef{actionRef(sparing.ID, sparing.RawRef)}, 1)
 	}
+	j.firmwareMarks(fs, who)
 }
 
 // wider reports whether a mode covers more than one cell: the faults
@@ -610,11 +620,63 @@ func (j *judge) offline(fs *findings) {
 // repair or a page offline afterwards.
 func (j *judge) repaired(fs *findings) {
 	cfg := j.cfg
+	// Repairs that name the module only, with the faults they stand for.
+	type moduleRepair struct {
+		m      *Mitigation
+		before int64
+		after  int64
+	}
+	var modules []*moduleRepair
+	byAction := map[int64]*moduleRepair{}
+	clockChecked, kindChecked := false, false
+	repairChecks := func(m *Mitigation, after []int32) {
+		if m.Kind == model.ActionPPR && !kindChecked {
+			kindChecked = true
+			fs.checks = append(fs.checks, model.Check{Effect: model.EffectOpen, Statement: statement("check.ppr_kind")})
+		}
+		// A repair dated by a BMC whose clock was not compared, and
+		// errors of the host less than 15 hours later.
+		if m.BMCClock && !clockChecked && len(after) > 0 {
+			first := j.in.events[after[0]].at
+			for _, i := range after {
+				first = min(first, j.in.events[i].at)
+			}
+			if first-m.At.UnixMicro() < 15*3600*1_000_000 {
+				clockChecked = true
+				fs.checks = append(fs.checks, model.Check{Effect: model.EffectOpen, Statement: statement("check.bmc_clock")})
+			}
+		}
+	}
 	for _, f := range fs.d.Faults {
 		var last *Mitigation
 		for i := range f.Mitigations {
 			m := &f.Mitigations[i]
 			if m.Result == model.ResultFailed {
+				continue
+			}
+			if m.ModuleOnly {
+				mr := byAction[m.ActionID]
+				if mr == nil {
+					mr = &moduleRepair{m: m}
+					byAction[m.ActionID] = mr
+					modules = append(modules, mr)
+				}
+				mr.before += int64(f.ErrorCount) - m.FaultErrorsAfter
+				mr.after += m.FaultErrorsAfter
+				if m.ErrorsAfter > 0 && repairKind(m.Kind) {
+					refs, total := j.eventRefs(m.after)
+					refs = append([]model.RecordRef{actionRef(m.ActionID, m.RawRef)}, refs...)
+					if f.Grade == model.GradeC || j.where(f) == "" {
+						fs.add(RuleRecurred, statement("rep.recurred_dimm_c", "n", m.ErrorsAfter, "kind", kindArg(m.Kind),
+							"when", dateText(m.At.UnixMicro())), refs, total+1)
+					} else {
+						fs.add(RuleRecurred, statement("rep.recurred_dimm", "n", m.ErrorsAfter, "where", j.where(f), "kind", kindArg(m.Kind),
+							"when", dateText(m.At.UnixMicro())), refs, total+1)
+					}
+					fs.covered[f] = true
+					fs.note(RuleRecurred, f)
+					repairChecks(m, m.after)
+				}
 				continue
 			}
 			if last == nil || !m.At.Before(last.At) {
@@ -629,6 +691,7 @@ func (j *judge) repaired(fs *findings) {
 			if place == "" {
 				place = j.where(f)
 			}
+			repairChecks(m, m.after)
 			fs.add(RuleRecurred, statement("rep.recurred", "n", m.ErrorsAfter, "where", place, "kind", kindArg(m.Kind),
 				"when", dateText(m.At.UnixMicro())), refs, total+1)
 			fs.covered[f] = true
@@ -663,6 +726,30 @@ func (j *judge) repaired(fs *findings) {
 			"last", faultDay(f, f.LastSeen), "days", since/microPerDay, "kind", kindArg(last.Kind), "when", dateText(last.At.UnixMicro())), refs, total+1)
 		fs.covered[f] = true
 		fs.note(RuleQuiet, f)
+	}
+	// A repair that names the module only: quiet when no fault that had
+	// errors before it had one since, for rule.quiet.days.
+	for _, mr := range modules {
+		m := mr.m
+		if mr.after != 0 || !repairKind(m.Kind) || fs.d.clk.zero() || fs.has(RuleRecurred) {
+			continue
+		}
+		since := fs.d.clk.asOf - m.At.UnixMicro()
+		if since < days(cfg.QuietDays) {
+			fs.quietShort = append(fs.quietShort, model.Check{Effect: model.EffectOpen, Statement: statement("check.quiet_short",
+				"days", since/microPerDay, "kind", kindArg(m.Kind), "when", dateText(m.At.UnixMicro()), "need", cfg.QuietDays)})
+			continue
+		}
+		fs.add(RuleQuiet, statement("quiet.after_dimm", "days", since/microPerDay, "kind", kindArg(m.Kind), "when", dateText(m.At.UnixMicro()),
+			"n", mr.before), []model.RecordRef{actionRef(m.ActionID, m.RawRef)}, 1)
+		for _, f := range fs.d.Faults {
+			for i := range f.Mitigations {
+				if f.Mitigations[i].ActionID == m.ActionID {
+					fs.covered[f] = true
+					fs.note(RuleQuiet, f)
+				}
+			}
+		}
 	}
 }
 
@@ -1092,6 +1179,8 @@ func (j *judge) next(fs *findings, grade model.VerdictGrade) model.Statement {
 	switch grade {
 	case model.VerdictHoldReplacement:
 		switch {
+		case fs.has(RuleFWTrain) && !fs.has(RuleLoopSpread) && !fs.has(RuleMapping) && !fs.has(RuleSlot) && !fs.has(RuleChannel):
+			return statement("next.fw_train")
 		case fs.has(RuleLoopSpread):
 			return statement("next.loop_spread")
 		case fs.has(RuleMapping):
@@ -1118,6 +1207,9 @@ func (j *judge) next(fs *findings, grade model.VerdictGrade) model.Statement {
 		}
 		return statement("next.replace")
 	case model.VerdictConsiderReplacement:
+		if fs.has(RuleFWPredict) && !fs.has(RuleRow) && !fs.has(RuleRecurred) && !fs.has(RuleScrub) && !fs.has(RuleOffline) {
+			return statement("next.fw_pfa")
+		}
 		return statement("next.plan")
 	}
 	if fs.unlocated {
@@ -1136,6 +1228,7 @@ var baseConfidence = map[string]int{
 	RuleSlot: 80, RuleMapping: 75, RuleChannel: 65, RuleReseat: 60,
 	RuleHostUE: 85, RuleHostCE: 70,
 	RuleLoopPlace: 90, RuleLoopDIMM: 80, RuleLoopSpread: 70,
+	RuleFWPredict: 75, RuleFWTrain: 65,
 }
 
 // confidence rates the finding from 0 to 100 and lists the steps.
@@ -1197,6 +1290,9 @@ func (j *judge) confidence(fs *findings, rules []string, missing []model.Stateme
 			step(-min(2*open, 6), statement("conf.open", "n", open))
 		}
 	}
+	if fs.fwWording {
+		step(-5, statement("conf.fw_wording"))
+	}
 	unread := 0
 	for _, m := range missing {
 		if m.Code == "missing.source" || m.Code == "missing.source_detail" {
@@ -1246,6 +1342,7 @@ func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 	j.offline(fs)
 	j.repaired(fs)
 	j.soft(fs)
+	j.thresholds(fs)
 	j.faultBoots(fs)
 
 	sort.SliceStable(fs.evidence, func(a, b int) bool {
@@ -1262,11 +1359,12 @@ func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 		}
 	}
 	j.check(fs, v.Grade)
+	fs.fwWording = j.fwChecks(fs, v.Grade)
 	if j.loop != nil {
 		fs.checks = append(fs.checks, j.loop.checks[d]...)
 	}
 	v.CounterEvidence = fs.checks
-	v.Missing = append(j.missing(fs, v.Grade), j.loopMissing(fs)...)
+	v.Missing = append(append(j.missing(fs, v.Grade), j.loopMissing(fs)...), j.fwMissing(fs)...)
 	v.NextAction = j.next(fs, v.Grade)
 	v.Confidence, v.ConfidenceFactors = j.confidence(fs, v.Rules, v.Missing)
 	return v
