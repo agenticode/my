@@ -31,6 +31,8 @@ func (r *run) journal() Check {
 	}
 	systemd := r.h.isDir("run/systemd/system") || r.h.there("usr/lib/systemd/systemd") || r.h.there("lib/systemd/systemd") || len(files) > 0
 	switch {
+	case !systemd && !onDisk && r.copyLacks("etc/systemd"):
+		return r.notInCopy(c.Name, "etc/systemd")
 	case !systemd && !onDisk:
 		c.State, c.Detail = None, statement("pf.journal.no_systemd")
 		return c
@@ -220,6 +222,8 @@ func (r *run) pstoreArchive() Check {
 		Source: "pstore.conf(5): Storage=, Unlink=",
 	}
 	switch {
+	case !u.present && !u.masked && r.copyLacks("etc/systemd", "usr/lib/systemd", "lib/systemd"):
+		return r.notInCopy(c.Name, "usr/lib/systemd/system")
 	case !u.present && !u.masked:
 		c.State, c.Detail = Lost, statement("pf.archive.no_unit")
 		c.Fix = &Fix{What: statement("pf.fix.pstore_by_hand"), Cost: statement("pf.cost.by_hand"), Source: "fs/pstore/inode.c (pstore_unlink)"}
@@ -849,6 +853,8 @@ func (r *run) harvest() Check {
 	fix := &Fix{What: statement("pf.fix.harvest"), Commands: []string{"my harvest install"}, Undo: []string{"my harvest uninstall"},
 		Cost: statement("pf.cost.harvest"), Source: "docs/crash-loop.md"}
 	switch {
+	case missing(err) && r.copyLacks("etc/systemd"):
+		return r.notInCopy(c.Name, "etc/systemd/system")
 	case missing(err):
 		c.State, c.Detail, c.Fix = Lost, statement("pf.harvest.absent"), fix
 		return c
