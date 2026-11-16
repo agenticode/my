@@ -162,6 +162,8 @@ func TestRequestsToOtherHostsAreRefused(t *testing.T) {
 			http.Redirect(w, r, other.URL+"/redfish/v1/", http.StatusFound)
 		case "/loop":
 			http.Redirect(w, r, "/loop", http.StatusFound)
+		case "/far":
+			http.Redirect(w, r, "http://"+strings.Repeat("a", 250)+".example/redfish/v1/", http.StatusFound)
 		}
 	}))
 	defer srv.Close()
@@ -179,6 +181,12 @@ func TestRequestsToOtherHostsAreRefused(t *testing.T) {
 	}
 	if _, err := c.Get(ctx, "/loop"); kindOf(err) != KindRefused {
 		t.Errorf("redirect loop: %v, want a refusal", err)
+	}
+	// The name of the other host is cut short in the reason: it is the
+	// BMC's text, of any length.
+	var e *Error
+	if _, err := c.Get(ctx, "/far"); !errors.As(err, &e) || e.Kind != KindRefused || len(e.Detail) > 200 || !strings.Contains(e.Detail, "aaa...") {
+		t.Errorf("redirect to a long host name: %v", err)
 	}
 	// A reference in a resource that names another host is not followed.
 	for _, ref := range []string{other.URL + "/redfish/v1/", "//" + strings.TrimPrefix(other.URL, "http://") + "/x",
