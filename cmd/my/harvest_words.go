@@ -23,6 +23,12 @@ var harvestWords = i18n.Catalog{
 
 	"harvest.not_root":       {EN: "install and uninstall write below /etc/systemd/system and run systemctl: run them as root (--dry-run shows what they do)", KO: "install과 uninstall은 /etc/systemd/system 아래에 쓰고 systemctl을 실행함: root로 실행해야 함(--dry-run은 할 일만 보여 줌)"},
 	"harvest.no_systemd":     {EN: "systemd is not the init system of this host (no /run/systemd/system): run my harvest from the boot scripts of the host", KO: "이 호스트의 init 시스템이 systemd가 아님(/run/systemd/system 없음): 호스트의 부팅 스크립트에서 my harvest를 실행해야 함"},
+	"harvest.why_below":      {EN: "below {dir}", KO: "{dir} 아래에 있음"},
+	"harvest.why_word":       {EN: "in a path that ExecStart= would split or expand (a space, a quote, a backslash, ;, % or $)", KO: "ExecStart=가 나누거나 바꿔 읽는 경로에 있음(공백, 따옴표, 역슬래시, ;, %, $)"},
+	"harvest.why_owner":      {EN: "not owned by root", KO: "root 소유가 아님"},
+	"harvest.why_writable":   {EN: "writable by others than its owner", KO: "소유자 외에도 쓰기 권한이 있음"},
+	"harvest.why_other":      {EN: "not usable: {why}", KO: "쓸 수 없음: {why}"},
+	"harvest.bad_ledger":     {EN: "--ledger {ledger}: the unit may write below {dir} only (ProtectSystem=strict, StateDirectory=my), and the path has to stand in ExecStart= as it is: keep the ledger there, with a name without spaces, quotes, % or $", KO: "--ledger {ledger}: 유닛은 {dir} 아래에만 쓸 수 있고(ProtectSystem=strict, StateDirectory=my) 경로는 ExecStart=에 그대로 들어가야 함. 원장을 그 아래에 두고 이름에 공백, 따옴표, %, $를 쓰지 말 것"},
 	"harvest.bad_binary":     {EN: "{binary} is {why}: a unit that runs it as root at every boot needs a binary only root can replace. Copy it: install -m 0755 -o root {binary} /usr/local/bin/my", KO: "{binary} 파일이 {why}. 부팅마다 root로 실행하는 유닛에는 root만 바꿀 수 있는 바이너리가 필요함. 복사: install -m 0755 -o root {binary} /usr/local/bin/my"},
 	"harvest.foreign":        {EN: "{file} is there and was not written by my harvest install: it is left alone and nothing is installed", KO: "{file} 파일이 있으나 my harvest install이 쓴 것이 아님. 그대로 두고 아무것도 설치하지 않음"},
 	"harvest.left_alone":     {EN: "{file} was not written by my harvest install: left alone", KO: "{file} 파일은 my harvest install이 쓴 것이 아니어서 그대로 둠"},
