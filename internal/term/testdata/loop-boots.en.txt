@@ -12,9 +12,7 @@ host synth-crash-loop  Example Systems R760  8 boots  2026-07-31 to 2026-11-12
  CPU0_C1  ·       ·       ▒       X       X       X       X       ·
  CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
- latest scan, - not on record
+ · none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: STOP a fatal
+ hardware error, - not on record
 
  my boots CPU0_C1: the places of this DIMM boot by boot

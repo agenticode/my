@@ -13,7 +13,4 @@ host lab-arm-loop  QEMU lab-arm-loop  5 boots  2026-11-16
  CPU0_C1  ·       ·       X       ·       ·
  CPU0_E1  ·       ·       ·       X       ·
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
- latest scan, - not on record
+ · none, X uncorrected in a boot that stopped; ended: STOP a fatal hardware error, - not on record

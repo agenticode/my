@@ -8,36 +8,19 @@ CPU1_A1  consider replacement  R-ROW-03  bank fault at rank1 dev12 bg1 bank1: 16
  next      Plan a replacement for the next maintenance window and watch the fault until then.
  confidence medium, 2 checks not made, 2 kinds of data missing: --detail
 
- where the errors sit (width = share of the errors of this DIMM)                              boots
- rank    |rank1 ██████████████████████████████████████████████████████████████████████ 100%|  2 of 3
- device  |dev12 ██████████████████████████████████████████████████████████████████████ 100%|  2 of 3
- bank    |bg1 bank1 ██████████████████████████████████████████████████████████████████ 100%|  2 of 3
- row     |596 rows ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 100%|  2 of 3
+ where the errors sit in rank1 dev12 bg1 bank1 (width = share of the errors of this DIMM)     boots
+ row  |596 rows ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 100%|  2 of 3
 
- rank1 dev12 bg1 bank1  row by column  one cell = 32 columns by 4,096 rows
- · 0   ░ 1-2   ▒ 3-9   ▓ 10-99   █ 100+   X uncorrected error
-
+ rank1 dev12 bg1 bank1  row by column  one cell = 32 columns by 8,192 rows    · 0   ░ 1-2   ▒ 3-9
  row       0x000                                                      0x7ff  (column)
- 0x0       ·░··░·░·····░▒░·░···░··░░░░··░·░··░··░░·░·░░░░░░··░░·░·····░··░·
- 0x1000    ·░···░░░░·░··░··░░▒·░░░░░····░░░░░░··░···░░······░░···░·▒░··░·░·
- 0x2000    ░···░░··░·░·░·░░░···░░·░░░░░·░·····░·░░░·····░····░░░░░░░·░·░░·░
- 0x3000    ···░░··░░·░░░···░░░··░░░░·░░░·······░·······░░·░░··░··░░░··░░░░·
- 0x4000    ░··░·░░░··░·░░·░·░·░·░·░░░······░·······░░··░·░·░·····░▒·░··░░░░
- 0x5000    ···░░░░····░░··░░░·░░·░░░░░··░░░···▒·░·░··░░······░░░···········
- 0x6000    ░·░░░░··░░·░··░····░····░·░░···░··░·░·▒░··░░··░░·░·░░·░··░·····░
- 0x7000    ░░·░▒·····░·░··░░·▒▒░··░░···░····░··░░░·░░····░·░·░··░·░░····░··
- 0x8000    ·░·░░░░··░░·░··░·░░░░········░·░░·····░░░░·░░░···░░░·░░··░░·░·░·
- 0x9000    ·░·····░······░··░··░░···░··░░·░░░···░·░░░··░····░░·░···░░···░░░
- 0xa000    ··░·░····░░·░·····░···░·░·░···░▒░··░░░··░░▒··░·░·░·░·░·░····░░·░
- 0xb000    ··░▒░··░·······░░░·░··░░····░··░···░··░░░░·░░·░░·░···░··░░··░·░·
- 0xc000    ░░░·░░····░░·░░·░░·░░░░░·░···░░░░·····░░···░··░·░·░·░░·░··░·░·░·
- 0xd000    ·░··░░·░░··░···▒···░··░·░······░·░░·░····░··░······░·░░░·░··░░·░
- 0xe000    ░·░░░··░···░·░·░·░···░░░▒···░░░·░·░░░··▒░░░··░··░░░░··░░░░···░·░
- 0xf000    ····░··░░░·░······░·░·░░░·░··░░····░░░··░····░····░···▒▒·░·░····
-
- bank fault at rank1 dev12 bg1 bank1: 600 errors, 236 columns in 596 rows, data lines DQ0, DQ1,
-   DQ2, DQ3, first 2026-09-06, latest 2026-11-12
- errors in 2 of the last 3 boots, uncorrected in 0
+ 0x0       ·▒··░░▒░░·░·░▒░·░░▒·░░░▒░░░··░░░░░░··░░·░░░░░░░░·░▒░·░░·▒░·░░·▒·
+ 0x2000    ░··░░░·░░·▒░▒·░░▒░░·░▒░░▒░░░░░·····░░░░░····░░·░░·░░░░▒░▒·░░░▒░░
+ 0x4000    ░··░░░░░··░░░░·▒░▒·░░░░▒░▒░··░░░░··▒·░·░░░░░░·░·░·░░░·░▒·░··░░░░
+ 0x6000    ░░░▒▒░··░░░░░·░░░·▒▒░··░░·░░░··░·░░·▒░▒░░░░░··░░░░░░░░░░░░···░·░
+ 0x8000    ·░·░░░░░·░░·░·░░·░░░░░···░··░▒·▒░░···░░▒░▒·░░░···▒▒░░░░·░░░·░░░░
+ 0xa000    ··▒▒░··░·░░·░··░░░░░··░░░·░·░·░▒░··░░░░░░░▒░░░░▒·▒·░·░·░░░··▒░░░
+ 0xc000    ░░░·░░·░░·░▒·░░▒░░·░░░▒░░░···░░░░░░·░·░░·░·░░·░·░·░░░░░▒·░░·░░░░
+ 0xe000    ░·░░▒··▒░░·▒·░·░·░░·░░░░▒·░·░▒▒·░·░▒▒░·▒░░░··▒··░░░░··▒▒░▒·░·░·░
 
  boots of this DIMM
  boot              1  2  3   boots   errors
@@ -54,16 +37,10 @@ CPU1_A1  consider replacement  R-ROW-03  bank fault at rank1 dev12 bg1 bank1: 16
    col 0x400       ·  ·  ░   1 of 3  CE 1
  595 other places  ·  ▒  ▓   2 of 3  CE 595
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, -
- not on record
+ · none, corrected ░ 1-9, ▒ 10-99, ▓ 100+; ended: - not on record
 
  errors per day and events
            07-31     09-01     10-01     11-12
  CPU1_A1   ▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▁▃▃▃▄▃▃▃▄▄▄▅▅▅▅▆▅▇█  peak 30/day
  events              B         B
                      └─────────┴ 2 reboots
-
- 600 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
- 539 of them since the boot of 2026-10-01: a counter that restarts at every boot shows only those
