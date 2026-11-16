@@ -15,6 +15,7 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `7.3.0-cxl` | the same guest with an emulated CXL memory device, rasdaemon 1.0.0 | 11 corrected and 1 uncorrected error of the device, a health record, 2 poison ranges |
 | `6.19.10-ghes` | aarch64 guest with a firmware error source | 24 corrected and 2 uncorrected errors on one DIMM, as firmware error records with row and column |
 | `6.19.10-ghes-clock-step` | the same guest in its next boot, clock set back after rasdaemon started | 10 corrected and 1 uncorrected error; rasdaemon's times are 10 seconds ahead and no record holds the kernel's time |
+| `6.19.10-ghes-multi` | another aarch64 guest with six DIMMs, booted three times a day apart | a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected and 1 uncorrected error; two DIMMs without errors |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 
@@ -30,6 +31,7 @@ my open testdata/real/7.3.0-mce/my/case.mycase
 | --- | --- |
 | `dmesg` | the kernel log of the running boot as `dmesg` prints it |
 | `journal-k.json` | `journalctl -k -o json`, on hosts with a journal |
+| `journal-all.json` | in `6.19.10-ghes-multi`: the kernel messages of every boot the journal holds (`journalctl -o json _TRANSPORT=kernel`); `-k` gives the running boot only |
 | `var/lib/rasdaemon/ras-mc_event.db` | the rasdaemon database as it was on disk |
 | `sys/devices/system/edac/`, `edac-sysfs.txt` | the EDAC tree file by file, and as one listing |
 | `dmidecode.txt` | `dmidecode -t 17` |

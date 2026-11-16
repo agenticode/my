@@ -22,7 +22,7 @@ QEMU builds the ACPI tables of its guests. For an aarch64 guest with `ras=on` th
 
 ## Method
 
-1. A scenario is a script that injects a fixed set of errors and writes down what it injected: `tools/lab/vm.sh` on the lab host, `tools/lab/mce.sh` and `tools/lab/cxl.sh` in the x86 guest, `tools/lab/ghes.sh` for the aarch64 guest. Where the kernel is to act on a page, the address is that of a page a waiting process holds (`tools/lab/hwpoison.c`), so the kernel has something to move or to take away.
+1. A scenario is a script that injects a fixed set of errors and writes down what it injected: `tools/lab/vm.sh` on the lab host, `tools/lab/mce.sh` and `tools/lab/cxl.sh` in the x86 guest, `tools/lab/ghes.sh` for the aarch64 guest. Where the kernel is to act on a page, the address is that of a page a waiting process holds (`tools/lab/hwpoison.c`), so the kernel has something to move or to take away; in `6.19.10-ghes-multi` the page is a free one, checked in `/proc/kpageflags` before.
 2. The result is an injection plan, `plan.yaml`: every injection with its time, its address, how many times, and what the kernel is expected to do with the page.
 3. `tools/lab/capture.sh` collects `dmesg`, `journalctl -k -o json`, the rasdaemon database, the EDAC tree, `dmidecode -t 17`, the files under `/proc` and `/sys` that name the host, and what `my scan` and `my bundle --anonymize` say on the host as root.
 4. `tools/lab/sanitize.py` replaces what names the lab and fails when a part of such a value is left anywhere, also inside the database and the bundle.
@@ -45,8 +45,9 @@ The plan format and the comparison are in `internal/injection`. `my verify --exp
 | `7.3.0-cxl` | 9 DRAM event records, 3 general media event records, 1 memory module event record, 2 poison ranges of an emulated CXL device | nothing per record | rasdaemon 1.0.0: 9, 3, 1 and 2 rows in the CXL tables | CE 11, UE 1 on `cxl:mem0`, grade A 9 and B 3, a row fault, "replace now" |
 | `6.19.10-ghes` | 26 firmware error records on one DIMM: a row with 15 corrected errors, 2 in the row next to it, 6 at one cell within a second, 1 with the threshold flag, 2 uncorrected | 21 firmware blocks, 26 EDAC lines, 2 `Memory failure` lines | 26 rows in `mc_event`, none in `memory_failure_event` | CE 24, UE 2 on `DIMM 0`, grade A, a multi-row fault, "replace now" |
 | `6.19.10-ghes-clock-step` | 11 firmware error records in the next boot of that guest, after its clock was set back by 10 seconds while rasdaemon ran | 8 firmware blocks, 11 EDAC lines, 1 `Memory failure` line, dated by the kernel's clock | 11 rows in `mc_event`, 10 to 11 seconds ahead of the journal; no record that holds the kernel's time | CE 10, UE 1 on `DIMM 0`; the 11 rasdaemon records moved to the kernel's time |
+| `6.19.10-ghes-multi` | 36 firmware error records on four of six DIMMs, over three boots a day apart: 10 in one row and 1 uncorrected found by the scrubber, 10 in one column, 12 scattered over one bank, 3 at one cell | the third boot: 14 firmware blocks, 14 EDAC lines, 1 `Memory failure` line; `journal-all.json` holds the three boots | 36 rows in `mc_event` from the three boots | CE 35, UE 1, grade A; a row, a column and a bank fault, "consider replacement", and a single-bit fault, "observe"; two DIMMs ok |
 
-The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guest has the memory controller `ghes_edac` registers, with its one DIMM and its counters.
+The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guests have the memory controller `ghes_edac` registers, with one DIMM, or six in `6.19.10-ghes-multi`, and their counters. QEMU gives every DIMM it describes the same serial number; `tools/lab/smbios17.py` gives each its own.
 
 ## What the captures changed
 
@@ -113,6 +114,7 @@ $LAB/tools/cxl.sh                # needs rasdaemon with CXL support at $RASDAEMO
 $LAB/tools/ghes.sh image         # once, from a Fedora cloud image for aarch64 under $LAB/img
 $LAB/tools/ghes.sh boot && $LAB/tools/ghes.sh prepare && $LAB/tools/ghes.sh run
 $LAB/tools/ghes.sh clock-step    # in a boot of its own
+$LAB/tools/ghes.sh multi         # another guest: six DIMMs, three boots a day apart
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 

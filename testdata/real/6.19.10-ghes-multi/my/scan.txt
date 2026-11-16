@@ -1,0 +1,23 @@
+host lab-arm6  QEMU lab-arm6  2026-11-14 to 2026-11-16  CE 35, UE 1  observation grade A
+host finding: consider replacement
+
+        A1   B1   C1   D1   E1   F1
+ CPU0   ▒▒   ▓▓   ░░   ▓▓   ▓▓   ░░
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
+ 6 slots, 6 DIMMs
+
+ #  SLOT     SERIAL    CE  UE  MODE        TREND 30D     FINDING               RULES
+ 1  CPU0_E1  LABM0005  12   0  bank        ▁▁▁▁▁▁▁▁▁█ ?  consider replacement  R-ROW-03
+ 2  CPU0_D1  LABM0004  10   1  row         ▁▁▁▁▁▁▁▁▁█ ?  consider replacement  R-ROW-03 R-SCRUB-01
+ 3  CPU0_B1  LABM0002  10   0  column      ▁▁▁▁▁▁▁▁▁█ ?  consider replacement  R-ROW-03
+ 4  CPU0_A1  LABM0001   3   0  single-bit  ▁▁▁▁▁▁▁▁▁█ ?  observe               R-SOFT-01
+
+ 2 DIMMs without errors
+ sources  hostinfo 2 records, rasdaemon 36 records, klog (journal) 82 records, klog (ring buffer) 32
+          records, edac-sysfs 7 records, smbios 6 records, slot-map 6 records
+ note     This host is a virtual machine (QEMU): a guest is not shown the corrected errors of the
+          machine it runs on, and of the uncorrected ones at most those that hit its own memory
+
+ my dimm CPU0_E1: examination of this DIMM   my why CPU0_E1: what the finding rests on
+ my bundle -o case.mycase: write a case bundle   my help: how to read the figures

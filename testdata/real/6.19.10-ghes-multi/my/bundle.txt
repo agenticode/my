@@ -1,0 +1,9 @@
+case bundle written: my/case.mycase (39.9 kB)
+  host host-71f73b2e: 6 DIMMs, CE 35, UE 1, finding: consider replacement
+  note: this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the
+    machine it runs on, and of the uncorrected ones at most those that hit its own memory
+  host names replaced:
+    lab-arm6 -> host-71f73b2e
+  Keep these lines: the bundle does not hold the names, and an answer about it will use the new
+  ones.
+look at it: my open my/case.mycase

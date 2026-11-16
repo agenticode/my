@@ -1,0 +1,777 @@
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x414fd0c1]
+[    0.000000] Linux version 6.19.10-300.fc44.aarch64 (mockbuild@fea49c8fbab948b09d95fb7305196ad4) (gcc (GCC) 16.0.1 20260321 (Red Hat 16.0.1-0), GNU ld version 2.46-1.fc44) #1 SMP PREEMPT_DYNAMIC Wed Mar 25 17:45:07 UTC 2026
+[    0.000000] KASLR enabled
+[    0.000000] efi: EFI v2.7 by EDK II
+[    0.000000] efi: SMBIOS 3.0=0x47e80000 OvmfDebugLog=0x47f80000 MEMATTR=0x45687018 ACPI 2.0=0x47ff3018 MOKvar=0x45650000 INITRD=0x4568a818 RNG=0x47ff3698 MEMRESERVE=0x4568e898 
+[    0.000000] random: crng init done
+[    0.000000] secureboot: Secure boot disabled
+[    0.000000] ACPI: Early table checksum verification disabled
+[    0.000000] ACPI: RSDP 0x0000000047FF3018 000024 (v02 BOCHS )
+[    0.000000] ACPI: XSDT 0x0000000047FF3F18 00006C (v01 BOCHS  BXPC     00000001      01000013)
+[    0.000000] ACPI: FACP 0x0000000047FF3B18 000114 (v06 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: DSDT 0x0000000047FF1018 0015C5 (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: APIC 0x0000000047FF3098 0002E8 (v04 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: PPTT 0x0000000047FF3C98 0000EC (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: GTDT 0x0000000047FF3E18 000068 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: MCFG 0x0000000047FF3498 00003C (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: SPCR 0x0000000047FF3A98 000050 (v02 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: DBG2 0x0000000047FF3918 000057 (v00 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: HEST 0x0000000047FF3518 0000E0 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: IORT 0x0000000047FF3998 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.000000] ACPI: SPCR: console: pl011,mmio32,0x9000000,9600
+[    0.000000] NUMA: Faking a node at [mem 0x0000000040000000-0x000000183fffffff]
+[    0.000000] NODE_DATA(0) allocated [mem 0x18313dc280-0x18313f2fff]
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000040000000-0x00000000ffffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   [mem 0x0000000100000000-0x000000183fffffff]
+[    0.000000]   Device   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000040000000-0x000000004564ffff]
+[    0.000000]   node   0: [mem 0x0000000045650000-0x000000004565ffff]
+[    0.000000]   node   0: [mem 0x0000000045660000-0x000000004629ffff]
+[    0.000000]   node   0: [mem 0x00000000462a0000-0x000000004641ffff]
+[    0.000000]   node   0: [mem 0x0000000046420000-0x00000000464bffff]
+[    0.000000]   node   0: [mem 0x00000000464c0000-0x000000004655ffff]
+[    0.000000]   node   0: [mem 0x0000000046560000-0x0000000047a4ffff]
+[    0.000000]   node   0: [mem 0x0000000047a50000-0x0000000047feffff]
+[    0.000000]   node   0: [mem 0x0000000047ff0000-0x000000183fffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000040000000-0x000000183fffffff]
+[    0.000000] cma: Reserved 64 MiB at 0x00000000fc000000
+[    0.000000] psci: probing for conduit method from ACPI.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: Trusted OS migration not required
+[    0.000000] psci: SMC Calling Convention v1.0
+[    0.000000] percpu: Embedded 57 pages/cpu s107480 r8192 d117800 u233472
+[    0.000000] pcpu-alloc: s107480 r8192 d117800 u233472 alloc=57*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 [0] 6 [0] 7 
+[    0.000000] Detected PIPT I-cache on CPU0
+[    0.000000] CPU features: detected: GICv3 CPU interface
+[    0.000000] CPU features: detected: Spectre-v4
+[    0.000000] CPU features: detected: Spectre-BHB
+[    0.000000] CPU features: kernel page table isolation forced ON by KASLR
+[    0.000000] CPU features: detected: Kernel page table isolation (KPTI)
+[    0.000000] CPU features: detected: SSBS not fully self-synchronizing
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Kernel command line: BOOT_IMAGE=(hd0,gpt2)/boot/vmlinuz-6.19.10-300.fc44.aarch64 no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off root=UUID=00000000-0000-4000-8000-000000000002 rootflags=subvol=root systemd.default_device_timeout_sec=900 systemd.default_timeout_start_sec=900 enforcing=0
+[    0.000000] Unknown kernel command line parameters "no_timer_check", will be passed to user space.
+[    0.000000] printk: log buffer data + meta data: 262144 + 917504 = 1179648 bytes
+[    0.000000] Dentry cache hash table entries: 8388608 (order: 14, 67108864 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4194304 (order: 13, 33554432 bytes, linear)
+[    0.000000] software IO TLB: area num 8.
+[    0.000000] software IO TLB: mapped [mem 0x00000000f8000000-0x00000000fc000000] (64MB)
+[    0.000000] Fallback order for Node 0: 0 
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 25165824
+[    0.000000] Policy zone: Normal
+[    0.000000] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=8, Nodes=1
+[    0.000000] ftrace: allocating 68925 entries in 270 pages
+[    0.000000] ftrace: allocated 270 pages with 4 groups
+[    0.000000] Dynamic Preempt: voluntary
+[    0.000000] rcu: Preemptible hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU event tracing is enabled.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=4096 to nr_cpu_ids=8.
+[    0.000000] 	Trampoline variant of Tasks RCU enabled.
+[    0.000000] 	Rude variant of Tasks RCU enabled.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=8
+[    0.000000] RCU Tasks: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+[    0.000000] RCU Tasks Rude: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+[    0.000000] RCU Tasks Trace: Setting shift to 3 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=8.
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] GICv3: 256 SPIs implemented
+[    0.000000] GICv3: 0 Extended SPIs implemented
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GICv3: GICv3 features: 16 PPIs
+[    0.000000] GICv3: GICD_CTLR.DS=1, SCR_EL3.FIQ=0
+[    0.000000] GICv3: CPU0: found redistributor 0 region 0:0x00000000080a0000
+[    0.000000] ITS [mem 0x08080000-0x0809ffff]
+[    0.000000] ITS@0x0000000008080000: allocated 8192 Devices @1002e0000 (indirect, esz 8, psz 64K, shr 1)
+[    0.000000] ITS@0x0000000008080000: allocated 8192 Interrupt Collections @1002f0000 (flat, esz 8, psz 64K, shr 1)
+[    0.000000] GICv3: using LPI property table @0x0000000100300000
+[    0.000000] GICv3: CPU0: using allocated LPI pending table @0x0000000100310000
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] arch_timer: cp15 timer running at 62.50MHz (virt).
+[    0.000000] clocksource: arch_sys_counter: mask: 0x1ffffffffffffff max_cycles: 0x1cd42e208c, max_idle_ns: 881590405314 ns
+[    0.000109] sched_clock: 57 bits at 63MHz, resolution 16ns, wraps every 4398046511096ns
+[    0.099078] kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+[    0.117009] Console: colour dummy device 80x25
+[    0.117951] printk: legacy console [tty1] enabled
+[    0.128803] ACPI: Core revision 20250807
+[    0.140711] Calibrating delay loop (skipped), value calculated using timer frequency.. 125.00 BogoMIPS (lpj=62500)
+[    0.141076] pid_max: default: 32768 minimum: 301
+[    0.174641] Yama: becoming mindful.
+[    0.175968] SELinux:  Initializing.
+[    0.313274] LSM support for eBPF active
+[    0.328294] landlock: Up and running.
+[    0.356196] Mount-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.357857] Mountpoint-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.526620] rcu: Hierarchical SRCU implementation.
+[    0.526773] rcu: 	Max phase no-delay instances is 400.
+[    0.531462] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.543650] fsl-mc MSI: ITS@0x8080000 domain created
+[    0.546689] Remapping and enabling EFI services.
+[    0.586322] smp: Bringing up secondary CPUs ...
+[    0.602324] Detected PIPT I-cache on CPU1
+[    0.603912] GICv3: CPU1: found redistributor 1 region 0:0x00000000080c0000
+[    0.604199] GICv3: CPU1: using allocated LPI pending table @0x0000000100320000
+[    0.605377] CPU1: Booted secondary processor 0x0000000001 [0x414fd0c1]
+[    0.618113] Detected PIPT I-cache on CPU2
+[    0.618307] GICv3: CPU2: found redistributor 2 region 0:0x00000000080e0000
+[    0.618908] GICv3: CPU2: using allocated LPI pending table @0x0000000100330000
+[    0.619862] CPU2: Booted secondary processor 0x0000000002 [0x414fd0c1]
+[    0.651657] Detected PIPT I-cache on CPU3
+[    0.651900] GICv3: CPU3: found redistributor 3 region 0:0x0000000008100000
+[    0.652163] GICv3: CPU3: using allocated LPI pending table @0x0000000100340000
+[    0.653615] CPU3: Booted secondary processor 0x0000000003 [0x414fd0c1]
+[    0.685599] Detected PIPT I-cache on CPU4
+[    0.685857] GICv3: CPU4: found redistributor 4 region 0:0x0000000008120000
+[    0.686266] GICv3: CPU4: using allocated LPI pending table @0x0000000100350000
+[    0.687288] CPU4: Booted secondary processor 0x0000000004 [0x414fd0c1]
+[    0.693588] Detected PIPT I-cache on CPU5
+[    0.693799] GICv3: CPU5: found redistributor 5 region 0:0x0000000008140000
+[    0.694308] GICv3: CPU5: using allocated LPI pending table @0x0000000100360000
+[    0.695608] CPU5: Booted secondary processor 0x0000000005 [0x414fd0c1]
+[    0.728523] Detected PIPT I-cache on CPU6
+[    0.729055] GICv3: CPU6: found redistributor 6 region 0:0x0000000008160000
+[    0.729365] GICv3: CPU6: using allocated LPI pending table @0x0000000100370000
+[    0.730786] CPU6: Booted secondary processor 0x0000000006 [0x414fd0c1]
+[    0.736494] Detected PIPT I-cache on CPU7
+[    0.736889] GICv3: CPU7: found redistributor 7 region 0:0x0000000008180000
+[    0.737214] GICv3: CPU7: using allocated LPI pending table @0x0000000100380000
+[    0.738764] CPU7: Booted secondary processor 0x0000000007 [0x414fd0c1]
+[    0.743200] smp: Brought up 1 node, 8 CPUs
+[    0.743979] SMP: Total of 8 processors activated.
+[    0.744056] CPU: All CPU(s) started at EL1
+[    0.745429] CPU features: detected: 32-bit EL0 Support
+[    0.745710] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.745821] CPU features: detected: Common not Private translations
+[    0.745860] CPU features: detected: CRC32 instructions
+[    0.745891] CPU features: detected: Data cache clean to Point of Persistence
+[    0.746348] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.746440] CPU features: detected: LSE atomic instructions
+[    0.746477] CPU features: detected: Privileged Access Never
+[    0.746576] CPU features: detected: PMUv3
+[    0.746721] CPU features: detected: RAS Extension Support
+[    0.747314] CPU features: detected: XNX
+[    0.747507] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.825350] alternatives: applying system-wide alternatives
+[    0.857661] CPU features: detected: Hardware dirty bit management on CPU0-7
+[    0.969769] Memory: 98521684K/100663296K available (22976K kernel code, 6030K rwdata, 19488K rodata, 14720K init, 10298K bss, 2063480K reserved, 65536K cma-reserved)
+[    1.163506] devtmpfs: initialized
+[    1.483060] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    1.486825] posixtimers hash table entries: 4096 (order: 4, 65536 bytes, linear)
+[    1.488708] futex hash table entries: 2048 (131072 bytes on 1 NUMA nodes, total 128 KiB, linear).
+[    1.498176] 2G module region forced by RANDOMIZE_MODULE_REGION_FULL
+[    1.498619] 0 pages in range for non-PLT usage
+[    1.499138] 505840 pages in range for PLT usage
+[    1.598480] SMBIOS 3.0.0 present.
+[    1.598870] DMI: QEMU lab-arm6, BIOS edk2-20260812-10.fc44 08/12/2026
+[    1.599784] DMI: Memory slots populated: 6/6
+[    1.905185] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    2.002166] DMA: preallocated 4096 KiB GFP_KERNEL pool for atomic allocations
+[    2.043671] DMA: preallocated 4096 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    2.044295] audit: initializing netlink subsys (disabled)
+[    2.049815] audit: type=2000 audit(0.846:1): state=initialized audit_enabled=0 res=1
+[    2.088522] thermal_sys: Registered thermal governor 'fair_share'
+[    2.088618] thermal_sys: Registered thermal governor 'step_wise'
+[    2.088680] thermal_sys: Registered thermal governor 'user_space'
+[    2.092642] cpuidle: using governor menu
+[    2.097496] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    2.107031] ASID allocator initialised with 32768 entries
+[    2.112723] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+[    2.117050] Serial: AMBA PL011 UART driver
+[    2.152841] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    2.152952] HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+[    2.152998] HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+[    2.153033] HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+[    2.153066] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    2.153097] HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+[    2.153130] HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+[    2.153160] HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+[    2.240095] raid6: skipped pq benchmark and selected neonx8
+[    2.242039] raid6: using neon recovery algorithm
+[    2.249031] fbcon: Taking over console
+[    2.257308] ACPI: Added _OSI(Module Device)
+[    2.257751] ACPI: Added _OSI(Processor Device)
+[    2.257808] ACPI: Added _OSI(Processor Aggregator Device)
+[    2.330113] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    2.361920] ACPI: Interpreter enabled
+[    2.362023] ACPI: Using GIC for interrupt routing
+[    2.365815] ACPI: MCFG table detected, 1 entries
+[    2.374121] HEST: Table parsing has been initialized.
+[    2.383189] GHES: Failed to enable APEI firmware first mode.
+[    2.489874] ACPI: CPU0 has been hot-added
+[    2.491325] ACPI: CPU1 has been hot-added
+[    2.492730] ACPI: CPU2 has been hot-added
+[    2.494119] ACPI: CPU3 has been hot-added
+[    2.495738] ACPI: CPU4 has been hot-added
+[    2.496182] ACPI: CPU5 has been hot-added
+[    2.496713] ACPI: CPU6 has been hot-added
+[    2.497081] ACPI: CPU7 has been hot-added
+[    2.548555] ARMH0011:00: ttyAMA0 at MMIO 0x9000000 (irq = 12, base_baud = 0) is a SBSA
+[    2.556394] printk: console [ttyAMA0] enabled
+[    2.655469] ACPI: PCI: Interrupt link L000 configured for IRQ 35
+[    2.657735] ACPI: PCI: Interrupt link L001 configured for IRQ 36
+[    2.657959] ACPI: PCI: Interrupt link L002 configured for IRQ 37
+[    2.658116] ACPI: PCI: Interrupt link L003 configured for IRQ 38
+[    2.659867] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    2.666285] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+[    2.682156] acpi PNP0A08:00: _OSC: platform does not support [LTR DPC]
+[    2.685920] acpi PNP0A08:00: _OSC: OS now controls [PCIeHotplug PME AER PCIeCapability]
+[    2.696741] acpi PNP0A08:00: ECAM area [mem 0x4010000000-0x401fffffff] reserved by PNP0C02:00
+[    2.698055] acpi PNP0A08:00: ECAM at [mem 0x4010000000-0x401fffffff] for [bus 00-ff]
+[    2.700317] ACPI: Remapped I/O 0x000000003eff0000 to [io  0x0000-0xffff window]
+[    2.738008] PCI host bridge to bus 0000:00
+[    2.740086] pci_bus 0000:00: root bus resource [mem 0x10000000-0x3efeffff window]
+[    2.740519] pci_bus 0000:00: root bus resource [io  0x0000-0xffff window]
+[    2.740814] pci_bus 0000:00: root bus resource [mem 0x8000000000-0xffffffffff window]
+[    2.741101] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    2.741392] PCI: OF: of_root node is NULL, cannot create PCI host bridge node
+[    2.748061] pci 0000:00:00.0: [1b36:0008] type 00 class 0x060000 conventional PCI endpoint
+[    2.767512] pci 0000:00:01.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+[    2.772021] pci 0000:00:01.0: BAR 0 [io  0x00a0-0x00bf]
+[    2.772434] pci 0000:00:01.0: BAR 1 [mem 0x10042000-0x10042fff]
+[    2.773132] pci 0000:00:01.0: BAR 4 [mem 0x8000000000-0x8000003fff 64bit pref]
+[    2.774545] pci 0000:00:01.0: ROM [mem 0xfffc0000-0xffffffff pref]
+[    2.780277] pci 0000:00:02.0: [1af4:1005] type 00 class 0x00ff00 conventional PCI endpoint
+[    2.783116] pci 0000:00:02.0: BAR 0 [io  0x0080-0x009f]
+[    2.784745] pci 0000:00:02.0: BAR 1 [mem 0x10041000-0x10041fff]
+[    2.784819] pci 0000:00:02.0: BAR 4 [mem 0x8000004000-0x8000007fff 64bit pref]
+[    2.788991] pci 0000:00:03.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    2.792639] pci 0000:00:03.0: BAR 0 [io  0x0000-0x007f]
+[    2.793950] pci 0000:00:03.0: BAR 1 [mem 0x10040000-0x10040fff]
+[    2.794081] pci 0000:00:03.0: BAR 4 [mem 0x8000008000-0x800000bfff 64bit pref]
+[    2.803114] pci 0000:00:01.0: ROM [mem 0x10000000-0x1003ffff pref]: assigned
+[    2.804350] pci 0000:00:01.0: BAR 4 [mem 0x8000000000-0x8000003fff 64bit pref]: assigned
+[    2.804902] pci 0000:00:02.0: BAR 4 [mem 0x8000004000-0x8000007fff 64bit pref]: assigned
+[    2.805258] pci 0000:00:03.0: BAR 4 [mem 0x8000008000-0x800000bfff 64bit pref]: assigned
+[    2.805467] pci 0000:00:01.0: BAR 1 [mem 0x10040000-0x10040fff]: assigned
+[    2.806456] pci 0000:00:02.0: BAR 1 [mem 0x10041000-0x10041fff]: assigned
+[    2.807057] pci 0000:00:03.0: BAR 1 [mem 0x10042000-0x10042fff]: assigned
+[    2.807216] pci 0000:00:03.0: BAR 0 [io  0x1000-0x107f]: assigned
+[    2.808051] pci 0000:00:01.0: BAR 0 [io  0x1080-0x109f]: assigned
+[    2.809848] pci 0000:00:02.0: BAR 0 [io  0x10a0-0x10bf]: assigned
+[    2.811841] pci_bus 0000:00: resource 4 [mem 0x10000000-0x3efeffff window]
+[    2.811984] pci_bus 0000:00: resource 5 [io  0x0000-0xffff window]
+[    2.812029] pci_bus 0000:00: resource 6 [mem 0x8000000000-0xffffffffff window]
+[    2.837817] iommu: Default domain type: Translated
+[    2.838278] iommu: DMA domain TLB invalidation policy: lazy mode
+[    2.890722] SCSI subsystem initialized
+[    2.895863] libata version 3.00 loaded.
+[    2.901172] ACPI: bus type USB registered
+[    2.903894] usbcore: registered new interface driver usbfs
+[    2.905774] usbcore: registered new interface driver hub
+[    2.907155] usbcore: registered new device driver usb
+[    2.911670] pps_core: LinuxPPS API ver. 1 registered
+[    2.911888] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    2.912820] PTP clock support registered
+[    2.919437] EDAC MC: Ver: 3.0.0
+[    2.928881] scmi_core: SCMI protocol bus registered
+[    2.938580] efivars: Registered efivars operations
+[    2.940658] OVMF debug log: firmware version: "edk2-20260812-10.fc44"
+[    2.940830] OVMF debug log: buffer size: 128k
+[    3.025746] NetLabel: Initializing
+[    3.025963] NetLabel:  domain hash size = 128
+[    3.026035] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    3.028692] NetLabel:  unlabeled traffic allowed by default
+[    3.029115] mctp: management component transport protocol core
+[    3.029371] NET: Registered PF_MCTP protocol family
+[    3.035259] vgaarb: loaded
+[    3.045503] clocksource: Switched to clocksource arch_sys_counter
+[    3.084607] VFS: Disk quotas dquot_6.6.0
+[    3.085124] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    3.132091] pnp: PnP ACPI init
+[    3.141206] system 00:00: [mem 0x4010000000-0x401fffffff window] could not be reserved
+[    3.143205] pnp: PnP ACPI: found 1 devices
+[    3.309938] NET: Registered PF_INET protocol family
+[    3.340936] IP idents hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    3.670230] tcp_listen_portaddr_hash hash table entries: 65536 (order: 8, 1048576 bytes, linear)
+[    3.673987] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    3.714827] TCP established hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    3.745975] TCP bind hash table entries: 65536 (order: 9, 2097152 bytes, linear)
+[    3.748178] TCP: Hash tables configured (established 524288 bind 65536)
+[    3.781876] MPTCP token hash table entries: 65536 (order: 9, 1572864 bytes, linear)
+[    3.840324] UDP hash table entries: 65536 (order: 10, 4194304 bytes, linear)
+[    3.888709] UDP-Lite hash table entries: 65536 (order: 10, 4194304 bytes, linear)
+[    3.901014] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    3.903926] NET: Registered PF_XDP protocol family
+[    3.905256] PCI: CLS 0 bytes, default 64
+[    3.908910] ACPI: bus type thunderbolt registered
+[    3.950311] Trying to unpack rootfs image as initramfs...
+[    4.006339] kvm [1]: HYP mode not available
+[    4.494659] Initialise system trusted keyrings
+[    4.505882] Key type blacklist registered
+[    4.517035] workingset: timestamp_bits=37 max_order=25 bucket_order=0
+[    4.608868] integrity: Platform Keyring initialized
+[    4.611077] integrity: Machine keyring initialized
+[    4.625179] cryptd: max_cpu_qlen set to 1000
+[    4.816035] NET: Registered PF_ALG protocol family
+[    4.819048] xor: measuring software checksum speed
+[    4.821936]    8regs           :  1235 MB/sec
+[    4.826284]    32regs          :   819 MB/sec
+[    4.831252]    arm64_neon      :   791 MB/sec
+[    4.832691] xor: using function: 8regs (1235 MB/sec)
+[    4.833486] Key type asymmetric registered
+[    4.835045] Asymmetric key parser 'x509' registered
+[    4.888952] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 241)
+[    4.903670] io scheduler mq-deadline registered
+[    4.904058] io scheduler kyber registered
+[    4.907542] io scheduler bfq registered
+[    4.966967] atomic64_test: passed
+[    5.006011] ledtrig-cpu: registered to indicate activity on CPUs
+[    5.046159] input: Power Button as /devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0C:00/input/input0
+[    5.052782] ACPI: button: Power Button [PWRB]
+[    5.187921] ACPI: \_SB_.L001: Enabled at IRQ 36
+[    5.190253] virtio-pci 0000:00:01.0: enabling device (0005 -> 0007)
+[    5.220042] ACPI: \_SB_.L002: Enabled at IRQ 37
+[    5.220650] virtio-pci 0000:00:02.0: enabling device (0005 -> 0007)
+[    5.235181] ACPI: \_SB_.L003: Enabled at IRQ 38
+[    5.235499] virtio-pci 0000:00:03.0: enabling device (0005 -> 0007)
+[    5.251944] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    5.413946] msm_serial: driver initialized
+[    5.416957] SuperH (H)SCI(F) driver initialized
+[    5.501958] ACPI: bus type drm_connector registered
+[    5.549055] virtio_blk virtio2: 8/0/0 default/read/poll queues
+[    5.641885] virtio_blk virtio2: [vda] 41943040 512-byte logical blocks (21.5 GB/20.0 GiB)
+[    5.743718]  vda: vda1 vda2
+[    5.801134] CAN device driver interface
+[    5.823925] usbcore: registered new interface driver usbserial_generic
+[    5.826221] usbserial: USB Serial support registered for generic
+[    5.831641] mousedev: PS/2 mouse device common for all mice
+[    5.859127] rtc-efi rtc-efi.0: registered as rtc0
+[    5.866407] rtc-efi rtc-efi.0: setting system clock to 2026-11-16T02:13:51 UTC (1794795231)
+[    5.876689] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+[    5.877132] device-mapper: uevent: version 1.0.3
+[    5.882902] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+[    5.896719] ghes_edac: This system has 6 DIMM sockets.
+[    5.902941] EDAC MC0: Giving out device to module ghes_edac.c controller ghes_edac: DEV ghes (INTERRUPT)
+[    5.932217] hid: raw HID events driver (C) Jiri Kosina
+[    5.938013] usbcore: registered new interface driver usbhid
+[    5.938234] usbhid: USB HID core driver
+[    5.979865] hw perfevents: enabled with armv8_pmuv3_0 PMU driver, 7 (0,8000003f) counters available
+[    5.983150] watchdog: NMI not fully supported
+[    5.984181] watchdog: Hard watchdog permanently disabled
+[    6.005095] drop_monitor: Initializing network drop monitor service
+[    6.017108] Initializing XFRM netlink socket
+[    6.021780] NET: Registered PF_INET6 protocol family
+[    6.102114] Segment Routing with IPv6
+[    6.102868] RPL Segment Routing with IPv6
+[    6.104071] In-situ OAM (IOAM) with IPv6
+[    6.107662] mip6: Mobile IPv6
+[    6.111108] NET: Registered PF_PACKET protocol family
+[    6.112057] can: controller area network core
+[    6.116132] NET: Registered PF_CAN protocol family
+[    6.270078] registered taskstats version 1
+[    6.320049] Loading compiled-in X.509 certificates
+[    6.456829] Loaded X.509 cert 'Fedora kernel signing key: ae73a0479fdcdd7483824a83e738e71a87e7cafe'
+[    9.255887] Freeing initrd memory: 42752K
+[   10.545178] Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+[   10.695319] Demotion targets for Node 0: null
+[   10.696925] page_owner is disabled
+[   10.731049] Key type .fscrypt registered
+[   10.731851] Key type fscrypt-provisioning registered
+[   10.756213] Btrfs loaded, zoned=yes, fsverity=yes
+[   10.760284] Key type big_key registered
+[   10.778241] Key type encrypted registered
+[   10.787268] ima: secureboot mode disabled
+[   10.790980] ima: No TPM chip found, activating TPM-bypass!
+[   10.792017] Loading compiled-in module X.509 certificates
+[   10.797325] Loaded X.509 cert 'Fedora kernel signing key: ae73a0479fdcdd7483824a83e738e71a87e7cafe'
+[   10.841201] ima: Allocated hash algorithm: sha256
+[   10.918160] ima: No architecture policies found
+[   10.925956] evm: Initialising EVM extended attributes:
+[   10.926171] evm: security.selinux
+[   10.926284] evm: security.SMACK64 (disabled)
+[   10.926339] evm: security.SMACK64EXEC (disabled)
+[   10.926369] evm: security.SMACK64TRANSMUTE (disabled)
+[   10.926549] evm: security.SMACK64MMAP (disabled)
+[   10.926827] evm: security.apparmor (disabled)
+[   10.926871] evm: security.ima
+[   10.926897] evm: security.capability
+[   10.927137] evm: HMAC attrs: 0x1
+[   11.051635] alg: No test for 842 (842-scomp)
+[   11.637983] clk: Disabling unused clocks
+[   11.640533] PM: genpd: Disabling unused power domains
+[   12.034241] Freeing unused kernel memory: 14720K
+[   16.309865] Checked W+X mappings: passed, no W+X pages found
+[   16.318195] Run /init as init process
+[   16.318921]   with arguments:
+[   16.319319]     /init
+[   16.320233]     no_timer_check
+[   16.320372]   with environment:
+[   16.321070]     HOME=/
+[   16.321203]     TERM=linux
+[   18.232669] fuse: init (API version 7.45)
+[   19.182214] systemd[1]: Successfully made /usr/ read-only.
+[   19.569180] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+[   19.572315] systemd[1]: Detected virtualization qemu.
+[   19.577151] systemd[1]: Detected architecture arm64.
+[   19.579000] systemd[1]: Running in initrd.
+[   19.652925] systemd[1]: Initializing machine ID from random generator.
+[   19.671264] systemd[1]: No hostname configured, using default hostname.
+[   19.685828] systemd[1]: Hostname set to <localhost>.
+[   22.453738] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+[   22.790230] hrtimer: interrupt took 2596080 ns
+[   35.255023] systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+[   36.746145] systemd[1]: Queued start job for default target initrd.target.
+[   48.358698] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[   48.377960] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+[   48.386312] systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+[   48.392045] systemd[1]: Reached target paths.target - Path Units.
+[   48.398317] systemd[1]: Reached target slices.target - Slice Units.
+[   48.404943] systemd[1]: Reached target swap.target - Swaps.
+[   48.410281] systemd[1]: Reached target timers.target - Timer Units.
+[   48.441480] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+[   48.459095] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+[   48.476725] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[   48.486970] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[   48.492487] systemd[1]: Reached target sockets.target - Socket Units.
+[   49.381624] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+[   49.406023] systemd[1]: memstrack.service - Memstrack Anylazing Service skipped, no trigger condition checks were met.
+[   49.423135] systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+[   50.423211] systemd[1]: Starting systemd-journald.service - Journal Service...
+[   51.818288] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+[   51.855277] systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+[   51.863896] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+[   52.940807] systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+[   55.451107] systemd-journald[268]: Collecting audit messages is disabled.
+[   56.927932] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[   57.655812] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+[   58.464014] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+[   59.803142] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+[   63.388101] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+[   64.333171] systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+[   65.008046] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+[   65.037139] systemd[1]: Started systemd-journald.service - Journal Service.
+[  210.740749] BTRFS: device label fedora devid 1 transid 153 /dev/vda2 (253:2) scanned by mount (517)
+[  210.767113] BTRFS info (device vda2): first mount of filesystem 00000000-0000-4000-8000-000000000002
+[  210.770105] BTRFS info (device vda2): using crc32c (crc32c-lib) checksum algorithm
+[  211.818055] BTRFS info (device vda2): turning on async discard
+[  211.819102] BTRFS info (device vda2): enabling free space tree
+[  271.854429] systemd-journald[268]: Received SIGTERM from PID 1 (systemd).
+[  277.372888] SELinux:  Permission firmware_load in class system not defined in policy.
+[  277.373153] SELinux:  Permission kexec_image_load in class system not defined in policy.
+[  277.373244] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+[  277.373305] SELinux:  Permission policy_load in class system not defined in policy.
+[  277.373369] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+[  277.374862] SELinux:  Permission allowed in class io_uring not defined in policy.
+[  277.375081] SELinux:  Class memfd_file not defined in policy.
+[  277.375173] SELinux: the above unknown classes and permissions will be allowed
+[  277.579667] SELinux:  policy capability network_peer_controls=1
+[  277.580113] SELinux:  policy capability open_perms=1
+[  277.581158] SELinux:  policy capability extended_socket_class=1
+[  277.581633] SELinux:  policy capability always_check_network=0
+[  277.582604] SELinux:  policy capability cgroup_seclabel=1
+[  277.582647] SELinux:  policy capability nnp_nosuid_transition=1
+[  277.582743] SELinux:  policy capability genfs_seclabel_symlinks=1
+[  277.582777] SELinux:  policy capability ioctl_skip_cloexec=0
+[  277.582874] SELinux:  policy capability userspace_initial_context=0
+[  277.582982] SELinux:  policy capability netlink_xperm=0
+[  277.583027] SELinux:  policy capability netif_wildcard=0
+[  277.583116] SELinux:  policy capability genfs_seclabel_wildcard=0
+[  277.583163] SELinux:  policy capability functionfs_seclabel=0
+[  277.583355] SELinux:  policy capability memfd_class=0
+[  278.159889] audit: type=1403 audit(1794795503.794:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+[  278.339680] systemd[1]: Successfully loaded SELinux policy in 1.471989s.
+[  279.340027] NET: Registered PF_VSOCK protocol family
+[  280.536996] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 713.156ms.
+[  281.038021] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+[  281.042519] systemd[1]: Detected virtualization qemu.
+[  281.044843] systemd[1]: Detected architecture arm64.
+[  281.219240] systemd[1]: Hostname set to <lab-arm6>.
+[  283.851164] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+[  298.700576] zram: Added device: zram0
+[  311.829284] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+[  311.850485] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+[  312.117254] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+[  312.164129] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+[  312.203047] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+[  312.245184] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+[  312.277421] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+[  312.317280] systemd[1]: Created slice user.slice - User and Session Slice.
+[  312.335768] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[  312.350026] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+[  312.409908] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+[  312.417989] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+[  312.425597] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0001.device - /dev/disk/by-uuid/0000-0001...
+[  312.430821] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+[  312.436757] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+[  312.441561] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+[  312.446774] systemd[1]: Reached target imports.target - Image Downloads.
+[  312.456746] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+[  312.461877] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+[  312.467064] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+[  312.471132] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+[  312.475752] systemd[1]: Reached target paths.target - Path Units.
+[  312.480861] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+[  312.487259] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+[  312.492146] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+[  312.496165] systemd[1]: Reached target slices.target - Slice Units.
+[  312.500997] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+[  312.519269] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+[  312.566253] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+[  312.641913] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+[  312.726054] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+[  312.778371] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+[  312.847126] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+[  312.888082] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+[  312.950636] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+[  312.984966] systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+[  312.992945] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+[  312.995045] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+[  313.051281] systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+[  313.080201] systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+[  313.098841] systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+[  313.134680] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[  313.159035] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+[  313.183989] systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+[  313.301667] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+[  313.468119] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+[  313.937459] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+[  314.411967] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+[  314.496912] systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+[  315.162974] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+[  315.656742] systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+[  315.708071] systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+[  315.735851] systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+[  315.749742] systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+[  315.786869] systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+[  316.969506] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+[  316.995968] systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+[  317.009879] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+[  317.807074] systemd[1]: Starting systemd-journald.service - Journal Service...
+[  318.887372] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+[  319.582878] systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+[  319.627186] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[  320.208118] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+[  320.273299] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+[  321.123822] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+[  321.836911] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+[  324.359793] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+[  325.091061] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+[  325.311041] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+[  325.503020] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+[  325.786908] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[  326.128727] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+[  326.624815] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+[  327.757082] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+[  328.002699] BTRFS info (device vda2 state M): use zstd compression, level 1
+[  328.443846] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+[  329.144011] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+[  329.408231] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+[  329.596152] systemd-journald[785]: Collecting audit messages is enabled.
+[  329.667128] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+[  329.685251] audit: type=1130 audit(1794795555.318:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-remount-fs comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  329.747912] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+[  329.776033] audit: type=1130 audit(1794795555.410:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  329.907657] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+[  331.590971] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+[  331.607566] audit: type=1130 audit(1794795557.243:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  331.667140] systemd[1]: Started systemd-journald.service - Journal Service.
+[  331.684476] audit: type=1130 audit(1794795557.319:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  333.124980] audit: type=1334 audit(1794795558.759:7): prog-id=48 op=LOAD
+[  333.134263] audit: type=1334 audit(1794795558.769:8): prog-id=49 op=LOAD
+[  333.147183] audit: type=1334 audit(1794795558.783:9): prog-id=50 op=LOAD
+[  336.140086] audit: type=1130 audit(1794795561.773:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  341.002045] audit: type=1130 audit(1794795566.637:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  341.270020] audit: type=1334 audit(1794795566.905:12): prog-id=51 op=LOAD
+[  349.169686] audit: type=1130 audit(1794795574.805:13): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  349.384031] audit: type=1130 audit(1794795575.018:14): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  349.450694] audit: type=1334 audit(1794795575.086:15): prog-id=23 op=UNLOAD
+[  349.453808] audit: type=1334 audit(1794795575.088:16): prog-id=22 op=UNLOAD
+[  349.491361] audit: type=1334 audit(1794795575.127:17): prog-id=52 op=LOAD
+[  349.502867] audit: type=1334 audit(1794795575.138:18): prog-id=53 op=LOAD
+[  354.965847] audit: type=1130 audit(1794795580.601:19): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  358.788698] zram0: detected capacity change from 0 to 16777216
+[  361.319327] audit: type=1130 audit(1794795586.950:20): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  363.870880] Adding 8388604k swap on /dev/zram0.  Priority:100 extents:1 across:8388604k SSDsc
+[  365.360128] audit: type=1334 audit(1794795590.994:21): prog-id=54 op=LOAD
+[  365.377132] audit: type=1334 audit(1794795591.012:22): prog-id=55 op=LOAD
+[  365.390883] audit: type=1334 audit(1794795591.026:23): prog-id=56 op=LOAD
+[  369.997566] audit: type=1130 audit(1794795595.633:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  412.440044] audit: type=1130 audit(1794795638.075:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  469.637464] FAT-fs (vda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+[  469.718353] systemd-journald[785]: Received client request to flush runtime journal.
+[  471.612526] audit: type=1130 audit(1794795697.239:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-random-seed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  477.085954] audit: type=1130 audit(1794795702.715:27): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdb-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  479.732617] audit: type=1130 audit(1794795705.366:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journal-flush comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  481.826145] audit: type=1130 audit(1794795707.460:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-binfmt comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  504.133149] audit: type=1130 audit(1794795729.768:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  507.116948] audit: type=1305 audit(1794795732.751:31): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+[  507.149530] audit: type=1300 audit(1794795732.751:31): arch=c00000b7 syscall=206 success=yes exit=60 a0=3 a1=fffff89a2590 a2=3c a3=0 items=0 ppid=917 pid=918 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="auditd" exe="/usr/bin/auditd" subj=system_u:system_r:auditd_t:s0 key=(null)
+[  507.151856] audit: type=1327 audit(1794795732.751:31): proctitle="/usr/bin/auditd"
+[  522.741859] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+[  522.741925] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+[  556.958721] virtio_net virtio0 enp0s1: renamed from eth0
+[  668.144027] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  668.144691] {1}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  668.145050] {1}[Hardware Error]: event severity: corrected
+[  668.145734] {1}[Hardware Error]:  precise tstamp: 2026-11-16 02:24:53
+[  668.145856] {1}[Hardware Error]:  Error 0, type: corrected
+[  668.145913] {1}[Hardware Error]:  fru_text: CPU0_D1
+[  668.146061] {1}[Hardware Error]:   section_type: memory error
+[  668.146524] {1}[Hardware Error]:   physical_address: 0x0000000ced052ac0
+[  668.148059] {1}[Hardware Error]:   node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:344 bit_position:1 
+[  668.148200] {1}[Hardware Error]:   error_type: 2, single-bit ECC
+[  668.148828] {1}[Hardware Error]:   DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 
+[  668.159001] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel3_Dimm0 CPU0_D1 (node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:344 bit_position:1 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 page:0xced052 offset:0xac0 grain:1 syndrome:0x0 - APEI location: node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:344 bit_position:1 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1)
+[  671.109113] {2}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  671.109509] {2}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  671.109565] {2}[Hardware Error]: event severity: corrected
+[  671.109605] {2}[Hardware Error]:  precise tstamp: 2026-11-16 02:24:56
+[  671.109861] {2}[Hardware Error]:  Error 0, type: corrected
+[  671.109982] {2}[Hardware Error]:  fru_text: CPU0_E1
+[  671.110136] {2}[Hardware Error]:   section_type: memory error
+[  671.110377] {2}[Hardware Error]:   physical_address: 0x00000012d39983c0
+[  671.110446] {2}[Hardware Error]:   node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:42214 column:120 bit_position:6 
+[  671.110804] {2}[Hardware Error]:   error_type: 2, single-bit ECC
+[  671.110867] {2}[Hardware Error]:   DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 
+[  671.111147] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel4_Dimm0 CPU0_E1 (node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:42214 column:120 bit_position:6 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 page:0x12d3998 offset:0x3c0 grain:1 syndrome:0x0 - APEI location: node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:42214 column:120 bit_position:6 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1)
+[  674.182699] {3}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  674.182847] {3}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  674.182892] {3}[Hardware Error]: event severity: corrected
+[  674.183016] {3}[Hardware Error]:  precise tstamp: 2026-11-16 02:24:59
+[  674.183163] {3}[Hardware Error]:  Error 0, type: corrected
+[  674.183201] {3}[Hardware Error]:  fru_text: CPU0_B1
+[  674.183235] {3}[Hardware Error]:   section_type: memory error
+[  674.183269] {3}[Hardware Error]:   physical_address: 0x0000000538426e40
+[  674.183434] {3}[Hardware Error]:   node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:15888 column:456 bit_position:3 
+[  674.183552] {3}[Hardware Error]:   error_type: 2, single-bit ECC
+[  674.183603] {3}[Hardware Error]:   DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 
+[  674.183902] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel1_Dimm0 CPU0_B1 (node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:15888 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 page:0x538426 offset:0xe40 grain:1 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:15888 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1)
+[  677.285111] {4}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  677.285939] {4}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  677.286753] {4}[Hardware Error]: event severity: corrected
+[  677.286926] {4}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:02
+[  677.286985] {4}[Hardware Error]:  Error 0, type: corrected
+[  677.287024] {4}[Hardware Error]:  fru_text: CPU0_D1
+[  677.287154] {4}[Hardware Error]:   section_type: memory error
+[  677.287196] {4}[Hardware Error]:   physical_address: 0x0000000ced0531c0
+[  677.287261] {4}[Hardware Error]:   node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:568 bit_position:7 
+[  677.287320] {4}[Hardware Error]:   error_type: 2, single-bit ECC
+[  677.287871] {4}[Hardware Error]:   DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 
+[  677.288024] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel3_Dimm0 CPU0_D1 (node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:568 bit_position:7 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 page:0xced053 offset:0x1c0 grain:1 syndrome:0x0 - APEI location: node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:568 bit_position:7 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1)
+[  680.449922] {5}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  680.450433] {5}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  680.450526] {5}[Hardware Error]: event severity: corrected
+[  680.450713] {5}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:06
+[  680.450797] {5}[Hardware Error]:  Error 0, type: corrected
+[  680.450832] {5}[Hardware Error]:  fru_text: CPU0_A1
+[  680.450868] {5}[Hardware Error]:   section_type: memory error
+[  680.450902] {5}[Hardware Error]:   physical_address: 0x0000000174bac7c0
+[  680.450952] {5}[Hardware Error]:   node:0 card:0 module:0 rank:1 bank_group:1 bank_address:2 device:2 row:19758 column:248 bit_position:4 
+[  680.451051] {5}[Hardware Error]:   error_type: 2, single-bit ECC
+[  680.451096] {5}[Hardware Error]:   DIMM location: P0_Node0_Channel0_Dimm0 CPU0_A1 
+[  680.451485] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel0_Dimm0 CPU0_A1 (node:0 card:0 module:0 rank:1 bank_group:1 bank_address:2 device:2 row:19758 column:248 bit_position:4 DIMM location: P0_Node0_Channel0_Dimm0 CPU0_A1 page:0x174bac offset:0x7c0 grain:1 syndrome:0x0 - APEI location: node:0 card:0 module:0 rank:1 bank_group:1 bank_address:2 device:2 row:19758 column:248 bit_position:4 DIMM location: P0_Node0_Channel0_Dimm0 CPU0_A1)
+[  683.564015] {6}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  683.564385] {6}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  683.564633] {6}[Hardware Error]: event severity: corrected
+[  683.564875] {6}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:09
+[  683.565164] {6}[Hardware Error]:  Error 0, type: corrected
+[  683.565228] {6}[Hardware Error]:  fru_text: CPU0_E1
+[  683.565539] {6}[Hardware Error]:   section_type: memory error
+[  683.565595] {6}[Hardware Error]:   physical_address: 0x000000131fc59540
+[  683.565669] {6}[Hardware Error]:   node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:47089 column:680 bit_position:1 
+[  683.565852] {6}[Hardware Error]:   error_type: 2, single-bit ECC
+[  683.565932] {6}[Hardware Error]:   DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 
+[  683.566135] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel4_Dimm0 CPU0_E1 (node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:47089 column:680 bit_position:1 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 page:0x131fc59 offset:0x540 grain:1 syndrome:0x0 - APEI location: node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:47089 column:680 bit_position:1 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1)
+[  686.646460] {7}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  686.646602] {7}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  686.646668] {7}[Hardware Error]: event severity: corrected
+[  686.646880] {7}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:12
+[  686.646924] {7}[Hardware Error]:  Error 0, type: corrected
+[  686.646956] {7}[Hardware Error]:  fru_text: CPU0_B1
+[  686.646990] {7}[Hardware Error]:   section_type: memory error
+[  686.647022] {7}[Hardware Error]:   physical_address: 0x00000005880e6e40
+[  686.647073] {7}[Hardware Error]:   node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:20995 column:456 bit_position:3 
+[  686.647120] {7}[Hardware Error]:   error_type: 2, single-bit ECC
+[  686.647162] {7}[Hardware Error]:   DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 
+[  686.647479] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel1_Dimm0 CPU0_B1 (node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:20995 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 page:0x5880e6 offset:0xe40 grain:1 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:20995 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1)
+[  689.741858] {8}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  689.742001] {8}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  689.742047] {8}[Hardware Error]: event severity: corrected
+[  689.742089] {8}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:15
+[  689.742129] {8}[Hardware Error]:  Error 0, type: corrected
+[  689.742162] {8}[Hardware Error]:  fru_text: CPU0_D1
+[  689.742195] {8}[Hardware Error]:   section_type: memory error
+[  689.742229] {8}[Hardware Error]:   physical_address: 0x0000000ced053600
+[  689.742337] {8}[Hardware Error]:   node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:704 bit_position:6 
+[  689.742386] {8}[Hardware Error]:   error_type: 2, single-bit ECC
+[  689.742450] {8}[Hardware Error]:   DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 
+[  689.742816] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel3_Dimm0 CPU0_D1 (node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:704 bit_position:6 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 page:0xced053 offset:0x600 grain:1 syndrome:0x0 - APEI location: node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:704 bit_position:6 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1)
+[  692.822130] {9}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  692.822490] {9}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  692.822538] {9}[Hardware Error]: event severity: corrected
+[  692.822576] {9}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:18
+[  692.822616] {9}[Hardware Error]:  Error 0, type: corrected
+[  692.822649] {9}[Hardware Error]:  fru_text: CPU0_E1
+[  692.822683] {9}[Hardware Error]:   section_type: memory error
+[  692.822715] {9}[Hardware Error]:   physical_address: 0x0000001364f58a80
+[  692.822763] {9}[Hardware Error]:   node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:51517 column:336 bit_position:5 
+[  692.822834] {9}[Hardware Error]:   error_type: 2, single-bit ECC
+[  692.822882] {9}[Hardware Error]:   DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 
+[  692.823011] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel4_Dimm0 CPU0_E1 (node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:51517 column:336 bit_position:5 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 page:0x1364f58 offset:0xa80 grain:1 syndrome:0x0 - APEI location: node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:51517 column:336 bit_position:5 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1)
+[  695.897882] {10}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  695.898008] {10}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  695.898054] {10}[Hardware Error]: event severity: corrected
+[  695.898093] {10}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:21
+[  695.898134] {10}[Hardware Error]:  Error 0, type: corrected
+[  695.898184] {10}[Hardware Error]:  fru_text: CPU0_B1
+[  695.898369] {10}[Hardware Error]:   section_type: memory error
+[  695.898405] {10}[Hardware Error]:   physical_address: 0x0000000640126e40
+[  695.898455] {10}[Hardware Error]:   node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:32772 column:456 bit_position:3 
+[  695.898503] {10}[Hardware Error]:   error_type: 2, single-bit ECC
+[  695.898545] {10}[Hardware Error]:   DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 
+[  695.898666] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel1_Dimm0 CPU0_B1 (node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:32772 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 page:0x640126 offset:0xe40 grain:1 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:32772 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1)
+[  698.995575] {11}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  698.995754] {11}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  698.995799] {11}[Hardware Error]: event severity: corrected
+[  698.995839] {11}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:24
+[  698.995880] {11}[Hardware Error]:  Error 0, type: corrected
+[  698.995912] {11}[Hardware Error]:  fru_text: CPU0_D1
+[  698.995946] {11}[Hardware Error]:   section_type: memory error
+[  698.995980] {11}[Hardware Error]:   physical_address: 0x0000000ced052300
+[  698.996027] {11}[Hardware Error]:   node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:96 bit_position:0 
+[  698.996074] {11}[Hardware Error]:   error_type: 2, single-bit ECC
+[  698.996115] {11}[Hardware Error]:   DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 
+[  698.996247] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel3_Dimm0 CPU0_D1 (node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:96 bit_position:0 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 page:0xced052 offset:0x300 grain:1 syndrome:0x0 - APEI location: node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:96 bit_position:0 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1)
+[  702.068611] {12}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  702.068774] {12}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  702.068819] {12}[Hardware Error]: event severity: corrected
+[  702.068859] {12}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:27
+[  702.068901] {12}[Hardware Error]:  Error 0, type: corrected
+[  702.068934] {12}[Hardware Error]:  fru_text: CPU0_B1
+[  702.068969] {12}[Hardware Error]:   section_type: memory error
+[  702.069057] {12}[Hardware Error]:   physical_address: 0x0000000783a66e40
+[  702.069109] {12}[Hardware Error]:   node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:53481 column:456 bit_position:3 
+[  702.069157] {12}[Hardware Error]:   error_type: 2, single-bit ECC
+[  702.069199] {12}[Hardware Error]:   DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 
+[  702.069339] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel1_Dimm0 CPU0_B1 (node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:53481 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1 page:0x783a66 offset:0xe40 grain:1 syndrome:0x0 - APEI location: node:0 card:1 module:0 rank:1 bank_group:0 bank_address:3 device:5 row:53481 column:456 bit_position:3 DIMM location: P0_Node0_Channel1_Dimm0 CPU0_B1)
+[  705.146532] {13}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  705.146765] {13}[Hardware Error]: It has been corrected by h/w and requires no further action
+[  705.146814] {13}[Hardware Error]: event severity: corrected
+[  705.146854] {13}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:30
+[  705.146896] {13}[Hardware Error]:  Error 0, type: corrected
+[  705.146928] {13}[Hardware Error]:  fru_text: CPU0_E1
+[  705.146962] {13}[Hardware Error]:   section_type: memory error
+[  705.146995] {13}[Hardware Error]:   physical_address: 0x00000013c2899fc0
+[  705.147044] {13}[Hardware Error]:   node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:57506 column:1016 bit_position:2 
+[  705.147092] {13}[Hardware Error]:   error_type: 2, single-bit ECC
+[  705.147133] {13}[Hardware Error]:   DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 
+[  705.147427] EDAC MC0: 1 CE single-bit ECC on P0_Node0_Channel4_Dimm0 CPU0_E1 (node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:57506 column:1016 bit_position:2 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 page:0x13c2899 offset:0xfc0 grain:1 syndrome:0x0 - APEI location: node:0 card:4 module:0 rank:0 bank_group:3 bank_address:0 device:6 row:57506 column:1016 bit_position:2 DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1)
+[  729.628274] {14}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[  729.628689] {14}[Hardware Error]: event severity: recoverable
+[  729.628997] {14}[Hardware Error]:  precise tstamp: 2026-11-16 02:25:55
+[  729.629058] {14}[Hardware Error]:  Error 0, type: recoverable
+[  729.629099] {14}[Hardware Error]:  fru_text: CPU0_D1
+[  729.629140] {14}[Hardware Error]:   section_type: memory error
+[  729.629180] {14}[Hardware Error]:   physical_address: 0x0000000ced052f80
+[  729.629252] {14}[Hardware Error]:   node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:496 
+[  729.629313] {14}[Hardware Error]:   error_type: 14, scrub uncorrected error
+[  729.629385] {14}[Hardware Error]:   DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 
+[  729.629946] EDAC MC0: 1 UE scrub uncorrected error on P0_Node0_Channel3_Dimm0 CPU0_D1 (node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:496 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1 page:0xced052 offset:0xf80 grain:1 - APEI location: node:0 card:3 module:0 rank:0 bank_group:2 bank_address:1 device:3 row:11073 column:496 DIMM location: P0_Node0_Channel3_Dimm0 CPU0_D1)
+[  729.667711] Memory failure: 0xced052: recovery action for free buddy page: Recovered
