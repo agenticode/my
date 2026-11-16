@@ -678,6 +678,15 @@ func TestOverviewNotes(t *testing.T) {
 	if err := Overview(&b, ov, Style{Lang: i18n.EN, Width: 100}, nil); err != nil {
 		t.Fatal(err)
 	}
+	// In short the sources line names the sources that gave records:
+	// none here.
+	if got := b.String(); strings.Contains(got, " sources ") {
+		t.Errorf("a sources line without records:\n%s", got)
+	}
+	b.Reset()
+	if err := Overview(&b, ov, Style{Lang: i18n.EN, Width: 100, Detail: true}, nil); err != nil {
+		t.Fatal(err)
+	}
 	got := b.String()
 	for _, want := range []string{
 		" sources  klog without records\n",

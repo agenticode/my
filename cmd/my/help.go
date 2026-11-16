@@ -249,7 +249,12 @@ var words = i18n.Catalog{
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
 	"help.overview.text":  {EN: "Scans this host and draws its slot map and the DIMMs ranked by risk. It reads the rasdaemon database, the kernel log, the EDAC counters and the SMBIOS tables. It changes nothing on the host. With --bmc ADDRESS it also asks the BMC of the host over Redfish, with requests that only read, and joins what the BMC and the host say about each DIMM. Sources it may not read as this user are named on the \"missing\" line with what root would add. A scan that can read no source of error records at all ends with exit code 70 and names what it looked for: it does not answer \"no errors on record\".", KO: "이 호스트를 스캔해 슬롯 맵과 위험 순위를 그립니다. rasdaemon DB, 커널 로그, EDAC 카운터, SMBIOS 테이블을 읽으며 호스트의 어떤 것도 바꾸지 않습니다. --bmc ADDRESS를 주면 호스트의 BMC에도 Redfish로 읽기 요청만 보내고, BMC와 호스트가 DIMM마다 알려 준 내용을 합칩니다. 현재 사용자로 읽지 못한 소스는 \"부족\" 줄에 나오고, root로 실행하면 무엇이 더해지는지도 함께 적습니다. 오류 기록 소스를 하나도 읽지 못하면 \"오류 기록 없음\"이라고 답하지 않고, 찾아본 소스를 적은 뒤 종료 코드 70으로 끝납니다."},
-	"help.overview.flags": {EN: "--all             list every DIMM, also those without errors", KO: "--all             오류 없는 DIMM도 모두 나열"},
+	"help.overview.flags": {
+		EN: "--all             list every DIMM, also those without errors\n" +
+			"--detail          every source with its count, the whole legend",
+		KO: "--all             오류 없는 DIMM도 모두 나열\n" +
+			"--detail          소스마다 건수, 범례 전체",
+	},
 
 	"help.dimm.usage": {EN: "my dimm <slot|serial> [--detail] [flags]", KO: "my dimm <슬롯|시리얼> [--detail] [옵션]"},
 	"help.dimm.text":  {EN: "The examination of one DIMM: its finding, the branch its errors sit on, the address map of the bank with the most errors, and its timeline. A DIMM is named by its slot, by its serial number or the end of it, or by the EDAC label of its slot.", KO: "DIMM 하나의 진찰 화면: 판정 카드, 오류가 몰린 가지, 오류가 가장 많은 bank의 주소 맵, 타임라인. DIMM은 슬롯 이름, 시리얼(끝자리만 써도 됨), 슬롯의 EDAC 라벨로 지정합니다."},

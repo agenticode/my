@@ -100,8 +100,8 @@ func TestFleetOverview(t *testing.T) {
 			if code != 3 || errOut != "" {
 				t.Fatalf("--host: exit code %d, stderr %q", code, errOut)
 			}
-			wantLines(t, out, "host db-07 ", "host finding: replace now", "NODE 1 CPU1_DIMM_B1", "sources  rasdaemon 11 records",
-				"my dimm 'NODE 1 CPU1_DIMM_B1' --fleet "+dialect+" --host db-07", "my bundle -o case.mycase --fleet "+dialect+" --host db-07")
+			wantLines(t, out, "host db-07 ", "host finding: replace now", "NODE 1 CPU1_DIMM_B1", "sources  rasdaemon\n",
+				"my dimm 'NODE 1 CPU1_DIMM_B1' --fleet "+dialect+" --host db-07")
 			// Only the rows of that host were read: a third of what the
 			// overview of the three hosts read, twice.
 			if n := rowReads(srv) - before; n == 0 || n*6 != before {
@@ -334,7 +334,7 @@ func TestFleetBundleAndLedger(t *testing.T) {
 		t.Fatalf("bundle: exit code %d, stderr %q\n%s", code, errOut, out)
 	}
 	code, out, _ = runEnv(fixed, "open", file)
-	if code != 3 || !strings.Contains(out, "host db-07 ") || !strings.Contains(out, "sources  rasdaemon 11 records") {
+	if code != 3 || !strings.Contains(out, "host db-07 ") || !strings.Contains(out, "sources  rasdaemon\n") {
 		t.Errorf("the bundle of a host of the fleet: exit code %d\n%s", code, out)
 	}
 

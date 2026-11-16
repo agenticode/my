@@ -297,7 +297,51 @@ func Text(lang i18n.Lang, st model.Statement) string {
 	if !Messages.Has(st.Code) {
 		return st.Text
 	}
+	if d, ok := st.Args["detail"].(string); ok && st.Code == "missing.source_detail" && lang != i18n.EN {
+		// What an adapter says of a source is English; the sentences it
+		// writes most have a translation.
+		args := make(map[string]any, len(st.Args))
+		for k, v := range st.Args {
+			args[k] = v
+		}
+		args["detail"] = DetailText(lang, d)
+		return Messages.Text(lang, st.Code, args)
+	}
 	return Messages.Text(lang, st.Code, st.Args)
+}
+
+// DetailText returns what an adapter said of a source in the given
+// language: the sentence itself when it has no translation.
+func DetailText(lang i18n.Lang, detail string) string {
+	if lang == i18n.KO {
+		if ko, ok := sourceDetails[detail]; ok {
+			return ko
+		}
+	}
+	return detail
+}
+
+// sourceDetails translates the fixed sentences the adapters write as the
+// detail of a source. A detail that carries a value (a path, a count, an
+// error of the system) stays as it was written.
+var sourceDetails = map[string]string{
+	"no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only": "rasdaemon DB 없음: rasdaemon이 설치되지 않았거나 저장한 기록이 없음. 오류 기록은 커널 로그와 카운터에서만 읽음",
+	"no rasdaemon tables found": "rasdaemon 테이블 없음",
+	"no EDAC memory controller directory; the kernel has no EDAC support or sysfs is not mounted":                      "EDAC 메모리 컨트롤러 디렉터리 없음: 커널에 EDAC 지원이 없거나 sysfs가 마운트되지 않음",
+	"no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)":       "등록된 메모리 컨트롤러 없음: 이 플랫폼에 맞는 EDAC 드라이버가 로드되지 않음(가상 머신에서는 흔함)",
+	"memory controllers are registered but expose no DIMM counters":                                                    "메모리 컨트롤러는 등록됐지만 DIMM 카운터가 없음",
+	"records without a date could not be matched with the dated records of the same errors; they may be counted twice": "날짜 없는 기록을 같은 오류의 날짜 있는 기록과 맞추지 못함: 두 번 셀 수 있음",
+	"EDAC positions and SMBIOS slots could not all be matched":                                                         "EDAC 위치와 SMBIOS 슬롯을 모두 맞추지는 못함",
+	"no dump of the kernel log":              "커널 로그 덤프 없음",
+	"no dump could be read":                  "읽을 수 있는 덤프 없음",
+	"no kdump text log":                      "kdump 텍스트 로그 없음",
+	"no SMBIOS tables exposed by the kernel": "커널이 내놓은 SMBIOS 테이블 없음",
+	"permission denied; the SMBIOS tables are readable as root. Without them DIMM serial numbers are unknown": "권한 없음: SMBIOS 테이블은 root로 읽을 수 있음. 없으면 DIMM 시리얼을 알 수 없음",
+	"permission denied; readable as root": "권한 없음: root로 읽을 수 있음",
+	"permission denied; the kernel ring buffer is readable as root (kernel.dmesg_restrict is set)": "권한 없음: 커널 링 버퍼는 root로 읽을 수 있음(kernel.dmesg_restrict 설정됨)",
+	"no /proc; not a running Linux system":                                                         "/proc 없음: 실행 중인 Linux 시스템이 아님",
+	"the daemon answered and lists no DIMM: it has counted no memory error since it started":       "데몬이 응답했지만 DIMM 목록이 비어 있음: 시작 이후 센 메모리 오류 없음",
+	"not read: the run reached its deadline":                                                       "읽지 않음: 실행 제한 시간에 걸림",
 }
 
 // GradeText returns the name of a grade in the given language.

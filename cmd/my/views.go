@@ -55,7 +55,7 @@ func cmdName(name string, src *source) string {
 // runOverview is the command without a name: the slot map and the ranking
 // of this host, or of the case that was opened.
 func runOverview(ctx context.Context, env *cli.Env, args []string, src *source) int {
-	o := newOptions(env, cmdName("", src), src)
+	o := newOptions(env, cmdName("", src), src).withDetail()
 	all := o.fs.Bool("all", false, "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
@@ -94,14 +94,19 @@ func runOverview(ctx context.Context, env *cli.Env, args []string, src *source) 
 	return s.emit("overview", s.h.Grade, ov, func(w io.Writer) error { return term.Overview(w, ov, s.st, hints) })
 }
 
-// hints names the commands that go on from the overview.
+// hints names the command that goes on from the overview: one line. On
+// this host with a kept ledger it is that ledger, which holds the boots a
+// scan cannot see; else the examination of the DIMM at the top of the
+// ranking (or the subject of a case); else the host finding.
 // shownHints, when set, is handed the hints of a screen. A test runs them.
 var shownHints func([]term.Hint)
 
 func (s *session) hints(ov *view.Overview) []term.Hint {
-	var out []term.Hint
-	// The DIMM to look at next: the subject of the case when it has one,
-	// else the DIMM at the top of the ranking.
+	if s.src == nil && s.o.root == "" && !s.o.sf.set() {
+		if fi, err := os.Stat(harvestLedger); err == nil && fi.Mode().IsRegular() {
+			return []term.Hint{{Command: "my open " + shellWord(harvestLedger) + " boots", Text: say(s.lang, "hint.kept")}}
+		}
+	}
 	slot := ""
 	if len(ov.Ranking) > 0 {
 		slot = ov.Ranking[0].Slot
@@ -109,31 +114,13 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 	if s.src != nil && s.src.manifest != nil && s.src.manifest.Subject != nil && s.src.manifest.Subject.Slot != "" {
 		slot = s.src.manifest.Subject.Slot
 	}
-	if slot != "" {
-		out = append(out,
-			term.Hint{Command: s.next("dimm", slot), Text: say(s.lang, "hint.dimm")},
-			term.Hint{Command: s.next("why", slot), Text: say(s.lang, "hint.why")})
-	} else if ov.HostFinding != nil {
-		// No DIMM to point at: the finding of the host is what to read.
-		out = append(out, term.Hint{Command: s.next("why"), Text: say(s.lang, "hint.why")})
+	switch {
+	case slot != "":
+		return []term.Hint{{Command: s.next("dimm", slot), Text: say(s.lang, "hint.dimm")}}
+	case ov.HostFinding != nil:
+		return []term.Hint{{Command: s.next("why"), Text: say(s.lang, "hint.why")}}
 	}
-	if s.src == nil {
-		// The bundle of what was scanned: this host, the copy of --root,
-		// or this host of the fleet.
-		out = append(out, term.Hint{Command: s.next("bundle", "-o", "case.mycase"), Text: say(s.lang, "hint.bundle")})
-	}
-	if s.src == nil && s.o.root == "" && !s.o.sf.set() {
-		// The kept ledger of the boot harvest holds what this scan cannot
-		// see: the boots before that ended in a reset.
-		if fi, err := os.Stat(harvestLedger); err == nil && fi.Mode().IsRegular() {
-			out = append(out, term.Hint{Command: "my open " + shellWord(harvestLedger) + " boots", Text: say(s.lang, "hint.kept")})
-		}
-	}
-	if ov.Stops != nil {
-		out = append(out, term.Hint{Command: s.next("boots"), Text: say(s.lang, "hint.boots_host")})
-	}
-	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
-	return out
+	return nil
 }
 
 // runDIMM is "my dimm <slot|serial>": the examination of one DIMM.

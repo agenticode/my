@@ -5,16 +5,14 @@ host finding: replace now
  CPU0   ░░   ░░   ██   ░░   ░░   ░░   ░░   ░░
  CPU1   ░░   ░░   ░░   ▒▒   ░░   ░░   ░░   ░░
 
- ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
- 32 slots, 16 DIMMs (16 empty slots not drawn)
+ ██ replace now   ▒▒ observe   ░░ ok    32 slots, 16 DIMMs (16 empty slots not drawn)
 
  #  SLOT     SERIAL     CE  UE  MODE                    TREND 30D     FINDING      RULES
  1  CPU0_C1  3B9C56  1,231   1  row (estimated)         ▃▄▄▄▅▅▆▆▇█ ↑  replace now  R-UE-01 R-ROW-03
  2  CPU1_D1  2AEB41     53   0  single-bit (estimated)  ▆▁▄█▃▄▃▄▄▁ ↓  observe      R-SOFT-01
 
  14 DIMMs without errors
- sources  hostinfo 2 records, rasdaemon 1,286 records, klog 807 records, edac-sysfs 34 records,
-          smbios 32 records, slot-map 32 records
+ sources  rasdaemon, klog, edac-sysfs
 
  my dimm CPU0_C1: examination   my why CPU0_C1: reasons   my bundle -o case.mycase: case bundle
  my help: how to read the figures

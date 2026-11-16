@@ -27,19 +27,16 @@ host finding: replace now
  CPU0   ░░   ░░   ██   ░░   ░░   ░░   ░░   ░░
  CPU1   ░░   ░░   ░░   ▒▒   ░░   ░░   ░░   ░░
 
- ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
- 32 slots, 16 DIMMs (16 empty slots not drawn)
+ ██ replace now   ▒▒ observe   ░░ ok    32 slots, 16 DIMMs (16 empty slots not drawn)
 
  #  SLOT     SERIAL     CE  UE  MODE        TREND 30D     FINDING      RULES
  1  CPU0_C1  3B9C56  1,231   1  row         ▃▄▄▄▅▅▆▆▇█ ↑  replace now  R-UE-01 R-ROW-03 R-REP-02
  2  CPU1_D1  2AEB41     53   0  single-bit  ▆▁▄█▃▄▃▄▄▁ ↓  observe      R-SOFT-01
 
  14 DIMMs without errors
- sources  synth 1,297 records
+ sources  synth
 
  my open examples/demo.mycase dimm CPU0_C1: examination of this DIMM
- my open examples/demo.mycase why CPU0_C1: what the finding rests on
- my help: how to read the figures
 ```
 
 A case that was opened from a bundle starts with a line about the bundle. The next line names the host, its system, the period the ledger knows about, the errors of the host and the observation grade of their records; when the grades differ, each is printed with its number of errors. Then comes the finding for the host: the worst among its DIMMs, its GPUs and the host finding.
@@ -71,9 +68,11 @@ Below the ranking:
 | `N DIMMs without errors` | the DIMMs the ranking leaves out |
 | `GPU ...` | a GPU with a finding, and what the rule saw |
 | `tied to no DIMM` | the host finding: errors and page offlines that no record ties to a DIMM, with its grade and rules |
-| `sources` | what was read, with the number of records |
+| `sources` | the kinds of source that gave error records; `--detail` names every source with the number of its records |
 | `missing` | what could not be read, and what a scan as root would add |
 | `note` | what limits the reach of the records, such as a virtual machine |
+
+The legend names the grades the map shows (`--detail`: all of them). The last line is the command to run next: on a host with a kept ledger that ledger, else the examination of the DIMM at the top of the ranking, else the host finding.
 
 ## Finding
 
