@@ -112,7 +112,7 @@ func TestTable(t *testing.T) {
 	want := "| Command | Input | 100,000 events: time | peak RSS | 1,000,000 events: time | peak RSS |\n" +
 		"| --- | --- | ---: | ---: | ---: | ---: |\n" +
 		"| `scan` | host copy | 20.7 s | 104.0 MB | 231 s | 300.0 MB |\n" +
-		"| `serve` | host copy | 19.7 s to ready, 0.00 s scrape | 105.0 MB | | |\n" +
+		"| `serve` | host copy | 19.7 s to ready, 4 ms scrape | 105.0 MB | | |\n" +
 		"| `open` | fleet ledger | | | failed | |\n"
 	if b.String() != want {
 		t.Errorf("table:\n%s\nwant:\n%s", b.String(), want)
@@ -122,7 +122,29 @@ func TestTable(t *testing.T) {
 			t.Errorf("size(%d) = %q, want %q", n, got, want)
 		}
 	}
-	if thousands(1234567) != "1,234,567" || thousands(999) != "999" || seconds(0.123) != "0.12 s" {
+	if thousands(1234567) != "1,234,567" || thousands(999) != "999" || seconds(0.123) != "0.12 s" || seconds(0.0042) != "4 ms" {
 		t.Error("number forms")
+	}
+}
+
+// A measured command runs with the memory limit asked for, and never with
+// one perf itself was started with.
+func TestChildEnv(t *testing.T) {
+	t.Setenv("GOMEMLIMIT", "1GiB")
+	has := func(env []string, kv string) bool {
+		for _, e := range env {
+			if e == kv {
+				return true
+			}
+		}
+		return false
+	}
+	env := childEnv("")
+	if has(env, "GOMEMLIMIT=1GiB") || !has(env, "NO_COLOR=1") {
+		t.Errorf("without a limit: %v", env)
+	}
+	env = childEnv("191MiB")
+	if !has(env, "GOMEMLIMIT=191MiB") || has(env, "GOMEMLIMIT=1GiB") {
+		t.Errorf("with 191MiB: %v", env)
 	}
 }

@@ -69,12 +69,14 @@ func main() {
 func usage() {
 	fmt.Fprint(os.Stderr, `Usage:
   perf gen -events N [-hosts H] [-seed S] [-ledger FILE] [-tree DIR [-flavor intel|amd|ghes]]
-  perf run -my PATH -dir DIR [-events N,N...] [-hosts H] [-seed S] [-only NAME,...] [-format md|json]
+  perf run -my PATH -dir DIR [-events N,N...] [-hosts H] [-seed S] [-only NAME,...] [-gomemlimit SIZE] [-format md|json]
 
 gen writes a made-up fleet into a ledger (-ledger) or, with -hosts 1, one
 host as a copy of its files (-tree). run makes both for each size below
 DIR, runs the commands of the binary at PATH on them and prints wall time
-and peak resident memory of each.
+and peak resident memory of each. -gomemlimit sets GOMEMLIMIT for the
+commands it runs: 191MiB is what the binary sets by itself on a machine
+with 765 MiB of memory.
 `)
 }
 
@@ -235,6 +237,8 @@ type Measurement struct {
 	Input   string   `json:"input"`
 	Events  int      `json:"events"`
 	Command []string `json:"command"`
+	// MemoryLimit is the GOMEMLIMIT the command ran under, if any.
+	MemoryLimit string `json:"gomemlimit,omitempty"`
 	// Seconds is the wall time, PeakRSS the largest resident set of the
 	// process in bytes, Exit its exit code.
 	Seconds float64 `json:"seconds"`
@@ -262,6 +266,21 @@ func peak(st *os.ProcessState) int64 {
 	return int64(ru.Maxrss) << 10
 }
 
+// childEnv is the environment of a measured command: that of perf, plain
+// output, and the memory limit asked for.
+func childEnv(limit string) []string {
+	env := []string{"NO_COLOR=1", "LC_ALL=C.UTF-8"}
+	for _, kv := range os.Environ() {
+		if !strings.HasPrefix(kv, "GOMEMLIMIT=") {
+			env = append(env, kv)
+		}
+	}
+	if limit != "" {
+		env = append(env, "GOMEMLIMIT="+limit)
+	}
+	return env
+}
+
 // measure runs one command. Its standard output goes nowhere: what is
 // measured is the work, not a terminal. An exit code below 64 is the grade
 // of a finding; from 64 on the command failed.
@@ -269,7 +288,7 @@ func measure(m *Measurement, out string) {
 	cmd := exec.Command(m.Command[0], m.Command[1:]...)
 	var stderr strings.Builder
 	cmd.Stdout, cmd.Stderr = io.Discard, &stderr
-	cmd.Env = append(os.Environ(), "NO_COLOR=1", "LC_ALL=C.UTF-8")
+	cmd.Env = childEnv(m.MemoryLimit)
 	start := time.Now()
 	err := cmd.Run()
 	m.Seconds = time.Since(start).Seconds()
@@ -314,6 +333,7 @@ func exporter(m *Measurement, limit time.Duration) {
 	cmd := exec.Command(m.Command[0], m.Command[1:]...)
 	var stderr strings.Builder
 	cmd.Stdout, cmd.Stderr = io.Discard, &stderr
+	cmd.Env = childEnv(m.MemoryLimit)
 	start := time.Now()
 	if err := cmd.Start(); err != nil {
 		m.Error = err.Error()
@@ -383,6 +403,7 @@ func run(args []string) error {
 	only := fl.String("only", "", "measure only the commands with these names, separated by commas")
 	format := fl.String("format", "md", "md for a table, json for one line per measurement")
 	limit := fl.Duration("limit", 30*time.Minute, "how long the first scan of the exporter may take")
+	memLimit := fl.String("gomemlimit", "", "run the commands with GOMEMLIMIT set to `size` (191MiB, 1GiB)")
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
@@ -456,7 +477,7 @@ func run(args []string) error {
 			if len(want) > 0 && !want[st.name] {
 				continue
 			}
-			m := Measurement{Name: st.name, Input: st.input, Events: st.events, Command: append([]string{bin}, st.args...)}
+			m := Measurement{Name: st.name, Input: st.input, Events: st.events, Command: append([]string{bin}, st.args...), MemoryLimit: *memLimit}
 			if st.serve {
 				exporter(&m, *limit)
 			} else {
@@ -581,6 +602,8 @@ func abs(n int) int {
 
 func seconds(s float64) string {
 	switch {
+	case s < 0.1:
+		return fmt.Sprintf("%.0f ms", s*1000)
 	case s >= 100:
 		return fmt.Sprintf("%.0f s", s)
 	case s >= 10:
