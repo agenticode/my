@@ -558,3 +558,47 @@ func TestSourceGrades(t *testing.T) {
 		t.Errorf("unknown host: %v, %v", got, err)
 	}
 }
+
+// The statements of a writer run under a context that does not end, so
+// that the SQLite driver starts no goroutine for each of them. The update
+// still stops when its own context ends: the next statement is not run,
+// and what the update wrote is taken back.
+func TestUpdateStopsBetweenStatements(t *testing.T) {
+	s := newStore(t)
+	cctx, cancel := context.WithCancel(ctx)
+	n := 0
+	err := s.Update(cctx, func(w *Writer) error {
+		for i := range 100 {
+			if i == 40 {
+				cancel()
+			}
+			if err := w.UpsertHost(&model.Host{Name: fmt.Sprintf("h%03d", i)}); err != nil {
+				return err
+			}
+			n++
+		}
+		return nil
+	})
+	if !errors.Is(err, context.Canceled) || n != 40 {
+		t.Fatalf("update: %v after %d statements; want the context's error after 40", err, n)
+	}
+	if hosts, err := s.Hosts(ctx); err != nil || len(hosts) != 0 {
+		t.Errorf("%d hosts are left of an update that was stopped (%v)", len(hosts), err)
+	}
+	// A query of the writer says the same.
+	cctx, cancel = context.WithCancel(ctx)
+	cancel()
+	err = s.Update(ctx, func(w *Writer) error {
+		w.ctx = cctx
+		var id int64
+		return w.queryRow(`SELECT count(*) FROM host`).Scan(&id)
+	})
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("query of a writer whose context has ended: %v", err)
+	}
+	// The ledger is usable afterwards.
+	mustUpdate(t, s, func(w *Writer) error { return w.UpsertHost(&model.Host{Name: "after"}) })
+	if hosts, err := s.Hosts(ctx); err != nil || len(hosts) != 1 {
+		t.Errorf("after a stopped update: %d hosts, %v", len(hosts), err)
+	}
+}

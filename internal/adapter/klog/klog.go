@@ -50,6 +50,10 @@ type Options struct {
 	// Location is the time zone of times that carry none (syslog files,
 	// dmesg -T). The default is UTC.
 	Location *time.Location
+	// TempDir is where records are kept that wait for the time of their
+	// boot once there are too many for memory; empty means the system's
+	// directory for temporary files.
+	TempDir string
 }
 
 // Adapter reads one kernel log.
@@ -179,11 +183,16 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	p := &parser{ctx: ctx, sink: sink, rep: &rep, origin: a.origin, opts: opts, ghes: map[string]*ghesBlock{}}
 	p.fr = framer{loc: opts.Location, ref: opts.CapturedAt}
+	p.pend.dir = opts.TempDir
+	defer p.pend.reset()
 
 	if err := p.run(rc); err != nil {
 		var se sinkError
+		var we waitError
 		if errors.As(err, &se) {
 			rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+se.err.Error(), se.err
+		} else if errors.As(err, &we) {
+			rep.Status, rep.Detail = model.SourceError, we.Error()
 		} else {
 			rep.Status, rep.Detail = adapter.StatusForError(err)
 		}
@@ -438,9 +447,10 @@ type parser struct {
 	estimated     int
 	bigPages      string
 
-	seg     *segment
-	segs    int
-	pend    []pending
+	seg  *segment
+	segs int
+	// pend holds the records that wait for the time of their boot.
+	pend    waiting
 	ghes    map[string]*ghesBlock
 	mce     *mceBlock
 	amd     *amdBlock
@@ -888,8 +898,7 @@ func (p *parser) nvrmLine(l *line) error {
 	case l.hasMono && seg.startQuality != "":
 		return p.sendGPU(g, seg.start.Add(l.mono), seg.startQuality, seg.bootID)
 	}
-	p.pend = append(p.pend, pending{gpu: g, mono: l.mono, hasMono: l.hasMono})
-	return nil
+	return p.pend.add(pending{gpu: g, mono: l.mono, hasMono: l.hasMono})
 }
 
 func (p *parser) sendGPU(g *model.GPUMem, t time.Time, q model.TimeQuality, bootID string) error {
@@ -1322,8 +1331,7 @@ func (p *parser) emit(e *model.Event, a *model.Action, l *line) error {
 	case l.hasMono && seg.startQuality != "":
 		return p.send(e, a, seg.start.Add(l.mono), seg.startQuality, seg.bootID)
 	}
-	p.pend = append(p.pend, pending{ev: e, act: a, mono: l.mono, hasMono: l.hasMono})
-	return nil
+	return p.pend.add(pending{ev: e, act: a, mono: l.mono, hasMono: l.hasMono})
 }
 
 func (p *parser) send(e *model.Event, a *model.Action, t time.Time, q model.TimeQuality, bootID string) error {
@@ -1407,7 +1415,7 @@ func (p *parser) closeSegment(last bool) error {
 		eventBoot = ""
 	}
 
-	for _, pd := range p.pend {
+	err := p.pend.each(func(pd pending) error {
 		t := seg.start
 		if pd.hasMono {
 			t = seg.start.Add(pd.mono)
@@ -1418,16 +1426,13 @@ func (p *parser) closeSegment(last bool) error {
 			q = model.TimeEstimated
 		}
 		if pd.gpu != nil {
-			if err := p.sendGPU(pd.gpu, t, q, eventBoot); err != nil {
-				return err
-			}
-			continue
+			return p.sendGPU(pd.gpu, t, q, eventBoot)
 		}
-		if err := p.send(pd.ev, pd.act, t, q, eventBoot); err != nil {
-			return err
-		}
+		return p.send(pd.ev, pd.act, t, q, eventBoot)
+	})
+	if err != nil {
+		return err
 	}
-	p.pend = nil
 
 	if y := seg.start.UTC().Year(); (seg.records > 0 || seg.banner != "") && (y < 1970 || y > 9999) {
 		// Stamps since boot that do not fit the dates of the log put the

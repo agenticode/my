@@ -530,16 +530,28 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 	}
 	open := map[string][]*cluster{}
-	updates := map[int64]int64{} // duplicate id -> primary id
+	// What was found: pairs of a duplicate and the record that stays. A
+	// host in an error storm has a pair for every second record, so they
+	// are kept as a list; marked says which records of a BMC log are among
+	// the duplicates, the only ones that are asked about again.
+	type pair struct{ dup, primary int64 }
+	var updates []pair
+	marked := map[int64]bool{}
 
 	// Records by severity class and slot, for the BMC match: the ones from
-	// the host's own logs in time order, and the ones from a BMC log.
+	// the host's own logs in time order, and the ones from a BMC log. The
+	// host's own records are kept only when a BMC log has records at all.
 	type stamped struct {
 		id int64
 		t  time.Time
 	}
 	hostLog := map[string][]stamped{}
 	bmcLog := map[string][]stamped{}
+	var withBMC bool
+	if err := s.db.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM event WHERE host = ? AND kind = 'error' AND dup_of IS NULL
+ AND (source LIKE 'sel/%' OR source LIKE 'redfish/%'))`, host).Scan(&withBMC); err != nil {
+		return 0, fmt.Errorf("mark duplicates: %w", err)
+	}
 
 	closeCluster := func(c *cluster) {
 		if len(c.members) < 2 {
@@ -563,7 +575,10 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 		for i, m := range c.members {
 			if i != best {
-				updates[m.id] = c.members[best].id
+				updates = append(updates, pair{m.id, c.members[best].id})
+				if bmcSource(m.source) {
+					marked[m.id] = true
+				}
 			}
 		}
 	}
@@ -574,6 +589,7 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 	if err != nil {
 		return 0, fmt.Errorf("mark duplicates: %w", err)
 	}
+	seen := 0
 	for rows.Next() {
 		var (
 			id                                  int64
@@ -602,12 +618,35 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 		t := parseTS(sql.NullString{String: dt, Valid: true})
 		est := model.TimeQuality(quality) != model.TimeExact
-		if slot != "" {
+		if slot != "" && withBMC {
 			k := class + "|" + slot
 			if bmcSource(source) {
 				bmcLog[k] = append(bmcLog[k], stamped{id, t})
 			} else {
 				hostLog[k] = append(hostLog[k], stamped{id, t})
+			}
+		}
+
+		// The rows come in the order of their times. A group that is too
+		// old for this row is too old for every row after it: such groups
+		// are closed and dropped now and then, also those whose place no
+		// later row names. Without that a group stays in memory for every
+		// cache line a host ever reported an error in.
+		if seen++; seen%8192 == 0 {
+			for k, cs := range open {
+				keep := cs[:0]
+				for _, c := range cs {
+					if t.Sub(c.first) > maxTol {
+						closeCluster(c)
+						continue
+					}
+					keep = append(keep, c)
+				}
+				if len(keep) == 0 {
+					delete(open, k)
+				} else {
+					open[k] = keep
+				}
 			}
 		}
 
@@ -676,7 +715,7 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 			continue
 		}
 		for _, b := range recs {
-			if _, dup := updates[b.id]; dup {
+			if marked[b.id] {
 				continue
 			}
 			i := sort.Search(len(host), func(i int) bool { return !host[i].t.Before(b.t) })
@@ -690,14 +729,14 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 				}
 			}
 			if best != 0 {
-				updates[b.id] = best
+				updates = append(updates, pair{b.id, best})
 			}
 		}
 	}
 
 	err = s.Update(ctx, func(w *Writer) error {
-		for dup, primary := range updates {
-			if _, err := w.exec(`UPDATE event SET dup_of = ? WHERE id = ?`, primary, dup); err != nil {
+		for _, u := range updates {
+			if _, err := w.exec(`UPDATE event SET dup_of = ? WHERE id = ?`, u.primary, u.dup); err != nil {
 				return err
 			}
 		}
