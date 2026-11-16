@@ -74,14 +74,14 @@ var biosWords = i18n.Catalog{
 			"For each setting the command prints the value in effect, a pending value that takes effect after a reboot, and whether it is what the profile expects. When the attribute registry of this BIOS allows no value with the expected meaning, the expectation does not fit this BIOS version; that is said and is no mismatch. " +
 			"ADDDC that is on with x8 DIMMs is reported as on and without effect on them. DIMMs that run below their rated speed are listed with what the records show that can be the reason. " +
 			"The built-in profile expects patrol scrub and the logging of corrected errors to be on, and reports the other settings without judging them. --profile checks against a profile of one's own. " +
-			"The command changes no setting. The exit code is 0 when every expectation is met, also when no settings are on record, and 1 when a setting is not as expected; it is no grade.",
+			"The command changes no setting. The exit code is 0 when every expectation is met, also when no settings are on record, and 1 when a setting in effect is not as expected; a pending value that will not be as expected after the next reboot is reported and leaves the exit code as it is. It is no grade.",
 		KO: "이 호스트의 BIOS 설정 중 메모리 오류에 영향을 주는 것을 설정 프로필과 대조합니다. 패트롤 스크럽, ADDDC와 메모리 모드, CE 로깅, PPR, 메모리 주파수, 리프레시 속도입니다. " +
 			"설정은 BMC가 Redfish로 알려 주는 값입니다. \"my bios --bmc ADDRESS\"는 같은 실행에서 이 호스트의 BMC에 설정을 요청합니다. --bmc가 없으면 아무것도 요청하지 않고 원장이나 열어 둔 케이스에 있는 값을 읽습니다. \"my collect redfish\"는 설정을 수집 결과로 읽어 오고, 그 수집 결과로 만든 케이스에 설정이 들어갑니다. " +
 			"서버 벤더마다 이 설정의 이름이 다릅니다. 프로필은 어느 벤더의 어느 BIOS 속성이 어떤 설정이고 값마다 무슨 뜻인지를 적고, 매핑마다 근거가 된 공개 문서를 밝힙니다. 공개 문서에 속성이 없는 설정은 매핑 없음으로 보고합니다. " +
 			"설정마다 현재 값, 재부팅 뒤에 적용될 대기 값, 프로필의 기대와 맞는지를 출력합니다. 이 BIOS의 속성 레지스트리에 기대한 뜻의 값이 없으면 기대값이 이 BIOS 버전에 맞지 않는 것으로 적으며 불일치로 세지 않습니다. " +
 			"x8 DIMM이 있는데 ADDDC가 켜져 있으면 켜져 있으나 그 DIMM에는 효과가 없다고 적습니다. 정격 속도에 못 미치게 동작하는 DIMM은 기록에서 보이는 원인 후보와 함께 나열합니다. " +
 			"내장 프로필은 패트롤 스크럽과 CE 로깅이 켜져 있기를 기대하고, 나머지 설정은 평가 없이 값만 보고합니다. --profile로 직접 만든 프로필과 대조할 수 있습니다. " +
-			"이 명령은 어떤 설정도 바꾸지 않습니다. 모든 기대가 충족되면 종료 코드는 0이며 설정 기록이 없을 때도 0입니다. 기대와 다른 설정이 있으면 1입니다. 이 종료 코드는 등급이 아닙니다.",
+			"이 명령은 어떤 설정도 바꾸지 않습니다. 모든 기대가 충족되면 종료 코드는 0이며 설정 기록이 없을 때도 0입니다. 지금 적용된 설정이 기대와 다르면 1입니다. 다음 재부팅 뒤 기대와 달라질 대기 값은 보고만 하고 종료 코드를 바꾸지 않습니다. 이 종료 코드는 등급이 아닙니다.",
 	},
 	"help.bios.flags": {
 		EN: "--profile FILE    check against the settings profile in FILE\n" +

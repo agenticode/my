@@ -196,7 +196,8 @@
           "args": {
             "n": 4,
             "of": 8,
-            "ran": "44 min",
+            "ran_n": 44,
+            "ran_unit": "@unit.min",
             "when": "2026-11-12 10:10 UTC"
           },
           "text": "4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC after 44 min"

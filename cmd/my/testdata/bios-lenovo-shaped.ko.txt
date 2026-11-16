@@ -1,7 +1,7 @@
 호스트 node-l  Lenovo ThinkSystem SR650 V3  BIOS ESE128B
 BIOS 메모리 설정 3개 기록됨, 읽은 시각 2026-11-13 09:30 UTC
 속성 레지스트리를 읽지 못함
-프로필 built-in, Lenovo 매핑 적용 (시스템 제조사 기준)
+프로필 기본 제공, Lenovo 매핑 적용 (시스템 제조사 기준)
 
  설정              상태       기대  점검       BIOS 속성 = 값
  패트롤 스크럽     -          켜짐  매핑 없음

@@ -23,6 +23,12 @@ var Messages = i18n.Catalog{
 	"confidence.medium":          {EN: "medium", KO: "보통"},
 	"confidence.low":             {EN: "low", KO: "낮음"},
 
+	// Units of a time span (Duration).
+	"unit.s":   {EN: "s", KO: "초"},
+	"unit.min": {EN: "min", KO: "분"},
+	"unit.h":   {EN: "h", KO: "시간"},
+	"unit.d":   {EN: "d", KO: "일"},
+
 	// Thresholds that cannot be set (ConfigError).
 	"config.unknown":            {EN: "unknown threshold \"{key}\"", KO: "알 수 없는 임계값 \"{key}\""},
 	"config.not_number":         {EN: "{key}: \"{value}\" is not a number", KO: "{key}: \"{value}\": 숫자가 아님"},
@@ -73,7 +79,6 @@ var Messages = i18n.Catalog{
 	"word.loop_each_stopped": {EN: "each of these boots ended in a fatal hardware error", KO: "해당 부팅 모두 치명적 하드웨어 오류로 끝남"},
 	"word.loop_some_stopped": {EN: "some of these boots ended in a fatal hardware error", KO: "해당 부팅 일부가 치명적 하드웨어 오류로 끝남"},
 	"word.loop_none_stopped": {EN: "none of these boots is on record as ended by a fatal hardware error", KO: "해당 부팅 중 치명적 하드웨어 오류로 끝난 기록 없음"},
-	"word.loop_ran_unknown":  {EN: "an unknown time", KO: "알 수 없는 시간"},
 	"word.loop_no_place":     {EN: "a place not on record", KO: "기록에 없는 위치"},
 	"status.empty":           {EN: "no records", KO: "기록 없음"},
 	"status.absent":          {EN: "not present", KO: "없음"},
@@ -186,7 +191,8 @@ var Messages = i18n.Catalog{
 	"loop.shared_socket":  {EN: "these DIMMs are all on socket {socket}, on more than one channel: its processor, its memory controller or its power", KO: "해당 DIMM 모두 소켓 {socket}에 있고 채널은 여러 개: 그 프로세서, 메모리 컨트롤러, 전원이 의심됨"},
 	"loop.shared_sockets": {EN: "these DIMMs are on {sockets} sockets: the board, the power supply or the firmware", KO: "해당 DIMM이 소켓 {sockets}개에 걸쳐 있음: 보드, 전원 공급 장치, 펌웨어가 의심됨"},
 	"loop.fault_boots":    {EN: "the fault at {where} had errors in {n} of the last {of} boots", KO: "{where} 고장: 최근 부팅 {of}회 중 {n}회에서 오류"},
-	"loop.stops":          {EN: "{n} of the last {of} boots ended in a fatal hardware error, the latest on {when} after {ran}", KO: "최근 부팅 {of}회 중 {n}회가 치명적 하드웨어 오류로 끝남, 최근 {when}, 부팅 후 {ran}"},
+	"loop.stops":          {EN: "{n} of the last {of} boots ended in a fatal hardware error, the latest on {when} after {ran_n} {ran_unit}", KO: "최근 부팅 {of}회 중 {n}회가 치명적 하드웨어 오류로 끝남, 최근 {when}, 부팅 후 {ran_n}{ran_unit}"},
+	"loop.stops_when":     {EN: "{n} of the last {of} boots ended in a fatal hardware error, the latest on {when}", KO: "최근 부팅 {of}회 중 {n}회가 치명적 하드웨어 오류로 끝남, 최근 {when}"},
 	"loop.where_dimm":     {EN: "{n} of them had an uncorrected error of {slot} ({rule})", KO: "그중 {n}회에 {slot}의 UE({rule})"},
 	"loop.where_spread":   {EN: "the uncorrected errors are spread over {dimms} DIMMs ({slots}), R-LOOP-03", KO: "UE가 DIMM {dimms}개({slots})에 흩어짐(R-LOOP-03)"},
 	"loop.where_one":      {EN: "uncorrected errors on {slot} in {n} {n|boot|boots}: too few for a rule of the boots", KO: "{slot}에서 UE, 부팅 {n}회: 부팅 반복 규칙에 미달"},

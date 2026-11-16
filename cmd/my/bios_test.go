@@ -172,7 +172,7 @@ func TestBIOSWithoutSettings(t *testing.T) {
 	}
 	// On a copy of a host's files too.
 	code, stdout, _ = runEnv(fixed, "bios", "--root", hostTree(t), "--lang", "ko")
-	if code != cli.ExitOK || !strings.Contains(stdout, "BIOS 설정 기록이 없습니다") {
+	if code != cli.ExitOK || !strings.Contains(stdout, "BIOS 설정 기록이 없음") {
 		t.Errorf("--root: exit code %d\n%s", code, stdout)
 	}
 	// The DMTF mockup has a Bios resource whose attributes are about boot,
