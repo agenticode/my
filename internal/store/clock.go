@@ -91,40 +91,35 @@ const (
 // the records it added.
 func (s *Store) AlignClocks(ctx context.Context, host string) ([]ClockAlignment, error) {
 	fail := func(err error) ([]ClockAlignment, error) { return nil, fmt.Errorf("align clocks: %w", err) }
-	daemon, err := s.clockRecords(ctx, host, "rasdaemon")
-	if err != nil {
-		return fail(err)
-	}
-	if len(daemon) == 0 {
-		return nil, nil
-	}
-	kernel, err := s.clockRecords(ctx, host, "klog")
-	if err != nil {
-		return fail(err)
-	}
-	if len(kernel) == 0 {
-		return nil, nil
-	}
-
+	// The records are read into their boots as they come: rasdaemon's in
+	// full, the kernel log's as anchors of the boots rasdaemon has records
+	// in. A host in an error storm has a million of each, and every boot id
+	// and every error repeats, so each is kept once.
 	boots := map[string]*clockBoot{}
-	boot := func(id string) *clockBoot {
-		b := boots[id]
+	text := map[string]string{}
+	err := s.clockRecords(ctx, host, "rasdaemon", text, func(r clockRec) {
+		b := boots[r.boot]
 		if b == nil {
 			b = &clockBoot{anchors: map[string][]int64{}}
-			boots[id] = b
+			boots[r.boot] = b
 		}
-		return b
+		b.recs = append(b.recs, r)
+	})
+	if err != nil {
+		return fail(err)
 	}
-	for _, k := range kernel {
-		if k.key != "" {
-			b := boot(k.boot)
+	if len(boots) == 0 {
+		return nil, nil
+	}
+	err = s.clockRecords(ctx, host, "klog", text, func(k clockRec) {
+		if b := boots[k.boot]; b != nil && k.key != "" {
 			b.anchors[k.key] = append(b.anchors[k.key], k.at)
 		}
+	})
+	if err != nil {
+		return fail(err)
 	}
-	for _, r := range daemon {
-		b := boot(r.boot)
-		b.recs = append(b.recs, r)
-	}
+	text = nil
 	// The page offlines rasdaemon recorded go with its errors.
 	rows, err := s.db.QueryContext(ctx, `SELECT id, at, COALESCE(boot_id, '') FROM action
  WHERE host = ? AND time_quality = 'exact' AND source LIKE 'rasdaemon/%' ORDER BY at, id`, host)
@@ -223,34 +218,43 @@ type clockRec struct {
 	boot string
 }
 
-// clockRecords returns the dated events of one reporter in time order.
-func (s *Store) clockRecords(ctx context.Context, host, reporter string) ([]clockRec, error) {
+// clockRecords hands the dated events of one reporter to fn in time order.
+// Boot ids and keys are taken from text, so that a repeated one is kept
+// once; new ones are added to it.
+func (s *Store) clockRecords(ctx context.Context, host, reporter string, text map[string]string, fn func(clockRec)) error {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, "ErrorDT", kind, "ErrorSeverity", "OsPhysicalAddress", slot, COALESCE(boot_id, '') FROM event
  WHERE host = ? AND time_quality = 'exact' AND source LIKE ? ORDER BY "ErrorDT", id`, host, reporter+"/%")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer rows.Close()
-	var out []clockRec
+	once := func(v string) string {
+		if t, ok := text[v]; ok {
+			return t
+		}
+		text[v] = v
+		return v
+	}
 	for rows.Next() {
 		var r clockRec
-		var dt, kind, sev, slot string
+		var dt, kind, sev, slot, boot string
 		var addr sql.NullInt64
-		if err := rows.Scan(&r.id, &dt, &kind, &sev, &addr, &slot, &r.boot); err != nil {
-			return nil, err
+		if err := rows.Scan(&r.id, &dt, &kind, &sev, &addr, &slot, &boot); err != nil {
+			return err
 		}
 		r.at = parseTS(sql.NullString{String: dt, Valid: true}).Unix()
+		r.boot = once(boot)
 		if class := model.Severity(sev).Class(); kind == string(model.KindError) && class != "" {
 			switch {
 			case addr.Valid:
-				r.key = fmt.Sprintf("%s|a%x", class, uint64(addr.Int64)>>6)
+				r.key = once(fmt.Sprintf("%s|a%x", class, uint64(addr.Int64)>>6))
 			case slot != "":
-				r.key = class + "|s" + slot
+				r.key = once(class + "|s" + slot)
 			}
 		}
-		out = append(out, r)
+		fn(r)
 	}
-	return out, rows.Err()
+	return rows.Err()
 }
 
 // shiftTimes adds seconds to the times of the rows with the given ids.

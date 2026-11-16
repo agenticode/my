@@ -25,28 +25,18 @@ import (
 // boot their source gave them.
 func (s *Store) LinkBoots(ctx context.Context, host string) error {
 	return s.Update(ctx, func(w *Writer) error {
-		for _, q := range []string{
-			`UPDATE event SET boot_id = (
-   SELECT b.boot_id FROM boot b
-   WHERE b.host = event.host AND b.start_quality != 'relative' AND b.started_at <= event."ErrorDT"
-   ORDER BY b.started_at DESC LIMIT 1)
- WHERE host = ? AND time_quality != 'relative'`,
-			`UPDATE action SET boot_id = (
-   SELECT b.boot_id FROM boot b
-   WHERE b.host = action.host AND b.start_quality != 'relative' AND b.started_at <= action.at
-   ORDER BY b.started_at DESC LIMIT 1)
- WHERE host = ? AND time_quality != 'relative'`,
-			`UPDATE gpu_mem SET boot_id = (
-   SELECT b.boot_id FROM boot b
-   WHERE b.host = gpu_mem.host AND b.start_quality != 'relative' AND b.started_at <= gpu_mem.observed_at
-   ORDER BY b.started_at DESC LIMIT 1)
- WHERE host = ? AND time_quality != 'relative'`,
-			`UPDATE ecs_sample SET boot_id = (
-   SELECT b.boot_id FROM boot b
-   WHERE b.host = ecs_sample.host AND b.start_quality != 'relative' AND b.started_at <= ecs_sample.observed_at
-   ORDER BY b.started_at DESC LIMIT 1)
- WHERE host = ? AND time_quality != 'relative'`,
+		for _, t := range []struct{ table, at string }{
+			{"event", `"ErrorDT"`}, {"action", "at"}, {"gpu_mem", "observed_at"}, {"ecs_sample", "observed_at"},
 		} {
+			boot := `(SELECT b.boot_id FROM boot b
+   WHERE b.host = ` + t.table + `.host AND b.start_quality != 'relative' AND b.started_at <= ` + t.table + `.` + t.at + `
+   ORDER BY b.started_at DESC LIMIT 1)`
+			// Only the rows whose boot changes are written. A scan runs
+			// this pass three times, and a row written again with the
+			// value it has costs as much as one that changes: on a host
+			// with a million records that was most of the pass.
+			q := `UPDATE ` + t.table + ` SET boot_id = ` + boot + `
+ WHERE host = ? AND time_quality != 'relative' AND boot_id IS NOT ` + boot
 			if _, err := w.exec(q, host); err != nil {
 				return fmt.Errorf("link boots: %w", err)
 			}
@@ -734,6 +724,12 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 	}
 
+	// In the order of the rows: the pairs come in the order their groups
+	// closed, which jumps back and forth over thousands of rows, so that a
+	// page of the table left the cache of the database and was read again
+	// for the next row on it. A record that is paired twice keeps the later
+	// pair, as before.
+	sort.SliceStable(updates, func(i, j int) bool { return updates[i].dup < updates[j].dup })
 	err = s.Update(ctx, func(w *Writer) error {
 		for _, u := range updates {
 			if _, err := w.exec(`UPDATE event SET dup_of = ? WHERE id = ?`, u.primary, u.dup); err != nil {
