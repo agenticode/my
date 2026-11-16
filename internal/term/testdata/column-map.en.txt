@@ -1,7 +1,7 @@
 CPU0_E1  S/N 34C15C  DDR5 RDIMM 64 GB 2Rx4
 
  rank1 dev12 bg1 bank1  row by column  one cell = 16 columns by 4,096 rows
- · 0   ░ 1-2   ▒ 3-9   ▓ 10-99   █ 100+   X uncorrected error
+ · 0   ░ 1-2   ▒ 3-9   ▓ 10-99
 
  row       0x000                                                      0x3ff  (column)
  0x1000    ·················░··············································

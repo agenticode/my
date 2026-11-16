@@ -11,7 +11,7 @@ host synth-crash-loop  2026-07-31 to 2026-11-12  105 days
  85 corrected and 4 uncorrected errors from 2026-07-31 to 2026-11-12
  0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
 
- the latest boots: a day above can hold several of them
+ the latest boots
  stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC
         after 44 min
         4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)
@@ -24,7 +24,5 @@ host synth-crash-loop  2026-07-31 to 2026-11-12  105 days
  CPU0_C1  ·       ·       ▒       X       X       X       X       ·
  CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
- latest scan, - not on record
+ · none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: STOP a fatal
+ hardware error, - not on record

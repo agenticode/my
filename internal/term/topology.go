@@ -147,11 +147,48 @@ func dimIf(dim bool) string {
 
 // topology draws the topology bars of a DIMM.
 func (st Style) topology(p *page, t *view.Topology) {
+	st.topologyTitled(p, t, st.say("topo.title"))
+}
+
+// topologyBrief draws the topology bars below the levels where all errors
+// sit on one branch: the title names those branches. When every level has
+// one branch the bars would say no more than the place, and none are drawn.
+func (st Style) topologyBrief(p *page, t *view.Topology) {
+	k := 0
+	var place []string
+	for _, lv := range t.Levels {
+		if !lv.Known || len(lv.Segments) != 1 || lv.Segments[0].Others > 0 || lv.Segments[0].Share < 0.995 {
+			break
+		}
+		place = append(place, lv.Segments[0].Label)
+		k++
+	}
+	switch {
+	case k == 0:
+		st.topology(p, t)
+	case k < len(t.Levels):
+		rest := *t
+		rest.Levels = t.Levels[k:]
+		st.topologyTitled(p, &rest, st.say("topo.title_in", "place", strings.Join(place, " ")))
+	}
+}
+
+// drawsTopology says whether topologyBrief draws anything.
+func drawsTopology(t *view.Topology) bool {
+	if t == nil || t.Total == 0 {
+		return false
+	}
+	for _, lv := range t.Levels {
+		if !lv.Known || len(lv.Segments) != 1 || lv.Segments[0].Others > 0 || lv.Segments[0].Share < 0.995 {
+			return true
+		}
+	}
+	return false
+}
+
+func (st Style) topologyTitled(p *page, t *view.Topology, title string) {
 	if t.Total == 0 {
 		return
-	}
-	for _, l := range wrap(st.say("topo.title"), st.width()-1) {
-		p.add(" " + l)
 	}
 	lw := 0
 	for _, lv := range t.Levels {
@@ -165,6 +202,16 @@ func (st Style) topology(p *page, t *view.Topology) {
 	if boots {
 		bw = max(Width(st.say("boots.boots")), Width(st.say("boots.of", "n", t.Window, "of", t.Window)))
 		width -= bw + 2
+	}
+	// The title leaves room for the head of that column.
+	titleW := st.width() - 1
+	if boots {
+		titleW = 1 + lw + 2 + width + 1
+	}
+	for _, l := range wrap(title, titleW) {
+		p.add(" " + l)
+	}
+	if boots {
 		p.lines[len(p.lines)-1] = padRight(p.lines[len(p.lines)-1], 1+lw+2+width+1+2) + st.say("boots.boots")
 	}
 	for i := range t.Levels {

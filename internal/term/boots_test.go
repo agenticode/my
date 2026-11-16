@@ -94,12 +94,19 @@ func TestBootsInOtherScreens(t *testing.T) {
 			t.Errorf("the overview lacks %q:\n%s", want, ov)
 		}
 	}
+	// In short the boots block carries the count of boots; the topology
+	// of one place is not drawn.
 	x := open(t, "crash-loop", "", en).examination("CPU0_C1")
-	if !strings.Contains(x, " boots of this DIMM\n") || !strings.Contains(x, "|  5 of 8") || strings.Contains(x, "the latest boots:") {
+	if !strings.Contains(x, " boots of this DIMM\n") || !strings.Contains(x, "  5 of 8  CE 60, UE 4") || strings.Contains(x, "the latest boots") ||
+		strings.Contains(x, "where the errors sit") {
 		t.Errorf("the examination:\n%s", x)
 	}
+	x = open(t, "crash-loop", "", en).detail().examination("CPU0_C1")
+	if !strings.Contains(x, " boots of this DIMM\n") || !strings.Contains(x, "|  5 of 8") || strings.Contains(x, "the latest boots") {
+		t.Errorf("the examination with detail:\n%s", x)
+	}
 	// The demo has errors in three of its four boots and no stop.
-	x = open(t, "demo", "", en).examination("CPU0_C1")
+	x = open(t, "demo", "", en).detail().examination("CPU0_C1")
 	if !strings.Contains(x, "boots\n rank    |rank0") || !strings.Contains(x, "|  3 of 4") || !strings.Contains(x, "errors in 3 of the last 4 boots, uncorrected in 1") {
 		t.Errorf("the demo examination:\n%s", x)
 	}
@@ -112,11 +119,11 @@ func TestBootsInOtherScreens(t *testing.T) {
 	}
 	check(t, "loop-timeline", en, open(t, "crash-loop", "", en).timeline(""))
 	tl := open(t, "crash-loop", "", en).timeline("CPU1_D1")
-	if !strings.Contains(tl, "the latest boots:") || strings.Contains(tl, "CPU0_C1  ") {
+	if !strings.Contains(tl, "the latest boots\n") || strings.Contains(tl, "CPU0_C1  ") {
 		t.Errorf("the timeline of CPU1_D1 draws other DIMMs in its boots:\n%s", tl)
 	}
 	// No stop, no strip.
-	if tl := open(t, "demo", "", en).timeline(""); strings.Contains(tl, "the latest boots:") {
+	if tl := open(t, "demo", "", en).timeline(""); strings.Contains(tl, "the latest boots\n") {
 		t.Errorf("a strip without a stop:\n%s", tl)
 	}
 }

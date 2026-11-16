@@ -89,7 +89,7 @@ func (s *screen) overview() string {
 
 func (s *screen) examination(ref string) string {
 	s.t.Helper()
-	x, err := s.c.Examine(ctx, s.h, s.dimm(ref), s.st.MapCells())
+	x, err := s.c.ExamineWith(ctx, s.h, s.dimm(ref), s.st.ExamMap())
 	if err != nil {
 		s.t.Fatal(err)
 	}
@@ -340,7 +340,6 @@ func TestTimelineWithMoreEventsThanDays(t *testing.T) {
 	}
 	got := b.String()
 	want := `host h  2026-11-13  1 day
-
 
  no DIMM   █  peak 7/day
  events    UOB

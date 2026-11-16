@@ -161,7 +161,7 @@ func runDIMM(ctx context.Context, env *cli.Env, args []string, src *source) int 
 	if d == nil {
 		return code
 	}
-	x, err := s.c.Examine(ctx, s.h, d, s.st.MapCells())
+	x, err := s.c.ExamineWith(ctx, s.h, d, s.st.ExamMap())
 	if err != nil {
 		return o.failure(env, err)
 	}

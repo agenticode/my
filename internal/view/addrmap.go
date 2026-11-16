@@ -181,6 +181,12 @@ type MapOptions struct {
 	Boots bool
 	// MaxLines is the tallest grid allowed, in lines; 0 means 24.
 	MaxLines int
+	// Margin is the number of quiet rows drawn above and below a group of
+	// rows with errors; 0 means mapMargin.
+	Margin int
+	// Bins is the number of lines of a grid whose rows are binned; 0 means
+	// binLines.
+	Bins int
 }
 
 // ErrNoSuchBank: no bank with located errors fits the selection.
@@ -443,6 +449,13 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	if maxLines <= 0 {
 		maxLines = 24
 	}
+	margin, bins := mapMargin, binLines
+	if opts.Margin > 0 {
+		margin = opts.Margin
+	}
+	if opts.Bins > 0 {
+		bins = opts.Bins
+	}
 	zoomed := opts.RowFrom.Valid && opts.RowTo.Valid && opts.RowTo.V >= opts.RowFrom.V
 	type span struct{ lo, hi int }
 	var spans []span
@@ -453,13 +466,13 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	case len(rows) > 0:
 		lo, hi := rows[0], rows[0]
 		for _, r := range rows[1:] {
-			if r-hi > 2*mapMargin+1 {
-				spans = append(spans, span{max(lo-mapMargin, 0), hi + mapMargin})
+			if r-hi > 2*margin+1 {
+				spans = append(spans, span{max(lo-margin, 0), hi + margin})
 				lo = r
 			}
 			hi = r
 		}
-		spans = append(spans, span{max(lo-mapMargin, 0), hi + mapMargin})
+		spans = append(spans, span{max(lo-margin, 0), hi + margin})
 		if opts.RowFrom.Valid {
 			spans[0].lo = max(spans[0].lo, opts.RowFrom.V)
 		}
@@ -570,7 +583,7 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 		if zoomed {
 			lo, hi = opts.RowFrom.V, opts.RowTo.V
 		}
-		step := pow2ceil((hi - lo + binLines) / binLines)
+		step := pow2ceil((hi - lo + bins) / bins)
 		lo = lo / step * step
 		m.Mode, m.RowsPerLine = MapBins, step
 		for r := lo; r <= hi; r += step {

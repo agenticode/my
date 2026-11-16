@@ -69,10 +69,7 @@ in this slot since 2026-07-31  0 slot changes
    col 0x420      .  .  .  +   1 of 4  CE 49
  10 other places  .  .  .  +   1 of 4  CE 69
 
- . none, : 1-9 corrected, + 10-99, * 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, -
- not on record
+ . none, corrected : 1-9, + 10-99, * 100+, U uncorrected; ended: - not on record
 
  errors per day and events
            07-31     09-01     10-01     11-12

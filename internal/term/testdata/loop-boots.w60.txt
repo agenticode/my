@@ -17,11 +17,8 @@ host synth-crash-loop  Example Systems R760  8 boots
 
  2 earlier boots are left out; --boots N sets how many are
  drawn
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X
- uncorrected in a boot that stopped, ? the boot stopped and
- no record names a DIMM, - not in the host
- ended: STOP a fatal hardware error ended the boot, panic
- another panic, running the boot of the latest scan, - not
- on record
+ · none, corrected ▒ 10-99, X uncorrected in a boot that
+ stopped; ended: STOP a fatal hardware error, - not on
+ record
 
  my boots CPU0_C1: the places of this DIMM boot by boot
