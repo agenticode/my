@@ -559,7 +559,7 @@ section#s7.sec
     | CPU1_H1 | 2E671F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
     |  | DDR5 RDIMM
   li: ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
-  li: CE OS counts the corrected errors in the records of the operating system. No BMC was read.
+  li: CE OS counts the corrected errors in the records of the operating system.
   #### Operating system and BMC
   p: No BMC was read, so there is nothing to set against the records of the operating system.
   ### Not read, or read in part

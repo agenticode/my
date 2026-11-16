@@ -18,7 +18,6 @@ memory RAS settings of the BIOS in effect for every DIMM: patrol scrub, ADDDC (w
  ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
  CE BMC counts the entries about corrected errors in the logs of the BMC. No source of the operating
  system was read.
- 4 of 4 DIMMs have no device width on record. SMBIOS and Redfish have no field for it; the EDAC
- driver of the host reports it where it is loaded.
+ 4 of 4 DIMMs have no device width on record (SMBIOS and Redfish lack the field).
 
  No source of the operating system was read, so there is nothing to set against the logs of the BMC.
