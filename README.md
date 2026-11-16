@@ -328,6 +328,7 @@ Early development; no version is tagged.
 | [docs/evaluation.md](docs/evaluation.md) | the comparison with a field dataset |
 | [docs/validation.md](docs/validation.md), [docs/validation-lab.md](docs/validation-lab.md) | runs on real hosts, and injected errors in a lab |
 | [docs/release.md](docs/release.md) | how a release is built and verified |
+| [docs/performance.md](docs/performance.md) | time and peak memory of the commands on large inputs, and what fits on a host with little memory |
 
 ## Contributing
 

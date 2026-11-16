@@ -53,6 +53,10 @@ type Host struct {
 	// channel holds a DIMM.
 	PopulateAll bool
 	Geometry    Geometry
+	// SerialDigits is the length of the DIMM serial numbers in hexadecimal
+	// digits; zero means 6. The hosts of a fleet take more, so that two
+	// hosts do not draw the same number.
+	SerialDigits int
 
 	SystemVendor  string
 	SystemProduct string

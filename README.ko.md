@@ -326,6 +326,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 | [docs/evaluation.md](docs/evaluation.md) | 필드 데이터셋과 대조한 결과 |
 | [docs/validation.md](docs/validation.md), [docs/validation-lab.md](docs/validation-lab.md) | 실제 호스트 실행 결과와 랩의 오류 주입 |
 | [docs/release.md](docs/release.md) | 릴리스를 빌드하고 검증하는 방법 |
+| [docs/performance.md](docs/performance.md) | 큰 입력에서 명령이 쓰는 시간과 최대 메모리, 메모리가 작은 호스트에서 다룰 수 있는 입력 크기 |
 
 ## 기여
 

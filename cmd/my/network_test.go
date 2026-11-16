@@ -88,6 +88,7 @@ func TestOnlyKnownPackagesUseTheNetwork(t *testing.T) {
 		"internal/serve":             true, // "my serve" listens
 		"internal/adapter/rasdaemon": true, // --fleet reads a database server
 		"cmd/my":                     true, // wires the three above
+		"tools/perf":                 true, // asks "my serve" on this machine for its first scrape
 	}
 	network := map[string]bool{"net": true, "net/http": true, "crypto/tls": true, "net/rpc": true, "net/smtp": true,
 		"github.com/go-sql-driver/mysql": true, "github.com/lib/pq": true}
