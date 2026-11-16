@@ -116,6 +116,7 @@ func TestStates(t *testing.T) {
 		{name: "crash kernel after pstore", base: kept, check: "pstore-vs-kdump", state: preflight.Kept, code: "pf.kexec.post"},
 		{name: "no crash kernel", base: bare, check: "pstore-vs-kdump", state: preflight.Kept, code: "pf.kexec.none"},
 		{name: "crash kernel before pstore", base: kept, with: pt.Files{"sys/module/kernel/parameters/crash_kexec_post_notifiers": "N\n", "proc/cmdline": "ro crashkernel=256M\n"}, check: "pstore-vs-kdump", state: preflight.Lost, code: "pf.kexec.first"},
+		{name: "crash kernel and no pstore backend", base: kept, with: pt.Files{"sys/module/pstore/parameters/backend": "(null)\n", "sys/module/kernel/parameters/crash_kexec_post_notifiers": "N\n", "proc/cmdline": "ro crashkernel=256M\n"}, check: "pstore-vs-kdump", state: preflight.Info, code: "pf.kexec.no_backend"},
 		{name: "crash kernel unreadable", base: kept, with: pt.Files{"sys/kernel/kexec_crash_loaded": pt.Denied}, check: "pstore-vs-kdump", state: preflight.Unknown, code: "pf.unreadable", root: true},
 
 		// kdump

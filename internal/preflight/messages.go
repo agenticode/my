@@ -66,6 +66,7 @@ var Messages = i18n.Catalog{
 
 	"pf.kexec.none":          {EN: "no crash kernel is loaded: a panic goes to pstore", KO: "crash 커널이 로드되지 않음. panic은 pstore로 감"},
 	"pf.kexec.post":          {EN: "a crash kernel is loaded and crash_kexec_post_notifiers is set: pstore gets the panic text before the crash kernel starts", KO: "crash 커널이 로드됐고 crash_kexec_post_notifiers가 설정됨. crash 커널이 시작하기 전에 pstore가 panic 내용을 받음"},
+	"pf.kexec.no_backend":    {EN: "a crash kernel is loaded and pstore has no backend: the kdump log is the one copy of the panic text, and the order of the two matters once pstore has a backend", KO: "crash 커널이 로드되어 있고 pstore에 백엔드가 없음. panic 내용의 사본은 kdump 로그 하나이며, 둘의 순서는 pstore에 백엔드가 생긴 뒤에 의미가 있음"},
 	"pf.kexec.first":         {EN: "a crash kernel is loaded and starts before pstore gets the panic text: the kdump log is then the only copy", KO: "crash 커널이 로드되어 있어 pstore가 panic 내용을 받기 전에 시작됨. 그러면 kdump 로그가 유일한 사본임"},
 	"pf.fix.post_notifiers":  {EN: "let pstore take the panic text before the crash kernel starts", KO: "crash 커널이 시작하기 전에 pstore가 panic 내용을 받게 함"},
 	"pf.cost.post_notifiers": {EN: "kernel-parameters.txt: \"This option increases the risks of a kdump failure, since some panic notifiers can make the crashed kernel more unstable.\"", KO: "kernel-parameters.txt에 따르면 일부 panic notifier가 죽어 가는 커널을 더 불안정하게 만들 수 있어 kdump가 실패할 위험이 커짐"},
