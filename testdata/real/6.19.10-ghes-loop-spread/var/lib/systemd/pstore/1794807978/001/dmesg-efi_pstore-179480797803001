@@ -1,0 +1,8 @@
+Panic#1 Part3
+<5>[  593.213667] audit: type=1302 audit(1794807686.125:26): item=1 name=(null) inode=2971 dev=00:23 mode=040755 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:systemd_pstore_var_lib_t:s0 nametype=CREATE cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0
+<5>[  593.213804] audit: type=1327 audit(1794807686.125:26): proctitle="/usr/lib/systemd/systemd-pstore"
+<5>[  596.052089] audit: type=1130 audit(1794807689.029:27): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-pstore comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  602.810907] audit: type=1130 audit(1794807695.791:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdb-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  603.734243] audit: type=1130 audit(1794807696.715:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journal-flush comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  606.680168] audit: type=1130 audit(1794807699.661:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-binfmt comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  640.093409] audit: type=1130 audit(1794807733.076:31): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'

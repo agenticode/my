@@ -1,0 +1,20 @@
+Panic#1 Part13
+<6>[  307.422479] SELinux:  policy capability network_peer_controls=1
+<6>[  307.423123] SELinux:  policy capability open_perms=1
+<6>[  307.424357] SELinux:  policy capability extended_socket_class=1
+<6>[  307.424603] SELinux:  policy capability always_check_network=0
+<6>[  307.424681] SELinux:  policy capability cgroup_seclabel=1
+<6>[  307.424802] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[  307.425228] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[  307.427175] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[  307.427223] SELinux:  policy capability userspace_initial_context=0
+<6>[  307.427257] SELinux:  policy capability netlink_xperm=0
+<6>[  307.427372] SELinux:  policy capability netif_wildcard=0
+<6>[  307.427471] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[  307.428591] SELinux:  policy capability functionfs_seclabel=0
+<6>[  307.428646] SELinux:  policy capability memfd_class=0
+<5>[  308.029162] audit: type=1403 audit(1794806526.400:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[  308.247831] systemd[1]: Successfully loaded SELinux policy in 2.091826s.
+<6>[  309.622650] NET: Registered PF_VSOCK protocol family
+<30>[  311.150033] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 1.001907s.
+<30>[  311.686861] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)

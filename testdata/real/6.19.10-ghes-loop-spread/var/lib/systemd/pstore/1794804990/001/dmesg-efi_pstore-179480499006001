@@ -1,0 +1,13 @@
+Panic#1 Part6
+<30>[  401.772814] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[  402.788755] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[  404.590386] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[  404.989998] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<30>[  405.423944] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<30>[  405.541923] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<46>[  405.622170] systemd-journald[786]: Collecting audit messages is enabled.
+<30>[  406.192918] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[  406.258862] audit: type=1130 audit(1794804576.300:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  408.709066] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<5>[  408.742236] audit: type=1130 audit(1794804578.800:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  409.077998] systemd[1]: Started systemd-journald.service - Journal Service.

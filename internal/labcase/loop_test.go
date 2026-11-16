@@ -52,6 +52,7 @@ var loops = []loop{
 	{dir: "6.19.10-mce-loop", host: "lab-x86", window: 4, stops: 3, where: "none", rule: "host.loop_address"},
 	{dir: "6.19.10-mce-loop-scatter", host: "lab-x86", window: 4, stops: 3, where: "none"},
 	{dir: "6.19.10-mce-loop-kdump", host: "lab-x86", window: 3, copyWindow: 2, stops: 1, where: "none"},
+	{dir: "6.19.10-ghes-loop-spread", host: "lab-arm-loop", window: 5, copyWindow: 4, stops: 3, where: engine.RuleLoopSpread, rule: "loop.spread_host", dimmRule: engine.RuleLoopSpread},
 	{dir: "6.19.10-bert-loop", host: "lab-x86", window: 4, copyWindow: 2, stops: 3, where: engine.RuleLoopPlace, dimmRule: engine.RuleLoopPlace,
 		copyStops: 1, copyWhere: "dimm"},
 }

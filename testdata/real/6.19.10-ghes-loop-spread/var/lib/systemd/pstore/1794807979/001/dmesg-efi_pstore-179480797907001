@@ -1,0 +1,13 @@
+Panic#1 Part7
+<30>[  403.540213] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<6>[  403.674355] BTRFS info (device vda2 state M): use zstd compression, level 1
+<30>[  404.922752] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[  405.248129] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<30>[  405.413124] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<30>[  405.694422] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[  406.132203] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<46>[  406.314537] systemd-journald[785]: Collecting audit messages is enabled.
+<30>[  406.572039] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[  406.666216] audit: type=1130 audit(1794807499.627:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  411.352001] systemd[1]: Started systemd-journald.service - Journal Service.
+<5>[  411.400101] audit: type=1130 audit(1794807504.380:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'

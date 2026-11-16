@@ -1,0 +1,17 @@
+Panic#1 Part15
+<30>[   52.714697] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+<30>[   52.728585] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[   52.739962] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+<30>[   52.745735] systemd[1]: Reached target sockets.target - Socket Units.
+<30>[   53.560927] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[   53.578406] systemd[1]: memstrack.service - Memstrack Anylazing Service skipped, no trigger condition checks were met.
+<30>[   53.590132] systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+<30>[   54.561878] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[   55.950181] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[   56.031150] systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   56.044601] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[   57.286690] systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+<46>[   59.968855] systemd-journald[269]: Collecting audit messages is disabled.
+<30>[   61.532997] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<30>[   62.305403] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<30>[   64.108046] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...

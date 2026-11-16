@@ -1,0 +1,13 @@
+Panic#1 Part5
+<5>[  409.097229] audit: type=1130 audit(1794804579.155:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  411.066654] audit: type=1334 audit(1794804581.126:6): prog-id=48 op=LOAD
+<5>[  411.077050] audit: type=1334 audit(1794804581.137:7): prog-id=49 op=LOAD
+<5>[  411.086045] audit: type=1334 audit(1794804581.146:8): prog-id=50 op=LOAD
+<5>[  414.894496] audit: type=1130 audit(1794804584.953:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  421.099916] audit: type=1130 audit(1794804591.159:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  421.506549] audit: type=1334 audit(1794804591.565:11): prog-id=51 op=LOAD
+<5>[  432.721073] audit: type=1130 audit(1794804602.776:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  432.935162] audit: type=1334 audit(1794804602.994:13): prog-id=23 op=UNLOAD
+<5>[  432.941802] audit: type=1334 audit(1794804602.997:14): prog-id=22 op=UNLOAD
+<5>[  432.998753] audit: type=1334 audit(1794804603.059:15): prog-id=52 op=LOAD
+<5>[  433.007925] audit: type=1334 audit(1794804603.068:16): prog-id=53 op=LOAD

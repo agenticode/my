@@ -1,0 +1,147 @@
+Panic#1 Part13
+<30>[   66.007090] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+<30>[   66.033127] systemd[1]: Started systemd-journald.service - Journal Service.
+<6>[  261.978569] BTRFS: device label fedora devid 1 transid 143 /dev/vda2 (253:2) scanned by mount (517)
+<6>[  262.016505] BTRFS info (device vda2): first mount of filesystem 00000000-0000-4000-8000-000000000002
+<6>[  262.020143] BTRFS info (device vda2): using crc32c (crc32c-lib) checksum algorithm
+<6>[  262.356557] BTRFS info (device vda2): turning on async discard
+<6>[  262.356849] BTRFS info (device vda2): enabling free space tree
+<46>[  335.403578] systemd-journald[268]: Received SIGTERM from PID 1 (systemd).
+<6>[  342.590788] SELinux:  Permission firmware_load in class system not defined in policy.
+<6>[  342.591049] SELinux:  Permission kexec_image_load in class system not defined in policy.
+<6>[  342.591135] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+<6>[  342.591198] SELinux:  Permission policy_load in class system not defined in policy.
+<6>[  342.591252] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+<6>[  342.593384] SELinux:  Permission allowed in class io_uring not defined in policy.
+<6>[  342.593506] SELinux:  Class memfd_file not defined in policy.
+<6>[  342.593578] SELinux: the above unknown classes and permissions will be allowed
+<6>[  343.166838] SELinux:  policy capability network_peer_controls=1
+<6>[  343.167060] SELinux:  policy capability open_perms=1
+<6>[  343.167874] SELinux:  policy capability extended_socket_class=1
+Panic#1 Part12
+<6>[  343.167930] SELinux:  policy capability always_check_network=0
+<6>[  343.169417] SELinux:  policy capability cgroup_seclabel=1
+<6>[  343.169455] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[  343.169486] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[  343.169516] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[  343.169613] SELinux:  policy capability userspace_initial_context=0
+<6>[  343.169661] SELinux:  policy capability netlink_xperm=0
+<6>[  343.169691] SELinux:  policy capability netif_wildcard=0
+<6>[  343.169720] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[  343.169814] SELinux:  policy capability functionfs_seclabel=0
+<6>[  343.169862] SELinux:  policy capability memfd_class=0
+<5>[  343.604317] audit: type=1403 audit(1794804513.662:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[  343.798436] systemd[1]: Successfully loaded SELinux policy in 1.848255s.
+<6>[  344.936212] NET: Registered PF_VSOCK protocol family
+<30>[  346.597996] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 1.131914s.
+<30>[  347.159555] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[  347.163068] systemd[1]: Detected virtualization qemu.
+<30>[  347.166485] systemd[1]: Detected architecture arm64.
+<30>[  347.360985] systemd[1]: Hostname set to <lab-arm-loop>.
+Panic#1 Part11
+<30>[  350.479347] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[  367.120039] zram: Added device: zram0
+<30>[  383.226616] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[  383.247897] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[  383.476885] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[  383.526134] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[  383.569672] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[  383.622796] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[  383.659909] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[  383.720983] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[  383.750908] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[  383.767422] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[  383.836929] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[  383.846552] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+<30>[  383.855000] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0002.device - /dev/disk/by-uuid/0000-0002...
+<30>[  383.861639] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+Panic#1 Part10
+<30>[  383.867220] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+<30>[  383.875062] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[  383.881053] systemd[1]: Reached target imports.target - Image Downloads.
+<30>[  383.887902] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+<30>[  383.895869] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+<30>[  383.901318] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+<30>[  383.908478] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+<30>[  383.916731] systemd[1]: Reached target paths.target - Path Units.
+<30>[  383.923254] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+<30>[  383.931721] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+<30>[  383.939748] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+<30>[  383.948885] systemd[1]: Reached target slices.target - Slice Units.
+<30>[  383.958935] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+<30>[  383.981153] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+<30>[  384.093748] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+<30>[  384.163938] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+<30>[  384.248748] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+<30>[  384.310974] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+Panic#1 Part9
+<30>[  384.392261] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+<30>[  384.441757] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+<30>[  384.522615] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+<30>[  384.563726] systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+<30>[  384.576238] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  384.580710] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  384.649396] systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+<30>[  384.691013] systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+<30>[  384.724757] systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+<30>[  384.775823] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[  384.828044] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+<30>[  384.861145] systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+<30>[  385.008907] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+<30>[  385.174843] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+<30>[  385.905602] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+<30>[  386.381412] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Panic#1 Part8
+<30>[  386.589239] systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+<30>[  387.331254] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[  387.666998] systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+<30>[  387.716564] systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+<30>[  387.762745] systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+<30>[  387.775851] systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+<30>[  387.833148] systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+<30>[  389.191315] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+<30>[  389.246702] systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+<30>[  389.269341] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+Panic#1 Part7
+<30>[  390.228955] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[  391.009834] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[  391.686622] systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+<30>[  391.727811] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  392.302097] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+<30>[  392.364966] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  393.086772] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+<30>[  394.100033] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+<30>[  396.494259] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+<30>[  396.784268] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+<30>[  397.105695] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+<30>[  398.706756] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+<30>[  399.258955] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<30>[  399.473043] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+<30>[  399.738856] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<6>[  401.684101] BTRFS info (device vda2 state M): use zstd compression, level 1
+Panic#1 Part6
+<30>[  401.772814] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[  402.788755] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[  404.590386] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[  404.989998] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<30>[  405.423944] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<30>[  405.541923] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<46>[  405.622170] systemd-journald[786]: Collecting audit messages is enabled.
+<30>[  406.192918] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[  406.258862] audit: type=1130 audit(1794804576.300:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  408.709066] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<5>[  408.742236] audit: type=1130 audit(1794804578.800:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  409.077998] systemd[1]: Started systemd-journald.service - Journal Service.
+Panic#1 Part5
+<5>[  409.097229] audit: type=1130 audit(1794804579.155:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  411.066654] audit: type=1334 audit(1794804581.126:6): prog-id=48 op=LOAD
+<5>[  411.077050] audit: type=1334 audit(1794804581.137:7): prog-id=49 op=LOAD
+<5>[  411.086045] audit: type=1334 audit(1794804581.146:8): prog-id=50 op=LOAD
+<5>[  414.894496] audit: type=1130 audit(1794804584.953:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  421.099916] audit: type=1130 audit(1794804591.159:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  421.506549] audit: type=1334 audit(1794804591.565:11): prog-id=51 op=LOAD
+<5>[  432.721073] audit: type=1130 audit(1794804602.776:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  432.935162] audit: type=1334 audit(1794804602.994:13): prog-id=23 op=UNLOAD
+<5>[  432.941802] audit: type=1334 audit(1794804602.997:14): prog-id=22 op=UNLOAD
+<5>[  432.998753] audit: type=1334 audit(1794804603.059:15): prog-id=52 op=LOAD
+<5>[  433.007925] audit: type=1334 audit(1794804603.068:16): prog-id=53 op=LOAD

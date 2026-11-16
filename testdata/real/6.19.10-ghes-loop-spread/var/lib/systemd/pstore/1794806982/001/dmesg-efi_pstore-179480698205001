@@ -1,0 +1,11 @@
+Panic#1 Part5
+<5>[  394.043623] audit: type=1130 audit(1794806612.414:16): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  401.482101] audit: type=1130 audit(1794806619.852:17): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  408.129739] zram0: detected capacity change from 0 to 16777216
+<5>[  410.425922] audit: type=1130 audit(1794806628.796:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  413.502834] Adding 8388604k swap on /dev/zram0.  Priority:100 extents:1 across:8388604k SSDsc
+<5>[  414.862726] audit: type=1334 audit(1794806633.232:19): prog-id=54 op=LOAD
+<5>[  414.886581] audit: type=1334 audit(1794806633.257:20): prog-id=55 op=LOAD
+<5>[  414.902842] audit: type=1334 audit(1794806633.272:21): prog-id=56 op=LOAD
+<5>[  420.301335] audit: type=1130 audit(1794806638.673:22): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  461.459355] audit: type=1130 audit(1794806679.830:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'

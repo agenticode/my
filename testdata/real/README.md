@@ -18,6 +18,9 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `6.19.10-ghes-multi` | another aarch64 guest with six DIMMs, booted three times a day apart | a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected and 1 uncorrected error; two DIMMs without errors |
 | `6.19.10-mce-loop` | an x86 guest with a disk of its own, in a crash loop | a fatal machine check at one address in three boots in a row; each boot panics, the next reads the record from the bank |
 | `6.19.10-mce-loop-scatter` | the same guest | a fatal machine check at another address and channel in each of three boots |
+| `6.19.10-mce-loop-kdump` | the same guest with a crash kernel loaded | one fatal machine check; the crash kernel saves the log, the next boot reads the bank |
+| `6.19.10-bert-loop` | the same guest with a boot error region made by hand | one fatal memory error of DIMM 0 with row and column, read by each of three boots |
+| `6.19.10-ghes-loop-spread` | an aarch64 guest with six DIMMs, in a crash loop | a fatal firmware error record on another DIMM in each of three boots; the panic text in EFI variables |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 

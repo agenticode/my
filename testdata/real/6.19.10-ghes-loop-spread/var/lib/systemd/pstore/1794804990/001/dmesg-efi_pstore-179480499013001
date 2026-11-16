@@ -1,0 +1,20 @@
+Panic#1 Part13
+<30>[   66.007090] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+<30>[   66.033127] systemd[1]: Started systemd-journald.service - Journal Service.
+<6>[  261.978569] BTRFS: device label fedora devid 1 transid 143 /dev/vda2 (253:2) scanned by mount (517)
+<6>[  262.016505] BTRFS info (device vda2): first mount of filesystem 00000000-0000-4000-8000-000000000002
+<6>[  262.020143] BTRFS info (device vda2): using crc32c (crc32c-lib) checksum algorithm
+<6>[  262.356557] BTRFS info (device vda2): turning on async discard
+<6>[  262.356849] BTRFS info (device vda2): enabling free space tree
+<46>[  335.403578] systemd-journald[268]: Received SIGTERM from PID 1 (systemd).
+<6>[  342.590788] SELinux:  Permission firmware_load in class system not defined in policy.
+<6>[  342.591049] SELinux:  Permission kexec_image_load in class system not defined in policy.
+<6>[  342.591135] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+<6>[  342.591198] SELinux:  Permission policy_load in class system not defined in policy.
+<6>[  342.591252] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+<6>[  342.593384] SELinux:  Permission allowed in class io_uring not defined in policy.
+<6>[  342.593506] SELinux:  Class memfd_file not defined in policy.
+<6>[  342.593578] SELinux: the above unknown classes and permissions will be allowed
+<6>[  343.166838] SELinux:  policy capability network_peer_controls=1
+<6>[  343.167060] SELinux:  policy capability open_perms=1
+<6>[  343.167874] SELinux:  policy capability extended_socket_class=1

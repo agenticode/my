@@ -1,0 +1,36 @@
+Panic#1 Part12
+<30>[  352.146939] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[  369.011495] zram: Added device: zram0
+<30>[  386.701709] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[  386.722954] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[  387.039947] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[  387.120102] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[  387.172324] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[  387.214769] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[  387.253865] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[  387.300159] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[  387.335646] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[  387.353868] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[  387.422117] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[  387.435964] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+<30>[  387.444169] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0002.device - /dev/disk/by-uuid/0000-0002...
+<30>[  387.451170] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+Panic#1 Part11
+<30>[  387.457070] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+<30>[  387.474083] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[  387.481166] systemd[1]: Reached target imports.target - Image Downloads.
+<30>[  387.487610] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+<30>[  387.494343] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+<30>[  387.500167] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+<30>[  387.514416] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+<30>[  387.520333] systemd[1]: Reached target paths.target - Path Units.
+<30>[  387.524075] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+<30>[  387.528658] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+<30>[  387.534695] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+<30>[  387.539067] systemd[1]: Reached target slices.target - Slice Units.
+<30>[  387.543916] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+<30>[  387.582949] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+<30>[  387.648015] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+<30>[  387.732925] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+<30>[  387.827121] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+<30>[  387.893122] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.

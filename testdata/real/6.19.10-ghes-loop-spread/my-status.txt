@@ -1,0 +1,37 @@
+host lab-arm-loop  kernel 6.19.10-300.fc44.aarch64  aarch64  booted 2026-11-16 06:12 UTC
+
+ what a reset right after a fatal memory error would leave on this host
+
+ kept     journal          on disk below /var/log/journal. A panic stops journald before it writes
+                           the last lines, and lines below priority CRIT reach the disk every
+                           SyncIntervalSec=5min
+ kept     pstore-backend   efi_pstore is the persistent store: a panic leaves the end of the kernel
+                           log in it
+ kept     pstore-archive   systemd-pstore.service is enabled and moves the dumps to
+                           /var/lib/systemd/pstore at boot
+ kept     pstore-vs-kdump  no crash kernel is loaded: a panic goes to pstore
+ info     kdump            no crash kernel is loaded, and efi_pstore keeps the panic text. kdump is
+                           a second way to keep it
+ none     mce-bootlog      not an x86 host (aarch64): this check is about the machine check banks of
+                           x86 processors
+ none     mce-print        not an x86 host (aarch64): this check is about the machine check banks of
+                           x86 processors
+ info     reset-kind       aarch64 with a firmware error source: a fatal firmware error panics the
+                           kernel, and with panic=0 the host stays down until a watchdog or the BMC
+                           restarts it. With panic=N the kernel restarts N seconds after the panic,
+                           and the next boot reads what pstore kept
+ none     bert             the firmware provides no BERT table
+ none     erst-mce         not an x86 host (aarch64): this check is about the machine check banks of
+                           x86 processors
+ kept     console          a serial console (ttyAMA0): the BMC's serial log or a console server
+                           keeps the last lines
+ kept     rasdaemon        rasdaemon.service is enabled and records to
+                           /var/lib/rasdaemon/ras-mc_event.db
+ kept     harvest          my-harvest.service is enabled and keeps its ledger at
+                           /var/lib/my/ledger.db; 18,982 MiB free
+
+ No check would lose records.
+my-harvest.service   installed and enabled
+my-harvest.timer     not installed
+ledger               /var/lib/my/ledger.db, 228 KiB, 5 boots of 1 host
+last run             2026-11-16T06:31:09Z

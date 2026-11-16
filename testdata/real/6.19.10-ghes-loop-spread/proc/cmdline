@@ -1,0 +1,1 @@
+BOOT_IMAGE=(hd0,gpt2)/boot/vmlinuz-6.19.10-300.fc44.aarch64 no_timer_check console=tty1 console=ttyAMA0,115200n8 systemd.firstboot=off root=UUID=00000000-0000-4000-8000-000000000002 rootflags=subvol=root systemd.default_device_timeout_sec=900 systemd.default_timeout_start_sec=900 enforcing=0 efi_pstore.pstore_disable=0
