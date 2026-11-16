@@ -2,6 +2,9 @@ package redfish
 
 import (
 	"fmt"
+	"github.com/agenticode/my/internal/ingest"
+	"github.com/agenticode/my/internal/store"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -502,32 +505,36 @@ func TestOneErrorInTwoLogs(t *testing.T) {
 			entry(mgr, "14", "2026-11-03T00:00:00Z", "DIMM_A1", "Correctable ECC"),  // corrected, where the other log has an uncorrected error
 			entry(mgr, "15", "2026-11-04T00:00:09Z", "DIMM_A1", "Correctable ECC")), // nine seconds off: another error
 	})
-	var c adapter.Collected
-	rep := NewFS(fsys, "dump", Options{Now: now}).Collect(ctx, &c)
-	if len(c.Events) != 10 {
-		t.Fatalf("%d events, want 10 (report %+v)", len(c.Events), rep)
+	// The ledger finds them (store.FirmwareDuplicates): the reader keeps
+	// every entry as it is.
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "ledger.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
 	}
-	byFingerprint := map[string]string{}
-	for _, e := range c.Events {
-		byFingerprint[e.Fingerprint] = e.RawRef[strings.LastIndex(e.RawRef, "/")+1:]
+	defer s.Close()
+	if _, err := ingest.Run(ctx, s, []adapter.Adapter{NewFS(fsys, "dump", Options{Now: now})}, ingest.Options{Host: "h1", Now: now}); err != nil {
+		t.Fatal(err)
 	}
-	got := map[string]string{}
-	for _, e := range c.Events {
-		if e.DupOfFingerprint != "" {
-			got[byFingerprint[e.Fingerprint]] = byFingerprint[e.DupOfFingerprint]
-		}
+	evs, err := s.EventList(ctx, store.EventFilter{Host: "h1", WithDuplicates: true})
+	if err != nil || len(evs) != 10 {
+		t.Fatalf("%d events, want 10 (%v)", len(evs), err)
 	}
-	// Which log comes first is the order of the dump; the pairs are what counts.
+	byID := map[int64]string{}
+	for _, e := range evs {
+		byID[e.ID] = e.RawRef[strings.LastIndex(e.RawRef, "/")+1:]
+	}
 	pairs := map[string]bool{}
-	for second, first := range got {
-		a, b := second, first
+	for _, e := range evs {
+		if e.DupOf == 0 {
+			continue
+		}
+		a, b := byID[e.ID], byID[e.DupOf]
 		if a > b {
 			a, b = b, a
 		}
 		pairs[a+"="+b] = true
 	}
 	if want := map[string]bool{"1=11": true, "12=2": true, "13=3": true}; !reflect.DeepEqual(pairs, want) {
-		t.Errorf("entries declared to repeat another = %v, want %v", pairs, want)
+		t.Errorf("entries that repeat another = %v, want %v", pairs, want)
 	}
-	wantNotes(t, rep, "3 error entries repeat an entry of another log of the same BMC: each such error is counted once")
 }

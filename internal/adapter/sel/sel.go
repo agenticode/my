@@ -334,7 +334,6 @@ type reader struct {
 	presence      int
 	unclassified  map[string]int
 	multiDIMM     int
-	cancelled     int
 	logLimit      []time.Time
 	logCleared    []time.Time
 	ceLoggingOff  int
@@ -474,21 +473,9 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 			}
 			fw.Mapping, fw.MapRef, fw.Basis = res.Mapping, res.Ref, res.Basis
 			name, clears := res.Event, fwevent.Name("")
+			// The end of a state is a record of its own; a mark it takes
+			// back is withdrawn by the ledger (store.FirmwareWithdrawals).
 			if e.deassert {
-				if ev == ipmi.MemDeviceDisabled {
-					// The module is in use again. A disable this log recorded
-					// before for the same module no longer holds.
-					for j := len(outs) - 1; j >= 0; j-- {
-						o := &outs[j]
-						if o.act == nil || o.act.Kind != model.ActionDisable || !sameModule(o.e, e, o.act.Label, labels) {
-							continue
-						}
-						was := info(ev.String() + " (enabled again later)")
-						was.RawRef, was.Raw, was.Label, was.Fingerprint, was.Firmware = o.act.RawRef, o.act.Raw, o.act.Label, o.act.Fingerprint, o.act.Firmware
-						o.ev, o.act = was, nil
-						r.cancelled++
-					}
-				}
 				name, clears = fwevent.Cleared, res.Event
 				r.cleared++
 			}
@@ -614,9 +601,6 @@ func (r *reader) notes() []string {
 	}
 	if r.cleared > 0 {
 		add("%d records only say that a state ended; they are kept as information", r.cleared)
-	}
-	if r.cancelled > 0 {
-		add("%d disable records were followed by the module coming back into use; they are kept as information, not as a disabled module", r.cancelled)
 	}
 	for i, k := range sortedKeys(r.unclassified) {
 		if i == maxKinds {
