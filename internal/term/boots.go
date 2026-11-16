@@ -418,20 +418,28 @@ func (st Style) bootsLegend(p *page, k *gridKeys, words bool) {
 		}
 		ends = append(ends, st.say("boots.key.end."+name, "w", w))
 	}
-	text := strings.Join(cells, ", ")
-	if len(ends) > 0 {
-		text += "; " + st.say("boots.key.ended") + " " + strings.Join(ends, ", ")
-	}
 	var fws []string
 	for _, l := range firmwareLetters {
 		if k.firmware[string(l)] {
 			fws = append(fws, st.say("boots.key.fw."+string(l)))
 		}
 	}
-	if len(fws) > 0 {
-		text += "; " + st.say("boots.key.firmware") + " " + strings.Join(fws, ", ")
+	// A grid of boots without a DIMM row shows no cell: the legend then
+	// starts with how the boots ended.
+	var parts []string
+	if len(cells) > 0 {
+		parts = append(parts, strings.Join(cells, ", "))
 	}
-	for _, l := range wrap(text, st.width()-2) {
+	if len(ends) > 0 {
+		parts = append(parts, st.say("boots.key.ended")+" "+strings.Join(ends, ", "))
+	}
+	if len(fws) > 0 {
+		parts = append(parts, st.say("boots.key.firmware")+" "+strings.Join(fws, ", "))
+	}
+	if len(parts) == 0 {
+		return
+	}
+	for _, l := range wrap(strings.Join(parts, "; "), st.width()-2) {
 		p.add(" " + st.dim(l))
 	}
 }

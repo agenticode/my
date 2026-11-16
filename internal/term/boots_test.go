@@ -166,3 +166,22 @@ func TestOneBoot(t *testing.T) {
 		t.Errorf("the boots of one boot:\n%s", b)
 	}
 }
+
+// TestBootsLegendWithoutCells: a grid of boots without a DIMM row has no
+// cell to explain; the legend starts with how the boots ended, without a
+// separator in front.
+func TestBootsLegendWithoutCells(t *testing.T) {
+	for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
+		st := Style{Lang: lang}
+		p := &page{st: st}
+		st.bootsLegend(p, &gridKeys{ends: map[string]bool{"": true}}, true)
+		if len(p.lines) != 1 || strings.HasPrefix(strings.TrimSpace(p.lines[0]), ";") {
+			t.Errorf("%s: legend %q", lang, p.lines)
+		}
+		p = &page{st: st}
+		st.bootsLegend(p, &gridKeys{}, true)
+		if len(p.lines) != 0 {
+			t.Errorf("%s: a legend of nothing: %q", lang, p.lines)
+		}
+	}
+}
