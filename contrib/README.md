@@ -9,10 +9,10 @@ Files for running `my serve --metrics` in a monitoring setup, and the units of t
 | `systemd/rasdaemon.env` | the settings of that store, in the variables rasdaemon takes |
 | `systemd/my-harvest.service`, `systemd/my-harvest.timer` | the boot harvest: at every boot, what the boot before left goes into the kept ledger `/var/lib/my/ledger.db`; the timer runs it again every hour of a long boot. `my harvest install` writes the same files |
 | `prometheus/scrape.yml` | scrape configuration for both setups |
-| `prometheus/my-findings.rules.yml` | the alert `MemoryFindingWorse`: the finding for a DIMM got worse |
+| `prometheus/my-findings.rules.yml` | the alerts `MemoryFindingWorse`: the finding for a DIMM got worse, and `GPUMemoryRepairFailed`: a row remapping of a GPU failed |
 | `prometheus/my-exporter.rules.yml` | the alert `MemoryFindingsStale`: an exporter has stopped renewing its findings |
 | `prometheus/*.rules.test.yml` | tests of the two rule files for `promtool test rules` |
-| `alertmanager/alertmanager.yml` | routes for the two alerts |
+| `alertmanager/alertmanager.yml` | routes for the three alerts |
 | `grafana/my-memory-findings.json` | a dashboard: DIMMs with a finding, the finding over time, errors, faults, repairs, GPU row remapping, sources |
 
 ## Alerts
@@ -20,6 +20,8 @@ Files for running `my serve --metrics` in a monitoring setup, and the units of t
 `MemoryFindingWorse` fires when `my_dimm_verdict` of a DIMM is higher than it was in the hour before: ok to observe, observe to consider replacement, and so on. It does not fire on error counts and it does not fire while a finding stays as it is. A DIMM that shows up with a finding counts as worse than before, so the alert also fires for the findings that exist when the exporter is first set up.
 
 The alert carries the new finding as the label `finding` (`observe`, `consider-replacement`, `replace-now`, `hold-replacement`) and a `severity` (`info`, `warning`, `critical`). It lasts ten minutes and then ends, while the finding stays. The Alertmanager example therefore sends no "resolved" message for it, and sends `replace-now` and `hold-replacement` to a receiver of their own.
+
+`GPUMemoryRepairFailed` fires when `my_gpu_remap_failure` of a GPU turns 1, the finding "replace now" of rule R-REP-01, with the same labels and the same ten minutes. The other states of a GPU (a remapping that waits for a reset, banks without spare rows) are graded by no rule and raise no alert; the dashboard shows them.
 
 `MemoryFindingsStale` is about the exporter: its last scan finished more than 30 minutes ago. Without it, no alert from a host could mean a healthy host or an exporter that reads nothing.
 

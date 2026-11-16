@@ -59,6 +59,7 @@ route memory-hardware alertname=MemoryFindingWorse finding=replace-now
 route memory-hardware alertname=MemoryFindingWorse finding=hold-replacement
 route memory-findings alertname=MemoryFindingWorse finding=consider-replacement
 route memory-findings alertname=MemoryFindingWorse finding=observe
+route memory-hardware alertname=GPUMemoryRepairFailed finding=replace-now
 route memory-exporter alertname=MemoryFindingsStale
 route default alertname=SomethingElse
 
@@ -175,7 +176,7 @@ import json, sys
 groups = json.load(sys.stdin)["data"]["groups"]
 rules = [(g["name"], r["name"], r["health"]) for g in groups for r in g["rules"]]
 print(rules)
-sys.exit(0 if len(rules) == 2 and all(h in ("ok", "unknown") for _, _, h in rules) else 1)' || fail "the rules did not load"
+sys.exit(0 if len(rules) == 3 and all(h in ("ok", "unknown") for _, _, h in rules) else 1)' || fail "the rules did not load"
 
 echo "=== grafana: a server loads the dashboard and runs its queries"
 mkdir -p "$tmp/provisioning/datasources" "$tmp/provisioning/dashboards"

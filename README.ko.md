@@ -302,7 +302,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 
 ## 모니터링
 
-`my serve --metrics`는 같은 스캔을 주기적으로 실행해 DIMM별 소견과 오류 건수를 Prometheus에 제공합니다. DIMM 하나의 소견은 `/api/dimm/<슬롯|시리얼>`에서 JSON으로 받습니다. `--fleet`을 쓰면 exporter 하나가 플릿의 rasdaemon이 기록하는 저장소를 읽습니다. 주소, row, column을 레이블로 쓰는 메트릭은 없습니다. [contrib/](contrib/README.md)에 systemd 유닛, 소견이 나빠지면 울리는 알림 규칙, Alertmanager 라우트, Grafana 대시보드가 있습니다.
+`my serve --metrics`는 같은 스캔을 주기적으로 실행해 DIMM별 소견과 오류 건수를 Prometheus에 제공합니다. DIMM 하나의 소견은 `/api/dimm/<슬롯|시리얼>`에서 JSON으로 받습니다. `--fleet`을 쓰면 exporter 하나가 플릿의 rasdaemon이 기록하는 저장소를 읽습니다. 주소, row, column을 레이블로 쓰는 메트릭은 없습니다. [contrib/](contrib/README.md)에 systemd 유닛, DIMM의 소견이 나빠지거나 GPU의 row remap이 실패하면 울리는 알림 규칙, Alertmanager 라우트, Grafana 대시보드가 있습니다.
 
 ## 현재 상태
 

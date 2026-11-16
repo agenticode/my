@@ -209,3 +209,37 @@ tests:
             exp_annotations:
               summary: 'h1 C1: the finding is now hold replacement'
               description: 'DIMM in slot C1 of host h1, serial number S3. A cause outside the DIMM is suspected: check the channel, the slot and the contact before the DIMM is pulled. "my why C1" on the host, or /api/dimm/C1 of the exporter, shows what the finding rests on.'
+
+  - name: a GPU whose row remapping fails alerts once, a GPU without a failure never
+    interval: 1m
+    input_series:
+      # No failure for two hours, then the flag of a failed remapping.
+      - series: 'my_gpu_remap_failure{host="gpu-01", gpu="1650924060088", instance="gpu-01:10163", job="memory"}'
+        values: '0x119 1x100'
+      # A GPU that never reports a failure.
+      - series: 'my_gpu_remap_failure{host="gpu-01", gpu="1650924060089", instance="gpu-01:10163", job="memory"}'
+        values: '0x220'
+    alert_rule_test:
+      - eval_time: 119m
+        alertname: GPUMemoryRepairFailed
+        exp_alerts: []
+      - eval_time: 120m
+        alertname: GPUMemoryRepairFailed
+        exp_alerts:
+          - exp_labels:
+              host: gpu-01
+              gpu: "1650924060088"
+              instance: gpu-01:10163
+              job: memory
+              finding: replace-now
+              severity: critical
+            exp_annotations:
+              summary: 'gpu-01 GPU 1650924060088: a row remapping failed, the finding is now replace now'
+              description: 'GPU 1650924060088 of host gpu-01 reports a row remapping that failed (rule R-REP-01). "my gpu" on the host shows its spare rows per bank and its Xid records.'
+      # The flag stays; after the hour the alert has ended.
+      - eval_time: 135m
+        alertname: GPUMemoryRepairFailed
+        exp_alerts: []
+      - eval_time: 200m
+        alertname: GPUMemoryRepairFailed
+        exp_alerts: []
