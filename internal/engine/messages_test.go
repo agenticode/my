@@ -2,16 +2,20 @@ package engine
 
 import (
 	"encoding/json"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/synth"
+	"github.com/agenticode/my/internal/testutil"
 )
 
 // TestCatalogIsComplete: every message exists in both languages and uses
@@ -220,5 +224,41 @@ func TestTextFallsBack(t *testing.T) {
 	}
 	if st := statement("missing.ecs"); st.Args != nil || st.Text != "no ECS counters" {
 		t.Errorf("statement without arguments = %+v", st)
+	}
+}
+
+// TestSourceDetailsAreWritten: every sentence sourceDetails translates is
+// one an adapter writes, so that a changed sentence does not leave its
+// translation behind unused, and the Korean has no character the English
+// form lacks a place for.
+func TestSourceDetailsAreWritten(t *testing.T) {
+	root := testutil.RepoRoot(t)
+	var code strings.Builder
+	err := filepath.WalkDir(filepath.Join(root, "internal"), func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") || strings.HasSuffix(path, "messages.go") {
+			return err
+		}
+		b, err := os.ReadFile(path)
+		code.Write(b)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for en, ko := range sourceDetails {
+		if !strings.Contains(code.String(), strconv.Quote(en)) {
+			t.Errorf("no adapter writes %q", en)
+		}
+		if ko == "" || ko == en || DetailText(i18n.KO, en) != ko || DetailText(i18n.EN, en) != en {
+			t.Errorf("translation of %q: %q", en, ko)
+		}
+	}
+	st := model.Statement{Code: "missing.source_detail", Args: map[string]any{"kind": "rasdaemon", "status": "@status.absent",
+		"detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only"}}
+	if got := Text(i18n.KO, st); strings.ContainsAny(got, "abcdefghijklmnopqrstuvwxyz ") && strings.Contains(got, "is not installed") {
+		t.Errorf("Korean source line: %q", got)
+	}
+	if got := Text(i18n.EN, st); !strings.Contains(got, "is not installed") {
+		t.Errorf("English source line: %q", got)
 	}
 }

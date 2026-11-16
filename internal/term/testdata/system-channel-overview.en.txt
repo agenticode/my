@@ -9,8 +9,7 @@ host finding: hold replacement
  CPU0   ░░   ??   ░░   ░░   ░░   ▒▒   ░░   ▒▒
  CPU1   ▒▒   ░░   ▒▒   ░░   ░░   ░░   ▒▒   ░░
 
- ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
- 32 slots, 32 DIMMs
+ ▒▒ observe   ░░ ok   ?? hold replacement    32 slots, 32 DIMMs
 
   #  SLOT     SERIAL   CE  UE  MODE          TREND 30D     FINDING           RULES
   1  CPU0_B1  880018  181   0  system issue  ▆▅▄▅▇▆▇█▃▆ →  hold replacement  R-SYS-01
@@ -29,7 +28,7 @@ host finding: hold replacement
  14  CPU1_G2  F6088C    1   0  single-bit    ▁▁▁▁▁▁▁▁▁▁ ↓  observe           R-SOFT-01
 
  18 DIMMs without errors
- sources  synth 356 records
+ sources  synth
 
  my dimm CPU0_C1: examination   my why CPU0_C1: reasons   my bundle -o case.mycase: case bundle
  my help: how to read the figures

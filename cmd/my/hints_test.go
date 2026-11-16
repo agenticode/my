@@ -64,7 +64,8 @@ func TestHintsRun(t *testing.T) {
 			}
 		}
 	}
-	if total < 16 || ran < 12 {
+	// One hint per screen at most, and every one runs.
+	if total < 7 || ran < 6 {
 		t.Errorf("%d hints shown, %d run", total, ran)
 	}
 	// The quoting of a name with a space.

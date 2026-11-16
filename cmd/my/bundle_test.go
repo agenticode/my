@@ -93,7 +93,7 @@ func TestBundleRoundTrip(t *testing.T) {
 		t.Fatalf("exit code %d, stderr %q", code, errOut)
 	}
 	_, out, _ = runEnv(fixed, "open", second)
-	wantLines(t, out, "subject CPU1_D1 S/N 2AEB41", "my open "+second+" dimm CPU1_D1: examination of this DIMM", "my open "+second+" why CPU1_D1:")
+	wantLines(t, out, "subject CPU1_D1 S/N 2AEB41", "my open "+second+" dimm CPU1_D1: examination of this DIMM")
 
 	// --json carries what the case is.
 	_, out, _ = runEnv(fixed, "open", file, "why", "CPU0_C1", "--json")

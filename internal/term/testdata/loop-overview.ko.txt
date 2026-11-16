@@ -9,15 +9,14 @@
  CPU1   ░░   ░░   ░░   ▒▒   ░░   ░░   ░░   ░░
  중단   ·    ·    ·    ·    ·    ·    ·    ·
 
- ██ 즉시 교체   ▓▓ 교체 고려   ▒▒ 관찰   ░░ 정상   ?? 교체 보류
- 슬롯 32개, DIMM 16개 (빈 슬롯 16개는 그리지 않음)
+ ██ 즉시 교체   ▒▒ 관찰   ░░ 정상    슬롯 32개, DIMM 16개 (빈 슬롯 16개는 그리지 않음)
 
  #  슬롯     시리얼  CE  UE  모드        추세 30일     소견       규칙
  1  CPU0_C1  BE8ED6  60   4  single bit  ▁▁▅▅▇▆▇▅█▇ ↑  즉시 교체  R-UE-01 R-LOOP-01
  2  CPU1_D1  21FD6F  25   0  single bit  ▁▄▅▁▁▁▁▁█▁ →  관찰       R-SOFT-01
 
  오류 없는 DIMM 14개
- 소스  synth 97건
+ 소스  synth
 
  my dimm CPU0_C1: examination   my why CPU0_C1: reasons   my bundle -o case.mycase: case bundle
  my help: how to read the figures

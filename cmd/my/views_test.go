@@ -298,9 +298,17 @@ func TestScanOfAHostTree(t *testing.T) {
 		"CE 1,284, UE 1  observation grade A",
 		" CPU0   ░░   ░░   ██   ░░   ░░   ░░   ░░   ░░",
 		"CPU0_C1  3B9C56  1,231   1  row",
-		" sources  hostinfo 2 records, rasdaemon 1,286 records, klog",
+		" sources  rasdaemon, klog, edac-sysfs\n",
 		"my dimm CPU0_C1 --root "+root,
 	)
+	// One line names what to look at next.
+	if n := strings.Count(out, "\n my "); n != 1 {
+		t.Errorf("%d hint lines:\n%s", n, out)
+	}
+	// --detail counts the records of every source.
+	if _, detail, _ := run("--root", root, "--detail"); !strings.Contains(detail, " sources  hostinfo 2 records, rasdaemon 1,286 records, klog") {
+		t.Errorf("--detail lacks the counts of the sources:\n%s", detail)
+	}
 	if strings.Contains(out, "missing") {
 		t.Errorf("every source was readable, yet something is missing:\n%s", out)
 	}
@@ -540,6 +548,7 @@ func sourceFor(topic string) *source {
 func registerFlags(o *options, topic string) {
 	switch topic {
 	case "overview":
+		o.withDetail()
 		o.fs.Bool("all", false, "")
 	case "why":
 		o.withDetail()

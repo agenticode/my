@@ -257,7 +257,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	}
 	summary(env.Stdout)
 	fmt.Fprintln(env.Stdout)
-	hints := []term.Hint{{Command: "my import ... -o case.mycase", Text: say(lang, "hint.import")}, {Command: "my help", Text: say(lang, "hint.help")}}
+	hints := []term.Hint{{Command: "my import ... -o case.mycase", Text: say(lang, "hint.import")}}
 	if err := term.Overview(env.Stdout, ov, st, hints); err != nil {
 		return o.failure(env, err)
 	}

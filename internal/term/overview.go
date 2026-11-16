@@ -149,7 +149,18 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		}
 	}
 	var read []string
+	seen := map[string]bool{}
 	for _, s := range ov.Sources {
+		if !st.Detail {
+			// In short: the kinds of source that gave records, each once.
+			// What describes the machine is left out, and what could not
+			// be read is on the line below.
+			if (s.Status == model.SourceOK || s.Status == model.SourcePartial) && s.Records > 0 && !seen[s.Kind] && !machineSource[s.Kind] {
+				seen[s.Kind] = true
+				read = append(read, s.Kind)
+			}
+			continue
+		}
 		switch s.Status {
 		case model.SourceOK, model.SourcePartial:
 			read = append(read, st.say("ov.source", "kind", sourceName(s), "n", s.Records))
@@ -187,6 +198,10 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	}
 	return p.writeTo(w)
 }
+
+// machineSource are the kinds of source that describe the machine and the
+// work of the scan, and hold no error record.
+var machineSource = map[string]bool{"hostinfo": true, "smbios": true, "slot-map": true, "time-align": true}
 
 // looseCounts writes how much the host finding is about: the errors and
 // the pages taken offline that are tied to no DIMM.
@@ -241,6 +256,7 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	var bands [][]bandRow
 	hidden := 0
 	emptyDrawn, unknownDrawn := false, false
+	drawn := map[string]bool{}
 	for k := range positions {
 		var band []bandRow
 		occupied, slots := false, 0
@@ -314,6 +330,7 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 					if cell != nil {
 						label = cell.Label
 						glyph = st.paint(gradeColor(cell.State), st.gradeGlyph(cell.State))
+						drawn[cell.State] = true
 					}
 					head.WriteString(strings.Repeat(" ", gap) + padRight(label, cw))
 					body.WriteString(strings.Repeat(" ", gap) + glyph + strings.Repeat(" ", cw-2))
@@ -349,8 +366,12 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	}
 
 	p.blank()
+	// The grades the map shows; with Detail all of them.
 	legend := []string{}
 	for _, g := range []model.VerdictGrade{model.VerdictReplaceNow, model.VerdictConsiderReplacement, model.VerdictObserve, model.VerdictOK, model.VerdictHoldReplacement} {
+		if !st.Detail && !drawn[string(g)] {
+			continue
+		}
 		legend = append(legend, st.paint(gradeColor(string(g)), st.gradeGlyph(string(g)))+" "+engine.GradeText(st.lang(), g))
 	}
 	if emptyDrawn {
@@ -359,14 +380,20 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	if unknownDrawn {
 		legend = append(legend, st.paint(gradeColor(view.SlotUnknown), st.gradeGlyph(view.SlotUnknown))+" "+st.say("ov.unknown"))
 	}
-	for _, line := range flow(legend, "   ", st.width()-1) {
-		p.add(" " + line)
-	}
 	note := st.say("ov.slots", "slots", sm.Slots, "dimms", sm.Populated)
 	if hidden > 0 {
 		note += " " + st.say("ov.hidden", "n", hidden)
 	}
-	p.add(" " + st.dim(note))
+	lines := flow(legend, "   ", st.width()-1)
+	// The count of slots stands beside the legend when there is room.
+	if n := len(lines); n > 0 && Width(lines[n-1])+4+Width(note) <= st.width()-1 {
+		lines[n-1] += "    " + st.dim(note)
+	} else {
+		lines = append(lines, st.dim(note))
+	}
+	for _, line := range lines {
+		p.add(" " + line)
+	}
 }
 
 // trendArrow returns the glyph of a trend direction.

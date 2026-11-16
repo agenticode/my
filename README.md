@@ -34,19 +34,16 @@ host finding: replace now
  CPU0   ░░   ░░   ██   ░░   ░░   ░░   ░░   ░░
  CPU1   ░░   ░░   ░░   ▒▒   ░░   ░░   ░░   ░░
 
- ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
- 32 slots, 16 DIMMs (16 empty slots not drawn)
+ ██ replace now   ▒▒ observe   ░░ ok    32 slots, 16 DIMMs (16 empty slots not drawn)
 
  #  SLOT     SERIAL     CE  UE  MODE        TREND 30D     FINDING      RULES
  1  CPU0_C1  3B9C56  1,231   1  row         ▃▄▄▄▅▅▆▆▇█ ↑  replace now  R-UE-01 R-ROW-03 R-REP-02
  2  CPU1_D1  2AEB41     53   0  single-bit  ▆▁▄█▃▄▃▄▄▁ ↓  observe      R-SOFT-01
 
  14 DIMMs without errors
- sources  synth 1,297 records
+ sources  synth
 
  my open examples/demo.mycase dimm CPU0_C1: examination of this DIMM
- my open examples/demo.mycase why CPU0_C1: what the finding rests on
- my help: how to read the figures
 ```
 
 One DIMM, examined: the finding, the branch of the DIMM the errors sit on, the address map of the bank with the most errors, and the timeline across reboots.

@@ -558,6 +558,7 @@ func blindText(lang i18n.Lang, opts *scan.Options, sources []model.Source) strin
 		}
 		line := "\n  " + src.Kind + ": " + engine.Messages.Text(lang, "status."+string(src.Status), nil)
 		if src.Detail != "" && src.Detail != "not present" {
+			src.Detail = engine.DetailText(lang, src.Detail)
 			line += " (" + src.Detail + ")"
 		}
 		b.WriteString(line)
