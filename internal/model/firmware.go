@@ -98,6 +98,11 @@ type FirmwareRecord struct {
 	// nor an action: what identifies it, and its text.
 	Fingerprint string `json:"fingerprint,omitzero"`
 	Raw         string `json:"raw,omitzero"`
+
+	// DIMMUID and Slot are those of the event or action of the record, as
+	// the ledger read them back; they are not stored with the record.
+	DIMMUID string `json:"dimm_uid,omitzero"`
+	Slot    string `json:"slot,omitzero"`
 }
 
 // MaxFirmwareText is how much of a message text a firmware record keeps.

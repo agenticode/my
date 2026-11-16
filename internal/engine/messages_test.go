@@ -180,7 +180,7 @@ func TestStatementsRender(t *testing.T) {
 // states, and the engine states no sentence the catalog lacks.
 func TestEveryMessageIsStated(t *testing.T) {
 	var src strings.Builder
-	for _, f := range []string{"verdict.go", "system.go", "analyze.go", "hostfinding.go", "recurrence.go", "config.go"} {
+	for _, f := range []string{"verdict.go", "system.go", "analyze.go", "hostfinding.go", "recurrence.go", "config.go", "fwrules.go"} {
 		b, err := os.ReadFile(f)
 		if err != nil {
 			t.Fatal(err)

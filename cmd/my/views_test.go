@@ -527,8 +527,8 @@ func TestHelp(t *testing.T) {
 	wantLines(t, flat(out), "슬롯 맵.", "## 즉시 교체", ":: 정상")
 	_, out, _ = run("help", "rules")
 	wantLines(t, out, "R-UE-01", "R-MAP-01", "R-HOST-01", "R-HOST-02", "hold replacement", "an uncorrected error on this DIMM")
-	if n := strings.Count(out, "\n  R-"); n != 18 {
-		t.Errorf("%d rules listed, want 18:\n%s", n, out)
+	if n := strings.Count(out, "\n  R-"); n != 20 {
+		t.Errorf("%d rules listed, want 20:\n%s", n, out)
 	}
 	_, out, _ = run("help", "thresholds")
 	wantLines(t, out, "rule.row.min_errors", "trend.recent_days")

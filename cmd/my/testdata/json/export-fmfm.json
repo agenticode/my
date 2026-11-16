@@ -5,7 +5,7 @@
   "Analyzer": {
     "Name": "MemorY",
     "Version": "dev",
-    "engine_version": "7",
+    "engine_version": "8",
     "level": 1
   },
   "HostID": "r12-n034",

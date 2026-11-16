@@ -64,11 +64,11 @@ Next step: replace the DIMM and attach a case bundle to the return.
 
 ### R-FW-01
 
-The BMC or the BIOS marks the DIMM as failed or disabled. The records are a "memory device disabled" event of the BMC event log, the state and health of a Redfish memory resource, and the health record of a CXL device that says its hardware needs replacement.
+The BMC or the BIOS marks the DIMM as failed or disabled. The records are a "memory device disabled" event of the BMC event log, the state and health of a Redfish memory resource, and the health record of a CXL device that says its hardware needs replacement. The rule also fires when the memory mirror failed over from the DIMM, and when the DIMM failed memory training in two different slots: the failure followed the module. A mark that a later record takes back (the module in use again) is history and fires nothing.
 
 ### R-REP-01
 
-Repair resources are used up: a post package repair or a row remap failed, or sparing is in use, which leaves no spare. For a GPU the rule fires when a row remapping failed: XID 64 in the kernel log, or the failure flag in the state `nvidia-smi` reports.
+Repair resources are used up: a post package repair or a row remap failed, or sparing is in use, which leaves no spare. A repair the firmware reports as failed counts whether it names a place or the module only; so do device sparing (ADDDC, SDDC) that failed or has no spare left, and a copy to a spare that failed. Device sparing in use does not fire the rule: it takes a device out of use and leaves the rest of the module's spare capacity. For a GPU the rule fires when a row remapping failed: XID 64 in the kernel log, or the failure flag in the state `nvidia-smi` reports.
 
 ### R-LOOP-01
 
@@ -117,6 +117,14 @@ The patrol scrubber found an uncorrected error that was not fatal: the memory wa
 
 Errors came back at the place of a repair: at least one error at the repaired row, device or rank after a post package repair, a sparing or a row remap. When the repair was a soft PPR and the host restarted before the errors came back, a check says so: a soft PPR is lost at power off.
 
+A repair that a firmware record reports names the module and no row in most logs. Such a repair stands for every fault of the module that had errors before it, and errors of one of those faults after it fire the rule; a fault first seen after the repair is a new fault and no recurrence. A repair that does not say whether it was soft or hard adds an open check, and so does a repair dated by a BMC whose clock was not compared with the host's when the errors came less than 15 hours later. Device sparing that engaged at a place is a repair of that place.
+
+### R-FW-02
+
+The firmware predicts a failure of the DIMM (predictive failure analysis, PFA), and no later record takes the prediction back. When the located records show errors at one cell only, a check weakens the finding: a repair of the row may be enough.
+
+Next step: plan the replacement for the next maintenance window and attach a case bundle to the return.
+
 ## Observe
 
 ### R-SOFT-01
@@ -127,11 +135,11 @@ Next step: none; look again when the count grows or a new place appears. For err
 
 ### R-QUIET-01
 
-A place failed repeatedly and has been quiet since a page offline or a repair: no error of the fault after it, for at least `rule.quiet.days`. Before that time has passed, a check says how many days are still needed.
+A place failed repeatedly and has been quiet since a page offline or a repair: no error of the fault after it, for at least `rule.quiet.days`. Before that time has passed, a check says how many days are still needed. For a repair that names the module only, every fault of the module that had errors before it has to be quiet since. A repair that waits for the next boot (scheduled) is no repair yet: it fires no rule, and a check says that no record shows that it ran.
 
 ### R-HOST-02
 
-Corrected errors or page offlines of the host that no record ties to a DIMM. It is a rule of the host finding (see below).
+Corrected errors or page offlines of the host that no record ties to a DIMM, and firmware records about memory that name no DIMM (a mirror that lost its redundancy, a sparing mode of the system). It is a rule of the host finding (see below).
 
 ## Hold replacement
 
@@ -176,6 +184,13 @@ Uncorrected errors tied to DIMMs in at least `rule.loop.scatter_boots` boots of 
 A DIMM that had a confined fault of its own before the first of these boots gets a check against it. A DIMM that fires R-LOOP-01 or R-LOOP-02 as well keeps them, and hold replacement outranks them.
 
 Next step: do not pull the DIMMs one after another; check the logs of the processor and the board, the power supply, and what changed before the first stop.
+
+
+### R-FW-03
+
+The DIMM failed memory training, the memory test or its initialisation at boot at least once, it has no uncorrected error and no fault located inside it (grade A or B) on record, and the failure was not seen with this module in a second slot. A module that fails training has shown no error of its own cells: a bad seat, a bent pin of the socket, the slot or a limit of the BIOS fit as well. When the failure follows the module into a second slot, R-FW-01 fires and this rule does not. When the slot failed training with another module before, a check supports the hold and names that module; when no reseat or slot change is on record since, an open check says so.
+
+Next step: reseat the DIMM; if it fails again, swap it with a DIMM of another channel and see whether the failure follows it.
 
 ## The host finding
 
@@ -224,6 +239,7 @@ The confidence starts at a value of the rule that set the grade and moves with t
 | R-OFF-02 | 70 | R-HOST-01 | 85 |
 | R-LOOP-01 | 90 | R-HOST-02 | 70 |
 | R-LOOP-02 | 80 | R-LOOP-03 | 70 |
+| R-FW-02 | 75 | R-FW-03 | 65 |
 | no rule (ok) | 85 | | |
 
 | Condition | Change |
@@ -238,6 +254,11 @@ The confidence starts at a value of the rule that set the grade and moves with t
 | checks that could not be made | -2 each, at most -6 |
 | sources that could not be read in full | -5 each, at most -15 |
 | "ok" without any source of error records | -45 |
+| the firmware record that decided the grade was classed by its wording, no table has it | -5 |
+
+A firmware record is read through a mapping table whose basis is `registry` or `documents` ([vendors.md](vendors.md)): a finding whose deciding record came through such a table carries an open check that says the meaning was not checked on real hardware. The firmware's own limit of corrected errors (`ce-threshold`) is an evidence line of R-SOFT-01 or R-ROW-03 and fires no rule by itself: a count without a place decides no replacement here, and a prediction has a rule of its own. A log of the BMC that was cleared or is full, and firmware records about the DIMM no table classes, are listed among the missing data.
+
+R-FW-02, R-FW-03 and the extensions of R-FW-01, R-REP-01, R-REP-02 and R-QUIET-01 for firmware records use the threshold `rule.quiet.days` and no threshold of their own. They were compared with no field data: no public log of a real machine holds these firmware records ([vendors.md](vendors.md)).
 
 `--audience fa` of a report and `my why` list these steps for a finding.
 
