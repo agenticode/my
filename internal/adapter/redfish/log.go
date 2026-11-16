@@ -350,125 +350,135 @@ func (r *run) logs(sink adapter.Sink) error {
 				return stopped{err}
 			}
 		}
+		if i == adapter.MaxRecords {
+			// The rest is counted and left out; the dump is read in part.
+			r.tally.Skip(r.entries[i].ref, fmt.Sprintf("%d log entries after the first %d were not read", len(r.entries)-i, adapter.MaxRecords))
+			break
+		}
 		res := &r.entries[i]
-		o := res.obj
-		// Every entry counts for the period its log covers.
-		r.cover(res)
-		if strings.EqualFold(str(o, "EntryType"), "CXL") {
-			cxl++
-			continue
-		}
-		d, memory := r.decode(o)
-		if !memory {
-			notMemory++
-			continue
-		}
-		r.coverMemory(res)
-		// A place given by numbers is the slot the same dump describes
-		// with those numbers.
-		if len(d.labels) == 0 && d.socket.Valid && d.channel.Valid && d.position.Valid {
-			if name, ok := r.places[[3]int{d.socket.V, d.channel.V, d.position.V}]; ok {
-				d.labels = []string{name}
+		if err := adapter.Each(&r.tally, res.ref, str(res.obj, "MessageId")+" "+str(res.obj, "Message"), func() error {
+			o := res.obj
+			// Every entry counts for the period its log covers.
+			r.cover(res)
+			if strings.EqualFold(str(o, "EntryType"), "CXL") {
+				cxl++
+				return nil
 			}
-		}
-		created, at, ok := entryTime(o)
-		if !ok {
-			r.tally.Skip(res.ref, "log entry about memory has no readable time")
-			continue
-		}
-		fp := model.Fingerprint(Kind, "log", res.id, created, str(o, "MessageId"), str(o, "Message"))
-		rawText := raw(o)
-		event := func(sev model.Severity, text string) *model.Event {
-			e := &model.Event{Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: sev, ErrorType: text, Count: 1,
-				SocketId: d.socket, ChannelId: d.channel, ChannelSlotId: d.position, Rank: d.rank,
-				Source: Kind + "/log", Decoder: d.decoder, RawRef: res.ref, Raw: rawText, Fingerprint: fp}
-			if len(d.labels) == 1 {
-				e.Label = d.labels[0]
+			d, memory := r.decode(o)
+			if !memory {
+				notMemory++
+				return nil
 			}
-			return e
-		}
-
-		if d.cleared {
-			cleared++
-			continue
-		}
-		if d.ev == ipmi.MemUnknown {
-			// About memory, in words this reader has no class for.
-			key := str(o, "MessageId")
-			if key == "" || selDataRE.MatchString(key) {
-				key = d.text
-				if len(key) > 60 {
-					key = key[:60] + "..."
+			r.coverMemory(res)
+			// A place given by numbers is the slot the same dump describes
+			// with those numbers.
+			if len(d.labels) == 0 && d.socket.Valid && d.channel.Valid && d.position.Valid {
+				if name, ok := r.places[[3]int{d.socket.V, d.channel.V, d.position.V}]; ok {
+					d.labels = []string{name}
 				}
 			}
-			unclassified[key]++
-			text := d.text
-			if text == "" {
-				text = str(o, "MessageId")
+			created, at, ok := entryTime(o)
+			if !ok {
+				r.tally.Unread(res.ref, "log entry about memory has no readable time", raw(o))
+				return nil
 			}
-			if text == "" {
-				r.tally.Skip(res.ref, "log entry about memory has no message")
-				continue
+			fp := model.Fingerprint(Kind, "log", res.id, created, str(o, "MessageId"), str(o, "Message"))
+			rawText := raw(o)
+			event := func(sev model.Severity, text string) *model.Event {
+				e := &model.Event{Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: sev, ErrorType: text, Count: 1,
+					SocketId: d.socket, ChannelId: d.channel, ChannelSlotId: d.position, Rank: d.rank,
+					Source: Kind + "/log", Decoder: d.decoder, RawRef: res.ref, Raw: rawText, Fingerprint: fp}
+				if len(d.labels) == 1 {
+					e.Label = d.labels[0]
+				}
+				return e
 			}
-			if len(text) > 200 {
-				text = text[:200] + "..."
-			}
-			outs = append(outs, out{ev: event(model.SevInformational, text)})
-			continue
-		}
 
-		m := d.ev.Meaning()
-		if d.deassert {
-			if d.ev == ipmi.MemDeviceDisabled {
-				for j := len(outs) - 1; j >= 0; j-- {
-					a := outs[j].act
-					if a == nil || a.Kind != model.ActionDisable || len(d.labels) != 1 || model.NormalizeLabel(a.Label) != model.NormalizeLabel(d.labels[0]) {
-						continue
+			if d.cleared {
+				cleared++
+				return nil
+			}
+			if d.ev == ipmi.MemUnknown {
+				// About memory, in words this reader has no class for.
+				key := str(o, "MessageId")
+				if key == "" || selDataRE.MatchString(key) {
+					key = d.text
+					if len(key) > 60 {
+						key = key[:60] + "..."
 					}
-					was := event(model.SevInformational, d.ev.String()+" (enabled again later)")
-					was.ErrorDT, was.RawRef, was.Raw, was.Label, was.Fingerprint = a.At, a.RawRef, a.Raw, a.Label, a.Fingerprint
-					outs[j] = out{ev: was}
-					withdrawn++
 				}
-				outs = append(outs, out{ev: event(model.SevInformational, d.ev.String()+" (deasserted: in use again)")})
-				continue
+				unclassified[key]++
+				text := d.text
+				if text == "" {
+					text = str(o, "MessageId")
+				}
+				if text == "" {
+					r.tally.Unread(res.ref, "log entry about memory has no message", rawText)
+					return nil
+				}
+				if len(text) > 200 {
+					text = text[:200] + "..."
+				}
+				outs = append(outs, out{ev: event(model.SevInformational, text)})
+				return nil
 			}
-			cleared++
-			continue
-		}
-		switch m.Class {
-		case ipmi.ClassNone:
-			presence++
-		case ipmi.ClassError, ipmi.ClassInfo:
-			e := event(m.Severity, d.ev.String())
-			e.ErrorScrubType = m.Scrub
-			named := len(d.labels) > 0 || (d.socket.Valid && d.channel.Valid && d.position.Valid)
-			switch {
-			case len(d.labels) > 1:
-				e.ErrorType += " on one of " + strings.Join(d.labels, ", ")
-				multi++
-			case !named && m.Class == ipmi.ClassError:
-				unnamed++
+
+			m := d.ev.Meaning()
+			if d.deassert {
+				if d.ev == ipmi.MemDeviceDisabled {
+					for j := len(outs) - 1; j >= 0; j-- {
+						a := outs[j].act
+						if a == nil || a.Kind != model.ActionDisable || len(d.labels) != 1 || model.NormalizeLabel(a.Label) != model.NormalizeLabel(d.labels[0]) {
+							continue
+						}
+						was := event(model.SevInformational, d.ev.String()+" (enabled again later)")
+						was.ErrorDT, was.RawRef, was.Raw, was.Label, was.Fingerprint = a.At, a.RawRef, a.Raw, a.Label, a.Fingerprint
+						outs[j] = out{ev: was}
+						withdrawn++
+					}
+					outs = append(outs, out{ev: event(model.SevInformational, d.ev.String()+" (deasserted: in use again)")})
+					return nil
+				}
+				cleared++
+				return nil
 			}
-			if d.ev == ipmi.MemLogLimit {
-				logLimit = append(logLimit, at)
+			switch m.Class {
+			case ipmi.ClassNone:
+				presence++
+			case ipmi.ClassError, ipmi.ClassInfo:
+				e := event(m.Severity, d.ev.String())
+				e.ErrorScrubType = m.Scrub
+				named := len(d.labels) > 0 || (d.socket.Valid && d.channel.Valid && d.position.Valid)
+				switch {
+				case len(d.labels) > 1:
+					e.ErrorType += " on one of " + strings.Join(d.labels, ", ")
+					multi++
+				case !named && m.Class == ipmi.ClassError:
+					unnamed++
+				}
+				if d.ev == ipmi.MemLogLimit {
+					logLimit = append(logLimit, at)
+				}
+				outs = append(outs, out{ev: e, log: logPath(res)})
+			case ipmi.ClassAction:
+				targets := d.labels
+				if len(targets) == 0 {
+					targets = []string{""}
+					unnamed++
+				}
+				method := d.generator
+				if method == "" && d.decoder != "redfish/sel" {
+					method = "bmc" // the BMC's own log
+				}
+				for n, label := range targets {
+					outs = append(outs, out{act: &model.Action{At: at, TimeQuality: model.TimeExact, Kind: m.Action, Method: method, Result: m.Result,
+						Label: label, Detail: d.ev.String(), Source: Kind + "/log", RawRef: res.ref, Raw: rawText,
+						Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}})
+				}
 			}
-			outs = append(outs, out{ev: e, log: logPath(res)})
-		case ipmi.ClassAction:
-			targets := d.labels
-			if len(targets) == 0 {
-				targets = []string{""}
-				unnamed++
-			}
-			method := d.generator
-			if method == "" && d.decoder != "redfish/sel" {
-				method = "bmc" // the BMC's own log
-			}
-			for n, label := range targets {
-				outs = append(outs, out{act: &model.Action{At: at, TimeQuality: model.TimeExact, Kind: m.Action, Method: method, Result: m.Result,
-					Label: label, Detail: d.ev.String(), Source: Kind + "/log", RawRef: res.ref, Raw: rawText,
-					Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}})
-			}
+			return nil
+		}); err != nil {
+			return err
 		}
 	}
 

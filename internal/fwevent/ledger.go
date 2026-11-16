@@ -30,7 +30,7 @@ type Record struct {
 	Labels []string
 	// Place by numbers, when the record gives them.
 	SocketId, ChannelId, ChannelSlotId, Rank, DeviceId, BankGroup, Bank, Row, Column model.Opt[int]
-	Address                                                                       model.Opt[uint64]
+	Address                                                                          model.Opt[uint64]
 	// Decoder names the format the place fields were read from.
 	Decoder string
 	// Method is the actor of a step: "bios", "bmc", or the generator of a

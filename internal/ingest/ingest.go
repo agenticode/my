@@ -100,6 +100,9 @@ type BoardInventory interface {
 // errOtherMachine rolls back a source that describes another machine.
 var errOtherMachine = errors.New("the source describes another machine")
 
+// errReaderFailed rolls back a source whose reader failed.
+var errReaderFailed = errors.New("the reader failed")
+
 // SlotMapKind is the source inventory entry that reports how EDAC positions
 // were tied to SMBIOS slots.
 const SlotMapKind = "slot-map"
@@ -189,11 +192,16 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		listed := 0
 		err := s.Update(ctx, func(w *store.Writer) error {
 			sk.w = w
-			rep = a.Collect(readCtx, sk)
+			rep = adapter.Safely(readCtx, a, sk)
 			// A record the ledger could not take rolls back the whole
 			// source: half a source would look like a complete one.
 			if rep.SinkErr != nil {
 				return rep.SinkErr
+			}
+			// So does a reader that failed: what it gave before is not
+			// known to be right.
+			if rep.Failed {
+				return errReaderFailed
 			}
 			if sk.fill {
 				if listed = otherMachine(sk.modules, board); listed > 0 {
@@ -211,6 +219,12 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 				listed, len(board))}
 			err = nil
 		}
+		if errors.Is(err, errReaderFailed) {
+			// Nothing of it is in the ledger. The report says why.
+			src = model.Source{ScanID: res.Scan.ID, Kind: a.Kind(), Origin: a.Origin()}
+			sk = &sink{host: host, scanID: res.Scan.ID, src: &src}
+			err = nil
+		}
 		cancel()
 		if err != nil {
 			return nil, fmt.Errorf("ingest %s %s: %w", a.Kind(), a.Origin(), err)
@@ -223,12 +237,13 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		src.Status, src.Detail = rep.Status, rep.Detail
 		src.Records = rep.Records
 		src.Skipped = rep.Skipped + sk.tally.Total()
+		src.Unread, src.Faults = rep.Unread, rep.Faults
 		src.Notes = append(src.Notes, rep.Notes...)
 		src.Notes = append(src.Notes, sk.tally.Notes()...)
 		if sk.known > 0 {
 			src.Notes = append(src.Notes, fmt.Sprintf("%d records were already in the ledger", sk.known))
 		}
-		if sk.tally.Total() > 0 && src.Status == model.SourceOK {
+		if (sk.tally.Total() > 0 || src.Unread > 0 || src.Faults > 0) && src.Status == model.SourceOK {
 			src.Status = model.SourcePartial
 		}
 		res.Events += sk.newEvents
@@ -236,7 +251,15 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		res.Actions += sk.newActions
 		res.Samples += sk.newSamples
 		modules = append(modules, sk.modules...)
-		if err := s.Update(ctx, func(w *store.Writer) error { return w.InsertSource(&src) }); err != nil {
+		if err := s.Update(ctx, func(w *store.Writer) error {
+			if err := w.InsertSource(&src); err != nil {
+				return err
+			}
+			if len(rep.UnreadRecords) == 0 {
+				return nil
+			}
+			return w.InsertUnread(src.ID, rep.UnreadRecords)
+		}); err != nil {
 			return nil, fmt.Errorf("ingest: %w", err)
 		}
 		res.Sources = append(res.Sources, src)

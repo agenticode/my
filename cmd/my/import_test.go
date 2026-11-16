@@ -121,8 +121,10 @@ func TestImportMistakes(t *testing.T) {
 	}{
 		{"no files", []string{"import"}, cli.ExitUsage, "name the files to import"},
 		{"a file of no known kind", []string{"import", gomod}, cli.ExitFailure, "not an input this tool reads: text of no known kind"},
-		// One input that is not understood stops the import of the others.
-		{"one of two is unknown", []string{"import", root, gomod, "-o", filepath.Join(dir, "x.mycase")}, cli.ExitFailure, "not an input this tool reads"},
+		// With --strict one input that is not understood stops the import
+		// of the others.
+		{"one of two is unknown, strict", []string{"import", root, gomod, "--strict", "-o", filepath.Join(dir, "x.mycase")}, cli.ExitFailure, "not an input this tool reads"},
+		{"none is known", []string{"import", gomod, gomod, "-o", filepath.Join(dir, "x.mycase")}, cli.ExitFailure, "not an input this tool reads"},
 		{"a missing file", []string{"import", filepath.Join(dir, "none.log")}, cli.ExitFailure, "no such file"},
 		{"a ledger", []string{"import", demo(t)}, cli.ExitFailure, `show it with "my open"`},
 		{"anonymizing nothing", []string{"import", root, "--anonymize"}, cli.ExitUsage, "--anonymize goes with -o"},
@@ -242,5 +244,57 @@ func TestImportDatesAKernelLogByTheDatabase(t *testing.T) {
 	flat := strings.Join(strings.Fields(out), " ")
 	if code != 3 || strings.Contains(out, "time-align") || !strings.Contains(flat, "804 records have only seconds since boot") || !strings.Contains(out, "CE 796, UE 1") {
 		t.Errorf("the kernel log alone: exit code %d\n%s", code, out)
+	}
+}
+
+// TestImportGoesOnPastAnUnknownInput: an input no reader recognises is a
+// source of its own that says what it looks like, and the import goes on;
+// a reader that understands only part of its input says how much. The
+// summary is pinned in both languages.
+func TestImportGoesOnPastAnUnknownInput(t *testing.T) {
+	syslog, err := os.ReadFile(testutil.Testdata(t, "klog", "intel-skx.messages"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	files := map[string]string{
+		"kern.log":  string(syslog),
+		"notes.txt": "rack 12, slot 4: replaced the fan on Tuesday\n",
+		// A list of the BMC's event log with one memory record whose time
+		// is unreadable.
+		"sel.txt": "   1 | 11/02/2026 | 14:07:55 | Memory DIMM_C1 | Correctable ECC | Asserted\n" +
+			"   2 | 13/45/2026 | 99:99:99 | Memory DIMM_C1 | Correctable ECC | Asserted\n",
+	}
+	for name, text := range files {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	outs := map[string]string{}
+	t.Run("import", func(t *testing.T) {
+		t.Chdir(dir)
+		for _, lang := range []string{"en", "ko"} {
+			code, out, errOut := runEnv(fixed, "import", "kern.log", "notes.txt", "sel.txt", "--host", "r07-n011", "-o", "case-"+lang+".mycase", "--lang", lang)
+			if code != cli.ExitOK || errOut != "" {
+				t.Fatalf("%s: exit code %d, stderr %q\n%s", lang, code, errOut, out)
+			}
+			outs[lang] = out
+		}
+		// --strict keeps the behaviour of earlier versions.
+		code, out, errOut := runEnv(fixed, "import", "kern.log", "notes.txt", "--strict")
+		if code != cli.ExitFailure || out != "" || !strings.Contains(errOut, "notes.txt: not an input this tool reads") {
+			t.Errorf("--strict: exit code %d, stdout %q, stderr %q", code, out, errOut)
+		}
+	})
+	for lang, out := range outs {
+		testutil.Golden(t, "import-unknown-"+lang+".txt", []byte(out))
+	}
+	if !strings.Contains(outs["en"], "notes.txt: not recognised") || !strings.Contains(outs["en"], "1 not understood") {
+		t.Errorf("summary:\n%s", outs["en"])
+	}
+	// The unknown input is in no "missing" line of the finding.
+	code, out, _ := runEnv(fixed, "open", filepath.Join(dir, "case-en.mycase"))
+	if code > 4 || strings.Contains(out, "unknown") {
+		t.Errorf("open: exit code %d, the unknown input is a source the finding missed:\n%s", code, out)
 	}
 }
