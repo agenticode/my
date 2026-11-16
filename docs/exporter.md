@@ -37,7 +37,7 @@ Every series has a `host` label, the name of the machine the records belong to.
 | `my_dimm_stop_boots` | gauge | `host`, `slot`, `serial` | boots of the window of the host (`loop.window_boots`) that stopped with an uncorrected error of the DIMM |
 | `my_host_stops` | gauge | `host`, `cause` | boots of the window that ended in a stop, by `cause`: `memory` (an uncorrected memory error is on record in the boot), `hardware-other` (a fatal hardware error without one), `panic` (a panic with no hardware error record) |
 | `my_host_stop_streak` | gauge | `host` | the latest boots in a row that a fatal hardware error ended |
-| `my_host_capture` | gauge | `host`, `check` | what `my preflight` found the latest live scan would keep over a reset, per check: 1 kept, 0 lost; no series for a check the platform does not offer or that could not be read |
+| `my_host_capture` | gauge | `host`, `check` | what `my preflight` found the latest live scan would keep over a reset, per check: 1 kept, 0 lost; no series for a check that is none, unknown or info |
 | `my_gpu_remap_banks` | gauge | `host`, `gpu`, `bucket` | memory banks of the GPU by the spare rows they have left for row remapping: `max`, `high`, `partial`, `low`, `none`, from the latest `nvidia-smi` state |
 | `my_gpu_remap_failure` | gauge | `host`, `gpu` | 1 when a row remapping of the GPU failed (XID 64 in the kernel log, or the flag in the `nvidia-smi` state), 0 when the GPU reports none |
 | `my_source_grade` | gauge | `host`, `source`, `status` | best observation grade of the errors a source gave in the latest scan: 3 A, 2 B, 1 C, 0 no errors. `status` says how reading the source went: `ok`, `partial`, `empty`, `absent`, `unreadable`, `error` |

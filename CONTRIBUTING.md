@@ -58,7 +58,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `cmd/my` | the binary and its commands |
 | `internal/model` | ledger records; the error event uses the field names of the FMFM runtime error log |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
+| `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, crash logs (pstore, kdump), the boot error region (BERT), EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, the signs of a virtual machine |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
