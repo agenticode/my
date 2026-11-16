@@ -1,0 +1,4 @@
+# One fatal machine check with a crash kernel loaded: the panic boots the
+# crash kernel instead of writing pstore (crash_kexec_post_notifiers is off).
+# bank status address misc
+7 0xbe00000000010090 0x12345040 0x86

@@ -25,6 +25,7 @@
 #   boot      start the guest; the console of every boot goes to $X86/console.log
 #   prepare   once per disk: packages, kernel parameters, this tool
 #   wait      wait until the guest answers
+#   kdump     once: a crash kernel in the guest, then a reboot
 #   inject ID BANK STATUS ADDR MISC [MCGSTATUS]
 #             write one record into a bank of CPU 0 and raise the machine check
 #   run PLAN  one boot per line of PLAN: wait for the harvest, put the record
@@ -171,6 +172,14 @@ prepare)
 	guest 'reboot' || true
 	;;
 
+kdump)
+	# kdump: a crash kernel in the guest (kdump-utils), with 256 MiB
+	# reserved for it; then a reboot. A panic then boots the crash kernel,
+	# which saves vmcore-dmesg.txt below /var/crash and restarts the guest.
+	guest 'dnf -y -q install kdump-utils makedumpfile >/dev/null && grubby --update-kernel=ALL --args=crashkernel=256M && systemctl enable kdump.service'
+	guest 'systemctl reboot' || true
+	;;
+
 inject)
 	# inject ID BANK STATUS ADDR MISC [MCGSTATUS]: CPU 0, one bank.
 	id=${2:?id}
@@ -234,7 +243,7 @@ capture)
 	dest=$X86/cap/$name
 	rm -rf "$dest"
 	mkdir -p "$dest"
-	guest 'cd / && tar -cf - --ignore-failed-read var/lib/my var/lib/systemd/pstore var/crash 2>/dev/null' | tar -xf - -C "$dest" || true
+	guest 'cd / && tar -cf - --ignore-failed-read --exclude=vmcore var/lib/my var/lib/systemd/pstore var/crash 2>/dev/null' | tar -xf - -C "$dest" || true
 	# Files of /proc report the size 0, so tar would copy them empty.
 	mkdir -p "$dest/proc/sys/kernel/random" "$dest/etc"
 	for f in cmdline version stat uptime cpuinfo sys/kernel/hostname sys/kernel/osrelease sys/kernel/arch sys/kernel/random/boot_id; do

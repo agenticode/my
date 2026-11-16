@@ -46,8 +46,23 @@ The plan format and the comparison are in `internal/injection`. `my verify --exp
 | `6.19.10-ghes` | 26 firmware error records on one DIMM: a row with 15 corrected errors, 2 in the row next to it, 6 at one cell within a second, 1 with the threshold flag, 2 uncorrected | 21 firmware blocks, 26 EDAC lines, 2 `Memory failure` lines | 26 rows in `mc_event`, none in `memory_failure_event` | CE 24, UE 2 on `DIMM 0`, grade A, a multi-row fault, "replace now" |
 | `6.19.10-ghes-clock-step` | 11 firmware error records in the next boot of that guest, after its clock was set back by 10 seconds while rasdaemon ran | 8 firmware blocks, 11 EDAC lines, 1 `Memory failure` line, dated by the kernel's clock | 11 rows in `mc_event`, 10 to 11 seconds ahead of the journal; no record that holds the kernel's time | CE 10, UE 1 on `DIMM 0`; the 11 rasdaemon records moved to the kernel's time |
 | `6.19.10-ghes-multi` | 36 firmware error records on four of six DIMMs, over three boots a day apart: 10 in one row and 1 uncorrected found by the scrubber, 10 in one column, 12 scattered over one bank, 3 at one cell | the third boot: 14 firmware blocks, 14 EDAC lines, 1 `Memory failure` line; `journal-all.json` holds the three boots | 36 rows in `mc_event` from the three boots | CE 35, UE 1, grade A; a row, a column and a bank fault, "consider replacement", and a single-bit fault, "observe"; two DIMMs ok |
+| `6.19.10-mce-loop` | a fatal machine check at `0x12345040` in each of three boots of a guest with a disk of its own | per panic a pstore dump (ERST) with the record and `Kernel panic - not syncing: Fatal machine check`; the next boot prints the record left in bank 7 | nothing about the errors | 3 boots that stopped, UE 3 tied to no DIMM, one place in 3 of 4 boots |
+| `6.19.10-mce-loop-scatter` | the same at three addresses and channels, one per boot | the same | nothing about the errors | 3 boots that stopped, UE 3 at three places |
 
 The x86 hosts have no EDAC memory controller: their EDAC tree is empty. The errors of the machine check captures are therefore of observation grade B (an address and a channel) and belong to no DIMM. The aarch64 guests have the memory controller `ghes_edac` registers, with one DIMM, or six in `6.19.10-ghes-multi`, and their counters. QEMU gives every DIMM it describes the same serial number; `tools/lab/smbios17.py` gives each its own.
+
+## Crash loops
+
+A fatal machine check panics the kernel, and 30 seconds later the kernel restarts the host. The loops of `tools/lab/loop.sh` do that boot after boot in an x86 guest with a disk of its own (`lab-x86`: Fedora 44 cloud image, 4 GiB as one DIMM, 4 CPUs, `mce=print_all`, `systemd-pstore`, `rasdaemon` and `my harvest install` enabled). The guest has an ACPI error record store with a file behind it (`-device acpi-erst`), so the kernel registers `erst` as its pstore backend. Without `-no-reboot` the guest restarts inside the same QEMU process. A plan file says per boot which record goes into which bank (`tools/lab/loop-same.plan`, `loop-scatter.plan`); `loop.sh run` waits for the harvest of each boot, puts the record into the banks with the monitor command `mce -b` and waits for the next boot.
+
+| What the lab showed | Where |
+| --- | --- |
+| QEMU keeps the contents of the banks over the reset of a guest: `mce_banks` lies after `end_reset_fields` in `CPUX86State`, which `x86_cpu_reset_hold()` leaves alone. The next boot polls the banks and prints the record as `CPU 0: Machine Check: 0 Bank 7: be00000000010090`, without ` Exception`, with `TSC 0` and the time of the poll as `TIME` | `dmesg`, `journal-all.json`, `console.log` of both loops |
+| `mce` without `-b` gave a panic on `Timeout: Not all CPUs entered broadcast exception handler` and printed no record at the panic. With `-b` the panic is `Fatal machine check` with the record before it; the broadcast also writes `a000000000000000` into bank 1 of the other CPUs, a record of no memory | the first crash of the lab; `console.log` |
+| Each panic left three ERST parts (`dmesg-erst-<id>`, `Panic#1 Part1` to `Part3`, consecutive ids) and the record `mce_panic()` wrote into ERST as `mce-erst-<id>`. systemd 259 put the files at the top of `/var/lib/systemd/pstore` with their times and wrote no `dmesg.txt` | `var/lib/systemd/pstore` |
+| The harvest of a boot ran 8.3 s, its phase A ended 4.5 s after the unit started, at 11.1 MiB peak | the journal of the guest, during the first loop |
+
+The guest names no DIMM for a machine check: the errors of the loops are the host's. In `6.19.10-mce-loop` the host finding says that one address had uncorrected errors in 3 of the last 4 boots; in `6.19.10-mce-loop-scatter` it says nothing of the kind. R-LOOP-01, R-LOOP-02 and R-LOOP-03 need records that name a DIMM.
 
 ## What the captures changed
 
@@ -64,6 +79,8 @@ Each of these was wrong or missing before the capture showed it.
 - A CXL device reports an error as a DRAM event record or as a general media event record. Records of the two tables that followed each other within 5 seconds were taken for one error: "CE 8" for 11.
 - An anonymized bundle kept `root=UUID=...` of the kernel command line.
 - A copy of a host's files was dated by the newest of its files. A copy that lost the times of its files, as every checkout of `testdata/real` does, is now dated by its own boot time and uptime.
+- A pstore dump holds the end of the kernel log, without the boot banner, so the kernel log reader made no boot of it. It now gets one, placed by the time in a machine check record, by the RTC line, or by the time of the dump less the stamp of its last line.
+- The record `mce_panic()` writes into ERST shows up in pstore as `mce-erst-<id>` and is archived by systemd-pstore. `my preflight` said that only a reader of `/dev/mcelog` takes it out.
 - A host whose errors cannot be tied to a DIMM had no finding for them: findings were made per DIMM. On `7.3.0-mce` the tool said "ok", with exit code 0, next to "CE 7, UE 3", and did not mention the 5 pages. The host finding now speaks about such records (rules R-HOST-01 and R-HOST-02): the capture reads `host finding: hold replacement`, the exit code is 4, and `my why` shows the 3 uncorrected errors, the 7 corrected errors and the 5 pages with the records behind them. The captures of pages taken offline alone (`7.3.0-hwpoison`, `7.3.0-soft-offline`) read "observe". The files under `my/` of these captures are what the tool printed when they were made: "ok" and exit code 0.
 
 ## What the kernel and rasdaemon do that the hand-written fixtures did not show
@@ -86,7 +103,8 @@ Each of these was wrong or missing before the capture showed it.
 ## What the lab cannot exercise
 
 - An EDAC driver of a real memory controller (`skx_edac`, `i10nm_edac`, `amd64_edac`): no hardware and no emulation of it. The labels, rows and columns these drivers decode are covered by hand-written fixtures only. Row, column and DIMM come from firmware error records in the lab, through `ghes_edac`.
-- Machine check banks of real hardware: corrected error interrupts, a record that stays in its bank across a reset and is logged by the next boot, the decoding of AMD processors (their memory banks lie above the ten banks QEMU emulates).
+- Machine check banks of real hardware: corrected error interrupts, whether a board keeps a record in its bank across the reset after a fatal error (QEMU does), the decoding of AMD processors (their memory banks lie above the ten banks QEMU emulates).
+- The boot error region of real firmware, and an ERST or EFI variable store of real firmware under repeated panics; the entries a BMC makes about a crash.
 - ACPI error injection (EINJ), and firmware-first handling on x86: QEMU builds a firmware error source for aarch64 guests only.
 - A BMC, a GPU, repairs by firmware. The CXL device is emulated: its records are real to the kernel, its memory cells are not.
 - Time: every capture spans minutes. Trends over days, the 30 day baseline and a database that grew for months are not in them.
@@ -115,6 +133,9 @@ $LAB/tools/ghes.sh image         # once, from a Fedora cloud image for aarch64 u
 $LAB/tools/ghes.sh boot && $LAB/tools/ghes.sh prepare && $LAB/tools/ghes.sh run
 $LAB/tools/ghes.sh clock-step    # in a boot of its own
 $LAB/tools/ghes.sh multi         # another guest: six DIMMs, three boots a day apart
+LOOP=$LAB/loop $LAB/tools/loop.sh image && $LAB/tools/loop.sh boot && $LAB/tools/loop.sh prepare
+$LAB/tools/loop.sh run $LAB/tools/loop-same.plan && $LAB/tools/loop.sh capture same
+$LAB/tools/loop.sh clean && $LAB/tools/loop.sh run $LAB/tools/loop-scatter.plan && $LAB/tools/loop.sh capture scatter
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 
