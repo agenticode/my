@@ -44,7 +44,7 @@ func TestAnalyzeDemo(t *testing.T) {
 		t.Fatalf("exit code %d, stderr %q", code, errOut)
 	}
 	wantLines(t, out,
-		"host r12-n034, as of 2026-11-13 00:00 UTC, engine 4",
+		"host r12-n034, as of 2026-11-13 00:00 UTC, engine 6",
 		"host finding: replace now",
 		"CPU0_C1  S/N 3B9C56  CE 1,231  UE 1  row",
 		"  finding   replace now (finding, confidence high, 91)  R-UE-01 R-ROW-03 R-REP-02",
@@ -70,7 +70,7 @@ func TestAnalyzeDemo(t *testing.T) {
 		t.Fatalf("ko: exit code %d", code)
 	}
 	wantLines(t, out,
-		"호스트 r12-n034, 기준 시각 2026-11-13 00:00 UTC, 엔진 4",
+		"호스트 r12-n034, 기준 시각 2026-11-13 00:00 UTC, 엔진 6",
 		"호스트 소견: 즉시 교체",
 		"  판정  즉시 교체 (소견, 신뢰도 높음, 91)  R-UE-01 R-ROW-03 R-REP-02",
 		"  근거  [R-UE-01] UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
@@ -167,7 +167,7 @@ func TestAnalyzeJSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(out), &res); err != nil {
 		t.Fatalf("output is not JSON: %v\n%.400s", err, out)
 	}
-	if res.EngineVersion != "4" || res.Config["trend.recent_days"] != 7 || len(res.Hosts) != 1 || res.Hosts[0].Grade != "replace-now" || len(res.Hosts[0].DIMMs) != 16 {
+	if res.EngineVersion != "6" || res.Config["trend.recent_days"] != 7 || len(res.Hosts) != 1 || res.Hosts[0].Grade != "replace-now" || len(res.Hosts[0].DIMMs) != 16 {
 		t.Fatalf("result = %+v", res)
 	}
 	d := res.Hosts[0].DIMMs[0]

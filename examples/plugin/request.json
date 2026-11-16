@@ -3,7 +3,7 @@
   "Core": {
     "Name": "MemorY",
     "Version": "dev",
-    "EngineVersion": "4"
+    "EngineVersion": "6"
   },
   "RequestDT": "2026-11-13T09:30:00.000Z",
   "PreviousLogs": 2,

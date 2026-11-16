@@ -319,6 +319,8 @@ func candidate(raw string) bool {
 		strings.Contains(raw, "ommand line: ") ||
 		strings.Contains(raw, "setting system clock to ") ||
 		strings.Contains(raw, "NVRM: ") ||
+		strings.Contains(raw, "not syncing: ") ||
+		strings.Contains(raw, "GHES: Fatal hardware error") ||
 		// A journal message that is not valid UTF-8 is exported as an
 		// array of byte values and has to be decoded to be looked at.
 		strings.Contains(raw, `"MESSAGE":[`) || strings.Contains(raw, `"MESSAGE" : [`)

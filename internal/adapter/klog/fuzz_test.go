@@ -35,6 +35,11 @@ func FuzzCollect(f *testing.F) {
 	f.Add("9,9,99999999999999999999,-;EDAC MC0: 1 UE on a (b page:0xffffffffffffffff offset:0xfff grain:9)\n", false)
 	f.Add("[9999999999.000000] EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)\n", true)
 	f.Add(`{"MESSAGE":"EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)","_TRANSPORT":"kernel","__REALTIME_TIMESTAMP":"9223372036854775807"}`+"\n", false)
+	// The end of a boot (stop.go): a fatal machine check, a fatal firmware
+	// error, a fake panic, another panic.
+	f.Add(mceBlockText(58.25, 0xbe00000000010090, 0x12345040, 1794739502)+"[ 58.260571] mce: [Hardware Error]: Machine check: Processor context corrupt\n[ 58.261381] Kernel panic - not syncing: Fatal machine check\n", false)
+	f.Add(fatalGHES(1, 100.5, 0x100010140)+"[ 100.51] GHES: Fatal hardware error but panic disabled\n[ 100.52][  C0] Kernel panic - not syncing: GHES: Fatal hardware error\n", true)
+	f.Add("mce: [Hardware Error]: Machine check: x\nmce: [Hardware Error]: Fake kernel panic: y\n---[ end Kernel panic - not syncing: z ]---\n", false)
 	f.Add("[99999999999.000000] NVRM: Xid (PCI:0000:3b:00): 9999, pid=1, name=x, text\n[1.000000] NVRM: GPU Board Serial Number: 1\n", true)
 	f.Fuzz(func(t *testing.T, text string, anchored bool) {
 		opts := Options{}

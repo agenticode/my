@@ -66,6 +66,11 @@ const (
 	// ErrorTypeFatalBlock marks a fatal block of the firmware's boot
 	// error region that holds no memory error.
 	ErrorTypeFatalBlock = "fatal firmware error"
+	// ErrorTypeStop marks the record of the kernel's own lines that a
+	// hardware error stops the host: the panic of a fatal machine check or
+	// of a fatal firmware error. Its CauseFingerprint names the error
+	// record printed just before, when there is one.
+	ErrorTypeStop = "hardware stop"
 )
 
 // DerivedBootID returns the boot ID used when no kernel boot ID is known.

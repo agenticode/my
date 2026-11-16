@@ -35,6 +35,9 @@ type Input struct {
 	// Places lists the names error records use for the place of an error,
 	// next to the slot the records were tied to.
 	Places []store.EventPlace
+	// Stops are the boots a hardware error stopped, with the error record
+	// that stopped each (store.Stops).
+	Stops []store.Stop
 
 	events []event
 
@@ -283,6 +286,9 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	if in.Boots, err = s.Boots(ctx, ""); err != nil {
 		return fail("boots", err)
+	}
+	if in.Stops, err = s.Stops(ctx, ""); err != nil {
+		return fail("stops", err)
 	}
 	if in.Actions, err = s.Actions(ctx, store.ActionFilter{}); err != nil {
 		return fail("actions", err)

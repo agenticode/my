@@ -92,6 +92,9 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 		} else {
 			add(RuleHostUE, statement("host.ue", "n", n, "when", when), refs, total)
 		}
+		if st, refs, total, ok := j.stopped(ue); ok {
+			add(RuleHostUE, st, refs, total)
+		}
 	}
 	if len(ce) > 0 {
 		var n int64
