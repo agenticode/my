@@ -1,5 +1,5 @@
 #!/bin/bash
-# capture.sh NAME [--formats]
+# capture.sh NAME [--formats] [--all-boots]
 #
 # Collects from the running host what a memory error investigation asks for:
 # the kernel log, the rasdaemon database, the EDAC counters, the memory
@@ -16,12 +16,26 @@
 #
 # --formats adds the kernel log in every form dmesg, /dev/kmsg and journalctl
 # print it, under formats/.
+#
+# --all-boots adds journal-all.json, the kernel messages of every boot the
+# journal holds (journalctl -k reads the running boot only).
 set -u
 LAB=${LAB:-/root/my-lab}
 MY=${MY:-$LAB/bin/my}
-NAME=${1:?usage: capture.sh NAME [--formats]}
+NAME=${1:?usage: capture.sh NAME [--formats] [--all-boots]}
+shift
 FORMATS=0
-[ "${2:-}" = "--formats" ] && FORMATS=1
+ALLBOOTS=0
+for opt in "$@"; do
+	case "$opt" in
+	--formats) FORMATS=1 ;;
+	--all-boots) ALLBOOTS=1 ;;
+	*)
+		echo "capture.sh: unknown option $opt" >&2
+		exit 2
+		;;
+	esac
+done
 
 OUT=$LAB/cap/$NAME
 rm -rf "$OUT"
@@ -64,6 +78,9 @@ if have journalctl && journalctl -k -n 1 >/dev/null 2>&1; then
 	save journal-k.json journalctl --no-pager -k -o json
 	# A host without a journal answers with nothing.
 	[ -s journal-k.json ] || rm -f journal-k.json
+	if [ "$ALLBOOTS" = 1 ] && [ -s journal-k.json ]; then
+		save journal-all.json journalctl --no-pager -o json _TRANSPORT=kernel
+	fi
 fi
 if [ "$FORMATS" = 1 ]; then
 	save formats/dmesg-T.txt dmesg -T
