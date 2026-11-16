@@ -168,6 +168,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | --- | --- | --- |
 | rasdaemon | `/var/lib/rasdaemon/ras-mc_event.db`; with `--fleet`, its store on MySQL, MariaDB or PostgreSQL | error records with the place the EDAC driver decoded, machine checks, page offlines, CXL events |
 | Kernel log | the journal and `/dev/kmsg` on a host; `dmesg` output, syslog files and `journalctl -o json` as files | EDAC lines, firmware error records, machine checks, page offlines, boots, Xid lines of the NVIDIA driver |
+| Crash logs | `/sys/fs/pstore`, `/var/lib/systemd/pstore`, `/var/crash` | the kernel log of a boot that ended in a panic: the records it printed before the reset |
 | EDAC counters | `/sys/devices/system/edac/mc` | counts per DIMM since boot |
 | mcelog daemon | `mcelog --client` | counts per DIMM |
 | SMBIOS | `/sys/firmware/dmi/tables`, or `dmidecode` output | slots, DIMM serial and part numbers |
