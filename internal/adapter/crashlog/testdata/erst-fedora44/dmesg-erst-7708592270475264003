@@ -1,0 +1,172 @@
+Panic#1 Part3
+<6>[    5.018519] ata5: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7300 irq 31 lpm-pol 1
+<6>[    5.019454] ata6: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7380 irq 31 lpm-pol 1
+<6>[    5.028213] CAN device driver interface
+<6>[    5.037315] usbcore: registered new interface driver usbserial_generic
+<6>[    5.039068] usbserial: USB Serial support registered for generic
+<6>[    5.042582] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+<6>[    5.075989] serio: i8042 KBD port at 0x60,0x64 irq 1
+<6>[    5.076723] serio: i8042 AUX port at 0x60,0x64 irq 12
+<6>[    5.082097] mousedev: PS/2 mouse device common for all mice
+<6>[    5.086162] rtc_cmos 00:04: RTC can wake from S4
+<6>[    5.098467] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+<6>[    5.100013] rtc_cmos 00:04: registered as rtc0
+<6>[    5.118249] rtc_cmos 00:04: setting system clock to 2026-11-16T02:29:27 UTC (1794796167)
+<6>[    5.124480] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram
+<6>[    5.127759] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+<6>[    5.130086] device-mapper: uevent: version 1.0.3
+<6>[    5.133441] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+<6>[    5.146239] intel_pstate: CPU model not supported
+<6>[    5.156441] hid: raw HID events driver (C) Jiri Kosina
+<6>[    5.159820] usbcore: registered new interface driver usbhid
+<6>[    5.160454] usbhid: USB HID core driver
+<6>[    5.164276] drop_monitor: Initializing network drop monitor service
+<6>[    5.169378] Initializing XFRM netlink socket
+<6>[    5.171408] NET: Registered PF_INET6 protocol family
+<6>[    5.210925] Segment Routing with IPv6
+<6>[    5.211258] RPL Segment Routing with IPv6
+<6>[    5.212799] In-situ OAM (IOAM) with IPv6
+<6>[    5.214385] mip6: Mobile IPv6
+<6>[    5.216028] NET: Registered PF_PACKET protocol family
+<6>[    5.216347] can: controller area network core
+<6>[    5.218208] NET: Registered PF_CAN protocol family
+<6>[    5.232150] resctrl: No MBM correction factor available
+<6>[    5.233313] IPI shorthand broadcast: enabled
+<6>[    5.294223] sched_clock: Marking stable (5197311098, 96503074)->(5535594788, -241780616)
+<6>[    5.309044] registered taskstats version 1
+<5>[    5.325562] Loading compiled-in X.509 certificates
+<6>[    5.360886] ata2: SATA link down (SStatus 0 SControl 300)
+<6>[    5.365825] ata6: SATA link down (SStatus 0 SControl 300)
+<6>[    5.367487] ata5: SATA link down (SStatus 0 SControl 300)
+<6>[    5.369618] ata1: SATA link down (SStatus 0 SControl 300)
+<6>[    5.372377] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+<5>[    5.378906] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    5.379046] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+<6>[    5.381762] ata3.00: applying bridge limits
+<6>[    5.385065] ata4: SATA link down (SStatus 0 SControl 300)
+<6>[    5.387062] ata3.00: configured for UDMA/100
+<5>[    5.404010] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+<6>[    5.435430] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+<6>[    5.437116] cdrom: Uniform CD-ROM driver Revision: 3.20
+<7>[    5.485007] sr 2:0:0:0: Attached scsi CD-ROM sr0
+<5>[    5.489052] sr 2:0:0:0: Attached scsi generic sg0 type 5
+<6>[    5.835973] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input3
+<6>[    7.735780] Freeing initrd memory: 48172K
+<5>[    8.285628] Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+<6>[    8.390398] Demotion targets for Node 0: null
+<6>[    8.391163] page_owner is disabled
+<5>[    8.395031] Key type .fscrypt registered
+<5>[    8.395305] Key type fscrypt-provisioning registered
+<6>[    8.406015] Btrfs loaded, zoned=yes, fsverity=yes
+<5>[    8.408304] Key type big_key registered
+<5>[    8.419960] Key type encrypted registered
+<6>[    8.421315] ima: No TPM chip found, activating TPM-bypass!
+<5>[    8.422114] Loading compiled-in module X.509 certificates
+<5>[    8.426190] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    8.436940] ima: Allocated hash algorithm: sha256
+<6>[    8.463384] ima: No architecture policies found
+<6>[    8.465856] evm: Initialising EVM extended attributes:
+<6>[    8.466464] evm: security.selinux
+<6>[    8.467096] evm: security.SMACK64 (disabled)
+<6>[    8.467412] evm: security.SMACK64EXEC (disabled)
+<6>[    8.467623] evm: security.SMACK64TRANSMUTE (disabled)
+<6>[    8.469422] evm: security.SMACK64MMAP (disabled)
+<6>[    8.469964] evm: security.apparmor (disabled)
+<6>[    8.470176] evm: security.ima
+<6>[    8.470326] evm: security.capability
+<6>[    8.470521] evm: HMAC attrs: 0x1
+<6>[    8.531087] alg: No test for 842 (842-scomp)
+<6>[    8.676082] PM:   Magic number: 2:369:460
+<6>[    8.694615] RAS: Correctable Errors collector initialized.
+<6>[    8.760417] clk: Disabling unused clocks
+<6>[    8.761336] PM: genpd: Disabling unused power domains
+<6>[    8.907156] Freeing unused decrypted memory: 2028K
+<6>[    9.128505] Freeing unused kernel image (initmem) memory: 5204K
+<6>[    9.130434] Write protecting the kernel read-only data: 43008k
+<6>[    9.137097] Freeing unused kernel image (text/rodata gap) memory: 816K
+<6>[    9.140483] Freeing unused kernel image (rodata/data gap) memory: 588K
+<6>[    9.591080] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[    9.593210] x86/mm: Checking user space page tables
+<6>[    9.995336] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[    9.996378] Run /init as init process
+<7>[    9.996994]   with arguments:
+<7>[    9.997058]     /init
+<7>[    9.997101]   with environment:
+<7>[    9.997135]     HOME=/
+<7>[    9.997168]     TERM=linux
+<6>[   11.034255] fuse: init (API version 7.45)
+<30>[   11.325909] systemd[1]: Successfully made /usr/ read-only.
+<30>[   11.689238] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   11.691296] systemd[1]: Detected virtualization qemu.
+<30>[   11.692528] systemd[1]: Detected architecture x86-64.
+<30>[   11.693167] systemd[1]: Running in initrd.
+<30>[   11.725184] systemd[1]: Initializing machine ID from random generator.
+<30>[   11.732126] systemd[1]: No hostname configured, using default hostname.
+<30>[   11.737551] systemd[1]: Hostname set to <localhost>.
+<30>[   13.658976] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<28>[   16.486281] systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+<30>[   17.311326] systemd[1]: Queued start job for default target initrd.target.
+<30>[   19.482293] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[   19.494254] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000001.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000001...
+<30>[   19.500016] systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+<30>[   19.503633] systemd[1]: Reached target paths.target - Path Units.
+<30>[   19.507366] systemd[1]: Reached target slices.target - Slice Units.
+<30>[   19.511183] systemd[1]: Reached target swap.target - Swaps.
+<30>[   19.515045] systemd[1]: Reached target timers.target - Timer Units.
+<30>[   19.530555] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+<30>[   19.538674] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+<30>[   19.547315] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[   19.553090] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+<30>[   19.556497] systemd[1]: Reached target sockets.target - Socket Units.
+<30>[   19.751371] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[   19.759308] systemd[1]: memstrack.service - Memstrack Anylazing Service skipped, no trigger condition checks were met.
+<30>[   19.779188] systemd[1]: systemd-battery-check.service - Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+<30>[   19.913229] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[   20.023464] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[   20.029448] systemd[1]: systemd-pcrphase-initrd.service - TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   20.032423] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[   20.132911] systemd[1]: Starting systemd-vconsole-setup.service - Virtual Console Setup...
+<46>[   20.281376] systemd-journald[256]: Collecting audit messages is disabled.
+<30>[   20.413225] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<30>[   20.502508] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<30>[   20.620225] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[   20.719403] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[   21.064549] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<30>[   21.254738] systemd[1]: Finished systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully.
+<30>[   21.379747] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+<30>[   21.738504] systemd[1]: Started systemd-journald.service - Journal Service.
+<6>[   49.452309] BTRFS: device label fedora devid 1 transid 55 /dev/vda3 (253:3) scanned by mount (492)
+<6>[   49.463435] BTRFS info (device vda3): first mount of filesystem 00000000-0000-4000-8000-000000000001
+<6>[   49.465424] BTRFS info (device vda3): using crc32c (crc32c-lib) checksum algorithm
+<6>[   49.630263] BTRFS info (device vda3): turning on async discard
+<6>[   49.630642] BTRFS info (device vda3): enabling free space tree
+<46>[   62.321294] systemd-journald[256]: Received SIGTERM from PID 1 (systemd).
+<5>[   64.573458] audit: type=1404 audit(1794796226.972:2): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295 enabled=1 old-enabled=1 lsm=selinux res=1
+<6>[   65.453397] SELinux:  Permission firmware_load in class system not defined in policy.
+<6>[   65.454214] SELinux:  Permission kexec_image_load in class system not defined in policy.
+<6>[   65.454567] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+<6>[   65.455147] SELinux:  Permission policy_load in class system not defined in policy.
+<6>[   65.455460] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+<6>[   65.456951] SELinux:  Permission allowed in class io_uring not defined in policy.
+<6>[   65.457411] SELinux:  Class memfd_file not defined in policy.
+<6>[   65.457877] SELinux: the above unknown classes and permissions will be allowed
+<6>[   65.515247] SELinux:  policy capability network_peer_controls=1
+<6>[   65.515608] SELinux:  policy capability open_perms=1
+<6>[   65.516264] SELinux:  policy capability extended_socket_class=1
+<6>[   65.516697] SELinux:  policy capability always_check_network=0
+<6>[   65.517593] SELinux:  policy capability cgroup_seclabel=1
+<6>[   65.517867] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[   65.518375] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[   65.518627] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[   65.519034] SELinux:  policy capability userspace_initial_context=0
+<6>[   65.519286] SELinux:  policy capability netlink_xperm=0
+<6>[   65.519499] SELinux:  policy capability netif_wildcard=0
+<6>[   65.519714] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[   65.520581] SELinux:  policy capability functionfs_seclabel=0
+<6>[   65.520942] SELinux:  policy capability memfd_class=0
+<5>[   66.173251] audit: type=1403 audit(1794796228.570:3): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[   66.235484] systemd[1]: Successfully loaded SELinux policy in 1.675432s.
+<6>[   67.243945] NET: Registered PF_VSOCK protocol family
+<30>[   68.021186] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 588.019ms.
+<30>[   68.453118] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   68.455572] systemd[1]: Detected virtualization qemu.

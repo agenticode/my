@@ -689,6 +689,19 @@ func (a *Adapter) read(ctx context.Context, d *dump, sink adapter.Sink, tally *a
 		return r, false
 	}
 	if d.kind == KindKdump || d.reason == "Panic" {
+		if bs.last == nil {
+			// The kernel log reader makes a boot of a text with a record or
+			// a boot banner. A dump of a panic is the end of a boot all the
+			// same: it is placed from what the text says, else from the
+			// time of the dump.
+			if b := placeBoot(d, text); b != nil {
+				if err := sink.Boot(b); err != nil {
+					r.Status, r.Detail, r.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
+					return r, false
+				}
+				bs.last = b
+			}
+		}
 		if err := a.panicRecord(d, text, bs.last, sink); err != nil {
 			r.Status, r.Detail, r.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
 			return r, false
@@ -786,6 +799,56 @@ func head(path string, limit int64) ([]byte, error) {
 		return nil, &adapter.TooLargeError{Name: path, Limit: limit}
 	}
 	return b, nil
+}
+
+// stampRE is the stamp of a line of kernel text: "<6>[   12.345678] " with
+// or without the priority.
+var stampRE = regexp.MustCompile(`(?m)^(?:<\d{1,3}>)?\[\s*(\d{1,10})\.(\d{6})\] `)
+
+// rtcStampRE and mceStampRE take the values out of the lines that anchor a
+// boot in time, with the stamp of their line.
+var (
+	rtcStampRE = regexp.MustCompile(`(?m)^(?:<\d{1,3}>)?\[\s*(\d{1,10})\.(\d{6})\] .*setting system clock to \S+(?: \S+)? UTC \((\d{9,11})\)`)
+	mceStampRE = regexp.MustCompile(`(?m)^(?:<\d{1,3}>)?\[\s*(\d{1,10})\.(\d{6})\] .*PROCESSOR \d+:[0-9a-fA-F]+ TIME ([1-9]\d{0,10}) SOCKET \d+`)
+)
+
+func mono(sec, usec string) time.Duration {
+	s, _ := strconv.ParseInt(sec, 10, 64)
+	u, _ := strconv.ParseInt(usec, 10, 64)
+	return time.Duration(s)*time.Second + time.Duration(u)*time.Microsecond
+}
+
+// placeBoot returns the boot a dump ends, placed in time the way the
+// kernel log reader would place it: by a machine check record's own time,
+// by the RTC line, else by the time of the dump less the stamp of its last
+// line. It returns nil for a text without stamps, or one nothing places.
+func placeBoot(d *dump, text []byte) *model.Boot {
+	stamps := stampRE.FindAllSubmatch(text, -1)
+	if len(stamps) == 0 {
+		return nil
+	}
+	last := stamps[len(stamps)-1]
+	lastMono := mono(string(last[1]), string(last[2]))
+	var start time.Time
+	quality := model.TimeEstimated
+	switch {
+	case mceStampRE.Match(text):
+		m := mceStampRE.FindSubmatch(text)
+		unix, _ := strconv.ParseInt(string(m[3]), 10, 64)
+		start, quality = time.Unix(unix, 0).UTC().Add(-mono(string(m[1]), string(m[2]))), model.TimeExact
+	case rtcStampRE.Match(text):
+		m := rtcStampRE.FindSubmatch(text)
+		unix, _ := strconv.ParseInt(string(m[3]), 10, 64)
+		start = time.Unix(unix, 0).UTC().Add(-mono(string(m[1]), string(m[2])))
+	case !d.time.IsZero():
+		start = d.time.Add(-lastMono)
+	default:
+		return nil
+	}
+	if y := start.Year(); y < 1970 || y > 9999 {
+		return nil
+	}
+	return &model.Boot{Derived: true, StartedAt: start, StartQuality: quality, LastSeen: start.Add(lastMono), Source: d.kind, RawRef: d.origin}
 }
 
 // The lines the kernel log reader takes the start of a boot from: the

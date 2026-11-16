@@ -1,0 +1,155 @@
+Panic#1 Part1
+<5>[   98.321315] audit: type=1130 audit(1794796260.719:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  105.666075] bochs-drm 0000:00:01.0: vgaarb: deactivate vga console
+<6>[  105.678160] Console: switching to colour dummy device 80x25
+<6>[  105.692150] [drm] Found bochs VGA, ID 0xb0c5.
+<6>[  105.692731] [drm] Framebuffer size 16384 kB @ 0xfd000000, mmio @ 0xfebd2000.
+<6>[  105.742474] bochs-drm 0000:00:01.0: [drm] Registered 1 planes with drm panic
+<6>[  105.756010] [drm] Initialized bochs-drm 1.0.0 for 0000:00:01.0 on minor 0
+<6>[  106.488325] fbcon: bochs-drmdrmfb (fb0) is primary device
+<6>[  106.858314] Console: switching to colour frame buffer device 160x50
+<6>[  106.947470] bochs-drm 0000:00:01.0: [drm] fb0: bochs-drmdrmfb frame buffer device
+<6>[  107.284158] parport_pc 00:02: reported by Plug and Play ACPI
+<6>[  107.296502] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+<6>[  107.472154] i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+<6>[  107.482338] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+<6>[  108.478039] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+<46>[  108.590113] systemd-journald[757]: Received client request to flush runtime journal.
+<5>[  109.537886] audit: type=1130 audit(1794796271.933:27): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-random-seed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  110.572265] audit: type=1130 audit(1794796272.969:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdb-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  111.035230] audit: type=1130 audit(1794796273.432:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journal-flush comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  111.304533] audit: type=1130 audit(1794796273.702:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-binfmt comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  112.885019] ppdev: user-space parallel port driver
+<6>[  113.833442] virtio_net virtio0 enp0s3: renamed from eth0
+<5>[  114.258628] audit: type=1130 audit(1794796276.655:31): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-vconsole-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  114.264090] audit: type=1131 audit(1794796276.656:32): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-vconsole-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  117.336542] audit: type=1130 audit(1794796279.735:33): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-vconsole-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  119.019382] audit: type=1130 audit(1794796281.417:34): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  119.651149] audit: type=1305 audit(1794796282.048:35): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+<4>[  122.975879] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  122.984548] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  332.325999] ------------[ cut here ]------------
+<4>[  332.327826] bochs-drm 0000:00:01.0: [drm] vblank wait timed out on crtc 0
+<4>[  332.328484] WARNING: drivers/gpu/drm/drm_vblank.c:1318 at drm_wait_one_vblank+0x193/0x260, CPU#3: kworker/3:0/38
+<4>[  332.331072] Modules linked in: intel_rapl_msr ppdev intel_rapl_common skx_edac_common binfmt_misc nfit libnvdimm rapl vfat fat i2c_i801 parport_pc i2c_smbus virtio_net parport net_failover failover bochs nfnetlink zram lz4hc_compress lz4_compress vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock ghash_clmulni_intel serio_raw qemu_fw_cfg virtiofs fuse
+<4>[  332.335461] CPU: 3 UID: 0 PID: 38 Comm: kworker/3:0 Not tainted 6.19.10-300.fc44.x86_64 #1 PREEMPT(lazy) 
+<4>[  332.336887] Hardware name: QEMU lab-x86, BIOS 1.17.0-10.fc44 06/10/2025
+<4>[  332.337986] Workqueue: events drm_fb_helper_damage_work
+<4>[  332.339109] RIP: 0010:drm_wait_one_vblank+0x19b/0x260
+<4>[  332.339697] Code: 0f 84 cd 00 00 00 48 8b 7b 08 4c 8b 67 50 4d 85 e4 75 03 4c 8b 27 e8 94 3a 03 00 48 8d 3d 5d 5b df 01 89 e9 4c 89 e2 48 89 c6 <67> 48 0f b9 3a e9 da fe ff ff 48 85 db 74 04 48 8b 5b 08 48 8b 6b
+<4>[  332.342124] RSP: 0018:ffffcb64c015bd90 EFLAGS: 00010286
+<4>[  332.343341] RAX: ffffffffc0311090 RBX: ffff89c04242a000 RCX: 0000000000000000
+<4>[  332.343895] RDX: ffff89c0412cf980 RSI: ffffffffc0311090 RDI: ffffffffba8a45a0
+<4>[  332.344409] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+<4>[  332.345228] R10: 0000000000000003 R11: ffff89c0409c0000 R12: ffff89c0412cf980
+<4>[  332.345771] R13: 00000000000041d8 R14: ffff89c040c41c30 R15: ffff89c040bcd4d8
+<4>[  332.346481] FS:  0000000000000000(0000) GS:ffff89c104a66000(0000) knlGS:0000000000000000
+<4>[  332.347112] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  332.347878] CR2: 000056163f0f96e8 CR3: 0000000107bdc000 CR4: 00000000007506f0
+<4>[  332.348867] PKRU: 55555554
+<4>[  332.349210] Call Trace:
+<4>[  332.349908]  <TASK>
+<4>[  332.350250]  ? __pfx_autoremove_wake_function+0x10/0x10
+<4>[  332.351090]  drm_client_modeset_wait_for_vblank+0x5b/0x70
+<4>[  332.352389]  drm_fb_helper_damage_work+0x7e/0x1d0
+<4>[  332.352694]  ? move_linked_works+0x88/0xd0
+<4>[  332.353237]  ? __pfx_drm_fb_helper_damage_work+0x10/0x10
+<4>[  332.353754]  process_one_work+0x190/0x350
+<4>[  332.354463]  worker_thread+0x18d/0x2f0
+<4>[  332.354911]  ? __pfx_worker_thread+0x10/0x10
+<4>[  332.355616]  kthread+0xfa/0x240
+<4>[  332.356115]  ? finish_task_switch.isra.0+0x82/0x2a0
+<4>[  332.356515]  ? __pfx_kthread+0x10/0x10
+<4>[  332.357218]  ? __pfx_kthread+0x10/0x10
+<4>[  332.357787]  ret_from_fork+0x130/0x1a0
+<4>[  332.358363]  ? __pfx_kthread+0x10/0x10
+<4>[  332.358621]  ret_from_fork_asm+0x1a/0x30
+<4>[  332.359694]  </TASK>
+<4>[  332.360017] ---[ end trace 0000000000000000 ]---
+<4>[  332.477353] ------------[ cut here ]------------
+<4>[  332.478155] [CRTC:35:crtc-0] vblank wait timed out
+<4>[  332.483066] WARNING: drivers/gpu/drm/drm_atomic_helper.c:1921 at drm_atomic_helper_wait_for_vblanks.part.0+0x250/0x2b0, CPU#3: kworker/3:0/38
+<4>[  332.487395] Modules linked in: intel_rapl_msr ppdev intel_rapl_common skx_edac_common binfmt_misc nfit libnvdimm rapl vfat fat i2c_i801 parport_pc i2c_smbus virtio_net parport net_failover failover bochs nfnetlink zram lz4hc_compress lz4_compress vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock ghash_clmulni_intel serio_raw qemu_fw_cfg virtiofs fuse
+<4>[  332.498120] CPU: 3 UID: 0 PID: 38 Comm: kworker/3:0 Tainted: G        W           6.19.10-300.fc44.x86_64 #1 PREEMPT(lazy) 
+<4>[  332.501869] Tainted: [W]=WARN
+<4>[  332.505083] Hardware name: QEMU lab-x86, BIOS 1.17.0-10.fc44 06/10/2025
+<4>[  332.508393] Workqueue: events drm_fb_helper_damage_work
+<4>[  332.511645] RIP: 0010:drm_atomic_helper_wait_for_vblanks.part.0+0x257/0x2b0
+<4>[  332.515530] Code: ff ff 84 c0 74 84 48 8d 74 24 10 4c 89 ff e8 f0 68 3c ff 45 85 ed 0f 85 e7 fe ff ff 48 8d 3d a0 13 de 01 48 8b 53 20 8b 73 60 <67> 48 0f b9 3a e9 cf fe ff ff 48 8b 5c 24 40 48 8b 6c 24 48 4c 8b
+<4>[  332.521931] RSP: 0018:ffffcb64c015bc18 EFLAGS: 00010246
+<4>[  332.525246] RAX: ffff89c040c41c38 RBX: ffff89c04242abc0 RCX: ffff89c040c41c38
+<4>[  332.529041] RDX: ffff89c040de77f0 RSI: 0000000000000023 RDI: ffffffffba8a4aa0
+<4>[  332.532708] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+<4>[  332.536230] R10: 0000000000000003 R11: ffff89c0409c0000 R12: 0000000000000000
+<4>[  332.539985] R13: 0000000000000000 R14: ffff89c041693280 R15: ffff89c040c41c30
+<4>[  332.543333] FS:  0000000000000000(0000) GS:ffff89c104a66000(0000) knlGS:0000000000000000
+<4>[  332.546745] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  332.549790] CR2: 000056163f0f96e8 CR3: 0000000107bdc000 CR4: 00000000007506f0
+<4>[  332.552938] PKRU: 55555554
+<4>[  332.555766] Call Trace:
+<4>[  332.559286]  <TASK>
+<4>[  332.562636]  ? __pfx_autoremove_wake_function+0x10/0x10
+<4>[  332.566047]  drm_atomic_helper_commit_tail+0xa8/0xc0
+<4>[  332.569398]  commit_tail+0xee/0x150
+<4>[  332.573182]  drm_atomic_helper_commit+0x158/0x1a0
+<4>[  332.576913]  drm_atomic_commit+0xb1/0xe0
+<4>[  332.580029]  ? __pfx___drm_printfn_info+0x10/0x10
+<4>[  332.583371]  drm_atomic_helper_dirtyfb+0x221/0x320
+<4>[  332.586617]  drm_fbdev_shmem_helper_fb_dirty+0x4d/0xb0
+<4>[  332.590730]  drm_fb_helper_damage_work+0xe9/0x1d0
+<4>[  332.594562]  ? move_linked_works+0x88/0xd0
+<4>[  332.597711]  ? __pfx_drm_fb_helper_damage_work+0x10/0x10
+<4>[  332.601009]  process_one_work+0x190/0x350
+<4>[  332.604289]  worker_thread+0x18d/0x2f0
+<4>[  332.607452]  ? __pfx_worker_thread+0x10/0x10
+<4>[  332.610744]  kthread+0xfa/0x240
+<4>[  332.614219]  ? finish_task_switch.isra.0+0x82/0x2a0
+<4>[  332.617156]  ? __pfx_kthread+0x10/0x10
+<4>[  332.620409]  ? __pfx_kthread+0x10/0x10
+<4>[  332.623448]  ret_from_fork+0x130/0x1a0
+<4>[  332.627151]  ? __pfx_kthread+0x10/0x10
+<4>[  332.630531]  ret_from_fork_asm+0x1a/0x30
+<4>[  332.634150]  </TASK>
+<4>[  332.637738] ---[ end trace 0000000000000000 ]---
+<4>[  333.669443] ------------[ cut here ]------------
+<4>[  333.673296] bochs-drm 0000:00:01.0: [drm] vblank wait timed out on crtc 0
+<4>[  333.677242] WARNING: drivers/gpu/drm/drm_vblank.c:1318 at drm_wait_one_vblank+0x193/0x260, CPU#3: kworker/3:0/38
+<4>[  333.681921] Modules linked in: intel_rapl_msr ppdev intel_rapl_common skx_edac_common binfmt_misc nfit libnvdimm rapl vfat fat i2c_i801 parport_pc i2c_smbus virtio_net parport net_failover failover bochs nfnetlink zram lz4hc_compress lz4_compress vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock ghash_clmulni_intel serio_raw qemu_fw_cfg virtiofs fuse
+<4>[  333.692496] CPU: 3 UID: 0 PID: 38 Comm: kworker/3:0 Tainted: G        W           6.19.10-300.fc44.x86_64 #1 PREEMPT(lazy) 
+<4>[  333.696414] Tainted: [W]=WARN
+<4>[  333.699198] Hardware name: QEMU lab-x86, BIOS 1.17.0-10.fc44 06/10/2025
+<4>[  333.702309] Workqueue: events drm_fb_helper_damage_work
+<4>[  333.705265] RIP: 0010:drm_wait_one_vblank+0x19b/0x260
+<4>[  333.708911] Code: 0f 84 cd 00 00 00 48 8b 7b 08 4c 8b 67 50 4d 85 e4 75 03 4c 8b 27 e8 94 3a 03 00 48 8d 3d 5d 5b df 01 89 e9 4c 89 e2 48 89 c6 <67> 48 0f b9 3a e9 da fe ff ff 48 85 db 74 04 48 8b 5b 08 48 8b 6b
+<4>[  333.715120] RSP: 0018:ffffcb64c015bd90 EFLAGS: 00010286
+<4>[  333.718034] RAX: ffffffffc0311090 RBX: ffff89c04242a000 RCX: 0000000000000000
+<4>[  333.721271] RDX: ffff89c0412cf980 RSI: ffffffffc0311090 RDI: ffffffffba8a45a0
+<4>[  333.725163] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000001
+<4>[  333.728205] R10: 0000000000000003 R11: ffff89c0409c0000 R12: ffff89c0412cf980
+<4>[  333.731139] R13: 00000000000041d8 R14: ffff89c040c41c30 R15: ffff89c040bcd4d8
+<4>[  333.734625] FS:  0000000000000000(0000) GS:ffff89c104a66000(0000) knlGS:0000000000000000
+<4>[  333.738048] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  333.741145] CR2: 000056163f0f96e8 CR3: 0000000107bdc000 CR4: 00000000007506f0
+<4>[  333.744582] PKRU: 55555554
+<4>[  333.747915] Call Trace:
+<4>[  333.751110]  <TASK>
+<4>[  333.753877]  ? __pfx_autoremove_wake_function+0x10/0x10
+<4>[  333.757050]  drm_client_modeset_wait_for_vblank+0x5b/0x70
+<4>[  333.760277]  drm_fb_helper_damage_work+0x7e/0x1d0
+<4>[  333.764111]  ? move_linked_works+0x88/0xd0
+<4>[  333.767309]  ? __pfx_drm_fb_helper_damage_work+0x10/0x10
+<4>[  333.770914]  process_one_work+0x190/0x350
+<4>[  333.774038]  worker_thread+0x18d/0x2f0
+<4>[  333.776951]  ? __pfx_worker_thread+0x10/0x10
+<4>[  333.779902]  kthread+0xfa/0x240
+<4>[  333.782682]  ? finish_task_switch.isra.0+0x82/0x2a0
+<4>[  333.785928]  ? __pfx_kthread+0x10/0x10
+<4>[  333.788730]  ? __pfx_kthread+0x10/0x10
+<4>[  333.791891]  ret_from_fork+0x130/0x1a0
+<4>[  333.794846]  ? __pfx_kthread+0x10/0x10
+<4>[  333.798051]  ret_from_fork_asm+0x1a/0x30
+<4>[  333.801372]  </TASK>
+<4>[  333.804140] ---[ end trace 0000000000000000 ]---
+<0>[  337.791023] mce: CPUs not responding to MCE broadcast (may include false positives): 1-3
+<0>[  337.796064] Kernel panic - not syncing: Timeout: Not all CPUs entered broadcast exception handler
+<0>[  337.800304] Kernel Offset: 0x36a00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)

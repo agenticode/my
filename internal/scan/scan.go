@@ -285,8 +285,10 @@ var CrashPlaces = []struct{ Kind, Dir string }{
 // this user is reported as such.
 //
 // The files of the pstore file system carry the time of their record
-// (fs/pstore/inode.c, pstore_mkfile); the archive and the dump path carry
-// the time of the copy.
+// (fs/pstore/inode.c, pstore_mkfile), and systemd-pstore keeps that time
+// when it moves them to its archive (seen with systemd 259 in the lab:
+// docs/compatibility.md). The text logs of kdump carry the time they were
+// written, after the crash.
 func CrashLogs(opts *Options) []adapter.Adapter {
 	var out []adapter.Adapter
 	for _, c := range CrashPlaces {
@@ -295,7 +297,7 @@ func CrashLogs(opts *Options) []adapter.Adapter {
 		if errors.Is(err, fs.ErrNotExist) || (err == nil && !fi.IsDir()) {
 			continue
 		}
-		out = append(out, crashlog.NewDir(c.Kind, p, crashlog.Options{ModTime: c.Dir == crashlog.StoreDir, TempDir: opts.TempDir}))
+		out = append(out, crashlog.NewDir(c.Kind, p, crashlog.Options{ModTime: c.Kind == crashlog.KindPstore, TempDir: opts.TempDir}))
 	}
 	return out
 }

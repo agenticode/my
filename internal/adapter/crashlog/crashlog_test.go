@@ -552,3 +552,44 @@ func TestReadAgain(t *testing.T) {
 		t.Errorf("read again: %s\nfirst:       %s", again, first)
 	}
 }
+
+// TestRealERSTDump reads the three ERST files of a real panic
+// (testdata/erst-fedora44/README.md): one dump, Part 3 first, its boot
+// dated by the RTC line of the text, and the panic on record.
+func TestRealERSTDump(t *testing.T) {
+	dir := filepath.Join("testdata", "erst-fedora44")
+	a := NewDir(KindPstore, dir, Options{})
+	f, err := a.walk()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(f.dumps) != 1 || len(f.dumps[0].parts) != 3 || f.dumps[0].reason != "Panic" {
+		t.Fatalf("dumps %+v", f.dumps)
+	}
+	for i, want := range []int{3, 2, 1} {
+		if p := f.dumps[0].parts[i]; p.no != want || p.count != 1 {
+			t.Errorf("part %d: %+v", i, p)
+		}
+	}
+	l := newLedger(t)
+	res := l.run(a)
+	src := source(t, res, KindPstore)
+	if src.Status != model.SourceOK {
+		t.Errorf("source %+v", src)
+	}
+	wantNote(t, src.Notes, "Panic dump in 3 parts", "436 lines read")
+	boots, _ := l.Boots(context.Background(), "h1")
+	// rtc_cmos: "setting system clock to 2026-11-16T02:29:27 UTC
+	// (1794796167)" 5.118249 s after boot.
+	start := time.Unix(1794796167, 0).Add(-5118249 * time.Microsecond)
+	if len(boots) != 1 || boots[0].StartQuality != model.TimeEstimated || boots[0].StartedAt.Sub(start).Abs() > time.Second {
+		t.Fatalf("boots %+v, want a start at %s", boots, start)
+	}
+	if p := l.panics(); len(p) != 1 || p[0].ErrorDT.Sub(start.Add(337800304*time.Microsecond)).Abs() > time.Second {
+		t.Errorf("panic records %+v", p)
+	}
+	l.ended(1)
+	if ev := l.events(); len(ev) != 0 {
+		t.Errorf("the dump holds no error record and gave %d", len(ev))
+	}
+}
