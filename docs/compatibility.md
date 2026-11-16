@@ -10,7 +10,7 @@ The observation grade of a record says how much of the place of an error its sou
 | B | physical address or rank | repetition per page and trends; a row fault is an estimate |
 | C | the module, or a count only | trends and thresholds |
 
-Every input gets an entry in the source inventory of a scan, also when it is absent or unreadable. The entry carries the status, the number of records read and skipped, and notes such as "3 records of other sensors were left out".
+Every input a scan looks for gets an entry in the source inventory, also when it is absent or unreadable. The mcelog daemon and `nvidia-smi` get one only on a host where their program is installed. The entry carries the status, the number of records read and skipped, and notes such as "3 records of other sensors were left out".
 
 ## What a platform gives
 
@@ -38,7 +38,7 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 
 | Content | Read as |
 | --- | --- |
-| directory with `proc`, `sys`, `var/log`, `var/lib/rasdaemon` or `sos_commands` below it | copy of a host's files, read like a live host |
+| directory with `proc`, `sys`, `var/log`, `var/lib/rasdaemon`, `usr/local/var/lib/rasdaemon` or `sos_commands` below it | copy of a host's files, read like a live host |
 | directory with pstore files, a `dmesg.txt` of systemd-pstore, or a kdump text log below it | crash logs |
 | directory with Redfish resources in JSON files | Redfish dump |
 | SQLite file | rasdaemon database |
@@ -483,7 +483,7 @@ A file written by `ipmitool sel save` is refused with a message: it holds the ev
 
 A scan of a copy of a host's files reads the listing sos saves under `sos_commands/ipmitool`: the output of `sel elist` if it is there, else of `sel list -v`, else of `sel list`. One listing is read, because the same record from two of them would count twice. A saved file that holds the error message of ipmitool is reported as not read.
 
-A scan of a live host does not ask the BMC. Reading the event log needs root and can take minutes; save it with `ipmitool sel elist > file` and import the file.
+A scan of a live host does not run ipmitool. With `--bmc ADDRESS` it asks the BMC over Redfish, which serves the event log as log entries ([redfish.md](redfish.md)). Without it, save the log with `ipmitool sel elist > file` (it needs root and can take minutes) and import the file.
 
 ### What is read
 
@@ -528,7 +528,7 @@ A label is matched to a known slot by name, ignoring case and separators: `DIMM 
 ipmitool prints the local time of the machine it runs on. Versions up to 1.8.18 do not name the zone; later versions follow the locale of that machine and append the zone abbreviation.
 
 - A zone abbreviation with one meaning (UTC, KST, CEST, PDT and others) or a numeric zone (`+09`) is applied.
-- A time without a zone, or with an abbreviation that has several meanings (CST, IST), is read as UTC, and the report says so. Pass the zone to the adapter (`sel.Options.Location`) to read such a dump correctly.
+- A time without a zone, or with an abbreviation that has several meanings (CST, IST), is read as UTC, and the report says so. Give the zone with `my import --tz ZONE` to read such a dump correctly.
 - Dates with slashes are read as month/day/year unless a date of the dump has a first number above 12. If no date tells the order, the report says so.
 - A record from before the BMC had its clock set (`Pre-Init`, timestamps below 20000000h) is kept with a time relative to the start of the BMC and gets no date.
 - The timestamps of the raw form are the BMC's clock and are read as UTC.
@@ -599,7 +599,7 @@ The mark a BMC puts on a module is the fact rule R-FW-01 reads:
 | `Health` is `Critical` | action `mark-failed`, method `bmc` |
 | `Health` is `Warning` | informational event |
 
-A memory resource carries no time. The mark is recorded at the time of the dump, once per DIMM: reading the same state again adds nothing. The time of the dump is `redfish.Options.Now`, else the start time in the manifest of a collection, else the modification time of the files with `ModTimeAsObserved`, else the time of the import.
+A memory resource carries no time. The mark is recorded at the time of the dump, once per DIMM: reading the same state again adds nothing. The time of the dump is the start time in the manifest of a collection, else the modification time of the files with `my import --mtime`, else the time of the import.
 
 ### The module as the BMC describes it
 
@@ -754,7 +754,7 @@ Adapter `nvidia-smi`, package `internal/adapter/nvidia`. It reads the text of `n
 
 `N/A` means the GPU does not report the value; the snapshot leaves it unset. A GPU that reports none of these values is still listed, and the report says how many there are.
 
-The time of a snapshot is the `Timestamp` of the output, which is the local time of the host without a zone. It is read as UTC unless the zone is given (`nvidia.Options.Location`). Output without a timestamp takes the time of the import.
+The time of a snapshot is the `Timestamp` of the output, which is the local time of the host without a zone. It is read as UTC unless `my import --tz ZONE` gives the zone. Output without a timestamp takes the time of the import.
 
 On a live host the scan runs `nvidia-smi -q -x` when the program is in the path, with a limit of 30 seconds. The query only reads. A host without the program has no NVIDIA driver and gets no entry in the source inventory; a program that is there and fails (driver not loaded, no permission) is reported with its message. In a copy of a host's files the output is read from `sos_commands/nvidia/nvidia-smi_-q`.
 
@@ -953,11 +953,11 @@ By the socket, channel and slot numbers, as described under "Which slot a record
 | date and time with a space or slashes | `2026-11-10 08:00:00`, `2026/11/10 08:00:00` |
 | a number | seconds since 1970; a number above 100000000000 is milliseconds |
 
-A time without a zone is read as UTC unless a zone is given (`fmfm.Options.Location`).
+A time without a zone is read as UTC unless `my import --tz ZONE` gives the zone.
 
 ### Host
 
-A log may hold the records of several hosts. One import reads one host: the host that is asked for (`fmfm.Options.HostID`) when the log names it, and the host of the first record that names one otherwise. Host names are compared without case.
+A log may hold the records of several hosts. One import reads one host: the host named with `my import --host NAME` when the log names it, and the host of the first record that names one otherwise. Host names are compared without case.
 
 Records of the other hosts are left out, and the report names those hosts. When the host was not asked for, the records left out count as skipped and the source is marked as partly read.
 
