@@ -32,6 +32,10 @@ func FuzzCollect(f *testing.F) {
 	}
 	f.Add("[18446744073709551615.999999] EDAC MC0: 1 CE x on y (page:0x0 offset:0x0 grain:1 syndrome:0x0)\n", false)
 	f.Add("{1}[Hardware Error]:  Error 0, type: corrected\n{1}[Hardware Error]:   section_type: memory error\n", true)
+	// What the next boot prints of the boot before: the boot error region
+	// and a record left in a bank (carried.go).
+	f.Add(bertLines, false)
+	f.Add(mceText(4.3, true, 0xbe00000000010090, 0, 1794798147)+later(60), false)
 	f.Add("9,9,99999999999999999999,-;EDAC MC0: 1 UE on a (b page:0xffffffffffffffff offset:0xfff grain:9)\n", false)
 	f.Add("[9999999999.000000] EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)\n", true)
 	f.Add(`{"MESSAGE":"EDAC MC0: 1 CE x on y (page:0x1 offset:0x0 grain:1 syndrome:0x0)","_TRANSPORT":"kernel","__REALTIME_TIMESTAMP":"9223372036854775807"}`+"\n", false)
