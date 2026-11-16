@@ -60,7 +60,13 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 	}
 	off := (&measurer{in: j.in, cfg: j.cfg, clk: clk}).offline(offlines)
 	h.LoosePages = off.Pages
-	if len(ue) == 0 && len(ce) == 0 && off.Pages == 0 {
+	// R-LOOP-03 is set on every DIMM involved; the host finding carries
+	// the summary.
+	var spread []model.Statement
+	if r := h.Recurrence; r != nil {
+		spread = r.spread
+	}
+	if len(ue) == 0 && len(ce) == 0 && off.Pages == 0 && len(spread) == 0 {
 		return nil
 	}
 
@@ -91,6 +97,15 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 			add(RuleHostUE, statement("host.ue_located", "n", n, "when", when, "where", w), refs, total)
 		} else {
 			add(RuleHostUE, statement("host.ue", "n", n, "when", when), refs, total)
+		}
+		// An address that had uncorrected errors in several boots.
+		if r := h.Recurrence; r != nil && r.Window() >= 2 {
+			for _, pb := range r.Loose {
+				if pb.Level == PlaceAddress && pb.BootsWithUE >= j.cfg.LoopMinBoots {
+					refs, total := j.eventRefs(pb.events)
+					add(RuleHostUE, statement("host.loop_address", "where", pb.Place, "n", pb.BootsWithUE, "of", r.Window()), refs, total)
+				}
+			}
 		}
 	}
 	if len(ce) > 0 {
@@ -140,6 +155,11 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 			add(RuleHostCE, statement("host.pages", "pages", off.Pages, "when", dateText(off.LastNew.UnixMicro())), refs, total)
 		}
 	}
+
+	for _, st := range spread {
+		add(RuleLoopSpread, st, nil, 0)
+	}
+	sort.SliceStable(evidence, func(a, b int) bool { return rulePosition(evidence[a].Rule) < rulePosition(evidence[b].Rule) })
 
 	v := &model.Verdict{Host: h.Host, Grade: model.VerdictOK, Label: model.VerdictLabel, Evidence: evidence,
 		EngineVersion: Version, ComputedAt: j.now}
@@ -199,8 +219,17 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 	if undated > 0 {
 		miss("missing.dates", "n", undated)
 	}
+	// Boots stopped and no record of them names a DIMM: what my preflight
+	// found a reset loses on the host.
+	if r := h.Recurrence; r != nil && r.Stops > 0 && r.Where == "none" {
+		if lost := lostCaptures(j.in, h.Host); len(lost) > 0 {
+			miss("missing.capture_lost", "checks", lost)
+		}
+	}
 
 	switch hold := v.Grade == model.VerdictHoldReplacement; {
+	case len(spread) > 0:
+		v.NextAction = statement("next.loop_spread")
 	case hold && hf.virtual != "":
 		v.NextAction = statement("next.host_ue_vm")
 	case hold:

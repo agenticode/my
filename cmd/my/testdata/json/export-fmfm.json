@@ -5,7 +5,7 @@
   "Analyzer": {
     "Name": "MemorY",
     "Version": "dev",
-    "engine_version": "4",
+    "engine_version": "5",
     "level": 1
   },
   "HostID": "r12-n034",
@@ -73,6 +73,7 @@
           "[R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before",
           "[R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows",
           "[R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device",
+          "[R-ROW-03] the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4 boots",
           "[R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28"
         ],
         "checks": [
@@ -147,7 +148,8 @@
         ],
         "confidence": 65,
         "evidence": [
-          "[R-SOFT-01] one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days"
+          "[R-SOFT-01] one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53 errors since 2026-08-03, 2 in the last 7 days",
+          "[R-SOFT-01] the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of the last 4 boots"
         ],
         "next_action": "No action. Look again when the count grows or a new place appears.",
         "next_action_code": "next.observe"

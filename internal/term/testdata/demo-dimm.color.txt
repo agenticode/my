@@ -10,6 +10,8 @@ in this slot since 2026-07-31  0 slot changes
            days; it now covers 9 columns in 2 rows
  [2m        [0m  [R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of
            one device
+ [2m        [0m  [R-ROW-03] the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4
+           boots
  [2m        [0m  [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28
  [2mchecks  [0m  open: no other DIMM on this channel: there is nothing to compare with
  [2m        [0m  open: no slot move or reseat on record: a cause in the board is not ruled out

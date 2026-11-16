@@ -63,6 +63,7 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
        [R-ROW-03] row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 30일 새 위치 13곳, 현재 row 2개에
        column 9개
        [R-ROW-03] rank0 dev7 bg0 bank3 row 0x1a2f 고장의 오류에 한 디바이스의 DQ 2개가 관여
+       [R-ROW-03] rank0 dev7 bg0 bank3 row 0x1a2f 고장: 최근 부팅 4회 중 3회에서 오류
        [R-REP-02] 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발
  반례  미확인: 이 채널에 다른 DIMM 없음: 비교 대상 없음
        미확인: 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함

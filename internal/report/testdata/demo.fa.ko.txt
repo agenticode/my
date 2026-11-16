@@ -17,7 +17,7 @@ section#s1.sec
   DIMM = 슬롯 32개에 DIMM 16개, 오류나 소견이 있는 DIMM 2개
   수집 = 합성 데이터, 2026-11-13 00:00 UTC
   리포트 = FA용 리포트, 2026-11-13 09:30 UTC 생성, 도구 my test
-  엔진 = 버전 4
+  엔진 = 버전 5
   p.how: 등급은 소견입니다. 기준 임계값은 FA 결과와 대조하기 전의 기본값입니다.
   li: 2 슬롯 맵
   li: 3 DIMM별 판정
@@ -83,7 +83,7 @@ section#s3.sec
     ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56
     p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
     판정 = 즉시 교체 (소견, 신뢰도 높음, 91) R-UE-01 R-ROW-03 R-REP-02
-    근거 = R-UE-01 UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 1건 R-ROW-03 row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의 2.3배 기록 421건 R-ROW-03 row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 30일 새 위치 13곳, 현재 row 2개에 column 9개 기록 1,232건 R-ROW-03 rank0 dev7 bg0 bank3 row 0x1a2f 고장의 오류에 한 디바이스의 DQ 2개가 관여 R-REP-02 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발 기록 765건
+    근거 = R-UE-01 UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 1건 R-ROW-03 row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 7일 421건, 그 앞 30일 일평균의 2.3배 기록 421건 R-ROW-03 row 고장(rank0 dev7 bg0 bank3 row 0x1a2f): 최근 30일 새 위치 13곳, 현재 row 2개에 column 9개 기록 1,232건 R-ROW-03 rank0 dev7 bg0 bank3 row 0x1a2f 고장의 오류에 한 디바이스의 DQ 2개가 관여 R-ROW-03 rank0 dev7 bg0 bank3 row 0x1a2f 고장: 최근 부팅 4회 중 3회에서 오류 R-REP-02 2026-10-28 hPPR 뒤 rank0 dev7 bg0 bank3 row 0x1a2f에서 764건 재발 기록 765건
     반례 = 미확인 이 채널에 다른 DIMM 없음: 비교 대상 없음 미확인 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음
     부족 = ECS 카운터 없음 DIMM 온도 이력 없음
     기준 = 자체 이력: 최근 7일 하루 60.1건, 그 앞 30일의 100 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
@@ -95,7 +95,7 @@ section#s3.sec
     ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 2AEB41
     p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
     판정 = 관찰 (소견, 신뢰도 보통, 65) R-SOFT-01
-    근거 = R-SOFT-01 셀 하나가 반복 실패(rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 2026-08-03부터 53건, 최근 7일 2건 기록 53건
+    근거 = R-SOFT-01 셀 하나가 반복 실패(rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 2026-08-03부터 53건, 최근 7일 2건 기록 53건 R-SOFT-01 rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 고장: 최근 부팅 4회 중 4회에서 오류
     기준 = 자체 이력: 최근 7일 하루 0.3건, 그 앞 30일의 60 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 91 백분위, 오류 있는 DIMM 2개
     다음 = 조치 없음. 건수가 늘거나 새 위치가 나오면 다시 확인.
     신뢰도 = 65 등급 근거 규칙: R-SOFT-01

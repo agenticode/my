@@ -60,7 +60,7 @@ func TestRulesPage(t *testing.T) {
 	for _, p := range params {
 		known[p.Key] = true
 	}
-	for _, m := range regexp.MustCompile("`((?:cluster|trend|spread|storm|baseline|rule|check|evidence)\\.[a-z_.]+)`").FindAllStringSubmatch(page, -1) {
+	for _, m := range regexp.MustCompile("`((?:cluster|trend|spread|storm|baseline|rule|check|evidence|loop)\\.[a-z_.]+)`").FindAllStringSubmatch(page, -1) {
 		if !known[m[1]] {
 			t.Errorf("docs/rules.md names the threshold %s, which the engine does not have", m[1])
 		}

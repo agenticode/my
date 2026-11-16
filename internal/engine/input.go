@@ -35,6 +35,9 @@ type Input struct {
 	// Places lists the names error records use for the place of an error,
 	// next to the slot the records were tied to.
 	Places []store.EventPlace
+	// Captures holds, per host, what "my preflight" found when the latest
+	// live scan ran: what a reset would lose there.
+	Captures []model.CaptureCheck
 
 	events []event
 
@@ -44,6 +47,14 @@ type Input struct {
 	slots     []slotKey
 	dimmIdx   map[string]int32
 	dimms     []string
+	// bootIdx maps host and boot ID to the boot of an event.
+	bootIdx map[bootKey]int32
+	boots   []bootKey
+}
+
+type bootKey struct {
+	host int32
+	id   string
 }
 
 type slotKey struct {
@@ -89,6 +100,7 @@ type event struct {
 	host   int32
 	slot   int32 // index into Input.slots, or -1
 	dimm   int32 // index into Input.dimms, or -1
+	boot   int32 // index into Input.boots, or -1
 	rank   int16
 	dev    int16
 	bg     int16
@@ -102,6 +114,7 @@ type event struct {
 	hasAddr  bool
 	relative bool // the time counts from boot, not from the epoch
 	inexact  bool // the time was estimated
+	carried  bool // kept over a reset, read by the next boot
 }
 
 // DIMM link values of the compact event.
@@ -121,7 +134,7 @@ func (e *event) located() bool {
 
 // NewInput returns an empty Input.
 func NewInput() *Input {
-	return &Input{hostIdx: map[string]int32{}, slotIdx: map[slotKey]int32{}, dimmIdx: map[string]int32{}}
+	return &Input{hostIdx: map[string]int32{}, slotIdx: map[slotKey]int32{}, dimmIdx: map[string]int32{}, bootIdx: map[bootKey]int32{}}
 }
 
 func (in *Input) host(name string) int32 {
@@ -158,6 +171,23 @@ func (in *Input) dimm(uid string) int32 {
 	i := int32(len(in.dimms))
 	in.dimmIdx[uid] = i
 	in.dimms = append(in.dimms, uid)
+	return i
+}
+
+func (in *Input) boot(host int32, id string) int32 {
+	if id == "" {
+		return -1
+	}
+	if in.bootIdx == nil {
+		in.bootIdx = map[bootKey]int32{}
+	}
+	k := bootKey{host, id}
+	if i, ok := in.bootIdx[k]; ok {
+		return i
+	}
+	i := int32(len(in.boots))
+	in.bootIdx[k] = i
+	in.boots = append(in.boots, k)
 	return i
 }
 
@@ -216,12 +246,13 @@ func (in *Input) Add(e *model.Event) {
 	h := in.host(e.Host)
 	c := event{
 		id: e.ID, at: e.ErrorDT.UnixMicro(), errors: int32(n),
-		host: h, slot: in.slot(h, e.Slot), dimm: in.dimm(e.DIMMUID),
+		host: h, slot: in.slot(h, e.Slot), dimm: in.dimm(e.DIMMUID), boot: in.boot(h, e.BootID),
 		rank: optInt16(e.Rank), dev: optInt16(e.DeviceId), bg: optInt16(e.BankGroup), bank: optInt16(e.Bank),
 		row: optInt32(e.Row), col: optInt32(e.Column),
 		counter:  e.Kind == model.KindCounter,
 		relative: e.TimeQuality == model.TimeRelative,
 		inexact:  e.TimeQuality == model.TimeEstimated,
+		carried:  e.Carried,
 	}
 	if !e.WindowStart.IsZero() {
 		c.from = e.WindowStart.UnixMicro()
@@ -327,6 +358,13 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	if in.Settings, err = s.BIOSSettings(ctx, ""); err != nil {
 		return fail("BIOS settings", err)
+	}
+	for _, name := range in.hostNames {
+		cs, err := s.CaptureChecks(ctx, name)
+		if err != nil {
+			return fail("capture checks", err)
+		}
+		in.Captures = append(in.Captures, cs...)
 	}
 	return in, nil
 }

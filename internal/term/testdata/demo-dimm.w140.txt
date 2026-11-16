@@ -6,6 +6,7 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56  in th
            before
            [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30 days; it now covers 9 columns in 2 rows
            [R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device
+           [R-ROW-03] the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4 boots
            [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28
  checks    open: no other DIMM on this channel: there is nothing to compare with
            open: no slot move or reseat on record: a cause in the board is not ruled out

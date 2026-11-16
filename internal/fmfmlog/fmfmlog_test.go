@@ -83,7 +83,7 @@ func TestAnalysisLogOfTheDemoHost(t *testing.T) {
 		t.Errorf("suggestion: %+v", a.RasActionSuggestion)
 	}
 	if a.Finding.Grade != "replace-now" || a.Finding.Label != "finding" || !reflect.DeepEqual(a.Finding.Rules, []string{"R-UE-01", "R-ROW-03", "R-REP-02"}) ||
-		a.Finding.NextActionCode != "next.replace" || len(a.Finding.Evidence) != 5 || !strings.HasPrefix(a.Finding.Evidence[0], "[R-UE-01] 1 uncorrected error") {
+		a.Finding.NextActionCode != "next.replace" || len(a.Finding.Evidence) != 6 || !strings.HasPrefix(a.Finding.Evidence[0], "[R-UE-01] 1 uncorrected error") {
 		t.Errorf("finding: %+v", a.Finding)
 	}
 	if a.Corrected != 1231 || a.Uncorrected != 1 || a.Observation != (Observation{GradeA: 1232}) {

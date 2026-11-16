@@ -53,6 +53,10 @@ type HostResult struct {
 	// LoosePages is the number of pages that were taken offline and are
 	// tied to no DIMM, each page counted once.
 	LoosePages int `json:"loose_pages,omitzero"`
+	// Recurrence says what the latest boots of the host show: which ended
+	// in a stop, and in which boots each DIMM and each place of it had
+	// errors.
+	Recurrence *Recurrence `json:"recurrence,omitzero"`
 }
 
 // GPUResult holds the finding about the memory of one GPU.
@@ -390,6 +394,9 @@ func Analyze(in *Input, opts Options) (*Result, error) {
 	}
 	jd.sys = newSystemView(in, cfg, all)
 	jd.sys.run(jd)
+	// The boots: which ended in a stop, which DIMM had uncorrected errors
+	// in which boots. It needs the channels the system view knows.
+	jd.loop = newLoopView(jd, hosts, clocks)
 	for _, d := range all {
 		d.Verdict = jd.verdict(d)
 	}
@@ -504,6 +511,7 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 			hf.bmcSource = true
 		}
 	}
+	hf.live = latest != nil && latest.Kind == model.ScanLive
 	for _, sl := range in.Slots {
 		if sl.Host == name && (sl.Locator != "" || sl.SMBIOSHandle.Valid) {
 			hf.inventory = true
