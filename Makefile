@@ -45,6 +45,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/smbios:FuzzEntryPoint \
 	./internal/adapter/smbios:FuzzDmidecode \
 	./internal/adapter/klog:FuzzCollect \
+	./internal/adapter/crashlog:FuzzParts \
 	./internal/adapter/rasdaemon:FuzzRows \
 	./internal/adapter/rasdaemon:FuzzDatabase \
 	./internal/adapter/rasdaemon:FuzzStoreSettings \

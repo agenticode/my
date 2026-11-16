@@ -34,15 +34,17 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 
 ## How a file is recognised
 
-`scan.Detect` picks the adapter for a file or a directory by its content. File names play no part.
+`scan.Detect` picks the adapter for a file or a directory by its content. File names play a part only for crash logs, whose names say what they are: a pstore file is named `<type>-<backend>-<id>` by the kernel, and kdump names its text log `vmcore-dmesg.txt` or `dmesg.<stamp>`.
 
 | Content | Read as |
 | --- | --- |
 | directory with `proc`, `sys`, `var/log`, `var/lib/rasdaemon` or `sos_commands` below it | copy of a host's files, read like a live host |
+| directory with pstore files, a `dmesg.txt` of systemd-pstore, or a kdump text log below it | crash logs |
 | directory with Redfish resources in JSON files | Redfish dump |
 | SQLite file | rasdaemon database |
 | lines with a kernel stamp, `/dev/kmsg` records, `dmesg -T` dates or syslog lines | kernel log |
 | JSON objects with `MESSAGE` and journal fields | kernel log from `journalctl -o json` |
+| a pstore file name, a first line such as `Panic#1 Part1`, `vmcore-dmesg.txt` or `dmesg.<12 digits>` | crash log: a pstore dump or a kdump text log |
 | `# dmidecode` or `Handle 0x..., DMI type` lines | dmidecode output |
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
@@ -243,6 +245,53 @@ With none of them the records stay relative to their boot. They are then dated b
 - Records that were overwritten in the ring buffer or dropped by the rate limit are missing. The EDAC counters show how many errors are known as a count only.
 - A log file that starts in the middle of a boot has no boot banner for that boot.
 - Machine check decoding covers the memory errors of Intel and AMD processors. Other machine checks, and firmware error sections that are not about memory, are counted in the report and left out.
+
+## Crash logs (pstore, kdump)
+
+Adapter `crashlog`, package `internal/adapter/crashlog`, source kinds `pstore` and `kdump`. A fatal memory error panics the kernel, and the journal and rasdaemon write nothing after that ([crash-loop.md](crash-loop.md)). Some kernel text of the crashed boot outlives it. The adapter finds it, puts it in order and hands it to the kernel log reader, so it is read as the kernel log of the boot that crashed.
+
+| Place | What is there | How it is read |
+| --- | --- | --- |
+| `/sys/fs/pstore` | `dmesg-<backend>-<id>` files: the end of the kernel log at the panic, in parts of the size the backend takes; `console-ramoops-<n>`: the console of the boot before, with ramoops | the parts of one dump are grouped and read from the highest part number down; the header line of each part is taken out |
+| `/var/lib/systemd/pstore` | the same files after `systemd-pstore` moved them: `<time>/<count>/` for EFI variables, `<first record id>/` for ERST, loose files at the top, and a `dmesg.txt` per dump | the original parts; the `dmesg.txt` only where the parts are gone |
+| `/var/crash/<dir>/vmcore-dmesg.txt` | the kernel log kdump-utils takes out of the memory dump (`vmcore-dmesg-incomplete.txt` when that failed half way) | as one kernel log |
+| `/var/crash/<stamp>/dmesg.<stamp>` | the same, by Debian's kdump-tools | as one kernel log |
+
+A scan of a host reads each of the three places that exists, and a copy of a host's files is read the same way. `my import` takes a single pstore file, a `dmesg.txt`, a kdump text log, or a directory of any of them.
+
+Grouping of the parts of one dump, from the ids the kernel gives:
+
+| Backend | Rule |
+| --- | --- |
+| EFI variables (`efi_pstore`) | the id is (time × 100 + part) × 1000 + count (`efi-pstore.c`, `generic_id`): parts with the same time and count are one dump |
+| ERST (`erst`) | the records of a boot get consecutive ids (`cper_next_record_id()` counts up from a seed of the time of its first use), and Part 1 is written first: consecutive ids are one dump, cut where the header starts another dump of the same boot |
+| ramoops and others | one file is one dump |
+
+Not read, each counted in a note of the source: `pmsg-*` (text user space wrote), `ftrace-*`, `mce-*` and the other record types of pstore, files ending in `.enc.z` (the kernel could not decompress the record), the memory dump (`vmcore`, `dump.<stamp>`), and `kexec-dmesg.log`, which is the log of the capture kernel and would enter the ledger as a boot of a few seconds. A file that is not readable as this user is skipped and named; `/sys/fs/pstore` is readable as root only.
+
+### Grade
+
+Whatever the lines give: a printed machine check record with an address is grade B, a firmware error record with row and column grade A. A panic text without a memory error record gives no error event.
+
+### Times
+
+The lines carry seconds since the start of the boot that crashed. The start is taken as the kernel log reader takes it (see "Times" under [Kernel log](#kernel-log)): a machine check record's own `TIME` field (exact), else a capture time, else the RTC line of the boot. The time of the dump is given as the capture time only when the text has neither a machine check record with a time nor an RTC line, because the reader ranks a capture time above the RTC line. The time of a dump is:
+
+- in `/sys/fs/pstore`, the modification time of the file, which the kernel sets to the time of the record (`pstore_mkfile()`);
+- for EFI variables also in the archive, the time in the id;
+- for a kdump log, the modification time of the file, which is later than the crash by the time the capture kernel took to start.
+
+The ERST id is not used as a time: its seed is the time of the first record of the boot, which need not be the time of the dump. A dump with no time and no anchor in its text stays relative to its boot.
+
+### Duplicates
+
+A line is identified by the kernel's stamp and its text, as in every kernel log. The same dump read from `/sys/fs/pstore` and from the archive, and a line that the journal also holds, give one record. The boot of a dump has no kernel boot ID; when its start lies within 30 seconds of a boot the journal holds, it is that boot.
+
+### Known gaps
+
+- No pstore file or kdump log of a real server was read. The tests build pstore files from the kernel lines of the lab capture `7.3.0-mce-fatal`, with the framing taken from the kernel source; the lab captures of [validation-lab.md](validation-lab.md) are the next check.
+- Line numbers in the record references of a dump of several parts count in the text as it is read, Part N first; the reference names Part 1 and the number of further parts (`dmesg-efi_pstore-<id>+2#L12`).
+- A copy of `/sys/fs/pstore` whose files lost their times, and an ERST archive, date a dump only by what its text says.
 
 ## EDAC counters
 

@@ -16,6 +16,10 @@
 //	             under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
+//	crash logs   the kernel log of a boot that crashed, where it outlived
+//	             the crash: pstore files in /sys/fs/pstore, their archive
+//	             in /var/lib/systemd/pstore, the text logs of kdump in
+//	             /var/crash
 //	mcelog       on a live host with the mcelog program, the counts its
 //	             daemon keeps per DIMM ("mcelog --client")
 //	GPU memory   on a live host, what "nvidia-smi -q -x" prints
@@ -37,6 +41,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/klog"
@@ -237,6 +242,7 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	}
 
 	out = append(out, kernelLog(ctx, &opts, info)...)
+	out = append(out, CrashLogs(&opts)...)
 
 	out = append(out, edacsysfs.NewRoot(opts.root(), edacsysfs.Options{Now: now}))
 	out = append(out, daemonCounts(&opts, now)...)
@@ -253,6 +259,35 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 	out = append(out, sm)
 	out = append(out, gpuMemory(&opts)...)
 	out = append(out, bmcLog(&opts)...)
+	return out
+}
+
+// CrashPlaces are the places a host keeps the kernel log of a crashed boot
+// in, below its root.
+var CrashPlaces = []struct{ Kind, Dir string }{
+	{crashlog.KindPstore, crashlog.StoreDir},
+	{crashlog.KindPstore, crashlog.ArchiveDir},
+	{crashlog.KindKdump, crashlog.KdumpDir},
+}
+
+// CrashLogs returns a source for each place of CrashPlaces that is there.
+// A place that is not there gets no entry: most hosts keep no crash dump,
+// and the inventory would say so on every scan. One that is closed to
+// this user is reported as such.
+//
+// The files of the pstore file system carry the time of their record
+// (fs/pstore/inode.c, pstore_mkfile); the archive and the dump path carry
+// the time of the copy.
+func CrashLogs(opts *Options) []adapter.Adapter {
+	var out []adapter.Adapter
+	for _, c := range CrashPlaces {
+		p := opts.path(c.Dir)
+		fi, err := os.Stat(p)
+		if errors.Is(err, fs.ErrNotExist) || (err == nil && !fi.IsDir()) {
+			continue
+		}
+		out = append(out, crashlog.NewDir(c.Kind, p, crashlog.Options{ModTime: c.Dir == crashlog.StoreDir, TempDir: opts.TempDir}))
+	}
 	return out
 }
 

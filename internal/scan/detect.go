@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/mcelog"
@@ -74,6 +75,9 @@ const (
 	WhatNvidiaCSV = "nvidia-smi query output"
 	WhatFMFM      = "FMFM log"
 	WhatMcelog    = "mcelog --client output"
+	WhatPstore    = "pstore dump"
+	WhatKdump     = "kdump text log"
+	WhatCrashLogs = "crash logs (pstore, kdump)"
 )
 
 // ErrUnknownInput is returned by Detect, wrapped with what the input looks
@@ -92,11 +96,13 @@ const maxBinary = 16 << 20
 //
 //   - a directory with proc, sys or var below it is a copy of a host's
 //     files and is read like a host;
+//   - a directory with pstore files, the archive of systemd-pstore or the
+//     text logs of kdump below it holds crash logs;
 //   - a directory with Redfish resources in JSON files is a Redfish dump;
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
 //     output of dmidecode, of nvidia-smi (-q, or a selective query in CSV
-//     form) or of mcelog --client, a BMC event log, a Redfish resource, or
-//     an FMFM boot, runtime or crash log.
+//     form) or of mcelog --client, a BMC event log, a Redfish resource, an
+//     FMFM boot, runtime or crash log, a pstore dump or a kdump text log.
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -134,6 +140,15 @@ func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.A
 			// counters of the copy would no longer line up with its records.
 			return Sources(ctx, Options{Root: dir, Location: opts.Location, TempDir: opts.TempDir}), WhatHostTree, nil
 		}
+	}
+	// Crash logs: pstore files, an archive of systemd-pstore, the dump
+	// path of kdump, or a copy of any of them.
+	if kinds := crashlog.Kinds(dir); len(kinds) > 0 {
+		var out []adapter.Adapter
+		for _, k := range kinds {
+			out = append(out, crashlog.NewDir(k, dir, crashlog.Options{ModTime: opts.ModTime, TempDir: opts.TempDir}))
+		}
+		return out, WhatCrashLogs, nil
 	}
 	// A Redfish dump: some JSON file below the directory is a resource.
 	const maxLooked = 400
@@ -283,6 +298,16 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 
 	kopts := klog.Options{CapturedAt: captured, Location: opts.Location, TempDir: opts.TempDir}
 	text := trimmed
+	// A crash log is known by its name or by the header of a pstore dump.
+	// It is a kernel log of the boot that crashed; its own reader puts the
+	// parts in order and takes the time of the record from the file.
+	if kind := crashlog.Sniff(path, text); kind != "" && !zipped {
+		what := WhatPstore
+		if kind == crashlog.KindKdump {
+			what = WhatKdump
+		}
+		return crashlog.NewFile(kind, path, crashlog.Options{ModTime: opts.ModTime, TempDir: opts.TempDir}), what, nil
+	}
 	var a adapter.Adapter
 	var what string
 	switch {
