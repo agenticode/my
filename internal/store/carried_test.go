@@ -413,3 +413,22 @@ func otherCell(e *model.Event) *model.Event {
 	e.Column = model.Some(0x240)
 	return e
 }
+
+// TestLinkCarriedKeepsTheReadingBoot: a carried record that its source
+// tied to the boot that printed it stays with that boot, though its time
+// lies before the start of the boot as the ledger has it (a clock set after
+// the bank was read). LinkCarried then moves it to the boot before.
+func TestLinkCarriedKeepsTheReadingBoot(t *testing.T) {
+	s := newStore(t)
+	addBoots(t, s, bootA, bootB)
+	c := cev("carried", at(2*time.Hour-time.Second), model.SevFatal, "klog/mce")
+	c.Carried, c.TimeQuality, c.BootID = true, model.TimeExact, "b"
+	addEvents(t, s, c)
+	for i := range 2 {
+		link(t, s)
+		got := eventByFP(t, s, "carried")
+		if got.BootID != "a" || got.ReadBootID != "b" {
+			t.Fatalf("run %d: boot %q, read by %q; want a, read by b", i, got.BootID, got.ReadBootID)
+		}
+	}
+}

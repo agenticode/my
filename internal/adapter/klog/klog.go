@@ -1343,7 +1343,7 @@ func (p *parser) mceEvent(b *mceBlock, lastN, vendor int, unix int64, socket mod
 	} else if dec.Address.Valid && b.addr != 0 {
 		e.OsPhysicalAddress = model.Some(b.addr)
 	}
-	first := b.first
+	first, printed := b.first, b.first
 	if unix > 0 {
 		// The record's own time is exact, and tells when the boot started.
 		first.wall = time.Unix(unix, 0).UTC()
@@ -1351,8 +1351,16 @@ func (p *parser) mceEvent(b *mceBlock, lastN, vendor int, unix int64, socket mod
 			p.seg.mceStart = first.wall.Add(-first.mono)
 		}
 	}
-	if carried == carryIfGoesOn {
-		return p.holdRule2(e, &first, unix)
+	switch carried {
+	case carryIfGoesOn:
+		return p.holdRule2(e, &first, &printed, unix)
+	case carryYes:
+		// The TIME of a carried record says when this boot read the bank,
+		// and a clock set after the read can put it before the start of
+		// the boot. The record goes with the time of its line, which lies
+		// in the boot that printed it; LinkCarried moves it to the boot
+		// before (store.LinkCarried).
+		return p.emit(e, nil, &printed)
 	}
 	return p.emit(e, nil, &first)
 }

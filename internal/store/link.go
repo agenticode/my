@@ -25,6 +25,13 @@ import (
 // boot their source gave them. A boot whose start is not on record (the
 // one LinkCarried puts before a boot that read a carried record) takes no
 // record by time.
+//
+// A carried record keeps the boot its source gave it, the boot that printed
+// it, and LinkCarried moves it to the boot before. Its time says when the
+// bank was read, which can lie before the start of the reading boot as the
+// ledger has it: the lab guest of testdata/real/6.19.10-mce-loop-kdump read
+// a bank one second "before" its boot started, because its clock was set
+// after the read. Only a carried record without a boot is placed by time.
 func (s *Store) LinkBoots(ctx context.Context, host string) error {
 	return s.Update(ctx, func(w *Writer) error {
 		for _, q := range []string{
@@ -32,7 +39,7 @@ func (s *Store) LinkBoots(ctx context.Context, host string) error {
    SELECT b.boot_id FROM boot b
    WHERE b.host = event.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= event."ErrorDT"
    ORDER BY b.started_at DESC LIMIT 1)
- WHERE host = ? AND time_quality != 'relative'`,
+ WHERE host = ? AND time_quality != 'relative' AND (carried = 0 OR (boot_id IS NULL AND read_boot_id IS NULL))`,
 			`UPDATE action SET boot_id = (
    SELECT b.boot_id FROM boot b
    WHERE b.host = action.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= action.at
