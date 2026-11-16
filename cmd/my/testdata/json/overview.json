@@ -415,6 +415,355 @@
       }
     ],
     "quiet": 14,
+    "recurrence": {
+      "boots": [
+        {
+          "index": 1,
+          "boot_id": "f42e06a462aa0c13b95dd4c7a152f73b",
+          "started_at": "2026-07-31T11:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 2213760,
+          "end": ""
+        },
+        {
+          "index": 2,
+          "boot_id": "6d9126624276254e46e24386bb76fe7d",
+          "started_at": "2026-08-26T02:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 3023760,
+          "end": ""
+        },
+        {
+          "index": 3,
+          "boot_id": "9fa24819800646a1b7eb3c7393b3c6a0",
+          "started_at": "2026-09-30T02:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 2417160,
+          "end": ""
+        },
+        {
+          "index": 4,
+          "boot_id": "86eacf5a7c1da2880018ae7a387134c1",
+          "started_at": "2026-10-28T01:30:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 1377000,
+          "end": ""
+        }
+      ],
+      "boots_on_record": 4,
+      "stops": 0,
+      "where": "dimm",
+      "dimms": [
+        {
+          "dimm_uid": "d878e1a15b6e30a44057",
+          "slot": "CPU0_C1",
+          "cells": [
+            {
+              "boot": 2,
+              "ce": 6
+            },
+            {
+              "boot": 3,
+              "ce": 436
+            },
+            {
+              "boot": 4,
+              "ce": 789,
+              "ue": 1
+            }
+          ],
+          "boots_with_errors": 3,
+          "boots_with_ue": 1,
+          "stop_boots": 0,
+          "places": [
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 6
+                },
+                {
+                  "boot": 3,
+                  "ce": 317
+                },
+                {
+                  "boot": 4,
+                  "ce": 244,
+                  "ue": 1
+                }
+              ],
+              "boots_with_errors": 3,
+              "boots_with_ue": 1,
+              "ce": 567,
+              "ue": 1
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x388",
+              "cells": [
+                {
+                  "boot": 3,
+                  "ce": 94
+                },
+                {
+                  "boot": 4,
+                  "ce": 200
+                }
+              ],
+              "boots_with_errors": 2,
+              "boots_with_ue": 0,
+              "ce": 294,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8",
+              "cells": [
+                {
+                  "boot": 3,
+                  "ce": 22
+                },
+                {
+                  "boot": 4,
+                  "ce": 136
+                }
+              ],
+              "boots_with_errors": 2,
+              "boots_with_ue": 0,
+              "ce": 158,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x390",
+              "cells": [
+                {
+                  "boot": 3,
+                  "ce": 3
+                },
+                {
+                  "boot": 4,
+                  "ce": 91
+                }
+              ],
+              "boots_with_errors": 2,
+              "boots_with_ue": 0,
+              "ce": 94,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x420",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 49
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 49,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 24
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 24,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x320",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 10
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 10,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x238",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 9
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 9,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 7
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 7,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 5
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 5,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x740",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 4
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 4,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x388",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 4
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 4,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x390",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 4
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 4,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x1d8",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 1
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 1,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x320",
+              "cells": [
+                {
+                  "boot": 4,
+                  "ce": 1
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 1,
+              "ue": 0
+            }
+          ]
+        },
+        {
+          "dimm_uid": "d6abde8014f7764becd7",
+          "slot": "CPU1_D1",
+          "cells": [
+            {
+              "boot": 1,
+              "ce": 16
+            },
+            {
+              "boot": 2,
+              "ce": 14
+            },
+            {
+              "boot": 3,
+              "ce": 16
+            },
+            {
+              "boot": 4,
+              "ce": 7
+            }
+          ],
+          "boots_with_errors": 4,
+          "boots_with_ue": 0,
+          "stop_boots": 0,
+          "places": [
+            {
+              "level": "cell",
+              "place": "rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110",
+              "cells": [
+                {
+                  "boot": 1,
+                  "ce": 16
+                },
+                {
+                  "boot": 2,
+                  "ce": 14
+                },
+                {
+                  "boot": 3,
+                  "ce": 16
+                },
+                {
+                  "boot": 4,
+                  "ce": 7
+                }
+              ],
+              "boots_with_errors": 4,
+              "boots_with_ue": 0,
+              "ce": 53,
+              "ue": 0
+            }
+          ]
+        }
+      ]
+    },
     "sources": [
       {
         "kind": "synth",

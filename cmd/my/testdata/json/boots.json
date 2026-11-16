@@ -1,0 +1,113 @@
+{
+  "view": "boots",
+  "version": 1,
+  "lang": "en",
+  "host": "r12-n034",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": "r12-n034",
+    "system": "Example Systems R760",
+    "boots_on_record": 4,
+    "boots": [
+      {
+        "index": 1,
+        "boot_id": "f42e06a462aa0c13b95dd4c7a152f73b",
+        "started_at": "2026-07-31T11:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 2213760,
+        "end": ""
+      },
+      {
+        "index": 2,
+        "boot_id": "6d9126624276254e46e24386bb76fe7d",
+        "started_at": "2026-08-26T02:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 3023760,
+        "end": ""
+      },
+      {
+        "index": 3,
+        "boot_id": "9fa24819800646a1b7eb3c7393b3c6a0",
+        "started_at": "2026-09-30T02:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 2417160,
+        "end": ""
+      },
+      {
+        "index": 4,
+        "boot_id": "86eacf5a7c1da2880018ae7a387134c1",
+        "started_at": "2026-10-28T01:30:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 1377000,
+        "end": ""
+      }
+    ],
+    "rows": [
+      {
+        "level": "dimm",
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "slot": "CPU0_C1",
+        "serial": "3B9C56",
+        "cells": [
+          {
+            "boot": 1,
+            "known": true
+          },
+          {
+            "boot": 2,
+            "ce": 6,
+            "known": true
+          },
+          {
+            "boot": 3,
+            "ce": 436,
+            "known": true
+          },
+          {
+            "boot": 4,
+            "ce": 789,
+            "ue": 1,
+            "known": true
+          }
+        ],
+        "boots_with_errors": 3,
+        "boots_with_ue": 1,
+        "ce": 1231,
+        "ue": 1
+      },
+      {
+        "level": "dimm",
+        "dimm_uid": "d6abde8014f7764becd7",
+        "slot": "CPU1_D1",
+        "serial": "2AEB41",
+        "cells": [
+          {
+            "boot": 1,
+            "ce": 16,
+            "known": true
+          },
+          {
+            "boot": 2,
+            "ce": 14,
+            "known": true
+          },
+          {
+            "boot": 3,
+            "ce": 16,
+            "known": true
+          },
+          {
+            "boot": 4,
+            "ce": 7,
+            "known": true
+          }
+        ],
+        "boots_with_errors": 4,
+        "boots_with_ue": 0,
+        "ce": 53,
+        "ue": 0
+      }
+    ]
+  }
+}

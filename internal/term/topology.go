@@ -158,6 +158,15 @@ func (st Style) topology(p *page, t *view.Topology) {
 		lw = max(lw, Width(lv.Name))
 	}
 	width := st.width() - 1 - lw - 2 - 1
+	// With errors in two or more boots, a column at the right says in how
+	// many boots of the window the largest branch of each level had errors.
+	boots := t.Window > 0 && t.Boots >= 2
+	bw := 0
+	if boots {
+		bw = max(Width(st.say("boots.boots")), Width(st.say("boots.of", "n", t.Window, "of", t.Window)))
+		width -= bw + 2
+		p.lines[len(p.lines)-1] = padRight(p.lines[len(p.lines)-1], 1+lw+2+width+1+2) + st.say("boots.boots")
+	}
 	for i := range t.Levels {
 		lv := &t.Levels[i]
 		var line string
@@ -166,6 +175,9 @@ func (st Style) topology(p *page, t *view.Topology) {
 			line = st.topoLine([]topoSeg{{start: 0, end: width, label: st.say("topo.unreported"), dim: true}}, false)
 		} else {
 			line = st.topoLine(st.topoLayout(lv, width), true)
+		}
+		if boots && lv.Known {
+			line += "  " + st.say("boots.of", "n", lv.Boots, "of", t.Window)
 		}
 		p.add(" " + st.dim(padRight(lv.Name, lw)) + "  " + line)
 	}

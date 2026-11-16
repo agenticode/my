@@ -166,7 +166,7 @@ func TestQuoteComparison(t *testing.T) {
 // what the commands print for the example case.
 func TestGuidesShowRealOutput(t *testing.T) {
 	for page, n := range map[string]int{
-		"docs/reading-guide.md": 5,
+		"docs/reading-guide.md": 7,
 	} {
 		t.Run(page, func(t *testing.T) {
 			if ran := checkQuotes(t, page, nil); len(ran) != n {

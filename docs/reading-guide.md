@@ -118,15 +118,15 @@ The memory of a DIMM is a tree: ranks hold devices, devices hold banks, banks ho
 ```
 $ my open examples/demo.mycase dimm CPU0_C1
 [...]
- where the errors sit (width = share of the errors of this DIMM)
- rank    |rank0 ██████████████████████████████████████████████████████████████████████████████ 100%|
- device  |dev7 ███████████████████████████████████████████████████████████████████████████████ 100%|
- bank    |bg0 bank3 ██████████████████████████████████████████████████████████████████████████ 100%|
- row     |0x1a2f ████████████████████████████████████████████████████████████████████████████ 98%|█|
+ where the errors sit (width = share of the errors of this DIMM)                              boots
+ rank    |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ device  |dev7 ███████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ bank    |bg0 bank3 ██████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ row     |0x1a2f ████████████████████████████████████████████████████████████████████ 98%|█|  3 of 4
 [...]
 ```
 
-The width of a segment is its share of the errors, and a segment lies below the segment it belongs to. The widest path from top to bottom is where the errors are.
+The width of a segment is its share of the errors, and a segment lies below the segment it belongs to. The widest path from top to bottom is where the errors are. When the DIMM has errors in two or more boots of the window (see "Boots" below), the column at the right says in how many of them the widest segment of each level had errors.
 
 | Shape | Reading |
 | --- | --- |
@@ -160,6 +160,7 @@ CPU0_C1  S/N 3B9C56  DDR5 RDIMM 64 GB 2Rx4
 
  row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2,
    DQ3, first 2026-09-24, latest 2026-11-12
+ errors in 3 of the last 4 boots, uncorrected in 1
 ```
 
 The map shows one bank of one device: rows down, columns across. A cell stands for a range of columns, which the line above the legend names. The shade of a cell is the number of errors in it on the scale `· 0`, `░ 1-2`, `▒ 3-9`, `▓ 10-99`, `█ 100+`, and `X` marks a cell with an uncorrected error. The mode of a fault is its shape:
@@ -175,7 +176,7 @@ The map shows one bank of one device: rows down, columns across. A cell stands f
 
 The arrow at the right of a row names the fault the row belongs to. Quiet rows between two groups of rows are left out and counted. When the errors span more rows than fit, one line stands for a range of rows. The last lines describe each fault: its place, its errors, how many columns and rows it covers, the data lines (DQ) that failed where the records name bits, and its first and latest error.
 
-`my map <slot>` draws the bank with the most errors. `--bank`, `--rank` and `--device` choose another, and `--rows A-B` zooms into a range of rows.
+`my map <slot>` draws the bank with the most errors. `--bank`, `--rank` and `--device` choose another, and `--rows A-B` zooms into a range of rows. The last line counts the boots of the window in which the bank had errors, when there are two or more. `--boots` draws the number of boots in each cell instead of the number of errors: a digit from 1 to 9, `+` for more, `X` where an uncorrected error came in two or more boots and `x` where it came in one.
 
 ![Address map of CPU0_C1](../examples/figures/CPU0_C1-map.svg)
 
@@ -225,6 +226,82 @@ Read it from left to right: when the errors began, whether they grow, and what h
 ![Timeline of CPU0_C1](../examples/figures/CPU0_C1-timeline.svg)
 
 In a report the events are lanes below the bars, one lane per kind. A line runs up from a boot, a repair, a reseat, a replacement and a slot change: the events across which the days before and after are compared.
+
+## Boots
+
+A fatal memory error ends its boot: the kernel panics and the host resets. On a hard fault every boot ends the same way, and a timeline, which counts errors per day, puts several such boots into one day. `my boots` draws the latest boots of the host, at most `loop.window_boots` of them. The example `crash-loop.mycase` is a host whose cell at `CPU0_C1` gave a fatal error in four boots in a row:
+
+```
+$ my open examples/crash-loop.mycase boots
+case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N BE8ED6
+host synth-crash-loop  Example Systems R760  8 boots  2026-07-31 to 2026-11-12
+ stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC
+        after 44 min
+        4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)
+
+ boot     1       2       3       4       5       6       7       8
+ started  07-31   09-01   10-01   11-12   11-12   11-12   11-12   11-12
+          11:00   03:00   03:00   08:00   08:41   09:23   09:25   10:10
+ ran      31 d    29 d    42 d    41 min  41 min  53 s    44 min  13 h
+ ended    -       -       -       STOP    STOP    STOP    STOP    -
+
+ CPU0_C1  ·       ·       ▒       X       X       X       X       ·
+ CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
+
+ · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
+ the boot stopped and no record names a DIMM, - not in the host
+ ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
+ latest scan, - not on record
+
+ my open examples/crash-loop.mycase boots CPU0_C1: the places of this DIMM boot by boot
+```
+
+The stops lines count the boots that a fatal hardware error ended, give the time of the latest and how long that boot ran, and say where the uncorrected errors lie: at one place of one DIMM (R-LOOP-01), on one DIMM at places that differ (R-LOOP-02), spread over DIMMs (R-LOOP-03), or in records that name no DIMM. The head of the grid gives each boot its number, its start in UTC, how long it ran, and how it ended:
+
+| Ended | Meaning |
+| --- | --- |
+| `STOP` | a record shows a fatal hardware error in the boot: a fatal machine check, or a record the next boot read out of a machine check bank or the boot error region |
+| `panic` | a crash log of the boot shows a panic, and no record shows a hardware error |
+| `running` | the boot that ran when a live scan read the host |
+| `-` | no record tells; a clean shutdown and a power loss look the same |
+
+Below, one line per DIMM with errors in these boots, and a line `no DIMM` for uncorrected errors that name none:
+
+| Cell | ASCII | Meaning |
+| --- | --- | --- |
+| `·` | `.` | no errors |
+| `░` `▒` `▓` | `:` `+` `*` | 1 to 9, 10 to 99, 100 or more corrected errors |
+| `U` | `U` | an uncorrected error |
+| `X` | `X` | an uncorrected error in a boot that stopped |
+| `?` | `?` | the boot stopped and no record names a DIMM, so the DIMM is not cleared for that boot |
+| `-` | `-` | the DIMM was not in the host |
+
+When more boots are on record than fit the width, the latest are drawn and a line says how many are left out; `--boots N` draws N of them. The overview adds the stops lines under the finding of the host and a row `stops` under each row of the slot map, with the number of stops of each slot: one number on one slot is one DIMM, ones along a socket are a spread.
+
+With a slot or a serial number, `my boots` draws the places of that DIMM boot by boot:
+
+```
+$ my open examples/crash-loop.mycase boots CPU0_C1
+case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N BE8ED6
+CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
+
+ boot         1  2  3  4  5  6  7  8   boots   errors
+ ended        -  -  -  S  S  S  S  -
+ rank0 dev7 bg0 bank3 row 0x1a2f
+   col 0x238  ·  ·  ▒  X  X  X  X  ·   5 of 8  CE 60, UE 4
+
+ · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
+ the boot stopped and no record names a DIMM, - not in the host
+ ended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, -
+ not on record
+
+ uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8       R-LOOP-01
+ boots: each of these boots ended in a fatal hardware error
+
+ my open examples/crash-loop.mycase dimm CPU0_C1: examination of this DIMM
+```
+
+A line is a place at the finest level the records give: a cell under the line of its row, an address, or the DIMM when a record names nothing inside it. The letters of the line `ended` are `S` stop, `p` panic, `r` running and `-` not on record. The lines are sorted by the boots they had errors in; twelve are listed, the rest summed in one. Below the grid stand the statements of the R-LOOP rules on the finding of the DIMM. `my dimm` shows the same block, cut to five places, between the address map and the timeline, when the DIMM has errors in two or more boots. `my timeline` adds the grid of the host below the days when a boot of the window stopped.
 
 ## GPU memory
 

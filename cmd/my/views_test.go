@@ -61,6 +61,9 @@ func TestJSONGolden(t *testing.T) {
 		{"map", []string{"map", "CPU0_C1", "--bank", "0/3"}, 3},
 		{"timeline", []string{"timeline", "CPU0_C1"}, 3},
 		{"timeline-host", []string{"timeline"}, 3},
+		{"boots", []string{"boots"}, 3},
+		{"boots-dimm", []string{"boots", "CPU1_D1"}, 1},
+		{"map-boots", []string{"map", "CPU0_C1", "--boots"}, 3},
 	} {
 		args := append(append([]string{"open", ledger}, tt.args...), "--json")
 		code, out, errOut := run(args...)
@@ -444,6 +447,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"help", "why"}, "why", []string{"--oneline", "Finding. A grade is a finding"}},
 		{[]string{"map", "?"}, "map", []string{"--bank N", "--rows A-B", "A horizontal line is a row fault"}},
 		{[]string{"help", "timeline"}, "timeline", []string{"--days N", "B boot, U uncorrected error"}},
+		{[]string{"boots", "--help"}, "boots", []string{"Usage: my boots [slot|serial] [--boots N]", "--boots N", "STOP a fatal hardware error ended it", "R-LOOP-03"}},
 		{[]string{"gpu", "?"}, "gpu", []string{"Usage: my gpu [index|serial|uuid|pci-address] [--days N] [flags]", "--days N", "GPU memory. A GPU does not report where in its memory an error was", "my open case.mycase gpu"}},
 		{[]string{"help", "verify"}, "verify", []string{"Usage: my verify --expect PLAN [flags]", "--expect PLAN", "The command injects nothing and changes nothing", "The exit code is 0 when every injection was found as planned and 1 when one was not", "Verification. A plan lists what a test injected"}},
 		{[]string{"export", "--help"}, "export", []string{"Usage: my export fmfm|labels [-o FILE] [flags]", "--records", "It holds no action descriptor (CPAD)", "The exit code is 0 when the log was written", "--names WHICH", "/etc/ras/dimm_labels.d"}},
@@ -543,6 +547,9 @@ func registerFlags(o *options, topic string) {
 		o.fs.Int("rank", -1, "")
 		o.fs.Int("device", -1, "")
 		o.fs.String("rows", "", "")
+		o.fs.Bool("boots", false, "")
+	case "boots":
+		o.fs.Int("boots", 0, "")
 	case "timeline", "gpu":
 		o.fs.Int("days", 0, "")
 	case "verify":
@@ -576,5 +583,63 @@ func registerFlags(o *options, topic string) {
 		o.fs.Bool("all", false, "")
 		o.fs.String("figures", "", "")
 		o.fs.Bool("force", false, "")
+	}
+}
+
+// TestBootsJSON pins the view "boots" of a crash loop and holds every
+// field it prints to the list of docs/data-model.md.
+func TestBootsJSON(t *testing.T) {
+	ledger := testledger.Path(t, "crash-loop", 1, "")
+	page, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), "docs", "data-model.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	at := strings.Index(string(page), "### The view `boots`")
+	if at < 0 {
+		t.Fatal("docs/data-model.md has no section on the view boots")
+	}
+	section := string(page)[at:]
+	if end := strings.Index(section[4:], "\n## "); end > 0 {
+		section = section[:end+4]
+	}
+	for _, tt := range []struct {
+		name string
+		args []string
+	}{
+		{"boots-loop", []string{"boots"}},
+		{"boots-loop-dimm", []string{"boots", "CPU0_C1"}},
+	} {
+		code, out, errOut := run(append(append([]string{"open", ledger}, tt.args...), "--json")...)
+		if code != 3 || errOut != "" {
+			t.Fatalf("%s: exit code %d, stderr %q", tt.name, code, errOut)
+		}
+		testutil.Golden(t, "json/"+tt.name+".json", []byte(out))
+		var e struct {
+			View string         `json:"view"`
+			Data map[string]any `json:"data"`
+		}
+		if err := json.Unmarshal([]byte(out), &e); err != nil || e.View != "boots" {
+			t.Fatalf("%s: %v, view %q", tt.name, err, e.View)
+		}
+		var walk func(v any)
+		walk = func(v any) {
+			switch x := v.(type) {
+			case map[string]any:
+				for k, sub := range x {
+					if !strings.Contains(section, "`"+k+"`") && !strings.Contains(section, "`"+k+"[]`") {
+						t.Errorf("%s: docs/data-model.md does not name the field %q", tt.name, k)
+					}
+					if k == "lines" || k == "rules" || k == "dimm" {
+						continue // statements and the DIMM have fields of their own
+					}
+					walk(sub)
+				}
+			case []any:
+				for _, sub := range x {
+					walk(sub)
+				}
+			}
+		}
+		walk(e.Data)
 	}
 }

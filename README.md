@@ -80,11 +80,11 @@ in this slot since 2026-07-31  0 slot changes
            them with errors
  next      Replace the DIMM. Attach a case bundle of this DIMM to the return.
 
- where the errors sit (width = share of the errors of this DIMM)
- rank    |rank0 ██████████████████████████████████████████████████████████████████████████████ 100%|
- device  |dev7 ███████████████████████████████████████████████████████████████████████████████ 100%|
- bank    |bg0 bank3 ██████████████████████████████████████████████████████████████████████████ 100%|
- row     |0x1a2f ████████████████████████████████████████████████████████████████████████████ 98%|█|
+ where the errors sit (width = share of the errors of this DIMM)                              boots
+ rank    |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ device  |dev7 ███████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ bank    |bg0 bank3 ██████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ row     |0x1a2f ████████████████████████████████████████████████████████████████████ 98%|█|  3 of 4
 
  rank0 dev7 bg0 bank3  row by column  one cell = 32 columns
  · 0   ░ 1-2   ▒ 3-9   ▓ 10-99   █ 100+   X uncorrected error
@@ -101,6 +101,23 @@ in this slot since 2026-07-31  0 slot changes
 
  row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2,
    DQ3, first 2026-09-24, latest 2026-11-12
+ errors in 3 of the last 4 boots, uncorrected in 1
+
+ boots of this DIMM
+ boot             1  2  3  4   boots   errors
+ ended            -  -  -  -
+ rank0 dev7 bg0 bank3 row 0x1a2f
+   col 0x238      ·  ░  ▓  U   3 of 4  CE 567, UE 1
+   col 0x388      ·  ·  ▒  ▓   2 of 4  CE 294
+   col 0x2f8      ·  ·  ▒  ▓   2 of 4  CE 158
+   col 0x390      ·  ·  ░  ▒   2 of 4  CE 94
+   col 0x420      ·  ·  ·  ▒   1 of 4  CE 49
+ 10 other places  ·  ·  ·  ▒   1 of 4  CE 69
+
+ · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
+ the boot stopped and no record names a DIMM, - not in the host
+ ended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, -
+ not on record
 
  errors per day and events
            07-31     09-01     10-01     11-12
@@ -199,6 +216,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my why [slot\|serial]` | the finding with the records, checks and confidence behind it; `--oneline` gives one line for a ticket |
 | `my map <slot\|serial>` | the address map of one bank; `--bank`, `--rank`, `--device` choose it, `--rows A-B` zooms |
 | `my timeline [slot\|serial]` | errors per day with boots, repairs, page offlines, slot changes and uncorrected errors |
+| `my boots [slot\|serial]` | the latest boots: how each ended, and which DIMM, or which place of one DIMM, had errors in it ([docs/reading-guide.md](docs/reading-guide.md#boots)) |
 | `my gpu [gpu]` | GPU memory as a repair budget: rows remapped, a remapping pending or failed, spare rows left per bank |
 | `my bundle [slot\|serial] -o case.mycase` | write the records of this host as one file to send or attach |
 | `my open FILE [command ...]` | run the commands above on a bundle or a ledger file |

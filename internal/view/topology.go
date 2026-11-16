@@ -20,6 +20,10 @@ type Topology struct {
 	Total int64 `json:"total"`
 	// Levels are rank, device, bank and row, in that order.
 	Levels []Level `json:"levels"`
+	// Window is the number of boots of the window of the host (engine
+	// recurrence), and Boots those of them the DIMM had errors in.
+	Window int `json:"window,omitzero"`
+	Boots  int `json:"boots,omitzero"`
 }
 
 // Level names of a Topology.
@@ -37,6 +41,9 @@ type Level struct {
 	Known bool `json:"known"`
 	// Segments are in drawing order, left to right.
 	Segments []Segment `json:"segments"`
+	// Boots is the number of boots of the window the largest segment had
+	// errors in.
+	Boots int `json:"boots,omitzero"`
 }
 
 // Segment is one branch at one level.
@@ -56,6 +63,8 @@ type Segment struct {
 	// Others is set on a segment that stands for that many branches too
 	// small to list.
 	Others int `json:"others,omitzero"`
+	// Boots is the number of boots of the window the branch had errors in.
+	Boots int `json:"boots,omitzero"`
 }
 
 // maxBranches is how many branches of one parent a level lists before the
@@ -68,6 +77,17 @@ type topoNode struct {
 	errors   int64
 	order    int64 // sort key among equal counts: the number of the branch
 	children map[int64]*topoNode
+	boots    map[int]bool // boots of the window with errors here
+}
+
+func (n *topoNode) boot(b int) {
+	if b < 0 {
+		return
+	}
+	if n.boots == nil {
+		n.boots = map[int]bool{}
+	}
+	n.boots[b] = true
 }
 
 func (n *topoNode) child(key int64, label string) *topoNode {
@@ -105,6 +125,13 @@ func bankLabel(bg, bank model.Opt[int]) string {
 // Topology builds the topology bars of a DIMM from its records.
 func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, error) {
 	root := &topoNode{}
+	// The boots of the window, by boot ID.
+	window := map[string]int{}
+	if h := c.Result.Host(d.Host); h != nil && h.Recurrence != nil {
+		for _, b := range h.Recurrence.Boots {
+			window[b.BootID] = b.Index
+		}
+	}
 	for e, err := range c.store.Events(ctx, store.EventFilter{DIMMUID: d.UID}) {
 		if err != nil {
 			return nil, err
@@ -113,13 +140,19 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		if n == 0 {
 			continue
 		}
+		bi := -1
+		if i, ok := window[e.BootID]; ok && e.Kind != model.KindCounter {
+			bi = i
+		}
 		root.errors += n
+		root.boot(bi)
 		label := "?"
 		if e.Rank.Valid {
 			label = fmt.Sprintf("rank%d", e.Rank.V)
 		}
 		node := root.child(optKey(e.Rank), label)
 		node.errors += n
+		node.boot(bi)
 
 		label = "?"
 		if e.DeviceId.Valid {
@@ -127,6 +160,7 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		}
 		node = node.child(optKey(e.DeviceId), label)
 		node.errors += n
+		node.boot(bi)
 
 		// A bank is known when the bank group or the bank address is.
 		key := int64(-1)
@@ -135,6 +169,7 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		}
 		node = node.child(key, bankLabel(e.BankGroup, e.Bank))
 		node.errors += n
+		node.boot(bi)
 
 		label = "?"
 		if e.Row.Valid {
@@ -142,9 +177,11 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		}
 		node = node.child(optKey(e.Row), label)
 		node.errors += n
+		node.boot(bi)
 	}
 
-	t := &Topology{Total: root.errors, Levels: []Level{{Name: LevelRank}, {Name: LevelDevice}, {Name: LevelBank}, {Name: LevelRow}}}
+	t := &Topology{Total: root.errors, Levels: []Level{{Name: LevelRank}, {Name: LevelDevice}, {Name: LevelBank}, {Name: LevelRow}},
+		Window: len(window), Boots: len(root.boots)}
 	for i := range t.Levels {
 		t.Levels[i].Segments = []Segment{}
 	}
@@ -159,6 +196,7 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		index  int       // index of the segment in the level above
 		errs   int64
 		others int // number of branches a fold stands for
+		boots  int
 	}
 	parents := []open{{node: root, index: -1, errs: root.errors}}
 	for li := range t.Levels {
@@ -166,8 +204,8 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 		var next []open
 		for _, p := range parents {
 			if p.node == nil {
-				lv.Segments = append(lv.Segments, Segment{Parent: p.index, Errors: p.errs, Share: share(p.errs, root.errors), Others: p.others})
-				next = append(next, open{index: len(lv.Segments) - 1, errs: p.errs, others: p.others})
+				lv.Segments = append(lv.Segments, Segment{Parent: p.index, Errors: p.errs, Share: share(p.errs, root.errors), Others: p.others, Boots: p.boots})
+				next = append(next, open{index: len(lv.Segments) - 1, errs: p.errs, others: p.others, boots: p.boots})
 				continue
 			}
 			kids := make([]*topoNode, 0, len(p.node.children))
@@ -186,23 +224,35 @@ func (c *Case) Topology(ctx context.Context, d *engine.DIMMResult) (*Topology, e
 			})
 			var rest int64
 			folded := 0
+			restBoots := map[int]bool{}
 			for i, k := range kids {
 				if i >= maxBranches && len(kids) > maxBranches+1 {
 					rest += k.errors
 					folded++
+					for b := range k.boots {
+						restBoots[b] = true
+					}
 					continue
 				}
-				lv.Segments = append(lv.Segments, Segment{Label: k.label, Parent: p.index, Errors: k.errors, Share: share(k.errors, root.errors), Unknown: k.unknown})
+				lv.Segments = append(lv.Segments, Segment{Label: k.label, Parent: p.index, Errors: k.errors, Share: share(k.errors, root.errors), Unknown: k.unknown,
+					Boots: len(k.boots)})
 				lv.Known = lv.Known || !k.unknown
 				next = append(next, open{node: k, index: len(lv.Segments) - 1, errs: k.errors})
 			}
 			if folded > 0 {
-				lv.Segments = append(lv.Segments, Segment{Parent: p.index, Errors: rest, Share: share(rest, root.errors), Others: folded})
+				lv.Segments = append(lv.Segments, Segment{Parent: p.index, Errors: rest, Share: share(rest, root.errors), Others: folded, Boots: len(restBoots)})
 				lv.Known = true
-				next = append(next, open{index: len(lv.Segments) - 1, errs: rest, others: folded})
+				next = append(next, open{index: len(lv.Segments) - 1, errs: rest, others: folded, boots: len(restBoots)})
 			}
 		}
 		parents = next
+		// The boots of the largest branch of the level.
+		var top int64 = -1
+		for _, s := range lv.Segments {
+			if s.Errors > top {
+				top, lv.Boots = s.Errors, s.Boots
+			}
+		}
 	}
 	return t, nil
 }

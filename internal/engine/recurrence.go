@@ -246,7 +246,7 @@ func (v *loopView) host(j *judge, name string, h *HostResult, clk clock) {
 		}
 		return boots[a].BootID < boots[b].BootID
 	})
-	r := &Recurrence{OnRecord: len(boots)}
+	r := &Recurrence{OnRecord: len(boots), Boots: []BootSpan{}}
 	if len(boots) > cfg.LoopWindowBoots {
 		boots = boots[len(boots)-cfg.LoopWindowBoots:]
 	}

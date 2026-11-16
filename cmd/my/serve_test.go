@@ -520,7 +520,7 @@ func TestServeAPI(t *testing.T) {
 
 	// One DIMM is one card, and the grade is that of the DIMM.
 	_, body := s.get("/api/dimm/CPU1_D1")
-	if !strings.Contains(body, `"exit_code": 1`) || strings.Count(body, `"slot":`) != 1 {
+	if !strings.Contains(body, `"exit_code": 1`) || strings.Count(body, `"confidence_level":`) != 1 {
 		t.Errorf("GET /api/dimm/CPU1_D1:\n%s", body)
 	}
 

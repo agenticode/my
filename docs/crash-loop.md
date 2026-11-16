@@ -130,7 +130,19 @@ The same unit files are in [contrib/systemd](../contrib/systemd) for a person wh
 
 `my-harvest.timer` (`OnBootSec=15min`, `OnUnitActiveSec=1h`) runs the harvest again during a long boot, so that counter readings and corrected errors of that boot are in the ledger before a reset. In a loop of short boots the run at boot is the one that matters.
 
-`my open /var/lib/my/ledger.db` shows the kept ledger with every command, and the overview of `my` names that command when the ledger is there.
+`my open /var/lib/my/ledger.db` shows the kept ledger with every command, and the overview of `my` names `my open /var/lib/my/ledger.db boots` when the ledger is there.
+
+## my boots
+
+`my boots` draws the latest boots of the host, at most `loop.window_boots` (16): when each started, how long it ran, how it ended (`STOP` when a record shows a fatal hardware error in it), and per DIMM what it showed in each boot. `my boots <slot>` draws the places of one DIMM boot by boot. [reading-guide.md](reading-guide.md#boots) explains the screens with the example `examples/crash-loop.mycase`, and [rules.md](rules.md#boots) the rules that read them:
+
+| Rule | Grade | Fires when |
+| --- | --- | --- |
+| R-LOOP-01 | replace now | uncorrected errors at one place of a DIMM in at least `rule.loop.min_boots` (2) boots |
+| R-LOOP-02 | replace now | uncorrected errors on one DIMM in as many boots, at no place that repeats |
+| R-LOOP-03 | hold replacement | uncorrected errors of at least `rule.loop.scatter_boots` (3) boots spread over DIMMs, none with more than `rule.loop.scatter_share` (0.5) of them |
+
+The thresholds are defaults that were compared with no field data.
 
 What MemorY never touches: kernel parameters, boot loader files, sysctls, files in `/sys` and `/proc`, the configuration of journald, systemd-pstore, kdump and rasdaemon, EFI variables, pstore files (removing one erases the record in the backend), the ERST and the boot error region. It never opens `/dev/mcelog`: a read hands the record over and clears it from ERST and from the kernel's buffer (`__mce_read_apei()`).
 

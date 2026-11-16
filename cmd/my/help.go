@@ -25,6 +25,7 @@ var words = i18n.Catalog{
 	"err.bank":           {EN: "--bank {value}: want a bank (3) or a bank group and a bank (0/3)", KO: "--bank {value}: bank 번호(3) 또는 bank group과 bank(0/3)여야 함"},
 	"err.rows":           {EN: "--rows {value}: want a range of rows such as 0x1a00-0x1aff", KO: "--rows {value}: 0x1a00-0x1aff 같은 row 범위여야 함"},
 	"err.days":           {EN: "--days {value}: want a number of days", KO: "--days {value}: 일수여야 함"},
+	"err.boots":          {EN: "--boots {value}: want a number of boots", KO: "--boots {value}: 부팅 수여야 함"},
 	"err.not_dir":        {EN: "not a directory", KO: "디렉터리가 아님"},
 	"err.empty":          {EN: "the ledger holds no host", KO: "원장에 호스트 없음"},
 	"err.not_linux":      {EN: "this is not a Linux host ({os}). A scan reads the records the Linux kernel and its tools keep about memory errors. A case from such a host is shown with \"my open FILE\" and built from its files with \"my import FILE...\"", KO: "이 시스템은 Linux 호스트가 아님({os}). 스캔은 Linux 커널과 그 도구가 남긴 메모리 오류 기록을 읽음. Linux 호스트의 케이스는 \"my open FILE\"로 열고, 그 호스트의 파일로는 \"my import FILE...\"로 케이스를 만듦"},
@@ -54,7 +55,7 @@ var words = i18n.Catalog{
 	"err.diff_order":     {EN: "{second} ({second_at}) is older than {first} ({first_at}): name the earlier case first", KO: "{second}({second_at})의 시점이 {first}({first_at}) 이전임: 앞선 케이스를 먼저 지정해야 함"},
 	"err.diff_at":        {EN: "--at {value}: want a time after the earlier case ({first_at}) and up to the later one ({second_at})", KO: "--at {value}: 앞 케이스({first_at}) 뒤이고 뒤 케이스({second_at})까지인 시각이어야 함"},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, gpu, bios, inventory, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, gpu, bios, inventory, verify, export, 또는 생략하면 개요)"},
+	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -137,11 +138,13 @@ var words = i18n.Catalog{
 	"report.open":    {EN: "open it in a browser; printing it there gives a PDF", KO: "브라우저로 엽니다. 거기서 인쇄하면 PDF가 됩니다."},
 
 	// What to run next.
-	"hint.dimm":   {EN: "examination of this DIMM", KO: "이 DIMM 진찰 화면"},
-	"hint.why":    {EN: "what the finding rests on", KO: "판정 근거"},
-	"hint.bundle": {EN: "write a case bundle", KO: "번들 만들기"},
-	"hint.import": {EN: "keep the import as a case to look closer", KO: "가져온 것을 케이스로 저장해 자세히 보기"},
-	"hint.help":   {EN: "how to read the figures", KO: "판독법"},
+	"hint.dimm":       {EN: "examination of this DIMM", KO: "이 DIMM 진찰 화면"},
+	"hint.boots":      {EN: "the places of this DIMM boot by boot", KO: "이 DIMM의 위치별 부팅 기록"},
+	"hint.boots_host": {EN: "the boots of this host and how each ended", KO: "이 호스트의 부팅과 각 부팅이 끝난 방식"},
+	"hint.why":        {EN: "what the finding rests on", KO: "판정 근거"},
+	"hint.bundle":     {EN: "write a case bundle", KO: "번들 만들기"},
+	"hint.import":     {EN: "keep the import as a case to look closer", KO: "가져온 것을 케이스로 저장해 자세히 보기"},
+	"hint.help":       {EN: "how to read the figures", KO: "판독법"},
 
 	// Help.
 	"help.usage":   {EN: "Usage:", KO: "사용법:"},
@@ -244,19 +247,24 @@ var words = i18n.Catalog{
 			"--all             오류 없는 DIMM도 포함",
 	},
 
-	"help.map.usage": {EN: "my map <slot|serial> [--bank N] [--rows A-B] [flags]", KO: "my map <슬롯|시리얼> [--bank N] [--rows A-B] [옵션]"},
+	"help.map.usage": {EN: "my map <slot|serial> [--bank N] [--rows A-B] [--boots] [flags]", KO: "my map <슬롯|시리얼> [--bank N] [--rows A-B] [--boots] [옵션]"},
 	"help.map.text":  {EN: "The address map of one bank of a DIMM: errors by row and column. Without --bank it draws the bank with the most errors and names the other banks that have errors.", KO: "DIMM의 bank 하나를 row x column 주소 맵으로 그립니다. --bank가 없으면 오류가 가장 많은 bank를 그리고 오류가 있는 다른 bank를 알려 줍니다."},
 	"help.map.flags": {
 		EN: "--bank N          the bank to draw: a bank address (3), or bank group and bank (0/3)\n" +
 			"--rank N          narrow the choice to a rank\n" +
 			"--device N        narrow the choice to a device\n" +
-			"--rows A-B        draw this range of rows (0x1a00-0x1aff)",
+			"--rows A-B        draw this range of rows (0x1a00-0x1aff)\n" +
+			"--boots           count boots in each cell: in how many of the latest boots it had errors",
 		KO: "--bank N          그릴 bank: bank 번호(3) 또는 bank group과 bank(0/3)\n" +
 			"--rank N          rank로 범위를 좁힘\n" +
 			"--device N        device로 범위를 좁힘\n" +
-			"--rows A-B        이 row 범위를 그림 (0x1a00-0x1aff)",
+			"--rows A-B        이 row 범위를 그림 (0x1a00-0x1aff)\n" +
+			"--boots           칸마다 부팅 수를 셈: 최근 부팅 중 몇 회에 오류가 있었는지",
 	},
 
+	"help.boots.usage":    {EN: "my boots [slot|serial] [--boots N] [flags]", KO: "my boots [슬롯|시리얼] [--boots N] [옵션]"},
+	"help.boots.text":     {EN: "The latest boots of the host, at most loop.window_boots of them: when each started, how long it ran, how it ended, and per DIMM what it showed in each boot. With a DIMM named: the places of that DIMM boot by boot. A fatal memory error ends its boot, and on a hard fault every boot ends the same way. A timeline counts errors per day, and one day can hold several such boots. The kept ledger of my harvest holds the boots that a scan of the running host no longer sees.", KO: "호스트의 최근 부팅(최대 loop.window_boots회): 부팅마다 시작 시각, 실행 시간, 끝난 방식, 그리고 DIMM별로 그 부팅에 보인 오류. DIMM을 지정하면 그 DIMM의 위치별 부팅 기록을 보여 줍니다. 치명적 메모리 오류는 그 부팅을 끝내고, 고장이 굳으면 부팅마다 같은 식으로 끝납니다. 타임라인은 하루 단위로 오류를 세며, 하루에 이런 부팅이 여러 번 들어갈 수 있습니다. 실행 중인 호스트를 스캔해서는 더 보이지 않는 부팅은 my harvest의 보관 원장에 남아 있습니다."},
+	"help.boots.flags":    {EN: "--boots N         draw the latest N boots only", KO: "--boots N         최근 부팅 N회만 그림"},
 	"help.timeline.usage": {EN: "my timeline [slot|serial] [--days N] [flags]", KO: "my timeline [슬롯|시리얼] [--days N] [옵션]"},
 	"help.timeline.text":  {EN: "Errors per day with boots, repairs, pages taken offline, slot changes and uncorrected errors, for one DIMM or, without one, for every DIMM of the host that has errors.", KO: "일별 오류에 부팅, 리페어, page offline, 슬롯 이동, UE를 표시합니다. DIMM을 지정하지 않으면 오류가 있는 모든 DIMM을 줄마다 그립니다."},
 	"help.timeline.flags": {EN: "--days N          draw the last N days only", KO: "--days N          최근 N일만 그림"},
@@ -308,7 +316,7 @@ var words = i18n.Catalog{
 			"--all             슬롯이 그대로이고 오류가 없는 DIMM도 모두 나열",
 	},
 
-	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|gpu|verify ...] [옵션]"},
+	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|boots|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|boots|gpu|verify ...] [옵션]"},
 	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
 	"help.bundle.usage": {EN: "my bundle [slot|serial] -o FILE [--anonymize] [flags]", KO: "my bundle [슬롯|시리얼] -o FILE [--anonymize] [옵션]"},
@@ -436,6 +444,7 @@ var guides = map[string][]string{
 	"why":      {"guide.card", "guide.grades", "guide.obs"},
 	"map":      {"guide.map", "guide.obs"},
 	"timeline": {"guide.timeline"},
+	"boots":    {"guide.boots"},
 	"gpu":      {"guide.gpu"},
 	"verify":   {"guide.verify"},
 	"diff":     {"guide.diff", "guide.grades"},
@@ -444,7 +453,7 @@ var guides = map[string][]string{
 	"report":   nil,
 	"export":   nil,
 	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
-	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.gpu", "guide.grades", "guide.obs"},
+	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.boots", "guide.gpu", "guide.grades", "guide.obs"},
 }
 
 // printGuides writes reading guides, each as a paragraph.

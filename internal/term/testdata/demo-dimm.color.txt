@@ -24,11 +24,11 @@ in this slot since 2026-07-31  0 slot changes
            them with errors
  [2mnext    [0m  Replace the DIMM. Attach a case bundle of this DIMM to the return.
 
- where the errors sit (width = share of the errors of this DIMM)
- [2mrank  [0m  |rank0 ██████████████████████████████████████████████████████████████████████████████ 100%|
- [2mdevice[0m  |dev7 ███████████████████████████████████████████████████████████████████████████████ 100%|
- [2mbank  [0m  |bg0 bank3 ██████████████████████████████████████████████████████████████████████████ 100%|
- [2mrow   [0m  |0x1a2f ████████████████████████████████████████████████████████████████████████████ 98%|█|
+ where the errors sit (width = share of the errors of this DIMM)                              boots
+ [2mrank  [0m  |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ [2mdevice[0m  |dev7 ███████████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ [2mbank  [0m  |bg0 bank3 ██████████████████████████████████████████████████████████████████ 100%|  3 of 4
+ [2mrow   [0m  |0x1a2f ████████████████████████████████████████████████████████████████████ 98%|█|  3 of 4
 
  [1mrank0 dev7 bg0 bank3[0m  row by column  one cell = 32 columns
  [2m·[0m 0   [36m░[0m 1-2   [32m▒[0m 3-9   [33m▓[0m 10-99   [31m█[0m 100+   [1;31mX[0m uncorrected error
@@ -45,6 +45,23 @@ in this slot since 2026-07-31  0 slot changes
 
  row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2,
    DQ3, first 2026-09-24, latest 2026-11-12
+ errors in 3 of the last 4 boots, uncorrected in 1
+
+ boots of this DIMM
+ boot             1  2  3  4   boots   errors
+ ended            -  -  -  -
+ rank0 dev7 bg0 bank3 row 0x1a2f
+   col 0x238      [2m·[0m  [36m░[0m  [33m▓[0m  [31mU[0m   3 of 4  CE 567, UE 1
+   col 0x388      [2m·[0m  [2m·[0m  [32m▒[0m  [33m▓[0m   2 of 4  CE 294
+   col 0x2f8      [2m·[0m  [2m·[0m  [32m▒[0m  [33m▓[0m   2 of 4  CE 158
+   col 0x390      [2m·[0m  [2m·[0m  [36m░[0m  [32m▒[0m   2 of 4  CE 94
+   col 0x420      [2m·[0m  [2m·[0m  [2m·[0m  [32m▒[0m   1 of 4  CE 49
+ 10 other places  [2m·[0m  [2m·[0m  [2m·[0m  [32m▒[0m   1 of 4  CE 69
+
+ [2m· none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?[0m
+ [2mthe boot stopped and no record names a DIMM, - not in the host[0m
+ [2mended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, -[0m
+ [2mnot on record[0m
 
  errors per day and events
            [2m07-31     09-01     10-01     11-12[0m
