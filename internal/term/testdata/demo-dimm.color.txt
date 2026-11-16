@@ -1,28 +1,14 @@
-[1mCPU0_C1[0m  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56
-in this slot since 2026-07-31  0 slot changes
+[1mCPU0_C1[0m  [1;31mreplace now[0m  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7
+                               bg0 bank3 row 0x1a2f col 0x238
+         [2mDDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56[0m
 
- [2mfinding [0m  [1;31mreplace now[0m (finding, confidence high)                          R-UE-01 R-ROW-03 R-REP-02
- [2mevidence[0m  [R-UE-01] 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3
-           row 0x1a2f col 0x238
- [2m        [0m  [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days,
+ [2mevidence[0m  [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days,
            2.3 times the daily rate of the 30 days before
- [2m        [0m  [R-ROW-03] row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 13 new places in the last 30
-           days; it now covers 9 columns in 2 rows
- [2m        [0m  [R-ROW-03] errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of
-           one device
- [2m        [0m  [R-ROW-03] the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4
-           boots
  [2m        [0m  [R-REP-02] 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28
- [2mchecks  [0m  open: no other DIMM on this channel: there is nothing to compare with
- [2m        [0m  open: no slot move or reseat on record: a cause in the board is not ruled out
  [2m        [0m  supports: the other 15 DIMMs of this host have no unconfined errors: a cause in the board
            is unlikely
- [2mmissing [0m  no ECS counters
- [2m        [0m  no DIMM temperature history
- [2mbaseline[0m  own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before
- [2m        [0m  same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of
-           them with errors
  [2mnext    [0m  Replace the DIMM. Attach a case bundle of this DIMM to the return.
+ [2mconfidence high, 3 more statements, 2 checks not made, 2 kinds of data missing: --detail[0m
 
  where the errors sit (width = share of the errors of this DIMM)                              boots
  [2mrank  [0m  |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4

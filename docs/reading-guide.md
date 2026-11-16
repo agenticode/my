@@ -80,28 +80,30 @@ Below the ranking:
 ```
 $ my open examples/demo.mycase why CPU1_D1
 case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C56
-CPU1_D1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 2AEB41
-in this slot since 2026-07-31  0 slot changes
+CPU1_D1  observe  R-SOFT-01  one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110):
+                             53 errors since 2026-08-03, 2 in the last 7 days
+         DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 2AEB41
 
- finding     observe (finding, confidence medium, 65)                                      R-SOFT-01
- evidence    [R-SOFT-01] one cell fails repeatedly (rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53
-             errors since 2026-08-03, 2 in the last 7 days
-             53 records: first synth:demo#event1, last synth:demo#event971
-             [R-SOFT-01] the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of
-             the last 4 boots
- baseline    own history: 0.3 errors a day over the last 7 days, percentile 60 of the 30 days before
-             same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2
-             of them with errors
- next        No action. Look again when the count grows or a new place appears.
- confidence  65 the grade rests on R-SOFT-01
- faults      single-bit fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110: CE 53, UE 0, 2026-08-03
-             to 2026-11-08, falling
+ evidence  [R-SOFT-01] the fault at rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 had errors in 4 of
+           the last 4 boots
+ next      No action. Look again when the count grows or a new place appears.
+ confidence medium: --detail
 ```
 
 | Line | Content |
 | --- | --- |
-| finding | the grade, the confidence, and at the right the rules that fired |
-| evidence | what each rule saw, with the number of ledger records behind the statement and where the first and the last of them were read |
+| first | the decision: the slot, the grade, the rule that set it and what that rule saw |
+| second | the module and its serial number; for a DIMM that changed slots, since when it is in this one |
+| evidence | at most three statements that bear on the decision: checks that weaken the finding, what the other rules saw, checks that support it |
+| next | the step that follows |
+| last | the confidence, and what `--detail` adds: further statements, the checks that could not be made, the kinds of data that were missing |
+
+`my why <slot> --detail` prints everything the finding rests on:
+
+| Line | Content |
+| --- | --- |
+| finding | the grade, the confidence with its number, and at the right every rule that fired |
+| evidence | every statement of every rule, with the number of ledger records behind it and where the first and the last of them were read |
 | checks | tests of the finding against other explanations: "supports" speaks for it, "weakens" against it, "open" could not be tested and names what would settle it |
 | missing | data the finding did not have |
 | baseline | how unusual the errors are, against the past of this DIMM and against the DIMMs of its part number in the ledger |

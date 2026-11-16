@@ -113,6 +113,13 @@ func (s *screen) why(ref string) string {
 	return b.String()
 }
 
+// detail is the screen as --detail draws it.
+func (s *screen) detail() *screen {
+	d := *s
+	d.st.Detail = true
+	return &d
+}
+
 func (s *screen) oneline(ref string) string {
 	s.t.Helper()
 	card, err := s.c.Card(ctx, s.h, s.dimm(ref))
@@ -222,6 +229,9 @@ func TestExamination(t *testing.T) {
 	for _, v := range []variant{en, ko, ascii, color, w60, w140} {
 		check(t, "demo-dimm", v, open(t, "demo", "", v).examination("CPU0_C1"))
 	}
+	for _, v := range all {
+		check(t, "demo-dimm-detail", v, open(t, "demo", "", v).detail().examination("CPU0_C1"))
+	}
 	// A bank fault: folded rows in the topology, binned rows in the map.
 	check(t, "bank-dimm", en, open(t, "bank", "", en).examination("CPU1_A1"))
 	// Addresses only: the lower levels are not reported and no map exists.
@@ -241,8 +251,10 @@ func TestExamination(t *testing.T) {
 func TestWhy(t *testing.T) {
 	for _, v := range all {
 		check(t, "demo-why", v, open(t, "demo", "", v).why("CPU0_C1"))
+		check(t, "demo-why-detail", v, open(t, "demo", "", v).detail().why("CPU0_C1"))
 	}
 	check(t, "system-channel-why", en, open(t, "system-channel", "", en).why("CPU0_B1"))
+	check(t, "system-channel-why-detail", en, open(t, "system-channel", "", en).detail().why("CPU0_B1"))
 	// The one-line form is not wrapped: it is pasted into a ticket.
 	for _, v := range all {
 		testutil.Golden(t, "demo-oneline."+v.name+".txt", []byte(open(t, "demo", "", v).oneline("CPU0_C1")))
@@ -763,11 +775,20 @@ func TestOverviewShowsTheHostFinding(t *testing.T) {
 	}
 	// The card of the host finding, as "my why" draws it, and its one line.
 	var b strings.Builder
-	if err := Why(&b, []*view.Card{card(i18n.EN)}, Style{Lang: i18n.EN}); err != nil {
+	if err := Why(&b, []*view.Card{card(i18n.EN)}, Style{Lang: i18n.EN, Detail: true}); err != nil {
 		t.Fatal(err)
 	}
 	if got := b.String(); !strings.HasPrefix(got, "host h  tied to no DIMM  CE 7, UE 3, 5 pages offline\n") || !strings.Contains(got, "[R-HOST-01] 3 uncorrected errors tied to no DIMM") {
 		t.Errorf("card:\n%s", got)
+	}
+	// In short the decision comes first: the host, the grade, the rule and
+	// its statement.
+	b.Reset()
+	if err := Why(&b, []*view.Card{card(i18n.EN)}, Style{Lang: i18n.EN}); err != nil {
+		t.Fatal(err)
+	}
+	if got := b.String(); !strings.HasPrefix(got, "host h  hold replacement  R-HOST-01  3 uncorrected errors tied to no DIMM") || !strings.Contains(got, "[R-HOST-02]") {
+		t.Errorf("short card:\n%s", got)
 	}
 	line := card(i18n.EN)
 	line.Label, line.ConfidenceText = "finding", "high"

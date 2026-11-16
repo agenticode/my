@@ -111,9 +111,9 @@ func analyzer(t *testing.T, mode string) string {
 // screen says that an analyzer took part.
 func TestPluginReachesTheEngine(t *testing.T) {
 	ledger := demo(t)
-	_, plain, _ := run("open", ledger, "dimm", "CPU0_C1")
+	_, plain, _ := run("open", ledger, "dimm", "CPU0_C1", "--detail")
 	exe := analyzer(t, "pairs")
-	code, out, errOut := run("open", ledger, "dimm", "CPU0_C1", "--plugin", exe)
+	code, out, errOut := run("open", ledger, "dimm", "CPU0_C1", "--detail", "--plugin", exe)
 	if code != 3 || errOut != "" {
 		t.Fatalf("exit code %d, stderr %q\n%s", code, errOut, out)
 	}
@@ -152,7 +152,7 @@ func TestPluginReachesTheEngine(t *testing.T) {
 
 	// An analyzer that only adds Level 2 output leaves the findings alone.
 	exe = analyzer(t, "level2-only")
-	_, out, _ = run("open", ledger, "dimm", "CPU0_C1", "--plugin", exe)
+	_, out, _ = run("open", ledger, "dimm", "CPU0_C1", "--detail", "--plugin", exe)
 	if !strings.Contains(out, "it now covers 9 columns in 2 rows") || !strings.HasPrefix(out, "vendor analyzer test analyzer") {
 		t.Errorf("an analyzer without adjacency changed the faults:\n%s", out)
 	}
@@ -303,7 +303,7 @@ func python(t *testing.T) string {
 func TestExampleAnalyzer(t *testing.T) {
 	python(t)
 	example := filepath.Join(testutil.RepoRoot(t), "examples", "plugin", "analyzer.py")
-	code, out, errOut := run("open", demo(t), "dimm", "CPU0_C1", "--plugin", example)
+	code, out, errOut := run("open", demo(t), "dimm", "CPU0_C1", "--detail", "--plugin", example)
 	if code != 3 || errOut != "" {
 		t.Fatalf("exit code %d, stderr %q\n%s", code, errOut, out)
 	}
