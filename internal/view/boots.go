@@ -34,6 +34,8 @@ type Boots struct {
 	Quiet int `json:"quiet,omitzero"`
 	// Stops is the summary of the stops of the window, nil without one.
 	Stops *Stops `json:"stops,omitzero"`
+	// Firmware are the firmware records of the DIMM, on the view of one.
+	Firmware []FirmwareRecord `json:"firmware,omitzero"`
 	// Rules are the statements of the R-LOOP rules on the finding of the
 	// DIMM.
 	Rules []Evidence `json:"rules,omitzero"`
@@ -52,6 +54,9 @@ type BootCol struct {
 	// StopSlot is the slot of the one DIMM with an uncorrected error in a
 	// boot that stopped.
 	StopSlot string `json:"stop_slot,omitzero"`
+	// Firmware is the letter of the firmware record of the boot that ranks
+	// highest (see bootLetters), or "".
+	Firmware string `json:"firmware,omitzero"`
 }
 
 // Levels of a BootRow beside the place levels of the engine.
@@ -159,6 +164,17 @@ func (c *Case) BootsView(ctx context.Context, h *engine.HostResult, d *engine.DI
 			RanSeconds: bs.RanSeconds, End: bs.End, EndRecord: bs.EndRecord, StopSlot: bs.StopSlot})
 	}
 	b.Stops = c.stops(h)
+	// The firmware records of each boot: of the DIMM, or of the host.
+	var fw []FirmwareRecord
+	if d != nil {
+		if fw, err = c.FirmwareOf(ctx, h.Host, d.UID); err != nil {
+			return nil, err
+		}
+		b.Firmware = fw
+	} else if fw, err = c.firmwareOf(ctx, h.Host, "", true); err != nil {
+		return nil, err
+	}
+	firmwareBoots(b.Boots, fw)
 	// A boot that stopped with no record naming a DIMM: an empty cell of a
 	// DIMM says nothing about it.
 	unnamed := map[int]bool{}

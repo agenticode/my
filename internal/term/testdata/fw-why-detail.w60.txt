@@ -1,0 +1,37 @@
+CPU1_D1  DDR5 RDIMM 64 GB 2Rx4
+Example Memory EXM64G48R2X4-A  S/N 21FD6F
+in this slot since 2026-07-31  0 slot changes
+
+ finding     replace now (finding, confidence high, 89)
+             R-FW-01 R-REP-01
+ evidence    [R-FW-01] the memory mirror failed over from
+             the DIMM on 2026-11-12 (EXM0006)
+             1 record
+             [R-REP-01] sparing has been in use since
+             2026-07-31: the spare is taken
+             1 record
+ checks      open: no other DIMM on this channel: there is
+             nothing to compare with
+             open: no slot move or reseat on record: a cause
+             in the board is not ruled out
+             supports: the other 15 DIMMs of this host have
+             no unconfined errors: a cause in the board is
+             unlikely
+             open: the meaning of EXM0006 comes from the
+             table example@1 (registry); it was not checked
+             on real hardware
+ missing     no ECS counters
+             no DIMM temperature history
+ baseline    own history: 0.6 errors a day over the last 7
+             days, percentile 87 of the 30 days before
+             same part number (EXM64G48R2X4-A): percentile
+             91 among the 16 DIMMs in this ledger, 2 of them
+             with errors
+ next        Replace the DIMM. Attach a case bundle of this
+             DIMM to the return.
+ confidence  90 the grade rests on R-FW-01
+             +5 1 check supports the finding
+             -6 3 checks could not be made
+ faults      single-bit fault at rank1 dev10 bg3 bank2 row
+             0xbce2 col 0x4c8: CE 25, UE 0, 2026-08-05 to
+             2026-11-09, steady

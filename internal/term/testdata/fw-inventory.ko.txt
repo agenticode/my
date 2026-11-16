@@ -1,0 +1,49 @@
+호스트 synth-crash-loop  Example Systems R760
+DIMM 16개. 빈 슬롯 16개는 생략 (--all로 표시)
+슬롯 이름과 모듈 정보의 출처: SMBIOS
+BIOS 설정 기록이 없어 RAS 열이 비어 있음. my bios --bmc ADDRESS로 읽을 수 있음
+
+ 슬롯     시리얼  제조사          파트 넘버        용량  구성  속도       CE OS  CE BMC
+ CPU0_A1  8F2453  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_B1  D6A738  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_C1  BE8ED6  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+          펌웨어: disabled 11-12, PFA 11-12 +2
+ CPU0_D1  0149B5  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_E1  3016FC  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_F1  2BE334  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_G1  CF6088  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_H1  D849FD  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_A1  B6446C  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_B1  E17AA4  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_C1  B5DAD6  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_D1  21FD6F  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+          BMC 로그 2026-11-12 09:40 UTC: cleared
+          펌웨어: mirror 11-12, sparing 07-31
+ CPU1_E1  EA1641  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_F1  EF9E30  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_G1  049F4B  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_H1  2E671F  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+
+ 구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s).
+ CE OS는 운영체제 기록의 CE 수, CE BMC는 BMC 로그의 CE 항목 수. 둘 다 양쪽 기록이 겹치는 기간인
+ 2026-11-12 09:40 UTC부터 2026-11-13 00:00 UTC까지를 셈.
+
+ 운영체제와 BMC 비교 기간: 2026-11-12 09:40 UTC부터 2026-11-13 00:00 UTC까지. 운영체제 기록은
+ 2026-07-31 11:00 UTC에, BMC 로그는 2026-11-12 09:40 UTC에 시작.
+ 그 기간에 어느 쪽에도 CE 기록이 없음.

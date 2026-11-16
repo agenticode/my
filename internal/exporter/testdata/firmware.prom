@@ -1,0 +1,76 @@
+# HELP my_dimm_verdict Finding for the DIMM in the slot: 0 ok, 1 observe, 2 consider replacement, 3 replace now, 4 hold replacement. An empty slot and serial carry the host finding, about errors and page offlines that are tied to no DIMM.
+# TYPE my_dimm_verdict gauge
+my_dimm_verdict{host="h1",slot="",serial=""} 4
+my_dimm_verdict{host="h1",slot="DIMM_A1",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A10",serial=""} 4
+my_dimm_verdict{host="h1",slot="DIMM_A2",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A3",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A4",serial=""} 0
+my_dimm_verdict{host="h1",slot="DIMM_A5",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A6",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A8",serial=""} 3
+my_dimm_verdict{host="h1",slot="DIMM_A9",serial=""} 3
+my_dimm_verdict{host="h1",slot="socket1 channel0 dimm0",serial=""} 1
+# HELP my_dimm_ce_total Corrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ce_total counter
+my_dimm_ce_total{host="h1",slot="",serial=""} 1
+my_dimm_ce_total{host="h1",slot="DIMM_A1",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A10",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A2",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A3",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A4",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A5",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A6",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A8",serial=""} 0
+my_dimm_ce_total{host="h1",slot="DIMM_A9",serial=""} 0
+my_dimm_ce_total{host="h1",slot="socket1 channel0 dimm0",serial=""} 1
+# HELP my_dimm_ue_total Uncorrected errors on record for the DIMM, counted from error records. An empty serial counts errors of the slot that could not be tied to a DIMM.
+# TYPE my_dimm_ue_total counter
+my_dimm_ue_total{host="h1",slot="",serial=""} 1
+my_dimm_ue_total{host="h1",slot="DIMM_A1",serial=""} 1
+my_dimm_ue_total{host="h1",slot="DIMM_A10",serial=""} 0
+my_dimm_ue_total{host="h1",slot="DIMM_A2",serial=""} 1
+my_dimm_ue_total{host="h1",slot="DIMM_A3",serial=""} 1
+my_dimm_ue_total{host="h1",slot="DIMM_A4",serial=""} 0
+my_dimm_ue_total{host="h1",slot="DIMM_A5",serial=""} 0
+my_dimm_ue_total{host="h1",slot="DIMM_A6",serial=""} 0
+my_dimm_ue_total{host="h1",slot="DIMM_A8",serial=""} 0
+my_dimm_ue_total{host="h1",slot="DIMM_A9",serial=""} 0
+my_dimm_ue_total{host="h1",slot="socket1 channel0 dimm0",serial=""} 0
+# HELP my_dimm_faults Faults of the DIMM in the slot by fault mode. A fault is a group of errors with one cause.
+# TYPE my_dimm_faults gauge
+my_dimm_faults{host="h1",slot="DIMM_A1",mode="undetermined"} 1
+my_dimm_faults{host="h1",slot="DIMM_A2",mode="undetermined"} 1
+my_dimm_faults{host="h1",slot="DIMM_A3",mode="undetermined"} 1
+my_dimm_faults{host="h1",slot="socket1 channel0 dimm0",mode="undetermined"} 1
+# HELP my_dimm_offlined_pages Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM.
+# TYPE my_dimm_offlined_pages gauge
+my_dimm_offlined_pages{host="h1",slot="DIMM_A1"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A10"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A2"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A3"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A4"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A5"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A6"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A8"} 0
+my_dimm_offlined_pages{host="h1",slot="DIMM_A9"} 0
+my_dimm_offlined_pages{host="h1",slot="socket1 channel0 dimm0"} 0
+# HELP my_dimm_repairs_total Repairs on record for the DIMM in the slot by type: sppr, hppr, ppr (a post package repair the record does not call soft or hard), sparing, device-sparing (ADDDC, SDDC), row-remap. Attempts that failed count too; a repair that waits for the next boot does not.
+# TYPE my_dimm_repairs_total counter
+my_dimm_repairs_total{host="h1",slot="DIMM_A5",type="ppr"} 1
+my_dimm_repairs_total{host="h1",slot="DIMM_A8",type="sparing"} 1
+my_dimm_repairs_total{host="h1",slot="DIMM_A9",type="sparing"} 1
+# HELP my_dimm_firmware_events_total Firmware records about the DIMM by common event: predicted-failure, disabled, ppr-scheduled, ppr-done, ppr-failed, sparing, device-sparing, spare-copy-started, sparing-failed, mirror-failover, mirror-lost, training-failure, config-error. A record that repeats another one is not counted.
+# TYPE my_dimm_firmware_events_total counter
+my_dimm_firmware_events_total{host="h1",slot="",serial="",event="device-sparing"} 1
+my_dimm_firmware_events_total{host="h1",slot="",serial="",event="mirror-failover"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A10",serial="",event="training-failure"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A4",serial="",event="ppr-scheduled"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A5",serial="",event="ppr-failed"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A6",serial="",event="mirror-failover"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A7",serial="",event="mirror-lost"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A8",serial="",event="sparing"} 1
+my_dimm_firmware_events_total{host="h1",slot="DIMM_A9",serial="",event="sparing-failed"} 1
+# HELP my_source_grade Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went.
+# TYPE my_source_grade gauge
+my_source_grade{host="h1",source="redfish",status="ok"} 2

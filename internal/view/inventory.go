@@ -108,6 +108,10 @@ type InventoryRow struct {
 	BMCCount *BMCCount `json:"bmc_count,omitzero"`
 	// Events are the newest entries of the logs of the BMC about the slot.
 	Events []RowEvent `json:"bmc_events,omitzero"`
+	// Firmware are the firmware records of the DIMM; Marks the marks and
+	// steps among them in a few words, newest first.
+	Firmware []FirmwareRecord `json:"firmware,omitzero"`
+	Marks    string           `json:"firmware_marks,omitzero"`
 	// Lines are the remarks below the line of the module.
 	Lines []Text `json:"lines,omitzero"`
 }
@@ -597,6 +601,18 @@ func (c *Case) Inventory(ctx context.Context, h *engine.HostResult, opts Invento
 			}
 		}
 		r.Events = data.newest[name]
+		if r.DIMMUID != "" {
+			fw, err := c.FirmwareOf(ctx, h.Host, r.DIMMUID)
+			if err == nil {
+				// The table names the records; my why and my dimm point at
+				// them.
+				for i := range fw {
+					fw[i].RawRef = ""
+				}
+				r.Firmware = fw
+				r.Marks = marksText(fw)
+			}
+		}
 		c.inventoryLines(&r)
 		v.Rows = append(v.Rows, r)
 	}
@@ -689,6 +705,16 @@ func (c *Case) Inventory(ctx context.Context, h *engine.HostResult, opts Invento
 	if widthUnknown > 0 {
 		v.Notes = append(v.Notes, c.inv("inv.note_width", "n", widthUnknown, "total", v.DIMMs))
 	}
+	// The message registries the BMC published, with how much of their
+	// memory messages this version classes.
+	if regs, err := c.store.RegistriesSeen(ctx, h.Host); err == nil {
+		for _, r := range regs {
+			if r.Memory == 0 {
+				continue
+			}
+			v.Notes = append(v.Notes, c.registryText(r))
+		}
+	}
 	return v, nil
 }
 
@@ -765,6 +791,9 @@ func (c *Case) inventoryLines(r *InventoryRow) {
 	}
 	for _, e := range r.Events {
 		r.Lines = append(r.Lines, c.inv("inv.line.event", "when", stamp(e.At), "text", e.Text))
+	}
+	if r.Marks != "" {
+		r.Lines = append(r.Lines, c.inv("inv.line.firmware", "marks", r.Marks))
 	}
 }
 
