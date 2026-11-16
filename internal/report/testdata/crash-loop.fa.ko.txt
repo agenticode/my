@@ -8,17 +8,11 @@ section#s1.sec
   p.grade: 즉시 교체 호스트 synth-crash-loop
   p.conclusion: CPU0_C1 S/N BE8ED6: 즉시 교체 (소견, 신뢰도 높음). UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
   p: 오류나 소견이 1개 더 있음: CPU1_D1 관찰.
-  케이스 ID = 0123456789ab 원장 식별자 앞 12자리
-  호스트 = synth-crash-loop
   시스템 = Example Systems R760
   기록 기간 = 2026-07-31 ~ 2026-11-13, 부팅 8회
   오류 = CE 85건, UE 4건
   관측 등급 = A (bank, row, column 확인)
   DIMM = 슬롯 32개에 DIMM 16개, 오류나 소견이 있는 DIMM 2개
-  수집 = 합성 데이터, 2026-11-13 00:00 UTC
-  리포트 = FA용 리포트, 2026-11-13 09:30 UTC 생성, 도구 my test
-  엔진 = 버전 7
-  p.how: 등급은 소견입니다. 기준 임계값은 FA 결과와 대조하기 전의 기본값입니다.
   li: 2 슬롯 맵
   li: 3 DIMM별 판정
   li: 4 토폴로지 막대와 주소 맵
@@ -64,10 +58,8 @@ section#s2.sec
       mark: CPU1_H2: 빈 슬롯
       text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
     li: 즉시 교체
-    li: 교체 고려
     li: 관찰
     li: 정상
-    li: 교체 보류
     li: 빈 슬롯
     figcaption: 슬롯 32개, DIMM 16개
   p.how: 칸 하나가 슬롯 하나입니다. 소켓마다 한 줄, 메모리 채널마다 한 묶음이며 보드 순서를 따릅니다. 칸의 색과 표식이 그 슬롯 DIMM의 소견 등급입니다. 모듈이 없는 슬롯은 테두리만 그립니다. 칸을 누르면 그 DIMM의 판정으로 갑니다.
@@ -169,27 +161,19 @@ section#s3.sec
   ## 3 DIMM별 판정
   article#dimm-CPU0_C1.card.g-replace
     ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
-    p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
-    판정 = 즉시 교체 (소견, 신뢰도 높음, 95) R-UE-01 R-LOOP-01
-    근거 = R-UE-01 UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 4건 R-LOOP-01 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두 치명적 하드웨어 오류로 끝남 기록 64건
-    반례 = 미확인 이 채널에 다른 DIMM 없음: 비교 대상 없음 미확인 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음 뒷받침 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음 뒷받침 UE가 DIMM의 한 위치에 머묾: 접촉이나 배선 고장이면 읽는 주소마다 오류가 남
-    부족 = ECS 카운터 없음 DIMM 온도 이력 없음
-    기준 = 자체 이력: 최근 7일 하루 3.3건, 그 앞 30일의 93 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
+    판정 = 즉시 교체 R-UE-01 UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 4건
+    근거 = R-LOOP-01 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두 치명적 하드웨어 오류로 끝남 기록 64건 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음 뒷받침 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음
     다음 = DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
-    신뢰도 = 90 등급 근거 규칙: R-UE-01 +10 소견을 뒷받침하는 점검 3건 -4 하지 못한 점검 2건
-    고장 = single bit 고장(rank0 dev7 bg0 bank3 row 0x1a2f col 0x238): CE 60건, UE 4건; 2026-10-21 ~ 2026-11-12; 증가; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
+    p.sub: 신뢰도 높음, 근거 1건 더, 확인 못 한 점검 2건, 빠진 데이터 2종: 판정 전체
     p.links: 토폴로지 막대와 주소 맵 타임라인 점검표
   article#dimm-CPU1_D1.card.g-observe
     ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
-    p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
-    판정 = 관찰 (소견, 신뢰도 보통, 65) R-SOFT-01
-    근거 = R-SOFT-01 셀 하나가 반복 실패(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 2026-08-05부터 25건, 최근 7일 4건 기록 25건 R-SOFT-01 rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 고장: 최근 부팅 8회 중 3회에서 오류
-    기준 = 자체 이력: 최근 7일 하루 0.6건, 그 앞 30일의 87 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 91 백분위, 오류 있는 DIMM 2개
+    판정 = 관찰 R-SOFT-01 셀 하나가 반복 실패(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 2026-08-05부터 25건, 최근 7일 4건 기록 25건
+    근거 = R-SOFT-01 rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 고장: 최근 부팅 8회 중 3회에서 오류
     다음 = 조치 없음. 건수가 늘거나 새 위치가 나오면 다시 확인.
-    신뢰도 = 65 등급 근거 규칙: R-SOFT-01
-    고장 = single bit 고장(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): CE 25건, UE 0건; 2026-08-05 ~ 2026-11-09; 유지; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
+    p.sub: 신뢰도 보통: 판정 전체
     p.links: 토폴로지 막대와 주소 맵 타임라인 점검표
-  p.how: 근거는 규칙마다 본 것과 그 바탕이 된 원장 기록 수입니다. 건수를 누르면 기록이 나옵니다. 반례는 소견을 다른 설명과 견준 점검입니다. "뒷받침"은 소견에 힘을 싣고, "약화"는 소견과 어긋나며, "미확인"은 하지 못한 점검입니다. 부족은 소견에 없던 데이터입니다.
+  p.how: 판정 줄은 등급, 등급을 정한 규칙, 그 규칙이 본 것입니다. 그 아래에 결정에 영향을 주는 문장이 최대 3개 나옵니다: 다른 규칙이 본 것, 소견에 힘을 싣는("뒷받침") 점검과 소견과 어긋나는("약화") 점검. 기록 건수를 누르면 기록이 나옵니다. 마지막 줄은 신뢰도와, 부록의 판정 전체가 더하는 것(나머지 문장, 하지 못한 점검, 빠진 데이터)의 수를 적습니다.
   ### 이 리포트에 나온 규칙
   table.rules
     | 규칙 | 주는 등급 | 발동 조건
@@ -219,10 +203,6 @@ section#s4.sec
     figure
       figcaption: rank0 dev7 bg0 bank3, row x column, 한 칸 = column 16개
       li: 0
-      li: 1-2
-      li: 3-9
-      li: 10-99
-      li: 100+
       li: UE
       li: 테두리: 두 부팅 이상에서 오류
       svg.fig.amap: CPU0_C1의 주소 맵, rank0 dev7 bg0 bank3
@@ -255,11 +235,7 @@ section#s4.sec
     figure
       figcaption: rank1 dev10 bg3 bank2, row x column, 한 칸 = column 32개
       li: 0
-      li: 1-2
-      li: 3-9
       li: 10-99
-      li: 100+
-      li: UE
       li: 테두리: 두 부팅 이상에서 오류
       svg.fig.amap: CPU1_D1의 주소 맵, rank1 dev10 bg3 bank2
         mark: row 0xbce2, column 0x4c0 ~ 0x4df: 오류 25건, 기록 25건; 처음 2026-08-05, 최근 2026-11-09; 최근 부팅 8회 중 3회에 오류
@@ -590,6 +566,32 @@ section#s7.sec
   p: 찾아본 소스를 모두 다 읽었습니다.
 section#s8.sec
   ## 8 부록
+  ### 케이스 정보
+  케이스 ID = 0123456789ab 원장 식별자 앞 12자리
+  호스트 = synth-crash-loop
+  수집 = 합성 데이터, 2026-11-13 00:00 UTC
+  리포트 = FA용 리포트, 2026-11-13 09:30 UTC 생성, 도구 my test
+  엔진 = 버전 7
+  p.how: 등급은 소견입니다. 기준 임계값은 FA 결과와 대조하기 전의 기본값입니다.
+  ### 판정 전체
+  article#full-dimm-CPU0_C1.card.g-replace
+    #### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    판정 = 즉시 교체 (소견, 신뢰도 높음, 95) R-UE-01 R-LOOP-01
+    근거 = R-UE-01 UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 4건 R-LOOP-01 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두 치명적 하드웨어 오류로 끝남 기록 64건
+    반례 = 미확인 이 채널에 다른 DIMM 없음: 비교 대상 없음 미확인 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음 뒷받침 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음 뒷받침 UE가 DIMM의 한 위치에 머묾: 접촉이나 배선 고장이면 읽는 주소마다 오류가 남
+    부족 = ECS 카운터 없음 DIMM 온도 이력 없음
+    기준 = 자체 이력: 최근 7일 하루 3.3건, 그 앞 30일의 93 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
+    다음 = DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
+    신뢰도 = 90 등급 근거 규칙: R-UE-01 +10 소견을 뒷받침하는 점검 3건 -4 하지 못한 점검 2건
+    고장 = single bit 고장(rank0 dev7 bg0 bank3 row 0x1a2f col 0x238): CE 60건, UE 4건; 2026-10-21 ~ 2026-11-12; 증가; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
+  article#full-dimm-CPU1_D1.card.g-observe
+    #### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    판정 = 관찰 (소견, 신뢰도 보통, 65) R-SOFT-01
+    근거 = R-SOFT-01 셀 하나가 반복 실패(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 2026-08-05부터 25건, 최근 7일 4건 기록 25건 R-SOFT-01 rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 고장: 최근 부팅 8회 중 3회에서 오류
+    기준 = 자체 이력: 최근 7일 하루 0.6건, 그 앞 30일의 87 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 91 백분위, 오류 있는 DIMM 2개
+    다음 = 조치 없음. 건수가 늘거나 새 위치가 나오면 다시 확인.
+    신뢰도 = 65 등급 근거 규칙: R-SOFT-01
+    고장 = single bit 고장(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): CE 25건, UE 0건; 2026-08-05 ~ 2026-11-09; 유지; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
   ### 원시 이벤트 표
   p.how: 이 리포트가 가리키는 원장 기록을 시간순으로 나열합니다: 소견이 인용한 기록, 타임라인에 표시한 UE와 리페어 기록, 주소 맵 칸마다 처음과 최근 기록. ID를 누르면 원본이 나옵니다. 모든 기록은 케이스에 들어 있습니다. 소견이 인용한 기록은 원본과 함께 인쇄됩니다.
   p.sub: 이 호스트의 기록 89건 중 10건

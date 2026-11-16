@@ -287,17 +287,29 @@ func TestSummary(t *testing.T) {
 		"replace now host r12-n034",
 		"CPU0_C1 S/N 3B9C56: replace now (finding, confidence high). 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. Replace the DIMM.",
 		"1 more with errors or a finding: CPU1_D1 observe.",
-		"Case ID 0123456789ab",
 		"Period on record 2026-07-31 to 2026-11-13, 4 boots",
 		"Errors CE 1,284, UE 1",
 		"Observation grade A (bank, row and column known)",
 		"DIMMs 16 in 32 slots, 2 with errors or a finding",
+	} {
+		if !strings.Contains(text, want) {
+			t.Errorf("the summary lacks %q:\n%s", want, text)
+		}
+	}
+	// The identity of the case is in the appendix.
+	if strings.Contains(text, "Case ID") || strings.Contains(text, "Engine version") {
+		t.Errorf("the summary holds the identity of the case:\n%s", text)
+	}
+	about := root.find("section.sec")[7].content()
+	for _, want := range []string{
+		"Case ID 0123456789ab",
+		"Host r12-n034",
 		"customer report, generated 2026-11-13 09:30 UTC by my test",
 		"Engine version " + engine.Version,
 		"A grade is a finding.",
 	} {
-		if !strings.Contains(text, want) {
-			t.Errorf("the summary lacks %q:\n%s", want, text)
+		if !strings.Contains(about, want) {
+			t.Errorf("the appendix lacks %q", want)
 		}
 	}
 	if v := sum.find("div.verdict"); len(v) != 1 || !v[0].hasClass("g-replace") {
@@ -510,10 +522,14 @@ func TestRecords(t *testing.T) {
 		t.Errorf("the appendix does not say how many records it lists")
 	}
 
-	// The statements of a finding lead to the records they cite.
-	links := root.find("a.recs")
+	// The statements of a finding lead to the records they cite: the
+	// short card of section 3 and the whole finding in the appendix.
+	if n := len(root.find("section.sec")[2].find("a.recs")); n != 4 {
+		t.Errorf("%d statements with records in the findings, want 4", n)
+	}
+	links := root.find("section.sec")[7].find("a.recs")
 	if len(links) != 5 {
-		t.Fatalf("%d statements with records, want 5", len(links))
+		t.Fatalf("%d statements with records in the appendix, want 5", len(links))
 	}
 	if l := links[0]; l.content() != "1 record" || l.attrs["data-rec"] != "e1228" || !strings.HasPrefix(l.attrs["data-label"], "[R-UE-01] 1 uncorrected error") {
 		t.Errorf("first statement: %q %v", l.content(), l.attrs)
@@ -800,8 +816,11 @@ func TestLimits(t *testing.T) {
 	if len(doc.DIMMs) != 14 || len(detailed) != 2 {
 		t.Fatalf("%d DIMMs, %d with figures", len(doc.DIMMs), len(detailed))
 	}
-	if n := len(root.find("article.card")); n != 14 {
+	if n := len(root.find("section.sec")[2].find("article.card")); n != 14 {
 		t.Errorf("%d finding cards, want 14", n)
+	}
+	if n := len(root.find("section.sec")[7].find("article.card")); n != 14 {
+		t.Errorf("%d whole findings in the appendix, want 14", n)
 	}
 	if n := len(root.find("svg.amap")); n != 2 {
 		t.Errorf("%d address maps, want 2", n)
@@ -1399,7 +1418,7 @@ func TestOtherStates(t *testing.T) {
 	for _, want := range []string{
 		// The DIMM that was taken out keeps its finding and says where it is.
 		"CPU0_C1 S/N 3B9C56: replace now", "The DIMM is no longer in the host.", "replace now (no longer in the host)",
-		"in this slot since 2026-07-31; 0 slot changes; no longer in the host",
+		"DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56 no longer in the host",
 		// The case.
 		"Case ID abcdef012345 the first 12 digits of the SHA-256 checksum of the ledger in the bundle",
 		"Case bundle written 2026-11-13 08:30 UTC by my 0.9.0 (0123abcd); host names and network addresses were replaced before it was sent",
@@ -1629,12 +1648,16 @@ func TestReportHasTheHostFinding(t *testing.T) {
 		"R-HOST-01 3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340 3 records",
 		"R-HOST-02 7 corrected errors tied to no DIMM on 2026-11-15 7 records",
 		"R-HOST-02 5 pages taken offline and tied to no DIMM, the last on 2026-11-15",
-		"open 10 errors name no slot",
 		"Do not pull a DIMM on these records",
+		"confidence high, 1 check not made, 1 kind of data missing: the whole finding",
 	} {
 		if !strings.Contains(card, want) {
 			t.Errorf("the card lacks %q:\n%s", want, card)
 		}
+	}
+	// The whole host finding is in the appendix, its open check too.
+	if full := byID(root, "article", "full-"+hostAnchor); len(full) != 1 || !strings.Contains(full[0].content(), "open 10 errors name no slot") {
+		t.Errorf("the appendix lacks the whole host finding")
 	}
 	// Every statement of the card leads to records in the appendix.
 	links := cards[0].find("a.recs")
@@ -1674,7 +1697,7 @@ func TestReportHasTheHostFinding(t *testing.T) {
 	if want := "DIMM 미확인 기록: 교체 보류 (소견, 신뢰도 높음). DIMM 미확인 UE 3건, 최근 2026-11-15 10:36 UTC, address 0x1060c4340."; !strings.Contains(strings.ReplaceAll(text, "\u00a0", " "), want) {
 		t.Errorf("Korean summary:\n%s", text)
 	}
-	if kc := byID(kroot, "article", hostAnchor); len(kc) != 1 || len(kc[0].find("ul.factors")) != 1 || len(kc[0].find("ul.factors")[0].find("li")) == 0 {
+	if kc := byID(kroot, "article", "full-"+hostAnchor); len(kc) != 1 || len(kc[0].find("ul.factors")) != 1 || len(kc[0].find("ul.factors")[0].find("li")) == 0 {
 		t.Error("the Korean FA report lacks the card of the host finding or the steps of its confidence")
 	}
 

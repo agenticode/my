@@ -8,17 +8,11 @@ section#s1.sec
   p.grade: hold replacement host synth-system-channel
   p.conclusion: CPU0_B1 S/N 880018: hold replacement (finding, confidence medium). CPU0_B1 and CPU0_B2 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 181 here, 160 there, between 2026-09-05 and 2026-11-12. Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another channel and see whether the errors follow it.
   p: 13 more with errors or a finding: CPU0_B2 hold replacement, CPU0_E1 observe, CPU0_F1 observe, CPU0_F2 observe, CPU0_G1 observe, CPU0_H2 observe, CPU1_A1 observe, CPU1_A2 observe, CPU1_C1 observe, CPU1_C2 observe, CPU1_E1 observe, CPU1_G1 observe, CPU1_G2 observe.
-  Case ID = 0123456789ab the first 12 digits of the identity of the ledger
-  Host = synth-system-channel
   System = Example Systems R760
   Period on record = 2026-07-31 to 2026-11-13, 3 boots
   Errors = CE 353, UE 0
   Observation grade = A (bank, row and column known)
   DIMMs = 32 in 32 slots, 14 with errors or a finding
-  Collected = synthetic data set, 2026-11-13 00:00 UTC
-  Report = failure analysis report, generated 2026-11-13 09:30 UTC by my test
-  Engine = version 7
-  p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
   li: 2 Slot map
   li: 3 Findings
   li: 4 Topology and address map
@@ -63,8 +57,6 @@ section#s2.sec
       mark: CPU1_H1: ok, S/N 849FD6
       mark: CPU1_H2: ok, S/N 6446CF
       text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
-    li: replace now
-    li: consider replacement
     li: observe
     li: ok
     li: hold replacement
@@ -287,99 +279,77 @@ section#s3.sec
   ## 3 Findings
   article#dimm-CPU0_B1.card.g-hold
     ### CPU0_B1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 880018
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = hold replacement (finding, confidence medium, 65) R-SYS-01
-    evidence = R-SYS-01 CPU0_B1 and CPU0_B2 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 181 here, 160 there, between 2026-09-05 and 2026-11-12 181 records
-    missing = no ECS counters no DIMM temperature history
-    baseline = own history: 1.9 errors a day over the last 7 days, percentile 37 of the 30 days before same part number (EXM64G48R2X4-A): percentile 98 among the 32 DIMMs in this ledger, 5 of them with errors
+    finding = hold replacement R-SYS-01 CPU0_B1 and CPU0_B2 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 181 here, 160 there, between 2026-09-05 and 2026-11-12 181 records
     next = Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another channel and see whether the errors follow it.
-    confidence = 65 the grade rests on R-SYS-01
-    faults = system issue: CE 181, UE 0; 2026-09-05 to 2026-11-12; steady; failed again later; 181 rows, 181 columns, 173 banks; observation grade A
+    p.sub: confidence medium, 2 kinds of data missing: the whole finding
     p.links: topology and address map timeline checks
   article#dimm-CPU0_B2.card.g-hold
     ### CPU0_B2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N E7A387
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = hold replacement (finding, confidence medium, 65) R-SYS-01
-    evidence = R-SYS-01 CPU0_B2 and CPU0_B1 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 160 here, 181 there, between 2026-09-05 and 2026-11-12 160 records
-    missing = no ECS counters no DIMM temperature history
-    baseline = own history: 2.7 errors a day over the last 7 days, percentile 63 of the 30 days before same part number (EXM64G48R2X4-A): percentile 95 among the 32 DIMMs in this ledger, 5 of them with errors
+    finding = hold replacement R-SYS-01 CPU0_B2 and CPU0_B1 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 160 here, 181 there, between 2026-09-05 and 2026-11-12 160 records
     next = Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another channel and see whether the errors follow it.
-    confidence = 65 the grade rests on R-SYS-01
-    faults = system issue: CE 160, UE 0; 2026-09-05 to 2026-11-12; steady; failed again later; 160 rows, 160 columns, 149 banks; observation grade A
+    p.sub: confidence medium, 2 kinds of data missing: the whole finding
     p.links: topology and address map timeline checks
   article#dimm-CPU0_E1.card.g-observe
     ### CPU0_E1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 01EAE2
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-07; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-09-07; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU0_F1.card.g-observe
     ### CPU0_F1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 332238
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-08; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-10-08; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU0_F2.card.g-observe
     ### CPU0_F2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N A8A64B
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-06; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-09-06; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU0_G1.card.g-observe
     ### CPU0_G1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N B31D2C
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-04; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-08-04; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU0_H2.card.g-observe
     ### CPU0_H2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 7F782A
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_A1.card.g-observe
     ### CPU1_A1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N B41102
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-19; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-10-19; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_A2.card.g-observe
     ### CPU1_A2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N C34D84
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-06; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-08-06; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_C1.card.g-observe
     ### CPU1_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 12AE34
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-09; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-09-09; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_C2.card.g-observe
     ### CPU1_C2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 098671
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_E1.card.g-observe
     ### CPU1_E1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 6A7388
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-21; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-10-21; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_G1.card.g-observe
     ### CPU1_G1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE334C
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-05; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-10-05; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
+    p.sub: confidence medium: the whole finding
   article#dimm-CPU1_G2.card.g-observe
     ### CPU1_G2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N F6088C
-    p.sub: in this slot since 2026-07-31; 0 slot changes
-    finding = observe (finding, confidence medium, 65) R-SOFT-01
-    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-05; no place failed again 1 record
+    finding = observe R-SOFT-01 1 corrected error at 1 place on 2026-08-05; no place failed again 1 record
     next = No action. Look again when the count grows or a new place appears.
-  p.how: Evidence states what each rule saw and how many ledger records it rests on; the count leads to the records. Checks test the finding against other explanations: "supports" speaks for it, "weakens" speaks against it, "open" could not be tested. Missing lists data the finding did not have.
+    p.sub: confidence medium: the whole finding
+  p.how: The finding line gives the grade, the rule that set it and what that rule saw. Below stand at most three statements that bear on the decision: what the other rules saw, and checks that speak for the finding ("supports") or against it ("weakens"). A count of records leads to the records. The last line gives the confidence and counts what the whole finding in the appendix adds: further statements, checks that could not be made, missing data.
   ### Rules named in this report
   table.rules
     | rule | grade it gives | fires when
@@ -748,10 +718,6 @@ section#s4.sec
       figcaption: rank0 dev13 bg0 bank0, row by column, one cell = 16 columns
       li: 0
       li: 1-2
-      li: 3-9
-      li: 10-99
-      li: 100+
-      li: uncorrected error
       svg.fig.amap: Address map of CPU0_B1, rank0 dev13 bg0 bank0
         mark: row 0xd85, columns 0xc0 to 0xcf: 1 error in 1 record; first 2026-11-02, latest 2026-11-02
         mark: row 0x2fca, columns 0x100 to 0x10f: 1 error in 1 record; first 2026-10-25, latest 2026-10-25
@@ -1094,10 +1060,6 @@ section#s4.sec
       figcaption: rank0 dev2 bg6 bank2, row by column, one cell = 32 columns
       li: 0
       li: 1-2
-      li: 3-9
-      li: 10-99
-      li: 100+
-      li: uncorrected error
       svg.fig.amap: Address map of CPU0_B2, rank0 dev2 bg6 bank2
         mark: row 0x23b2, columns 0x7e0 to 0x7ff: 1 error in 1 record; first 2026-09-19, latest 2026-09-19
         mark: row 0x7a6c, columns 0x500 to 0x51f: 1 error in 1 record; first 2026-09-17, latest 2026-09-17
@@ -1763,6 +1725,92 @@ section#s7.sec
   p: Every source that was looked for was read in full.
 section#s8.sec
   ## 8 Appendix
+  ### About this case
+  Case ID = 0123456789ab the first 12 digits of the identity of the ledger
+  Host = synth-system-channel
+  Collected = synthetic data set, 2026-11-13 00:00 UTC
+  Report = failure analysis report, generated 2026-11-13 09:30 UTC by my test
+  Engine = version 7
+  p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
+  ### Findings in full
+  article#full-dimm-CPU0_B1.card.g-hold
+    #### CPU0_B1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 880018
+    finding = hold replacement (finding, confidence medium, 65) R-SYS-01
+    evidence = R-SYS-01 CPU0_B1 and CPU0_B2 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 181 here, 160 there, between 2026-09-05 and 2026-11-12 181 records
+    missing = no ECS counters no DIMM temperature history
+    baseline = own history: 1.9 errors a day over the last 7 days, percentile 37 of the 30 days before same part number (EXM64G48R2X4-A): percentile 98 among the 32 DIMMs in this ledger, 5 of them with errors
+    next = Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another channel and see whether the errors follow it.
+    confidence = 65 the grade rests on R-SYS-01
+    faults = system issue: CE 181, UE 0; 2026-09-05 to 2026-11-12; steady; failed again later; 181 rows, 181 columns, 173 banks; observation grade A
+  article#full-dimm-CPU0_B2.card.g-hold
+    #### CPU0_B2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N E7A387
+    finding = hold replacement (finding, confidence medium, 65) R-SYS-01
+    evidence = R-SYS-01 CPU0_B2 and CPU0_B1 share one channel (socket 0 channel 1) and both have errors that are not confined to one place: 160 here, 181 there, between 2026-09-05 and 2026-11-12 160 records
+    missing = no ECS counters no DIMM temperature history
+    baseline = own history: 2.7 errors a day over the last 7 days, percentile 63 of the 30 days before same part number (EXM64G48R2X4-A): percentile 95 among the 32 DIMMs in this ledger, 5 of them with errors
+    next = Do not pull a DIMM yet. Check the channel first: swap this DIMM with one from another channel and see whether the errors follow it.
+    confidence = 65 the grade rests on R-SYS-01
+    faults = system issue: CE 160, UE 0; 2026-09-05 to 2026-11-12; steady; failed again later; 160 rows, 160 columns, 149 banks; observation grade A
+  article#full-dimm-CPU0_E1.card.g-observe
+    #### CPU0_E1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 01EAE2
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-07; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU0_F1.card.g-observe
+    #### CPU0_F1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 332238
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-08; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU0_F2.card.g-observe
+    #### CPU0_F2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N A8A64B
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-06; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU0_G1.card.g-observe
+    #### CPU0_G1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N B31D2C
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-04; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU0_H2.card.g-observe
+    #### CPU0_H2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 7F782A
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_A1.card.g-observe
+    #### CPU1_A1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N B41102
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-19; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_A2.card.g-observe
+    #### CPU1_A2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N C34D84
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-06; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_C1.card.g-observe
+    #### CPU1_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 12AE34
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-09-09; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_C2.card.g-observe
+    #### CPU1_C2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 098671
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-23; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_E1.card.g-observe
+    #### CPU1_E1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 6A7388
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-21; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_G1.card.g-observe
+    #### CPU1_G1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE334C
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-10-05; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
+  article#full-dimm-CPU1_G2.card.g-observe
+    #### CPU1_G2 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N F6088C
+    finding = observe (finding, confidence medium, 65) R-SOFT-01
+    evidence = R-SOFT-01 1 corrected error at 1 place on 2026-08-05; no place failed again 1 record
+    next = No action. Look again when the count grows or a new place appears.
   ### Records
   p.how: The ledger records this report refers to, in time order: the records the findings cite, every record of an uncorrected error or of a repair that a timeline marks, and the first and the latest record of the cells of the address maps. The original text of a record opens when its ID is chosen. The case holds every record. Records a finding cites are printed with their original text.
   p.sub: 24 of the 353 records of this host

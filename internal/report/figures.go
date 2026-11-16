@@ -343,16 +343,21 @@ func pointerIcon() *node {
 // set it also says what the pointer above a cell means.
 func (doc *Document) slotLegend(sm *view.SlotMap, subject bool) *node {
 	ul := el("ul", A{"class", "legend"})
-	for _, g := range []model.VerdictGrade{model.VerdictReplaceNow, model.VerdictConsiderReplacement, model.VerdictObserve, model.VerdictOK, model.VerdictHoldReplacement} {
-		ul.add(el("li", icon(string(g), 14), engine.GradeText(doc.Lang, g)))
-	}
 	empty, unknown := false, false
+	shown := map[string]bool{}
 	for _, r := range sm.Rows {
 		for _, ch := range r.Channels {
 			for _, sl := range ch.Slots {
 				empty = empty || sl.State == view.SlotEmpty
 				unknown = unknown || sl.State == view.SlotUnknown
+				shown[sl.State] = true
 			}
+		}
+	}
+	// The grades the map shows.
+	for _, g := range []model.VerdictGrade{model.VerdictReplaceNow, model.VerdictConsiderReplacement, model.VerdictObserve, model.VerdictOK, model.VerdictHoldReplacement} {
+		if shown[string(g)] {
+			ul.add(el("li", icon(string(g), 14), engine.GradeText(doc.Lang, g)))
 		}
 	}
 	if empty {
@@ -515,12 +520,35 @@ func swatch(class string, ue bool) *node {
 
 // mapLegend lists the shades of the address map.
 func (doc *Document) mapLegend(m *view.AddressMap) *node {
-	ul := el("ul", A{"class", "legend"})
-	ul.add(el("li", swatch("ht0", false), "0"))
-	for i := range m.Scale {
-		ul.add(el("li", swatch(fmt.Sprintf("ht%d", min(i+1, 4)), false), scaleText(m.Scale, i)))
+	// The shades the map shows.
+	used, ue := map[int]bool{}, false
+	for _, ln := range m.Lines {
+		if ln.Gap {
+			continue
+		}
+		at := map[int]bool{}
+		for _, i := range ln.UE {
+			at[i] = true
+		}
+		ue = ue || len(ln.UE) > 0
+		for i, n := range ln.Cells {
+			if !at[i] {
+				used[heatLevel(n, m.Scale)] = true
+			}
+		}
 	}
-	ul.add(el("li", swatch("ue", true), doc.vsay("map.ue")))
+	ul := el("ul", A{"class", "legend"})
+	if used[0] {
+		ul.add(el("li", swatch("ht0", false), "0"))
+	}
+	for i := range m.Scale {
+		if used[min(i+1, 4)] {
+			ul.add(el("li", swatch(fmt.Sprintf("ht%d", min(i+1, 4)), false), scaleText(m.Scale, i)))
+		}
+	}
+	if ue {
+		ul.add(el("li", swatch("ue", true), doc.vsay("map.ue")))
+	}
 	// The outline of cells with errors in two or more boots.
 	multi := false
 	for _, ln := range m.Lines {

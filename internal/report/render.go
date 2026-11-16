@@ -257,16 +257,12 @@ func (doc *Document) summary() *node {
 	}
 	s.add(verdict)
 
+	// What the decision rests on in numbers; the identity of the case is
+	// in the appendix.
 	facts := el("dl", A{"class", "facts"})
 	fact := func(code string, value ...any) {
 		facts.add(el("div", el("dt", doc.say(code)), el("dd", value...)))
 	}
-	caseNote := doc.say("val.case_id")
-	if doc.Case.Bundle {
-		caseNote = doc.say("val.case_file")
-	}
-	fact("fact.case", el("span", A{"class", "id"}, doc.CaseID), " ", el("span", A{"class", "sub"}, caseNote))
-	fact("fact.host", host.Name)
 	if host.System != "" {
 		fact("fact.system", host.System)
 	}
@@ -289,6 +285,31 @@ func (doc *Document) summary() *node {
 	if len(doc.GPUs) > 0 {
 		fact("fact.gpus", doc.say("val.gpus", "n", len(doc.GPUs)))
 	}
+	s.add(facts)
+
+	toc := el("ol", A{"class", "toc"})
+	for n := 2; n <= 8; n++ {
+		toc.add(el("li", el("a", A{"href", "#s" + strconv.Itoa(n)}, el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.say("sec."+strconv.Itoa(n)))))
+	}
+	s.add(el("nav", A{"aria-label", doc.say("contents")}, toc))
+	return s
+}
+
+// about is the identity of the case, in the appendix: its ID, the host,
+// how and when the records were collected, the bundle, the report and the
+// engine.
+func (doc *Document) about() *node {
+	host := doc.Overview.Host
+	facts := el("dl", A{"class", "facts"})
+	fact := func(code string, value ...any) {
+		facts.add(el("div", el("dt", doc.say(code)), el("dd", value...)))
+	}
+	caseNote := doc.say("val.case_id")
+	if doc.Case.Bundle {
+		caseNote = doc.say("val.case_file")
+	}
+	fact("fact.case", el("span", A{"class", "id"}, doc.CaseID), " ", el("span", A{"class", "sub"}, caseNote))
+	fact("fact.host", host.Name)
 	if sc := host.Scan; sc != nil {
 		what := doc.say("scan." + sc.Kind)
 		if sc.Kind == model.ScanLive {
@@ -316,14 +337,7 @@ func (doc *Document) summary() *node {
 	} else {
 		fact("fact.engine", doc.say("val.engine", "version", doc.EngineVersion))
 	}
-	s.add(facts, el("p", A{"class", "how"}, doc.say("sum.finding")))
-
-	toc := el("ol", A{"class", "toc"})
-	for n := 2; n <= 8; n++ {
-		toc.add(el("li", el("a", A{"href", "#s" + strconv.Itoa(n)}, el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.say("sec."+strconv.Itoa(n)))))
-	}
-	s.add(el("nav", A{"aria-label", doc.say("contents")}, toc))
-	return s
+	return facts
 }
 
 // anchors maps the slot of each described DIMM to its name in links.
@@ -519,81 +533,25 @@ func (doc *Document) findings() *node {
 		c := d.Card
 		art := el("article", A{"id", d.Anchor, "class", classes("card", gradeClass(string(c.Grade)))}, doc.dimmHead(d, "h3"))
 		var facts []string
-		if !c.Since.IsZero() {
-			facts = append(facts, doc.vsay("dimm.since", "when", day(c.Since)))
+		if c.Moves > 0 {
+			if !c.Since.IsZero() {
+				facts = append(facts, doc.vsay("dimm.since", "when", day(c.Since)))
+			}
+			facts = append(facts, doc.vsay("dimm.moves", "n", c.Moves))
 		}
-		facts = append(facts, doc.vsay("dimm.moves", "n", c.Moves))
 		if !c.Present {
 			facts = append(facts, doc.vsay("ov.gone"))
 		}
 		if d.Subject {
 			facts = append(facts, doc.say("sum.subject"))
 		}
-		art.add(el("p", A{"class", "sub"}, R(strings.Join(facts, "; "))))
-
-		dl := el("dl", A{"class", "finding"})
-		row := func(code string, kids ...any) {
-			dl.add(el("div", el("dt", doc.vsay(code)), el("dd", kids...)))
+		if len(facts) > 0 {
+			art.add(el("p", A{"class", "sub"}, R(strings.Join(facts, "; "))))
 		}
-		conf := doc.vsay("card.confidence", "level", c.ConfidenceText)
-		if doc.Audience == FA {
-			conf += fmt.Sprintf(", %d", c.Confidence)
-		}
-		row("card.finding", doc.badge(c.Grade), " ("+c.Label+", "+conf+") ", el("span", A{"class", "rules"}, doc.ruleChips(c.Rules)))
 		for _, id := range c.Rules {
 			fired[id] = true
 		}
-		if len(c.Evidence) > 0 {
-			ul := el("ul")
-			for i := range c.Evidence {
-				e := &c.Evidence[i]
-				ul.add(el("li", el("span", A{"class", "rule"}, e.Rule), R(" "+e.Text.Text+" "), doc.recordsLink(e)))
-			}
-			row("card.evidence", ul)
-		}
-		if len(c.Checks) > 0 {
-			ul := el("ul")
-			for _, k := range c.Checks {
-				ul.add(el("li", el("span", A{"class", "tag " + k.Effect}, k.EffectText), R(" "+k.Text.Text)))
-			}
-			row("card.checks", ul)
-		}
-		list := func(code string, items []view.Text) {
-			if len(items) == 0 {
-				return
-			}
-			ul := el("ul")
-			for _, it := range items {
-				ul.add(el("li", R(it.Text)))
-			}
-			row(code, ul)
-		}
-		list("card.missing", c.Missing)
-		if d.Detail {
-			list("card.baseline", c.Baseline)
-		}
-		if c.Next != nil {
-			row("card.next", el("strong", R(c.Next.Text)))
-		}
-		// A DIMM without figures has a short card: what was seen and what
-		// follows.
-		if doc.Audience == FA && d.Detail {
-			if len(c.Factors) > 0 {
-				ol := el("ul", A{"class", "factors"})
-				for i, f := range c.Factors {
-					delta := fmt.Sprintf("%+d", f.Delta)
-					if i == 0 {
-						delta = strconv.Itoa(f.Delta)
-					}
-					ol.add(el("li", el("span", A{"class", "delta"}, delta), R(" "+f.Text.Text)))
-				}
-				row("card.factors", ol)
-			}
-			if len(c.Faults) > 0 {
-				row("card.faults", doc.faultList(c))
-			}
-		}
-		art.add(dl)
+		art.add(doc.briefCard(c, "full-"+d.Anchor))
 		for _, l := range d.Level2 {
 			art.add(doc.level2(l))
 		}
@@ -652,12 +610,131 @@ func (doc *Document) findings() *node {
 	return s
 }
 
+// briefCard is the finding of a DIMM in short: the decision with the
+// rule that set it and what that rule saw, at most view.BriefLines
+// statements that bear on it, the next step, and a line that counts what
+// the whole finding in the appendix adds.
+func (doc *Document) briefCard(c *view.Card, full string) *node {
+	b := c.Brief()
+	dl := el("dl", A{"class", "finding"})
+	row := func(code string, kids ...any) {
+		dl.add(el("div", el("dt", doc.vsay(code)), el("dd", kids...)))
+	}
+	decision := []any{doc.badge(c.Grade), " "}
+	switch {
+	case b.Lead != nil:
+		decision = append(decision, el("span", A{"class", "rules"}, doc.ruleChips([]string{b.Lead.Rule})), R(" "+b.Lead.Text.Text+" "), doc.recordsLink(b.Lead))
+	case len(c.Rules) > 0:
+		decision = append(decision, el("span", A{"class", "rules"}, doc.ruleChips(c.Rules[:1])))
+	}
+	row("card.finding", decision...)
+	if len(b.Lines) > 0 {
+		ul := el("ul")
+		for _, l := range b.Lines {
+			if e := l.Evidence; e != nil {
+				ul.add(el("li", el("span", A{"class", "rule"}, e.Rule), R(" "+e.Text.Text+" "), doc.recordsLink(e)))
+			} else {
+				ul.add(el("li", el("span", A{"class", "tag " + l.Check.Effect}, l.Check.EffectText), R(" "+l.Check.Text.Text)))
+			}
+		}
+		row("card.evidence", ul)
+	}
+	if c.Next != nil {
+		row("card.next", el("strong", R(c.Next.Text)))
+	}
+	rest := []string{doc.vsay("card.confidence", "level", c.ConfidenceText)}
+	if b.More > 0 {
+		rest = append(rest, doc.vsay("card.more", "n", b.More))
+	}
+	if b.Open > 0 {
+		rest = append(rest, doc.vsay("card.open_n", "n", b.Open))
+	}
+	if b.Missing > 0 {
+		rest = append(rest, doc.vsay("card.missing_n", "n", b.Missing))
+	}
+	return el("div", dl, el("p", A{"class", "sub"}, R(strings.Join(rest, ", ")+": "),
+		el("a", A{"href", "#" + full}, doc.say("card.to_full"))))
+}
+
+// fullCard is the whole finding of a DIMM, as the appendix holds it: every
+// statement with the records behind it, the checks, the missing data, the
+// next step and, for failure analysis, the steps of the confidence and the
+// faults.
+func (doc *Document) fullCard(d *DIMM) *node {
+	c := d.Card
+	dl := el("dl", A{"class", "finding"})
+	row := func(code string, kids ...any) {
+		dl.add(el("div", el("dt", doc.vsay(code)), el("dd", kids...)))
+	}
+	conf := doc.vsay("card.confidence", "level", c.ConfidenceText)
+	if doc.Audience == FA {
+		conf += fmt.Sprintf(", %d", c.Confidence)
+	}
+	row("card.finding", doc.badge(c.Grade), " ("+c.Label+", "+conf+") ", el("span", A{"class", "rules"}, doc.ruleChips(c.Rules)))
+	if len(c.Evidence) > 0 {
+		ul := el("ul")
+		for i := range c.Evidence {
+			e := &c.Evidence[i]
+			ul.add(el("li", el("span", A{"class", "rule"}, e.Rule), R(" "+e.Text.Text+" "), doc.recordsLink(e)))
+		}
+		row("card.evidence", ul)
+	}
+	if len(c.Checks) > 0 {
+		ul := el("ul")
+		for _, k := range c.Checks {
+			ul.add(el("li", el("span", A{"class", "tag " + k.Effect}, k.EffectText), R(" "+k.Text.Text)))
+		}
+		row("card.checks", ul)
+	}
+	list := func(code string, items []view.Text) {
+		if len(items) == 0 {
+			return
+		}
+		ul := el("ul")
+		for _, it := range items {
+			ul.add(el("li", R(it.Text)))
+		}
+		row(code, ul)
+	}
+	list("card.missing", c.Missing)
+	if d.Detail {
+		list("card.baseline", c.Baseline)
+	}
+	if c.Next != nil {
+		row("card.next", el("strong", R(c.Next.Text)))
+	}
+	// A DIMM without figures has a short card: what was seen and what
+	// follows.
+	if doc.Audience == FA && d.Detail {
+		if len(c.Factors) > 0 {
+			ol := el("ul", A{"class", "factors"})
+			for i, f := range c.Factors {
+				delta := fmt.Sprintf("%+d", f.Delta)
+				if i == 0 {
+					delta = strconv.Itoa(f.Delta)
+				}
+				ol.add(el("li", el("span", A{"class", "delta"}, delta), R(" "+f.Text.Text)))
+			}
+			row("card.factors", ol)
+		}
+		if len(c.Faults) > 0 {
+			row("card.faults", doc.faultList(c))
+		}
+	}
+	return dl
+}
+
 // hostCard is the card of the host finding: what the engine makes of the
 // errors and the page offlines that are tied to no DIMM.
 func (doc *Document) hostCard(c *view.Card) *node {
 	art := el("article", A{"id", hostAnchor, "class", classes("card", gradeClass(string(c.Grade)))},
 		el("h3", doc.say("host.title")))
 	art.add(el("p", A{"class", "sub"}, R(doc.say("host.sub", "host", c.Host, "counts", doc.looseCounts(c)))))
+	return art.add(doc.briefCard(c, "full-"+hostAnchor))
+}
+
+// hostCardFull is the whole host finding, as the appendix holds it.
+func (doc *Document) hostCardFull(c *view.Card) *node {
 	dl := el("dl", A{"class", "finding"})
 	row := func(code string, kids ...any) {
 		dl.add(el("div", el("dt", doc.vsay(code)), el("dd", kids...)))
@@ -703,7 +780,7 @@ func (doc *Document) hostCard(c *view.Card) *node {
 		}
 		row("card.factors", ol)
 	}
-	return art.add(dl)
+	return dl
 }
 
 // faultList lists the faults of a DIMM one by one: mode and place, counts,
@@ -1382,6 +1459,18 @@ func (doc *Document) recordRows(r *Record) *node {
 // original text, and the error records with FMFM field names.
 func (doc *Document) appendix() (*node, error) {
 	s := doc.section(8)
+	s.add(el("h3", A{"id", "about"}, doc.say("app.about")), doc.about(), el("p", A{"class", "how"}, doc.say("sum.finding")))
+	if len(doc.DIMMs) > 0 || doc.Host != nil {
+		s.add(el("h3", A{"id", "findings-full"}, doc.say("app.findings")))
+		for _, d := range doc.DIMMs {
+			s.add(el("article", A{"id", "full-" + d.Anchor, "class", classes("card", gradeClass(string(d.Card.Grade)))},
+				doc.dimmHead(d, "h4"), doc.fullCard(d)))
+		}
+		if c := doc.Host; c != nil {
+			s.add(el("article", A{"id", "full-" + hostAnchor, "class", classes("card", gradeClass(string(c.Grade)))},
+				el("h4", doc.say("host.title")), doc.hostCardFull(c)))
+		}
+	}
 	s.add(el("h3", A{"id", "records"}, doc.say("app.records")), how(doc.say("cap.records")+" "+doc.say("cap.cited")))
 	if len(doc.Records) == 0 {
 		s.add(el("p", doc.say("rec.none")))
