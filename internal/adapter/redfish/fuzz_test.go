@@ -2,6 +2,7 @@ package redfish
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,6 +35,9 @@ func FuzzCollect(f *testing.F) {
 		`{"Id":"R","RegistryEntries":{"Attributes":[{"AttributeName":"MemA","Type":7,"Value":[1,{"ValueName":2}],"LowerBound":"x","ReadOnly":"no"},7,{"AttributeName":""}]}}]`))
 	f.Add([]byte(`[{"@odata.id":"/m/1","DeviceLocator":"A1","CapacityMiB":4096,"SerialNumber":"S1","AllowedSpeedsMHz":[-1,"x",1e99],"Metrics":{"@odata.id":"/m/1/MemoryMetrics"},"IsRankSpareEnabled":"yes"},` +
 		`{"@odata.id":"/m/1/MemoryMetrics","@odata.type":"#MemoryMetrics.v1_7_0.MemoryMetrics","LifeTime":{"CorrectableECCErrorCount":-5,"UncorrectableECCErrorCount":1e30},"CurrentPeriod":7,"HealthData":{"AlarmTrips":[]}}]`))
+
+	// An attribute name far longer than any BIOS writes one (CI found it).
+	f.Add([]byte(`[{"@odata.id":"/s/1/Bios","AttributeRegistry":"R","Attributes":{"Memory_AdvMemTestOpti` + strings.Repeat("o", 600) + `ns":983040,"MemTest":"Enabled"}}]`))
 
 	f.Fuzz(func(t *testing.T, data []byte) {
 		var c adapter.Collected
