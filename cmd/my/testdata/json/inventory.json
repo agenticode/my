@@ -310,7 +310,7 @@
           "n": 4,
           "total": 4
         },
-        "text": "4 of 4 DIMMs have no device width on record. SMBIOS and Redfish have no field for it; the EDAC driver of the host reports it where it is loaded."
+        "text": "4 of 4 DIMMs have no device width on record (SMBIOS and Redfish lack the field)."
       }
     ],
     "sides": {

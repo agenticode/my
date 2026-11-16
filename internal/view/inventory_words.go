@@ -33,9 +33,9 @@ var InventoryMessages = i18n.Catalog{
 	"inv.legend_ras":      {EN: "ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s. RAS lists the memory RAS settings of the BIOS that are on and act on the module; my bios has every setting.", KO: "구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s). RAS는 켜져 있고 해당 모듈에 적용되는 BIOS 메모리 RAS 설정이며, 전체 설정은 my bios에 있음."},
 	"inv.legend_ce":       {EN: "CE OS counts the corrected errors in the records of the operating system, CE BMC the entries about corrected errors in the logs of the BMC, both from {from} to {to}, the period both sides cover.", KO: "CE OS는 운영체제 기록의 CE 수, CE BMC는 BMC 로그의 CE 항목 수. 둘 다 양쪽 기록이 겹치는 기간인 {from}부터 {to}까지를 셈."},
 	"inv.legend_ce_apart": {EN: "CE OS counts the corrected errors in the records of the operating system, CE BMC the entries about corrected errors in the logs of the BMC, each over everything it has on record: the two cover no common period.", KO: "CE OS는 운영체제 기록의 CE 수, CE BMC는 BMC 로그의 CE 항목 수. 양쪽 기록에 겹치는 기간이 없어 각자 가진 기록 전체를 셈."},
-	"inv.legend_ce_os":    {EN: "CE OS counts the corrected errors in the records of the operating system. No BMC was read.", KO: "CE OS는 운영체제 기록의 CE 수. BMC는 읽지 않음."},
+	"inv.legend_ce_os":    {EN: "CE OS counts the corrected errors in the records of the operating system.", KO: "CE OS는 운영체제 기록의 CE 수."},
 	"inv.legend_ce_bmc":   {EN: "CE BMC counts the entries about corrected errors in the logs of the BMC. No source of the operating system was read.", KO: "CE BMC는 BMC 로그의 CE 항목 수. 운영체제 쪽 소스는 읽지 않음."},
-	"inv.note_width":      {EN: "{n} of {total} {total|DIMM|DIMMs} {n|has|have} no device width on record. SMBIOS and Redfish have no field for it; the EDAC driver of the host reports it where it is loaded.", KO: "DIMM {total}개 중 {n}개는 디바이스 폭 기록이 없음. SMBIOS와 Redfish에는 이 항목이 없고, 호스트에 EDAC 드라이버가 올라와 있으면 거기서 알 수 있음."},
+	"inv.note_width":      {EN: "{n} of {total} {total|DIMM|DIMMs} {n|has|have} no device width on record (SMBIOS and Redfish lack the field).", KO: "DIMM {total}개 중 {n}개는 디바이스 폭 기록 없음(SMBIOS와 Redfish에 이 항목이 없음)."},
 
 	"inv.ras.scrub":                {EN: "patrol scrub", KO: "패트롤 스크럽"},
 	"inv.ras.mode.mirroring":       {EN: "mirroring", KO: "미러링"},
@@ -56,7 +56,7 @@ var InventoryMessages = i18n.Catalog{
 	"inv.line.event":          {EN: "BMC log {when}: {text}", KO: "BMC 로그 {when}: {text}"},
 
 	"sides.nothing":           {EN: "No source of error records was read on either side.", KO: "어느 쪽에서도 오류 기록 소스를 읽지 못함."},
-	"sides.no_bmc":            {EN: "No BMC was read, so there is nothing to set against the records of the operating system. my inventory --bmc ADDRESS reads the BMC in the same run.", KO: "BMC를 읽지 않아 운영체제 기록과 맞대어 볼 대상이 없음. my inventory --bmc ADDRESS로 같은 실행에서 BMC를 읽을 수 있음."},
+	"sides.no_bmc":            {EN: "No BMC was read: my inventory --bmc ADDRESS reads it in the same run.", KO: "BMC를 읽지 않음. my inventory --bmc ADDRESS가 같은 실행에서 BMC를 읽음."},
 	"sides.no_os":             {EN: "No source of the operating system was read, so there is nothing to set against the logs of the BMC.", KO: "운영체제 쪽 소스를 읽지 않아 BMC 로그와 맞대어 볼 대상이 없음."},
 	"sides.window":            {EN: "OS and BMC side by side, {from} to {to}. The records of the operating system begin {os_from}, the logs of the BMC {bmc_from}.", KO: "운영체제와 BMC 비교 기간: {from}부터 {to}까지. 운영체제 기록은 {os_from}에, BMC 로그는 {bmc_from}에 시작."},
 	"sides.bmc_empty":         {EN: "The logs of the BMC hold no entry, so the period they cover is not known: the counts are those of everything on record.", KO: "BMC 로그에 항목이 없어 로그가 다루는 기간을 알 수 없음. 기록 전체를 셈."},

@@ -559,7 +559,7 @@ section#s7.sec
     | CPU1_H1 | 2E671F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
     |  | DDR5 RDIMM
   li: 구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s).
-  li: CE OS는 운영체제 기록의 CE 수. BMC는 읽지 않음.
+  li: CE OS는 운영체제 기록의 CE 수.
   #### 운영체제와 BMC
   p: BMC를 읽지 않아 운영체제 기록과 맞대어 볼 대상이 없습니다.
   ### 읽지 못했거나 일부만 읽은 것
