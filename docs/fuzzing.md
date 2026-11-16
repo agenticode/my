@@ -12,6 +12,8 @@ go test -run '^$' -fuzz '^FuzzCollect$' -fuzztime 10m -fuzzminimizetime 200x ./i
 
 CI runs every target on each push (job `fuzz`, `make fuzz FUZZTIME=20000x`): the seeds, the inputs kept under `testdata/fuzz`, and 20,000 new inputs per target.
 
+The long run takes ten minutes per target, more than seven hours for all of them. Each target has run that long with two workers on a Mac mini M4 in November 2026, and a target that failed ran for ten minutes again after its fix. The inputs behind the fixes are kept under `testdata/fuzz`. A run on arm64 does not find what goes wrong on amd64 only: Go converts a float beyond the range of `int` to the smallest `int` on amd64 and to the largest on arm64, and the input `storm.count=1e99` of `FuzzConfigRead` failed in CI (amd64) and never on the Mac.
+
 A run that is limited by a duration can end with the one line `context deadline exceeded` and no failing input: `go test` ran out of time while a worker was at work on an input. That is no finding, and `make fuzz` runs such a target once more. A run limited by a number of calls, as in CI, has no deadline to hit.
 
 `go test` spends up to 60 s on making each input smaller that reached new code, and a worker that does so fuzzes nothing meanwhile. `make fuzz` bounds that work to 200 calls per input (`FUZZMINIMIZE`). On a Mac mini M4 with two workers, `FuzzParseText` of `internal/decode/cper` made 86,208 calls in its first 153 s with the default, and 1,222,676 calls in 27 s with the bound.
