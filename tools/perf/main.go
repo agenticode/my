@@ -53,6 +53,8 @@ func main() {
 		err = gen(os.Args[2:])
 	case "run":
 		err = run(os.Args[2:])
+	case "table":
+		err = tableOf(os.Stdin, os.Stdout)
 	case "-h", "--help", "help":
 		usage()
 		return
@@ -70,13 +72,15 @@ func usage() {
 	fmt.Fprint(os.Stderr, `Usage:
   perf gen -events N [-hosts H] [-seed S] [-ledger FILE] [-tree DIR [-flavor intel|amd|ghes]]
   perf run -my PATH -dir DIR [-events N,N...] [-hosts H] [-seed S] [-only NAME,...] [-gomemlimit SIZE] [-format md|json]
+  perf table < measurements.json
 
 gen writes a made-up fleet into a ledger (-ledger) or, with -hosts 1, one
 host as a copy of its files (-tree). run makes both for each size below
 DIR, runs the commands of the binary at PATH on them and prints wall time
 and peak resident memory of each. -gomemlimit sets GOMEMLIMIT for the
 commands it runs: 191MiB is what the binary sets by itself on a machine
-with 765 MiB of memory.
+with 765 MiB of memory. table reads what run -format json printed and
+prints the table.
 `)
 }
 
@@ -233,8 +237,11 @@ func size(n int64) string {
 
 // Measurement is one command on one input.
 type Measurement struct {
-	Name    string   `json:"name"`
-	Input   string   `json:"input"`
+	Name  string `json:"name"`
+	Input string `json:"input"`
+	// Size is the number of events asked for, Events the number the
+	// input holds.
+	Size    int      `json:"size,omitempty"`
 	Events  int      `json:"events"`
 	Command []string `json:"command"`
 	// MemoryLimit is the GOMEMLIMIT the command ran under, if any.
@@ -477,7 +484,7 @@ func run(args []string) error {
 			if len(want) > 0 && !want[st.name] {
 				continue
 			}
-			m := Measurement{Name: st.name, Input: st.input, Events: st.events, Command: append([]string{bin}, st.args...), MemoryLimit: *memLimit}
+			m := Measurement{Name: st.name, Input: st.input, Size: n, Events: st.events, Command: append([]string{bin}, st.args...), MemoryLimit: *memLimit}
 			if st.serve {
 				exporter(&m, *limit)
 			} else {
@@ -513,6 +520,29 @@ func run(args []string) error {
 	return nil
 }
 
+// tableOf reads measurements, one JSON object per line as run prints them,
+// and writes their table.
+func tableOf(r io.Reader, w io.Writer) error {
+	dec := json.NewDecoder(r)
+	var all []Measurement
+	for {
+		var m Measurement
+		err := dec.Decode(&m)
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("measurement %d: %w", len(all)+1, err)
+		}
+		all = append(all, m)
+	}
+	if len(all) == 0 {
+		return errors.New("no measurements on standard input")
+	}
+	table(w, all)
+	return nil
+}
+
 // remember runs make unless its result is on file from a run before.
 func remember(file string, m *made, make func() (made, error)) error {
 	if b, err := os.ReadFile(file); err == nil && json.Unmarshal(b, m) == nil && m.Events > 0 {
@@ -539,16 +569,18 @@ func table(w io.Writer, all []Measurement) {
 	var rows []key
 	have := map[key]bool{}
 	cell := map[key]map[int]Measurement{}
-	// The sizes a row is filed under are those asked for: the inputs hold
-	// about as many events, and the row says how many.
+	// A row is filed under the size that was asked for. Measurements
+	// written without it are filed under their number of events with two
+	// significant digits: the inputs hold about as many as were asked for.
 	nominal := func(m Measurement) int {
-		best := 1
-		for n := 10; n <= 1_000_000_000; n *= 10 {
-			if abs(m.Events-n) < abs(m.Events-best) {
-				best = n
-			}
+		if m.Size > 0 {
+			return m.Size
 		}
-		return best
+		n, p := m.Events, 1
+		for n/p >= 100 {
+			p *= 10
+		}
+		return (n + p/2) / p * p
 	}
 	for _, m := range all {
 		n := nominal(m)
@@ -593,15 +625,10 @@ func table(w io.Writer, all []Measurement) {
 	}
 }
 
-func abs(n int) int {
-	if n < 0 {
-		return -n
-	}
-	return n
-}
-
 func seconds(s float64) string {
 	switch {
+	case s < 0.01:
+		return fmt.Sprintf("%.1f ms", s*1000)
 	case s < 0.1:
 		return fmt.Sprintf("%.0f ms", s*1000)
 	case s >= 100:

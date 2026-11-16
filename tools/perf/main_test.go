@@ -112,7 +112,7 @@ func TestTable(t *testing.T) {
 	want := "| Command | Input | 100,000 events: time | peak RSS | 1,000,000 events: time | peak RSS |\n" +
 		"| --- | --- | ---: | ---: | ---: | ---: |\n" +
 		"| `scan` | host copy | 20.7 s | 104.0 MB | 231 s | 300.0 MB |\n" +
-		"| `serve` | host copy | 19.7 s to ready, 4 ms scrape | 105.0 MB | | |\n" +
+		"| `serve` | host copy | 19.7 s to ready, 4.0 ms scrape | 105.0 MB | | |\n" +
 		"| `open` | fleet ledger | | | failed | |\n"
 	if b.String() != want {
 		t.Errorf("table:\n%s\nwant:\n%s", b.String(), want)
@@ -122,7 +122,7 @@ func TestTable(t *testing.T) {
 			t.Errorf("size(%d) = %q, want %q", n, got, want)
 		}
 	}
-	if thousands(1234567) != "1,234,567" || thousands(999) != "999" || seconds(0.123) != "0.12 s" || seconds(0.0042) != "4 ms" {
+	if thousands(1234567) != "1,234,567" || thousands(999) != "999" || seconds(0.123) != "0.12 s" || seconds(0.0042) != "4.2 ms" || seconds(0.042) != "42 ms" {
 		t.Error("number forms")
 	}
 }
@@ -146,5 +146,35 @@ func TestChildEnv(t *testing.T) {
 	env = childEnv("191MiB")
 	if !has(env, "GOMEMLIMIT=191MiB") || has(env, "GOMEMLIMIT=1GiB") {
 		t.Errorf("with 191MiB: %v", env)
+	}
+}
+
+func TestTableOf(t *testing.T) {
+	in := `{"name":"scan","input":"host copy","events":100002,"seconds":14.0,"peak_rss_bytes":94371840}
+{"name":"scan","input":"host copy","events":1000006,"seconds":291.6,"peak_rss_bytes":349700096}
+`
+	var b strings.Builder
+	if err := tableOf(strings.NewReader(in), &b); err != nil {
+		t.Fatal(err)
+	}
+	if want := "| `scan` | host copy | 14.0 s | 90.0 MB | 292 s | 333.5 MB |\n"; !strings.HasSuffix(b.String(), want) {
+		t.Errorf("table:\n%s\nwant it to end in\n%s", b.String(), want)
+	}
+	// Sizes that are no power of ten keep their own column.
+	b.Reset()
+	in = `{"name":"scan","input":"host copy","events":300004,"seconds":47.9,"peak_rss_bytes":165257216}
+{"name":"scan","input":"host copy","size":100000,"events":100002,"seconds":14.0,"peak_rss_bytes":94371840}
+`
+	if err := tableOf(strings.NewReader(in), &b); err != nil {
+		t.Fatal(err)
+	}
+	if want := "| `scan` | host copy | 14.0 s | 90.0 MB | 47.9 s | 157.6 MB |\n"; !strings.HasSuffix(b.String(), want) || !strings.Contains(b.String(), "300,000 events") {
+		t.Errorf("table:\n%s\nwant it to end in\n%s", b.String(), want)
+	}
+	if err := tableOf(strings.NewReader("{broken"), &b); err == nil {
+		t.Error("a broken line was taken")
+	}
+	if err := tableOf(strings.NewReader(""), &b); err == nil {
+		t.Error("an empty input gave a table")
 	}
 }
