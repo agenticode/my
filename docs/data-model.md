@@ -267,12 +267,32 @@ The commands that write a file (`bundle`, `report`, `import -o`, `export`, `coll
 | `host`, `system` | the host and its vendor and product name |
 | `slot`, `dimm` | the DIMM, on the view of one DIMM |
 | `boots_on_record` | the number of boots of the host on record; `boots` holds the latest of them |
-| `boots[]` | one per boot, oldest first: `index` (from 1), `boot_id`, `started_at`, `start_quality`, `ran_seconds`, `end` (`stop`, `panic`, `running`, or empty when no record tells), `end_record`, `stop_slot` (the one DIMM with an uncorrected error in a boot that stopped) |
+| `boots[]` | one per boot, oldest first: `index` (from 1), `boot_id`, `started_at`, `start_quality`, `ran_seconds`, `end` (`stop`, `panic`, `running`, or empty when no record tells), `end_record`, `stop_slot` (the one DIMM with an uncorrected error in a boot that stopped), `firmware` (the letter of the firmware record of the boot that ranks highest: `D` disabled, `V` mirror failover, `N` training failure, `E` a repair or sparing that failed, `A` predicted failure, `S` sparing, `P` a repair done) |
+| `firmware[]` | on the view of one DIMM, its firmware records (see below) |
 | `rows[]` | per DIMM with errors in these boots, or per place of the one DIMM: `level` (`dimm`, `no-dimm`, `cell`, `address`, `dimm-only`), `dimm_uid`, `slot`, `serial`, `place`, `cells[]`, `boots_with_errors`, `boots_with_ue`, `ce`, `ue`, `stop_boots` |
 | `rows[].cells[]` | one per boot: `boot`, `ce`, `ue`, `stopped` (an uncorrected error in a boot that stopped), `known` (false when the boot stopped and no record names a DIMM), `absent` (the DIMM was not in the host) |
 | `others` | the places of the DIMM beyond the first 12, summed, with `places` their number |
 | `quiet` | the DIMMs of the host without errors in these boots |
 | `stops` | `stops`, `window`, `streak` (the latest boots in a row that stopped), `panics`, `where` (`R-LOOP-01`, `R-LOOP-02`, `R-LOOP-03`, `dimm`, `none`) and `lines[]`, the stops lines as statements |
 | `rules[]` | the statements of the R-LOOP rules on the finding of the DIMM |
+
+### Firmware records in the views
+
+The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]`, and every row of `inventory` carries `firmware[]` and `firmware_marks`. A record of `firmware[]` holds:
+
+| Field | Content |
+| --- | --- |
+| `time` | when the BIOS or the BMC wrote it |
+| `event` | the common event (see the table above), or `unclassified` |
+| `flags` | the flags of the event, `sddc`, `adddc` and `runtime` among them |
+| `vendor_id`, `registry` | the message ID of the vendor and the registry it is from |
+| `location` | how the record named the module |
+| `mapping` | how the event was found: `table` (a line of a mapping table), `ipmi` (the state of the IPMI memory sensor), `bmc-registry` (the wording rules read the registry text of the BMC), `wording` (they read the text of the entry), `cper` (the memory section of CPER the entry carries) or `none` |
+| `basis` | for a table, what it rests on; a table whose basis is not `capture` was not checked on real hardware |
+| `raw_ref` | where the raw record is, in the views of a DIMM |
+| `withdrawn` | a later record took the mark back |
+| `duplicate` | the step repeats one another log of the same BMC reported |
+
+`firmware_marks` is the marks of the DIMM in a few words, newest first, the latest two and the number of the others: `PPR ok 11-03, PFA 11-09 +2`. Marks taken back and steps that repeat another are left out.
 
 The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above, and the window as the engine sees it (per DIMM `cells`, `places` and the boots each had uncorrected errors in). The topology of `dimm` adds `window` and `boots` to the levels, the address map `window`, `boots` and `ue_boots`, and `my map --boots` per line the `boots` and `ue_boots` of each cell.

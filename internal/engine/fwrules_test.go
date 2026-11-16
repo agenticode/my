@@ -238,13 +238,14 @@ func TestRepairOfTheModule(t *testing.T) {
 }
 
 // TestFirmwareMissing: records about the DIMM no table classes, and a log
-// of the BMC that was cleared.
+// of the BMC that was cleared and one that is full.
 func TestFirmwareMissing(t *testing.T) {
 	b := ruleBuilder()
 	b.ce("d1", t0.Add(20*day), cellA)
 	b.in.Firmware = append(b.in.Firmware,
 		model.FirmwareRecord{Host: "h1", At: t0.Add(21 * day), Common: "unclassified", DIMMUID: "d1", EventID: 1000},
 		model.FirmwareRecord{Host: "h1", At: t0.Add(22 * day), Common: "log-cleared", Fingerprint: "c"},
+		model.FirmwareRecord{Host: "h1", At: t0.Add(22*day + time.Hour), Common: "log-full", Fingerprint: "f"},
 		model.FirmwareRecord{Host: "h1", At: t0.Add(23 * day), Common: "mirror-lost", EventID: 1001})
 	res := analyze(t, b.in, Options{AsOf: asOf})
 	v := res.Host("h1").DIMM("d1").Verdict
@@ -252,7 +253,8 @@ func TestFirmwareMissing(t *testing.T) {
 	for _, m := range v.Missing {
 		missing = append(missing, m.Code)
 	}
-	if !slices.Contains(missing, "missing.fw_unclassified") || !slices.Contains(missing, "missing.bmc_log_cleared") {
+	if !slices.Contains(missing, "missing.fw_unclassified") || !slices.Contains(missing, "missing.bmc_log_cleared") ||
+		!slices.Contains(missing, "missing.bmc_log_full") {
 		t.Errorf("missing %v", missing)
 	}
 	hf := res.Host("h1").Loose

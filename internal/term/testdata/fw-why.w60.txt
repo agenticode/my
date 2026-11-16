@@ -1,0 +1,15 @@
+CPU1_D1  replace now  R-FW-01
+         the memory mirror failed over from the DIMM on
+         2026-11-12 (EXM0006)
+         DDR5 RDIMM 64 GB 2Rx4
+         Example Memory EXM64G48R2X4-A  S/N 21FD6F
+
+ evidence  [R-REP-01] sparing has been in use since
+           2026-07-31: the spare is taken
+           supports: the other 15 DIMMs of this host have no
+           unconfined errors: a cause in the board is
+           unlikely
+ next      Replace the DIMM. Attach a case bundle of this
+           DIMM to the return.
+ confidence high, 3 checks not made, 2 kinds of data
+ missing: --detail

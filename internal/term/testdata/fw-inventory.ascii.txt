@@ -1,0 +1,50 @@
+host synth-crash-loop  Example Systems R760
+16 DIMMs; 16 empty slots not listed (--all lists them)
+slot names and module data from SMBIOS
+no BIOS settings on record, so the RAS column is empty; my bios --bmc ADDRESS reads them
+
+ SLOT     SERIAL  MAKER           PART NUMBER      SIZE  ORG   SPEED      CE OS  CE BMC
+ CPU0_A1  8F2453  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_B1  D6A738  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_C1  BE8ED6  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+          firmware: disabled 11-12, PFA 11-12 +2
+ CPU0_D1  0149B5  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_E1  3016FC  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_F1  2BE334  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_G1  CF6088  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU0_H1  D849FD  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_A1  B6446C  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_B1  E17AA4  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_C1  B5DAD6  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_D1  21FD6F  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+          BMC log 2026-11-12 09:40 UTC: cleared
+          firmware: mirror 11-12, sparing 07-31
+ CPU1_E1  EA1641  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_F1  EF9E30  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_G1  049F4B  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+ CPU1_H1  2E671F  Example Memory  EXM64G48R2X4-A  64 GB  2Rx4  4800/4800      0       0
+          DDR5 RDIMM
+
+ ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
+ CE OS counts the corrected errors in the records of the operating system, CE BMC the entries about
+ corrected errors in the logs of the BMC, both from 2026-11-12 09:40 UTC to 2026-11-13 00:00 UTC,
+ the period both sides cover.
+
+ OS and BMC side by side, 2026-11-12 09:40 UTC to 2026-11-13 00:00 UTC. The records of the operating
+ system begin 2026-07-31 11:00 UTC, the logs of the BMC 2026-11-12 09:40 UTC.
+ Neither side has a corrected error on record for that period.

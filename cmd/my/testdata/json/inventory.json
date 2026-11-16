@@ -112,6 +112,24 @@
             "source": "redfish/log"
           }
         ],
+        "firmware": [
+          {
+            "time": "2026-10-28T21:04:55Z",
+            "event": "ce-threshold",
+            "vendor_id": "MEM0701",
+            "location": "DIMM_A1",
+            "mapping": "table",
+            "basis": "registry"
+          },
+          {
+            "time": "2026-11-05T02:41:07Z",
+            "event": "ce-threshold",
+            "vendor_id": "MEM0702",
+            "location": "DIMM_A1",
+            "mapping": "table",
+            "basis": "registry"
+          }
+        ],
         "lines": [
           {
             "code": "inv.line.module",

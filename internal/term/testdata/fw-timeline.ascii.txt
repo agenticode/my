@@ -1,0 +1,27 @@
+host synth-crash-loop  CPU1_D1  S/N 21FD6F  2026-07-31 to 2026-11-12  105 days
+
+           07-31     09-01     10-01     11-12
+ CPU1_D1   _---=--_-____-_=__=_---_=_-=_____#_  peak 2/day
+ events    S         B         B             BVA
+           |         |         |             ||+ 2026-11-12 failure predicted by firmware, taken
+           |         |         |             ||  back by a later record
+           |         |         |             |+- 2026-11-12 the memory mirror failed over
+           +---------+---------+-------------+-- 2026-07-31 sparing
+                     +---------+-------------+-- 7 reboots, 4 after a hardware error stopped the
+                                                 host
+
+ 25 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
+ 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
+
+ the latest boots
+ stops: CPU0_C1 had an uncorrected error in 4 of the boots that stopped (R-LOOP-01)
+ boot      1       2       3       4       5       6       7       8
+ started   07-31   09-01   10-01   11-12   11-12   11-12   11-12   11-12
+           11:00   03:00   03:00   08:00   08:41   09:23   09:25   10:10
+ ran       31 d    29 d    42 d    41 min  41 min  53 s    44 min  13 h
+ ended     -       -       -       STOP    STOP    STOP    STOP    -
+ firmware  S       -       -       -       -       V       -       -
+ CPU1_D1   :       :       +       .       .       .       .       .
+
+ . none, corrected : 1-9, + 10-99; ended: STOP a fatal hardware error, - not on record; firmware: V
+ mirror failover, S sparing

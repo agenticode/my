@@ -174,7 +174,7 @@ func TestDescs(t *testing.T) {
 	// The labels the design allows. A row, a column, a bank or an address
 	// as a label would make the number of series grow without bound; the
 	// cause of a stop has three values and a check of preflight thirteen.
-	allowed := map[string]bool{"host": true, "slot": true, "serial": true, "mode": true, "type": true, "gpu": true, "bucket": true,
+	allowed := map[string]bool{"event": true, "host": true, "slot": true, "serial": true, "mode": true, "type": true, "gpu": true, "bucket": true,
 		"source": true, "status": true, "version": true, "revision": true, "engine": true, "cause": true, "check": true}
 	seen := map[string]bool{}
 	for _, d := range Descs {

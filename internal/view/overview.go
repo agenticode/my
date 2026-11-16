@@ -221,6 +221,9 @@ type Source struct {
 	// understand, Faults the faults of the reader that were caught.
 	Unread int `json:"unread,omitzero"`
 	Faults int `json:"faults,omitzero"`
+	// UnreadRecords are the records not understood whose text names
+	// memory, as the ledger keeps them.
+	UnreadRecords []model.UnreadRecord `json:"unread_records,omitzero"`
 	// Grade is the best observation grade among the events of the source.
 	Grade model.Grade `json:"grade,omitzero"`
 	First time.Time   `json:"first,omitzero"`
@@ -357,6 +360,11 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 			Records: s.Records, Events: s.Events, Actions: s.Actions, Skipped: s.Skipped, Unread: s.Unread, Faults: s.Faults, Grade: s.BestGrade(),
 			First: s.FirstTS, Last: s.LastTS, Notes: s.Notes,
 		})
+		if s.Unread > 0 {
+			if un, err := c.store.UnreadRecords(ctx, s.ID); err == nil {
+				ov.Sources[len(ov.Sources)-1].UnreadRecords = un
+			}
+		}
 		if s.Kind == model.SourceKindUnknown {
 			// An input no reader recognised: listed, not missed.
 			continue

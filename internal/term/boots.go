@@ -170,7 +170,33 @@ func (st Style) bootGlyph(c view.BootCell) string {
 type gridKeys struct {
 	cells [cellKinds]bool
 	ends  map[string]bool
+	// firmware holds the letters of firmware records the grid shows.
+	firmware map[string]bool
 }
+
+// fw notes a letter of a firmware record.
+func (k *gridKeys) fw(letter string) {
+	if letter == "" {
+		return
+	}
+	if k.firmware == nil {
+		k.firmware = map[string]bool{}
+	}
+	k.firmware[letter] = true
+}
+
+// hasFirmware says whether a boot has the letter of a firmware record.
+func hasFirmware(boots []view.BootCol) bool {
+	for _, bc := range boots {
+		if bc.Firmware != "" {
+			return true
+		}
+	}
+	return false
+}
+
+// firmwareLetters is the order of the letters of firmware records.
+const firmwareLetters = "DVNEASP"
 
 func (k *gridKeys) cell(c view.BootCell) { k.cells[cellKind(c)] = true }
 
@@ -239,6 +265,9 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 	for _, h := range heads {
 		lw = max(lw, Width(h))
 	}
+	if hasFirmware(b.Boots) {
+		lw = max(lw, Width(st.say("boots.firmware")))
+	}
 	for _, r := range b.Rows {
 		if r.Level == view.RowNoDIMM {
 			lw = max(lw, Width(noDIMM))
@@ -283,7 +312,8 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		showEnds = showEnds || bc.End == model.BootStop || bc.End == model.BootPanic
 	}
 	var keys gridKeys
-	var idx, day, clock, ran, ended []string
+	var idx, day, clock, ran, ended, fwLine []string
+	anyFW := false
 	for _, bc := range cols {
 		if showEnds {
 			keys.end(bc.End)
@@ -297,6 +327,14 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		}
 		ran = append(ran, st.ranText(bc.RanSeconds))
 		ended = append(ended, st.endWord(bc.End))
+		fwl := bc.Firmware
+		if fwl == "" {
+			fwl = "-"
+		} else {
+			anyFW = true
+			keys.fw(bc.Firmware)
+		}
+		fwLine = append(fwLine, fwl)
 	}
 	line(heads[0], idx)
 	if oneDay {
@@ -313,6 +351,9 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 	line(heads[2], ran)
 	if showEnds {
 		line(heads[3], ended)
+	}
+	if anyFW {
+		line(st.say("boots.firmware"), fwLine)
 	}
 	for _, r := range b.Rows {
 		label := r.Slot
@@ -380,6 +421,15 @@ func (st Style) bootsLegend(p *page, k *gridKeys, words bool) {
 	text := strings.Join(cells, ", ")
 	if len(ends) > 0 {
 		text += "; " + st.say("boots.key.ended") + " " + strings.Join(ends, ", ")
+	}
+	var fws []string
+	for _, l := range firmwareLetters {
+		if k.firmware[string(l)] {
+			fws = append(fws, st.say("boots.key.fw."+string(l)))
+		}
+	}
+	if len(fws) > 0 {
+		text += "; " + st.say("boots.key.firmware") + " " + strings.Join(fws, ", ")
 	}
 	for _, l := range wrap(text, st.width()-2) {
 		p.add(" " + st.dim(l))
@@ -473,6 +523,9 @@ func (st Style) placesGrid(p *page, b *view.Boots, show, limit int) {
 	for _, h := range heads {
 		lw = max(lw, Width(h))
 	}
+	if hasFirmware(b.Boots) {
+		lw = max(lw, Width(st.say("boots.firmware")))
+	}
 	for _, e := range entries {
 		lw = max(lw, Width(e.label))
 	}
@@ -495,14 +548,26 @@ func (st Style) placesGrid(p *page, b *view.Boots, show, limit int) {
 		p.add(s.String())
 	}
 	var keys gridKeys
-	var idx, ended []string
+	var idx, ended, fwLine []string
+	anyFW := false
 	for _, bc := range b.Boots[from:] {
 		keys.end(bc.End)
 		idx = append(idx, strconv.Itoa(bc.Index))
 		ended = append(ended, st.endLetter(bc.End))
+		fwl := bc.Firmware
+		if fwl == "" {
+			fwl = "-"
+		} else {
+			anyFW = true
+			keys.fw(bc.Firmware)
+		}
+		fwLine = append(fwLine, fwl)
 	}
 	line(heads[0], idx, padRight(st.say("boots.boots"), bw)+"  "+st.say("boots.errors_head"))
 	line(heads[1], ended, "")
+	if anyFW {
+		line(st.say("boots.firmware"), fwLine, "")
+	}
 	head := ""
 	for _, e := range entries {
 		if e.head != "" && e.head != head {
