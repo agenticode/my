@@ -6,7 +6,7 @@ MemorY는 Linux 서버가 이미 남기고 있는 메모리 오류 기록을 읽
 
 메모리 오류를 읽고 조치를 정해야 하는 사람이 쓰는 도구입니다. 플랫폼과 데이터센터 엔지니어, SRE, 하드웨어 벤더의 필드와 지원 엔지니어, 시스템 통합 업체, 커널과 RAS 개발자가 여기에 듭니다.
 
-명령은 `my`입니다. 설정 없이 실행되는 정적 바이너리 하나이고 읽기만 합니다. 페이지를 offline하지 않고, 리페어를 시작하지 않고, 카운터를 초기화하지 않습니다.
+명령은 `my`입니다. 설정 없이 실행되는 정적 바이너리 하나이고 읽기만 합니다. 예외는 하나이며 요청해야만 일어납니다: `my harvest install`은 systemd 유닛 파일 두 개를 호스트에 두고 활성화하며, `my harvest uninstall`은 그것을 지웁니다. 페이지를 offline하지 않고, 리페어를 시작하지 않고, 카운터를 초기화하지 않습니다.
 
 ![예제 호스트의 슬롯 맵: CPU0_C1은 즉시 교체, CPU1_D1은 관찰](examples/ko/figures/slotmap.svg)
 
@@ -165,7 +165,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | rasdaemon | `/var/lib/rasdaemon/ras-mc_event.db`. `--fleet`을 쓰면 MySQL, MariaDB, PostgreSQL에 둔 저장소 | EDAC 드라이버가 디코딩한 위치가 든 오류 기록, machine check, page offline, CXL 이벤트 |
 | 커널 로그 | 호스트에서는 저널과 `/dev/kmsg`. 파일로는 `dmesg` 출력, syslog, `journalctl -o json` | EDAC 줄, 펌웨어 오류 기록, machine check, page offline, 부팅, NVIDIA 드라이버의 Xid 줄 |
 | 크래시 로그 | `/sys/fs/pstore`, `/var/lib/systemd/pstore`, `/var/crash` | panic으로 끝난 부팅의 커널 로그: reset 전에 출력한 기록 |
-| 부팅 오류 영역 | `/sys/firmware/acpi/tables/data/BERT` | 펌웨어가 호스트를 reset시킨 오류에 대해 남긴 기록 |
+| 부팅 오류 영역 | `/sys/firmware/acpi/tables/data/BERT` | 호스트를 reset시킨 오류를 펌웨어가 남긴 기록 |
 | EDAC 카운터 | `/sys/devices/system/edac/mc` | 부팅 이후 DIMM별 건수 |
 | mcelog 데몬 | `mcelog --client` | DIMM별 건수 |
 | SMBIOS | `/sys/firmware/dmi/tables` 또는 `dmidecode` 출력 | 슬롯, DIMM 시리얼과 부품번호 |
@@ -205,6 +205,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 저장 |
 | `my verify --expect plan.yaml` | 오류 주입 계획과 호스트가 기록한 것을 대조([docs/verify.md](docs/verify.md)) |
+| `my harvest` | 부팅마다 이전 부팅이 남긴 것(pstore, 부팅 오류 영역, kdump 로그, 머신 체크 뱅크에 남은 기록)을 보관 원장 `/var/lib/my/ledger.db`에 읽어 넣음. `install`, `uninstall`, `status`([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my preflight` | 치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 남는 것과 그것을 바꾸는 설정([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my serve --metrics` | Prometheus exporter로 실행([docs/exporter.md](docs/exporter.md)) |
 | `my help [명령]` | 명령의 옵션과 출력 읽는 법 |

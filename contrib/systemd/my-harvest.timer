@@ -1,0 +1,16 @@
+# Written by "my harvest install"
+#
+# Runs the boot harvest again during a long boot, so that counter readings
+# and corrected errors are in the kept ledger before a reset. In a loop of
+# short boots the run at boot is the one that matters.
+
+[Unit]
+Description=MemorY boot harvest, again during a long boot
+Documentation=https://github.com/agenticode/my/blob/main/docs/crash-loop.md
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target

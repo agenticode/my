@@ -107,6 +107,28 @@ print("as service:", sorted(service))
 sys.exit(0 if root == service else 1)
 EOF
 
+echo "=== systemd: the boot harvest"
+# The one command that changes the host: what it writes is what contrib
+# holds, systemd takes the units, the service runs and keeps its ledger,
+# and uninstall takes back what install did and leaves the ledger.
+sudo /usr/local/bin/my harvest install --timer --dry-run || fail "harvest install --dry-run"
+[ ! -e /etc/systemd/system/my-harvest.service ] || fail "a dry run wrote the unit"
+sudo /usr/local/bin/my harvest install --timer || fail "harvest install"
+cmp /etc/systemd/system/my-harvest.service "$root/contrib/systemd/my-harvest.service" || fail "install wrote another service than contrib holds"
+cmp /etc/systemd/system/my-harvest.timer "$root/contrib/systemd/my-harvest.timer" || fail "install wrote another timer than contrib holds"
+sudo systemd-analyze verify /etc/systemd/system/my-harvest.service /etc/systemd/system/my-harvest.timer || fail "systemd-analyze verify the harvest"
+systemctl is-enabled my-harvest.service my-harvest.timer || fail "the harvest units are not enabled"
+sudo systemctl start my-harvest.service || { sudo journalctl -u my-harvest --no-pager | tail -20; fail "start my-harvest"; }
+sudo systemctl start my-harvest.service || { sudo journalctl -u my-harvest --no-pager | tail -20; fail "start my-harvest again"; }
+sudo journalctl -u my-harvest --no-pager | tail -8
+sudo journalctl -u my-harvest --no-pager | grep -q "phase A:" || fail "the harvest wrote no line for phase A"
+sudo test -s /var/lib/my/ledger.db || fail "the harvest kept no ledger"
+sudo /usr/local/bin/my harvest status || fail "harvest status"
+sudo /usr/local/bin/my open /var/lib/my/ledger.db --json > "$tmp/kept.json"; [ $? -le 4 ] || fail "my open of the kept ledger"
+sudo /usr/local/bin/my harvest uninstall || fail "harvest uninstall"
+[ ! -e /etc/systemd/system/my-harvest.service ] && [ ! -e /etc/systemd/system/my-harvest.timer ] || fail "uninstall left a unit"
+sudo test -s /var/lib/my/ledger.db || fail "uninstall removed the ledger"
+
 echo "=== prometheus: a server scrapes the exporter and loads the rules"
 # This machine has no memory errors. A second exporter serves the demo
 # host, which has two DIMMs with a finding, so that the queries of the

@@ -42,7 +42,19 @@ type Options struct {
 	// Tolerance bounds the time difference between two reports of the same
 	// error from different sources. Zero values use the defaults.
 	Tolerance store.DuplicateTolerance
+	// ReadDeadline ends the reading of sources: a source that is not
+	// started by then is recorded as not read, and one that is read at the
+	// time is stopped. The passes run all the same. Zero means no
+	// deadline.
+	ReadDeadline time.Time
+	// AfterSource is called after the i-th source is in the ledger, before
+	// the next is read. An error ends the run.
+	AfterSource func(i int, src model.Source) error
 }
+
+// NotReadDetail is the detail of a source that the deadline of a run left
+// unread.
+const NotReadDetail = "not read: the run reached its deadline"
 
 // Result summarises a run.
 type Result struct {
@@ -149,11 +161,23 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	}
 
 	var modules []*model.Module
-	for _, a := range adapters {
+	for i, a := range adapters {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		src := model.Source{ScanID: res.Scan.ID, Kind: a.Kind(), Origin: a.Origin()}
+		readCtx, cancel := ctx, context.CancelFunc(func() {})
+		if !opts.ReadDeadline.IsZero() {
+			if !time.Now().Before(opts.ReadDeadline) {
+				src.Status, src.Detail = model.SourceError, NotReadDetail
+				if err := s.Update(ctx, func(w *store.Writer) error { return w.InsertSource(&src) }); err != nil {
+					return nil, fmt.Errorf("ingest: %w", err)
+				}
+				res.Sources = append(res.Sources, src)
+				continue
+			}
+			readCtx, cancel = context.WithDeadline(ctx, opts.ReadDeadline)
+		}
 		whole, _ := a.(BoardInventory)
 		// What a BMC says about the machine fills what the host does not
 		// say about itself.
@@ -162,7 +186,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 		listed := 0
 		err := s.Update(ctx, func(w *store.Writer) error {
 			sk.w = w
-			rep = a.Collect(ctx, sk)
+			rep = a.Collect(readCtx, sk)
 			// A record the ledger could not take rolls back the whole
 			// source: half a source would look like a complete one.
 			if rep.SinkErr != nil {
@@ -184,6 +208,7 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 				listed, len(board))}
 			err = nil
 		}
+		cancel()
 		if err != nil {
 			return nil, fmt.Errorf("ingest %s %s: %w", a.Kind(), a.Origin(), err)
 		}
@@ -211,6 +236,11 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 			return nil, fmt.Errorf("ingest: %w", err)
 		}
 		res.Sources = append(res.Sources, src)
+		if opts.AfterSource != nil {
+			if err := opts.AfterSource(i, src); err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	// Slots, DIMM identities and placements from what this run observed,

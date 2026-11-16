@@ -110,6 +110,12 @@ func app() *cli.App {
 				Run:       runCollect,
 			},
 			{
+				Name:      "harvest",
+				Summary:   "at every boot, read what the boot before left into a kept ledger; install, uninstall, status",
+				SummaryKO: "부팅마다 이전 부팅이 남긴 것을 보관 원장에 읽어 넣기. install, uninstall, status",
+				Run:       runHarvest,
+			},
+			{
 				Name:      "preflight",
 				Summary:   "what a reset after a fatal memory error would leave on this host, and the settings that change it",
 				SummaryKO: "치명적 메모리 오류 뒤 reset이 일어나면 이 호스트에 남는 것과 그것을 바꾸는 설정",
