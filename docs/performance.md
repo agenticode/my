@@ -52,7 +52,7 @@ On the fleet, where no host has more than 146,787 errors, time grows in step wit
 
 ## Small hosts
 
-At start the binary sets a soft limit for the Go heap: a quarter of the memory the process may use (`MemTotal` of `/proc/meminfo`, or the smallest `memory.max` of its control groups, as in a container or a systemd unit with `MemoryMax=`), at least 64 MiB. `GOMEMLIMIT` overrides it. On a host with 765 MiB the limit is 191 MiB, and `-gomemlimit 191MiB` runs the commands that way on any machine:
+At start the binary sets a soft limit for the Go heap: a quarter of the memory the process may use (`MemTotal` of `/proc/meminfo`, or the smallest limit of its control groups when that is less: `memory.max` of version 2, `memory.limit_in_bytes` of version 1, as in a container or a systemd unit with `MemoryMax=`), at least 64 MiB. `GOMEMLIMIT` overrides it. On a host with 765 MiB the limit is 191 MiB, and `-gomemlimit 191MiB` runs the commands that way on any machine:
 
 | Command | Input | 100,000 events: time | peak RSS | 300,000 events: time | peak RSS | 1,000,000 events: time | peak RSS |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
