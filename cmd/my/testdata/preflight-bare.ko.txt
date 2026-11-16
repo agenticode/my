@@ -21,7 +21,7 @@
  참고  reset-kind       재부팅 모드 cold, panic 뒤에도 같음. panic=0이면 커널은 panic 뒤에
                         기다리지만 치명적 머신 체크 뒤에는 30초 뒤 재시작함. reset 동안 뱅크 내용이
                         유지되는지는 보드와 BIOS에 달려 있음. my harvest를 설치한 뒤 처음 멈춘
-                        부팅에서 드러남
+                        부팅에서 알 수 있음
  없음  bert             펌웨어가 BERT 테이블을 제공하지 않음
  없음  erst-mce         펌웨어가 ERST 테이블을 제공하지 않음. mce_panic()은 기록 사본을 남기지 않음
 
