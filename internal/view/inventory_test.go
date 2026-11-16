@@ -440,3 +440,41 @@ func TestInventoryMessagesAreComplete(t *testing.T) {
 		}
 	}
 }
+
+// klogCopy is the kernel log's report of an error another source has: a
+// record of the OS that the adapter declares a second report.
+func klogCopy(ref, slot string, at time.Time, of string) *model.Event {
+	return &model.Event{ErrorDT: at, ErrorSeverity: model.SevCE, Source: "klog/edac", RawRef: ref, Fingerprint: ref, Label: slot, DupOfFingerprint: of}
+}
+
+// A host without a BMC source: the kernel log's copies of rasdaemon's
+// records are not counted twice, and the comparison does not keep them.
+// A record of the BMC that comes without a BMC source (a ledger written
+// some other way) makes the comparison read the records again, so that an
+// OS record that repeats it counts.
+func TestSidesWithoutABMCSource(t *testing.T) {
+	klog := func(events ...*model.Event) adapter.Adapter {
+		return &source{kind: "klog", fn: func(sink adapter.Sink) error {
+			for _, e := range events {
+				if err := sink.Event(e); err != nil {
+					return err
+				}
+			}
+			return nil
+		}}
+	}
+	v := inventoryOf(t, i18n.EN, osSide(osError("mc/1", "A1", day(1)), osError("mc/2", "A1", day(5))),
+		klog(klogCopy("k/1", "A1", day(1), "mc/1"), klogCopy("k/2", "A1", day(5), "mc/2")))
+	if len(v.Rows) != 1 || v.Rows[0].Slot != "A1" || v.Rows[0].CEOS != model.Some[int64](2) || v.Sides.BMC.Read {
+		t.Fatalf("rows = %+v", v.Rows)
+	}
+
+	// The BMC's entry comes through a source that is not a BMC's.
+	other := &source{kind: "import", fn: func(sink adapter.Sink) error {
+		return sink.Event(bmcEntry("sel/1", "A1", day(3), "correctable ECC"))
+	}}
+	v = inventoryOf(t, i18n.EN, osSide(osError("mc/1", "A1", day(1))), other, klog(klogCopy("k/3", "A1", day(3), "sel/1")))
+	if len(v.Rows) != 1 || v.Rows[0].CEOS != model.Some[int64](2) {
+		t.Fatalf("with an entry of the BMC: rows = %+v", v.Rows)
+	}
+}
