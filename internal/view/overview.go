@@ -374,10 +374,10 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 			unreadable = append(unreadable, s.Kind)
 			fallthrough
 		case model.SourcePartial, model.SourceError:
-			ov.Missing = append(ov.Missing, c.missingSource(s))
+			ov.Missing = append(ov.Missing, c.missingSource(s, names[i]))
 		case model.SourceAbsent:
 			if absentMatters[s.Kind] {
-				ov.Missing = append(ov.Missing, c.missingSource(s))
+				ov.Missing = append(ov.Missing, c.missingSource(s, names[i]))
 			}
 		}
 	}
@@ -406,27 +406,24 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 }
 
 // sourceNames names the sources of a scan for a line of text. A kind that
-// was read once is named by its kind. Where several sources of one kind
-// were read, as the journal and the ring buffer of a live host are, each
-// also says which one it is.
+// was tried once is named by its kind. Where several sources of one kind
+// were tried, as the journal and the ring buffer of a live host are, each
+// also says which one it is: also when one of them could not be read, so
+// that "klog" on the sources line and "klog: not readable" on the missing
+// line do not seem to speak about one source. A source that is not there
+// is left out of the count.
 func (c *Case) sourceNames(srcs []model.Source) []string {
-	read := func(s model.Source) bool {
-		switch s.Status {
-		case model.SourceOK, model.SourcePartial, model.SourceEmpty:
-			return true
-		}
-		return false
-	}
+	tried := func(s model.Source) bool { return s.Status != model.SourceAbsent }
 	count := map[string]int{}
 	for _, s := range srcs {
-		if read(s) {
+		if tried(s) {
 			count[s.Kind]++
 		}
 	}
 	names := make([]string, len(srcs))
 	for i, s := range srcs {
 		names[i] = s.Kind
-		if !read(s) || count[s.Kind] < 2 {
+		if !tried(s) || count[s.Kind] < 2 {
 			continue
 		}
 		var which string
@@ -475,8 +472,8 @@ func (c *Case) statusText(s model.SourceStatus) string {
 
 // missingSource states that a source could not be read, in the words the
 // findings use for it.
-func (c *Case) missingSource(s model.Source) Text {
-	st := model.Statement{Code: "missing.source", Args: map[string]any{"kind": s.Kind, "status": "@status." + string(s.Status)}}
+func (c *Case) missingSource(s model.Source, name string) Text {
+	st := model.Statement{Code: "missing.source", Args: map[string]any{"kind": name, "status": "@status." + string(s.Status)}}
 	// "not present" as the detail of a source that is not there adds nothing.
 	if s.Detail != "" && s.Detail != "not present" {
 		st.Code = "missing.source_detail"

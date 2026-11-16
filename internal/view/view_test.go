@@ -1546,6 +1546,19 @@ func TestSourceNamesApart(t *testing.T) {
 	if strings.Join(got, "|") != strings.Join(want, "|") {
 		t.Errorf("names %q, want %q", got, want)
 	}
+	// A scan without root: the journal is closed and the ring buffer read.
+	// Both are named, so that the sources line and the missing line do not
+	// both say "klog". A source that is not there is not counted.
+	got = c.sourceNames([]model.Source{
+		{Kind: "klog", Origin: "journalctl -o json _TRANSPORT=kernel", Status: model.SourceUnreadable},
+		{Kind: "klog", Origin: "/dev/kmsg", Status: model.SourceOK},
+		{Kind: "pstore", Origin: "/sys/fs/pstore", Status: model.SourceEmpty},
+		{Kind: "pstore", Origin: "/var/lib/systemd/pstore", Status: model.SourceAbsent},
+	})
+	want = []string{"klog (journal)", "klog (ring buffer)", "pstore", "pstore"}
+	if strings.Join(got, "|") != strings.Join(want, "|") {
+		t.Errorf("names without root %q, want %q", got, want)
+	}
 }
 
 // TestBIOSNotRead: when the BMC was read and its Bios resource did not come

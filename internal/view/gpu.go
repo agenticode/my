@@ -409,7 +409,7 @@ func (c *Case) GPUs(ctx context.Context, h *engine.HostResult, opts GPUOptions) 
 			}
 			switch s.Status {
 			case model.SourcePartial, model.SourceUnreadable, model.SourceError:
-				v.Notes = append(v.Notes, c.missingSource(s))
+				v.Notes = append(v.Notes, c.missingSource(s, s.Kind))
 			}
 		}
 	}
