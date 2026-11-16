@@ -28,8 +28,10 @@ type loop struct {
 	dir  string
 	host string
 	// window is the number of boots of the window, stops those that end
-	// in a stop: the boots of the plan.
-	window, stops int
+	// in a stop: the boots of the plan. copyWindow is the window of the
+	// copy of the host where it differs: a copy without the journal knows
+	// the boots its other files name.
+	window, copyWindow, stops int
 	// where says where the uncorrected errors of the window lie
 	// (engine.Recurrence.Where).
 	where string
@@ -44,6 +46,7 @@ type loop struct {
 var loops = []loop{
 	{dir: "6.19.10-mce-loop", host: "lab-x86", window: 4, stops: 3, where: "none", rule: "host.loop_address"},
 	{dir: "6.19.10-mce-loop-scatter", host: "lab-x86", window: 4, stops: 3, where: "none"},
+	{dir: "6.19.10-mce-loop-kdump", host: "lab-x86", window: 3, copyWindow: 2, stops: 1, where: "none"},
 }
 
 // loopBoot is one line of boots.jsonl: what was injected in a boot.
@@ -147,8 +150,12 @@ func TestLoops(t *testing.T) {
 func checkLoop(t *testing.T, name string, l loop, plan []loopBoot, h *engine.HostResult) {
 	t.Helper()
 	r := h.Recurrence
-	if r.Window() != l.window || r.Stops != l.stops || r.Where != l.where {
-		t.Errorf("%s: window %d, stops %d, where %q; want %d, %d, %q", name, r.Window(), r.Stops, r.Where, l.window, l.stops, l.where)
+	window := l.window
+	if name == "copy" && l.copyWindow > 0 {
+		window = l.copyWindow
+	}
+	if r.Window() != window || r.Stops != l.stops || r.Where != l.where {
+		t.Errorf("%s: window %d, stops %d, where %q; want %d, %d, %q", name, r.Window(), r.Stops, r.Where, window, l.stops, l.where)
 	}
 	// The boot of the window an injection fell into: by its boot ID, or
 	// by time where a source does not record the ID (a pstore dump).

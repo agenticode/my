@@ -1,0 +1,17 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: mce-loop-kdump
+summary: "a fatal machine check with a crash kernel loaded: the panic boots the crash kernel, which saves the kernel log and restarts the guest; the next boot reads the record out of the bank"
+method: "QEMU monitor command mce -b (QMP human-monitor-command): a record in bank 7 of every virtual CPU and a broadcast machine check"
+kernel: 6.19.10-300.fc44.x86_64
+rasdaemon: 0.8.0
+cpu: "Skylake-SP (family 6 model 85) emulated by QEMU 10.2.2 without hardware virtualization"
+injections:
+  - id: boot-1
+    time: 2026-11-16T04:53:01.141Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x12345040
+    socket: 0
+    note: "boot e79a7e656aac4ecebd30abc06cbe0566: bank 7, status 0xbe00000000010090 (uncorrected memory read error, processor context corrupt), MISC 0x86; kdump-utils with crashkernel=256M"
