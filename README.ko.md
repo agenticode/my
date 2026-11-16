@@ -6,7 +6,7 @@ MemorY는 Linux 서버가 이미 남기고 있는 메모리 오류 기록을 읽
 
 메모리 오류를 읽고 조치를 정해야 하는 사람이 쓰는 도구입니다. 플랫폼과 데이터센터 엔지니어, SRE, 하드웨어 벤더의 필드와 지원 엔지니어, 시스템 통합 업체, 커널과 RAS 개발자가 여기에 듭니다.
 
-명령은 `my`입니다. 설정 없이 실행되는 정적 바이너리 하나이고 읽기만 합니다. 예외는 하나이며 요청해야만 일어납니다: `my harvest install`은 systemd 유닛 파일 두 개를 호스트에 두고 활성화하며, `my harvest uninstall`은 그것을 지웁니다. 페이지를 offline하지 않고, 리페어를 시작하지 않고, 카운터를 초기화하지 않습니다.
+명령은 `my`입니다. 설정 없이 실행되는 정적 바이너리 하나이고 읽기만 합니다. 예외는 하나이며 요청해야만 일어납니다: `my harvest install`은 systemd 유닛 파일을 호스트에 두고(`--timer`를 주면 두 개) 활성화하며, `my harvest uninstall`은 그것을 지웁니다. 페이지를 offline하지 않고, 리페어를 시작하지 않고, 카운터를 초기화하지 않습니다.
 
 ![예제 호스트의 슬롯 맵: CPU0_C1은 즉시 교체, CPU1_D1은 관찰](examples/ko/figures/slotmap.svg)
 
@@ -266,7 +266,7 @@ r12-n034 CPU0_C1 S/N 3B9C56: 즉시 교체 (소견, 신뢰도 높음; R-UE-01, R
 
 ## BMC
 
-`--bmc ADDRESS`를 주면 명령이 호스트의 BMC에도 Redfish로 묻습니다. 요청은 모두 GET이고, 메모리 모듈과 그 오류 카운트, BIOS 메모리 설정, 이벤트 로그를 읽습니다. `my inventory`는 DIMM을 한 줄에 하나씩 적고 운영체제와 BMC가 각각 기록한 CE를 나란히 놓습니다. `my bios`는 메모리 RAS 설정을 프로필과 대조합니다. 프로필의 속성 이름은 모두 서버 벤더의 공개 문서에서 가져왔습니다. `my export labels`는 BMC의 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 씁니다. 호스트에 들어갈 수 없으면 `my collect redfish`로 BMC만 읽습니다.
+`--bmc ADDRESS`를 주면 명령이 호스트의 BMC에도 Redfish로 묻습니다. 요청은 모두 GET이고(`--session`은 로그인과 로그아웃을 더함), 메모리 모듈과 그 오류 카운트, BIOS 메모리 설정, 이벤트 로그를 읽습니다. `my inventory`는 DIMM을 한 줄에 하나씩 적고 운영체제와 BMC가 각각 기록한 CE를 나란히 놓습니다. `my bios`는 메모리 RAS 설정을 프로필과 대조합니다. 프로필의 속성 이름은 모두 서버 벤더의 공개 문서에서 가져왔습니다. `my export labels`는 슬롯 이름을, `--names bmc`를 주면 BMC의 서비스 라벨을 rasdaemon용 DIMM 라벨 파일로 씁니다. 호스트에 들어갈 수 없으면 `my collect redfish`로 BMC만 읽습니다.
 
 보내는 요청, 인증서와 암호 처리, 아직 시험하지 못한 것은 [docs/redfish.md](docs/redfish.md)에 있습니다. 실제 서버의 BMC는 아직 읽어 보지 못했습니다.
 

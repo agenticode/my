@@ -11,7 +11,7 @@ go run ./tools/perf run -my /tmp/my -dir /tmp/my-perf -events 100000,300000,1000
 go run ./tools/perf table < runs.json
 ```
 
-`perf run` makes the inputs below `-dir` once and takes them from there on later runs. It runs each command with its output thrown away and records the wall time and the peak resident set size (RSS) of the process as the kernel accounts it. Without `-format json` it prints the table at once; `-only` picks commands by the names in the first column of the table; `perf gen` writes one input on its own. With the three sizes the directory holds 3.4 GB at the end. A scan of the 1,000,000 host copy needs 2.15 GB more in the directory for temporary files, and `my open` of its case as much to unpack the ledger.
+`perf run` makes the inputs below `-dir` once and takes them from there on later runs. It runs each command with its output thrown away and records the wall time and the peak resident set size (RSS) of the process as the kernel accounts it. Without `-format json` it prints the table at once; `-only` picks commands by the names in the first column of the table; `perf gen` writes one input on its own. With the three sizes the directory holds 3.4 GB at the end. A scan of the 1,000,000 host copy needs 2.15 GB more in `$TMPDIR` for its temporary ledger, and `my open` of its case as much to unpack the ledger.
 
 ## Inputs
 
@@ -65,7 +65,7 @@ At start the binary sets a soft limit for the Go heap: a quarter of the memory t
 | `bundle` | fleet ledger | 1.67 s | 86.4 MB | 4.67 s | 145.4 MB | 14.6 s | 327.5 MB |
 | `open` | fleet case | 0.96 s | 76.8 MB | 2.65 s | 137.9 MB | 8.50 s | 388.4 MB |
 
-Every command stayed below 400 MB, up to 1,000,000 errors on one host and in the fleet: all of these inputs fit in 512 MB. The limit is soft. The collector runs more often near it, and what lies outside the Go heap (SQLite's page cache, the runtime) comes on top, so a peak above 191 MiB is no failure. What a small host makes slow is a host with hundreds of thousands of errors: its scan takes minutes, and its ledger (2.15 GB per million errors) is larger than the memory that could cache it.
+Every command of the table stayed below 400 MB, up to 1,000,000 errors on one host and in the fleet: all of these inputs fit in 512 MB. The limit is soft. The collector runs more often near it, and what lies outside the Go heap (SQLite's page cache, the runtime) comes on top, so a peak above 191 MiB is no failure. What a small host makes slow is a host with hundreds of thousands of errors: its scan takes minutes, and its ledger (2.15 GB per million errors) is larger than the memory that could cache it.
 
 The temporary ledger of a scan lies in `$TMPDIR`, or `/tmp` when that is not set. Where `/tmp` is a tmpfs, the ledger is held in memory: 2.15 GB for 1,000,000 errors on a host whose rasdaemon and kernel log both record every error. Point `TMPDIR` at a directory on disk, or keep the ledger in a file of its own with `--ledger FILE`.
 
