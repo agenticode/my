@@ -187,6 +187,9 @@ var inf = math.Inf(1)
 // tiny is the lower bound of thresholds that must be above zero.
 const tiny = 1e-9
 
+// maxWhole is the largest value a whole-number threshold takes.
+const maxWhole = 1 << 53
+
 var params = []Param{
 	floatParam("cluster.line_chance", "largest chance of an accidental alignment at which errors sharing a row or column are still a line", tiny, 1,
 		func(c *Config) *float64 { return &c.LineChance }),
@@ -300,6 +303,12 @@ func (c *Config) Set(key, value string) error {
 	}
 	if p.Integer && v != math.Trunc(v) {
 		return fmt.Errorf("%s: %q is not a whole number", p.Key, value)
+	}
+	// A count has no upper bound of its own, and a float beyond the range
+	// of int converts to a value that depends on the processor (the
+	// smallest int on amd64). Above 2^53 not every whole number is exact.
+	if p.Integer && v > maxWhole {
+		return fmt.Errorf("%s: %q is larger than %s", p.Key, value, formatValue(maxWhole, true))
 	}
 	if err := p.check(v); err != nil {
 		return err

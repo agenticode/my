@@ -1,0 +1,2 @@
+go test fuzz v1
+string("storm.count=1e99")
