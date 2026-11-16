@@ -55,6 +55,8 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | any file given to `my import`, plain or gzip-compressed: what it is taken for, and the reader that was chosen | `internal/scan` | `FuzzDetect` |
 | injection plan of `my verify` | `internal/injection` | `FuzzRead` |
 | settings profile of `my bios` | `internal/memras` | `FuzzParse` |
+| table of firmware messages (`--event-map`) | `internal/fwmap` | `FuzzParse` |
+| a firmware record asked of the tables and the wording rules: message ID, text, arguments, the BMC's registry text | `internal/fwmap` | `FuzzClassify` |
 | a copy of a host's files that `my preflight --root` reads: kernel command line, processor, consoles, journald, systemd-pstore, kdump and unit files | `internal/preflight` | `FuzzHost` |
 | engine configuration file | `internal/engine` | `FuzzConfigRead` |
 | message template | `internal/i18n` | `FuzzFormat` |

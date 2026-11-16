@@ -234,8 +234,8 @@ memory RAS settings of the BIOS in effect for every DIMM: patrol scrub, ADDDC (w
        DDR4 RDIMM; BMC: DIMM A1, DIMM.Socket.A1
        corrected errors the BMC counts: 1,250 over the life of the module, 3 since the reset of
        2026-10-02 08:15 UTC
-       BMC log 2026-10-28 21:04 UTC: correctable ECC
-       BMC log 2026-11-05 02:41 UTC: correctable ECC
+       BMC log 2026-10-28 21:04 UTC: corrected-error limit passed
+       BMC log 2026-11-05 02:41 UTC: corrected-error limit passed
 [...]
  No source of the operating system was read, so there is nothing to set against the logs of the BMC.
 ```

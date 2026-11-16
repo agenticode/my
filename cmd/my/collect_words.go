@@ -121,6 +121,8 @@ var collectWords = i18n.Catalog{
 			"--parallel N          with --targets: BMCs asked at the same time (default 4)\n" +
 			"--force               replace OUT when it is a case bundle that exists\n" +
 			"--quiet               print no progress\n" +
+			"--event-map FILE      with -o NAME.mycase: a table of firmware messages of one's own,\n" +
+			"                      asked before the shipped tables; may be repeated\n" +
 			"--lang en|ko          language of the output (default: from the locale, English otherwise)\n" +
 			"--json                print the result as JSON\n" +
 			"--width N             columns to fill (default: the terminal, 100 otherwise)",
@@ -145,6 +147,8 @@ var collectWords = i18n.Catalog{
 			"--parallel N          --targets와 함께: 동시에 요청할 BMC 수 (기본 4)\n" +
 			"--force               OUT이 이미 있는 케이스 번들이면 덮어씀\n" +
 			"--quiet               진행 상황을 출력하지 않음\n" +
+			"--event-map FILE      -o NAME.mycase와 함께: 내장 표보다 먼저 볼, 직접 만든\n" +
+			"                      펌웨어 메시지 표. 여러 번 줄 수 있음\n" +
 			"--lang en|ko          출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
 			"--json                결과를 JSON으로 출력\n" +
 			"--width N             출력 폭 (기본: 터미널 폭, 터미널이 아니면 100)",

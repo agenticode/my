@@ -1,6 +1,7 @@
 package redfish
 
 import (
+	"encoding/hex"
 	"fmt"
 	"regexp"
 	"sort"
@@ -9,61 +10,29 @@ import (
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/decode/ipmi"
+	"github.com/agenticode/my/internal/fwevent"
+	"github.com/agenticode/my/internal/fwmap"
 	"github.com/agenticode/my/internal/model"
 )
 
-// A log entry says what happened in one of several vocabularies. The ones
-// read here:
-//
-//   - entries of type SEL about a Memory sensor: the event bytes in
-//     MessageId, as the schema defines for this entry type, or the text of
-//     the IPMI state in Message;
-//   - the OpenBMC message registry (OpenBMC.x.y.MemoryECCCorrectable and
-//     its neighbours), whose arguments are socket, channel, DIMM and rank;
-//   - message IDs of the form MEMnnnn, where MEM0000 to MEM0010 follow the
-//     states of the IPMI memory sensor one by one;
-//   - messages that spell out an IPMI memory state or one of two widely
-//     used vendor texts about a memory module.
-//
-// Every state is mapped through the IPMI memory sensor vocabulary, so an
-// event reads the same whether it came from a SEL dump or from Redfish.
-// An entry that is about memory and fits none of these is counted and
-// named in the report.
+// A log entry says what happened in one of the vocabularies of package
+// fwmap: the event bytes of an entry of type SEL (in MessageId, with or
+// without 0x) or of a message that carries a SEL record, the name of a
+// state of the IPMI memory sensor in the text of such an entry, a message
+// of a registry a table maps (the DMTF standard, OpenBMC under any prefix,
+// a vendor's), or words the wording rules know. Every entry about memory
+// is read as a common event of package fwevent, and fwevent says what it
+// is in the ledger, so an event reads the same whatever vocabulary it came
+// in. An entry that is about memory and fits nothing is kept as
+// information and named in the report.
 
 var (
-	selDataRE = regexp.MustCompile(`^0[xX][0-9a-fA-F]{8}$`)
-	openbmcRE = regexp.MustCompile(`^OpenBMC\.\d+\.\d+(?:\.\d+)?\.(\w+)$`)
-	memIDRE   = regexp.MustCompile(`(?:^|\.)MEM(\d{4})$`)
+	selDataRE = regexp.MustCompile(`^(?:0[xX])?[0-9a-fA-F]{8}$`)
 	// "(Processor 1, Memory Module 4)" in the message of a vendor log.
 	procModuleRE = regexp.MustCompile(`\(Processor (\d{1,2}), Memory Module (\d{1,3})\)`)
 	locationRE   = regexp.MustCompile(`(?i)\bat location(?:\(s\))? ([^.;]+)`)
-	memoryWordRE = regexp.MustCompile(`(?i)\b(?:memory|dimm\w*|ecc)\b`)
+	hexDigitsRE  = regexp.MustCompile(`^[0-9a-fA-F]{32}$`)
 )
-
-// openbmcEvents maps message names of the OpenBMC registry to states.
-var openbmcEvents = map[string]ipmi.MemoryEvent{
-	"MemoryECCCorrectable":          ipmi.MemCorrectable,
-	"MemoryECCUncorrectable":        ipmi.MemUncorrectable,
-	"MemoryParityCommandAndAddress": ipmi.MemParity,
-	"MemoryParityNotKnown":          ipmi.MemParity,
-	"SparingRedundancyDegraded":     ipmi.MemSpare,
-	"MemoryThermTrip":               ipmi.MemOvertemp,
-}
-
-// openbmcCleared are messages that say a state ended.
-var openbmcCleared = map[string]bool{"SparingRedundancyFull": true, "MirroringRedundancyFull": true}
-
-// memIDEvents maps MEMnnnn message IDs to states.
-var memIDEvents = map[string]ipmi.MemoryEvent{
-	"0000": ipmi.MemCorrectable, "0001": ipmi.MemUncorrectable, "0002": ipmi.MemParity, "0003": ipmi.MemScrubFailed,
-	"0004": ipmi.MemDeviceDisabled, "0005": ipmi.MemLogLimit, "0006": ipmi.MemPresence, "0007": ipmi.MemConfigError,
-	"0008": ipmi.MemSpare, "0009": ipmi.MemThrottled, "0010": ipmi.MemOvertemp,
-	// The corrected error rate of a module passed a limit.
-	"0701": ipmi.MemCorrectable, "0702": ipmi.MemCorrectable,
-}
-
-// memIDCleared are MEMnnnn messages that say a module is fine again.
-var memIDCleared = map[string]bool{"0016": true, "0700": true}
 
 // crossLogWindow is how far apart the entries of two logs of one BMC may
 // be stamped and still report one error. The firmware writes both while it
@@ -72,17 +41,17 @@ const crossLogWindow = 5 * time.Second
 
 // decoded is what a log entry says once its vocabulary is read.
 type decoded struct {
-	ev       ipmi.MemoryEvent
+	res fwmap.Result
+	// state is the IPMI state name, for an entry read through the IPMI
+	// memory sensor.
+	state    string
 	deassert bool
 	decoder  string
 	// labels are the modules the entry names.
-	labels []string
-	// Places by number, when the vocabulary has them.
-	socket, channel, position, rank model.Opt[int]
-	generator                       string
-	text                            string // the state in the entry's own words, for states this reader has no class for
-	// cleared is set for a message that says a state ended.
-	cleared bool
+	labels    []string
+	place     fwmap.Place
+	generator string
+	text      string // the entry's own words
 }
 
 // parseTime reads the time of a log entry. A time without a zone is taken
@@ -129,9 +98,13 @@ func (r *run) memoryOrigin(uri string) (label string, ok bool) {
 	return lastSegment(uri), true
 }
 
-// args returns the message arguments of an entry as text.
+// args returns the message arguments of an entry as text, at most
+// adapter.MaxArgs of them.
 func args(o object) []string {
 	list, _ := o["MessageArgs"].([]any)
+	if len(list) > adapter.MaxArgs {
+		list = list[:adapter.MaxArgs]
+	}
 	out := make([]string, 0, len(list))
 	for _, a := range list {
 		out = append(out, strings.TrimSpace(fmt.Sprint(a)))
@@ -139,44 +112,61 @@ func args(o object) []string {
 	return out
 }
 
-// channelIndex reads a channel given as a number or as a letter.
-func channelIndex(s string) model.Opt[int] {
-	if len(s) == 1 && s[0] >= 'A' && s[0] <= 'Z' {
-		return model.Some(int(s[0] - 'A'))
+// ipmiState returns what a state of the IPMI memory sensor means.
+func ipmiState(ev ipmi.MemoryEvent) fwmap.Result {
+	if ev == ipmi.MemUnknown {
+		return fwmap.Result{Event: fwevent.Unclassified, Mapping: model.MappingNone, Memory: true}
 	}
-	if len(s) == 1 && s[0] >= 'a' && s[0] <= 'z' {
-		return model.Some(int(s[0] - 'a'))
+	res := fwmap.Current().Classify(fwmap.Entry{IPMI: fmt.Sprintf("memory-%02x", int(ev))})
+	if !res.Event.Valid() {
+		return fwmap.Result{Event: fwevent.Unclassified, Mapping: model.MappingNone, Memory: true}
 	}
-	return smallInt(s)
-}
-
-func smallInt(s string) model.Opt[int] {
-	n := 0
-	if s == "" || len(s) > 4 {
-		return model.Opt[int]{}
-	}
-	for i := 0; i < len(s); i++ {
-		if s[i] < '0' || s[i] > '9' {
-			return model.Opt[int]{}
-		}
-		n = n*10 + int(s[i]-'0')
-	}
-	return model.Some(n)
+	return res
 }
 
 // decode reads what a log entry says. memory reports whether the entry is
-// about memory at all; an entry that is, and that no vocabulary explains,
-// comes back with the state MemUnknown.
+// about memory at all.
 func (r *run) decode(o object) (d decoded, memory bool) {
-	d.ev = ipmi.MemUnknown
 	entryType, sensorType := str(o, "EntryType"), str(o, "SensorType")
 	msgID, msg := str(o, "MessageId"), str(o, "Message")
+	d.text = msg
 	origin, originIsMemory := r.memoryOrigin(originOf(o))
 	if originIsMemory {
 		d.labels = []string{origin}
 	}
 	if code := str(o, "EntryCode"); strings.HasPrefix(strings.ToLower(code), "deassert") {
 		d.deassert = true
+	}
+
+	// A record of the IPMI memory sensor: an entry of type SEL, or a
+	// message that carries the bytes of a SEL record.
+	sel := func(rec ipmi.Record) {
+		ev := ipmi.MemoryEventOf(rec)
+		d.deassert = d.deassert || rec.Deassert
+		if id := rec.ModuleID(); id.Valid && len(d.labels) == 0 {
+			d.labels = []string{fmt.Sprintf("sensor 0x%02x module %d", rec.SensorNumber, id.V)}
+		}
+		d.res, d.decoder = ipmiState(ev), "redfish/sel"
+		if ev != ipmi.MemUnknown {
+			d.state = ev.String()
+		}
+	}
+	if _, _, key := fwmap.SplitMessageID(msgID); key == "SELEntryAdded" {
+		a := args(o)
+		if len(a) != 1 {
+			return d, false
+		}
+		hexText := strings.Join(strings.Fields(strings.TrimPrefix(strings.TrimPrefix(a[0], "0x"), "0X")), "")
+		if !hexDigitsRE.MatchString(hexText) {
+			return d, false
+		}
+		b, _ := hex.DecodeString(hexText)
+		rec, err := ipmi.ParseRecord(b)
+		if err != nil || !rec.SystemEvent() || rec.SensorType != ipmi.SensorMemory {
+			return d, false
+		}
+		sel(rec)
+		return d, true
 	}
 
 	switch {
@@ -191,23 +181,29 @@ func (r *run) decode(o object) (d decoded, memory bool) {
 				d.generator = ipmi.Generator(id)
 			}
 		}
+		read := false
 		if selDataRE.MatchString(msgID) {
-			et, deassert, data, err := ipmi.ParseEventData(msgID)
-			if err == nil {
+			if et, deassert, data, err := ipmi.ParseEventData(msgID); err == nil {
 				rec := ipmi.Record{Type: ipmi.RecordSystemEvent, SensorType: ipmi.SensorMemory, EventType: et, Deassert: deassert, Data: data}
 				if n, ok := integer(o, "SensorNumber"); ok && n >= 0 && n <= 0xFF {
 					rec.SensorNumber = uint8(n)
 				}
-				d.ev = ipmi.MemoryEventOf(rec)
-				d.deassert = d.deassert || deassert
-				if id := rec.ModuleID(); id.Valid && len(d.labels) == 0 {
-					d.labels = []string{fmt.Sprintf("sensor 0x%02x module %d", rec.SensorNumber, id.V)}
+				if ipmi.MemoryEventOf(rec) != ipmi.MemUnknown {
+					generator := d.generator
+					sel(rec)
+					d.generator = generator
+					read = true
 				}
 			}
 		}
-		if d.ev == ipmi.MemUnknown {
-			if d.ev, _ = ipmi.MemoryEventFromText(msg); d.ev == ipmi.MemUnknown {
-				d.ev, _ = ipmi.MemoryEventInText(msg)
+		if !read {
+			ev, _ := ipmi.MemoryEventFromText(msg)
+			if ev == ipmi.MemUnknown {
+				ev, _ = ipmi.MemoryEventInText(msg)
+			}
+			d.res = ipmiState(ev)
+			if ev != ipmi.MemUnknown {
+				d.state = ev.String()
 			}
 		}
 		if strings.Contains(strings.ToLower(msg), "deassert") {
@@ -217,125 +213,70 @@ func (r *run) decode(o object) (d decoded, memory bool) {
 		if names := ipmi.ModuleNames(msg); len(names) > 0 && !originIsMemory {
 			d.labels = names
 		}
-		d.text = msg
 		return d, true
 	}
 
-	if m := openbmcRE.FindStringSubmatch(msgID); m != nil {
-		ev, known := openbmcEvents[m[1]]
-		if !known && !openbmcCleared[m[1]] && !strings.HasPrefix(m[1], "Memory") && !strings.HasPrefix(m[1], "Mirroring") {
-			return d, false
-		}
-		d.decoder, d.text = "redfish/openbmc", msg
-		d.cleared = openbmcCleared[m[1]]
-		if known {
-			d.ev = ev
-		}
-		// Socket, channel and DIMM lead the arguments of these messages;
-		// the parity messages say whether channel and DIMM are known.
-		if a := args(o); len(a) >= 3 && m[1] != "MemoryThermTrip" {
-			chOK, dimmOK := true, true
-			if strings.HasPrefix(m[1], "MemoryParity") && len(a) >= 5 {
-				chOK, dimmOK = a[3] != "0", a[4] != "0"
-			}
-			d.socket = smallInt(a[0])
-			if chOK {
-				d.channel = channelIndex(a[1])
-			}
-			if chOK && dimmOK {
-				d.position = smallInt(a[2])
-			}
-			if len(a) >= 4 && (m[1] == "MemoryECCCorrectable" || m[1] == "MemoryECCUncorrectable") {
-				d.rank = smallInt(a[3])
-			}
-		}
+	d.res = fwmap.Current().Classify(fwmap.Entry{MessageID: msgID, Message: msg, Args: args(o), MemoryOrigin: originIsMemory})
+	if d.res.Skipped || !d.res.Memory {
+		return d, false
+	}
+	form := "plain"
+	switch {
+	case d.res.Table != nil && d.res.Table.Name == "openbmc":
+		d.decoder = "redfish/openbmc"
+	case d.res.Table != nil:
+		d.decoder = "redfish/registry"
+	case d.res.Mapping == model.MappingWording || d.res.Mapping == model.MappingRegistry:
+		d.decoder = "redfish/text"
+	}
+	if d.res.Table != nil {
+		form = d.res.Table.Location
+	}
+	a := args(o)
+	d.place = fwmap.PlaceOf(form, d.res.Roles, a)
+	if originIsMemory {
 		return d, true
 	}
-
-	if m := memIDRE.FindStringSubmatch(msgID); m != nil {
-		d.decoder, d.text = "redfish/registry", msg
-		if ev, known := memIDEvents[m[1]]; known {
-			d.ev = ev
-		}
-		d.cleared = memIDCleared[m[1]]
-		if !originIsMemory {
-			d.labels = locations(o, msg)
-		}
-		return d, true
-	}
-
-	// Plain text: the name of an IPMI memory state, or a vendor text that
-	// names the module as "(Processor 1, Memory Module 4)".
-	pm := procModuleRE.FindStringSubmatch(msg)
-	ev, _ := ipmi.MemoryEventInText(msg)
-	if ev == ipmi.MemUnknown && pm != nil {
-		if low := strings.ToLower(msg); strings.Contains(low, "corrected memory error threshold exceeded") {
-			ev = ipmi.MemCorrectable
+	d.labels = d.place.Labels
+	if len(d.labels) == 0 && d.res.Roles == nil && d.res.Table != nil {
+		// A message of a table without the roles of its arguments: the
+		// arguments that are names of slots.
+		for _, x := range a {
+			d.labels = append(d.labels, fwmap.SplitLocations(x)...)
 		}
 	}
-	if ev != ipmi.MemUnknown || pm != nil {
-		d.ev, d.decoder, d.text = ev, "redfish/text", msg
-		switch names := ipmi.ModuleNames(msg); {
-		case originIsMemory:
-		case len(names) > 0:
-			d.labels = names
-		case pm != nil:
-			// The boards that write this text name the slot "PROC 1 DIMM 4".
-			d.labels = []string{fmt.Sprintf("PROC %s DIMM %s", pm[1], pm[2])}
+	if len(d.labels) == 0 && !d.place.Socket.Valid {
+		if d.labels = textLocations(msg); len(d.labels) > 0 && d.decoder == "" {
+			d.decoder = "redfish/text"
 		}
-		return d, true
 	}
-
-	if originIsMemory || memoryWordRE.MatchString(msg) || strings.Contains(strings.ToLower(msgID), "memory") {
-		d.text = msg
-		return d, true
-	}
-	return d, false
+	return d, true
 }
 
-// locations returns the modules a registry message names: its arguments
-// when they are DIMM names, and the text after "at location" otherwise.
-func locations(o object, msg string) []string {
-	var out []string
-	for _, a := range args(o) {
-		out = append(out, splitLocations(a)...)
-	}
-	if len(out) == 0 {
-		if m := locationRE.FindStringSubmatch(msg); m != nil {
-			out = splitLocations(m[1])
+// textLocations returns the modules a message names in its text: after
+// "at location", by a DIMM name, or as "(Processor 1, Memory Module 4)".
+func textLocations(msg string) []string {
+	if m := locationRE.FindStringSubmatch(msg); m != nil {
+		if out := fwmap.SplitLocations(m[1]); len(out) > 0 {
+			return out
 		}
 	}
-	if len(out) == 0 {
-		out = ipmi.ModuleNames(msg)
+	if names := ipmi.ModuleNames(msg); len(names) > 0 {
+		return names
 	}
-	return out
-}
-
-// splitLocations splits "DIMM_A1, DIMM_A2" and keeps what looks like the
-// name of a slot: a DIMM name, a processor with a module number, or a
-// short designator such as "A1".
-func splitLocations(s string) []string {
-	var out []string
-	for _, p := range strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ';' }) {
-		p = strings.TrimSpace(p)
-		switch names := ipmi.ModuleNames(p); {
-		case p == "":
-		case ipmi.IsProcessorModule(p):
-			out = append(out, strings.Join(strings.Fields(p), " "))
-		case len(names) > 0:
-			out = append(out, names...)
-		case len(p) <= 6 && !strings.ContainsAny(p, " ()") && strings.ContainsAny(p, "0123456789"):
-			out = append(out, p)
-		}
+	if pm := procModuleRE.FindStringSubmatch(msg); pm != nil {
+		// The boards that write this text name the slot "PROC 1 DIMM 4".
+		return []string{fmt.Sprintf("PROC %s DIMM %s", pm[1], pm[2])}
 	}
-	return out
+	return nil
 }
 
 // logs turns the log entries into events and actions.
 func (r *run) logs(sink adapter.Sink) error {
 	type out struct {
-		ev  *model.Event
-		act *model.Action
+		ev    *model.Event
+		act   *model.Action
+		alone *model.FirmwareRecord
 		// log is the log the entry stands in.
 		log string
 	}
@@ -372,8 +313,9 @@ func (r *run) logs(sink adapter.Sink) error {
 			r.coverMemory(res)
 			// A place given by numbers is the slot the same dump describes
 			// with those numbers.
-			if len(d.labels) == 0 && d.socket.Valid && d.channel.Valid && d.position.Valid {
-				if name, ok := r.places[[3]int{d.socket.V, d.channel.V, d.position.V}]; ok {
+			p := d.place
+			if len(d.labels) == 0 && p.Socket.Valid && p.Channel.Valid && p.Position.Valid {
+				if name, ok := r.places[[3]int{p.Socket.V, p.Channel.V, p.Position.V}]; ok {
 					d.labels = []string{name}
 				}
 			}
@@ -382,25 +324,47 @@ func (r *run) logs(sink adapter.Sink) error {
 				r.tally.Unread(res.ref, "log entry about memory has no readable time", raw(o))
 				return nil
 			}
-			fp := model.Fingerprint(Kind, "log", res.id, created, str(o, "MessageId"), str(o, "Message"))
+			msgID := str(o, "MessageId")
+			fp := model.Fingerprint(Kind, "log", res.id, created, msgID, str(o, "Message"))
 			rawText := raw(o)
-			event := func(sev model.Severity, text string) *model.Event {
-				e := &model.Event{Kind: model.KindError, ErrorDT: at, TimeQuality: model.TimeExact, ErrorSeverity: sev, ErrorType: text, Count: 1,
-					SocketId: d.socket, ChannelId: d.channel, ChannelSlotId: d.position, Rank: d.rank,
-					Source: Kind + "/log", Decoder: d.decoder, RawRef: res.ref, Raw: rawText, Fingerprint: fp}
-				if len(d.labels) == 1 {
-					e.Label = d.labels[0]
-				}
-				return e
-			}
 
-			if d.cleared {
-				cleared++
-				return nil
+			ev, clears := d.res.Event, d.res.Clears
+			if d.deassert && ev != fwevent.Cleared && ev != fwevent.Unclassified {
+				if ev == fwevent.Disabled {
+					// The module is in use again: a disable this dump
+					// recorded before for the same module no longer holds.
+					for j := len(outs) - 1; j >= 0; j-- {
+						a := outs[j].act
+						if a == nil || a.Kind != model.ActionDisable || len(d.labels) != 1 || model.NormalizeLabel(a.Label) != model.NormalizeLabel(d.labels[0]) {
+							continue
+						}
+						was := &model.Event{Kind: model.KindError, ErrorDT: a.At, TimeQuality: model.TimeExact, ErrorSeverity: model.SevInformational,
+							ErrorType: d.state + " (enabled again later)", Count: 1, Label: a.Label, Source: Kind + "/log", Decoder: d.decoder,
+							RawRef: a.RawRef, Raw: a.Raw, Fingerprint: a.Fingerprint, Firmware: a.Firmware}
+						outs[j] = out{ev: was}
+						withdrawn++
+					}
+				}
+				ev, clears = fwevent.Cleared, ev
 			}
-			if d.ev == ipmi.MemUnknown {
+			text := fwevent.Text(ev, clears)
+			if d.res.Line != nil && d.res.Line.Words != "" && ev == d.res.Event {
+				text = d.res.Line.Words
+			}
+			switch {
+			case d.state != "" && ev == fwevent.Cleared && clears == fwevent.Disabled:
+				text = d.state + " (deasserted: in use again)"
+			case d.state != "" && ev != fwevent.Cleared:
+				text = d.state
+			}
+			switch ev {
+			case fwevent.Presence:
+				presence++
+			case fwevent.Cleared:
+				cleared++
+			case fwevent.Unclassified:
 				// About memory, in words this reader has no class for.
-				key := str(o, "MessageId")
+				key := msgID
 				if key == "" || selDataRE.MatchString(key) {
 					key = d.text
 					if len(key) > 60 {
@@ -408,9 +372,9 @@ func (r *run) logs(sink adapter.Sink) error {
 					}
 				}
 				unclassified[key]++
-				text := d.text
+				text = d.text
 				if text == "" {
-					text = str(o, "MessageId")
+					text = msgID
 				}
 				if text == "" {
 					r.tally.Unread(res.ref, "log entry about memory has no message", rawText)
@@ -419,62 +383,60 @@ func (r *run) logs(sink adapter.Sink) error {
 				if len(text) > 200 {
 					text = text[:200] + "..."
 				}
-				outs = append(outs, out{ev: event(model.SevInformational, text)})
-				return nil
 			}
-
-			m := d.ev.Meaning()
-			if d.deassert {
-				if d.ev == ipmi.MemDeviceDisabled {
-					for j := len(outs) - 1; j >= 0; j-- {
-						a := outs[j].act
-						if a == nil || a.Kind != model.ActionDisable || len(d.labels) != 1 || model.NormalizeLabel(a.Label) != model.NormalizeLabel(d.labels[0]) {
-							continue
-						}
-						was := event(model.SevInformational, d.ev.String()+" (enabled again later)")
-						was.ErrorDT, was.RawRef, was.Raw, was.Label, was.Fingerprint = a.At, a.RawRef, a.Raw, a.Label, a.Fingerprint
-						outs[j] = out{ev: was}
-						withdrawn++
-					}
-					outs = append(outs, out{ev: event(model.SevInformational, d.ev.String()+" (deasserted: in use again)")})
-					return nil
-				}
-				cleared++
-				return nil
+			method := d.generator
+			if method == "" && d.decoder != "redfish/sel" {
+				method = "bmc" // the BMC's own log
 			}
-			switch m.Class {
-			case ipmi.ClassNone:
-				presence++
-			case ipmi.ClassError, ipmi.ClassInfo:
-				e := event(m.Severity, d.ev.String())
-				e.ErrorScrubType = m.Scrub
-				named := len(d.labels) > 0 || (d.socket.Valid && d.channel.Valid && d.position.Valid)
+			registry, version, key := fwmap.SplitMessageID(msgID)
+			if d.decoder == "redfish/sel" {
+				registry, version = "", ""
+			}
+			location := p.Location
+			if location == "" && len(d.labels) > 0 {
+				location = strings.Join(d.labels, ", ")
+			}
+			severity := str(o, "Severity")
+			if severity == "" {
+				severity = d.res.Severity
+			}
+			rec := &fwevent.Record{Event: ev, Flags: d.res.Flags, Clears: clears, At: at, Count: p.Count, Labels: d.labels,
+				SocketId: p.Socket, ChannelId: p.Channel, ChannelSlotId: p.Position, Rank: p.Rank, DeviceId: p.Device, Bank: p.Bank,
+				Row: p.Row, Column: p.Column, Address: p.Address, Decoder: d.decoder, Method: method, Text: text,
+				Source: Kind + "/log", RawRef: res.ref, Raw: rawText, Fingerprint: fp,
+				Firmware: model.FirmwareRecord{Vendor: d.res.Vendor, VendorID: key, Registry: registry, RegistryVersion: version,
+					VendorSeverity: severity, Origin: model.OriginBMCLog, Log: lastSegment(logPath(res)), Location: location,
+					Args: p.Args, Text: d.text, EntryKey: model.Fingerprint(logPath(res), res.id, created), Mapping: d.res.Mapping,
+					MapRef: d.res.Ref, Basis: d.res.Basis}}
+			lo, err := rec.Ledger()
+			if err != nil {
+				return adapter.Unreadable("the entry could not be read as a firmware record: %v", err)
+			}
+			for _, e := range lo.Events {
+				named := e.Label != "" || (e.SocketId.Valid && e.ChannelId.Valid && e.ChannelSlotId.Valid)
 				switch {
-				case len(d.labels) > 1:
-					e.ErrorType += " on one of " + strings.Join(d.labels, ", ")
+				case len(d.labels) > 1 && e.ErrorSeverity.Class() != "":
 					multi++
-				case !named && m.Class == ipmi.ClassError:
+				case !named && e.ErrorSeverity.Class() != "":
 					unnamed++
 				}
-				if d.ev == ipmi.MemLogLimit {
+				if ev == fwevent.CELogLimit {
 					logLimit = append(logLimit, at)
 				}
-				outs = append(outs, out{ev: e, log: logPath(res)})
-			case ipmi.ClassAction:
-				targets := d.labels
-				if len(targets) == 0 {
-					targets = []string{""}
-					unnamed++
+				o := out{ev: e}
+				if e.ErrorSeverity.Class() != "" {
+					o.log = logPath(res)
 				}
-				method := d.generator
-				if method == "" && d.decoder != "redfish/sel" {
-					method = "bmc" // the BMC's own log
-				}
-				for n, label := range targets {
-					outs = append(outs, out{act: &model.Action{At: at, TimeQuality: model.TimeExact, Kind: m.Action, Method: method, Result: m.Result,
-						Label: label, Detail: d.ev.String(), Source: Kind + "/log", RawRef: res.ref, Raw: rawText,
-						Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}})
-				}
+				outs = append(outs, o)
+			}
+			if len(lo.Actions) > 0 && len(d.labels) == 0 {
+				unnamed++
+			}
+			for _, a := range lo.Actions {
+				outs = append(outs, out{act: a})
+			}
+			if lo.Alone != nil {
+				outs = append(outs, out{alone: lo.Alone})
 			}
 			return nil
 		}); err != nil {
@@ -532,11 +494,14 @@ func (r *run) logs(sink adapter.Sink) error {
 
 	for _, o := range outs {
 		var err error
-		if o.ev != nil {
+		switch {
+		case o.ev != nil:
 			o.ev.Grade = o.ev.ComputeGrade()
 			err = sink.Event(o.ev)
-		} else {
+		case o.act != nil:
 			err = sink.Action(o.act)
+		case o.alone != nil:
+			err = sink.Firmware(o.alone)
 		}
 		if err != nil {
 			return err
@@ -554,10 +519,10 @@ func (r *run) logs(sink adapter.Sink) error {
 		add("%d log entries of type CXL were not read: the event record in them is not decoded", cxl)
 	}
 	if presence > 0 {
-		add("%d presence entries were left out", presence)
+		add("%d presence entries are kept apart and counted in no total", presence)
 	}
 	if cleared > 0 {
-		add("%d entries only say that a state ended and were left out", cleared)
+		add("%d entries only say that a state ended; they are kept as information", cleared)
 	}
 	if withdrawn > 0 {
 		add("%d disable entries were followed by the module coming back into use; they are kept as information, not as a disabled module", withdrawn)

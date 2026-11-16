@@ -431,7 +431,9 @@ func TestSELWithInventory(t *testing.T) {
 		t.Fatal(err)
 	}
 	src := res.Sources[1]
-	if src.Kind != "sel" || src.Status != model.SourceOK || src.Events != 10 || src.Actions != 2 || src.GradeC != 10 || src.Records != 20 {
+	// The end of a state is kept as information (one more event), the
+	// presence record as a firmware record alone (a sample).
+	if src.Kind != "sel" || src.Status != model.SourceOK || src.Events != 11 || src.Actions != 2 || src.GradeC != 11 || src.Records != 20 || src.Samples != 1 {
 		t.Errorf("source inventory entry = %+v", src)
 	}
 

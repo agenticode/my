@@ -1,0 +1,76 @@
+format: 1
+table: wording
+version: 1
+
+# Rules of this tool, for a text about memory that no table names. Each
+# pattern is RE2, matched without regard to case. A text that fits rules of
+# two families stays unclassified. The first rule of a family that fits
+# decides, so a narrower rule comes before a wider one of the same family.
+
+# Words that say a state ended: the result is "cleared" of what the rule
+# found.
+ends: '\bcleared\b|\brecovered\b|\brestored\b|\bdeassert|\bno longer\b|\benabled again\b'
+
+rules:
+  # The names of the states of the IPMI memory sensor (IPMI v2.0 table 42-3,
+  # as ipmitool prints them), for a log that writes them out.
+  - event: ce-log-limit
+    all:
+      - '\bcorrectable\b.*\blogging (?:limit|disabled)\b'
+  - event: ce
+    all:
+      - '\bcorrectable (?:ecc|memory error)'
+    none:
+      - '\blogging\b'
+  - event: scrub-ce
+    all:
+      - '\bmemory scrub failed\b'
+  - event: disabled
+    all:
+      - '\bmemory device disabled\b'
+
+  # Words of any vendor.
+  - event: ue
+    all:
+      - '\buncorrect'
+      - '\b(?:memory|dimm|ecc)'
+  - event: ue
+    all:
+      - '\bmulti-?bit\b'
+      - '\b(?:memory|dimm|ecc)'
+  - event: ppr-failed
+    all:
+      - '\bpost package repair\b|\bppr\b'
+      - '\bfail|\bunable\b|\bcould not\b'
+  - event: ppr-done
+    all:
+      - '\bpost package repair\b|\bppr\b'
+      - '\bsuccess|\bcomplet'
+  - event: ppr-scheduled
+    all:
+      - '\bpost package repair\b|\bppr\b'
+      - '\bschedul|\bnext boot\b|\breboot|\brestart'
+  - event: ce-threshold
+    all:
+      - '\bcorrect'
+      - '\bthreshold|\brate\b|\blimit\b'
+      - '\bexceed|\breach'
+  - event: predicted-failure
+    all:
+      - '\bpredict|\bprefailure\b|\bpre-failure\b'
+  - event: disabled
+    all:
+      - '\bmapped out\b|\bmap-out\b|\bisolated\b|\bdisabled\b'
+    none:
+      - '\blogging\b'
+  - event: device-sparing
+    all:
+      - '\badddc\b|\bsddc\b|\blockstep\b|\bvls\b'
+  - event: mirror-failover
+    all:
+      - '\bmirror'
+      - '\bfailover\b|\bfail-over\b|\bdegraded\b'
+  - event: training-failure
+    all:
+      - '\btraining\b|\binitiali[sz]ation\b|\bself test\b|\bself-test\b|\bbist\b'
+      - '\bfail|\berror'

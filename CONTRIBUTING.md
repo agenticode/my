@@ -1,6 +1,6 @@
 # Contributing
 
-This page says how to report a problem, how to build and test, what a change needs, and how the source tree is laid out.
+This page says how to report a problem or send a sample of a BMC log, how to build and test, what a change needs, and how the source tree is laid out.
 
 ## Reporting a problem
 
@@ -9,6 +9,10 @@ Open an issue with the command line, what was printed, and the output of `my ver
 A platform whose records are decoded wrongly, or not at all, is a report worth making even without a fix: the kernel release, the EDAC driver and a few of the original log lines are enough to start.
 
 Security problems do not belong in an issue: see [SECURITY.md](SECURITY.md).
+
+## Sending a sample of a BMC log
+
+The tables that read the memory messages of each BMC vendor rest on registries and documents; none has been compared with a log of a real machine yet ([docs/vendors.md](docs/vendors.md)). A log of a machine with a memory event, of any vendor, is the most useful thing to send: a Redfish collection (`my collect redfish --bmc ADDRESS -o DIR`), the saved output of a vendor tool, or an exported log. Open an issue with the file attached, the vendor, model and firmware version of the BMC, and what happened to the DIMM if it is known (replaced, repaired, still in use). Replace host names, addresses and user names first; `my collect` leaves out passwords and session tokens by itself. The sample becomes a fixture, and the table that reads it moves to the basis `capture`.
 
 ## Building and testing
 
@@ -60,6 +64,8 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
 | `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, crash logs (pstore, kdump), the boot error region (BERT), EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
 | `internal/fwevent` | the common events a firmware record of any vendor is read as, and what each becomes in the ledger |
+| `internal/fwmap` | the tables that map the messages of each BMC and BIOS vendor to common events, the wording rules, and the classifier that asks them |
+| `internal/yamlite` | the small part of YAML the settings profile and the mapping tables are written in |
 | `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, the signs of a virtual machine |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |

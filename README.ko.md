@@ -191,6 +191,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my collect redfish --bmc ADDRESS -o OUT` | BMC에 Redfish로 메모리, BIOS 설정, 로그를 물어 저장 |
 | `my inventory` | DIMM을 한 줄에 하나씩: 제조사, 파트 넘버, 용량, 구성, 속도, 적용 중인 RAS 설정, 운영체제와 BMC가 각각 기록한 CE |
 | `my bios` | BIOS의 메모리 RAS 설정을 프로필과 대조([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
+| `my vendors` | BMC와 BIOS 벤더별 메모리 메시지를 읽는 표, 표마다 확인한 정도, 케이스에서 어느 표도 분류하지 못한 메시지([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 저장 |
 | `my verify --expect plan.yaml` | 오류 주입 계획과 호스트가 기록한 것을 대조([docs/verify.md](docs/verify.md)) |
@@ -240,6 +241,8 @@ r12-n034 CPU0_C1 S/N 3B9C56: 즉시 교체 (소견, 신뢰도 높음; R-UE-01, R
 `--bmc ADDRESS`를 주면 명령이 호스트의 BMC에도 Redfish로 묻습니다. 요청은 모두 GET이고(`--session`은 로그인과 로그아웃을 더함), 메모리 모듈과 그 오류 카운트, BIOS 메모리 설정, 이벤트 로그를 읽습니다. `my inventory`는 DIMM을 한 줄에 하나씩 적고 운영체제와 BMC가 각각 기록한 CE를 나란히 놓습니다. `my bios`는 메모리 RAS 설정을 프로필과 대조합니다. 프로필의 속성 이름은 모두 서버 벤더의 공개 문서에서 가져왔습니다. `my export labels`는 슬롯 이름을, `--names bmc`를 주면 BMC의 서비스 라벨을 rasdaemon용 DIMM 라벨 파일로 씁니다. 호스트에 들어갈 수 없으면 `my collect redfish`로 BMC만 읽습니다.
 
 보내는 요청, 인증서와 암호 처리, 아직 시험하지 못한 것은 [docs/redfish.md](docs/redfish.md)에 있습니다. 실제 서버의 BMC는 아직 읽어 보지 못했습니다.
+
+벤더마다 메모리 이벤트를 자기 메시지로 적습니다. MemorY는 벤더나 표준별 표(DMTF 레지스트리, OpenBMC, IPMI 메모리 센서, iDRAC)로 각 메시지를 공통 이벤트 27종 중 하나로 읽습니다. 그래서 리페어, 고장 예측, UE가 어느 BMC에서 왔든 같은 말로 나옵니다. 표는 공개 레지스트리와 문서에 근거하며, 실제 장비의 로그와 맞춰 본 표는 아직 없습니다. `my vendors`가 표마다 이를 밝히고, 표마다 읽는 것과 표를 더하는 방법은 [docs/vendors.md](docs/vendors.md)에 있습니다.
 
 ## 프라이버시
 

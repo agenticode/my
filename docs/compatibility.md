@@ -502,10 +502,10 @@ Records of the Memory sensor type (0Ch). Records of other sensors, OEM records a
 | Memory Device Disabled | action `disable` |
 | Spare | action `sparing` |
 | Correctable ECC logging limit reached, Configuration Error, Throttled, Critical Overtemperature | informational event, counted in no total |
-| Presence Detected | left out |
+| Presence Detected | a firmware record alone, counted in no total |
 | any other text on a memory sensor | informational event with the text as printed |
 
-A deasserted record adds no error. A deasserted "Memory Device Disabled" withdraws the `disable` action the same log recorded for that module; both records are kept as informational events.
+The states are read through the table `ipmi` ([vendors.md](vendors.md)), and each record keeps a row of `fw_record` with its event bytes. A deasserted record adds no error: it is kept as an informational event that a state ended. A deasserted "Memory Device Disabled" also withdraws the `disable` action the same log recorded for that module; both records are kept as informational events.
 
 The verbose, raw and JSON forms carry the event bytes. With them the event is decoded from its offset, and the generator ID tells who logged it: a `disable` logged by the BIOS or its SMI handler has the method `bios`, one logged by the BMC `bmc`.
 
@@ -656,31 +656,32 @@ A collection made by `my collect redfish` has a `manifest.json`. From it come th
 
 ### Log entries
 
-An entry is read in the first of these vocabularies that fits. Every state is mapped through the states of the IPMI memory sensor, so an event reads the same whether it came from a SEL dump or from Redfish.
+Every entry is read as one of the common events of [data-model.md](data-model.md#firmware-records), through the mapping tables of [vendors.md](vendors.md). The first step that answers decides:
 
-| Vocabulary | How it is recognised | Read |
+| Step | How it is recognised | Read |
 | --- | --- | --- |
-| SEL | `EntryType` is `SEL` and `SensorType` is `Memory` | the event bytes in `MessageId` (`0xNNaabbcc`), or the name of the state in `Message`; `EntryCode` gives the direction, `GeneratorId` who logged it |
-| OpenBMC registry | `MessageId` is `OpenBMC.x.y.Name` | `MemoryECCCorrectable`, `MemoryECCUncorrectable`, `MemoryParityCommandAndAddress`, `MemoryParityNotKnown`, `SparingRedundancyDegraded`, `MemoryThermTrip`; the arguments give socket, channel, DIMM and rank |
-| `MEMnnnn` message IDs | `MessageId` ends in `MEM` and four digits | `MEM0000` to `MEM0010` follow the states of the IPMI memory sensor, `MEM0701` and `MEM0702` are a corrected error rate above a limit; the module comes from the arguments or from the text after "at location" |
-| text | `Message` holds the name of an IPMI memory state, or names the module as `(Processor 1, Memory Module 4)` with "Uncorrectable Memory Error" or "Corrected Memory Error threshold exceeded" | the state and the module |
+| SEL bytes | `EntryType` is `SEL` and `SensorType` is `Memory`; or the message `SELEntryAdded` of the OpenBMC registry, whose argument is a SEL record in hex | the event bytes in `MessageId` (`0xNNaabbcc`, or 8 hex digits without `0x` as iDRAC writes them), or the name of the state in `Message`, through the table `ipmi`; `EntryCode` gives the direction, `GeneratorId` who logged it |
+| a table | the registry prefix of `MessageId` is one a table applies to (`Platform`, `LogService`, `ResourceEvent`, `OpenBMC`, `IDRAC`), or the name is one of the OpenBMC registry under any prefix | the line of the message: the common event, its flags, the role of each argument (socket, channel, DIMM and rank of the OpenBMC messages; the location of the DMTF and iDRAC messages) |
+| the BMC's registry | the dump holds the registry `MessageId` names | its text for the message, read by the wording rules |
+| wording | the text of the entry is about memory | the wording rules: the names of the IPMI memory states, and words of any vendor ("post package repair ... completed", "corrected ... threshold ... exceeded", "predictive failure") |
 
-The states map to ledger records as in the SEL section above.
+An entry that is about memory and fits none of these is kept as an informational event with its message, and the report lists its message ID. An entry is about memory when a table says so (iDRAC keys that begin with `MEM`, a message of a table), when its `OriginOfCondition` is a memory resource, or when its message mentions memory, a DIMM or ECC. A message the table of its registry names as about something else is left out.
 
-An entry that is about memory and fits no vocabulary is kept as an informational event with its message, and the report lists its message ID. An entry is taken to be about memory when its `OriginOfCondition` is a memory resource or its message mentions memory, a DIMM or ECC.
+Every entry about memory also keeps a row of `fw_record`: message ID, registry and version, the vendor's severity, the place as written, the arguments, the text, the table line that classed it and how far that table was checked. A record that makes no event or action (a module detected, the RAS mode in effect, a log cleared) has that row alone.
 
 Entries of type `CXL` are counted and not read.
 
 ### Grade
 
-C for most entries: they name a module at best. An OpenBMC registry entry that carries the rank has grade B.
+C for most entries: they name a module at best. An OpenBMC registry entry that carries the rank has grade B, and an entry whose arguments carry an address or a rank by their role in the table has grade B.
 
 ### Which module
 
 1. `Links.OriginOfCondition`, when it points at a memory resource. The label is the `DeviceLocator` of that resource if the dump holds it, and the last segment of the URI otherwise.
-2. A DIMM name in the message or its arguments.
-3. Socket, channel and DIMM numbers of an OpenBMC registry entry. They are matched with the `MemoryLocation` of the memory resources of the same dump. The numbers are also kept on the event, and name its slot when no inventory lists the place.
-4. For SEL entries, event data 3 when the event bytes mark it as the module number.
+2. The arguments that the line of the table names as the location, or, for a message of a table without roles, an argument that is the name of a slot.
+3. A DIMM name in the message, the text after "at location", or a module named as `(Processor 1, Memory Module 4)`.
+4. Socket, channel and DIMM numbers of an OpenBMC registry entry. They are matched with the `MemoryLocation` of the memory resources of the same dump. The numbers are also kept on the event, and name its slot when no inventory lists the place.
+5. For SEL entries, event data 3 when the event bytes mark it as the module number.
 
 ### Times
 

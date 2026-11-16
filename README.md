@@ -191,6 +191,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my collect redfish --bmc ADDRESS -o OUT` | ask a BMC over Redfish for memory, BIOS settings and logs |
 | `my inventory` | the DIMMs one per line: maker, part number, size, organisation, speed, the RAS settings in effect, and the corrected errors the operating system and the BMC each recorded |
 | `my bios` | check the memory RAS settings of the BIOS against a profile ([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
+| `my vendors` | the tables that read the memory messages of each BMC and BIOS vendor, how far each was checked, and the messages of a case no table classes ([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | write the slot names as a DIMM label file for rasdaemon |
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded ([docs/verify.md](docs/verify.md)) |
@@ -240,6 +241,8 @@ A bundle is a ZIP archive with the ledger, a manifest, the source inventory and 
 With `--bmc ADDRESS` a command also asks the BMC of the host over Redfish, with GET requests only (`--session` adds its login and logout), for its memory modules and their error counts, the BIOS memory settings and its event logs. `my inventory` lists the DIMMs one per line and sets the corrected errors the operating system and the BMC each recorded side by side. `my bios` checks the memory RAS settings against a profile whose attribute names all come from public documents of the server vendors. `my export labels` writes the slot names, or with `--names bmc` the service labels of the BMC, as a DIMM label file for rasdaemon. When the host cannot be reached, `my collect redfish` reads the BMC alone.
 
 [docs/redfish.md](docs/redfish.md) lists every request, how certificates and passwords are handled, and what has not been tried: no BMC of a real server has been read yet.
+
+Every vendor writes memory events in its own messages. MemorY reads each through a table of that vendor or standard (the DMTF registries, OpenBMC, the IPMI memory sensor, iDRAC) as one of 27 common events, so a repair, a prediction or an uncorrected error reads the same whichever BMC reported it. The tables rest on public registries and documents and none has been checked against a log of a real machine; `my vendors` says so per table, and [docs/vendors.md](docs/vendors.md) lists what each reads and how to add one.
 
 ## Privacy
 

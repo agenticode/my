@@ -1,0 +1,144 @@
+format: 1
+table: dmtf
+version: 1
+vendor: DMTF
+basis: registry
+applies:
+  message-id-prefix:
+    - Platform
+    - LogService
+    - ResourceEvent
+key: message-id
+location: plain
+sources:
+  platform:
+    title: "DMTF Redfish message registry Platform 1.5.0"
+    url: https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/Platform.1.5.0.json
+    read: 2026-11-16
+  logservice:
+    title: "DMTF Redfish message registry LogService 1.2.1"
+    url: https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/LogService.1.2.1.json
+    read: 2026-11-16
+  resourceevent:
+    title: "DMTF Redfish message registry ResourceEvent 1.5.0"
+    url: https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/ResourceEvent.1.5.0.json
+    read: 2026-11-16
+
+# The one argument of each memory message is the name of the memory device,
+# in the implementer's spelling. Row remapping is the standard's name for a
+# post package repair of a DIMM.
+messages:
+  - id: MemoryUncorrectableError
+    event: ue
+    args: location
+    severity: Critical
+    source: platform
+  - id: MemoryContainedError
+    event: ue
+    flags: contained
+    args: location
+    severity: Warning
+    source: platform
+  - id: MemoryParityError
+    event: ue
+    words: parity error
+    args: location
+    severity: Critical
+    source: platform
+  - id: MemoryRowRemappingPending
+    event: ppr-scheduled
+    args: location
+    severity: Warning
+    source: platform
+  - id: MemoryRowRemappingError
+    event: ppr-failed
+    args: location
+    severity: Critical
+    source: platform
+  - id: MemoryMirroringDegraded
+    event: mirror-failover
+    args: location
+    severity: Warning
+    source: platform
+  - id: MemoryMirroringFailed
+    event: mirror-lost
+    args: location
+    severity: Critical
+    source: platform
+  - id: MemorySparingActivated
+    event: sparing
+    args: location
+    severity: OK
+    source: platform
+  - id: MemorySparingFailed
+    event: sparing-failed
+    args: location
+    severity: Critical
+    source: platform
+  - id: MemoryTrainingFailed
+    event: training-failure
+    args: location
+    severity: Critical
+    source: platform
+  - id: LogCleared
+    event: log-cleared
+    args: -
+    severity: OK
+    source: logservice
+
+  # Generic messages that are about memory only when the entry is about a
+  # memory resource. The first argument is the property; a threshold of the
+  # uncorrected errors is an uncorrected error, any other a threshold of the
+  # corrected ones.
+  - id: ResourceErrorThresholdExceeded
+    args-like: '(?i)uncorrect'
+    origin: memory
+    event: ue
+    args: -, -
+    severity: Critical
+    source: resourceevent
+  - id: ResourceErrorThresholdExceeded
+    origin: memory
+    event: ce-threshold
+    args: -, -
+    severity: Critical
+    source: resourceevent
+  - id: ResourceWarningThresholdExceeded
+    args-like: '(?i)uncorrect'
+    origin: memory
+    event: ue
+    args: -, -
+    severity: Warning
+    source: resourceevent
+  - id: ResourceWarningThresholdExceeded
+    origin: memory
+    event: ce-threshold
+    args: -, -
+    severity: Warning
+    source: resourceevent
+  - id: ResourceErrorThresholdCleared
+    origin: memory
+    event: cleared
+    clears: ce-threshold
+    args: -, -
+    severity: OK
+    source: resourceevent
+  - id: ResourceWarningThresholdCleared
+    origin: memory
+    event: cleared
+    clears: ce-threshold
+    args: -, -
+    severity: OK
+    source: resourceevent
+  - id: ResourceErrorsDetected
+    origin: memory
+    event: unclassified
+    args: -, -
+    severity: Warning
+    source: resourceevent
+  - id: ResourceErrorsCorrected
+    origin: memory
+    event: cleared
+    args: -, -
+    severity: OK
+    source: resourceevent

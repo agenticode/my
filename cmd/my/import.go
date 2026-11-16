@@ -50,6 +50,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	force := o.fs.Bool("force", false, "")
 	all := o.fs.Bool("all", false, "")
 	strict := o.fs.Bool("strict", false, "")
+	o.fs.Var(&o.maps, "event-map", "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -65,6 +66,10 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	case *anonymize && *out == "":
 		return o.usageError(env, lang, "%s", say(lang, "err.anonymize_out"))
 	}
+	if err := useEventMaps(env, lang, o.maps); err != nil {
+		return o.usageError(env, lang, "%s", errText(lang, err))
+	}
+	defer useEventMaps(env, lang, nil)
 	now := clock(env)
 	// A log that holds the records of several hosts is read for the host
 	// the case is about.

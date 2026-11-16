@@ -1,0 +1,7 @@
+ table      vendor or standard  messages  basis
+ dell@1     Dell                      15  registry: not checked on real hardware
+ dmtf@1     DMTF                      19  registry: not checked on real hardware
+ ipmi@1     IPMI                      11  registry: not checked on real hardware
+ openbmc@1  OpenBMC                   15  registry: not checked on real hardware
+ wording@1  any, by wording           15  rules of this tool
+ my vendors TABLE: the messages of a table; my vendors --seen: what the BMCs of a case published

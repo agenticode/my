@@ -1,0 +1,23 @@
+dmtf@1  DMTF  registry: not checked on real hardware
+ applies to: message IDs of the registry Platform, message IDs of the registry LogService, message IDs of the registry ResourceEvent
+ sources:
+  platform: DMTF Redfish message registry Platform 1.5.0
+    https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/Platform.1.5.0.json
+  logservice: DMTF Redfish message registry LogService 1.2.1
+    https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/LogService.1.2.1.json
+  resourceevent: DMTF Redfish message registry ResourceEvent 1.5.0
+    https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/ResourceEvent.1.5.0.json
+ ce-threshold      ResourceErrorThresholdExceeded, ResourceWarningThresholdExceeded
+ ue                MemoryContainedError, MemoryParityError, MemoryUncorrectableError,
+                   ResourceErrorThresholdExceeded, ResourceWarningThresholdExceeded
+ ppr-scheduled     MemoryRowRemappingPending
+ ppr-failed        MemoryRowRemappingError
+ sparing           MemorySparingActivated
+ sparing-failed    MemorySparingFailed
+ mirror-failover   MemoryMirroringDegraded
+ mirror-lost       MemoryMirroringFailed
+ training-failure  MemoryTrainingFailed
+ log-cleared       LogCleared
+ cleared           ResourceErrorThresholdCleared, ResourceErrorsCorrected,
+                   ResourceWarningThresholdCleared
+ unclassified      ResourceErrorsDetected

@@ -590,6 +590,11 @@ func registerFlags(o *options, topic string) {
 		o.fs.Bool("force", false, "")
 		o.fs.Bool("all", false, "")
 		o.fs.Bool("strict", false, "")
+		o.fs.String("event-map", "", "")
+	case "vendors":
+		o.fs.Bool("seen", false, "")
+		o.fs.String("print", "", "")
+		o.fs.String("event-map", "", "")
 	case "bundle":
 		o.fs.Bool("anonymize", false, "")
 		o.fs.String("key-file", "", "")

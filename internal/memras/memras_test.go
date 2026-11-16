@@ -1,6 +1,7 @@
 package memras
 
 import (
+	"github.com/agenticode/my/internal/yamlite"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -459,28 +460,8 @@ func TestProfileMistakes(t *testing.T) {
 			t.Errorf("%s: error %v, want %q", name, err, tt.want)
 		}
 	}
-	if _, err := Parse(make([]byte, maxProfileBytes+1)); err == nil {
+	if _, err := Parse(make([]byte, yamlite.MaxBytes+1)); err == nil {
 		t.Errorf("a file over the size limit was read")
-	}
-}
-
-// What the reader makes of the small part of YAML it reads.
-func TestYAMLForms(t *testing.T) {
-	root, err := parseYAML([]byte("\xef\xbb\xbfa: 1   # one\nb:\n  - x\n  -   y: 2\n      z: \"q # not a comment\"\n  - \n\"k: 1\": 'v''s'\nurl: https://example.com/a#b\nempty:\nlast: text with: a colon\r\n"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got := strings.Join(root.keys, "|"); got != "a|b|k: 1|url|empty|last" {
-		t.Fatalf("keys: %s", got)
-	}
-	b := root.m["b"]
-	if root.m["a"].scalar != "1" || b.kind != kindList || len(b.list) != 3 || b.list[0].scalar != "x" || b.list[1].m["y"].scalar != "2" ||
-		b.list[1].m["z"].scalar != "q # not a comment" || b.list[2].scalar != "" || root.m["k: 1"].scalar != "v's" ||
-		root.m["url"].scalar != "https://example.com/a#b" || root.m["empty"].scalar != "" || root.m["last"].scalar != "text with: a colon" {
-		t.Errorf("tree: %+v", root)
-	}
-	if root.m["last"].line != 10 || b.list[1].line != 4 {
-		t.Errorf("lines: %d, %d", root.m["last"].line, b.list[1].line)
 	}
 }
 

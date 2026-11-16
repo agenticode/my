@@ -1,0 +1,98 @@
+format: 1
+table: dell
+version: 1
+vendor: Dell
+basis: registry
+applies:
+  message-id-prefix: IDRAC
+  # A log saved by a tool can carry the ID without its registry.
+  bare-id: yes
+memory-keys: MEM
+key: message-id
+location: plain
+sources:
+  registry:
+    title: "message registry IDRAC 2.9.0 as an iDRAC9 7.20 serves it (R660xs mockup in dell/iDRAC-Redfish-Scripting, iDRAC Redfish Mockup Clients)"
+    url: https://github.com/dell/iDRAC-Redfish-Scripting/tree/3bc6e7b/iDRAC%20Redfish%20Mockup%20Clients
+    read: 2026-11-16
+
+# The one argument of these messages is the location of the module or
+# modules ("DIMM_A1", several joined by commas).
+messages:
+  - id: MEM0000
+    event: ce
+    args: locations
+    severity: Informational
+    source: registry
+  - id: MEM0001
+    event: ue
+    args: locations
+    severity: Critical
+    source: registry
+  - id: MEM0002
+    event: ue
+    words: parity error
+    args: location
+    severity: Critical
+    source: registry
+  - id: MEM0003
+    event: scrub-ce
+    args: location
+    severity: Critical
+    source: registry
+  - id: MEM0004
+    event: disabled
+    args: location
+    severity: Critical
+    source: registry
+  - id: MEM0005
+    event: ce-log-limit
+    args: locations
+    severity: Critical
+    source: registry
+  - id: MEM0006
+    event: presence
+    args: location
+    severity: Informational
+    source: registry
+  - id: MEM0007
+    event: config-error
+    args: location
+    severity: Critical
+    source: registry
+  - id: MEM0008
+    event: config-state
+    args: location
+    severity: Informational
+    source: registry
+  - id: MEM0009
+    event: thermal
+    args: location
+    severity: Warning
+    source: registry
+  - id: MEM0010
+    event: thermal
+    args: location
+    severity: Critical
+    source: registry
+  - id: MEM0016
+    event: cleared
+    args: locations
+    severity: Informational
+    source: registry
+  - id: MEM0700
+    event: cleared
+    clears: ce-threshold
+    args: location
+    severity: Informational
+    source: registry
+  - id: MEM0701
+    event: ce-threshold
+    args: location
+    severity: Informational
+    source: registry
+  - id: MEM0702
+    event: ce-threshold
+    args: location
+    severity: Warning
+    source: registry

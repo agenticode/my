@@ -1,0 +1,209 @@
+{
+  "view": "vendors",
+  "version": 1,
+  "lang": "en",
+  "exit_code": 0,
+  "data": {
+    "table": "dell",
+    "version": 1,
+    "vendor": "Dell",
+    "messages": 15,
+    "basis": "registry",
+    "not_checked_on_real_hardware": true,
+    "applies": [
+      "registry IDRAC",
+      "bare-id"
+    ],
+    "sources": [
+      {
+        "name": "registry",
+        "title": "message registry IDRAC 2.9.0 as an iDRAC9 7.20 serves it (R660xs mockup in dell/iDRAC-Redfish-Scripting, iDRAC Redfish Mockup Clients)",
+        "url": "https://github.com/dell/iDRAC-Redfish-Scripting/tree/3bc6e7b/iDRAC%20Redfish%20Mockup%20Clients",
+        "read": "2026-11-16"
+      }
+    ],
+    "lines": [
+      {
+        "id": "MEM0000",
+        "event": "ce",
+        "args": [
+          "locations"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0001",
+        "event": "ue",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0002",
+        "event": "ue",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0003",
+        "event": "scrub-ce",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0004",
+        "event": "disabled",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0005",
+        "event": "ce-log-limit",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0006",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0007",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0008",
+        "event": "config-state",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0009",
+        "event": "thermal",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0010",
+        "event": "thermal",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0016",
+        "event": "cleared",
+        "args": [
+          "locations"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0700",
+        "event": "cleared",
+        "clears": "ce-threshold",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0701",
+        "event": "ce-threshold",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0702",
+        "event": "ce-threshold",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      }
+    ]
+  }
+}

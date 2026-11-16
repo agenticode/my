@@ -102,13 +102,13 @@
           {
             "at": "2026-10-28T21:04:55Z",
             "severity": "CE",
-            "text": "correctable ECC",
+            "text": "corrected-error limit passed",
             "source": "redfish/log"
           },
           {
             "at": "2026-11-05T02:41:07Z",
             "severity": "CE",
-            "text": "correctable ECC",
+            "text": "corrected-error limit passed",
             "source": "redfish/log"
           }
         ],
@@ -127,18 +127,18 @@
           {
             "code": "inv.line.event",
             "args": {
-              "text": "correctable ECC",
+              "text": "corrected-error limit passed",
               "when": "2026-10-28 21:04 UTC"
             },
-            "text": "BMC log 2026-10-28 21:04 UTC: correctable ECC"
+            "text": "BMC log 2026-10-28 21:04 UTC: corrected-error limit passed"
           },
           {
             "code": "inv.line.event",
             "args": {
-              "text": "correctable ECC",
+              "text": "corrected-error limit passed",
               "when": "2026-11-05 02:41 UTC"
             },
-            "text": "BMC log 2026-11-05 02:41 UTC: correctable ECC"
+            "text": "BMC log 2026-11-05 02:41 UTC: corrected-error limit passed"
           }
         ]
       },

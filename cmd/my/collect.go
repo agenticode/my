@@ -113,6 +113,7 @@ func newCollectOptions() *collectOptions {
 	o.fs.BoolVar(&o.noLogs, "no-logs", false, "")
 	o.fs.IntVar(&o.parallel, "parallel", 4, "")
 	o.fs.BoolVar(&o.quiet, "quiet", false, "")
+	o.fs.Var(&o.maps, "event-map", "")
 	o.fs.StringVar(&o.lang, "lang", "", "")
 	o.fs.BoolVar(&o.asJSON, "json", false, "")
 	o.fs.IntVar(&o.width, "width", 0, "")
@@ -298,6 +299,10 @@ func runCollect(ctx context.Context, env *cli.Env, args []string) int {
 	case len(pos) > 1:
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
 	}
+	if err := useEventMaps(env, lang, o.maps); err != nil {
+		return o.usageError(env, lang, "%s", errText(lang, err))
+	}
+	defer useEventMaps(env, lang, nil)
 	return o.redfish(ctx, env, lang)
 }
 

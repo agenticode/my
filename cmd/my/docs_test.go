@@ -167,6 +167,8 @@ func TestQuoteComparison(t *testing.T) {
 func TestGuidesShowRealOutput(t *testing.T) {
 	for page, n := range map[string]int{
 		"docs/reading-guide.md": 7,
+		// The tables the binary ships, as the page lists them.
+		"docs/vendors.md": 2,
 	} {
 		t.Run(page, func(t *testing.T) {
 			if ran := checkQuotes(t, page, nil); len(ran) != n {
