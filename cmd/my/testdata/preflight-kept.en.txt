@@ -1,0 +1,36 @@
+host r12-n034  kernel 6.12.0-55.el10.x86_64  x86_64  Intel family 6 model 143
+booted 2026-11-16 05:01 UTC
+
+ what a reset right after a fatal memory error would leave on this host
+
+ kept     journal          on disk below /var/log/journal. A panic stops journald before it writes
+                           the last lines, and lines below priority CRIT reach the disk every
+                           SyncIntervalSec=5min
+ kept     pstore-backend   erst is the persistent store: a panic leaves the end of the kernel log in
+                           it
+ kept     pstore-archive   systemd-pstore.service is enabled and moves the dumps to
+                           /var/lib/systemd/pstore at boot
+ kept     pstore-vs-kdump  a crash kernel is loaded and crash_kexec_post_notifiers is set: pstore
+                           gets the panic text before the crash kernel starts
+ kept     kdump            a crash kernel is loaded (256 MiB reserved): kdump writes the kernel log
+                           of a crash below /var/crash
+ kept     mce-bootlog      on by default for this processor (Intel family 6)
+ kept     mce-print        mce=print_all: a record left in a bank is printed to the kernel log at
+                           the next boot
+ info     reset-kind       reboot mode cold, the same after a panic. With panic=0 the kernel waits
+                           after a panic, and after a fatal machine check it restarts in 30 s.
+                           Whether the banks keep their contents over the reset depends on the board
+                           and its BIOS; the first stop after my harvest is installed shows it
+ kept     bert             the firmware has a BERT table: a fatal error it handled before the reset
+                           is left there for the next boot
+ info     erst-mce         mce_panic() keeps a copy of the record in ERST; only a reader of
+                           /dev/mcelog takes it out, and no mcelog daemon runs. MemorY does not open
+                           /dev/mcelog, because the read clears the record
+ kept     console          a serial console (ttyS0): the BMC's serial log or a console server keeps
+                           the last lines
+ kept     rasdaemon        rasdaemon.service is enabled and records to
+                           /var/lib/rasdaemon/ras-mc_event.db
+ kept     harvest          my-harvest.service is enabled and keeps its ledger at
+                           /var/lib/my/ledger.db; 40,960 MiB free
+
+ No check would lose records.

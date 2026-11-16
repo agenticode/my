@@ -203,6 +203,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
 | `my export labels` | 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 저장 |
 | `my verify --expect plan.yaml` | 오류 주입 계획과 호스트가 기록한 것을 대조([docs/verify.md](docs/verify.md)) |
+| `my preflight` | 치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 남는 것과 그것을 바꾸는 설정([docs/crash-loop.md](docs/crash-loop.md)) |
 | `my serve --metrics` | Prometheus exporter로 실행([docs/exporter.md](docs/exporter.md)) |
 | `my help [명령]` | 명령의 옵션과 출력 읽는 법 |
 
@@ -317,6 +318,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 | [docs/plugin-contract.md](docs/plugin-contract.md) | 벤더 분석기 계약 |
 | [docs/fmfm-mapping.md](docs/fmfm-mapping.md) | 기록과 소견을 FMFM 필드 이름에 대응시킨 표 |
 | [docs/exporter.md](docs/exporter.md) | 메트릭과 HTTP API |
+| [docs/crash-loop.md](docs/crash-loop.md) | 치명적 메모리 오류 뒤 reset이 잃는 것과 그것을 남기는 설정 |
 | [docs/verify.md](docs/verify.md) | 주입 계획과 기록의 대조 |
 | [docs/evaluation.md](docs/evaluation.md) | 필드 데이터셋과 대조한 결과 |
 | [docs/validation.md](docs/validation.md), [docs/validation-lab.md](docs/validation-lab.md) | 실제 호스트 실행 결과와 랩의 오류 주입 |

@@ -1,0 +1,356 @@
+{
+  "view": "preflight",
+  "version": 1,
+  "lang": "en",
+  "host": "web-07",
+  "exit_code": 1,
+  "data": {
+    "host": "web-07",
+    "kernel": "6.8.0-87-generic",
+    "arch": "x86_64",
+    "cpu": "Intel family 6 model 143",
+    "booted": "2026-11-16T05:01:00Z",
+    "os": "Ubuntu 24.04.3 LTS",
+    "family": "update-grub",
+    "checks": [
+      {
+        "name": "journal",
+        "state": "lost",
+        "detail": {
+          "code": "pf.journal.no_dir",
+          "text": "the directory /var/log/journal does not exist and Storage= is not set: the journal is kept in memory and is gone after a reset"
+        },
+        "evidence": [
+          "/etc/systemd/journald.conf",
+          "/var/log/journal: not there"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.journal",
+            "text": "store the journal on disk (Storage=persistent)"
+          },
+          "commands": [
+            "mkdir -p /etc/systemd/journald.conf.d",
+            "printf '[Journal]\\nStorage=persistent\\n' \u003e /etc/systemd/journald.conf.d/90-my-persistent.conf",
+            "systemctl restart systemd-journald.service"
+          ],
+          "undo": [
+            "rm /etc/systemd/journald.conf.d/90-my-persistent.conf",
+            "systemctl restart systemd-journald.service"
+          ],
+          "cost": {
+            "code": "pf.cost.journal",
+            "text": "journal files on disk, by default up to 10% of the file system and at most 4G"
+          },
+          "source": "journald.conf(5): Storage=, SystemMaxUse="
+        }
+      },
+      {
+        "name": "pstore-backend",
+        "state": "lost",
+        "detail": {
+          "code": "pf.pstore.none",
+          "args": {
+            "efi": "@pf.why.efi_disabled",
+            "erst": "@pf.why.erst_absent"
+          },
+          "text": "no backend is registered: the firmware has no ERST table; efi_pstore has pstore_disable=Y"
+        },
+        "evidence": [
+          "/sys/module/pstore/parameters/backend: (null)",
+          "/sys/module/efi_pstore/parameters/pstore_disable: Y",
+          "/sys/firmware/acpi/tables/ERST: not there"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.efi_pstore",
+            "text": "let efi_pstore keep the panic text in EFI variables"
+          },
+          "param": "efi_pstore.pstore_disable=0",
+          "commands": [
+            "echo N \u003e /sys/module/efi_pstore/parameters/pstore_disable",
+            "mkdir -p /etc/default/grub.d",
+            "echo 'GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT efi_pstore.pstore_disable=0\"' \u003e /etc/default/grub.d/90-my-efi-pstore.cfg",
+            "update-grub"
+          ],
+          "undo": [
+            "echo Y \u003e /sys/module/efi_pstore/parameters/pstore_disable",
+            "rm /etc/default/grub.d/90-my-efi-pstore.cfg",
+            "update-grub"
+          ],
+          "cost": {
+            "code": "pf.cost.efi_pstore",
+            "args": {
+              "kmsg": "10240",
+              "record": "1024"
+            },
+            "text": "each panic writes the last 10240 bytes of the kernel log as EFI variables of 1024 bytes into the variable store of the firmware, where they stay until systemd-pstore or a person removes the files"
+          },
+          "source": "drivers/firmware/efi/efi-pstore.c (record_size, pstore_disable); fs/pstore/Kconfig (PSTORE_DEFAULT_KMSG_BYTES)",
+          "reboot": true
+        }
+      },
+      {
+        "name": "pstore-archive",
+        "state": "lost",
+        "detail": {
+          "code": "pf.archive.disabled",
+          "text": "systemd-pstore.service is not enabled: the files stay in /sys/fs/pstore, and a full store saves no later panic"
+        },
+        "evidence": [
+          "/sys/fs/pstore: 0 files",
+          "/usr/lib/systemd/system/systemd-pstore.service"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.pstore_archive",
+            "text": "let systemd-pstore move the dumps out of the store at every boot"
+          },
+          "commands": [
+            "systemctl enable systemd-pstore.service"
+          ],
+          "undo": [
+            "systemctl disable systemd-pstore.service"
+          ],
+          "cost": {
+            "code": "pf.cost.pstore_archive",
+            "text": "a few files per panic below /var/lib/systemd/pstore, each with the end of the kernel log"
+          },
+          "source": "systemd-pstore.service(8); pstore.conf(5)"
+        }
+      },
+      {
+        "name": "pstore-vs-kdump",
+        "state": "kept",
+        "detail": {
+          "code": "pf.kexec.none",
+          "text": "no crash kernel is loaded: a panic goes to pstore"
+        },
+        "evidence": [
+          "/sys/kernel/kexec_crash_loaded: 0"
+        ]
+      },
+      {
+        "name": "kdump",
+        "state": "lost",
+        "detail": {
+          "code": "pf.kdump.none",
+          "text": "no crash kernel is loaded and no crashkernel= is on the command line"
+        },
+        "evidence": [
+          "/sys/kernel/kexec_crash_loaded: 0"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.kdump",
+            "text": "reserve memory for a crash kernel and enable the kdump service of the distribution"
+          },
+          "commands": [
+            "apt install kdump-tools",
+            "update-grub"
+          ],
+          "undo": [
+            "apt purge kdump-tools",
+            "update-grub"
+          ],
+          "cost": {
+            "code": "pf.cost.kdump_debian",
+            "text": "the package reserves 192 MB for the crash kernel on hosts with 512 MB or more (crashkernel=512M-:192M)"
+          },
+          "source": "Debian kdump-tools: debian/kdump-tools.grub.default, debian/rules",
+          "reboot": true
+        }
+      },
+      {
+        "name": "mce-bootlog",
+        "state": "kept",
+        "detail": {
+          "code": "pf.bootlog.default",
+          "args": {
+            "family": 6,
+            "vendor": "Intel"
+          },
+          "text": "on by default for this processor (Intel family 6)"
+        },
+        "evidence": [
+          "/proc/cpuinfo: GenuineIntel family 6 model 143"
+        ]
+      },
+      {
+        "name": "mce-print",
+        "state": "lost",
+        "detail": {
+          "code": "pf.print.lost",
+          "text": "a record left in a bank goes to /dev/mcelog and is not printed, and no mcelog daemon runs"
+        },
+        "evidence": [
+          "/sys/devices/system/machinecheck/machinecheck0/print_all: 0",
+          "/sys/devices/system/machinecheck/machinecheck0/trigger: there"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.print_all",
+            "text": "print every machine check record to the kernel log (mce=print_all)"
+          },
+          "param": "mce=print_all",
+          "commands": [
+            "mkdir -p /etc/default/grub.d",
+            "echo 'GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT mce=print_all\"' \u003e /etc/default/grub.d/90-my-print-all.cfg",
+            "update-grub"
+          ],
+          "undo": [
+            "rm /etc/default/grub.d/90-my-print-all.cfg",
+            "update-grub"
+          ],
+          "cost": {
+            "code": "pf.cost.print_all",
+            "text": "every machine check record, corrected ones included, is printed at emergency level"
+          },
+          "source": "arch/x86/kernel/cpu/mce/core.c (mce_default_notifier, __print_mce)",
+          "reboot": true
+        }
+      },
+      {
+        "name": "reset-kind",
+        "state": "info",
+        "detail": {
+          "code": "pf.reset.mode_mce",
+          "args": {
+            "mode": "cold",
+            "panic": "@pf.after.same"
+          },
+          "text": "reboot mode cold, the same after a panic. With panic=0 the kernel waits after a panic, and after a fatal machine check it restarts in 30 s. Whether the banks keep their contents over the reset depends on the board and its BIOS; the first stop after my harvest is installed shows it"
+        },
+        "evidence": [
+          "/sys/kernel/reboot/mode: cold",
+          "/proc/sys/kernel/panic: 0"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.panic_warm",
+            "text": "restart warm after a panic (reboot=panic_warm), a candidate for keeping the bank contents"
+          },
+          "param": "reboot=panic_warm",
+          "commands": [
+            "mkdir -p /etc/default/grub.d",
+            "echo 'GRUB_CMDLINE_LINUX_DEFAULT=\"$GRUB_CMDLINE_LINUX_DEFAULT reboot=panic_warm\"' \u003e /etc/default/grub.d/90-my-panic-warm.cfg",
+            "update-grub"
+          ],
+          "undo": [
+            "rm /etc/default/grub.d/90-my-panic-warm.cfg",
+            "update-grub"
+          ],
+          "cost": {
+            "code": "pf.cost.panic_warm",
+            "text": "the restart after a panic changes; whether a board keeps the banks over a warm reset is documented neither by the kernel nor by this tool"
+          },
+          "source": "kernel/reboot.c (reboot_setup); Documentation/admin-guide/kernel-parameters.txt: reboot=",
+          "reboot": true
+        }
+      },
+      {
+        "name": "bert",
+        "state": "none",
+        "detail": {
+          "code": "pf.bert.none",
+          "text": "the firmware provides no BERT table"
+        },
+        "evidence": [
+          "/sys/firmware/acpi/tables/BERT: not there"
+        ]
+      },
+      {
+        "name": "erst-mce",
+        "state": "none",
+        "detail": {
+          "code": "pf.erst.none",
+          "text": "the firmware provides no ERST table: mce_panic() keeps no copy of the record"
+        },
+        "evidence": [
+          "/sys/firmware/acpi/tables/ERST: not there"
+        ]
+      },
+      {
+        "name": "console",
+        "state": "lost",
+        "detail": {
+          "code": "pf.console.lost",
+          "args": {
+            "consoles": "@pf.word.none_given"
+          },
+          "text": "no console leaves the host (no console= on the command line): the last lines before a reset stay on its screen"
+        },
+        "evidence": [
+          "/proc/consoles: tty0                 -WU (EC p  )    4:7"
+        ],
+        "fix": {
+          "what": {
+            "code": "pf.fix.console",
+            "text": "add a serial console (console=tty0 console=ttyS0,115200) and keep what the port prints with the BMC's serial log or a console server, or send the kernel log to another host with netconsole"
+          },
+          "cost": {
+            "code": "pf.cost.console",
+            "text": "netconsole does not capture the earliest panics of a boot (netconsole.rst); a serial console needs something that keeps what it prints: a console server, or a BMC that logs the port"
+          },
+          "source": "Documentation/admin-guide/serial-console.rst; Documentation/networking/netconsole.rst"
+        }
+      },
+      {
+        "name": "rasdaemon",
+        "state": "lost",
+        "detail": {
+          "code": "pf.ras.absent",
+          "text": "rasdaemon is not installed: the corrected errors of a boot are kept only in its kernel log"
+        },
+        "fix": {
+          "what": {
+            "code": "pf.fix.rasdaemon",
+            "text": "run rasdaemon with --record, so that each error of a running boot is in a database before a reset"
+          },
+          "commands": [
+            "apt install rasdaemon",
+            "systemctl enable --now rasdaemon.service"
+          ],
+          "undo": [
+            "systemctl disable --now rasdaemon.service"
+          ],
+          "cost": {
+            "code": "pf.cost.rasdaemon",
+            "text": "a daemon that stores every error the kernel traces in a SQLite database below /var/lib/rasdaemon"
+          },
+          "source": "rasdaemon(8): --record"
+        }
+      },
+      {
+        "name": "harvest",
+        "state": "lost",
+        "detail": {
+          "code": "pf.harvest.absent",
+          "text": "my-harvest.service is not installed: what the boot before left is read only when someone runs my"
+        },
+        "evidence": [
+          "/etc/systemd/system/my-harvest.service: not there"
+        ],
+        "needs_live": true,
+        "fix": {
+          "what": {
+            "code": "pf.fix.harvest",
+            "text": "read what the boot before left into a kept ledger at every boot"
+          },
+          "commands": [
+            "my harvest install"
+          ],
+          "undo": [
+            "my harvest uninstall"
+          ],
+          "cost": {
+            "code": "pf.cost.harvest",
+            "text": "writes /etc/systemd/system/my-harvest.service and enables it; a run at every boot reads the host and adds its records to /var/lib/my/ledger.db"
+          },
+          "source": "docs/crash-loop.md"
+        }
+      }
+    ],
+    "lost": 8
+  }
+}

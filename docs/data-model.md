@@ -158,7 +158,7 @@ These passes run after every read, in a fixed order, and each computes its resul
 
 | Field | Content |
 | --- | --- |
-| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `gpu`, `diff`, `verify` |
+| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `gpu`, `diff`, `verify`, `preflight` |
 | `version` | the version of this form, 1. It changes when a field is renamed or removed; new fields do not change it |
 | `lang` | the language of the sentences |
 | `host` | the host the data is about |
