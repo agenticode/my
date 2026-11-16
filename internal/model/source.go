@@ -87,3 +87,16 @@ func (s *Source) BestGrade() Grade {
 	}
 	return ""
 }
+
+// CaptureCheck is what "my preflight" found for one check when a live scan
+// ran: whether a reset right after a fatal memory error would keep the
+// records of that kind.
+type CaptureCheck struct {
+	ScanID int64  `json:"scan_id,omitzero"`
+	Host   string `json:"host,omitzero"`
+	Name   string `json:"name"`
+	// State is kept, lost, none, unknown or info.
+	State    string    `json:"state"`
+	Detail   Statement `json:"detail"`
+	Evidence []string  `json:"evidence,omitzero"`
+}

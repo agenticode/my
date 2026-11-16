@@ -160,9 +160,10 @@ const eventColumns = `host, kind, "ErrorDT", "ErrorSeverity", "ErrorScrubType",
  "SocketId", "ChannelId", "ChannelSlotId", "SubChannel", "Rank", "DeviceId", "BankGroup", "Bank", "Row", "Column",
  "ErrorVector", "OsPhysicalAddress", source, raw_ref, grade, boot_id, dimm_uid, dimm_link,
  count, covered, dup_of, dup_fingerprint, time_quality, window_start, utc_offset,
- imc, edac_mc, edac_location, smbios_handle, label, slot, syndrome, error_type, decoder, fingerprint, scan_id`
+ imc, edac_mc, edac_location, smbios_handle, label, slot, syndrome, error_type, decoder, fingerprint, scan_id,
+ carried, read_boot_id, not_before`
 
-const eventColumnCount = 41
+const eventColumnCount = 44
 
 var insertEventSQL = `INSERT INTO event (` + eventColumns + `) VALUES (` + placeholders(eventColumnCount) + `)
  ON CONFLICT(fingerprint) DO NOTHING`
@@ -221,7 +222,8 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 		nullStr(e.BootID), nullStr(e.DIMMUID), e.DIMMLink,
 		e.Count, e.Covered, dupOf, e.DupOfFingerprint, string(e.TimeQuality), ts(e.WindowStart), optInt(e.UTCOffset),
 		optInt(e.IMC), optInt(e.EdacMC), e.EdacLocation, optInt(e.SMBIOSHandle), e.Label, e.Slot,
-		optU64(e.Syndrome), e.ErrorType, e.Decoder, e.Fingerprint, scanID)
+		optU64(e.Syndrome), e.ErrorType, e.Decoder, e.Fingerprint, scanID,
+		boolInt(e.Carried), nullStr(e.ReadBootID), ts(e.NotBefore))
 	if err != nil {
 		return false, fmt.Errorf("event %s: %w", e.RawRef, err)
 	}
@@ -353,6 +355,8 @@ func (w *Writer) UpsertBoot(b *model.Boot) (string, error) {
 	}
 
 	if cur == nil {
+		// How the boot ended is not taken from the record: BootOutcomes
+		// works it out from the records of the ledger.
 		_, err := w.exec(`INSERT INTO boot (host, boot_id, derived, started_at, start_quality, last_seen, kernel, bios, bmc, cmdline, source, raw_ref)
  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			b.Host, id, boolInt(derived), ts(b.StartedAt), string(b.StartQuality), ts(b.LastSeen),
@@ -390,7 +394,8 @@ func (w *Writer) UpsertBoot(b *model.Boot) (string, error) {
 	return id, nil
 }
 
-const bootColumns = `host, boot_id, derived, started_at, start_quality, last_seen, kernel, bios, bmc, cmdline, source, raw_ref`
+const bootColumns = `host, boot_id, derived, started_at, start_quality, last_seen, kernel, bios, bmc, cmdline, source, raw_ref,
+ "end", end_at, end_ref, end_source`
 
 type rowScanner interface {
 	Scan(dest ...any) error
@@ -399,13 +404,14 @@ type rowScanner interface {
 func scanBoot(r rowScanner) (*model.Boot, error) {
 	var b model.Boot
 	var derived int64
-	var started, last sql.NullString
+	var started, last, endAt sql.NullString
 	var quality string
-	if err := r.Scan(&b.Host, &b.BootID, &derived, &started, &quality, &last, &b.Kernel, &b.BIOS, &b.BMC, &b.Cmdline, &b.Source, &b.RawRef); err != nil {
+	if err := r.Scan(&b.Host, &b.BootID, &derived, &started, &quality, &last, &b.Kernel, &b.BIOS, &b.BMC, &b.Cmdline, &b.Source, &b.RawRef,
+		&b.End, &endAt, &b.EndRef, &b.EndSource); err != nil {
 		return nil, err
 	}
 	b.Derived = derived != 0
-	b.StartedAt, b.LastSeen = parseTS(started), parseTS(last)
+	b.StartedAt, b.LastSeen, b.EndAt = parseTS(started), parseTS(last), parseTS(endAt)
 	b.StartQuality = model.TimeQuality(quality)
 	return &b, nil
 }
@@ -422,7 +428,7 @@ func (w *Writer) bootByID(host, id string) (*model.Boot, error) {
 // merge window, ignoring boots whose start is only known relative to boot.
 func (w *Writer) bootNear(host string, t time.Time) (*model.Boot, error) {
 	rows, err := w.tx.QueryContext(w.ctx, `SELECT `+bootColumns+` FROM boot
- WHERE host = ? AND started_at >= ? AND started_at <= ? AND start_quality != 'relative'`,
+ WHERE host = ? AND started_at >= ? AND started_at <= ? AND start_quality NOT IN ('relative', 'unknown')`,
 		host, ts(t.Add(-bootMergeWindow)), ts(t.Add(bootMergeWindow)))
 	if err != nil {
 		return nil, err
@@ -935,4 +941,40 @@ func (w *Writer) InsertECS(e *model.ECSSample) (inserted bool, err error) {
 	}
 	e.ID, err = res.LastInsertId()
 	return err == nil, err
+}
+
+// PutCaptureChecks stores what "my preflight" found during a scan: one row
+// per check. Checks the scan already has are replaced.
+func (w *Writer) PutCaptureChecks(scanID int64, host string, checks []model.CaptureCheck) error {
+	if host == "" {
+		return invalid("capture check: host is empty")
+	}
+	for _, c := range checks {
+		switch c.State {
+		case "kept", "lost", "none", "unknown", "info":
+		default:
+			return invalid("capture check %s: unknown state %q", c.Name, c.State)
+		}
+		if c.Name == "" {
+			return invalid("capture check: name is empty")
+		}
+		detail, err := json.Marshal(c.Detail)
+		if err != nil {
+			return err
+		}
+		evidence := c.Evidence
+		if evidence == nil {
+			evidence = []string{}
+		}
+		ev, err := json.Marshal(evidence)
+		if err != nil {
+			return err
+		}
+		if _, err := w.exec(`INSERT INTO capture_check (scan_id, host, name, state, detail, evidence) VALUES (?, ?, ?, ?, ?, ?)
+ ON CONFLICT(scan_id, name) DO UPDATE SET host = excluded.host, state = excluded.state, detail = excluded.detail, evidence = excluded.evidence`,
+			scanID, host, c.Name, c.State, string(detail), string(ev)); err != nil {
+			return fmt.Errorf("capture check %s: %w", c.Name, err)
+		}
+	}
+	return nil
 }

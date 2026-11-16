@@ -38,7 +38,35 @@ type Boot struct {
 
 	Source string `json:"source,omitzero"`
 	RawRef string `json:"raw_ref,omitzero"`
+
+	// End says how the boot ended, when a record shows it: BootStop or
+	// BootPanic. Empty when nothing tells: the records do not tell a clean
+	// shutdown from a power loss. EndRef names the record that shows it,
+	// EndSource its source, EndAt the time.
+	End       string    `json:"end,omitzero"`
+	EndAt     time.Time `json:"end_at,omitzero"`
+	EndRef    string    `json:"end_ref,omitzero"`
+	EndSource string    `json:"end_source,omitzero"`
 }
+
+// How a boot ended.
+const (
+	// BootStop: a hardware error stopped the boot.
+	BootStop = "stop"
+	// BootPanic: the kernel panicked, and no record shows a hardware error.
+	BootPanic = "panic"
+)
+
+// Error types of the records that tell how a boot ended without being an
+// error: their severity is Informational and they count in no total.
+const (
+	// ErrorTypePanic marks the record of a panic that a crash log shows:
+	// a pstore dump written for a panic, a kdump text log.
+	ErrorTypePanic = "panic"
+	// ErrorTypeFatalBlock marks a fatal block of the firmware's boot
+	// error region that holds no memory error.
+	ErrorTypeFatalBlock = "fatal firmware error"
+)
 
 // DerivedBootID returns the boot ID used when no kernel boot ID is known.
 func DerivedBootID(host string, startedAt time.Time) string {

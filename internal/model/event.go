@@ -243,6 +243,17 @@ type Event struct {
 	// example "edac/skx-adxl" or "cper". It tells a reader how to check them.
 	Decoder string `json:"decoder,omitzero"`
 
+	// Carried says that hardware or firmware kept the record over a reset
+	// and a later boot logged it: the contents of a machine check bank, a
+	// boot error record of the firmware. BootID is then the boot before
+	// the one that read it, ReadBootID that boot, and ErrorDT the latest
+	// time the error can have happened. The time is estimated.
+	Carried    bool   `json:"carried,omitzero"`
+	ReadBootID string `json:"read_boot_id,omitzero"`
+	// NotBefore is the earliest time the error can have happened, when
+	// known: the start of the boot it belongs to.
+	NotBefore time.Time `json:"not_before,omitzero"`
+
 	// Raw is the original record text.
 	Raw string `json:"raw,omitzero"`
 	// Fingerprint identifies the original record so that importing the same
