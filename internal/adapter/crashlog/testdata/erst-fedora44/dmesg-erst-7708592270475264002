@@ -1,0 +1,112 @@
+Panic#1 Part2
+<30>[   68.457221] systemd[1]: Detected architecture x86-64.
+<30>[   68.545472] systemd[1]: Hostname set to <lab-x86>.
+<30>[   70.463157] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[   72.342317] zram: Added device: zram0
+<30>[   80.107377] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[   80.117523] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[   80.189257] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[   80.220263] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[   80.245121] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[   80.269140] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[   80.289161] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[   80.309510] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[   80.320918] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[   80.329394] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[   80.355062] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[   80.360537] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000001.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000001...
+<30>[   80.366003] systemd[1]: Expecting device dev-disk-by\x2duuid-5BCC\x2d12A9.device - /dev/disk/by-uuid/0000-0001...
+<30>[   80.369411] systemd[1]: Expecting device dev-ttyS0.device - /dev/ttyS0...
+<30>[   80.373148] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+<30>[   80.376525] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[   80.382076] systemd[1]: Reached target imports.target - Image Downloads.
+<30>[   80.387082] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+<30>[   80.391102] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+<30>[   80.394571] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+<30>[   80.399546] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+<30>[   80.404221] systemd[1]: Reached target paths.target - Path Units.
+<30>[   80.407730] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+<30>[   80.412135] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+<30>[   80.416044] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+<30>[   80.420198] systemd[1]: Reached target slices.target - Slice Units.
+<30>[   80.424043] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+<30>[   80.446622] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+<30>[   80.482458] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+<30>[   80.531015] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+<30>[   80.583346] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+<30>[   80.619139] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+<30>[   80.665341] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+<30>[   80.689175] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+<30>[   80.735273] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+<30>[   80.758595] systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+<30>[   80.765681] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   80.767803] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   80.804486] systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+<30>[   80.823159] systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+<30>[   80.835035] systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+<30>[   80.857133] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[   80.872535] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+<30>[   80.887077] systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+<30>[   80.987366] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+<30>[   81.039724] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+<30>[   81.097829] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+<30>[   81.149640] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+<30>[   81.174262] systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+<30>[   81.246014] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[   81.309927] systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+<30>[   81.322298] systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+<30>[   81.329240] systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+<30>[   81.335373] systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+<30>[   81.342013] systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+<30>[   81.773150] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+<30>[   81.785523] systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+<30>[   81.835431] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+<30>[   81.934227] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[   81.998360] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[   82.078497] systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+<30>[   82.087561] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   82.143365] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+<30>[   82.154243] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[   82.294235] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+<30>[   82.479133] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+<30>[   82.730178] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+<30>[   82.748996] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+<30>[   82.769493] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+<30>[   82.785311] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+<30>[   82.809307] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+<30>[   82.831897] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[   82.873471] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+<30>[   82.910174] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<6>[   82.957585] BTRFS info (device vda3 state M): use zstd compression, level 1
+<30>[   82.969282] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<46>[   83.016454] systemd-journald[757]: Collecting audit messages is enabled.
+<30>[   83.029376] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<5>[   83.039350] audit: type=1130 audit(1794796245.436:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-remount-fs comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   83.070321] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<30>[   83.116127] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[   83.228455] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[   83.267549] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[   83.286030] audit: type=1130 audit(1794796245.684:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[   83.654516] systemd[1]: Started systemd-journald.service - Journal Service.
+<5>[   83.674141] audit: type=1130 audit(1794796246.068:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   83.761030] audit: type=1130 audit(1794796246.158:7): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   84.129835] audit: type=1334 audit(1794796246.528:8): prog-id=48 op=LOAD
+<5>[   84.132164] audit: type=1334 audit(1794796246.530:9): prog-id=49 op=LOAD
+<5>[   84.134212] audit: type=1334 audit(1794796246.533:10): prog-id=50 op=LOAD
+<5>[   85.301281] audit: type=1130 audit(1794796247.699:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   86.806197] audit: type=1130 audit(1794796249.204:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   86.891222] audit: type=1334 audit(1794796249.289:13): prog-id=51 op=LOAD
+<5>[   89.296625] audit: type=1130 audit(1794796251.693:14): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   89.379071] audit: type=1334 audit(1794796251.777:15): prog-id=23 op=UNLOAD
+<5>[   89.379841] audit: type=1334 audit(1794796251.778:16): prog-id=22 op=UNLOAD
+<5>[   89.399450] audit: type=1334 audit(1794796251.798:17): prog-id=52 op=LOAD
+<5>[   89.403228] audit: type=1334 audit(1794796251.801:18): prog-id=53 op=LOAD
+<5>[   89.557001] audit: type=1130 audit(1794796251.955:19): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[   91.958289] audit: type=1130 audit(1794796254.355:20): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[   95.393217] zram0: detected capacity change from 0 to 7991296
+<5>[   95.840240] audit: type=1130 audit(1794796258.238:21): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[   96.370972] Adding 3995644k swap on /dev/zram0.  Priority:100 extents:1 across:3995644k SSDsc
+<5>[   96.602327] audit: type=1334 audit(1794796259.000:22): prog-id=54 op=LOAD
+<5>[   96.607032] audit: type=1334 audit(1794796259.005:23): prog-id=55 op=LOAD
+<5>[   96.611064] audit: type=1334 audit(1794796259.009:24): prog-id=56 op=LOAD
+<5>[   97.775208] audit: type=1130 audit(1794796260.172:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
