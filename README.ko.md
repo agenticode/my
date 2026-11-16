@@ -157,7 +157,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | EDAC 카운터 | `/sys/devices/system/edac/mc` | 부팅 이후 DIMM별 건수 |
 | mcelog 데몬 | `mcelog --client` | DIMM별 건수 |
 | SMBIOS | `/sys/firmware/dmi/tables` 또는 `dmidecode` 출력 | 슬롯, DIMM 시리얼과 부품번호 |
-| BMC | `ipmitool sel` 출력, Redfish 덤프, Redfish 서비스 | 메모리 이벤트, 펌웨어가 비활성화한 모듈, sparing |
+| BMC | `ipmitool sel` 출력, Redfish 덤프, Redfish 서비스, 저장한 `racadm getsel`과 `racadm lclog view` 출력 | 메모리 이벤트, 펌웨어가 비활성화한 모듈, sparing, 리페어 |
 | GPU 메모리 | `nvidia-smi -q`와 쿼리 출력 | GPU별 row remapping 상태와 ECC 카운터 |
 | FMFM 로그 | JSON 파일 | 런타임, 부팅, 크래시 기록과 ECS 값 |
 | 호스트 파일 사본 | 아래에 `proc`, `sys`, `var`가 있는 디렉터리(`--root`, `my import`) | 위 입력을 파일로 |

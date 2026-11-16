@@ -7,20 +7,33 @@
     "tables": [
       {
         "table": "dell",
-        "version": 1,
+        "version": 2,
         "vendor": "Dell",
-        "messages": 15,
+        "messages": 311,
         "basis": "registry",
         "not_checked_on_real_hardware": true,
         "applies": [
           "registry IDRAC",
-          "bare-id"
+          "bare-id",
+          "manufacturer dell"
         ],
         "sources": [
           {
             "name": "registry",
-            "title": "message registry IDRAC 2.9.0 as an iDRAC9 7.20 serves it (R660xs mockup in dell/iDRAC-Redfish-Scripting, iDRAC Redfish Mockup Clients)",
+            "title": "message registry IDRAC 2.9.0, 2.10.0, 2.14.0 and 2.15.0 as four servers serve it (R660xs iDRAC9 7.20, R770 iDRAC10 1.10, R7725 iDRAC10 1.20, XE9712 iDRAC10 1.30; iDRAC Redfish Mockup Clients in dell/iDRAC-Redfish-Scripting)",
             "url": "https://github.com/dell/iDRAC-Redfish-Scripting/tree/3bc6e7b/iDRAC%20Redfish%20Mockup%20Clients",
+            "read": "2026-11-16"
+          },
+          {
+            "name": "ras",
+            "title": "Memory Errors and Dell EMC PowerEdge YX4X Server Memory RAS Features, v1.0: self-healing (post package repair) at the next boot, MEM9072 found by patrol scrub and not consumed",
+            "url": "https://dl.dell.com/manuals/common/dellemc_poweredge_yx4x_memoryras_v1_0.pdf",
+            "read": "2026-11-16"
+          },
+          {
+            "name": "paste",
+            "title": "racadm getsel output of a server with an uncorrected error on DIMM_A10, pasted in Wikimedia Phabricator T317662",
+            "url": "https://phabricator.wikimedia.org/T317662",
             "read": "2026-11-16"
           }
         ]

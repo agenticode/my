@@ -538,3 +538,53 @@ func TestOneErrorInTwoLogs(t *testing.T) {
 		t.Errorf("entries that repeat another = %v, want %v", pairs, want)
 	}
 }
+
+// TestLifecycleCopyOfASELEvent: an iDRAC writes a memory event into its
+// SEL and copies it into the Lifecycle log with the agent "SEL". The copy
+// keeps its message ID and is marked as a SEL event; the ledger counts the
+// event once.
+func TestLifecycleCopyOfASELEvent(t *testing.T) {
+	const sel, lc = "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel", "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Lclog"
+	fsys := tree(map[string]string{
+		"/redfish/v1/Systems/System.Embedded.1/Memory/DIMM.Socket.A7": `{"@odata.id":"/redfish/v1/Systems/System.Embedded.1/Memory/DIMM.Socket.A7","Id":"DIMM.Socket.A7","Name":"DIMM A7","DeviceLocator":"DIMM A7","SerialNumber":"0F1E2D3C","Manufacturer":"Example Memory","PartNumber":"EX-PART-1"}`,
+		sel + "/Entries": `{"@odata.id":"` + sel + `/Entries","Members@odata.count":1,"Members":[` +
+			`{"@odata.id":"` + sel + `/Entries/31","@odata.type":"#LogEntry.v1_16_1.LogEntry","Id":"31","EntryType":"SEL","EntryCode":"Assert","GeneratorId":"0x0001","SensorType":"Memory","SensorNumber":1,"MessageId":"6f01ffa7","Created":"2026-11-02T04:11:27-06:00","Severity":"Critical","Message":"Multi-bit memory errors are detected on the memory device at location(s) DIMM_A7."}]}`,
+		lc + "/Entries": `{"@odata.id":"` + lc + `/Entries","Members@odata.count":1,"Members":[` +
+			`{"@odata.id":"` + lc + `/Entries/2191","@odata.type":"#LogEntry.v1_16_1.LogEntry","Id":"2191","EntryType":"Oem","OemRecordFormat":"Dell","MessageId":"IDRAC.2.9.MEM0001","MessageArgs":["DIMM_A7"],"Created":"2026-11-02T04:11:27-06:00","Severity":"Critical","Message":"Multi-bit memory errors are detected on the memory device at location(s) DIMM_A7.","Oem":{"Dell":{"@odata.type":"#DellLCLogEntry.v1_2_0.DellLCLogEntry","AgentID":"SEL","Category":"SystemHealth"}}}]}`,
+	})
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "ledger.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	if _, err := ingest.Run(ctx, s, []adapter.Adapter{NewFS(fsys, "dump", Options{Now: now})}, ingest.Options{Host: "h1", Now: now}); err != nil {
+		t.Fatal(err)
+	}
+	evs, err := s.EventList(ctx, store.EventFilter{Host: "h1", WithDuplicates: true})
+	if err != nil || len(evs) != 2 {
+		t.Fatalf("%d events, want 2 (%v)", len(evs), err)
+	}
+	counted := 0
+	for _, e := range evs {
+		if e.DupOf == 0 {
+			counted++
+		}
+		if e.ErrorSeverity.Class() != "UE" {
+			t.Errorf("event %+v", e)
+		}
+	}
+	if counted != 1 {
+		t.Errorf("%d of the two records count", counted)
+	}
+	fws, err := s.FirmwareRecords(ctx, store.FirmwareFilter{Host: "h1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	origins := map[string]string{}
+	for _, f := range fws {
+		origins[f.Log] = f.Origin + " " + f.VendorID
+	}
+	if origins["Lclog"] != "sel MEM0001" {
+		t.Errorf("firmware records by log %v", origins)
+	}
+}

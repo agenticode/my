@@ -1,6 +1,7 @@
 package fwmap
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -42,7 +43,11 @@ func PlaceOf(form string, roles, args []string) Place {
 			if p.Location == "" {
 				p.Location = a
 			}
-			p.Labels = append(p.Labels, SplitLocations(a)...)
+			if form == "dell" {
+				p.Labels = append(p.Labels, DellLocations(a)...)
+			} else {
+				p.Labels = append(p.Labels, SplitLocations(a)...)
+			}
 		case "socket":
 			p.Socket = smallInt(a)
 		case "channel":
@@ -156,4 +161,37 @@ func number(s string) model.Opt[int] {
 		return model.Opt[int]{}
 	}
 	return model.Some(int(v))
+}
+
+// The spellings of a Dell module: the FQDD of the Redfish memory resource
+// (DIMM.Socket.A7), the name in a part event (DDR5 DIMM(DIMM B1)), the
+// device locator (DIMM A7) and the SEL sentence (DIMM_A7).
+var (
+	dellFQDD  = regexp.MustCompile(`(?i)^DIMM\.Socket\.([A-Z]{1,2}\d{1,2})$`)
+	dellParen = regexp.MustCompile(`(?i)\(\s*DIMM[ _]?([A-Z]{1,2}\d{1,2})\s*\)`)
+	dellName  = regexp.MustCompile(`(?i)^DIMM[ _.-]?([A-Z]{1,2}\d{1,2})$`)
+	dellBare  = regexp.MustCompile(`(?i)^([A-Z]{1,2}\d{1,2})$`)
+)
+
+// DellLocations reads the modules a Dell message names, each as "DIMM A7":
+// the spelling of the device locator of the Redfish memory resource. A
+// list gives several modules.
+func DellLocations(s string) []string {
+	var out []string
+	for _, p := range strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ';' }) {
+		p = strings.TrimSpace(p)
+		var slot string
+		for _, re := range []*regexp.Regexp{dellFQDD, dellParen, dellName, dellBare} {
+			if m := re.FindStringSubmatch(p); m != nil {
+				slot = strings.ToUpper(m[1])
+				break
+			}
+		}
+		if slot == "" {
+			out = append(out, SplitLocations(p)...)
+			continue
+		}
+		out = append(out, "DIMM "+slot)
+	}
+	return out
 }

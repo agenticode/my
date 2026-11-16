@@ -358,6 +358,7 @@ func TestLookupLabel(t *testing.T) {
 		"label:CPU1_DIMM2": "slot y",
 		"handle:4352":      "DIMM_A1",
 		"label:A-1":        "A-1",
+		"label:B7":         "B7",
 	}
 	for label, want := range map[string]string{
 		"DIMM_A1":   "DIMM_A1",
@@ -367,6 +368,9 @@ func TestLookupLabel(t *testing.T) {
 		"DIMMA1":    "DIMM_A1",
 		"P1_DIMMB1": "P1-DIMMB1",
 		"A1":        "A-1",
+		// A BMC names the slot an SMBIOS table calls "B7" "DIMM B7".
+		"DIMM B7": "B7",
+		"DIMM_B7": "B7",
 	} {
 		if got, ok := lookupLabel(aliases, label); !ok || got != want {
 			t.Errorf("lookupLabel(%q) = %q, %v; want %q", label, got, ok, want)
@@ -374,7 +378,7 @@ func TestLookupLabel(t *testing.T) {
 	}
 	for _, label := range []string{
 		"CPU1-DIMM2", // fits two slots when separators are ignored
-		"DIMM_A2", "IMM_A1", "", "---", "4352",
+		"DIMM_A2", "IMM_A1", "", "---", "4352", "DIMM B8", "DIMM CPU1",
 	} {
 		if got, ok := lookupLabel(aliases, label); ok {
 			t.Errorf("lookupLabel(%q) = %q, want no slot", label, got)

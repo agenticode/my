@@ -1,5 +1,5 @@
  표         벤더 또는 표준     메시지  근거
- dell@1     Dell                   15  registry: 실물 장비에서 확인하지 않음
+ dell@2     Dell                  311  registry: 실물 장비에서 확인하지 않음
  dmtf@1     DMTF                   19  registry: 실물 장비에서 확인하지 않음
  ipmi@1     IPMI                   11  registry: 실물 장비에서 확인하지 않음
  openbmc@1  OpenBMC                15  registry: 실물 장비에서 확인하지 않음

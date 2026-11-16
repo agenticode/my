@@ -24,6 +24,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/adapter/smbios"
+	"github.com/agenticode/my/internal/adapter/vendorlog"
 )
 
 // Reader is one reader of one form of input.
@@ -135,6 +136,12 @@ func List() []Reader {
 			Bad:  []byte(`[{"SensorType": "Memory", "Created": ` + garbageText)},
 		{Name: "sel/binary", Package: "sel", Fixture: "testdata/sel/sel-writeraw.hex",
 			Open: func(p string) adapter.Adapter { return sel.NewFile(p, sel.Options{}) }},
+		{Name: "vendorlog/racadm-getsel", Package: "vendorlog", Fixture: "testdata/vendorlog/racadm-getsel.txt",
+			Open: func(p string) adapter.Adapter { return vendorlog.NewFile(p, vendorlog.Options{}) },
+			Bad:  []byte("Record:      1\nDate/Time:   11/12/2026 03:14:07\nDescription: " + garbageText)},
+		{Name: "vendorlog/racadm-lclog", Package: "vendorlog", Fixture: "testdata/vendorlog/racadm-lclog.txt",
+			Open: func(p string) adapter.Adapter { return vendorlog.NewFile(p, vendorlog.Options{}) },
+			Bad:  []byte("SeqNumber = 1\nMessage ID = MEM0001\nTimestamp = " + garbageText)},
 		{Name: "smbios/dmidecode", Package: "smbios", Fixture: "testdata/smbios/dmidecode-t17-ddr4.txt",
 			Open: func(p string) adapter.Adapter { return smbios.NewDmidecodeFile(p, smbios.Options{Now: When}) },
 			Bad:  []byte("# dmidecode 3.5\n" + garbageText)},

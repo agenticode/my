@@ -82,7 +82,8 @@ FUZZ_TARGETS := \
 	./internal/fwmap:FuzzClassify \
 	./internal/adapter/redfish:FuzzRegistry \
 	./internal/preflight:FuzzHost \
-	./internal/eventstream:FuzzLine
+	./internal/eventstream:FuzzLine \
+	./internal/adapter/vendorlog:FuzzCollect
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 

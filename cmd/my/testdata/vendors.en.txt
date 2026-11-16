@@ -1,5 +1,5 @@
  table      vendor or standard  messages  basis
- dell@1     Dell                      15  registry: not checked on real hardware
+ dell@2     Dell                     311  registry: not checked on real hardware
  dmtf@1     DMTF                      19  registry: not checked on real hardware
  ipmi@1     IPMI                      11  registry: not checked on real hardware
  openbmc@1  OpenBMC                   15  registry: not checked on real hardware

@@ -62,7 +62,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `cmd/my` | the binary and its commands |
 | `internal/model` | ledger records; the error event uses the field names of the FMFM runtime error log |
 | `internal/store` | the ledger: one SQLite file, schema migrations, totals, consistency passes |
-| `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, crash logs (pstore, kdump), the boot error region (BERT), EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
+| `internal/adapter` | one reader per input: the rasdaemon database and its store on a database server, the kernel log, crash logs (pstore, kdump), the boot error region (BERT), EDAC sysfs, the mcelog daemon, SMBIOS, host facts, the BMC event log, Redfish dumps, saved output of vendor tools (`racadm getsel`, `racadm lclog view`), `nvidia-smi` output, FMFM logs, and the dcbrain dataset |
 | `internal/fwevent` | the common events a firmware record of any vendor is read as, and what each becomes in the ledger |
 | `internal/fwmap` | the tables that map the messages of each BMC and BIOS vendor to common events, the wording rules, and the classifier that asks them |
 | `internal/yamlite` | the small part of YAML the settings profile and the mapping tables are written in |
