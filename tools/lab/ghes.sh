@@ -298,6 +298,7 @@ pageflags() { guest "dd if=/proc/kpageflags bs=8 skip=$1 count=1 status=none | o
 
 # multi_send DAY: the errors of the day.
 multi_send() {
+	local off day id slot type sev rank dev bg bank row col bit base args addr page flags
 	off=$(multi_offset)
 	echo "day $1: the guest's clock is $off s from the lab host's"
 	printf '{"day":%s,"boot_id":"%s","clock_offset":%s}\n' "$1" "$(guest cat /proc/sys/kernel/random/boot_id)" "$off" >>"$WORK/clock.jsonl"
@@ -505,16 +506,16 @@ multi)
 	WORK=$M/tmp
 	multi_disk
 	: >"$WORK/injected.jsonl"
-	for day in 1 2 3; do
-		multi_boot "$day"
-		if [ "$day" = 1 ]; then
+	for today in 1 2 3; do
+		multi_boot "$today"
+		if [ "$today" = 1 ]; then
 			push "$HERE/capture.sh" root@127.0.0.1:/root/my-lab/tools/
 			push "$MYBIN" root@127.0.0.1:/root/my-lab/bin/my
 			guest 'hostname; systemctl is-enabled chronyd || true; systemctl is-active rasdaemon; /root/my-lab/bin/my version
 				grep . /sys/devices/system/edac/mc/mc0/dimm*/dimm_label; dmidecode -t 17 | grep -E "^Handle|Locator|Serial"' | tee "$WORK/guest.txt"
 		fi
-		multi_send "$day"
-		if [ "$day" != 3 ]; then multi_stop; fi
+		multi_send "$today"
+		if [ "$today" != 3 ]; then multi_stop; fi
 	done
 	finish ghes-multi "firmware error records in an aarch64 guest with six DIMMs over three boots a day apart: a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected errors and 1 uncorrected" --all-boots
 	cp "$WORK/clock.jsonl" "$WORK/page.txt" "$WORK/guest.txt" "$LAB/cap/ghes-multi/extra/"
