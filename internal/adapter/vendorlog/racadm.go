@@ -43,7 +43,7 @@ func splitGetSEL(data []byte, origin string) []entry {
 			n := len(out) + 1
 			cur = &entry{n: n, ref: fmt.Sprintf("%s#record/%d", origin, n)}
 			if v := strings.TrimSpace(strings.TrimPrefix(t, "Record:")); v != "" {
-				cur.ref = fmt.Sprintf("%s#record/%s", origin, v)
+				cur.ref, cur.key = fmt.Sprintf("%s#record/%s", origin, v), v
 			}
 			raw = append(raw, line)
 			continue
@@ -130,7 +130,7 @@ func splitLCLog(data []byte, origin string) []entry {
 		if ok && k == "SeqNumber" {
 			flush()
 			seq := strings.TrimSpace(value)
-			cur = &entry{n: len(out) + 1, ref: fmt.Sprintf("%s#seq/%s", origin, seq)}
+			cur = &entry{n: len(out) + 1, key: seq, ref: fmt.Sprintf("%s#seq/%s", origin, seq)}
 			raw = append(raw, line)
 			continue
 		}
