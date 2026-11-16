@@ -261,10 +261,10 @@ func stamp(t time.Time) string { return t.UTC().Format("2006-01-02 15:04") + " U
 
 // sideEvent is what the comparison keeps of a record of a corrected error.
 type sideEvent struct {
-	id, dupOf int64
-	slot      string
-	at        time.Time
-	bmc       bool
+	dupOf int64
+	slot  string
+	at    time.Time
+	bmc   bool
 	// errors is the number of errors the record stands for.
 	errors int64
 }
@@ -272,8 +272,8 @@ type sideEvent struct {
 // sideData is what the comparison reads from the ledger.
 type sideData struct {
 	os, bmc  SideCover
-	events   []sideEvent // corrected errors of both sides
-	side     map[int64]bool
+	events   []sideEvent           // corrected errors of both sides, of a slot
+	side     map[int64]bool        // the records of the BMC
 	newest   map[string][]RowEvent // slot -> newest BMC entries of any severity
 	bmcs     []model.BMC
 	logLimit time.Time
@@ -282,13 +282,16 @@ type sideData struct {
 
 // readSides reads what each side has on record for a host.
 func (c *Case) readSides(ctx context.Context, host string) (*sideData, error) {
-	d := &sideData{side: map[int64]bool{}, newest: map[string][]RowEvent{}}
+	d := &sideData{}
 	scans, err := c.store.Scans(ctx)
 	if err != nil {
 		return nil, err
 	}
 	osNames, bmcNames := map[string]bool{}, map[string]bool{}
 	var latestOS time.Time
+	// Whether a scan of the host had a source of the BMC at all, in any
+	// state: without one, no record is the BMC's.
+	anyBMC := false
 	for i := range scans {
 		sc := &scans[i]
 		if sc.Host != host {
@@ -300,6 +303,9 @@ func (c *Case) readSides(ctx context.Context, host string) (*sideData, error) {
 		}
 		hasOS := false
 		for _, src := range srcs {
+			if bmcKinds[src.Kind] {
+				anyBMC = true
+			}
 			switch src.Status {
 			case model.SourceOK, model.SourcePartial, model.SourceEmpty:
 			default:
@@ -340,43 +346,72 @@ func (c *Case) readSides(ctx context.Context, host string) (*sideData, error) {
 			*dst = t
 		}
 	}
-	for e, err := range c.store.Events(ctx, store.EventFilter{Host: host, WithDuplicates: true}) {
-		if err != nil {
+	// The records of a host in an error storm are millions, and the
+	// comparison keeps a few numbers of each corrected error. A record of
+	// the OS that repeats another one counts only when that other one is
+	// the BMC's: on a host without a BMC source such records are not kept.
+	// Should a record of the BMC turn up all the same, the records are read
+	// again with all of them.
+	read := func(keepRepeats bool) (sawBMC bool, err error) {
+		d.side, d.newest, d.events = map[int64]bool{}, map[string][]RowEvent{}, nil
+		d.os.From, d.bmc.From, d.logLimit = time.Time{}, time.Time{}, time.Time{}
+		slots := map[string]string{}
+		for e, err := range c.store.Events(ctx, store.EventFilter{Host: host, WithDuplicates: true}) {
+			if err != nil {
+				return false, err
+			}
+			kind := sourceKind(e.Source)
+			isOS, isBMC := osKinds[kind], bmcKinds[kind]
+			if !isOS && !isBMC {
+				continue
+			}
+			if isBMC {
+				d.side[e.ID], sawBMC = true, true
+			}
+			if e.TimeQuality != model.TimeRelative {
+				if isOS {
+					early(&d.os.From, e.ErrorDT)
+				} else {
+					early(&d.bmc.From, e.ErrorDT)
+				}
+			}
+			if isBMC && e.Slot != "" && (e.Source == "redfish/log" || kind == "sel") {
+				// An entry of a log; what the BMC says about the state of a
+				// module at the time it was read is no entry.
+				list := append(d.newest[e.Slot], RowEvent{At: e.ErrorDT, Severity: e.ErrorSeverity, Text: e.ErrorType, Source: e.Source})
+				if len(list) > maxRowEvents {
+					list = list[len(list)-maxRowEvents:]
+				}
+				d.newest[e.Slot] = list
+			}
+			if isBMC && strings.Contains(strings.ToLower(e.ErrorType), "logging limit") {
+				early(&d.logLimit, e.ErrorDT)
+			}
+			// What the comparison counts: corrected errors of a slot.
+			if e.ErrorSeverity != model.SevCE || e.Kind != model.KindError || e.Slot == "" || (isOS && e.DupOf != 0 && !keepRepeats) {
+				continue
+			}
+			n := int64(e.Count - e.Covered)
+			if n < 0 {
+				n = 0
+			}
+			slot, ok := slots[e.Slot]
+			if !ok {
+				slot = e.Slot
+				slots[slot] = slot
+			}
+			d.events = append(d.events, sideEvent{dupOf: e.DupOf, slot: slot, at: e.ErrorDT, bmc: isBMC, errors: n})
+		}
+		return sawBMC, nil
+	}
+	sawBMC, err := read(anyBMC)
+	if err != nil {
+		return nil, err
+	}
+	if sawBMC && !anyBMC {
+		if _, err := read(true); err != nil {
 			return nil, err
 		}
-		kind := sourceKind(e.Source)
-		isOS, isBMC := osKinds[kind], bmcKinds[kind]
-		if !isOS && !isBMC {
-			continue
-		}
-		d.side[e.ID] = isBMC
-		if e.TimeQuality != model.TimeRelative {
-			if isOS {
-				early(&d.os.From, e.ErrorDT)
-			} else {
-				early(&d.bmc.From, e.ErrorDT)
-			}
-		}
-		if isBMC && e.Slot != "" && (e.Source == "redfish/log" || kind == "sel") {
-			// An entry of a log; what the BMC says about the state of a
-			// module at the time it was read is no entry.
-			list := append(d.newest[e.Slot], RowEvent{At: e.ErrorDT, Severity: e.ErrorSeverity, Text: e.ErrorType, Source: e.Source})
-			if len(list) > maxRowEvents {
-				list = list[len(list)-maxRowEvents:]
-			}
-			d.newest[e.Slot] = list
-		}
-		if isBMC && strings.Contains(strings.ToLower(e.ErrorType), "logging limit") {
-			early(&d.logLimit, e.ErrorDT)
-		}
-		if e.ErrorSeverity != model.SevCE || e.Kind != model.KindError {
-			continue
-		}
-		n := int64(e.Count - e.Covered)
-		if n < 0 {
-			n = 0
-		}
-		d.events = append(d.events, sideEvent{id: e.ID, dupOf: e.DupOf, slot: e.Slot, at: e.ErrorDT, bmc: isBMC, errors: n})
 	}
 	boots, err := c.store.Boots(ctx, host)
 	if err != nil {
