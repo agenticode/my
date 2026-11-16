@@ -112,11 +112,12 @@ func TestElist(t *testing.T) {
 		{"L13", "CE: correctable ECC", "", "2026-11-13 11:00:00", ""}, // a shared sensor names no module
 		{"L15", "CE: correctable ECC", "DIMM_A1", "boot+42s", "relative"},
 		{"L16", "Informational: Predictive Failure Asserted", "DIMM_B1", "2026-11-13 12:00:00", ""},
-		// DIMM_G1 was taken out of use and came back: no disabled module remains.
-		{"L19", "Informational: memory device disabled (enabled again later)", "DIMM_G1", "2026-11-14 02:00:00", ""},
+		// DIMM_G1 was taken out of use and came back: the ledger withdraws
+		// the mark (store.FirmwareWithdrawals).
 		{"L20", "Informational: memory device disabled (deasserted: in use again)", "DIMM_G1", "2026-11-14 02:45:00", ""},
 		{"L8", "action disable/ok: memory device disabled", "DIMM_C1", "2026-11-12 03:19:44", ""},
 		{"L11", "action sparing/ok: spare", "DIMM_F1", "2026-11-13 10:02:31", ""},
+		{"L19", "action disable/ok: memory device disabled", "DIMM_G1", "2026-11-14 02:00:00", ""},
 	})
 	if rep.Status != model.SourceOK || rep.Records != 20 || rep.Skipped != 0 || rep.Kind != Kind {
 		t.Errorf("report = %+v", rep)
@@ -129,7 +130,6 @@ func TestElist(t *testing.T) {
 		`1 records of kind "Linux kernel panic"`,
 		"1 presence records were left out",
 		"2 records only say that a state ended; they are kept as information",
-		"1 disable records were followed by the module coming back into use",
 		`1 memory sensor records say "Predictive Failure Asserted"`,
 		"1 memory records do not name a module",
 		"the firmware stopped logging corrected errors 1 time(s), first on 2026-11-09 22:41 UTC",
@@ -316,10 +316,10 @@ func TestRaw(t *testing.T) {
 	check(t, &c, []got{
 		{"record 1", "CE: correctable ECC", "sensor 0x53 module 3", "2026-11-12 03:14:07", ""},
 		{"record 2", "UE: uncorrectable ECC", "", "2026-11-12 03:14:09", ""},
-		// Record 9 says the module of record 3 is in use again.
-		{"record 3", "Informational: memory device disabled (enabled again later)", "sensor 0x53 module 2", "2026-11-12 03:20:00", ""},
 		{"record 5", "CE: correctable ECC", "sensor 0x53 module 3", "boot+42s", "relative"},
+		// Record 9 says the module of record 3 is in use again.
 		{"record 9", "Informational: memory device disabled (deasserted: in use again)", "sensor 0x53 module 2", "2026-11-12 03:40:00", ""},
+		{"record 3", "action disable/ok: memory device disabled", "sensor 0x53 module 2", "2026-11-12 03:20:00", "by bios"},
 	})
 	if rep.Status != model.SourcePartial || rep.Records != 9 || rep.Skipped != 1 {
 		t.Errorf("report = %+v", rep)
