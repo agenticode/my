@@ -1,0 +1,146 @@
+rasdaemon: Failed to open config file /usr/local/etc/sysconfig/rasdaemon: No such file or directory
+rasdaemon: Cpu fault isolation is disabled
+rasdaemon: module ipmi_bmc init failed: -19
+rasdaemon: Improper PAGE_CE_ACTION, set to default soft
+rasdaemon: Page offline choice on Corrected Errors is soft
+rasdaemon: Improper PAGE_CE_THRESHOLD, set to default 50.
+rasdaemon: Improper PAGE_CE_REFRESH_CYCLE, set to default 86400s.
+rasdaemon: Threshold of memory Corrected Errors is 50 / 86400s
+rasdaemon: Improper ROW_CE_ACTION, set to default off
+rasdaemon: Row offline choice on Corrected Errors is off
+rasdaemon: Enabling DB backend: sqlite3
+rasdaemon: block:block_rq_error event enabled
+rasdaemon: Enabled event block:block_rq_error
+rasdaemon: cxl:cxl_aer_correctable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_correctable_error
+rasdaemon: cxl:cxl_aer_uncorrectable_error event enabled
+rasdaemon: Enabled event cxl:cxl_aer_uncorrectable_error
+rasdaemon: cxl:cxl_dram event enabled
+rasdaemon: Enabled event cxl:cxl_dram
+rasdaemon: cxl:cxl_general_media event enabled
+rasdaemon: Enabled event cxl:cxl_general_media
+rasdaemon: cxl:cxl_generic_event event enabled
+rasdaemon: Enabled event cxl:cxl_generic_event
+rasdaemon: cxl:cxl_memory_module event enabled
+rasdaemon: Enabled event cxl:cxl_memory_module
+rasdaemon: cxl:cxl_memory_sparing event enabled
+rasdaemon: Enabled event cxl:cxl_memory_sparing
+rasdaemon: cxl:cxl_overflow event enabled
+rasdaemon: Enabled event cxl:cxl_overflow
+rasdaemon: cxl:cxl_poison event enabled
+rasdaemon: Enabled event cxl:cxl_poison
+rasdaemon: mce:mce_record event enabled
+rasdaemon: Enabled event mce:mce_record
+rasdaemon: net:net_dev_xmit_timeout event enabled
+rasdaemon: Enabled event net:net_dev_xmit_timeout
+rasdaemon: ras:aer_event event enabled
+rasdaemon: Enabled event ras:aer_event
+rasdaemon: 	 no AER_CE_TRIGGER ((nil))
+rasdaemon: ras:arm_event event enabled
+rasdaemon: Enabled event ras:arm_event
+rasdaemon: ras:extlog_mem_event event not exist
+rasdaemon: Can't get traces from ras:extlog_mem_event
+rasdaemon: ras:mc_event event enabled
+rasdaemon: Enabled event ras:mc_event
+rasdaemon: ras:memory_failure_event event enabled
+rasdaemon: Enabled event ras:memory_failure_event
+rasdaemon: ras:non_standard_event event enabled
+rasdaemon: Enabled event ras:non_standard_event
+rasdaemon: ras:reri_event event not exist
+rasdaemon: Can't get traces from ras:reri_event
+rasdaemon: signal:signal_generate event enabled
+rasdaemon: Enabled event signal:signal_generate
+rasdaemon: devlink:devlink_health_report event not exist
+rasdaemon: Can't get traces from devlink:devlink_health_report
+rasdaemon: Recording aer_event events
+rasdaemon: Recording arm_event events
+rasdaemon: Recording cxl_poison_event events
+rasdaemon: Recording cxl_aer_ue_event events
+rasdaemon: Recording cxl_aer_ce_event events
+rasdaemon: Recording cxl_overflow_event events
+rasdaemon: Recording cxl_generic_event events
+rasdaemon: Recording cxl_general_media_event events
+rasdaemon: Recording cxl_dram_event events
+rasdaemon: Recording cxl_memory_module_event events
+rasdaemon: Recording cxl_memory_sparing_event events
+rasdaemon: Recording devlink_event events
+rasdaemon: Recording disk_errors events
+rasdaemon: Recording extlog_event events
+rasdaemon: Recording mc_event events
+rasdaemon: Recording memory_failure_event events
+rasdaemon: Recording non_standard_event events
+rasdaemon: Recording reri_event events
+rasdaemon: Recording signal_event events
+rasdaemon: Recording mce_record events
+rasdaemon: Recording amp_payload0_event events
+rasdaemon: Recording amp_payload1_event events
+rasdaemon: Recording amp_payload2_event events
+rasdaemon: Recording amp_payload3_event events
+rasdaemon: Recording ampereone_payload0_event events
+rasdaemon: Recording ampereone_payload1_event events
+rasdaemon: Recording ampereone_payload2_event events
+rasdaemon: Recording ampereone_payload3_event events
+rasdaemon: Recording ampereone_payload4_event events
+rasdaemon: Recording ampereone_payload5_event events
+rasdaemon: Recording ampereone_payload6_event events
+rasdaemon: Recording hip08_oem_type1_event_v2 events
+rasdaemon: Recording hip08_oem_type2_event_v2 events
+rasdaemon: Recording hip08_pcie_local_event_v2 events
+rasdaemon: Recording hisi_common_section_v2 events
+rasdaemon: Recording jm_payload0_event events
+rasdaemon: Recording nvidia_ns_event events
+rasdaemon: Recording nvidia_vera_ns_event events
+rasdaemon: Recording yitian_ddr_reg_dump_event events
+rasdaemon: Database backend started: sqlite3.
+rasdaemon: Listening to events for cpus 0 to 1
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:33:58 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:33:56 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1002000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:128 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:33:59 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:33:57 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1001000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:64 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:00 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x2 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:33:58 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1007000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:448 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:01 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x2 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:33:59 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1008000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:512 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:02 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x3 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:00 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1002000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:128 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:03 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x3 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:01 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1001000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:64 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:04 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x4 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:02 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x100c000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:768 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:05 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x4 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:03 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x100f000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:960 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000007 cxl_dram [ERROR] 2026-11-16 23:34:06 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x5 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:04 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1007000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:448 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000008 cxl_dram [ERROR] 2026-11-16 23:34:07 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x5 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:05 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1008000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:512 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-94    [001] .....     0.000008 cxl_dram [ERROR] 2026-11-16 23:34:08 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x6 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:06 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1002000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:128 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000008 cxl_dram [ERROR] 2026-11-16 23:34:09 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x6 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:07 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1001000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:64 
+rasdaemon: cxl_memory_sparing_event store: 0x2ad39598
+rasdaemon: register inserted at db
+           <...>-93    [000] .....     0.000008 cxl_memory_sparing 2026-11-16 23:34:14 +0000 memdev:mem1 host:0000:0d:00.0 serial:0x4c41420011 log type:Informational hdr_uuid:e71f3a40-2d29-4092-8a39-4d1c966c7c65 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:12 +0000 hdr_length:128 hdr_maint_op_class:2 hdr_maint_op_sub_class:0 flags:0x0 result:0x0 spare resources available:2 channel:0 rank:0 nibble_mask:2 bank_group:1 bank:2 row:8000 column:128 
+rasdaemon: cxl_memory_sparing_event store: 0x2ad39598
+rasdaemon: register inserted at db
+           <...>-88    [000] .....     0.000008 cxl_memory_sparing 2026-11-16 23:34:16 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Informational hdr_uuid:e71f3a40-2d29-4092-8a39-4d1c966c7c65 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x1 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:14 +0000 hdr_length:128 hdr_maint_op_class:2 hdr_maint_op_sub_class:0 flags:0x0 result:0x0 spare resources available:2 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:64 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000009 cxl_dram [ERROR] 2026-11-16 23:34:22 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x7 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:20 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1008000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:512 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000009 cxl_dram [ERROR] 2026-11-16 23:34:23 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x8 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:21 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x100b000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:704 
+rasdaemon: cxl_dram_event store: 0x2ad31f78
+rasdaemon: register inserted at db
+           <...>-89    [001] .....     0.000009 cxl_dram [ERROR] 2026-11-16 23:34:24 +0000 memdev:mem0 host:0000:0e:00.0 serial:0x4c41420012 log type:Warning hdr_uuid:601dcbb3-9c06-4eab-b8af-4e9bfb5c9624 'MAINTENANCE_NEEDED' 'MAINT_OP_SUB_CLASS_VALID' hdr_handle:0x9 hdr_related_handle:0x0 hdr_timestamp:2026-11-16 23:34:22 +0000 hdr_length:128 hdr_maint_op_class:1 hdr_maint_op_sub_class:0 dpa:0x1001000 dpa_flags:descriptor:memory_event_type:Media ECC Error memory_event_sub_type:Not Reported transaction_type:Host Read hpa:0xffffffffffffffff hpa_alias0:0xffffffffffffffff region: region_uuid:00000000-0000-0000-0000-000000000000 channel:1 rank:1 nibble_mask:16 bank_group:3 bank:0 row:2684 column:64 

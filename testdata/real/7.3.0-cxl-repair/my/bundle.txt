@@ -1,0 +1,9 @@
+case bundle written: my/case.mycase (24.1 kB)
+  host host-c04b9747: 3 DIMMs, CE 15, UE 0, finding: consider replacement
+  note: this host is a virtual machine (VMware): a guest is not shown the corrected errors of the
+    machine it runs on, and of the uncorrected ones at most those that hit its own memory
+  host names replaced, and 1 network address:
+    lab-guest -> host-c04b9747
+  Keep these lines: the bundle does not hold the names, and an answer about it will use the new
+  ones.
+look at it: my open my/case.mycase

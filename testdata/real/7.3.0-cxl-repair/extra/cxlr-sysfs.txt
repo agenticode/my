@@ -1,0 +1,36 @@
+# ls -l /sys/bus/cxl/devices
+total 0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder0.0 -> ../../../devices/platform/ACPI0017:00/root0/decoder0.0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder1.0 -> ../../../devices/platform/ACPI0017:00/root0/port1/decoder1.0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder1.1 -> ../../../devices/platform/ACPI0017:00/root0/port1/decoder1.1
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder1.2 -> ../../../devices/platform/ACPI0017:00/root0/port1/decoder1.2
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder1.3 -> ../../../devices/platform/ACPI0017:00/root0/port1/decoder1.3
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder2.0 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint2/decoder2.0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder2.1 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint2/decoder2.1
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder2.2 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint2/decoder2.2
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder2.3 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint2/decoder2.3
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder3.0 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint3/decoder3.0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder3.1 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint3/decoder3.1
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder3.2 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint3/decoder3.2
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 decoder3.3 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint3/decoder3.3
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 endpoint2 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint2
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 endpoint3 -> ../../../devices/platform/ACPI0017:00/root0/port1/endpoint3
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 mem0 -> ../../../devices/pci0000:0c/0000:0c:01.0/0000:0e:00.0/mem0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 mem1 -> ../../../devices/pci0000:0c/0000:0c:00.0/0000:0d:00.0/mem1
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 nvdimm-bridge0 -> ../../../devices/platform/ACPI0017:00/root0/nvdimm-bridge0
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 port1 -> ../../../devices/platform/ACPI0017:00/root0/port1
+lrwxrwxrwx 1 root root 0 Nov 16 23:33 root0 -> ../../../devices/platform/ACPI0017:00/root0
+# /sys/bus/cxl/devices/mem0
+serial: 0x4c41420012
+firmware_version: BWFW VERSION 00
+payload_max: 2048
+ram/size: 0x10000000
+pmem/size: 0x0
+numa_node: -1
+# /sys/bus/cxl/devices/mem1
+serial: 0x4c41420011
+firmware_version: BWFW VERSION 00
+payload_max: 2048
+ram/size: 0x10000000
+pmem/size: 0x0
+numa_node: -1

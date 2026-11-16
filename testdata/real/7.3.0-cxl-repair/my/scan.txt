@@ -1,0 +1,21 @@
+host lab-guest  QEMU Standard PC (Q35 + ICH9, 2009)  2026-10-27 to 2026-11-16  CE 15, UE 0
+observation grade A
+host finding: consider replacement
+
+       DIMM 0
+       ░░
+       mem0     mem1
+ cxl   ▓▓       ▒▒
+
+ ▓▓ consider replacement   ▒▒ observe   ░░ ok    3 slots, 3 DIMMs
+
+ #  SLOT      SERIAL    CE  UE  MODE  TREND 30D     FINDING               RULES
+ 1  cxl:mem0  ..420012   9   0  row   ▁▁▁▁▁▁▁▁▁█ ↑  consider replacement  R-REP-02
+ 2  cxl:mem1  ..420011   6   0  row   ▁▁▁▁▁▁▁▁▁█ ↑  observe               R-SOFT-01
+
+ 1 DIMM without errors
+ sources  rasdaemon, klog, kdump
+ note     This host is a virtual machine (VMware): a guest is not shown the corrected errors of the
+          machine it runs on, and of the uncorrected ones at most those that hit its own memory
+
+ my dimm cxl:mem0: examination of this DIMM

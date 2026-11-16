@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -100,6 +101,11 @@ type dimm struct {
 	grade        model.VerdictGrade
 	mode         model.FaultMode
 	rules        []string
+	// repair is the kind of the repair the faults of the DIMM name, if
+	// any; before and after count the errors of those faults before it and
+	// at the repaired place since.
+	repair        model.ActionKind
+	before, after int64
 }
 
 // forms is what one form of the kernel log gives by itself.
@@ -190,6 +196,29 @@ var captures = []capture{
 		finding: model.VerdictReplaceNow,
 		dimms: []dimm{{slot: "cxl:mem0", serial: "0x4c41420001", ce: 11, ue: 1, grade: model.VerdictReplaceNow, mode: model.ModeRow,
 			rules: []string{"R-UE-01", "R-FW-01"}}},
+	},
+	{
+		// Two emulated CXL devices under QEMU 11.1.3: errors in one row of
+		// each, a soft PPR of that row through the kernel's EDAC interface,
+		// then errors again in the repaired row of one of them. Each device
+		// answers the PPR with a memory sparing record that leaves 2 spares.
+		dir: "7.3.0-cxl-repair", host: "lab-guest", virtual: "QEMU", ce: 15, gradeA: 15,
+		reports: []string{"rasdaemon/cxl_dram_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		// The guest sees the files of the lab host. Its own scan read
+		// pstore, mcelog and the crash dumps of the lab host as well, and
+		// found a page taken offline in the kernel log of a crash of the
+		// lab host three weeks before.
+		live: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "pstore empty", "pstore empty", "kdump ok", "edac-sysfs empty",
+			"mcelog absent", "smbios ok"},
+		before: state{hard: 1},
+		finding: model.VerdictConsiderReplacement,
+		dimms: []dimm{
+			{slot: "cxl:mem0", serial: "0x4c41420012", ce: 9, grade: model.VerdictConsiderReplacement, mode: model.ModeRow,
+				rules: []string{"R-REP-02"}, repair: model.ActionMemorySparing, before: 6, after: 3},
+			{slot: "cxl:mem1", serial: "0x4c41420011", ce: 6, grade: model.VerdictObserve, mode: model.ModeRow,
+				rules: []string{"R-SOFT-01"}, repair: model.ActionMemorySparing, before: 6, after: 0},
+		},
 	},
 	{
 		// Firmware error records on an aarch64 guest: every error is in
@@ -518,6 +547,25 @@ func TestCopyOfTheHost(t *testing.T) {
 				}
 				if d.Features.CE != want.ce || d.Features.UE != want.ue {
 					t.Errorf("slot %s: CE %d, UE %d; want %d, %d", want.slot, d.Features.CE, d.Features.UE, want.ce, want.ue)
+				}
+				var kinds []model.ActionKind
+				var before, after int64
+				for _, f := range d.Faults {
+					for _, m := range f.Mitigations {
+						if m.Kind == model.ActionPageOffline {
+							continue
+						}
+						kinds = append(kinds, m.Kind)
+						before += int64(f.ErrorCount) - m.FaultErrorsAfter
+						after += m.ErrorsAfter
+					}
+				}
+				wantKinds := []model.ActionKind(nil)
+				if want.repair != "" {
+					wantKinds = []model.ActionKind{want.repair}
+				}
+				if !slices.Equal(kinds, wantKinds) || before != want.before || after != want.after {
+					t.Errorf("slot %s: repairs %v, %d errors before, %d after; want %v, %d, %d", want.slot, kinds, before, after, wantKinds, want.before, want.after)
 				}
 			}
 			// The DIMMs that were left alone have nothing.
