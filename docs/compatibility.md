@@ -25,7 +25,7 @@ The same fault shows more or less of itself depending on who handles the error a
 | CXL memory device | rasdaemon database | A | DRAM event records carry bank, row and column |
 | Fleet with FMFM logging | FMFM logs | A to C | as much as the logging fills in |
 | Fleet whose rasdaemons write to a MySQL or PostgreSQL server | rasdaemon store, read with `--fleet` | as the hosts' own databases | the rows are those each host would keep in its SQLite file, without serial numbers |
-| Host that cannot be reached | BMC event log, Redfish dump | C, B with a rank | a BMC names the module at best |
+| Host that cannot be reached | BMC event log, Redfish dump or the Redfish service | C, B with a rank | a BMC names the module at best |
 | No rasdaemon and no readable kernel log | EDAC counters | C | counts per DIMM since boot |
 | Host that runs the mcelog daemon in place of rasdaemon | `mcelog --client` output, kernel log | C | the daemon keeps counts per DIMM and no records |
 | NVIDIA GPU memory | Xid lines, `nvidia-smi -q` or its queries | C | the driver reports no location |
@@ -454,7 +454,7 @@ Redfish log entries of type SEL are read by the Redfish adapter.
 
 ## Redfish
 
-Adapter `redfish`, package `internal/adapter/redfish`. It reads what a BMC serves over Redfish from files and does not talk to a BMC. `my collect redfish` writes such files from a BMC.
+Adapter `redfish`, package `internal/adapter/redfish`. It reads what a BMC serves over Redfish from files and does not talk to a BMC. `my collect redfish` writes such files from a BMC, and `--bmc` does the same within the commands that scan; [redfish.md](redfish.md) describes both.
 
 ### Accepted forms
 
@@ -574,7 +574,7 @@ A `ComputerSystem` resource gives the host name (`HostName`), the system vendor 
 
 ### Known gaps
 
-- The error counts of a BMC are readings beside the ledger's events. They are not compared with the host's records yet.
+- The error counts of a BMC are readings beside the ledger's events, and no total of the ledger includes them. `my inventory` sets them against the host's records ([redfish.md](redfish.md#operating-system-and-bmc-side-by-side)).
 - `MemoryMetrics` properties other than the four counts and the two alarm flags are not read. A `MemoryMetrics` resource that no module of the dump links is counted in the report and not read.
 - Of several systems behind one BMC, the BIOS settings of the first are read.
 - A BIOS setting about memory whose name, display name and menu say nothing of memory is not kept.
