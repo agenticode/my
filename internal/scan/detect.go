@@ -28,6 +28,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/redfish"
 	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/adapter/smbios"
+	"github.com/agenticode/my/internal/adapter/vendorlog"
 )
 
 // DetectOptions carry what a file cannot say about itself.
@@ -80,6 +81,8 @@ const (
 	WhatKdump     = "kdump text log"
 	WhatCrashLogs = "crash logs (pstore, kdump)"
 	WhatBERT      = "boot error region (BERT)"
+	WhatRacadmSEL = "racadm getsel output"
+	WhatRacadmLC  = "racadm lclog view output"
 )
 
 // ErrUnknownInput is returned by Detect, as an *UnknownInputError that says
@@ -432,6 +435,20 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = smbios.NewDmidecodeReader(stream(), path, smbios.Options{Now: seen})
 		} else {
 			a = smbios.NewDmidecodeFile(path, smbios.Options{Now: seen})
+		}
+
+	case adapter.Sniffs(vendorlog.Sniff, text):
+		// Saved output of racadm: a format of its own, read before the
+		// text forms of the SEL.
+		what = WhatRacadmSEL
+		if vendorlog.FormatOf(text) == vendorlog.FormatLCLog {
+			what = WhatRacadmLC
+		}
+		vopts := vendorlog.Options{Location: opts.Location}
+		if zipped {
+			a = vendorlog.NewReader(stream(), path, vopts)
+		} else {
+			a = vendorlog.NewFile(path, vopts)
 		}
 
 	case adapter.Sniffs(sel.Sniff, text):

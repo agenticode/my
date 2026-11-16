@@ -5,20 +5,33 @@
   "exit_code": 0,
   "data": {
     "table": "dell",
-    "version": 1,
+    "version": 2,
     "vendor": "Dell",
-    "messages": 15,
+    "messages": 311,
     "basis": "registry",
     "not_checked_on_real_hardware": true,
     "applies": [
       "registry IDRAC",
-      "bare-id"
+      "bare-id",
+      "manufacturer dell"
     ],
     "sources": [
       {
         "name": "registry",
-        "title": "message registry IDRAC 2.9.0 as an iDRAC9 7.20 serves it (R660xs mockup in dell/iDRAC-Redfish-Scripting, iDRAC Redfish Mockup Clients)",
+        "title": "message registry IDRAC 2.9.0, 2.10.0, 2.14.0 and 2.15.0 as four servers serve it (R660xs iDRAC9 7.20, R770 iDRAC10 1.10, R7725 iDRAC10 1.20, XE9712 iDRAC10 1.30; iDRAC Redfish Mockup Clients in dell/iDRAC-Redfish-Scripting)",
         "url": "https://github.com/dell/iDRAC-Redfish-Scripting/tree/3bc6e7b/iDRAC%20Redfish%20Mockup%20Clients",
+        "read": "2026-11-16"
+      },
+      {
+        "name": "ras",
+        "title": "Memory Errors and Dell EMC PowerEdge YX4X Server Memory RAS Features, v1.0: self-healing (post package repair) at the next boot, MEM9072 found by patrol scrub and not consumed",
+        "url": "https://dl.dell.com/manuals/common/dellemc_poweredge_yx4x_memoryras_v1_0.pdf",
+        "read": "2026-11-16"
+      },
+      {
+        "name": "paste",
+        "title": "racadm getsel output of a server with an uncorrected error on DIMM_A10, pasted in Wikimedia Phabricator T317662",
+        "url": "https://phabricator.wikimedia.org/T317662",
         "read": "2026-11-16"
       }
     ],
@@ -168,6 +181,81 @@
         "basis": "registry"
       },
       {
+        "id": "MEM0020",
+        "event": "cleared",
+        "clears": "disabled",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0021",
+        "event": "cleared",
+        "clears": "ce-log-limit",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0022",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0024",
+        "event": "cleared",
+        "clears": "config-state",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0600",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0601",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
         "id": "MEM0700",
         "event": "cleared",
         "clears": "ce-threshold",
@@ -199,6 +287,3319 @@
           "location"
         ],
         "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0802",
+        "event": "ppr-scheduled",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0804",
+        "event": "ppr-done",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0805",
+        "event": "ppr-failed",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1000",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1001",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1002",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1003",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1004",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1005",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1006",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1007",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1008",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1009",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1010",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1011",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1012",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1013",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1014",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1015",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1016",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1017",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1200",
+        "event": "cleared",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1201",
+        "event": "mirror-lost",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1202",
+        "event": "mirror-failover",
+        "args": [
+          "locations"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1203",
+        "event": "config-error",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1204",
+        "event": "cleared",
+        "clears": "mirror-lost",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1205",
+        "event": "mirror-lost",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1206",
+        "event": "mirror-failover",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1207",
+        "event": "cleared",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1208",
+        "event": "sparing-failed",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1209",
+        "event": "sparing",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1210",
+        "event": "cleared",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1212",
+        "event": "mirror-lost",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1214",
+        "event": "mirror-failover",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5100",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5101",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5102",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5103",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5104",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5107",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5109",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM5199",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6101",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6102",
+        "nargs": 2,
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6102",
+        "nargs": 4,
+        "event": "unclassified",
+        "args": [
+          "serial",
+          "part",
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6104",
+        "nargs": 2,
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6104",
+        "nargs": 4,
+        "event": "unclassified",
+        "args": [
+          "serial",
+          "part",
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6106",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6107",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6110",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6114",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM6199",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7000",
+        "event": "cleared",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7002",
+        "event": "config-error",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7101",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7102",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7104",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7107",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7108",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7110",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7114",
+        "nargs": 2,
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7114",
+        "nargs": 4,
+        "event": "unclassified",
+        "args": [
+          "serial",
+          "part",
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM7199",
+        "event": "unclassified",
+        "args": [
+          "location",
+          "code"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM8000",
+        "event": "ce-log-limit",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM8001",
+        "event": "cleared",
+        "clears": "ce-log-limit",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM8502",
+        "event": "ce-threshold",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9000",
+        "event": "unclassified",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9001",
+        "event": "unclassified",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9002",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9003",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9004",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9005",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9006",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9007",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9008",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9009",
+        "event": "unclassified",
+        "args": [
+          "-"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9010",
+        "event": "unclassified",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9011",
+        "event": "unclassified",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9012",
+        "event": "unclassified",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9013",
+        "event": "unclassified",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9014",
+        "event": "ce",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9015",
+        "event": "ue",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9016",
+        "event": "ce-threshold",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9020",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9021",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9022",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9030",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9031",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9032",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9033",
+        "event": "unclassified",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9034",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9035",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9036",
+        "event": "unclassified",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9037",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9038",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9039",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9040",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9050",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9060",
+        "event": "ppr-done",
+        "severity": "Informational",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9061",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9072",
+        "event": "scrub-ue",
+        "flags": [
+          "contained"
+        ],
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9073",
+        "event": "unclassified",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PR7",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PR8",
+        "event": "presence",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0091",
+        "event": "training-failure",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0128",
+        "event": "training-failure",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0129",
+        "event": "training-failure",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0130",
+        "event": "training-failure",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0142",
+        "event": "training-failure",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0193",
+        "event": "training-failure",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "PST0196",
+        "event": "config-error",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0002",
+        "event": "log-full",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0004",
+        "event": "log-cleared",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0006",
+        "event": "log-full",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0008",
+        "event": "log-full",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0014",
+        "event": "log-cleared",
+        "args": [
+          "-",
+          "-"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SYS565",
+        "event": "thermal",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SYS566",
+        "event": "cleared",
+        "clears": "thermal",
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0058",
+        "event": "ue",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0079",
+        "event": "ue",
+        "flags": [
+          "previous-boot"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0081",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0086",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0087",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0088",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0089",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0090",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0091",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0092",
+        "event": "config-error",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0093",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0094",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0095",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0096",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0097",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0098",
+        "event": "disabled",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0099",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0100",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0101",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0102",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0103",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0104",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0106",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0107",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0108",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0109",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0110",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0111",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0112",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0113",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0114",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0144",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0159",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0160",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0161",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0162",
+        "event": "config-error",
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0163",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0164",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0165",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0166",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0167",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0168",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0169",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0170",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0171",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0172",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0173",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0174",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0175",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0176",
+        "event": "config-error",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0177",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0178",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0179",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0180",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0181",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0182",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0183",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0184",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0185",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0186",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0187",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0188",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0189",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0190",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0191",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0192",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0193",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0194",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0195",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0196",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0197",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0198",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0199",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0200",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0201",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0202",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0203",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0204",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0205",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0206",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0207",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0208",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0209",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0210",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0211",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0212",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0213",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0214",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0215",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0216",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0217",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0218",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0219",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0220",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0221",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0222",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0223",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0224",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0225",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0226",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0227",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0228",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0229",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0230",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0231",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0232",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0233",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0234",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0235",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0236",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0237",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0238",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0239",
+        "event": "training-failure",
+        "args": [
+          "locations"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0240",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0241",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0242",
+        "event": "config-error",
+        "args": [
+          "-",
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0243",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0251",
+        "event": "config-error",
+        "args": [
+          "-"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0253",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0254",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0262",
+        "event": "training-failure",
+        "args": [
+          "-"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0278",
+        "event": "ppr-failed",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0279",
+        "event": "ppr-done",
+        "args": [
+          "location"
+        ],
+        "severity": "Informational",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0288",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0289",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0290",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0291",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0292",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0293",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0294",
+        "event": "config-error",
+        "args": [
+          "location"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0326",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0327",
+        "event": "training-failure",
+        "args": [
+          "socket",
+          "channel"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0328",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0329",
+        "event": "training-failure",
+        "args": [
+          "socket",
+          "channel"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0330",
+        "event": "training-failure",
+        "args": [
+          "socket",
+          "channel"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0331",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0332",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0333",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0334",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0335",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0336",
+        "event": "training-failure",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0339",
+        "event": "disabled",
+        "args": [
+          "location"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0400",
+        "event": "config-error",
+        "args": [
+          "socket"
+        ],
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0401",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0415",
+        "event": "config-error",
+        "severity": "Warning",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "UEFI0430",
+        "event": "disabled",
+        "args": [
+          "socket"
+        ],
+        "severity": "Critical",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9072",
+        "text": "(?i)non-execution path of a memory device at the location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "scrub-ue",
+        "flags": [
+          "contained"
+        ],
+        "sources": [
+          "paste",
+          "ras"
+        ],
+        "basis": "sample"
+      },
+      {
+        "id": "MEM0001",
+        "text": "(?i)multi-bit memory errors (?:are )?detected on (?:the|a) memory device at location\\(s\\) (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ue",
+        "sources": [
+          "paste"
+        ],
+        "basis": "sample"
+      },
+      {
+        "id": "SEL0004",
+        "text": "(?i)^log cleared\\.?$",
+        "event": "log-cleared",
+        "sources": [
+          "paste"
+        ],
+        "basis": "sample"
+      },
+      {
+        "id": "MEM9072",
+        "text": "(?i)error on a memory transaction at the location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "scrub-ue",
+        "flags": [
+          "contained"
+        ],
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0000",
+        "text": "(?i)persistent correctable memory errors detected on a memory device at location\\(s\\) (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ce",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0002",
+        "text": "(?i)parity memory errors detected on a memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ue",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0003",
+        "text": "(?i)stuck bit memory error detected on a memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "scrub-ce",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0004",
+        "text": "(?i)memory device at location (?P\u003clocation\u003e[A-Za-z0-9_]+) is disabled",
+        "event": "disabled",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0020",
+        "text": "(?i)memory device at location (?P\u003clocation\u003e[A-Za-z0-9_]+) is enabled",
+        "event": "cleared",
+        "clears": "disabled",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0005",
+        "text": "(?i)persistent correctable memory error limit reached for a memory device at location\\(s\\) (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ce-log-limit",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM8000",
+        "text": "(?i)correctable memory error logging disabled for a memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ce-log-limit",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM8001",
+        "text": "(?i)correctable memory error logging enabled for a memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "cleared",
+        "clears": "ce-log-limit",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0701",
+        "text": "(?i)^correctable memory errors detected for (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "ce-threshold",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0700",
+        "text": "(?i)correctable memory error rate is at normal levels for a memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$)",
+        "event": "cleared",
+        "clears": "ce-threshold",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0802",
+        "text": "(?i)memory health monitor .{0,40}degradation in the DIMM installed in (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?:\\.|$)",
+        "event": "ppr-scheduled",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0804",
+        "text": "(?i)self-heal operation successfully completed at DIMM (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?:\\.|$)",
+        "event": "ppr-done",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM0805",
+        "text": "(?i)unable to complete the self-heal operation of the memory in the DIMM installed in (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?: because|\\.|$)",
+        "event": "ppr-failed",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9060",
+        "text": "(?i)self-heal operation successfully completed on the memory module",
+        "event": "ppr-done",
+        "sources": [
+          "registry",
+          "ras"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9014",
+        "text": "(?i)correctable memory error has occurred in Dual In-line Memory Module \\(DIMM\\) device (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?:\\.|$)",
+        "event": "ce",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9015",
+        "text": "(?i)multi-bit memory errors detected on a Dual In-line Memory Module \\(DIMM\\) device (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?:\\.|$)",
+        "event": "ue",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM9016",
+        "text": "(?i)correctable memory error rate exceeded for Dual In-line Memory Module \\(DIMM\\) (?P\u003clocation\u003e[A-Za-z0-9_ ]+?)(?:\\.|$)",
+        "event": "ce-threshold",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1205",
+        "text": "(?i)memory mirror redundancy is lost(?:\\. Check memory device at location(?:\\(s\\))? (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$))?",
+        "event": "mirror-lost",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1206",
+        "text": "(?i)memory mirror redundancy is degraded(?:\\. Check memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$))?",
+        "event": "mirror-failover",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1208",
+        "text": "(?i)memory spare redundancy is lost(?:\\. Check memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$))?",
+        "event": "sparing-failed",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "MEM1209",
+        "text": "(?i)memory spare redundancy is degraded(?:\\. Check memory device at location (?P\u003clocation\u003e[A-Za-z0-9_ ,]+?)(?:\\.|$))?",
+        "event": "sparing",
+        "sources": [
+          "registry"
+        ],
+        "basis": "registry"
+      },
+      {
+        "id": "SEL0008",
+        "text": "(?i)system event log \\(SEL\\) is full",
+        "event": "log-full",
         "sources": [
           "registry"
         ],

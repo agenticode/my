@@ -75,18 +75,39 @@ func lookupLabel(aliases map[string]string, label string) (string, bool) {
 	if want == "" {
 		return "", false
 	}
+	name, ok, many := squashLookup(aliases, want)
+	if ok || many {
+		return name, ok
+	}
+	// "DIMM A7" of a BMC is the slot an SMBIOS table calls "A7", when no
+	// slot has the longer name.
+	if rest, ok := strings.CutPrefix(want, "DIMM"); ok && designatorRE.MatchString(rest) {
+		if name, ok, _ := squashLookup(aliases, rest); ok {
+			return name, true
+		}
+	}
+	return "", false
+}
+
+// designatorRE is the short name of a slot: a bank letter or two and a
+// number.
+var designatorRE = regexp.MustCompile(`^[A-Z]{1,2}[0-9]{1,2}$`)
+
+// squashLookup finds the one slot whose label is want without separators.
+// many says that several slots fit: then none is named.
+func squashLookup(aliases map[string]string, want string) (name string, ok, many bool) {
 	found := ""
-	for a, name := range aliases {
-		rest, ok := strings.CutPrefix(a, "label:")
-		if !ok || squash(rest) != want {
+	for a, n := range aliases {
+		rest, isLabel := strings.CutPrefix(a, "label:")
+		if !isLabel || squash(rest) != want {
 			continue
 		}
-		if found != "" && found != name {
-			return "", false
+		if found != "" && found != n {
+			return "", false, true
 		}
-		found = name
+		found = n
 	}
-	return found, found != ""
+	return found, found != "", false
 }
 
 var bankLocatorREs = []*regexp.Regexp{

@@ -35,6 +35,10 @@ type Entry struct {
 	// Registry is what the BMC's own registry says of the MessageId, when
 	// the dump holds that registry.
 	Registry *RegistryMessage
+	// Manufacturer is the maker of the system a log without message IDs
+	// comes from, when the reader knows it ("Dell"): the text lines of its
+	// tables are asked for the message.
+	Manufacturer string
 }
 
 // RegistryMessage is one message of a registry a BMC serves.
@@ -74,6 +78,9 @@ type Result struct {
 	// table says it is not.
 	Memory  bool
 	Skipped bool
+	// Text holds what the named groups of a text line found: location,
+	// socket, count.
+	Text map[string]string
 }
 
 // Classifier asks the tables and the wording rules what a record means.
@@ -175,7 +182,8 @@ func (c *Classifier) WithUser(files map[string][]byte) (*Classifier, error) {
 			out.Notes = append(out.Notes, fmt.Sprintf("%s: a line was left out: %v", name, e))
 		}
 		t.User = true
-		if base := out.Table(t.Name); base != nil && len(t.Applies.Prefixes) == 0 && !t.Applies.AnyRegistry && !t.Applies.IPMI {
+		if base := out.Table(t.Name); base != nil && len(t.Applies.Prefixes) == 0 && !t.Applies.AnyRegistry && !t.Applies.IPMI &&
+			len(t.Applies.Manufacturers) == 0 {
 			t.Applies = base.Applies
 		}
 		out.user = append(out.user, t)
@@ -273,6 +281,31 @@ func (c *Classifier) classify(e Entry) (r Result) {
 			}
 			if t.memoryKey(r.Key) && r.Table == nil {
 				r.Table, r.Vendor, r.Basis = t, t.Vendor, t.Basis
+			}
+		}
+	}
+	if e.MessageID == "" && e.Message != "" && e.Manufacturer != "" {
+		maker := strings.ToLower(e.Manufacturer)
+		for _, t := range c.ordered() {
+			if !t.madeBy(maker) {
+				continue
+			}
+			for _, l := range t.texts {
+				m := l.Text.FindStringSubmatch(e.Message)
+				if m == nil {
+					continue
+				}
+				r.fromLine(l, e)
+				r.Mapping, r.Key, r.Roles = model.MappingTable, l.ID, nil
+				for i, name := range l.Text.SubexpNames() {
+					if name != "" && m[i] != "" {
+						if r.Text == nil {
+							r.Text = map[string]string{}
+						}
+						r.Text[name] = m[i]
+					}
+				}
+				return r
 			}
 		}
 	}
@@ -386,4 +419,15 @@ func ShippedText(name string) ([]byte, error) {
 		return nil, fmt.Errorf("no table %q", name)
 	}
 	return shippedFS.ReadFile("tables/" + name + ".yaml")
+}
+
+// madeBy says whether a table holds for the logs of a system whose maker
+// is named maker (lower case).
+func (t *Table) madeBy(maker string) bool {
+	for _, w := range t.Applies.Manufacturers {
+		if strings.Contains(maker, w) {
+			return true
+		}
+	}
+	return false
 }

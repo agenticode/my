@@ -54,6 +54,8 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | comma separated lines under a header with a GPU property (`gpu_uuid`, `pci.bus_id`, `remapped_rows.failure`), under the saved `nvidia-smi --query-gpu=...` command line, or with a GPU UUID among the values | output of an `nvidia-smi` query in CSV form |
 | a `SOCKET n CHANNEL n DIMM n` line, or a line of the page table of the mcelog daemon | `mcelog --client` output |
 | JSON with `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` or `OsCrashDT` among its field names | FMFM log |
+| blocks of `Record:`, `Date/Time:` and `Description:` lines | `racadm getsel` output ([vendors.md](vendors.md#saved-output-of-vendor-tools)) |
+| blocks of `SeqNumber =`, `Message ID =` and `Timestamp =` lines | `racadm lclog view` or `racadm getraclog` output |
 
 A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are not read; the message says what the content looks like. `my import` lists such an input as a source of the kind `unknown` with that message and reads the other inputs; it is no source a finding missed, since nobody knows whether it held memory records. With `--strict`, or when no input is recognised, the import stops with exit code 70.
 
@@ -67,7 +69,7 @@ What a file cannot say about itself is an option of the import:
 
 | Option | `my import` | Applies to |
 | --- | --- | --- |
-| time zone of times that carry none | `--tz` | syslog files, `dmesg -T`, the text forms of a BMC event log, the timestamp of `nvidia-smi` output, times of an FMFM log written without a zone |
+| time zone of times that carry none | `--tz` | syslog files, `dmesg -T`, the text forms of a BMC event log, `racadm` output, the timestamp of `nvidia-smi` output, times of an FMFM log written without a zone |
 | capture time | `--captured-at` | a kernel log that has seconds since boot only |
 | modification time of the file as its capture time | `--mtime` | the same log, and inputs that carry no time: dmidecode output, the memory resources of a Redfish dump, an FMFM boot record without a boot time, `mcelog --client` output |
 | host | `--host` | a log that holds the records of several hosts (an FMFM log) |

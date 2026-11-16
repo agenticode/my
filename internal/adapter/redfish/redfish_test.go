@@ -204,9 +204,11 @@ func TestRegistryEntries(t *testing.T) {
 	c, rep := collect(t, "registry-log.json")
 	check(t, c, []got{
 		// MEM0701 says that the corrected errors passed the firmware's rate.
-		{"101", "CE: corrected-error limit passed", "DIMM_A1", "2026-11-05 19:02:44", "C redfish/registry"},
-		{"102", "UE: uncorrectable ECC on one of DIMM_A1, DIMM_A2", "", "2026-11-05 19:40:10", "C redfish/registry"},
-		{"104", "Informational: state ended", "DIMM_B3", "2026-11-06 14:00:00", "C redfish/registry"},
+		// The location form of the Dell table writes a module as its device
+		// locator does ("DIMM A1"); the slot pass folds the separators.
+		{"101", "CE: corrected-error limit passed", "DIMM A1", "2026-11-05 19:02:44", "C redfish/registry"},
+		{"102", "UE: uncorrectable ECC on one of DIMM A1, DIMM A2", "", "2026-11-05 19:40:10", "C redfish/registry"},
+		{"104", "Informational: state ended", "DIMM B3", "2026-11-06 14:00:00", "C redfish/registry"},
 		{"105", "Informational: Memory self-test completed on DIMM_A1.", "DIMM_A1", "2026-11-06 14:05:00", "C redfish/registry"},
 		{"103", "action disable/ok: memory device disabled", "DIMM_A1", "2026-11-05 19:41:00", "by bmc"},
 	})

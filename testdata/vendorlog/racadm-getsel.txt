@@ -1,0 +1,48 @@
+Record:      1
+Date/Time:   10/28/2026 08:02:11
+Source:      system
+Severity:    Ok
+Description: Log cleared.
+-------------------------------------------------------------------------------
+Record:      2
+Date/Time:   11/03/2026 21:04:55
+Source:      system
+Severity:    Ok
+Description: Correctable memory errors detected for DIMM_B2.
+-------------------------------------------------------------------------------
+Record:      3
+Date/Time:   11/09/2026 15:44:41
+Source:      system
+Severity:    Critical
+Description: The system memory has uncorrectable multi-bit memory errors in the non-execution path of a memory device at the location DIMM_A10. Immediately replace the DIMM.
+-------------------------------------------------------------------------------
+Record:      4
+Date/Time:   11/09/2026 15:44:42
+Source:      system
+Severity:    Ok
+Description: An OEM diagnostic event occurred.
+-------------------------------------------------------------------------------
+Record:      5
+Date/Time:   11/09/2026 15:44:42
+Source:      system
+Severity:    Critical
+Description: Multi-bit memory errors are detected on the memory device at location(s) DIMM_A10. Immediately replace the DIMM.
+-------------------------------------------------------------------------------
+Record:      6
+Date/Time:   11/09/2026 15:44:44
+Source:      system
+Severity:    Critical
+Description: The system memory has uncorrectable multi-bit memory errors in the non-execution path of a memory device at the location DIMM_A10. Immediately replace the DIMM.
+-------------------------------------------------------------------------------
+Record:      7
+Date/Time:   11/10/2026 06:20:03
+Source:      system
+Severity:    Ok
+Description: The self-heal operation successfully completed at DIMM DIMM_B2.
+-------------------------------------------------------------------------------
+Record:      8
+Date/Time:   11/11/2026 01:00:00
+Source:      system
+Severity:    Critical
+Description: The power supply is not working.
+-------------------------------------------------------------------------------

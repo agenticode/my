@@ -1,5 +1,6 @@
 dmtf@1  DMTF  registry: not checked on real hardware
- applies to: message IDs of the registry Platform, message IDs of the registry LogService, message IDs of the registry ResourceEvent
+ applies to: message IDs of the registry Platform, message IDs of the registry LogService, message
+  IDs of the registry ResourceEvent
  sources:
   platform: DMTF Redfish message registry Platform 1.5.0
     https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/Platform.1.5.0.json

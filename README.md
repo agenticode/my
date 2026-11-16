@@ -157,7 +157,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | EDAC counters | `/sys/devices/system/edac/mc` | counts per DIMM since boot |
 | mcelog daemon | `mcelog --client` | counts per DIMM |
 | SMBIOS | `/sys/firmware/dmi/tables`, or `dmidecode` output | slots, DIMM serial and part numbers |
-| BMC | `ipmitool sel` listings, Redfish dumps, or the Redfish service | memory events, modules that firmware disabled, sparing |
+| BMC | `ipmitool sel` listings, Redfish dumps, the Redfish service, or saved `racadm getsel` and `racadm lclog view` output | memory events, modules that firmware disabled, sparing, repairs |
 | GPU memory | `nvidia-smi -q` and its queries | row remapping state and ECC counters per GPU |
 | FMFM logs | JSON files | runtime, boot and crash records, ECS readings |
 | Copy of a host's files | a directory with `proc`, `sys` and `var` below it (`--root`, `my import`) | the inputs above, as files |

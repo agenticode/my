@@ -70,23 +70,6 @@ var handEntries = map[string][]handEntry{
 		{id: "memory-06", want: fwevent.Presence}, {id: "memory-07", want: fwevent.ConfigError}, {id: "memory-08", want: fwevent.Sparing},
 		{id: "memory-09", want: fwevent.Thermal}, {id: "memory-0a", want: fwevent.Thermal},
 	},
-	"dell": {
-		{id: "IDRAC.2.9.MEM0000", args: []string{"DIMM_A1, DIMM_A2"}, want: fwevent.CE, place: "DIMM_A1,DIMM_A2"},
-		{id: "IDRAC.2.9.MEM0001", args: []string{"DIMM_A1"}, want: fwevent.UE, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0002", args: []string{"DIMM_A1"}, want: fwevent.UE, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0003", args: []string{"DIMM_A1"}, want: fwevent.ScrubCE, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0004", args: []string{"DIMM_A1"}, want: fwevent.Disabled, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0005", args: []string{"DIMM_A1"}, want: fwevent.CELogLimit, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0006", args: []string{"DIMM_A1"}, want: fwevent.Presence, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0007", args: []string{"DIMM_A1"}, want: fwevent.ConfigError, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0008", args: []string{"DIMM_B3"}, want: fwevent.ConfigState, place: "DIMM_B3"},
-		{id: "IDRAC.2.9.MEM0009", args: []string{"DIMM_A1"}, want: fwevent.Thermal, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0010", args: []string{"DIMM_A1"}, want: fwevent.Thermal, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0016", args: []string{"DIMM_A1"}, want: fwevent.Cleared, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0700", args: []string{"DIMM_A1"}, want: fwevent.Cleared, clears: fwevent.CEThreshold, place: "DIMM_A1"},
-		{id: "IDRAC.2.9.MEM0701", args: []string{"DIMM_A1"}, want: fwevent.CEThreshold, place: "DIMM_A1"},
-		{id: "MEM0702", args: []string{"DIMM_A1"}, want: fwevent.CEThreshold, place: "DIMM_A1"},
-	},
 }
 
 func placeText(form string, r Result, args []string) string {
@@ -147,7 +130,8 @@ func TestEveryLineOfTheShippedTables(t *testing.T) {
 			met[r.Line] = true
 		}
 		for _, l := range tb.Lines {
-			if !met[l] {
+			// A text line is met by a sentence of the test of its table.
+			if !met[l] && l.Text == nil {
 				t.Errorf("table %s: line %s (line %d of the file) has no hand-written entry", table, l.ID, l.Line)
 			}
 			if len(l.Sources) == 0 {
@@ -259,8 +243,8 @@ func TestLookupOrder(t *testing.T) {
 	}{
 		{"user table", Entry{MessageID: "EXAMPLE.1.0.E100", Args: []string{"DIMM_A1"}}, fwevent.PPRDone, model.MappingTable, "example@1:E100", true},
 		{"user line replaces the shipped one", Entry{MessageID: "IDRAC.2.9.MEM0001", Args: []string{"DIMM_A1"}}, fwevent.UE, model.MappingTable, "dell@1:MEM0001", true},
-		{"user line the shipped table lacks", Entry{MessageID: "IDRAC.2.9.MEM0804", Args: []string{"DIMM_A1"}}, fwevent.PPRDone, model.MappingTable, "dell@1:MEM0804", true},
-		{"shipped table", Entry{MessageID: "IDRAC.2.9.MEM0004", Args: []string{"DIMM_A1"}}, fwevent.Disabled, model.MappingTable, "dell@1:MEM0004", true},
+		{"user line of a key the shipped table has too", Entry{MessageID: "IDRAC.2.9.MEM0804", Args: []string{"DIMM_A1"}}, fwevent.PPRDone, model.MappingTable, "dell@1:MEM0804", true},
+		{"shipped table", Entry{MessageID: "IDRAC.2.9.MEM0004", Args: []string{"DIMM_A1"}}, fwevent.Disabled, model.MappingTable, "dell@2:MEM0004", true},
 		{"registry text", Entry{MessageID: "Contoso.1.0.MemFault7", Message: "x", Registry: &RegistryMessage{Text: "Uncorrectable memory error on DIMM %1", NArgs: 1}}, fwevent.UE, model.MappingRegistry, "wording@1:", true},
 		{"entry text", Entry{MessageID: "Contoso.1.0.MemFault7", Message: "Post package repair of DIMM_A1 completed successfully"}, fwevent.PPRDone, model.MappingWording, "wording@1:", true},
 		{"unclassified", Entry{MessageID: "Contoso.1.0.MemFault8", Message: "DIMM_A1 reported something"}, fwevent.Unclassified, model.MappingNone, "", true},

@@ -73,8 +73,10 @@ type vendorTable struct {
 }
 
 type vendorLine struct {
-	ID       string   `json:"id"`
-	NArgs    int      `json:"nargs,omitzero"`
+	ID    string `json:"id"`
+	NArgs int    `json:"nargs,omitzero"`
+	// Text is the pattern of a line that reads a sentence without its ID.
+	Text     string   `json:"text,omitzero"`
 	Event    string   `json:"event"`
 	Flags    []string `json:"flags,omitzero"`
 	Clears   string   `json:"clears,omitzero"`
@@ -107,6 +109,9 @@ func tableOf(t *fwmap.Table, lines bool) vendorTable {
 	if t.Applies.IPMI {
 		v.Applies = append(v.Applies, "ipmi")
 	}
+	for _, m := range t.Applies.Manufacturers {
+		v.Applies = append(v.Applies, "manufacturer "+m)
+	}
 	for _, name := range t.SourceOrder {
 		s := t.Sources[name]
 		v.Sources = append(v.Sources, struct {
@@ -120,6 +125,9 @@ func tableOf(t *fwmap.Table, lines bool) vendorTable {
 		for _, l := range t.Lines {
 			vl := vendorLine{ID: l.ID, NArgs: l.NArgs, Event: string(l.Event), Clears: string(l.Clears), Args: l.Args, Severity: l.Severity,
 				Sources: l.Sources, Basis: l.BasisOf()}
+			if l.Text != nil {
+				vl.Text = l.Text.String()
+			}
 			for _, f := range l.Flags {
 				vl.Flags = append(vl.Flags, string(f))
 			}
@@ -311,12 +319,23 @@ func drawTable(w io.Writer, lang i18n.Lang, st term.Style, t vendorTable) error 
 				ap = append(ap, say(lang, "vendors.ap_any"))
 			case a == "ipmi":
 				ap = append(ap, say(lang, "vendors.ap_ipmi"))
+			case strings.HasPrefix(a, "manufacturer "):
+				maker := strings.TrimPrefix(a, "manufacturer ")
+				if maker != "" {
+					maker = strings.ToUpper(maker[:1]) + maker[1:]
+				}
+				ap = append(ap, say(lang, "vendors.ap_maker", "maker", maker))
 			default:
 				ap = append(ap, say(lang, "vendors.ap_registry", "prefix", strings.TrimPrefix(a, "registry ")))
 			}
 		}
-		if err := p(" %s", say(lang, "vendors.applies", "list", strings.Join(ap, ", "))); err != nil {
-			return err
+		for i, l := range st.Wrap(say(lang, "vendors.applies", "list", strings.Join(ap, ", ")), 2) {
+			if i == 0 {
+				l = " " + strings.TrimLeft(l, " ")
+			}
+			if err := p("%s", l); err != nil {
+				return err
+			}
 		}
 	}
 	if err := p(" %s", say(lang, "vendors.sources")); err != nil {
@@ -335,7 +354,10 @@ func drawTable(w io.Writer, lang i18n.Lang, st term.Style, t vendorTable) error 
 	byEvent := map[string][]string{}
 	for _, l := range t.Lines {
 		id := l.ID
-		if l.NArgs != 0 {
+		switch {
+		case l.Text != "":
+			id = say(lang, "vendors.sentence", "id", id)
+		case l.NArgs != 0:
 			id = fmt.Sprintf("%s(%d)", id, l.NArgs)
 		}
 		byEvent[l.Event] = append(byEvent[l.Event], id)
@@ -500,6 +522,8 @@ var vendorsWords = i18n.Catalog{
 	"vendors.ap_bare":           {EN: "message IDs without a registry", KO: "레지스트리 없는 메시지 ID"},
 	"vendors.ap_any":            {EN: "the same names under any registry", KO: "어느 레지스트리든 같은 이름"},
 	"vendors.ap_ipmi":           {EN: "states of the IPMI memory sensor", KO: "IPMI 메모리 센서 상태"},
+	"vendors.ap_maker":          {EN: "sentences without an ID in a log of a {maker} system", KO: "{maker} 시스템 로그의 ID 없는 문장"},
+	"vendors.sentence":          {EN: "{id} (sentence)", KO: "{id}(문장)"},
 	"vendors.sources":           {EN: "sources:", KO: "근거:"},
 	"vendors.note":              {EN: "note: {note}", KO: "참고: {note}"},
 	"vendors.no_registry":       {EN: "no message registry of a BMC is on record", KO: "기록된 BMC 메시지 레지스트리 없음"},

@@ -445,6 +445,11 @@ func (r *run) logs(sink adapter.Sink) error {
 					VendorSeverity: severity, Origin: model.OriginBMCLog, Log: lastSegment(logPath(res)), Location: location,
 					Args: p.Args, Text: d.text, EntryKey: model.Fingerprint(logPath(res), res.id, created), Mapping: d.res.Mapping,
 					MapRef: d.res.Ref, Basis: d.res.Basis, Resolved: o["Resolved"] == true}}
+			if dellAgent(o) == "SEL" {
+				// An iDRAC Lifecycle log entry that copies a SEL event: the
+				// same event stands in the SEL, and the ledger counts it once.
+				rec.Firmware.Origin = model.OriginSEL
+			}
 			lo, err := rec.Ledger()
 			if err != nil {
 				return adapter.Unreadable("the entry could not be read as a firmware record: %v", err)
@@ -544,4 +549,13 @@ func (r *run) logs(sink adapter.Sink) error {
 			n, logLimit[0].Format("2006-01-02 15:04 UTC"))
 	}
 	return nil
+}
+
+// dellAgent returns Oem.Dell.AgentID of an iDRAC log entry: the part of
+// the iDRAC that wrote it ("SEL" for a copy of a SEL event).
+func dellAgent(o map[string]any) string {
+	oem, _ := o["Oem"].(map[string]any)
+	dell, _ := oem["Dell"].(map[string]any)
+	s, _ := dell["AgentID"].(string)
+	return strings.TrimSpace(s)
 }

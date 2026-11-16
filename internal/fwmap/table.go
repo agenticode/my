@@ -40,7 +40,7 @@ var roles = []string{"location", "locations", "socket", "channel", "position", "
 // Key extractors and location forms a table can name.
 var (
 	extractors = []string{"message-id", "event-id", "text", "ipmi"}
-	forms      = []string{"plain", "openbmc"}
+	forms      = []string{"plain", "openbmc", "dell"}
 )
 
 // Source is a document or file the lines of a table rest on.
@@ -60,6 +60,10 @@ type Applies struct {
 	AnyRegistry bool
 	// IPMI: the table holds for the states of IPMI sensors.
 	IPMI bool
+	// Manufacturers are words of the system manufacturer a log without
+	// message IDs comes from ("dell"): its text lines are asked for such a
+	// log.
+	Manufacturers []string
 }
 
 // Line maps one message, or one state, to a common event.
@@ -70,6 +74,10 @@ type Line struct {
 	NArgs int
 	// ArgsLike, when set, holds only when the first argument matches.
 	ArgsLike *regexp.Regexp
+	// Text, when set, is a pattern over the message of a log that carries
+	// no message ID; ID then names the message it stands for. Its named
+	// groups location, socket and count give the place.
+	Text *regexp.Regexp
 	// Origin "memory": the line holds only when the entry is about a
 	// memory resource.
 	Origin string
@@ -124,6 +132,8 @@ type Table struct {
 	User bool
 
 	index map[string][]*Line
+	// texts are the lines with a text pattern, in the order of the file.
+	texts []*Line
 }
 
 // lookup returns the lines of a key, with variants by argument count and
@@ -172,7 +182,7 @@ func Parse(data []byte) (*Table, []error, error) {
 		return nil, nil, fmt.Errorf("table %s: location %q is none of %s", t.Name, t.Location, strings.Join(forms, ", "))
 	}
 	if a, ok := root.Map["applies"]; ok {
-		if err := a.Mapping("applies", "message-id-prefix", "bare-id", "any-registry", "ipmi"); err != nil {
+		if err := a.Mapping("applies", "message-id-prefix", "bare-id", "any-registry", "ipmi", "manufacturer"); err != nil {
 			return nil, nil, err
 		}
 		if p, ok := a.Map["message-id-prefix"]; ok {
@@ -186,6 +196,14 @@ func Parse(data []byte) (*Table, []error, error) {
 			t.Applies.Prefixes = append(t.Applies.Prefixes, "")
 		}
 		t.Applies.IPMI = a.Map["ipmi"] != nil && a.Map["ipmi"].Scalar == "yes"
+		if m, ok := a.Map["manufacturer"]; ok {
+			if t.Applies.Manufacturers, err = texts(m, "manufacturer"); err != nil {
+				return nil, nil, err
+			}
+			for i, w := range t.Applies.Manufacturers {
+				t.Applies.Manufacturers[i] = strings.ToLower(w)
+			}
+		}
 	}
 	if s, ok := root.Map["sources"]; ok {
 		if err := s.Mapping("sources"); err != nil {
@@ -242,6 +260,9 @@ func Parse(data []byte) (*Table, []error, error) {
 		if l.ArgsLike != nil {
 			like = l.ArgsLike.String()
 		}
+		if l.Text != nil {
+			like = "text:" + l.Text.String()
+		}
 		k := fmt.Sprintf("%s\x00%d\x00%s", l.ID, l.NArgs, like)
 		if first, dup := seen[k]; dup {
 			lineErrs = append(lineErrs, yamlite.ErrAt(l.Line, "message %s: given twice (first on line %d)", l.ID, first))
@@ -252,6 +273,12 @@ func Parse(data []byte) (*Table, []error, error) {
 	}
 	t.Lines = kept
 	for _, l := range t.Lines {
+		if l.Text != nil {
+			// A pattern stands for its message in a log without IDs; it
+			// is no line of the ID.
+			t.texts = append(t.texts, l)
+			continue
+		}
 		t.index[l.ID] = append(t.index[l.ID], l)
 	}
 	for k := range t.index {
@@ -309,7 +336,7 @@ func list(s string) []string {
 }
 
 func (t *Table) parseLine(n *yamlite.Node) (*Line, error) {
-	if err := n.Mapping("message", "id", "nargs", "args-like", "origin", "event", "flags", "clears", "args", "words", "severity",
+	if err := n.Mapping("message", "id", "nargs", "args-like", "text", "origin", "event", "flags", "clears", "args", "words", "severity",
 		"source", "basis"); err != nil {
 		return nil, err
 	}
@@ -343,6 +370,21 @@ func (t *Table) parseLine(n *yamlite.Node) (*Line, error) {
 			return nil, at("the pattern does not compile: %v", err)
 		}
 		l.ArgsLike = re
+	}
+	if p := get("text"); p != "" {
+		if len(p) > MaxPattern {
+			return nil, at("the pattern is longer than %d bytes", MaxPattern)
+		}
+		re, err := regexp.Compile(p)
+		if err != nil {
+			return nil, at("the pattern does not compile: %v", err)
+		}
+		for _, g := range re.SubexpNames()[1:] {
+			if g != "" && g != "location" && g != "socket" && g != "count" {
+				return nil, at("the pattern names the group %q; a pattern names location, socket and count only", g)
+			}
+		}
+		l.Text = re
 	}
 	if l.Origin != "" && l.Origin != "memory" {
 		return nil, at("origin %q is not memory", l.Origin)

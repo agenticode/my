@@ -1,0 +1,62 @@
+SeqNumber = 9301
+Message ID = USR0005
+Category = Audit
+AgentID = RACLOG
+Severity = Information
+Timestamp = 2026-11-02 06:25:27
+Message = Login failed from example-host: 192.0.2.10
+Message Arg 1 = example-host
+Message Arg 2 = 192.0.2.10
+FQDD = iDRAC.Embedded.1
+-------------------------------------------------------------------------------
+SeqNumber = 9302
+Message ID = MEM0802
+Category = System Health
+AgentID = SEL
+Severity = Warning
+Timestamp = 2026-11-03 04:11:27
+Message = The memory health monitor feature has detected a degradation in the DIMM installed in DIMM B1. Reboot
+system to initiate self-heal process.
+Message Arg 1 = DIMM B1
+FQDD = DIMM.Socket.B1
+-------------------------------------------------------------------------------
+SeqNumber = 9303
+Message ID = UEFI0279
+Category = System Health
+AgentID = BIOS
+Severity = Information
+Timestamp = 2026-11-03 04:19:40
+Message = The Post Package Repair (PPR) operation in the DIMM memory slot B1 is successfully completed.
+Message Arg 1 = B1
+FQDD = DIMM.Socket.B1
+-------------------------------------------------------------------------------
+SeqNumber = 9304
+Message ID = MEM0804
+Category = System Health
+AgentID = SEL
+Severity = Information
+Timestamp = 2026-11-03 04:20:02
+Message = The self-heal operation successfully completed at DIMM DIMM B1.
+Message Arg 1 = DIMM B1
+FQDD = DIMM.Socket.B1
+-------------------------------------------------------------------------------
+SeqNumber = 9305
+Message ID = MEM7114
+Category = System Health
+AgentID = DE
+Severity = Critical
+Timestamp = 2026-11-05 10:00:00
+Message = A critical diagnostic event occurred in the memory device with Serial No: 0F1E2D3C and Part No: EX-PART-1 at DIMM.Socket.A3.
+Message Arg 1 = 0F1E2D3CMessage Arg 2 = EX-PART-1Message Arg 3 = DIMM.Socket.A3Message Arg 4 = 0x1234
+FQDD = DIMM.Socket.A3
+-------------------------------------------------------------------------------
+SeqNumber = 9306
+Message ID = MEM0001
+Category = System Health
+AgentID = SEL
+Severity = Critical
+Timestamp = 2026-11-06 12:00:00
+Message = Multi-bit memory errors are detected on the memory device at location(s) DIMM A3.
+Message Arg 1 = DIMM A3
+FQDD = DIMM.Socket.A3
+-------------------------------------------------------------------------------
