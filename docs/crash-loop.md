@@ -76,6 +76,7 @@ A check is `kept`, `lost`, `none` (the platform does not offer it), `unknown` (a
 | `mce-bootlog` (x86) | boot logging is on: by default from AMD family 0x11 and Intel Core Yonah, or `mce=bootlog` | `mce=bootlog` | the kernel turns it off on older processors because some BIOS leave stale records in the banks (`amd_apply_global_quirks()`, `intel_apply_global_quirks()`) |
 | `mce-print` (x86) | `mce=print_all`, an AMD processor, a kernel without `/dev/mcelog`, or a running mcelog daemon | `mce=print_all` | every machine check record, corrected ones included, is printed at emergency level (`mce_default_notifier()`, `__print_mce()`) |
 | `reset-kind` (x86) | information | `reboot=panic_warm` as a candidate | whether a board keeps the banks over a warm reset is not documented by the kernel; the first stop after `my harvest` is installed shows it |
+| `reset-kind` (another architecture with a firmware error source, `panic=0`) | information | none | a fatal firmware error leaves the host down: `__ghes_panic()` panics with the timeout as it is (`drivers/acpi/apei/ghes.c`); seen in the lab |
 | `bert` | the firmware has a BERT table | none | the region stays readable as root also with `bert_disable`, which only stops the printing |
 | `erst-mce` (x86) | information: with an ERST table `mce_panic()` keeps a copy of the record there | none | only a reader of `/dev/mcelog` takes it out, and reading clears it |
 | `console` | a serial console on the command line or in `/proc/consoles`, or netconsole | named, no command: the serial log of the BMC, a console server, netconsole | netconsole does not capture the earliest panics of a boot (`netconsole.rst`) |
@@ -154,6 +155,8 @@ The lab of [validation-lab.md](validation-lab.md) runs crash loops in guests tha
 - QEMU keeps the contents of the machine check banks over the reset of the guest, and the next boot prints the record left in the bank (`TSC 0`, the time of the poll as `TIME`). With `mce=print_all` the line is in the kernel log of every such boot. `testdata/real/6.19.10-mce-loop` and `6.19.10-mce-loop-scatter` hold three such boots each.
 - With an ACPI error record store as the pstore backend, each panic left the end of the kernel log in three parts and the record of `mce_panic()`; systemd-pstore 259 archived both at the next boot.
 - `my harvest` ran at every boot of a loop, kept what each boot left in `/var/lib/my/ledger.db`, and `my boots` of that ledger shows the stops (`testdata/real/*-loop*/var/lib/my/ledger.db`).
+- With a crash kernel loaded, the panic went to kdump and not to pstore, as `my preflight` warns (`pstore-vs-kdump`); `vmcore-dmesg.txt` held the record, and the next boot still printed it from the bank (`testdata/real/6.19.10-mce-loop-kdump`).
+- On aarch64 with a firmware error source, a fatal record panicked the kernel and the guest stayed down: `__ghes_panic()` leaves the panic timeout at 0. Such a host needs `panic=N`, a watchdog or the BMC to come back.
 
 What the lab cannot show, and what MemorY has therefore not been checked against:
 
