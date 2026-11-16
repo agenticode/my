@@ -489,10 +489,44 @@ func efiTime(id uint64) (ts uint64, part, count int) {
 
 func efiBackend(b string) bool { return b == "efi_pstore" || b == "efi" }
 
+// efiDumpGap is the most seconds between two parts of one EFI dump.
+const efiDumpGap = 60
+
+// efiRoot is the directory the EFI parts of one dump share: the archive of
+// systemd-pstore for a part filed under <archive>/<seconds>/<count>/, and
+// the directory of the file otherwise.
+func efiRoot(path string) string {
+	dir := filepath.Dir(path)
+	count, seconds := filepath.Base(dir), filepath.Base(filepath.Dir(dir))
+	if allDigits(count) && allDigits(seconds) {
+		return filepath.Dir(filepath.Dir(dir))
+	}
+	return dir
+}
+
+func allDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
+
 // group puts the dmesg parts into dumps.
 //
-//   - EFI variables: the id holds the time of the dump, the part and the
-//     count (efiTime); the parts of a dump share time and count.
+//   - EFI variables: the id holds a time, the part and the count
+//     (efiTime). The time is that of the part: pstore_dump calls
+//     pstore_record_init for every part (fs/pstore/platform.c), and a slow
+//     variable store spreads one dump over seconds. systemd-pstore then
+//     files the parts under one directory per second
+//     (<archive>/<seconds>/<count>/). A dump is a run of parts from Part 1
+//     up, in the order of their times, within one archive and count; the
+//     lab guest of testdata/real/6.19.10-ghes-loop-spread wrote 16 parts
+//     over three seconds.
 //   - ERST: every record of a boot gets the next id (cper_next_record_id
 //     in drivers/firmware/efi/cper.c: seeded with the time of its first
 //     use, then counted up), and pstore_dump writes Part 1 first, so the
@@ -517,19 +551,58 @@ func (a *Adapter) group(parts []*part, f *found) []*dump {
 		}
 		groups[k] = append(groups[k], p)
 	}
-	var erst []*part
+	var erst, efi []*part
 	for _, p := range parts {
 		dir := filepath.Dir(p.path)
 		switch {
 		case efiBackend(p.backend) && p.hasID:
-			ts, _, count := efiTime(p.id)
-			add(key{dir: dir, backend: p.backend, a: ts, b: uint64(count)}, p)
+			efi = append(efi, p)
 		case p.backend == "erst" && p.hasID:
 			erst = append(erst, p)
 		default:
 			add(key{dir: dir, backend: p.backend, a: p.id, b: uint64(len(order))}, p)
 		}
 	}
+	// EFI: runs from Part 1 up, in the order of the times of the parts.
+	partNo := func(p *part) int {
+		if p.header {
+			return p.no
+		}
+		_, n, _ := efiTime(p.id)
+		return n
+	}
+	sort.SliceStable(efi, func(i, j int) bool {
+		ri, rj := efiRoot(efi[i].path), efiRoot(efi[j].path)
+		if ri != rj {
+			return ri < rj
+		}
+		ti, ni, ci := efiTime(efi[i].id)
+		tj, nj, cj := efiTime(efi[j].id)
+		if ci != cj {
+			return ci < cj
+		}
+		if ti != tj {
+			return ti < tj
+		}
+		return ni < nj
+	})
+	var efiStart, efiPrev *part
+	for _, p := range efi {
+		ts, _, count := efiTime(p.id)
+		if efiPrev == nil {
+			efiStart = p
+		} else {
+			pts, _, pcount := efiTime(efiPrev.id)
+			if efiRoot(p.path) != efiRoot(efiPrev.path) || count != pcount || partNo(p) <= partNo(efiPrev) || ts > pts+efiDumpGap ||
+				(p.header && efiPrev.header && (p.count != efiPrev.count || p.reason != efiPrev.reason)) {
+				efiStart = p
+			}
+		}
+		_, _, sc := efiTime(efiStart.id)
+		add(key{dir: efiRoot(p.path), backend: p.backend, a: efiStart.id, b: uint64(sc)}, p)
+		efiPrev = p
+	}
+
 	// ERST: runs of ids that follow each other, cut where the header
 	// starts another dump.
 	sort.Slice(erst, func(i, j int) bool {
