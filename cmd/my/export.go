@@ -13,7 +13,7 @@ import (
 )
 
 // exportFormats are the forms "my export" writes.
-var exportFormats = []string{"fmfm"}
+var exportFormats = []string{"fmfm", "labels"}
 
 // runExport is "my export fmfm": the findings of a host as an analysis
 // log in the form of the FMFM framework. The log goes to standard output,
@@ -25,6 +25,11 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	records := o.fs.Bool("records", false, "")
 	all := o.fs.Bool("all", false, "")
 	force := o.fs.Bool("force", false, "")
+	var lf labelFlags
+	o.fs.StringVar(&lf.names, "names", "", "")
+	o.fs.StringVar(&lf.vendor, "vendor", "", "")
+	o.fs.StringVar(&lf.model, "model", "", "")
+	o.fs.StringVar(&lf.product, "product", "", "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -35,10 +40,14 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	switch {
 	case len(pos) == 0:
 		return o.usageError(env, lang, "%s", say(lang, "err.export_format"))
-	case pos[0] != "fmfm":
+	case pos[0] != "fmfm" && pos[0] != "labels":
 		return o.usageError(env, lang, "%s", say(lang, "err.export_unknown", "format", pos[0]))
 	case len(pos) > 1:
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
+	}
+	if pos[0] == "labels" {
+		// The DIMM label file of rasdaemon, written from the slot names.
+		return exportLabels(ctx, env, o, lang, src, lf, *out, *force)
 	}
 	toFile := *out != "" && *out != "-"
 	if toFile {
