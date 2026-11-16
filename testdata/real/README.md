@@ -16,6 +16,8 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `6.19.10-ghes` | aarch64 guest with a firmware error source | 24 corrected and 2 uncorrected errors on one DIMM, as firmware error records with row and column |
 | `6.19.10-ghes-clock-step` | the same guest in its next boot, clock set back after rasdaemon started | 10 corrected and 1 uncorrected error; rasdaemon's times are 10 seconds ahead and no record holds the kernel's time |
 | `6.19.10-ghes-multi` | another aarch64 guest with six DIMMs, booted three times a day apart | a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected and 1 uncorrected error; two DIMMs without errors |
+| `6.19.10-mce-loop` | an x86 guest with a disk of its own, in a crash loop | a fatal machine check at one address in three boots in a row; each boot panics, the next reads the record from the bank |
+| `6.19.10-mce-loop-scatter` | the same guest | a fatal machine check at another address and channel in each of three boots |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 
@@ -41,6 +43,9 @@ my open testdata/real/7.3.0-mce/my/case.mycase
 | `my/` | what `my` printed on the host as root: `scan.json`, `scan.txt`, `timeline.txt`, and the bundle `case.mycase` written with `--anonymize` |
 | `extra/` | what the injectors printed, what the kernel counts itself (`/proc/meminfo`, the table of the corrected error collector) and the output of `ras-mc-ctl` |
 | `formats/` | in `7.3.0-hwpoison` and `6.19.10-ghes`: the kernel log of the boot in seven more forms |
-| `console.log` | in `7.3.0-mce-fatal`: the kernel's lines on the serial console |
+| `console.log` | in `7.3.0-mce-fatal` and the loops: the kernel's lines on the serial console |
+| `var/lib/systemd/pstore/` | in the loops: the dumps `systemd-pstore` archived, one per panic |
+| `var/lib/my/ledger.db` | in the loops: the kept ledger of `my harvest` |
+| `boots.jsonl` | in the loops: per boot of the plan its boot ID and what was put into the banks |
 
 What named the lab was replaced with `tools/lab/sanitize.py`: host names, machine IDs, hardware and network addresses, UUIDs of file systems. Boot IDs are as recorded.
