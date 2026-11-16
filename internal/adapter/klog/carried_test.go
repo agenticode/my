@@ -185,6 +185,33 @@ func TestBERTLines(t *testing.T) {
 	}
 }
 
+// TestBERTBlockIsBounded: a log that goes on with "[Hardware Error]" lines
+// after the head of the boot error region far beyond what the kernel
+// prints ends the block at maxBERTLines; no event keeps more lines.
+func TestBERTBlockIsBounded(t *testing.T) {
+	var b strings.Builder
+	b.WriteString("[    0.000000] Linux version 7.3.0\n[    7.100000] BERT: Error records from previous boot:\n")
+	for i := 0; i < 20000; i++ {
+		fmt.Fprintf(&b, "[    7.%06d] [Hardware Error]: event severity: corrected\n", i%1000000)
+		fmt.Fprintf(&b, "[    7.%06d] [Hardware Error]:  Error 0, type: corrected\n", i%1000000)
+		fmt.Fprintf(&b, "[    7.%06d] [Hardware Error]:   section_type: memory error\n", i%1000000)
+		fmt.Fprintf(&b, "[    7.%06d] [Hardware Error]:   physical_address: 0x0000000077000040\n", i%1000000)
+	}
+	c, _ := collectText(t, b.String()+later(60), Options{})
+	carried := 0
+	for _, e := range c.Events {
+		if e.Source == "klog/bert" {
+			carried++
+			if n := strings.Count(e.Raw, "\n") + 1; n > maxBERTLines {
+				t.Fatalf("an event keeps %d lines", n)
+			}
+		}
+	}
+	if carried == 0 || carried > maxBERTLines {
+		t.Errorf("%d events of the region", carried)
+	}
+}
+
 // TestTwoBootsEqualStamp: two boots that print the same record left in a
 // bank at the same stamp are two records: the boots read the bank at
 // different times. Records that are not carried keep their fingerprints.
