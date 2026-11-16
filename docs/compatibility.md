@@ -212,7 +212,8 @@ Every kernel log source notes when its first and its last line were written ("it
 | `EDAC MC0: 1 CE ...` | error event with the EDAC position, label, page, offset, syndrome and the driver detail |
 | `{1}[Hardware Error]: ...` blocks of GHES | error event per memory error section, with the fields the firmware filled |
 | `mce: [Hardware Error]: CPU 3: Machine Check: ...` with its `ADDR`, `MISC` and `TIME` lines, and the decode `mce_amd` prints | error event when the machine check reports a memory error |
-| `Memory failure: 0x...: recovery action for ...`, soft offline messages | action `page-offline`, method `hard` or `soft`, with the result |
+| `Memory failure: 0x...: recovery action for ...`, soft offline messages (`Soft offline: 0x...: ...` up to 5.x; `Memory failure: 0x...: invalidated`, `... page migration failed ...`, `... isolation failed ...` and `... thp split failed` from 6.x) | action `page-offline`, method `hard` or `soft`, with the result |
+| `mce: Uncorrected hardware memory error in user-access at <address>`, `mce: Kernel accessed poison in user space at <address>`, `Memory failure: 0x...: Sending SIGBUS to <program>:<pid> ...` | added to the detail of the `Memory failure` record of the same page: a read in user space or a copy by the kernel consumed the error, and which programs got the signal. Without such a record within 200 lines, a note |
 | `NVRM: Xid ...` | see "NVIDIA GPU memory" |
 | `Linux version ...`, `DMI: ...`, the command line | a boot, with kernel, board and BIOS |
 | `mce: [Hardware Error]: Machine check: <why>` and `Kernel panic - not syncing: Fatal machine check`, with the other reasons `mce_panic()` gives in `arch/x86/kernel/cpu/mce/core.c` | a record of type `hardware stop` (source `klog/stop`): the boot ended there, and the machine check record printed just before it in the same boot stopped the host |
@@ -237,6 +238,21 @@ Two kinds of record in a kernel log belong to the boot before the one that print
 The `TIME` field of a carried machine check record is the time the boot read the bank, not the time of the error. Its fingerprint takes that field in: two boots that print the same record left in a bank at the same stamp are two records. Records that are not carried keep the fingerprint they always had. The lines of the boot error region are a second report of the region when the region was read too: the region is counted.
 
 The lab guest shows the first rule on real kernel output (`testdata/klog/carried-lab.dmesg`: a fatal machine check, a panic, and the next boot printing the record from bank 7 as `CPU 0: Machine Check: 0 Bank 7: be00000000010090`, `TSC 0`). The second rule and the lines of the boot error region rest on the kernel source; QEMU clears `MCG_STATUS` at reset and builds no BERT table. On AMD processors with SMCA a poll logs any valid record (`smca_should_log_poll_error()`), so a polled uncorrected record with PCC could in principle come from the running boot; the decode block `mce_amd` prints does not say whether a record was polled and is never taken as carried.
+
+### Lines of other programs
+
+A syslog file and a journal export hold the lines of other programs beside the kernel's. These are read:
+
+| Program | Lines | Ledger |
+| --- | --- | --- |
+| mcelog | `Offlining page <address>`, `Offlining page <address> failed: <error>`, `Soft offlining of page <address> failed, trying hard offlining` (`page.c`) | action `page-offline`, source `klog/mcelog`, without a method: the line does not say soft or hard |
+| mcelog | `Corrected memory errors on page <address> exceed threshold <n> in <time>` (`page.c`, `memdb.c`) | the reason in the detail of the page offline of that page |
+| sel-logger of OpenBMC | `Failed adding this event: <error>` (`src/sel_logger.cpp`) | a note: the event log of the BMC lacks these records |
+| QEMU, through libvirt or its monitor | `Can't migrate this vm with hardware poisoned memory, please reboot the vm and try again` (`migration/migration.c`) | a note: an uncorrected error reached the memory of a guest |
+
+The kernel prints nothing when a soft offline works, so the line of mcelog is then the only record of it. When the kernel's own record of the same page follows within 200 lines (a failed soft offline, a hard offline), that record is kept, with "asked for by mcelog" and the threshold in its detail. A threshold line with no page offline record of its page is counted in a note: with `memory-ce-action = account` mcelog counts and takes nothing offline. None of these lines counts as an error.
+
+A live scan reads the journal entries of the kernel and of mcelog (`_TRANSPORT=kernel + SYSLOG_IDENTIFIER=mcelog`). The lines of sel-logger and QEMU are read from files given to `my import`: the journal of a BMC, the journal or syslog file of a hypervisor host.
 
 ### Host name
 
@@ -264,6 +280,8 @@ With none of them the records stay relative to their boot. They are then dated b
 - Records that were overwritten in the ring buffer or dropped by the rate limit are missing. The EDAC counters show how many errors are known as a count only.
 - A log file that starts in the middle of a boot has no boot banner for that boot.
 - Machine check decoding covers the memory errors of Intel and AMD processors. Other machine checks, and firmware error sections that are not about memory, are counted in the report and left out.
+- `Failed to add SEL entry` and `Failed to add SEL record` are not read: no public source of OpenBMC prints them. phosphor-sel-logger, in its history up to November 2026, prints `Failed adding this event`.
+- The log file of mcelog (`/var/log/mcelog`) has lines without dates and is not read; its lines in syslog or the journal are.
 - Panics of arm64 for an error that firmware did not handle first (`Asynchronous SError Interrupt`, a synchronous external abort) are read as panics for another reason: no stop is recorded.
 
 ## Crash logs (pstore, kdump)

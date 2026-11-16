@@ -213,6 +213,16 @@ var (
 	// Soft offline: 0x1f8bd1: page migration failed ...       (6.x)
 	// soft_offline: 0x1f8bd1: invalidated                      (clean page cache dropped)
 	softRE = regexp.MustCompile(`[Ss]oft[ _]offline: (0x[0-9a-fA-F]+):? ?(.*)$`)
+	// Since Linux 6.x the soft offline code prints with the prefix of
+	// mm/memory-failure.c (soft_offline_in_use_page in 6.12):
+	//
+	//	Memory failure: 0x1f8bd1: invalidated
+	//	Memory failure: 0x1f8bd1: page migration failed 1, type 0x17ffffc0000000(node=0|zone=2)
+	//	Memory failure: 0x1f8bd1: hugepage isolation failed, page count 2, type ...
+	//	Memory failure: 0x1f8bd1: thp split failed
+	//
+	// The kernel prints nothing when the page was migrated.
+	mfSoftRE = regexp.MustCompile(`Memory failure: (0x[0-9a-fA-F]+): (invalidated|thp split failed|(?:page|hugepage) (?:migration|isolation) failed.*?)\s*$`)
 )
 
 // A hard offline that a program asked for, not one that follows an error
@@ -259,6 +269,13 @@ func parseOffline(msg string) (o offline, ok bool) {
 			o.result = model.ResultFailed
 		default:
 			o.result = model.ResultUnknown
+		}
+		return o, true
+	}
+	if m := mfSoftRE.FindStringSubmatch(msg); m != nil && pfn(m[1]) {
+		o.method, o.detail, o.result = "soft", m[2], model.ResultFailed
+		if m[2] == "invalidated" {
+			o.result = model.ResultOK
 		}
 		return o, true
 	}
@@ -321,6 +338,12 @@ func candidate(raw string) bool {
 		strings.Contains(raw, "NVRM: ") ||
 		strings.Contains(raw, "BERT: ") ||
 		strings.Contains(raw, "not syncing: ") ||
+		strings.Contains(raw, "user-access at ") ||
+		strings.Contains(raw, "poison in user space at ") ||
+		strings.Contains(raw, "Corrected memory errors on page ") ||
+		strings.Contains(raw, "Offlining page ") ||
+		strings.Contains(raw, selLostText) ||
+		strings.Contains(raw, qemuPoisonText) ||
 		strings.Contains(raw, "GHES: Fatal hardware error") ||
 		// A journal message that is not valid UTF-8 is exported as an
 		// array of byte values and has to be decoded to be looked at.
