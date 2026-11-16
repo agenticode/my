@@ -1,0 +1,66 @@
+Panic#1 Part4
+<5>[  433.278611] audit: type=1130 audit(1794804603.338:17): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  439.749943] audit: type=1130 audit(1794804609.809:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  444.692448] zram0: detected capacity change from 0 to 16777216
+<5>[  447.851962] audit: type=1130 audit(1794804617.911:19): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  450.677645] Adding 8388604k swap on /dev/zram0.  Priority:100 extents:1 across:8388604k SSDsc
+<5>[  452.315045] audit: type=1334 audit(1794804622.373:20): prog-id=54 op=LOAD
+<5>[  452.345269] audit: type=1334 audit(1794804622.398:21): prog-id=55 op=LOAD
+<5>[  452.392195] audit: type=1334 audit(1794804622.450:22): prog-id=56 op=LOAD
+<5>[  458.883740] audit: type=1130 audit(1794804628.943:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  508.888899] audit: type=1130 audit(1794804678.948:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Panic#1 Part3
+<46>[  575.896806] systemd-journald[786]: Received client request to flush runtime journal.
+<4>[  576.174605] FAT-fs (vda1): Volume was not properly unmounted. Some data may be corrupt. Please run fsck.
+<5>[  580.200606] audit: type=1130 audit(1794804750.259:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-random-seed comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  588.566903] audit: type=1130 audit(1794804758.622:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdb-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  589.583362] audit: type=1130 audit(1794804759.643:27): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journal-flush comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  590.659130] audit: type=1130 audit(1794804760.711:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-binfmt comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  618.981526] audit: type=1130 audit(1794804789.041:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Panic#1 Part2
+<5>[  623.042500] audit: type=1305 audit(1794804793.099:30): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+<5>[  623.050457] audit: type=1300 audit(1794804793.099:30): arch=c00000b7 syscall=206 success=yes exit=60 a0=3 a1=ffffcf5c3e90 a2=3c a3=0 items=0 ppid=917 pid=918 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="auditd" exe="/usr/bin/auditd" subj=system_u:system_r:auditd_t:s0 key=(null)
+<5>[  623.051669] audit: type=1327 audit(1794804793.099:30): proctitle="/usr/bin/auditd"
+<4>[  642.874967] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  642.875033] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<6>[  711.957060] virtio_net virtio0 enp0s1: renamed from eth0
+<0>[  818.779648] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+<0>[  818.780164] {1}[Hardware Error]: event severity: fatal
+<0>[  818.780818] {1}[Hardware Error]:  precise tstamp: 2026-11-16 04:56:28
+<0>[  818.782957] {1}[Hardware Error]:  Error 0, type: fatal
+<0>[  818.783230] {1}[Hardware Error]:  fru_text: CPU0_A1
+<0>[  818.784882] {1}[Hardware Error]:   section_type: memory error
+<0>[  818.785949] {1}[Hardware Error]:   physical_address: 0x00000000a8bcd1c0
+<0>[  818.789199] {1}[Hardware Error]:   node:0 card:0 module:0 rank:0 bank_group:1 bank_address:2 device:4 row:6703 column:568 
+<0>[  818.789555] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+Panic#1 Part1
+<0>[  818.791995] {1}[Hardware Error]:   DIMM location: P0_Node0_Channel0_Dimm0 CPU0_A1 
+<0>[  818.801888] GHES: Fatal hardware error but panic disabled
+<0>[  818.805695] Kernel panic - not syncing: GHES: Fatal hardware error
+<4>[  818.873271] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Tainted: G   M                6.19.10-300.fc44.aarch64 #1 PREEMPT(voluntary) 
+<4>[  818.889850] Tainted: [M]=MACHINE_CHECK
+<4>[  818.893476] Hardware name: QEMU lab-arm-loop, BIOS edk2-20260812-10.fc44 08/12/2026
+<4>[  818.907498] Workqueue: kacpi_notify acpi_os_execute_deferred
+<4>[  818.930923] Call trace:
+<4>[  818.935106]  show_stack+0x20/0x38 (C)
+<4>[  818.941990]  dump_stack_lvl+0x7c/0xa0
+<4>[  818.947032]  dump_stack+0x18/0x2c
+<4>[  818.949858]  vpanic+0x14c/0x360
+<4>[  818.952644]  panic+0x68/0x70
+<4>[  818.957151]  __ghes_panic+0x94/0xa0
+<4>[  818.960226]  ghes_proc+0x150/0x220
+<4>[  818.964078]  ghes_notify_hed+0x5c/0xb0
+<4>[  818.966084]  notifier_call_chain+0x78/0x140
+<4>[  818.972555]  blocking_notifier_call_chain+0x40/0x80
+<4>[  818.976652]  acpi_hed_notify+0x28/0x40
+<4>[  818.977917]  acpi_ev_notify_dispatch+0x54/0xa8
+<4>[  818.982141]  acpi_os_execute_deferred+0x24/0x48
+<4>[  818.986886]  process_one_work+0x17c/0x3f0
+<4>[  818.992375]  worker_thread+0x194/0x300
+<4>[  818.996346]  kthread+0x11c/0x140
+<4>[  818.998480]  ret_from_fork+0x10/0x20
+<2>[  819.003854] SMP: stopping secondary CPUs
+<0>[  819.008807] Kernel Offset: 0x55505a340000 from 0xffff800080000000
+<0>[  819.009496] PHYS_OFFSET: 0x40000000
+<0>[  819.009699] CPU features: 0x400000,000b8001,4008c501,0401720b
+<0>[  819.010354] Memory Limit: none

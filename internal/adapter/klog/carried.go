@@ -74,9 +74,11 @@ const goesOnAfter = 10 * time.Second
 
 // heldMCE is a record of rule 2 that waits for the end of its boot.
 type heldMCE struct {
-	ev   *model.Event
-	line line
-	unix int64
+	ev *model.Event
+	// line carries the record's TIME as its time, printed the time of
+	// the line itself: a record that turns out carried goes with that.
+	line, printed line
+	unix          int64
 }
 
 // carryFingerprint is the extra of the fingerprint of a carried machine
@@ -88,8 +90,8 @@ type heldMCE struct {
 func carryFingerprint(unix int64) string { return "carried " + strconv.FormatInt(unix, 10) }
 
 // holdRule2 keeps a record of rule 2 until the end of its boot.
-func (p *parser) holdRule2(e *model.Event, l *line, unix int64) error {
-	p.seg.held = append(p.seg.held, heldMCE{ev: e, line: *l, unix: unix})
+func (p *parser) holdRule2(e *model.Event, l, printed *line, unix int64) error {
+	p.seg.held = append(p.seg.held, heldMCE{ev: e, line: *l, printed: *printed, unix: unix})
 	p.noteHeld(e, l)
 	return nil
 }
@@ -104,6 +106,7 @@ func (p *parser) closeCarried(seg *segment) error {
 		if l.hasMono && seg.hasMono && seg.lastMono-l.mono >= goesOnAfter {
 			h.ev.Carried = true
 			h.ev.Fingerprint = p.fingerprint("mce", &l, carryFingerprint(h.unix))
+			l = h.printed
 		}
 		if err := p.emit(h.ev, nil, &l); err != nil {
 			return err

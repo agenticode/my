@@ -280,7 +280,8 @@ MemorY에는 텔레메트리가 없고, 프로젝트가 운영하는 서버에 �
 | 호스트가 기록한 리페어와 page offline | 사용자 계정, 자격 증명, 키 |
 | DIMM 신원: 제조사, 부품번호, 시리얼, 용량 | 네트워크 설정 |
 | 보드의 슬롯과, 어느 DIMM이 언제 어디에 있었는지 | 메모리 오류, page offline, machine check, 부팅 배너와 무관한 커널 로그 줄 |
-| 부팅: 시각, 커널 릴리스, BIOS 버전, 커널 명령줄 | |
+| 부팅: 시각, 커널 릴리스, BIOS 버전, 커널 명령줄, 그리고 기록이 있으면 부팅이 끝난 방식 | |
+| `my preflight`가 본, 이 호스트에서 reset 때 잃는 것과 읽은 파일 | |
 | 호스트 이름, 아키텍처, 시스템 제품명 | |
 | DIMM별 오류 카운터 값, GPU 메모리 기록, ECS 값, BMC가 보고한 내용 | |
 | 찾아본 소스 전부와 읽은 경로, 소스별 결과 | |
@@ -310,6 +311,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 합성 호스트와 픽스처로 시험했습니다. 고장 모드, 규칙, 입력마다 시험이 있습니다.
 - 실제 호스트 5대에서 일반 사용자와 root로 실행했습니다. x86_64와 aarch64이고 5대 모두 가상 머신입니다. 결과는 [docs/validation.md](docs/validation.md)에 있습니다.
 - 랩 호스트에 page offline, machine check, 펌웨어 오류 기록, CXL 이벤트 기록을 주입해 캡처하고 주입 계획과 대조했습니다. 결과는 [docs/validation-lab.md](docs/validation-lab.md)에 있습니다.
+- 크래시 루프, `my harvest`, `my boots`는 에뮬레이션 게스트에서만 실행했고 실제 서버에서는 아직입니다. 실제 보드가 reset 뒤에도 machine check 기록을 뱅크에 남기는지는 확인하지 못했습니다([docs/crash-loop.md](docs/crash-loop.md#what-the-lab-shows-and-what-it-does-not)).
 - 소견을 공개 플릿 데이터셋의 장애 티켓과 대조했습니다. 결과는 [docs/evaluation.md](docs/evaluation.md)에 있습니다.
 - 실제 메모리 컨트롤러의 EDAC 드라이버가 올라간 호스트에서는 아직 검증하지 못했습니다. 그런 호스트의 기록 디코딩은 커널과 rasdaemon 소스를 따라 만든 픽스처로만 시험했습니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.

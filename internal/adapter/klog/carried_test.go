@@ -206,3 +206,23 @@ func TestTwoBootsEqualStamp(t *testing.T) {
 		t.Errorf("fingerprint of the exception changed: %+v", c.Events)
 	}
 }
+
+// TestCarriedKeepsTheTimeOfItsLine: the TIME of a record the boot found in
+// a bank says when the bank was read. A clock set after the read can put
+// that before the start of the boot (the lab guest of
+// testdata/real/6.19.10-mce-loop-kdump read a bank a second "before" its
+// boot began). The record goes with the time of its line, which lies in
+// the boot that printed it.
+func TestCarriedKeepsTheTimeOfItsLine(t *testing.T) {
+	boot := time.Unix(1794804996, 0).UTC()
+	text := "[    0.000000] Linux version 6.19.10-300.fc44.x86_64 (mockbuild@example) #1 SMP\n" +
+		mceText(4.296672, false, 0xbe00000000010090, 0, 1794804995) + later(30)
+	c, _ := collectText(t, text, Options{BootTime: boot})
+	if len(c.Events) != 1 {
+		t.Fatalf("%d events", len(c.Events))
+	}
+	e := c.Events[0]
+	if want := boot.Add(4296672 * time.Microsecond); !e.Carried || !e.ErrorDT.Equal(want) || e.ErrorDT.Before(boot) {
+		t.Errorf("carried record at %s, want %s (the boot started %s)", e.ErrorDT, want, boot)
+	}
+}

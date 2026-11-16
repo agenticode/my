@@ -947,6 +947,9 @@ func TestEveryCaptureIsListed(t *testing.T) {
 	for _, c := range consoles {
 		known[c.dir] = true
 	}
+	for _, l := range loops {
+		known[l.dir] = true
+	}
 	var missing []string
 	for _, e := range entries {
 		if e.IsDir() && !known[e.Name()] {

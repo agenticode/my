@@ -1,0 +1,31 @@
+Panic#1 Part1
+<0>[  762.061237] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+<0>[  762.065446] {1}[Hardware Error]:   DIMM location: P0_Node0_Channel2_Dimm0 CPU0_C1 
+<0>[  762.073516] Kernel panic - not syncing: GHES: Fatal hardware error
+<4>[  762.163341] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Tainted: G   M                6.19.10-300.fc44.aarch64 #1 PREEMPT(voluntary) 
+<4>[  762.169226] Tainted: [M]=MACHINE_CHECK
+<4>[  762.172881] Hardware name: QEMU lab-arm-loop, BIOS edk2-20260812-10.fc44 08/12/2026
+<4>[  762.180678] Workqueue: kacpi_notify acpi_os_execute_deferred
+<4>[  762.206765] Call trace:
+<4>[  762.212181]  show_stack+0x20/0x38 (C)
+<4>[  762.215565]  dump_stack_lvl+0x7c/0xa0
+<4>[  762.220572]  dump_stack+0x18/0x2c
+<4>[  762.222361]  vpanic+0x14c/0x360
+<4>[  762.222762]  panic+0x68/0x70
+<4>[  762.224097]  __ghes_panic+0x94/0xa0
+<4>[  762.226597]  ghes_proc+0x150/0x220
+<4>[  762.232456]  ghes_notify_hed+0x5c/0xb0
+<4>[  762.233230]  notifier_call_chain+0x78/0x140
+<4>[  762.236425]  blocking_notifier_call_chain+0x40/0x80
+<4>[  762.238197]  acpi_hed_notify+0x28/0x40
+<4>[  762.240467]  acpi_ev_notify_dispatch+0x54/0xa8
+<4>[  762.243035]  acpi_os_execute_deferred+0x24/0x48
+<4>[  762.244177]  process_one_work+0x17c/0x3f0
+<4>[  762.245505]  worker_thread+0x194/0x300
+<4>[  762.249560]  kthread+0x11c/0x140
+<4>[  762.251662]  ret_from_fork+0x10/0x20
+<2>[  762.257829] SMP: stopping secondary CPUs
+<0>[  762.264647] Kernel Offset: 0x222db8060000 from 0xffff800080000000
+<0>[  762.265267] PHYS_OFFSET: 0x40000000
+<0>[  762.265455] CPU features: 0x400000,000b8001,4008c501,0401720b
+<0>[  762.265929] Memory Limit: none

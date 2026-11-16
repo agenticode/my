@@ -1,0 +1,67 @@
+Panic#1 Part9
+<30>[  348.912521] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+<30>[  349.739004] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+<30>[  350.268209] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+<30>[  350.475899] systemd[1]: fips-crypto-policy-overlay.service - Bind-mount FIPS crypto-policy in FIPS mode skipped, unmet condition check ConditionKernelCommandLine=fips=1
+<30>[  351.387728] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+<30>[  351.980446] systemd[1]: Starting lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+<30>[  352.076842] systemd[1]: modprobe@configfs.service - Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+<30>[  352.108532] systemd[1]: modprobe@drm.service - Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+<30>[  352.156749] systemd[1]: modprobe@efi_pstore.service - Load Kernel Module efi_pstore skipped, unmet condition check ConditionKernelModuleLoaded=!efi_pstore
+<30>[  352.187951] systemd[1]: modprobe@fuse.service - Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+<30>[  353.386169] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+<30>[  353.451583] systemd[1]: systemd-boot-clear-sysfail.service - Clear SysFail Entry If The Boot Is Successful skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/LoaderEntrySysFail-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f
+Panic#1 Part8
+<30>[  353.470403] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+<30>[  354.554391] systemd[1]: Starting systemd-journald.service - Journal Service...
+<30>[  355.356568] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+<30>[  356.139511] systemd[1]: Starting systemd-network-generator.service - Generate Network Units from Kernel Command Line...
+<30>[  356.186614] systemd[1]: systemd-pcrmachine.service - TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  356.730019] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+<30>[  356.775853] systemd[1]: systemd-tpm2-setup-early.service - Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  357.479380] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+<30>[  358.375854] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+<30>[  360.423996] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+<30>[  360.540462] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+<30>[  361.166870] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+<30>[  361.495991] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+<30>[  363.059973] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+Panic#1 Part7
+<30>[  363.640798] systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+<30>[  363.976264] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+<30>[  365.117930] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<6>[  365.345189] BTRFS info (device vda2 state M): use zstd compression, level 1
+<30>[  366.154580] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[  367.540778] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[  367.891527] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<30>[  368.163693] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<30>[  368.306196] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<46>[  368.446826] systemd-journald[785]: Collecting audit messages is enabled.
+<30>[  368.647661] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<30>[  371.045438] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<5>[  371.062688] audit: type=1130 audit(1794806589.431:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  371.358645] systemd[1]: Started systemd-journald.service - Journal Service.
+Panic#1 Part6
+<5>[  371.373481] audit: type=1130 audit(1794806589.744:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  373.221734] audit: type=1334 audit(1794806591.592:5): prog-id=48 op=LOAD
+<5>[  373.230181] audit: type=1334 audit(1794806591.603:6): prog-id=49 op=LOAD
+<5>[  373.240164] audit: type=1334 audit(1794806591.612:7): prog-id=50 op=LOAD
+<5>[  377.249906] audit: type=1130 audit(1794806595.616:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  383.659962] audit: type=1130 audit(1794806602.032:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  383.901525] audit: type=1334 audit(1794806602.273:10): prog-id=51 op=LOAD
+<5>[  393.225063] audit: type=1130 audit(1794806611.595:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  393.780085] audit: type=1334 audit(1794806612.150:12): prog-id=23 op=UNLOAD
+<5>[  393.786733] audit: type=1334 audit(1794806612.158:13): prog-id=22 op=UNLOAD
+<5>[  393.849194] audit: type=1334 audit(1794806612.221:14): prog-id=52 op=LOAD
+<5>[  393.859186] audit: type=1334 audit(1794806612.232:15): prog-id=53 op=LOAD
+Panic#1 Part5
+<5>[  394.043623] audit: type=1130 audit(1794806612.414:16): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  401.482101] audit: type=1130 audit(1794806619.852:17): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  408.129739] zram0: detected capacity change from 0 to 16777216
+<5>[  410.425922] audit: type=1130 audit(1794806628.796:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  413.502834] Adding 8388604k swap on /dev/zram0.  Priority:100 extents:1 across:8388604k SSDsc
+<5>[  414.862726] audit: type=1334 audit(1794806633.232:19): prog-id=54 op=LOAD
+<5>[  414.886581] audit: type=1334 audit(1794806633.257:20): prog-id=55 op=LOAD
+<5>[  414.902842] audit: type=1334 audit(1794806633.272:21): prog-id=56 op=LOAD
+<5>[  420.301335] audit: type=1130 audit(1794806638.673:22): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  461.459355] audit: type=1130 audit(1794806679.830:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'

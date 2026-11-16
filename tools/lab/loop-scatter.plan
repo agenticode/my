@@ -1,0 +1,6 @@
+# Another place in every boot: the same kind of fatal record at three
+# addresses of the one DIMM of the guest, on channels 0, 1 and 2.
+# bank status address misc
+7 0xbe00000000010090 0x0a2b3040 0x86
+8 0xbe00000000010091 0x1c4d5080 0x86
+7 0xbe00000000010092 0x2e6f70c0 0x86

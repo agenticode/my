@@ -1,0 +1,27 @@
+Panic#1 Part17
+<6>[   12.191688] evm: security.SMACK64MMAP (disabled)
+<6>[   12.191868] evm: security.apparmor (disabled)
+<6>[   12.191935] evm: security.ima
+<6>[   12.191964] evm: security.capability
+<6>[   12.192078] evm: HMAC attrs: 0x1
+<6>[   12.310698] alg: No test for 842 (842-scomp)
+<6>[   12.723185] clk: Disabling unused clocks
+<6>[   12.727263] PM: genpd: Disabling unused power domains
+<6>[   13.074075] Freeing unused kernel memory: 14720K
+<6>[   17.011898] Checked W+X mappings: passed, no W+X pages found
+<6>[   17.017172] Run /init as init process
+<7>[   17.018138]   with arguments:
+<7>[   17.019466]     /init
+<7>[   17.019978]     no_timer_check
+<7>[   17.020083]   with environment:
+<7>[   17.020150]     HOME=/
+<7>[   17.020930]     TERM=linux
+<6>[   19.123200] fuse: init (API version 7.45)
+<30>[   20.282564] systemd[1]: Successfully made /usr/ read-only.
+<30>[   20.685188] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[   20.688463] systemd[1]: Detected virtualization qemu.
+<30>[   20.692067] systemd[1]: Detected architecture arm64.
+<30>[   20.692947] systemd[1]: Running in initrd.
+<30>[   20.774604] systemd[1]: Initializing machine ID from random generator.
+<30>[   20.803056] systemd[1]: No hostname configured, using default hostname.
+<30>[   20.813960] systemd[1]: Hostname set to <localhost>.

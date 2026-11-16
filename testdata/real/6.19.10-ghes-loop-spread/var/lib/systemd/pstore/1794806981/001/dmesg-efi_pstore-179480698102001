@@ -1,0 +1,15 @@
+Panic#1 Part2
+<5>[  559.509117] audit: type=1305 audit(1794806777.880:31): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+<5>[  559.513872] audit: type=1300 audit(1794806777.880:31): arch=c00000b7 syscall=206 success=yes exit=60 a0=3 a1=ffffe8954ba0 a2=3c a3=0 items=0 ppid=920 pid=921 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="auditd" exe="/usr/bin/auditd" subj=system_u:system_r:auditd_t:s0 key=(null)
+<5>[  559.516815] audit: type=1327 audit(1794806777.880:31): proctitle="/usr/bin/auditd"
+<4>[  578.157600] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  578.158157] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<6>[  632.610796] virtio_net virtio0 enp0s1: renamed from eth0
+<0>[  762.043457] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+<0>[  762.045432] {1}[Hardware Error]: event severity: fatal
+<0>[  762.048307] {1}[Hardware Error]:  precise tstamp: 2026-11-16 05:29:40
+<0>[  762.048811] {1}[Hardware Error]:  Error 0, type: fatal
+<0>[  762.049056] {1}[Hardware Error]:  fru_text: CPU0_C1
+<0>[  762.049800] {1}[Hardware Error]:   section_type: memory error
+<0>[  762.051742] {1}[Hardware Error]:   physical_address: 0x0000000870470780
+<0>[  762.057741] {1}[Hardware Error]:   node:0 card:2 module:0 rank:1 bank_group:2 bank_address:0 device:9 row:3089 column:240 

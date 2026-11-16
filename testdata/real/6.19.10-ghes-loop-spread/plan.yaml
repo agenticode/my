@@ -1,0 +1,60 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: ghes-loop-spread
+summary: "a fatal firmware error record in each of three boots of an aarch64 guest with six DIMMs, on another DIMM every time; each panics the kernel and the panic text goes to EFI variables"
+method: "QMP inject-ghes-v2-error of QEMU: CPER memory error sections of severity fatal through the generic hardware error source"
+kernel: 6.19.10-300.fc44.aarch64
+rasdaemon: 0.8.0
+machine: "QEMU 10.2.2 virt, ras=on, emulated without hardware virtualization"
+injections:
+  - id: boot-1
+    time: 2026-11-16T04:56:28.937Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0xa8bcd1c0
+    socket: 0
+    channel: 0
+    slot: 0
+    rank: 0
+    device: 4
+    bank_group: 1
+    bank: 2
+    row: 0x1a2f
+    column: 0x238
+    label: CPU0_A1
+    note: "firmware error record (CPER), memory error section, type 3 (multi-bit ECC); a fatal multi-bit ECC error; the kernel panics"
+  - id: boot-2
+    time: 2026-11-16T05:29:40.697Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x870470780
+    socket: 0
+    channel: 2
+    slot: 0
+    rank: 1
+    device: 9
+    bank_group: 2
+    bank: 0
+    row: 0xc11
+    column: 0xf0
+    label: CPU0_C1
+    note: "firmware error record (CPER), memory error section, type 3 (multi-bit ECC); a fatal multi-bit ECC error; the kernel panics"
+  - id: boot-3
+    time: 2026-11-16T05:46:17.151Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x11781dee40
+    socket: 0
+    channel: 4
+    slot: 0
+    rank: 0
+    device: 2
+    bank_group: 3
+    bank: 3
+    row: 0x4e07
+    column: 0x1c8
+    label: CPU0_E1
+    note: "firmware error record (CPER), memory error section, type 3 (multi-bit ECC); a fatal multi-bit ECC error; the kernel panics"

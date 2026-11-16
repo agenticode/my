@@ -1,0 +1,92 @@
+Panic#1 Part14
+<30>[   65.537065] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<30>[   69.620148] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+<30>[   69.734642] systemd[1]: Started systemd-journald.service - Journal Service.
+<6>[  228.153669] BTRFS: device label fedora devid 1 transid 150 /dev/vda2 (253:2) scanned by mount (516)
+<6>[  228.185890] BTRFS info (device vda2): first mount of filesystem 00000000-0000-4000-8000-000000000002
+<6>[  228.189492] BTRFS info (device vda2): using crc32c (crc32c-lib) checksum algorithm
+<6>[  228.444754] BTRFS info (device vda2): start tree-log replay
+<6>[  229.416839] BTRFS info (device vda2): turning on async discard
+<6>[  229.417694] BTRFS info (device vda2): enabling free space tree
+<46>[  298.693555] systemd-journald[269]: Received SIGTERM from PID 1 (systemd).
+<6>[  307.185335] SELinux:  Permission firmware_load in class system not defined in policy.
+<6>[  307.185955] SELinux:  Permission kexec_image_load in class system not defined in policy.
+<6>[  307.186233] SELinux:  Permission kexec_initramfs_load in class system not defined in policy.
+<6>[  307.186385] SELinux:  Permission policy_load in class system not defined in policy.
+<6>[  307.186465] SELinux:  Permission x509_certificate_load in class system not defined in policy.
+<6>[  307.188060] SELinux:  Permission allowed in class io_uring not defined in policy.
+<6>[  307.188597] SELinux:  Class memfd_file not defined in policy.
+<6>[  307.189530] SELinux: the above unknown classes and permissions will be allowed
+Panic#1 Part13
+<6>[  307.422479] SELinux:  policy capability network_peer_controls=1
+<6>[  307.423123] SELinux:  policy capability open_perms=1
+<6>[  307.424357] SELinux:  policy capability extended_socket_class=1
+<6>[  307.424603] SELinux:  policy capability always_check_network=0
+<6>[  307.424681] SELinux:  policy capability cgroup_seclabel=1
+<6>[  307.424802] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[  307.425228] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[  307.427175] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[  307.427223] SELinux:  policy capability userspace_initial_context=0
+<6>[  307.427257] SELinux:  policy capability netlink_xperm=0
+<6>[  307.427372] SELinux:  policy capability netif_wildcard=0
+<6>[  307.427471] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[  307.428591] SELinux:  policy capability functionfs_seclabel=0
+<6>[  307.428646] SELinux:  policy capability memfd_class=0
+<5>[  308.029162] audit: type=1403 audit(1794806526.400:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[  308.247831] systemd[1]: Successfully loaded SELinux policy in 2.091826s.
+<6>[  309.622650] NET: Registered PF_VSOCK protocol family
+<30>[  311.150033] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 1.001907s.
+<30>[  311.686861] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+Panic#1 Part12
+<30>[  311.688826] systemd[1]: Detected virtualization qemu.
+<30>[  311.693516] systemd[1]: Detected architecture arm64.
+<30>[  311.896019] systemd[1]: Hostname set to <lab-arm-loop>.
+<30>[  315.598868] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[  330.305587] zram: Added device: zram0
+<30>[  346.452647] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[  346.479714] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[  346.919895] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[  347.014623] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[  347.108456] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[  347.175742] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[  347.221502] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[  347.267772] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[  347.305610] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[  347.336557] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[  347.432710] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[  347.446823] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+Panic#1 Part11
+<30>[  347.457825] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0002.device - /dev/disk/by-uuid/0000-0002...
+<30>[  347.465812] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+<30>[  347.473532] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+<30>[  347.480857] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+<30>[  347.500249] systemd[1]: Reached target imports.target - Image Downloads.
+<30>[  347.508603] systemd[1]: Stopped target initrd-switch-root.target - Switch Root.
+<30>[  347.519577] systemd[1]: Stopped target initrd-fs.target - Initrd File Systems.
+<30>[  347.529253] systemd[1]: Stopped target initrd-root-fs.target - Initrd Root File System.
+<30>[  347.549759] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+<30>[  347.558702] systemd[1]: Reached target paths.target - Path Units.
+<30>[  347.565522] systemd[1]: Reached target remote-cryptsetup.target - Remote Encrypted Volumes.
+<30>[  347.573855] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+<30>[  347.581643] systemd[1]: Reached target remote-veritysetup.target - Remote Verity Protected Volumes.
+<30>[  347.588872] systemd[1]: Reached target slices.target - Slice Units.
+<30>[  347.596685] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+<30>[  347.628784] systemd[1]: Listening on dm-event.socket - Device-mapper event daemon FIFOs.
+<30>[  347.686795] systemd[1]: Listening on lvm2-lvmpolld.socket - LVM2 poll daemon socket.
+<30>[  347.807384] systemd[1]: Listening on systemd-ask-password.socket - Query the User Interactively for a Password.
+Panic#1 Part10
+<30>[  347.921630] systemd[1]: Listening on systemd-coredump.socket - Process Core Dump Socket.
+<30>[  347.993512] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+<30>[  348.092542] systemd[1]: Listening on systemd-factory-reset.socket - Factory Reset Management.
+<30>[  348.156885] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+<30>[  348.243743] systemd[1]: Listening on systemd-mute-console.socket - Console Output Muting Service Socket.
+<30>[  348.292606] systemd[1]: Listening on systemd-oomd.socket - Userspace Out-Of-Memory (OOM) Killer Socket.
+<30>[  348.308752] systemd[1]: systemd-pcrextend.socket - TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  348.313849] systemd[1]: systemd-pcrlock.socket - Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+<30>[  348.379882] systemd[1]: Listening on systemd-repart.socket - Disk Repartitioning Service Socket.
+<30>[  348.424701] systemd[1]: Listening on systemd-resolved-monitor.socket - Resolve Monitor Varlink Socket.
+<30>[  348.446644] systemd[1]: Listening on systemd-resolved-varlink.socket - Resolve Service Varlink Socket.
+<30>[  348.490529] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+<30>[  348.525698] systemd[1]: Listening on systemd-udevd-varlink.socket - udev Varlink Socket.
+<30>[  348.558702] systemd[1]: Listening on systemd-userdbd.socket - User Database Manager Socket.
+<30>[  348.729590] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...

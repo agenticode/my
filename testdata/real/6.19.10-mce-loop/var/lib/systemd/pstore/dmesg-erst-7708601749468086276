@@ -1,0 +1,203 @@
+Panic#1 Part3
+<6>[    2.060475] ACPI: PCI: Interrupt link GSIA configured for IRQ 16
+<6>[    2.061525] ACPI: PCI: Interrupt link GSIB configured for IRQ 17
+<6>[    2.061601] ACPI: PCI: Interrupt link GSIC configured for IRQ 18
+<6>[    2.063364] ACPI: PCI: Interrupt link GSID configured for IRQ 19
+<6>[    2.063847] ACPI: PCI: Interrupt link GSIE configured for IRQ 20
+<6>[    2.065483] ACPI: PCI: Interrupt link GSIF configured for IRQ 21
+<6>[    2.065759] ACPI: PCI: Interrupt link GSIG configured for IRQ 22
+<6>[    2.067087] ACPI: PCI: Interrupt link GSIH configured for IRQ 23
+<6>[    2.086522] iommu: Default domain type: Translated
+<6>[    2.087263] iommu: DMA domain TLB invalidation policy: lazy mode
+<5>[    2.094545] SCSI subsystem initialized
+<7>[    2.100429] libata version 3.00 loaded.
+<6>[    2.102608] ACPI: bus type USB registered
+<6>[    2.106300] usbcore: registered new interface driver usbfs
+<6>[    2.108222] usbcore: registered new interface driver hub
+<6>[    2.109055] usbcore: registered new device driver usb
+<6>[    2.112151] pps_core: LinuxPPS API ver. 1 registered
+<6>[    2.112453] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+<6>[    2.113018] PTP clock support registered
+<6>[    2.118956] EDAC MC: Ver: 3.0.0
+<6>[    2.249327] NetLabel: Initializing
+<6>[    2.249896] NetLabel:  domain hash size = 128
+<6>[    2.249896] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+<6>[    2.254896] NetLabel:  unlabeled traffic allowed by default
+<6>[    2.256145] mctp: management component transport protocol core
+<6>[    2.257018] NET: Registered PF_MCTP protocol family
+<6>[    2.257966] PCI: Using ACPI for IRQ routing
+<7>[    2.268417] PCI: pci_cache_line_size set to 64 bytes
+<7>[    2.269303] e820: reserve RAM buffer [mem 0x0009fc00-0x0009ffff]
+<7>[    2.269958] e820: reserve RAM buffer [mem 0x7ffdc000-0x7fffffff]
+<6>[    2.304896] pci 0000:00:01.0: vgaarb: setting as boot VGA device
+<6>[    2.304896] pci 0000:00:01.0: vgaarb: bridge control possible
+<6>[    2.307983] pci 0000:00:01.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+<6>[    2.309111] vgaarb: loaded
+<6>[    2.315529] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+<6>[    2.315830] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+<6>[    2.327205] clocksource: Switched to clocksource tsc-early
+<5>[    2.365084] VFS: Disk quotas dquot_6.6.0
+<6>[    2.366803] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+<6>[    2.379292] pnp: PnP ACPI init
+<6>[    2.390972] system 00:05: [mem 0xb0000000-0xbfffffff window] has been reserved
+<6>[    2.397973] pnp: PnP ACPI: found 6 devices
+<6>[    2.523789] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+<6>[    2.528509] NET: Registered PF_INET protocol family
+<6>[    2.536571] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+<6>[    2.831179] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+<6>[    2.833551] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+<6>[    2.835935] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+<6>[    2.842426] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+<6>[    2.843748] TCP: Hash tables configured (established 32768 bind 32768)
+<6>[    2.850346] MPTCP token hash table entries: 4096 (order: 5, 98304 bytes, linear)
+<6>[    2.852233] UDP hash table entries: 2048 (order: 5, 131072 bytes, linear)
+<6>[    2.854290] UDP-Lite hash table entries: 2048 (order: 5, 131072 bytes, linear)
+<6>[    2.859344] NET: Registered PF_UNIX/PF_LOCAL protocol family
+<6>[    2.861426] NET: Registered PF_XDP protocol family
+<6>[    2.864500] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+<6>[    2.864860] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+<6>[    2.865595] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+<6>[    2.865919] pci_bus 0000:00: resource 7 [mem 0x80000000-0xafffffff window]
+<6>[    2.866601] pci_bus 0000:00: resource 8 [mem 0xc0000000-0xfebfffff window]
+<6>[    2.866918] pci_bus 0000:00: resource 9 [mem 0x180000000-0x97fffffff window]
+<6>[    2.868911] PCI: CLS 0 bytes, default 64
+<6>[    2.871323] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+<6>[    2.871697] software IO TLB: mapped [mem 0x000000007bfdc000-0x000000007ffdc000] (64MB)
+<6>[    2.883870] Trying to unpack rootfs image as initramfs...
+<5>[    3.183329] Initialise system trusted keyrings
+<5>[    3.190489] Key type blacklist registered
+<6>[    3.194856] workingset: timestamp_bits=36 max_order=20 bucket_order=0
+<5>[    3.241627] integrity: Platform Keyring initialized
+<5>[    3.243780] integrity: Machine keyring initialized
+<6>[    3.288756] cryptd: max_cpu_qlen set to 1000
+<6>[    3.456304] NET: Registered PF_ALG protocol family
+<6>[    3.458928] xor: automatically using best checksumming function   avx       
+<5>[    3.460754] Key type asymmetric registered
+<5>[    3.462128] Asymmetric key parser 'x509' registered
+<6>[    3.485792] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 244)
+<6>[    3.520127] io scheduler mq-deadline registered
+<6>[    3.520182] io scheduler kyber registered
+<6>[    3.521685] io scheduler bfq registered
+<6>[    3.565471] atomic64_test: passed for x86-64 platform with CX8 and with SSE
+<6>[    3.577383] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+<6>[    3.593652] ACPI: button: Power Button [PWRF]
+<6>[    3.618396] ERST: Error Record Serialization Table (ERST) support is initialized.
+<6>[    3.622327] pstore: Using crash dump compression: deflate
+<6>[    3.623414] pstore: Registered erst as persistent store backend
+<6>[    3.644285] ACPI: \_SB_.GSIH: Enabled at IRQ 23
+<6>[    3.669681] ACPI: \_SB_.GSIE: Enabled at IRQ 20
+<6>[    3.680295] ACPI: \_SB_.GSIF: Enabled at IRQ 21
+<6>[    3.687898] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+<6>[    3.702748] 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+<6>[    3.803908] Non-volatile memory driver v1.3
+<6>[    3.833799] Linux agpgart interface v0.103
+<6>[    3.842559] ACPI: bus type drm_connector registered
+<6>[    3.870858] virtio_blk virtio2: 4/0/0 default/read/poll queues
+<5>[    3.910769] virtio_blk virtio2: [vda] 33554432 512-byte logical blocks (17.2 GB/16.0 GiB)
+<6>[    3.913859] tsc: Refined TSC clocksource calibration: 3393.601 MHz
+<6>[    3.916713] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x30eab1d6d44, max_idle_ns: 440795346532 ns
+<6>[    3.919995] clocksource: Switched to clocksource tsc
+<6>[    4.011657]  vda: vda1 vda2 vda3
+<6>[    4.034528] ACPI: \_SB_.GSIA: Enabled at IRQ 16
+<6>[    4.053773] ahci 0000:00:1f.2: AHCI vers 0001.0000, 32 command slots, 1.5 Gbps, SATA mode
+<6>[    4.055022] ahci 0000:00:1f.2: 6/6 ports implemented (port mask 0x3f)
+<6>[    4.056769] ahci 0000:00:1f.2: flags: 64bit ncq only 
+<6>[    4.090340] scsi host0: ahci
+<6>[    4.101970] scsi host1: ahci
+<6>[    4.107912] scsi host2: ahci
+<6>[    4.114474] scsi host3: ahci
+<6>[    4.119874] scsi host4: ahci
+<6>[    4.126286] scsi host5: ahci
+<6>[    4.129272] ata1: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7100 irq 31 lpm-pol 1
+<6>[    4.130434] ata2: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7180 irq 31 lpm-pol 1
+<6>[    4.130825] ata3: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7200 irq 31 lpm-pol 1
+<6>[    4.132364] ata4: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7280 irq 31 lpm-pol 1
+<6>[    4.133399] ata5: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7300 irq 31 lpm-pol 1
+<6>[    4.133802] ata6: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7380 irq 31 lpm-pol 1
+<6>[    4.145165] CAN device driver interface
+<6>[    4.159822] usbcore: registered new interface driver usbserial_generic
+<6>[    4.161912] usbserial: USB Serial support registered for generic
+<6>[    4.166879] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+<6>[    4.179894] serio: i8042 KBD port at 0x60,0x64 irq 1
+<6>[    4.181900] serio: i8042 AUX port at 0x60,0x64 irq 12
+<6>[    4.187859] mousedev: PS/2 mouse device common for all mice
+<6>[    4.194699] rtc_cmos 00:04: RTC can wake from S4
+<6>[    4.203909] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+<6>[    4.210885] rtc_cmos 00:04: registered as rtc0
+<6>[    4.215537] rtc_cmos 00:04: setting system clock to 2026-11-16T03:08:27 UTC (1794798507)
+<6>[    4.223660] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram
+<6>[    4.225134] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+<6>[    4.228012] device-mapper: uevent: version 1.0.3
+<6>[    4.233672] device-mapper: ioctl: 4.50.0-ioctl (2025-04-28) initialised: dm-devel@lists.linux.dev
+<6>[    4.241904] intel_pstate: CPU model not supported
+<6>[    4.249247] hid: raw HID events driver (C) Jiri Kosina
+<6>[    4.253697] usbcore: registered new interface driver usbhid
+<6>[    4.254687] usbhid: USB HID core driver
+<6>[    4.260907] drop_monitor: Initializing network drop monitor service
+<6>[    4.266744] Initializing XFRM netlink socket
+<6>[    4.269720] NET: Registered PF_INET6 protocol family
+<6>[    4.304694] Segment Routing with IPv6
+<6>[    4.305497] RPL Segment Routing with IPv6
+<6>[    4.306442] In-situ OAM (IOAM) with IPv6
+<6>[    4.308313] mip6: Mobile IPv6
+<6>[    4.310655] NET: Registered PF_PACKET protocol family
+<6>[    4.311442] can: controller area network core
+<6>[    4.313631] NET: Registered PF_CAN protocol family
+<6>[    4.332370] resctrl: No MBM correction factor available
+<6>[    4.335410] IPI shorthand broadcast: enabled
+<6>[    4.416682] sched_clock: Marking stable (4440380995, -24103423)->(4553683933, -137406361)
+<6>[    4.433356] registered taskstats version 1
+<5>[    4.455527] Loading compiled-in X.509 certificates
+<6>[    4.464562] ata2: SATA link down (SStatus 0 SControl 300)
+<6>[    4.472895] ata4: SATA link down (SStatus 0 SControl 300)
+<6>[    4.478698] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+<6>[    4.490327] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+<6>[    4.492262] ata3.00: applying bridge limits
+<6>[    4.495997] ata6: SATA link down (SStatus 0 SControl 300)
+<6>[    4.499624] ata1: SATA link down (SStatus 0 SControl 300)
+<6>[    4.501046] ata5: SATA link down (SStatus 0 SControl 300)
+<6>[    4.505489] ata3.00: configured for UDMA/100
+<5>[    4.538507] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+<5>[    4.541968] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    4.584562] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+<6>[    4.586691] cdrom: Uniform CD-ROM driver Revision: 3.20
+<7>[    4.617001] sr 2:0:0:0: Attached scsi CD-ROM sr0
+<5>[    4.621487] sr 2:0:0:0: Attached scsi generic sg0 type 5
+<6>[    4.885594] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input3
+<6>[    7.373400] Freeing initrd memory: 48172K
+<5>[    8.023878] Loaded X.509 cert 'Fedora IMA CA: a8a00c31663f853f9c6ff2564872e378af026b28'
+<6>[    8.131276] Demotion targets for Node 0: null
+<6>[    8.132114] page_owner is disabled
+<5>[    8.135966] Key type .fscrypt registered
+<5>[    8.137129] Key type fscrypt-provisioning registered
+<6>[    8.149311] Btrfs loaded, zoned=yes, fsverity=yes
+<5>[    8.152810] Key type big_key registered
+<5>[    8.167975] Key type encrypted registered
+<6>[    8.169988] ima: No TPM chip found, activating TPM-bypass!
+<5>[    8.171105] Loading compiled-in module X.509 certificates
+<5>[    8.176079] Loaded X.509 cert 'Fedora kernel signing key: 7d9678ff2b91529062efdc8a18734284816e388f'
+<6>[    8.186391] ima: Allocated hash algorithm: sha256
+<6>[    8.215489] ima: No architecture policies found
+<6>[    8.218530] evm: Initialising EVM extended attributes:
+<6>[    8.218911] evm: security.selinux
+<6>[    8.220162] evm: security.SMACK64 (disabled)
+<6>[    8.220436] evm: security.SMACK64EXEC (disabled)
+<6>[    8.220652] evm: security.SMACK64TRANSMUTE (disabled)
+<6>[    8.221976] evm: security.SMACK64MMAP (disabled)
+<6>[    8.222344] evm: security.apparmor (disabled)
+<6>[    8.223575] evm: security.ima
+<6>[    8.223914] evm: security.capability
+<6>[    8.224879] evm: HMAC attrs: 0x1
+<6>[    8.273534] alg: No test for 842 (842-scomp)
+<6>[    8.428774] PM:   Magic number: 2:613:108
+<6>[    8.449184] RAS: Correctable Errors collector initialized.
+<6>[    8.527668] clk: Disabling unused clocks
+<6>[    8.529895] PM: genpd: Disabling unused power domains
+<6>[    8.657832] Freeing unused decrypted memory: 2028K
+<6>[    8.877555] Freeing unused kernel image (initmem) memory: 5204K
+<6>[    8.880085] Write protecting the kernel read-only data: 43008k
+<6>[    8.887409] Freeing unused kernel image (text/rodata gap) memory: 816K
+<6>[    8.890875] Freeing unused kernel image (rodata/data gap) memory: 588K
+<6>[    9.329626] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+<6>[    9.333226] x86/mm: Checking user space page tables
+<6>[    9.744346] x86/mm: Checked W+X mappings: passed, no W+X pages found.

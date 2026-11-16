@@ -1,0 +1,17 @@
+Panic#1 Part11
+<30>[  350.479347] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<6>[  367.120039] zram: Added device: zram0
+<30>[  383.226616] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+<30>[  383.247897] systemd[1]: Stopped initrd-switch-root.service - Switch Root.
+<30>[  383.476885] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+<30>[  383.526134] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+<30>[  383.569672] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+<30>[  383.622796] systemd[1]: Created slice system-sshd\x2dkeygen.slice - Slice /system/sshd-keygen.
+<30>[  383.659909] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+<30>[  383.720983] systemd[1]: Created slice user.slice - User and Session Slice.
+<30>[  383.750908] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[  383.767422] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+<30>[  383.836929] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+<30>[  383.846552] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+<30>[  383.855000] systemd[1]: Expecting device dev-disk-by\x2duuid-0000\x2d0002.device - /dev/disk/by-uuid/0000-0002...
+<30>[  383.861639] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...

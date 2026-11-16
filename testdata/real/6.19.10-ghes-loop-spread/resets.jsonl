@@ -1,0 +1,2 @@
+{"reset":"2026-11-16T05:15:35Z","why":"boot 1 stayed down after its panic (panic=0, __ghes_panic sets no timeout); reset by QMP system_reset, then kernel.panic=30 by sysctl"}
+{"reset":"2026-11-16T06:11:09Z","why":"boot 3 stayed down after its panic (panic=30 not on its command line); reset by QMP system_reset"}

@@ -1,0 +1,20 @@
+Panic#1 Part13
+<6>[  344.211062] SELinux:  policy capability always_check_network=0
+<6>[  344.211509] SELinux:  policy capability cgroup_seclabel=1
+<6>[  344.211586] SELinux:  policy capability nnp_nosuid_transition=1
+<6>[  344.212842] SELinux:  policy capability genfs_seclabel_symlinks=1
+<6>[  344.212883] SELinux:  policy capability ioctl_skip_cloexec=0
+<6>[  344.212913] SELinux:  policy capability userspace_initial_context=0
+<6>[  344.213011] SELinux:  policy capability netlink_xperm=0
+<6>[  344.213082] SELinux:  policy capability netif_wildcard=0
+<6>[  344.213320] SELinux:  policy capability genfs_seclabel_wildcard=0
+<6>[  344.213371] SELinux:  policy capability functionfs_seclabel=0
+<6>[  344.213401] SELinux:  policy capability memfd_class=0
+<5>[  344.789206] audit: type=1403 audit(1794807437.770:2): auid=4294967295 ses=4294967295 lsm=selinux res=1
+<30>[  345.004963] systemd[1]: Successfully loaded SELinux policy in 1.909968s.
+<6>[  346.211472] NET: Registered PF_VSOCK protocol family
+<30>[  348.467210] systemd[1]: Relabeled /dev/, /dev/shm/, /run/ in 1.775632s.
+<30>[  349.039975] systemd[1]: systemd 259.5-1.fc44 running in system mode (+PAM +AUDIT +SELINUX -APPARMOR +IMA +IPE +SMACK +SECCOMP -GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP +SYSVINIT +LIBARCHIVE)
+<30>[  349.041975] systemd[1]: Detected virtualization qemu.
+<30>[  349.044131] systemd[1]: Detected architecture arm64.
+<30>[  349.232334] systemd[1]: Hostname set to <lab-arm-loop>.

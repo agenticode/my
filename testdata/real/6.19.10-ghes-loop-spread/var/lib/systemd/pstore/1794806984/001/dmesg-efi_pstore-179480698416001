@@ -1,0 +1,18 @@
+Panic#1 Part16
+<30>[   23.318524] systemd[1]: Detected virtualization qemu.
+<30>[   23.321937] systemd[1]: Detected architecture arm64.
+<30>[   23.323079] systemd[1]: Running in initrd.
+<30>[   23.387653] systemd[1]: Initializing machine ID from random generator.
+<30>[   23.404741] systemd[1]: No hostname configured, using default hostname.
+<30>[   23.418600] systemd[1]: Hostname set to <localhost>.
+<30>[   26.193603] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+<28>[   39.670676] systemd[1]: /usr/lib/systemd/system/systemd-udevd.service:56: System call bpf cannot be resolved as libseccomp is not available, ignoring: Operation not supported
+<30>[   41.047498] systemd[1]: Queued start job for default target initrd.target.
+<30>[   52.622681] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+<30>[   52.652304] systemd[1]: Expecting device dev-disk-by\x2duuid-00000000\x2d0000\x2d4000\x2d8000\x2d000000000002.device - /dev/disk/by-uuid/00000000-0000-4000-8000-000000000002...
+<30>[   52.660505] systemd[1]: Reached target initrd-usr-fs.target - Initrd /usr File System.
+<30>[   52.666287] systemd[1]: Reached target paths.target - Path Units.
+<30>[   52.670991] systemd[1]: Reached target slices.target - Slice Units.
+<30>[   52.675675] systemd[1]: Reached target swap.target - Swaps.
+<30>[   52.680990] systemd[1]: Reached target timers.target - Timer Units.
+<30>[   52.702450] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).

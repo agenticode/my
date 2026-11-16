@@ -1,0 +1,37 @@
+Panic#1 Part7
+<30>[  403.540213] systemd[1]: Finished systemd-network-generator.service - Generate Network Units from Kernel Command Line.
+<6>[  403.674355] BTRFS info (device vda2 state M): use zstd compression, level 1
+<30>[  404.922752] systemd[1]: Finished lvm2-monitor.service - Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling.
+<30>[  405.248129] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+<30>[  405.413124] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database skipped, unmet condition check ConditionNeedsUpdate=/etc
+<30>[  405.694422] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+<30>[  406.132203] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+<46>[  406.314537] systemd-journald[785]: Collecting audit messages is enabled.
+<30>[  406.572039] systemd[1]: Finished systemd-udev-load-credentials.service - Load udev Rules from Credentials.
+<5>[  406.666216] audit: type=1130 audit(1794807499.627:3): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-load-credentials comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<30>[  411.352001] systemd[1]: Started systemd-journald.service - Journal Service.
+<5>[  411.400101] audit: type=1130 audit(1794807504.380:4): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-journald comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+Panic#1 Part6
+<5>[  411.603385] audit: type=1130 audit(1794807504.582:5): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  413.989138] audit: type=1334 audit(1794807506.970:6): prog-id=48 op=LOAD
+<5>[  414.000278] audit: type=1334 audit(1794807506.981:7): prog-id=49 op=LOAD
+<5>[  414.014692] audit: type=1334 audit(1794807506.997:8): prog-id=50 op=LOAD
+<5>[  419.036734] audit: type=1130 audit(1794807512.018:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-userdbd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  425.659751] audit: type=1130 audit(1794807518.639:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev-early comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  425.976043] audit: type=1334 audit(1794807518.956:11): prog-id=51 op=LOAD
+<5>[  436.128854] audit: type=1130 audit(1794807529.110:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  436.583716] audit: type=1130 audit(1794807529.563:13): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-resolved comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  436.684302] audit: type=1334 audit(1794807529.666:14): prog-id=23 op=UNLOAD
+Panic#1 Part5
+<5>[  436.692550] audit: type=1334 audit(1794807529.675:15): prog-id=22 op=UNLOAD
+<5>[  436.746190] audit: type=1334 audit(1794807529.729:16): prog-id=52 op=LOAD
+<5>[  436.758255] audit: type=1334 audit(1794807529.740:17): prog-id=53 op=LOAD
+<5>[  444.214757] audit: type=1130 audit(1794807537.196:18): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udevd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  448.968969] zram0: detected capacity change from 0 to 16777216
+<5>[  451.796422] audit: type=1130 audit(1794807544.777:19): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-zram-setup@zram0 comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<6>[  454.945855] Adding 8388604k swap on /dev/zram0.  Priority:100 extents:1 across:8388604k SSDsc
+<5>[  456.722897] audit: type=1334 audit(1794807549.701:20): prog-id=54 op=LOAD
+<5>[  456.743849] audit: type=1334 audit(1794807549.722:21): prog-id=55 op=LOAD
+<5>[  456.760037] audit: type=1334 audit(1794807549.740:22): prog-id=56 op=LOAD
+<5>[  463.142786] audit: type=1130 audit(1794807556.124:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-oomd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+<5>[  523.373124] audit: type=1130 audit(1794807616.355:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'

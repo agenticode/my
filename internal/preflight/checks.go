@@ -562,6 +562,18 @@ func (r *run) mcelogDaemon(c *Check) bool {
 func (r *run) resetKind() Check {
 	c := Check{Name: "reset-kind", State: Info}
 	if nc, not := r.notX86(c.Name); not {
+		// A firmware error source on another architecture: a fatal
+		// record ends in __ghes_panic (drivers/acpi/apei/ghes.c), which
+		// panics with the timeout as it is; with panic=0 the host stays
+		// down until something outside restarts it. The aarch64 guest of
+		// the lab did (docs/validation-lab.md).
+		if nc.State == None && r.h.there("sys/firmware/acpi/tables/HEST") {
+			if v, err := r.h.read("proc/sys/kernel/panic"); err == nil && strings.TrimSpace(v) == "0" {
+				c.Evidence = append(c.Evidence, "/sys/firmware/acpi/tables/HEST: there", "/proc/sys/kernel/panic: 0")
+				c.Detail = statement("pf.reset.ghes_stays", "arch", r.info.Arch)
+				return c
+			}
+		}
 		return nc
 	}
 	const rel = "sys/kernel/reboot/mode"
@@ -637,9 +649,13 @@ func (r *run) bert() Check {
 // erstMCE: where mce_panic leaves a copy of the record, and who reads it.
 //
 // arch/x86/kernel/cpu/mce/core.c, mce_panic, calls apei_write_mce
-// (arch/x86/kernel/cpu/mce/apei.c) for the records it prints. Only a
-// reader of /dev/mcelog takes them back out, and the read clears them
-// (dev-mcelog.c, __mce_read_apei). MemorY never opens /dev/mcelog.
+// (arch/x86/kernel/cpu/mce/apei.c) for the records it prints. A reader of
+// /dev/mcelog takes them back out, and the read clears them (dev-mcelog.c,
+// __mce_read_apei). With erst as the pstore backend, pstore lists them as
+// well: erst_reader (drivers/acpi/apei/erst.c) gives a record of section
+// type CPER_SECTION_TYPE_MCE the pstore type PSTORE_TYPE_MCE, whose files
+// are mce-erst-<id>; the lab showed systemd-pstore archiving them. MemorY
+// never opens /dev/mcelog and does not read those files.
 func (r *run) erstMCE() Check {
 	c := Check{Name: "erst-mce"}
 	if nc, not := r.notX86(c.Name); not {

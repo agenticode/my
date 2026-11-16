@@ -1,0 +1,47 @@
+Panic#1 Part2
+<5>[  643.946762] audit: type=1305 audit(1794807736.926:32): op=set audit_enabled=1 old=1 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+<5>[  643.952536] audit: type=1300 audit(1794807736.926:32): arch=c00000b7 syscall=206 success=yes exit=60 a0=3 a1=fffff1f1f2d0 a2=3c a3=0 items=0 ppid=923 pid=924 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="auditd" exe="/usr/bin/auditd" subj=system_u:system_r:auditd_t:s0 key=(null)
+<5>[  643.954470] audit: type=1327 audit(1794807736.926:32): proctitle="/usr/bin/auditd"
+<4>[  664.545967] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<4>[  664.546085] NOTICE: Automounting of tracing to debugfs is deprecated and will be removed in 2030
+<6>[  738.751450] virtio_net virtio0 enp0s1: renamed from eth0
+<0>[  884.559603] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+<0>[  884.560862] {1}[Hardware Error]: event severity: fatal
+<0>[  884.562959] {1}[Hardware Error]:  precise tstamp: 2026-11-16 05:46:17
+<0>[  884.563178] {1}[Hardware Error]:  Error 0, type: fatal
+<0>[  884.564726] {1}[Hardware Error]:  fru_text: CPU0_E1
+<0>[  884.565941] {1}[Hardware Error]:   section_type: memory error
+<0>[  884.567293] {1}[Hardware Error]:   physical_address: 0x00000011781dee40
+<0>[  884.570002] {1}[Hardware Error]:   node:0 card:4 module:0 rank:0 bank_group:3 bank_address:3 device:2 row:19975 column:456 
+<0>[  884.570639] {1}[Hardware Error]:   error_type: 3, multi-bit ECC
+Panic#1 Part1
+<0>[  884.571999] {1}[Hardware Error]:   DIMM location: P0_Node0_Channel4_Dimm0 CPU0_E1 
+<0>[  884.577447] GHES: Fatal hardware error but panic disabled
+<0>[  884.582859] Kernel panic - not syncing: GHES: Fatal hardware error
+<4>[  884.642267] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Tainted: G   M                6.19.10-300.fc44.aarch64 #1 PREEMPT(voluntary) 
+<4>[  884.650674] Tainted: [M]=MACHINE_CHECK
+<4>[  884.655056] Hardware name: QEMU lab-arm-loop, BIOS edk2-20260812-10.fc44 08/12/2026
+<4>[  884.664971] Workqueue: kacpi_notify acpi_os_execute_deferred
+<4>[  884.675609] Call trace:
+<4>[  884.677842]  show_stack+0x20/0x38 (C)
+<4>[  884.682796]  dump_stack_lvl+0x7c/0xa0
+<4>[  884.684674]  dump_stack+0x18/0x2c
+<4>[  884.689636]  vpanic+0x14c/0x360
+<4>[  884.690962]  panic+0x68/0x70
+<4>[  884.692009]  __ghes_panic+0x94/0xa0
+<4>[  884.692841]  ghes_proc+0x150/0x220
+<4>[  884.695276]  ghes_notify_hed+0x5c/0xb0
+<4>[  884.698242]  notifier_call_chain+0x78/0x140
+<4>[  884.700607]  blocking_notifier_call_chain+0x40/0x80
+<4>[  884.705883]  acpi_hed_notify+0x28/0x40
+<4>[  884.711676]  acpi_ev_notify_dispatch+0x54/0xa8
+<4>[  884.713190]  acpi_os_execute_deferred+0x24/0x48
+<4>[  884.717461]  process_one_work+0x17c/0x3f0
+<4>[  884.721850]  worker_thread+0x194/0x300
+<4>[  884.723446]  kthread+0x11c/0x140
+<4>[  884.725883]  ret_from_fork+0x10/0x20
+<2>[  884.732663] SMP: stopping secondary CPUs
+<0>[  884.737833] Kernel Offset: 0x4d59ab9a0000 from 0xffff800080000000
+<0>[  884.738177] PHYS_OFFSET: 0x40000000
+<0>[  884.738359] CPU features: 0x400000,000b8001,4008c501,0401720b
+<0>[  884.738907] Memory Limit: none

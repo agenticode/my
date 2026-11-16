@@ -23,9 +23,10 @@ booted 2026-11-16 05:01 UTC
                            and its BIOS; the first stop after my harvest is installed shows it
  kept     bert             the firmware has a BERT table: a fatal error it handled before the reset
                            is left there for the next boot
- info     erst-mce         mce_panic() keeps a copy of the record in ERST; only a reader of
-                           /dev/mcelog takes it out, and no mcelog daemon runs. MemorY does not open
-                           /dev/mcelog, because the read clears the record
+ info     erst-mce         mce_panic() keeps a copy of the record in ERST. With erst as the pstore
+                           backend pstore shows it as mce-erst-<id> and systemd-pstore archives it;
+                           MemorY does not read that file, and it does not open /dev/mcelog, because
+                           the read clears the record
  kept     console          a serial console (ttyS0): the BMC's serial log or a console server keeps
                            the last lines
  kept     rasdaemon        rasdaemon.service is enabled and records to

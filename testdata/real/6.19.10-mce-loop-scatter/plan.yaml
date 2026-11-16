@@ -1,0 +1,36 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: mce-loop-scatter
+summary: "a fatal machine check in three boots in a row, at another address and channel every time; each panics the kernel and the next boot reads the record out of the bank"
+method: "QEMU monitor command mce -b (QMP human-monitor-command): a record in a bank of every virtual CPU and a broadcast machine check"
+kernel: 6.19.10-300.fc44.x86_64
+rasdaemon: 0.8.0
+cpu: "Skylake-SP (family 6 model 85) emulated by QEMU 10.2.2 without hardware virtualization"
+injections:
+  - id: boot-1
+    time: 2026-11-16T04:18:18.389Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x0a2b3040
+    socket: 0
+    channel: 0
+    note: "boot 790b1bf4c0f44e278a27f2def3ac82be: bank 7, status 0xbe00000000010090 (uncorrected memory read error, channel 0, processor context corrupt), MISC 0x86"
+  - id: boot-2
+    time: 2026-11-16T04:22:10.781Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x1c4d5080
+    socket: 0
+    channel: 1
+    note: "boot 04ebedcd9aac4e2fbb3982afc0dd9419: bank 8, status 0xbe00000000010091 (channel 1)"
+  - id: boot-3
+    time: 2026-11-16T04:26:36.965Z
+    inject: error
+    severity: Fatal
+    count: 1
+    address: 0x2e6f70c0
+    socket: 0
+    channel: 2
+    note: "boot c8e2ff3dc3ea4f73ac4015f902fb360f: bank 7, status 0xbe00000000010092 (channel 2)"

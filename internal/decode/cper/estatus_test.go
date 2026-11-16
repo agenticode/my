@@ -136,3 +136,47 @@ func FuzzParseStatusBlocks(f *testing.F) {
 		}
 	})
 }
+
+// TestEntryLayout reads entries laid out by hand from struct
+// acpi_hest_generic_data and acpi_hest_generic_data_v300
+// (include/acpi/actbl1.h), not with the builder of this package: the FRU
+// text at byte 44, the time stamp of revision 0x300 at byte 64, the section
+// after 64 or 72 bytes. The builder once put both 8 bytes later, and the
+// kernel refused such a region in the lab.
+func TestEntryLayout(t *testing.T) {
+	le := binary.LittleEndian
+	section := MemSection(MemError{PhysicalAddress: model.Some(uint64(0x12345040))})
+	entry := func(rev uint16, valid byte, stamp []byte) []byte {
+		head := make([]byte, 64)
+		copy(head[0:16], SectionPlatformMemory[:])
+		le.PutUint32(head[16:], uint32(SevFatal))
+		le.PutUint16(head[20:], rev)
+		head[22] = valid
+		le.PutUint32(head[24:], uint32(len(section)))
+		copy(head[44:64], "CPU0_C1")
+		head = append(head, stamp...)
+		return append(head, section...)
+	}
+	stamp := []byte{0x07, 0x14, 0x03, 0x01, 0x16, 0x11, 0x26, 0x20} // 2026-11-16 03:14:07, precise
+	for _, tt := range []struct {
+		name  string
+		entry []byte
+		time  bool
+	}{
+		{"revision 0x201", entry(0x201, entryValidFRUText, nil), false},
+		{"revision 0x300", entry(0x300, entryValidFRUText|entryValidTimestamp, stamp), true},
+	} {
+		block := make([]byte, statusLen)
+		le.PutUint32(block[0:], 1)
+		le.PutUint32(block[12:], uint32(len(tt.entry)))
+		le.PutUint32(block[16:], uint32(SevFatal))
+		blocks, err := ParseStatusBlocks(append(block, tt.entry...))
+		if err != "" || len(blocks) != 1 || len(blocks[0].Entries) != 1 {
+			t.Fatalf("%s: %v, %+v", tt.name, err, blocks)
+		}
+		e := blocks[0].Entries[0]
+		if e.FRUText != "CPU0_C1" || len(e.Data) != len(section) || (tt.time && !e.Time.Equal(time.Date(2026, 11, 16, 3, 14, 7, 0, time.UTC))) {
+			t.Errorf("%s: FRU %q, %d bytes of section, time %v", tt.name, e.FRUText, len(e.Data), e.Time)
+		}
+	}
+}

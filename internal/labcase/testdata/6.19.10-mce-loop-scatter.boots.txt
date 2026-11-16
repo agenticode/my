@@ -1,0 +1,17 @@
+host lab-x86  QEMU lab-x86  4 boots  2026-11-16
+ stops: 3 of the last 4 boots ended in a fatal hardware error, the latest on 2026-11-16 04:26 UTC
+        after 3 min
+        no record of these boots names a DIMM
+
+ boot     1       2       3       4
+ started  11-16   11-16   11-16   11-16
+          04:14   04:19   04:23   04:27
+ ran      3 min   2 min   3 min   2 min
+ ended    STOP    STOP    STOP    running
+
+ no DIMM  X       X       X       ·
+
+ · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
+ the boot stopped and no record names a DIMM, - not in the host
+ ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
+ latest scan, - not on record
