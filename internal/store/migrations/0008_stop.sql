@@ -1,0 +1,11 @@
+-- MemorY ledger, schema version 8.
+--
+-- The kernel's own lines that a hardware error stops the host ("Kernel
+-- panic - not syncing: Fatal machine check", the panic of a fatal firmware
+-- error) are kept as a record of severity 'Informational' and type
+-- 'hardware stop'. cause_fingerprint is the fingerprint of the error record
+-- the kernel printed just before them in the same boot, '' when there is
+-- none: the machine check that was fatal, or the firmware error record.
+-- BootOutcomes reads the pair to set how the boot ended and which record
+-- shows it.
+ALTER TABLE event ADD COLUMN cause_fingerprint TEXT NOT NULL DEFAULT '';

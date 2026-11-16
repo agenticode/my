@@ -17,7 +17,7 @@ section#s1.sec
   DIMMs = 16 in 32 slots, 2 with errors or a finding
   Collected = synthetic data set, 2026-11-13 00:00 UTC
   Report = customer report, generated 2026-11-13 09:30 UTC by my test
-  Engine = version 5
+  Engine = version 6
   p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
   li: 2 Slot map
   li: 3 Findings
@@ -321,10 +321,10 @@ section#s5.sec
         mark: 2026-09-01 reboot
         mark: 2026-10-01 reboot
         mark: 2026-11-12 reboot, and 4 more at this mark
-        mark: CPU0_C1: 2026-11-12 UE (demand read), and 3 more at this mark
+        mark: CPU0_C1: 2026-11-12 UE (demand read), it stopped the host, and 3 more at this mark
         text: CPU0_C1 | peak 5/day | CPU1_D1 | peak 2/day | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12 | uncorrected error | 11-12
-    li: 7 reboots
-    li: 4 UE on 2026-11-12
+    li: 7 reboots, 4 after a hardware error stopped the host
+    li: 4 UE on 2026-11-12; 4 of them stopped the host
     li: 85 corrected and 4 uncorrected errors from 2026-07-31 to 2026-11-12
     li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
     details
@@ -404,10 +404,10 @@ section#s5.sec
         mark: 2026-09-01 reboot
         mark: 2026-10-01 reboot
         mark: 2026-11-12 reboot, and 4 more at this mark
-        mark: 2026-11-12 UE (demand read), and 3 more at this mark
+        mark: 2026-11-12 UE (demand read), it stopped the host, and 3 more at this mark
         text: corrected errors per day | 0 | 2 | 5 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12 | uncorrected error | 11-12
-    li: 7 reboots
-    li: 4 UE on 2026-11-12
+    li: 7 reboots, 4 after a hardware error stopped the host
+    li: 4 UE on 2026-11-12; 4 of them stopped the host
     li: 60 corrected and 4 uncorrected errors from 2026-07-31 to 2026-11-12
     li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
     details
@@ -468,7 +468,7 @@ section#s5.sec
         mark: 2026-10-01 reboot
         mark: 2026-11-12 reboot, and 4 more at this mark
         text: corrected errors per day | 0 | 2 | 4 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12
-    li: 7 reboots
+    li: 7 reboots, 4 after a hardware error stopped the host
     li: 25 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
     li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
     details

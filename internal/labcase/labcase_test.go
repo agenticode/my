@@ -766,11 +766,30 @@ func TestConsoleOfAHostThatWentDown(t *testing.T) {
 			if cmp.UnplannedErrors != 0 || cmp.UnplannedOfflines != 0 {
 				t.Errorf("beyond the plan: %v", cmp.Unplanned)
 			}
-			events, err := s.EventList(ctx, store.EventFilter{Host: res.Host})
-			if err != nil || len(events) != 1 {
-				t.Fatalf("%d events, %v", len(events), err)
+			all, err := s.EventList(ctx, store.EventFilter{Host: res.Host})
+			if err != nil {
+				t.Fatal(err)
+			}
+			// The error, and the kernel's lines that it stops the host.
+			var events, stops []*model.Event
+			for _, e := range all {
+				if e.ErrorType == model.ErrorTypeStop {
+					stops = append(stops, e)
+				} else {
+					events = append(events, e)
+				}
+			}
+			if len(events) != 1 || len(stops) != 1 {
+				t.Fatalf("%d events, %d stops", len(events), len(stops))
 			}
 			e := events[0]
+			if st := stops[0]; st.ErrorSeverity != model.SevInformational || st.CauseFingerprint != e.Fingerprint || st.Source != "klog/stop" {
+				t.Errorf("stop: %+v", *st)
+			}
+			boots, err := s.Boots(ctx, res.Host)
+			if err != nil || len(boots) != 1 || boots[0].End != model.BootStop || boots[0].EndRef != "event:"+strconv.FormatInt(e.ID, 10) {
+				t.Errorf("boots %+v, %v", boots, err)
+			}
 			// The record carries its own time, so the log needs no date.
 			if e.ErrorSeverity != c.severity || !e.OsPhysicalAddress.Valid || e.OsPhysicalAddress.V != c.address || e.Grade != model.GradeB ||
 				e.TimeQuality != model.TimeExact || e.ErrorDT.Sub(p.Injections[0].Time).Abs() > time.Minute {
@@ -779,6 +798,16 @@ func TestConsoleOfAHostThatWentDown(t *testing.T) {
 			out, err := engine.Run(ctx, s, engine.Options{Now: e.ErrorDT.Add(time.Minute)})
 			if err != nil || len(out.Hosts) != 1 {
 				t.Fatalf("engine: %v", err)
+			}
+			// The host finding says that this error stopped the host.
+			stated := false
+			if v := out.Hosts[0].Loose; v != nil {
+				for _, ev := range v.Evidence {
+					stated = stated || ev.Code == "ue.stopped"
+				}
+			}
+			if !stated {
+				t.Errorf("no finding says that the error stopped the host: %+v", out.Hosts[0].Loose)
 			}
 		})
 	}

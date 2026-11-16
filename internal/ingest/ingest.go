@@ -420,6 +420,9 @@ func (k *sink) Event(e *model.Event) error {
 	if e.DupOfFingerprint != "" {
 		e.DupOfFingerprint = model.Fingerprint(k.host, e.DupOfFingerprint)
 	}
+	if e.CauseFingerprint != "" {
+		e.CauseFingerprint = model.Fingerprint(k.host, e.CauseFingerprint)
+	}
 	inserted, err := k.w.InsertEvent(e)
 	if err != nil {
 		return k.refuse(e.RawRef, err)

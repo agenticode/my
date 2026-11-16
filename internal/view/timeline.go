@@ -3,6 +3,7 @@ package view
 import (
 	"context"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/agenticode/my/internal/engine"
@@ -322,7 +323,20 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	if err != nil {
 		return nil, err
 	}
+	// A boot after one that a hardware error stopped, or that panicked,
+	// says so: the end of a boot is the reason of the next.
+	stops, err := c.store.Stops(ctx, h.Host)
+	if err != nil {
+		return nil, err
+	}
+	stoppedBy := map[int64]bool{}
+	for _, st := range stops {
+		if st.EventID != 0 {
+			stoppedBy[st.EventID] = true
+		}
+	}
 	var latest time.Time
+	var prevEnd string
 	for _, b := range boots {
 		if b.StartQuality == model.TimeRelative || b.StartedAt.After(h.AsOf) {
 			continue
@@ -333,8 +347,16 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		// The boot that was running when the period began is not a reboot
 		// within it.
 		if b.StartedAt.After(h.ObservedFrom) {
-			add(MarkBoot, b.StartedAt, 1, c.say("tl.boot.one", "when", when(b.StartedAt)), nil)
+			code := "tl.boot.one"
+			switch prevEnd {
+			case model.BootStop:
+				code = "tl.boot.after_stop"
+			case model.BootPanic:
+				code = "tl.boot.after_panic"
+			}
+			add(MarkBoot, b.StartedAt, 1, c.say(code, "when", when(b.StartedAt)), nil)
 		}
+		prevEnd = b.End
 	}
 
 	ueFilter := filter
@@ -352,6 +374,9 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 		if e.ErrorScrubType != "" {
 			code = "tl.ue.one_how"
 			args = append(args, "how", Messages.Text(c.Lang, "how."+string(e.ErrorScrubType), nil))
+		}
+		if stoppedBy[e.ID] {
+			code = strings.Replace(code, ".one", ".stopped", 1)
 		}
 		add(MarkUE, e.ErrorDT, n, slotOf(e.Slot, c.say(code, args...)), &model.RecordRef{Kind: model.RecordEvent, ID: e.ID, RawRef: e.RawRef})
 	}
@@ -417,8 +442,14 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 	groups := map[string]*MarkerGroup{}
 	first, last := map[string]time.Time{}, map[string]time.Time{}
 	events := map[string]int{}
+	// stopped counts the marks that say a stop: a boot after one, an
+	// uncorrected error that stopped the host.
+	stopped := map[string]int{}
 	var kinds []string
 	for _, mk := range marks {
+		if mk.text.Code == "tl.boot.after_stop" || strings.HasPrefix(mk.text.Code, "tl.ue.stopped") {
+			stopped[mk.kind]++
+		}
 		g := groups[mk.kind]
 		if g == nil {
 			g = &MarkerGroup{Kind: mk.kind, Letter: MarkerLetters[mk.kind], Text: mk.text}
@@ -453,8 +484,16 @@ func (c *Case) Timeline(ctx context.Context, h *engine.HostResult, d *engine.DIM
 			}
 			switch kind {
 			case MarkBoot:
+				if stopped[kind] > 0 {
+					g.Text = c.say("tl.boot.many_stops", "n", g.Count, "s", stopped[kind])
+					break
+				}
 				g.Text = c.say("tl.boot.many", "n", g.Count)
 			case MarkUE:
+				if stopped[kind] > 0 {
+					g.Text = c.say("tl.ue."+form+"_stops", "n", g.Count, "first", a, "last", b, "s", stopped[kind])
+					break
+				}
 				g.Text = c.say("tl.ue."+form, "n", g.Count, "first", a, "last", b)
 			case MarkMove:
 				g.Text = c.say("tl.move."+form, "n", g.Count, "first", a, "last", b)

@@ -38,6 +38,9 @@ type Input struct {
 	// Captures holds, per host, what "my preflight" found when the latest
 	// live scan ran: what a reset would lose there.
 	Captures []model.CaptureCheck
+	// Stops are the boots a hardware error stopped, with the error record
+	// that stopped each (store.Stops).
+	Stops []store.Stop
 
 	events []event
 
@@ -314,6 +317,9 @@ func Load(ctx context.Context, s *store.Store) (*Input, error) {
 	}
 	if in.Boots, err = s.Boots(ctx, ""); err != nil {
 		return fail("boots", err)
+	}
+	if in.Stops, err = s.Stops(ctx, ""); err != nil {
+		return fail("stops", err)
 	}
 	if in.Actions, err = s.Actions(ctx, store.ActionFilter{}); err != nil {
 		return fail("actions", err)

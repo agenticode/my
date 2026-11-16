@@ -98,6 +98,9 @@ func (j *judge) loose(h *HostResult, clk clock) *model.Verdict {
 		} else {
 			add(RuleHostUE, statement("host.ue", "n", n, "when", when), refs, total)
 		}
+		if st, refs, total, ok := j.stopped(ue); ok {
+			add(RuleHostUE, st, refs, total)
+		}
 		// An address that had uncorrected errors in several boots.
 		if r := h.Recurrence; r != nil && r.Window() >= 2 {
 			for _, pb := range r.Loose {

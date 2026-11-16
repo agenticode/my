@@ -105,6 +105,7 @@ var columns = map[string]treatment{
 	"event.dimm_uid": dimmUID, "event.dimm_link": keep, "event.dup_fingerprint": derived, "event.time_quality": keep,
 	"event.window_start": keep, "event.edac_location": keep, "event.label": keep, "event.slot": keep, "event.error_type": keep,
 	"event.decoder": keep, "event.fingerprint": derived, "event.read_boot_id": bootID, "event.not_before": keep,
+	"event.cause_fingerprint": derived,
 
 	"event_raw.text": freeText,
 

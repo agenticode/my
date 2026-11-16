@@ -219,10 +219,93 @@ func (s *Store) stopRecords(ctx context.Context, host string) (map[string]endRec
 
 // kernelStops returns the stops the kernel itself printed, per boot: the
 // panic lines of a fatal machine check ("Kernel panic - not syncing:
-// Fatal machine check") or of a fatal firmware error. The kernel log
-// reader does not keep them as records yet; until it does there are none.
+// Fatal machine check") or of a fatal firmware error, which the kernel log
+// reader keeps as a record of type model.ErrorTypeStop. The record that
+// shows the stop is the error record the kernel printed just before the
+// panic (the stop record's cause_fingerprint), else the stop record
+// itself. The first stop of a boot counts.
 func (s *Store) kernelStops(ctx context.Context, host string) (map[string]endRecord, error) {
-	return map[string]endRecord{}, nil
+	out := map[string]endRecord{}
+	rows, err := s.db.QueryContext(ctx, `SELECT s.id, s.boot_id, s.source, s."ErrorDT", COALESCE(c.id, 0) FROM event s
+ LEFT JOIN event c ON s.cause_fingerprint != '' AND c.fingerprint = s.cause_fingerprint AND c.host = s.host
+ WHERE s.host = ? AND s.boot_id IS NOT NULL AND s."ErrorSeverity" = 'Informational' AND s.error_type = ?
+ ORDER BY s."ErrorDT", s.id`, host, model.ErrorTypeStop)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var r endRecord
+		var boot, at string
+		var cause int64
+		if err := rows.Scan(&r.id, &boot, &r.source, &at, &cause); err != nil {
+			return nil, err
+		}
+		if cause != 0 {
+			r.id = cause
+		}
+		r.end, r.at = model.BootStop, parseTS(sql.NullString{String: at, Valid: true})
+		if _, ok := out[boot]; !ok {
+			out[boot] = r
+		}
+	}
+	return out, rows.Err()
+}
+
+// Stop is a boot of a host that a hardware error stopped, with the error
+// record that stopped it.
+type Stop struct {
+	Host   string
+	BootID string
+	// At is when the boot stopped, when a record dates it: the time of the
+	// kernel's panic line. It is zero for a stop that the next boot showed.
+	At time.Time
+	// EventID is the counted error record that stopped the boot: the record
+	// end_ref names, or the one it is a duplicate of. It is 0 when no error
+	// record shows the stop (a panic without the record before it).
+	EventID int64
+	// Source is the source of the record that shows the stop.
+	Source string
+	// StopID and StopRef name the record of the kernel's lines that say
+	// the host stops (model.ErrorTypeStop), when the boot has one.
+	StopID  int64
+	StopRef string
+}
+
+// Stops returns the boots that a hardware error stopped, of one host or of
+// every host when host is "", in the order of their start. It reads what
+// BootOutcomes set.
+func (s *Store) Stops(ctx context.Context, host string) ([]Stop, error) {
+	q, args := `SELECT b.host, b.boot_id, b.end_at, b.end_source, COALESCE(e.dup_of, e.id, 0), COALESCE(e."ErrorSeverity", ''),
+ COALESCE(s.id, 0), COALESCE(s.raw_ref, '')
+ FROM boot b LEFT JOIN event e ON b.end_ref = 'event:' || e.id
+ LEFT JOIN event s ON s.id = (SELECT x.id FROM event x WHERE x.host = b.host AND x.boot_id = b.boot_id
+  AND x."ErrorSeverity" = 'Informational' AND x.error_type = ? ORDER BY x."ErrorDT", x.id LIMIT 1)
+ WHERE b."end" = ?`, []any{model.ErrorTypeStop, model.BootStop}
+	if host != "" {
+		q, args = q+` AND b.host = ?`, append(args, host)
+	}
+	rows, err := s.db.QueryContext(ctx, q+` ORDER BY b.host, b.started_at, b.boot_id`, args...)
+	if err != nil {
+		return nil, fmt.Errorf("stops: %w", err)
+	}
+	defer rows.Close()
+	var out []Stop
+	for rows.Next() {
+		var st Stop
+		var at sql.NullString
+		var sev string
+		if err := rows.Scan(&st.Host, &st.BootID, &at, &st.Source, &st.EventID, &sev, &st.StopID, &st.StopRef); err != nil {
+			return nil, fmt.Errorf("stops: %w", err)
+		}
+		st.At = parseTS(at)
+		if model.Severity(sev).Class() == "" {
+			// The record of the stop itself: no error record shows it.
+			st.EventID = 0
+		}
+		out = append(out, st)
+	}
+	return out, rows.Err()
 }
 
 // endRecord is the record that shows how a boot ended.
