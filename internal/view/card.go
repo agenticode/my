@@ -286,6 +286,12 @@ type Examination struct {
 // Examine builds the examination of a DIMM. The address map shows the bank
 // with the most errors; cells is the width of its grid in cells.
 func (c *Case) Examine(ctx context.Context, h *engine.HostResult, d *engine.DIMMResult, cells int) (*Examination, error) {
+	return c.ExamineWith(ctx, h, d, MapOptions{Cells: cells, MaxLines: 16})
+}
+
+// ExamineWith builds the examination of a DIMM with an address map drawn
+// as opts say; the map shows the bank with the most errors.
+func (c *Case) ExamineWith(ctx context.Context, h *engine.HostResult, d *engine.DIMMResult, opts MapOptions) (*Examination, error) {
 	x := &Examination{}
 	var err error
 	if x.Card, err = c.Card(ctx, h, d); err != nil {
@@ -294,7 +300,7 @@ func (c *Case) Examine(ctx context.Context, h *engine.HostResult, d *engine.DIMM
 	if x.Topology, err = c.Topology(ctx, d); err != nil {
 		return nil, err
 	}
-	if x.AddressMap, err = c.AddressMap(ctx, h, d, MapOptions{Cells: cells, MaxLines: 16}); err != nil {
+	if x.AddressMap, err = c.AddressMap(ctx, h, d, opts); err != nil {
 		return nil, err
 	}
 	if db := h.Recurrence.DIMM(d.UID); db != nil && db.BootsWithErrors >= 2 {

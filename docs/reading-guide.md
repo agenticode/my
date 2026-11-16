@@ -118,7 +118,7 @@ A grade is a finding: the thresholds behind it are defaults. [rules.md](rules.md
 The memory of a DIMM is a tree: ranks hold devices, devices hold banks, banks hold rows. The bars split all errors of the DIMM at each of these levels.
 
 ```
-$ my open examples/demo.mycase dimm CPU0_C1
+$ my open examples/demo.mycase dimm CPU0_C1 --detail
 [...]
  where the errors sit (width = share of the errors of this DIMM)                              boots
  rank    |rank0 ██████████████████████████████████████████████████████████████████████ 100%|  3 of 4
@@ -128,7 +128,7 @@ $ my open examples/demo.mycase dimm CPU0_C1
 [...]
 ```
 
-The width of a segment is its share of the errors, and a segment lies below the segment it belongs to. The widest path from top to bottom is where the errors are. When the DIMM has errors in two or more boots of the window (see "Boots" below), the column at the right says in how many of them the widest segment of each level had errors.
+The width of a segment is its share of the errors, and a segment lies below the segment it belongs to. The widest path from top to bottom is where the errors are. When the DIMM has errors in two or more boots of the window (see "Boots" below), the column at the right says in how many of them the widest segment of each level had errors. Without `--detail`, `my dimm` names the levels whose errors all sit on one branch in the title and draws the levels below them, and draws no bars when every level has one branch.
 
 | Shape | Reading |
 | --- | --- |
@@ -165,7 +165,7 @@ CPU0_C1  S/N 3B9C56  DDR5 RDIMM 64 GB 2Rx4
  errors in 3 of the last 4 boots, uncorrected in 1
 ```
 
-The map shows one bank of one device: rows down, columns across. A cell stands for a range of columns, which the line above the legend names. The shade of a cell is the number of errors in it on the scale `· 0`, `░ 1-2`, `▒ 3-9`, `▓ 10-99`, `█ 100+`, and `X` marks a cell with an uncorrected error. The mode of a fault is its shape:
+The map shows one bank of one device: rows down, columns across. A cell stands for a range of columns, which the head line of the map names. The shade of a cell is the number of errors in it on the scale `· 0`, `░ 1-2`, `▒ 3-9`, `▓ 10-99`, `█ 100+`, and `X` marks a cell with an uncorrected error; the legend lists the shades the map uses, beside the head when there is room. The mode of a fault is its shape:
 
 | Shape | Fault mode |
 | --- | --- |
@@ -250,10 +250,8 @@ host synth-crash-loop  Example Systems R760  8 boots  2026-07-31 to 2026-11-12
  CPU0_C1  ·       ·       ▒       X       X       X       X       ·
  CPU1_D1  ░       ░       ▒       ·       ·       ·       ·       ·
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the
- latest scan, - not on record
+ · none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: STOP a fatal
+ hardware error, - not on record
 
  my open examples/crash-loop.mycase boots CPU0_C1: the places of this DIMM boot by boot
 ```
@@ -292,10 +290,8 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
  rank0 dev7 bg0 bank3 row 0x1a2f
    col 0x238  ·  ·  ▒  X  X  X  X  ·   5 of 8  CE 60, UE 4
 
- · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?
- the boot stopped and no record names a DIMM, - not in the host
- ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, -
- not on record
+ · none, corrected ▒ 10-99, X uncorrected in a boot that stopped; ended: H a fatal hardware error,
+ - not on record
 
  uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8       R-LOOP-01
  boots: each of these boots ended in a fatal hardware error

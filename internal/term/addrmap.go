@@ -27,10 +27,25 @@ func (st Style) MapCells() int {
 const mapLabelWidth = 8
 
 // rowLabel writes a row address.
+// ExamMap is how the examination of a DIMM draws its address map: in
+// short with one quiet row around the rows with errors and at most eight
+// lines of binned rows, with Detail as "my map" draws it.
+func (st Style) ExamMap() view.MapOptions {
+	o := view.MapOptions{Cells: st.MapCells(), MaxLines: 16}
+	if !st.Detail {
+		o.Margin, o.Bins = 1, 8
+	}
+	return o
+}
+
 func rowLabel(row int) string { return fmt.Sprintf("%#x", row) }
 
 // addressMap draws the heat map of one bank.
-func (st Style) addressMap(p *page, m *view.AddressMap) {
+//
+// In brief, as part of the examination of a DIMM, it leaves out what the
+// card above already says: the faults of the bank and the boots it had
+// errors in.
+func (st Style) addressMap(p *page, m *view.AddressMap, brief bool) {
 	g := st.g()
 	if m.Bank == nil {
 		p.add(" " + st.say("map.none"))
@@ -44,17 +59,34 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 	if m.Mode == view.MapBins {
 		cellNote = st.say("map.cell_bins", "n", m.ColumnsPerCell, "rows", m.RowsPerLine)
 	}
-	for _, line := range flow([]string{st.bold(m.Bank.Label), st.say("map.axes"), cellNote}, "  ", st.width()-1) {
-		p.add(" " + line)
-	}
+	head := flow([]string{st.bold(m.Bank.Label), st.say("map.axes"), cellNote}, "  ", st.width()-1)
 
-	// The scale: what each shade stands for.
-	legend := []string{st.paint(heatColor(0), g.shade[0]) + " 0"}
+	// The scale: what each shade the grid shows stands for.
+	used := map[int]bool{}
+	anyUE := false
+	for _, ln := range m.Lines {
+		if ln.Gap {
+			continue
+		}
+		ue := map[int]bool{}
+		for _, i := range ln.UE {
+			ue[i] = true
+		}
+		anyUE = anyUE || len(ln.UE) > 0
+		for i, n := range ln.Cells {
+			if !ue[i] {
+				used[heatLevel(n, m.Scale)] = true
+			}
+		}
+	}
+	var legend []string
+	if used[0] {
+		legend = append(legend, st.paint(heatColor(0), g.shade[0])+" 0")
+	}
+	var sentence []string
 	if m.ByBoots {
 		legend = nil
-		for _, l := range wrap(st.say("map.by_boots", "of", m.Window, "g0", g.shade[0], "ue", g.ue), st.width()-1) {
-			p.add(" " + l)
-		}
+		sentence = wrap(st.say("map.by_boots", "of", m.Window, "g0", g.shade[0], "ue", g.ue), st.width()-1)
 	}
 	for i, lo := range m.Scale {
 		text := fmt.Sprintf("%d+", lo)
@@ -68,15 +100,25 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 		if m.ByBoots {
 			break
 		}
-		legend = append(legend, st.paint(heatColor(i+1), g.shade[min(i+1, 4)])+" "+text)
+		if used[heatLevel(lo, m.Scale)] {
+			legend = append(legend, st.paint(heatColor(i+1), g.shade[min(i+1, 4)])+" "+text)
+		}
 	}
-	if !m.ByBoots {
+	if !m.ByBoots && anyUE {
 		legend = append(legend, st.paint(cBoldRed, g.ue)+" "+st.say("map.ue"))
 	}
-	for _, line := range flow(legend, "   ", st.width()-1) {
+	// The scale stands beside the head when there is room.
+	keys := flow(legend, "   ", st.width()-1)
+	if n := len(head); n > 0 && len(keys) == 1 && Width(head[n-1])+4+Width(keys[0]) <= st.width()-1 {
+		head[n-1] += "    " + keys[0]
+		keys = nil
+	}
+	for _, line := range append(append(head, sentence...), keys...) {
 		p.add(" " + line)
 	}
-	p.blank()
+	if !brief {
+		p.blank()
+	}
 
 	if len(m.Lines) == 0 {
 		p.add(" " + st.say("map.no_rows"))
@@ -153,8 +195,13 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 		}
 	}
 
-	p.blank()
+	if !brief {
+		p.blank()
+	}
 	for _, f := range m.Faults {
+		if brief {
+			break
+		}
 		for i, l := range wrap(f.Text.Text, st.width()-3) {
 			if i == 0 {
 				p.add(" " + l)
@@ -166,7 +213,8 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 	if m.Stray > 0 {
 		p.add(" " + st.say("map.stray", "n", m.Stray))
 	}
-	if m.BankCount > 1 {
+	if m.BankCount > 1 && !brief {
+		// In brief the topology bars above name the other branches.
 		var others []string
 		for _, b := range m.Banks {
 			if b.Label != m.Bank.Label {
@@ -188,7 +236,7 @@ func (st Style) addressMap(p *page, m *view.AddressMap) {
 	if m.Unlocated > 0 {
 		p.add(" " + st.say("map.unlocated", "n", m.Unlocated))
 	}
-	if m.Window > 0 && m.Boots >= 2 {
+	if m.Window > 0 && m.Boots >= 2 && !brief {
 		p.add(" " + st.say("map.boots", "n", m.Boots, "of", m.Window, "ue", m.UEBoots))
 	}
 }
@@ -205,6 +253,6 @@ func AddressMap(w io.Writer, m *view.AddressMap, st Style) error {
 		p.add(line)
 	}
 	p.blank()
-	st.addressMap(p, m)
+	st.addressMap(p, m, false)
 	return p.writeTo(w)
 }

@@ -10,7 +10,11 @@ import (
 )
 
 // timeline draws errors per day with the events of the period below.
-func (st Style) timeline(p *page, tl *view.Timeline) {
+//
+// In brief, as part of the examination of a DIMM, it leaves out the totals
+// below the chart, which the card and the ranking give, and the stops
+// lines of the host.
+func (st Style) timeline(p *page, tl *view.Timeline, brief bool) {
 	g := st.g()
 	if tl.Days == 0 {
 		p.add(" " + st.say("tl.none"))
@@ -76,7 +80,11 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 		}
 		place(int(d.Sub(tl.From).Hours()/24)/per, d.Format(layout), false)
 	}
-	p.add(" " + strings.Repeat(" ", lw) + "  " + st.dim(string(axis)))
+	if strings.TrimSpace(string(axis)) != "" {
+		// A chart of a few days has no room for a date: the events below
+		// carry theirs.
+		p.add(" " + strings.Repeat(" ", lw) + "  " + st.dim(string(axis)))
+	}
 
 	for _, s := range tl.Series {
 		bins := make([]float64, cols)
@@ -216,6 +224,9 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 
 	p.blank()
 	for _, n := range tl.Notes {
+		if brief && (strings.HasPrefix(n.Code, "tl.total") || n.Code == "tl.since_boot") {
+			continue
+		}
 		for i, l := range wrap(n.Text, st.width()-3) {
 			if i == 0 {
 				p.add(" " + l)
@@ -227,8 +238,37 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 	if b := tl.Boots; b != nil && len(b.Boots) > 0 {
 		p.blank()
 		p.add(" " + st.say("tl.boots"))
-		st.stopsLines(p, b.Stops)
+		if !brief {
+			st.stopsLines(p, b.Stops)
+		}
 		st.bootsGrid(p, b, 0)
+	}
+}
+
+// dayEvents writes a timeline of one day as lines: the errors of the day,
+// then its events in the order they came. Uncorrected errors that neither
+// stopped the host nor say how they were found are in the first line.
+func (st Style) dayEvents(p *page, tl *view.Timeline) {
+	put := func(text string, indent int) {
+		for i, l := range wrap(text, st.width()-1-indent-2) {
+			lead := strings.Repeat(" ", indent)
+			if i > 0 {
+				lead += "  "
+			}
+			p.add(" " + lead + l)
+		}
+	}
+	for _, n := range tl.Notes {
+		if strings.HasPrefix(n.Code, "tl.total") {
+			put(n.Text, 0)
+		}
+	}
+	for _, m := range tl.Markers {
+		switch m.Text.Code {
+		case "tl.ue.one", "tl.ue.day", "tl.ue.many":
+			continue // the line of the day counts them
+		}
+		put(m.Text.Text, 2)
 	}
 }
 
@@ -251,6 +291,6 @@ func Timeline(w io.Writer, tl *view.Timeline, st Style) error {
 		p.add(line)
 	}
 	p.blank()
-	st.timeline(p, tl)
+	st.timeline(p, tl, false)
 	return p.writeTo(w)
 }

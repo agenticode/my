@@ -102,27 +102,82 @@ func (st Style) stopsLines(p *page, s *view.Stops) {
 	}
 }
 
+// Kinds of the cells of a boots grid, in the order of the legend.
+const (
+	cellNone = iota
+	cellCE1
+	cellCE10
+	cellCE100
+	cellUE
+	cellStopped
+	cellUnknown
+	cellAbsent
+	cellKinds
+)
+
+// cellKind says what a DIMM or a place showed in one boot.
+func cellKind(c view.BootCell) int {
+	switch {
+	case c.Stopped:
+		return cellStopped
+	case c.UE > 0:
+		return cellUE
+	case c.CE >= 100:
+		return cellCE100
+	case c.CE >= 10:
+		return cellCE10
+	case c.CE > 0:
+		return cellCE1
+	case c.Absent:
+		return cellAbsent
+	case !c.Known:
+		return cellUnknown
+	}
+	return cellNone
+}
+
 // bootGlyph is the letter of a cell: what a DIMM or a place showed in one
 // boot.
 func (st Style) bootGlyph(c view.BootCell) string {
 	g := st.g()
-	switch {
-	case c.Stopped:
+	switch cellKind(c) {
+	case cellStopped:
 		return st.paint(cRed, g.ue)
-	case c.UE > 0:
+	case cellUE:
 		return st.paint(cRed, "U")
-	case c.CE >= 100:
+	case cellCE100:
 		return st.paint(heatColor(3), g.shade[3])
-	case c.CE >= 10:
+	case cellCE10:
 		return st.paint(heatColor(2), g.shade[2])
-	case c.CE > 0:
+	case cellCE1:
 		return st.paint(heatColor(1), g.shade[1])
-	case c.Absent:
+	case cellAbsent:
 		return "-"
-	case !c.Known:
+	case cellUnknown:
 		return "?"
 	}
 	return st.dim(g.shade[0])
+}
+
+// gridKeys collects what the cells and the ends of a boots grid show, for
+// a legend of those symbols only.
+type gridKeys struct {
+	cells [cellKinds]bool
+	ends  map[string]bool
+}
+
+func (k *gridKeys) cell(c view.BootCell) { k.cells[cellKind(c)] = true }
+
+func (k *gridKeys) end(e string) {
+	if k.ends == nil {
+		k.ends = map[string]bool{}
+	}
+	switch e {
+	case model.BootStop, model.BootPanic, "running":
+	default:
+		e = ""
+	}
+	k.ends[e] = true
 }
 
 // endWord is how a boot ended, in the grid of a host.
@@ -202,8 +257,10 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		}
 		p.add(s.String())
 	}
+	var keys gridKeys
 	var idx, day, clock, ran, ended []string
 	for _, bc := range cols {
+		keys.end(bc.End)
 		idx = append(idx, strconv.Itoa(bc.Index))
 		if bc.StartQuality == "unknown" {
 			day, clock = append(day, "?"), append(clock, "")
@@ -227,6 +284,7 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 		}
 		var cells []string
 		for _, c := range r.Cells[from:] {
+			keys.cell(c)
 			cells = append(cells, st.bootGlyph(c))
 		}
 		line(label, cells)
@@ -238,7 +296,7 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 	if b.Quiet > 0 {
 		st.para(p, st.say("boots.quiet", "n", b.Quiet))
 	}
-	st.bootsLegend(p, true)
+	st.bootsLegend(p, &keys, true)
 }
 
 // para writes a sentence wrapped to the width, one space in.
@@ -248,17 +306,45 @@ func (st Style) para(p *page, text string) {
 	}
 }
 
-// bootsLegend explains the letters of a grid.
-func (st Style) bootsLegend(p *page, words bool) {
+// bootsLegend explains the symbols a grid shows, and only those: the
+// cells, then how the boots ended, in words or in letters.
+func (st Style) bootsLegend(p *page, k *gridKeys, words bool) {
 	g := st.g()
-	for _, l := range wrap(st.say("boots.legend", "g0", g.shade[0], "g1", g.shade[1], "g2", g.shade[2], "g3", g.shade[3], "ue", g.ue), st.width()-2) {
-		p.add(" " + st.dim(l))
+	glyph := [cellKinds]string{g.shade[0], g.shade[1], g.shade[2], g.shade[3], "U", g.ue, "?", "-"}
+	code := [cellKinds]string{"none", "ce1", "ce10", "ce100", "ue", "stopped", "unknown", "absent"}
+	var cells []string
+	ce := false
+	for i, on := range k.cells {
+		if !on {
+			continue
+		}
+		key := st.say("boots.key."+code[i], "g", glyph[i])
+		if (i == cellCE1 || i == cellCE10 || i == cellCE100) && !ce {
+			// The first range of corrected errors names them.
+			key, ce = st.say("boots.key.ce")+" "+key, true
+		}
+		cells = append(cells, key)
 	}
-	code := "boots.legend_letters"
-	if words {
-		code = "boots.legend_words"
+	var ends []string
+	for _, e := range []string{model.BootStop, model.BootPanic, "running", ""} {
+		if !k.ends[e] {
+			continue
+		}
+		w := st.endLetter(e)
+		if words {
+			w = st.endWord(e)
+		}
+		name := map[string]string{model.BootStop: "stop", model.BootPanic: "panic", "running": "running", "": "none"}[e]
+		if words && e == "running" {
+			continue // the word says it
+		}
+		ends = append(ends, st.say("boots.key.end."+name, "w", w))
 	}
-	for _, l := range wrap(st.say(code), st.width()-2) {
+	text := strings.Join(cells, ", ")
+	if len(ends) > 0 {
+		text += "; " + st.say("boots.key.ended") + " " + strings.Join(ends, ", ")
+	}
+	for _, l := range wrap(text, st.width()-2) {
 		p.add(" " + st.dim(l))
 	}
 }
@@ -371,8 +457,10 @@ func (st Style) placesGrid(p *page, b *view.Boots, show, limit int) {
 		}
 		p.add(s.String())
 	}
+	var keys gridKeys
 	var idx, ended []string
 	for _, bc := range b.Boots[from:] {
+		keys.end(bc.End)
 		idx = append(idx, strconv.Itoa(bc.Index))
 		ended = append(ended, st.endLetter(bc.End))
 	}
@@ -388,6 +476,7 @@ func (st Style) placesGrid(p *page, b *view.Boots, show, limit int) {
 		label := truncate(e.label, lw, st.g().ellipsis)
 		var cells []string
 		for _, c := range r.Cells[from:] {
+			keys.cell(c)
 			cells = append(cells, st.bootGlyph(c))
 		}
 		var counts []string
@@ -403,5 +492,5 @@ func (st Style) placesGrid(p *page, b *view.Boots, show, limit int) {
 	if from > 0 {
 		st.para(p, st.say("boots.left_out", "n", from))
 	}
-	st.bootsLegend(p, false)
+	st.bootsLegend(p, &keys, false)
 }

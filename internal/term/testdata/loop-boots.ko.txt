@@ -11,9 +11,6 @@
  CPU0_C1    ·      ·      ▒      X      X      X      X      ·
  CPU1_D1    ░      ░      ▒      ·      ·      ·      ·      ·
 
- · 없음, ░ CE 1-9, ▒ 10-99, ▓ 100+, U UE, X 중단된 부팅의 UE, ? 부팅이 중단됐고 DIMM을 지목한 기록
- 없음, - 호스트에 없던 때
- 종료: 중단은 치명적 하드웨어 오류로 끝난 부팅, panic은 다른 panic, 실행중은 최근 스캔 때의 부팅,
- -는 기록 없음
+ · 없음, CE ░ 1-9, ▒ 10-99, X 중단된 부팅의 UE; 종료: 중단 치명적 하드웨어 오류, - 기록 없음
 
  my boots CPU0_C1: the places of this DIMM boot by boot

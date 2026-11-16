@@ -11,8 +11,7 @@ CPU0_C1  replace now  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:
  next      Replace the DIMM. Attach a case bundle of this DIMM to the return.
  confidence medium, 1 more statement, 3 checks not made, 4 kinds of data missing: --detail
 
- where the errors sit (width = share of the errors of this DIMM)
- rank    |rank0 ██████████████████████████████████████████████████████████████████████████████ 100%|
+ where the errors sit in rank0 (width = share of the errors of this DIMM)
  device  |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
  bank    |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
  row     |not reported by this platform ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░|
@@ -27,6 +26,3 @@ CPU0_C1  replace now  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:
                                        │    │└ 2026-11-12 UE
                                        │    └─ 7 pages offline, 2026-11-11 to 2026-11-12
                                        └────── 2026-10-28 reboot
-
- 1,231 corrected and 1 uncorrected error from 2026-08-03 to 2026-11-12
- 790 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those

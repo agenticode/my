@@ -12,9 +12,7 @@ host [1msynth-crash-loop[0m  Example Systems R760  8 boots  2026-07-31 to 2026
  CPU0_C1  [2m·[0m       [2m·[0m       [32m▒[0m       [31mX[0m       [31mX[0m       [31mX[0m       [31mX[0m       [2m·[0m
  CPU1_D1  [36m░[0m       [36m░[0m       [32m▒[0m       [2m·[0m       [2m·[0m       [2m·[0m       [2m·[0m       [2m·[0m
 
- [2m· none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ?[0m
- [2mthe boot stopped and no record names a DIMM, - not in the host[0m
- [2mended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the[0m
- [2mlatest scan, - not on record[0m
+ [2m· none, corrected ░ 1-9, ▒ 10-99, X uncorrected in a boot that stopped; ended: [31mSTOP[0m a fatal[0m
+ [2mhardware error, - not on record[0m
 
  [1mmy boots CPU0_C1[0m: the places of this DIMM boot by boot
