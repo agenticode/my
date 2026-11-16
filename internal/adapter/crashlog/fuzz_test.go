@@ -98,3 +98,4 @@ func (discard) Counter(*model.CounterSample) error   { return nil }
 func (discard) BMC(*model.BMC) error                 { return nil }
 func (discard) BIOSSetting(*model.BIOSSetting) error { return nil }
 func (discard) BMCMemory(*model.BMCMemory) error     { return nil }
+func (discard) Firmware(*model.FirmwareRecord) error { return nil }

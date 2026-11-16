@@ -245,6 +245,12 @@ func (w *Writer) InsertEvent(e *model.Event) (inserted bool, err error) {
 			return false, fmt.Errorf("event %s: raw record: %w", e.RawRef, err)
 		}
 	}
+	if e.Firmware != nil {
+		firmwareOf(e.Firmware, e.Host, e.ScanID, e.ErrorDT, e.Source, e.RawRef)
+		if _, err := w.insertFirmware(e.Firmware, e.ID, 0); err != nil {
+			return false, err
+		}
+	}
 	return true, nil
 }
 
@@ -628,8 +634,16 @@ func (w *Writer) InsertAction(a *model.Action) (inserted bool, err error) {
 		err := w.queryRow(`SELECT id FROM action WHERE fingerprint = ?`, a.Fingerprint).Scan(&a.ID)
 		return false, err
 	}
-	a.ID, err = res.LastInsertId()
-	return err == nil, err
+	if a.ID, err = res.LastInsertId(); err != nil {
+		return false, err
+	}
+	if a.Firmware != nil {
+		firmwareOf(a.Firmware, a.Host, a.ScanID, a.At, a.Source, a.RawRef)
+		if _, err := w.insertFirmware(a.Firmware, 0, a.ID); err != nil {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 // InsertCounterSample stores one counter reading. A reading of the same
@@ -712,9 +726,9 @@ func (w *Writer) InsertSource(src *model.Source) error {
 		return err
 	}
 	res, err := w.exec(`INSERT INTO source (scan_id, kind, origin, status, detail, records, events, actions, skipped, samples,
- grade_a, grade_b, grade_c, first_ts, last_ts, notes) VALUES (`+placeholders(16)+`)`,
+ grade_a, grade_b, grade_c, first_ts, last_ts, notes, unread, faults) VALUES (`+placeholders(18)+`)`,
 		src.ScanID, src.Kind, src.Origin, string(src.Status), src.Detail, src.Records, src.Events, src.Actions, src.Skipped, src.Samples,
-		src.GradeA, src.GradeB, src.GradeC, ts(src.FirstTS), ts(src.LastTS), string(nb))
+		src.GradeA, src.GradeB, src.GradeC, ts(src.FirstTS), ts(src.LastTS), string(nb), src.Unread, src.Faults)
 	if err != nil {
 		return fmt.Errorf("source %s %s: %w", src.Kind, src.Origin, err)
 	}
@@ -996,7 +1010,7 @@ func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
 		if q.sql == `DELETE FROM scan WHERE id = ?` {
 			// Records that name the scan and were there before it keep
 			// their row; they lose the reference.
-			for _, t := range []string{"event", "action", "gpu_mem", "ecs_sample", "bmc", "bios_setting", "bmc_memory"} {
+			for _, t := range []string{"event", "action", "gpu_mem", "ecs_sample", "bmc", "bios_setting", "bmc_memory", "fw_record", "registry_seen"} {
 				if _, err := w.exec(`UPDATE `+t+` SET scan_id = NULL WHERE scan_id = ?`, scanID); err != nil {
 					return fmt.Errorf("drop scan %d: %w", scanID, err)
 				}
