@@ -158,7 +158,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | rasdaemon, mcelog | record error events and counts | reads the database of rasdaemon, its store on a MySQL or PostgreSQL server, and the counts of the mcelog daemon |
 | The kernel: EDAC drivers, firmware error records, machine checks | detects, decodes and logs errors | reads the kernel log and the EDAC counters |
 | Page offlining by the kernel, post package repair and sparing by firmware, repair services of a BMC | take pages away, repair rows, spare devices | shows on the timeline what was done and when, and whether errors came back; it does none of it |
-| A BMC | keeps an event log outside the operating system | reads `ipmitool sel` listings and Redfish dumps, or asks the Redfish service itself and changes nothing on it (`my collect redfish`) |
+| A BMC | keeps an event log outside the operating system | reads `ipmitool sel` listings and Redfish dumps, or asks the Redfish service itself and changes nothing on it (`--bmc`, `my collect redfish`) |
 | A fault analyzer of a memory vendor (OCP FMFM) | classifies faults with knowledge of the device | hands it the records in FMFM field names and shows its answer (`--plugin`) |
 | Prometheus | stores series and alerts | `my serve --metrics` exports the finding per DIMM |
 
@@ -202,7 +202,10 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my diff BEFORE AFTER` | two cases of one host, before and after a reseat, a slot swap, a replacement or a firmware update: did the errors move with the DIMM or stay with the slot |
 | `my import <file\|directory>...` | build a case from files, without the host they came from |
 | `my collect redfish --bmc ADDRESS -o OUT` | ask a BMC over Redfish for memory, BIOS settings and logs |
+| `my inventory` | the DIMMs one per line: maker, part number, size, organisation, speed, the RAS settings in effect, and the corrected errors the operating system and the BMC each recorded |
+| `my bios` | check the memory RAS settings of the BIOS against a profile ([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
+| `my export labels` | write the slot names as a DIMM label file for rasdaemon |
 | `my verify --expect plan.yaml` | compare an error injection plan with what the host recorded ([docs/verify.md](docs/verify.md)) |
 | `my serve --metrics` | run as a Prometheus exporter ([docs/exporter.md](docs/exporter.md)) |
 | `my help [command]` | flags of a command and how to read what it prints |
@@ -243,9 +246,15 @@ A case travels as one file, from the person at the server to the person who read
 
 A bundle is a ZIP archive with the ledger, a manifest, the source inventory and a `README.txt` that says what is inside. `my open` never changes it, and it computes the findings again from the records: a receiver with a newer version reads an older case. `my diff before.mycase after.mycase` compares two cases of one host ([docs/diff.md](docs/diff.md)), and [docs/bundle-format.md](docs/bundle-format.md) describes the format.
 
+## The BMC
+
+With `--bmc ADDRESS` a command also asks the BMC of the host over Redfish, with GET requests only, for its memory modules and their error counts, the BIOS memory settings and its event logs. `my inventory` lists the DIMMs one per line and sets the corrected errors the operating system and the BMC each recorded side by side. `my bios` checks the memory RAS settings against a profile whose attribute names all come from public documents of the server vendors. `my export labels` writes the BMC's slot names as a DIMM label file for rasdaemon. When the host cannot be reached, `my collect redfish` reads the BMC alone.
+
+[docs/redfish.md](docs/redfish.md) lists every request, how certificates and passwords are handled, and what has not been tried: no BMC of a real server has been read yet.
+
 ## Privacy
 
-MemorY has no telemetry and contacts no server of the project. It uses the network in three cases, each asked for on the command line: `--fleet` reads the database server that the rasdaemons of a fleet write to, `my collect redfish` asks a BMC, and `my serve` listens for Prometheus. What leaves a host is a bundle, when a person sends it.
+MemorY has no telemetry and contacts no server of the project. It uses the network in three cases, each asked for on the command line: `--fleet` reads the database server that the rasdaemons of a fleet write to, `--bmc` and `my collect redfish` ask a BMC, and `my serve` listens for Prometheus. What leaves a host is a bundle, when a person sends it.
 
 | A bundle holds | A bundle never holds |
 | --- | --- |
@@ -286,6 +295,7 @@ Early development; no version is tagged.
 - Findings compared with the failure tickets of a public fleet dataset: [docs/evaluation.md](docs/evaluation.md).
 - Not validated yet: hosts with the EDAC driver of a real memory controller. The decoding of their records rests on fixtures written from kernel and rasdaemon sources.
 - No analyzer of a memory vendor has been run against the plugin contract.
+- No BMC of a real server has been read. The Redfish client has run against the stand-in BMCs of the tests and against the DMTF mockup server ([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## Roadmap
 
@@ -302,6 +312,7 @@ Early development; no version is tagged.
 | [docs/reading-guide.md](docs/reading-guide.md) | how to read each figure |
 | [docs/rules.md](docs/rules.md) | every rule with its condition, its thresholds and what the finding says |
 | [docs/compatibility.md](docs/compatibility.md) | every input: what is read, which observation grade, what is missing |
+| [docs/redfish.md](docs/redfish.md) | reading a BMC: the requests, certificates and passwords, the BIOS settings check, OS and BMC side by side, DIMM labels |
 | [docs/data-model.md](docs/data-model.md) | the ledger: tables, identities, how records of several sources become one history |
 | [docs/bundle-format.md](docs/bundle-format.md) | the case bundle: members, manifest, what a reader checks, anonymizing |
 | [docs/diff.md](docs/diff.md) | comparing two cases of one host |

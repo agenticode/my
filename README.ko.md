@@ -154,7 +154,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | rasdaemon, mcelog | 오류 이벤트와 건수를 기록 | rasdaemon 데이터베이스, MySQL이나 PostgreSQL 서버에 둔 저장소, mcelog 데몬의 건수를 읽음 |
 | 커널: EDAC 드라이버, 펌웨어 오류 기록, machine check | 오류를 감지하고 디코딩해 로그에 남김 | 커널 로그와 EDAC 카운터를 읽음 |
 | 커널의 page offline, 펌웨어의 PPR과 sparing, BMC의 리페어 서비스 | 페이지를 빼고, row를 고치고, 디바이스를 예비로 돌림 | 언제 무엇을 했고 그 뒤 오류가 재발했는지 타임라인에 표시. 직접 실행하는 것은 없음 |
-| BMC | 운영체제 밖에서 이벤트 로그를 보관 | `ipmitool sel` 출력과 Redfish 덤프를 읽음. `my collect redfish`는 Redfish 서비스에 직접 묻고 아무것도 바꾸지 않음 |
+| BMC | 운영체제 밖에서 이벤트 로그를 보관 | `ipmitool sel` 출력과 Redfish 덤프를 읽음. `--bmc`와 `my collect redfish`는 Redfish 서비스에 직접 묻고 아무것도 바꾸지 않음 |
 | 메모리 벤더의 고장 분석기(OCP FMFM) | 디바이스 지식으로 고장을 분류 | 기록을 FMFM 필드 이름으로 넘기고 답을 표시(`--plugin`) |
 | Prometheus | 시계열을 저장하고 알림을 보냄 | `my serve --metrics`가 DIMM별 소견을 내보냄 |
 
@@ -198,7 +198,10 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my diff BEFORE AFTER` | 한 호스트의 두 케이스를 비교. reseat, 슬롯 교차, 교체, 펌웨어 업데이트 전후에 오류가 DIMM을 따라갔는지 슬롯에 남았는지 확인 |
 | `my import <파일\|디렉터리>...` | 호스트 없이 파일만으로 케이스를 만듦 |
 | `my collect redfish --bmc ADDRESS -o OUT` | BMC에 Redfish로 메모리, BIOS 설정, 로그를 물어 저장 |
+| `my inventory` | DIMM을 한 줄에 하나씩: 제조사, 파트 넘버, 용량, 구성, 속도, 적용 중인 RAS 설정, 운영체제와 BMC가 각각 기록한 CE |
+| `my bios` | BIOS의 메모리 RAS 설정을 프로필과 대조([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
+| `my export labels` | 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 저장 |
 | `my verify --expect plan.yaml` | 오류 주입 계획과 호스트가 기록한 것을 대조([docs/verify.md](docs/verify.md)) |
 | `my serve --metrics` | Prometheus exporter로 실행([docs/exporter.md](docs/exporter.md)) |
 | `my help [명령]` | 명령의 옵션과 출력 읽는 법 |
@@ -239,9 +242,15 @@ r12-n034 CPU0_C1 S/N 3B9C56: 즉시 교체 (소견, 신뢰도 높음; R-UE-01, R
 
 번들은 ZIP 아카이브입니다. 원장, 매니페스트, 소스 인벤토리, 그리고 내용물을 글로 적은 `README.txt`가 들어 있습니다. `my open`은 번들을 바꾸지 않고, 기록에서 소견을 다시 계산합니다. 새 버전은 예전 케이스를 그대로 읽습니다. `my diff before.mycase after.mycase`는 한 호스트의 두 케이스를 비교합니다([docs/diff.md](docs/diff.md)). 형식은 [docs/bundle-format.md](docs/bundle-format.md)에 있습니다.
 
+## BMC
+
+`--bmc ADDRESS`를 주면 명령이 호스트의 BMC에도 Redfish로 묻습니다. 요청은 모두 GET이고, 메모리 모듈과 그 오류 카운트, BIOS 메모리 설정, 이벤트 로그를 읽습니다. `my inventory`는 DIMM을 한 줄에 하나씩 적고 운영체제와 BMC가 각각 기록한 CE를 나란히 놓습니다. `my bios`는 메모리 RAS 설정을 프로필과 대조합니다. 프로필의 속성 이름은 모두 서버 벤더의 공개 문서에서 가져왔습니다. `my export labels`는 BMC의 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 씁니다. 호스트에 들어갈 수 없으면 `my collect redfish`로 BMC만 읽습니다.
+
+보내는 요청, 인증서와 암호 처리, 아직 시험하지 못한 것은 [docs/redfish.md](docs/redfish.md)에 있습니다. 실제 서버의 BMC는 아직 읽어 보지 못했습니다.
+
 ## 프라이버시
 
-MemorY에는 텔레메트리가 없고, 프로젝트가 운영하는 서버에 접속하는 일도 없습니다. 네트워크는 명령줄에서 요청한 세 경우에만 씁니다. `--fleet`은 플릿의 rasdaemon이 기록하는 데이터베이스 서버를 읽고, `my collect redfish`는 BMC에 묻고, `my serve`는 Prometheus의 요청을 받습니다. 호스트 밖으로 나가는 것은 사람이 보내는 번들입니다.
+MemorY에는 텔레메트리가 없고, 프로젝트가 운영하는 서버에 접속하는 일도 없습니다. 네트워크는 명령줄에서 요청한 세 경우에만 씁니다. `--fleet`은 플릿의 rasdaemon이 기록하는 데이터베이스 서버를 읽고, `--bmc`와 `my collect redfish`는 BMC에 묻고, `my serve`는 Prometheus의 요청을 받습니다. 호스트 밖으로 나가는 것은 사람이 보내는 번들입니다.
 
 | 번들에 담기는 것 | 번들에 담기지 않는 것 |
 | --- | --- |
@@ -282,6 +291,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 소견을 공개 플릿 데이터셋의 장애 티켓과 대조했습니다. 결과는 [docs/evaluation.md](docs/evaluation.md)에 있습니다.
 - 실제 메모리 컨트롤러의 EDAC 드라이버가 올라간 호스트에서는 아직 검증하지 못했습니다. 그런 호스트의 기록 디코딩은 커널과 rasdaemon 소스를 따라 만든 픽스처로만 시험했습니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
+- 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵
 
@@ -300,6 +310,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 | [docs/reading-guide.md](docs/reading-guide.md) | 그림마다 읽는 법 |
 | [docs/rules.md](docs/rules.md) | 규칙별 조건, 임계값, 소견의 내용 |
 | [docs/compatibility.md](docs/compatibility.md) | 입력별로 읽는 것, 관측 등급, 빠지는 것 |
+| [docs/redfish.md](docs/redfish.md) | BMC 읽기: 보내는 요청, 인증서와 암호, BIOS 설정 대조, 운영체제와 BMC 비교, DIMM 라벨 |
 | [docs/data-model.md](docs/data-model.md) | 원장: 테이블, 식별자, 여러 소스의 기록이 하나의 이력이 되는 과정 |
 | [docs/bundle-format.md](docs/bundle-format.md) | 케이스 번들: 구성 파일, 매니페스트, 읽을 때의 검사, 익명화 |
 | [docs/diff.md](docs/diff.md) | 한 호스트의 두 케이스 비교 |
