@@ -1,4 +1,10 @@
-package memras
+// Package yamlite reads a small part of YAML: mappings, block lists and
+// scalars, indented with spaces. It is what the settings profile of
+// "my bios" and the mapping tables of firmware messages are written in,
+// and it keeps the reader small enough to check by reading it. What lies
+// outside this part (flow style, anchors, tags, multi-line scalars,
+// several documents, tabs) is refused with the line it is on.
+package yamlite
 
 import (
 	"errors"
@@ -6,35 +12,29 @@ import (
 	"strings"
 )
 
-// A profile is written in a small part of YAML: mappings, block lists and
-// scalars, indented with spaces. That is all a profile needs, and it keeps
-// the reader small enough to check by reading it. What lies outside this
-// part (flow style, anchors, tags, multi-line scalars, several documents,
-// tabs) is refused with the line it is on.
-
 // Limits of a profile file.
 const (
-	maxProfileBytes = 1 << 20
-	maxProfileLines = 20000
-	maxDepth        = 12
+	MaxBytes = 1 << 20
+	MaxLines = 20000
+	MaxDepth        = 12
 )
 
 // kind of a node.
 const (
-	kindScalar = iota
-	kindMap
-	kindList
+	Scalar = iota
+	Map
+	List
 )
 
 // node is a value of the file.
-type node struct {
-	kind   int
-	line   int
-	scalar string
-	// keys keeps the order of a mapping.
-	keys []string
-	m    map[string]*node
-	list []*node
+type Node struct {
+	Kind   int
+	Line   int
+	Scalar string
+	// Keys keeps the order of a mapping.
+	Keys []string
+	Map  map[string]*Node
+	List []*Node
 }
 
 // line of the file that holds something.
@@ -44,7 +44,7 @@ type yline struct {
 	text   string // without indent and without a trailing comment
 }
 
-func errAt(line int, format string, a ...any) error {
+func ErrAt(line int, format string, a ...any) error {
 	return fmt.Errorf("line %d: %s", line, fmt.Sprintf(format, a...))
 }
 
@@ -75,15 +75,15 @@ func stripComment(s string) string {
 
 // lines splits a file into the lines that hold something.
 func splitLines(data []byte) ([]yline, error) {
-	if len(data) > maxProfileBytes {
-		return nil, fmt.Errorf("larger than %d bytes", maxProfileBytes)
+	if len(data) > MaxBytes {
+		return nil, fmt.Errorf("larger than %d bytes", MaxBytes)
 	}
 	text := strings.TrimPrefix(string(data), "\xef\xbb\xbf")
 	var out []yline
 	for i, raw := range strings.Split(text, "\n") {
 		n := i + 1
-		if n > maxProfileLines {
-			return nil, fmt.Errorf("more than %d lines", maxProfileLines)
+		if n > MaxLines {
+			return nil, fmt.Errorf("more than %d lines", MaxLines)
 		}
 		raw = strings.TrimRight(raw, "\r")
 		indent := 0
@@ -92,7 +92,7 @@ func splitLines(data []byte) ([]yline, error) {
 		}
 		rest := raw[indent:]
 		if strings.HasPrefix(rest, "\t") {
-			return nil, errAt(n, "a tab in the indentation: indent with spaces")
+			return nil, ErrAt(n, "a tab in the indentation: indent with spaces")
 		}
 		rest = stripComment(rest)
 		if rest == "" {
@@ -100,11 +100,11 @@ func splitLines(data []byte) ([]yline, error) {
 		}
 		for j := 0; j < len(rest); j++ {
 			if rest[j] < 0x20 && rest[j] != '\t' || rest[j] == 0x7f {
-				return nil, errAt(n, "a control character")
+				return nil, ErrAt(n, "a control character")
 			}
 		}
 		if rest == "---" || rest == "..." || strings.HasPrefix(rest, "--- ") {
-			return nil, errAt(n, "document markers are not read: a profile is one document")
+			return nil, ErrAt(n, "document markers are not read: a profile is one document")
 		}
 		out = append(out, yline{n: n, indent: indent, text: rest})
 	}
@@ -119,14 +119,14 @@ func scalarText(s string, line int) (string, error) {
 		return "", nil
 	case s[0] == '"':
 		if len(s) < 2 || s[len(s)-1] != '"' {
-			return "", errAt(line, "a quoted text without its closing quote")
+			return "", ErrAt(line, "a quoted text without its closing quote")
 		}
 		var b strings.Builder
 		body := s[1 : len(s)-1]
 		for i := 0; i < len(body); i++ {
 			c := body[i]
 			if c == '"' {
-				return "", errAt(line, "a quote inside a quoted text: write \\\"")
+				return "", ErrAt(line, "a quote inside a quoted text: write \\\"")
 			}
 			if c != '\\' {
 				b.WriteByte(c)
@@ -134,7 +134,7 @@ func scalarText(s string, line int) (string, error) {
 			}
 			i++
 			if i == len(body) {
-				return "", errAt(line, "a quoted text that ends in a backslash")
+				return "", ErrAt(line, "a quoted text that ends in a backslash")
 			}
 			switch body[i] {
 			case '"', '\\', '/':
@@ -144,25 +144,25 @@ func scalarText(s string, line int) (string, error) {
 			case 't':
 				b.WriteByte('\t')
 			default:
-				return "", errAt(line, "the escape \\%c is not read", body[i])
+				return "", ErrAt(line, "the escape \\%c is not read", body[i])
 			}
 		}
 		return b.String(), nil
 	case s[0] == '\'':
 		if len(s) < 2 || s[len(s)-1] != '\'' {
-			return "", errAt(line, "a quoted text without its closing quote")
+			return "", ErrAt(line, "a quoted text without its closing quote")
 		}
 		body := s[1 : len(s)-1]
 		if strings.Contains(strings.ReplaceAll(body, "''", ""), "'") {
-			return "", errAt(line, "a quote inside a quoted text: write ''")
+			return "", ErrAt(line, "a quote inside a quoted text: write ''")
 		}
 		return strings.ReplaceAll(body, "''", "'"), nil
 	}
 	switch s[0] {
 	case '[', '{':
-		return "", errAt(line, "flow style (%c) is not read: write one item per line", s[0])
+		return "", ErrAt(line, "flow style (%c) is not read: write one item per line", s[0])
 	case '&', '*', '!', '|', '>', '%', '@', '`':
-		return "", errAt(line, "a value that starts with %c is not read: put it in quotes", s[0])
+		return "", ErrAt(line, "a value that starts with %c is not read: put it in quotes", s[0])
 	}
 	return s, nil
 }
@@ -211,7 +211,7 @@ func splitKey(s string, line int) (key, rest string, ok bool, err error) {
 		}
 	}
 	if key == "" {
-		return "", "", false, errAt(line, "an empty key")
+		return "", "", false, ErrAt(line, "an empty key")
 	}
 	return key, strings.TrimSpace(s[end+1:]), true, nil
 }
@@ -223,7 +223,7 @@ type parser struct {
 }
 
 // parseYAML reads a file into its tree.
-func parseYAML(data []byte) (*node, error) {
+func Parse(data []byte) (*Node, error) {
 	lines, err := splitLines(data)
 	if err != nil {
 		return nil, err
@@ -237,15 +237,15 @@ func parseYAML(data []byte) (*node, error) {
 		return nil, err
 	}
 	if p.at < len(p.lines) {
-		return nil, errAt(p.lines[p.at].n, "the indentation does not fit the lines above")
+		return nil, ErrAt(p.lines[p.at].n, "the indentation does not fit the lines above")
 	}
 	return root, nil
 }
 
 // block reads the lines at one indentation: a mapping or a list.
-func (p *parser) block(indent, depth int) (*node, error) {
-	if depth > maxDepth {
-		return nil, errAt(p.lines[p.at].n, "nested deeper than %d levels", maxDepth)
+func (p *parser) block(indent, depth int) (*Node, error) {
+	if depth > MaxDepth {
+		return nil, ErrAt(p.lines[p.at].n, "nested deeper than %d levels", MaxDepth)
 	}
 	first := p.lines[p.at]
 	if strings.HasPrefix(first.text, "- ") || first.text == "-" {
@@ -257,59 +257,59 @@ func (p *parser) block(indent, depth int) (*node, error) {
 // value reads what follows a key or a list dash: a scalar on the same
 // line, or a block on the lines below that are indented deeper than
 // parent.
-func (p *parser) value(rest string, line, parent, depth int) (*node, error) {
+func (p *parser) value(rest string, line, parent, depth int) (*Node, error) {
 	if rest != "" {
 		text, err := scalarText(rest, line)
 		if err != nil {
 			return nil, err
 		}
-		return &node{kind: kindScalar, line: line, scalar: text}, nil
+		return &Node{Kind: Scalar, Line: line, Scalar: text}, nil
 	}
 	if p.at < len(p.lines) && p.lines[p.at].indent > parent {
 		return p.block(p.lines[p.at].indent, depth+1)
 	}
-	return &node{kind: kindScalar, line: line}, nil
+	return &Node{Kind: Scalar, Line: line}, nil
 }
 
 // mapping reads the entries of a mapping at an indentation. into is a
 // mapping that was begun on the line of a list dash.
-func (p *parser) mapping(indent, depth int, into *node) (*node, error) {
+func (p *parser) mapping(indent, depth int, into *Node) (*Node, error) {
 	n := into
 	if n == nil {
-		n = &node{kind: kindMap, line: p.lines[p.at].n, m: map[string]*node{}}
+		n = &Node{Kind: Map, Line: p.lines[p.at].n, Map: map[string]*Node{}}
 	}
 	for p.at < len(p.lines) && p.lines[p.at].indent == indent {
 		l := p.lines[p.at]
 		if strings.HasPrefix(l.text, "- ") || l.text == "-" {
-			return nil, errAt(l.n, "a list item where a key is expected")
+			return nil, ErrAt(l.n, "a list item where a key is expected")
 		}
 		key, rest, ok, err := splitKey(l.text, l.n)
 		if err != nil {
 			return nil, err
 		}
 		if !ok {
-			return nil, errAt(l.n, "expected \"key: value\"")
+			return nil, ErrAt(l.n, "expected \"key: value\"")
 		}
-		if _, dup := n.m[key]; dup {
-			return nil, errAt(l.n, "the key %q is given twice", key)
+		if _, dup := n.Map[key]; dup {
+			return nil, ErrAt(l.n, "the key %q is given twice", key)
 		}
 		p.at++
 		v, err := p.value(rest, l.n, indent, depth)
 		if err != nil {
 			return nil, err
 		}
-		n.keys, n.m[key] = append(n.keys, key), v
+		n.Keys, n.Map[key] = append(n.Keys, key), v
 	}
 	return n, nil
 }
 
 // sequence reads the items of a list at an indentation.
-func (p *parser) sequence(indent, depth int) (*node, error) {
-	n := &node{kind: kindList, line: p.lines[p.at].n}
+func (p *parser) sequence(indent, depth int) (*Node, error) {
+	n := &Node{Kind: List, Line: p.lines[p.at].n}
 	for p.at < len(p.lines) && p.lines[p.at].indent == indent {
 		l := p.lines[p.at]
 		if !strings.HasPrefix(l.text, "- ") && l.text != "-" {
-			return nil, errAt(l.n, "a key where a list item is expected")
+			return nil, ErrAt(l.n, "a key where a list item is expected")
 		}
 		rest := strings.TrimSpace(strings.TrimPrefix(l.text, "-"))
 		// "- key: value" begins a mapping whose other keys stand below the
@@ -318,19 +318,19 @@ func (p *parser) sequence(indent, depth int) (*node, error) {
 			return nil, err
 		} else if ok {
 			inner := indent + (len(l.text) - len(strings.TrimLeft(l.text[1:], " ")))
-			item := &node{kind: kindMap, line: l.n, m: map[string]*node{}}
+			item := &Node{Kind: Map, Line: l.n, Map: map[string]*Node{}}
 			p.at++
 			v, err := p.value(tail, l.n, inner, depth+1)
 			if err != nil {
 				return nil, err
 			}
-			item.keys, item.m[key] = append(item.keys, key), v
+			item.Keys, item.Map[key] = append(item.Keys, key), v
 			if p.at < len(p.lines) && p.lines[p.at].indent == inner {
 				if _, err := p.mapping(inner, depth+1, item); err != nil {
 					return nil, err
 				}
 			}
-			n.list = append(n.list, item)
+			n.List = append(n.List, item)
 			continue
 		}
 		p.at++
@@ -338,7 +338,45 @@ func (p *parser) sequence(indent, depth int) (*node, error) {
 		if err != nil {
 			return nil, err
 		}
-		n.list = append(n.list, v)
+		n.List = append(n.List, v)
 	}
 	return n, nil
+}
+
+// Text returns the value of a scalar node; what names the node in the
+// error.
+func (n *Node) Text(what string) (string, error) {
+	if n.Kind != Scalar {
+		return "", ErrAt(n.Line, "%s: expected a value", what)
+	}
+	return n.Scalar, nil
+}
+
+// Mapping checks that n is a mapping whose keys are among known; with no
+// known keys any key is taken.
+func (n *Node) Mapping(what string, known ...string) error {
+	if n.Kind != Map {
+		return ErrAt(n.Line, "%s: expected keys with values", what)
+	}
+	for _, k := range n.Keys {
+		ok := len(known) == 0
+		for _, w := range known {
+			ok = ok || k == w
+		}
+		if !ok {
+			return ErrAt(n.Map[k].Line, "%s: unknown key %q (known: %s)", what, k, strings.Join(known, ", "))
+		}
+	}
+	return nil
+}
+
+// Items returns the items of a list node; an empty value is an empty list.
+func (n *Node) Items(what string) ([]*Node, error) {
+	if n.Kind == Scalar && n.Scalar == "" {
+		return nil, nil
+	}
+	if n.Kind != List {
+		return nil, ErrAt(n.Line, "%s: expected a list", what)
+	}
+	return n.List, nil
 }

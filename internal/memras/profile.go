@@ -16,6 +16,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"github.com/agenticode/my/internal/yamlite"
 	"os"
 	"sort"
 	"strings"
@@ -264,8 +265,8 @@ func ReadFile(path string) (*Profile, error) {
 	if fi.IsDir() {
 		return nil, fmt.Errorf("%s is a directory", path)
 	}
-	if fi.Size() > maxProfileBytes {
-		return nil, fmt.Errorf("%s: larger than %d bytes", path, maxProfileBytes)
+	if fi.Size() > yamlite.MaxBytes {
+		return nil, fmt.Errorf("%s: larger than %d bytes", path, yamlite.MaxBytes)
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -281,91 +282,58 @@ func ReadFile(path string) (*Profile, error) {
 // Decoding of the tree of a profile file. Every key is checked: a key
 // that is not known is a mistake in the file, not something to pass over.
 
-func (n *node) text(what string) (string, error) {
-	if n.kind != kindScalar {
-		return "", errAt(n.line, "%s: expected a value", what)
-	}
-	return n.scalar, nil
-}
-
-func (n *node) mapping(what string, known ...string) error {
-	if n.kind != kindMap {
-		return errAt(n.line, "%s: expected keys with values", what)
-	}
-	for _, k := range n.keys {
-		ok := len(known) == 0
-		for _, w := range known {
-			ok = ok || k == w
-		}
-		if !ok {
-			return errAt(n.m[k].line, "%s: unknown key %q (known: %s)", what, k, strings.Join(known, ", "))
-		}
-	}
-	return nil
-}
-
-func (n *node) items(what string) ([]*node, error) {
-	if n.kind == kindScalar && n.scalar == "" {
-		return nil, nil
-	}
-	if n.kind != kindList {
-		return nil, errAt(n.line, "%s: expected a list", what)
-	}
-	return n.list, nil
-}
-
 // Parse reads a profile.
 func Parse(data []byte) (*Profile, error) {
-	root, err := parseYAML(data)
+	root, err := yamlite.Parse(data)
 	if err != nil {
 		return nil, err
 	}
-	if err := root.mapping("profile", "format", "name", "expect", "why", "vendors"); err != nil {
+	if err := root.Mapping("profile", "format", "name", "expect", "why", "vendors"); err != nil {
 		return nil, err
 	}
 	p := &Profile{Expect: map[string]string{}, Why: map[string]string{}}
-	f, ok := root.m["format"]
+	f, ok := root.Map["format"]
 	if !ok {
 		return nil, errors.New("no \"format: 1\" line: not a memory RAS settings profile")
 	}
-	if v, err := f.text("format"); err != nil {
+	if v, err := f.Text("format"); err != nil {
 		return nil, err
 	} else if v != "1" {
-		return nil, errAt(f.line, "format %s: this version reads format %d", v, FormatVersion)
+		return nil, yamlite.ErrAt(f.Line, "format %s: this version reads format %d", v, FormatVersion)
 	}
-	if n, ok := root.m["name"]; ok {
-		if p.Name, err = n.text("name"); err != nil {
+	if n, ok := root.Map["name"]; ok {
+		if p.Name, err = n.Text("name"); err != nil {
 			return nil, err
 		}
 	}
-	if n, ok := root.m["expect"]; ok {
-		if err := n.mapping("expect", Settings...); err != nil {
+	if n, ok := root.Map["expect"]; ok {
+		if err := n.Mapping("expect", Settings...); err != nil {
 			return nil, err
 		}
-		for _, k := range n.keys {
-			v, err := n.m[k].text("expect " + k)
+		for _, k := range n.Keys {
+			v, err := n.Map[k].Text("expect " + k)
 			if err != nil {
 				return nil, err
 			}
 			if !knownState(k, v) {
-				return nil, errAt(n.m[k].line, "expect %s: %q is not one of %s", k, v, strings.Join(states[k], ", "))
+				return nil, yamlite.ErrAt(n.Map[k].Line, "expect %s: %q is not one of %s", k, v, strings.Join(states[k], ", "))
 			}
 			p.Expect[k] = v
 		}
 	}
-	if n, ok := root.m["why"]; ok {
-		if err := n.mapping("why", Settings...); err != nil {
+	if n, ok := root.Map["why"]; ok {
+		if err := n.Mapping("why", Settings...); err != nil {
 			return nil, err
 		}
-		for _, k := range n.keys {
-			if p.Why[k], err = n.m[k].text("why " + k); err != nil {
+		for _, k := range n.Keys {
+			if p.Why[k], err = n.Map[k].Text("why " + k); err != nil {
 				return nil, err
 			}
 		}
 	}
-	vendors := []*node{}
-	if n, ok := root.m["vendors"]; ok {
-		if vendors, err = n.items("vendors"); err != nil {
+	vendors := []*yamlite.Node{}
+	if n, ok := root.Map["vendors"]; ok {
+		if vendors, err = n.Items("vendors"); err != nil {
 			return nil, err
 		}
 	}
@@ -376,7 +344,7 @@ func Parse(data []byte) (*Profile, error) {
 			return nil, err
 		}
 		if ids[v.ID] {
-			return nil, errAt(vn.line, "the vendor %q is given twice", v.ID)
+			return nil, yamlite.ErrAt(vn.Line, "the vendor %q is given twice", v.ID)
 		}
 		ids[v.ID] = true
 		p.Vendors = append(p.Vendors, v)
@@ -384,23 +352,23 @@ func Parse(data []byte) (*Profile, error) {
 	return p, nil
 }
 
-func parseVendor(n *node) (*Vendor, error) {
-	if err := n.mapping("vendor", "id", "name", "manufacturer", "sources", "settings", "unmapped"); err != nil {
+func parseVendor(n *yamlite.Node) (*Vendor, error) {
+	if err := n.Mapping("vendor", "id", "name", "manufacturer", "sources", "settings", "unmapped"); err != nil {
 		return nil, err
 	}
 	v := &Vendor{Sources: map[string]Source{}, Unmapped: map[string]string{}}
 	var err error
 	for _, key := range []string{"id", "name"} {
-		kn, ok := n.m[key]
+		kn, ok := n.Map[key]
 		if !ok {
-			return nil, errAt(n.line, "vendor: no %q", key)
+			return nil, yamlite.ErrAt(n.Line, "vendor: no %q", key)
 		}
-		text, err := kn.text("vendor " + key)
+		text, err := kn.Text("vendor " + key)
 		if err != nil {
 			return nil, err
 		}
 		if text == "" {
-			return nil, errAt(kn.line, "vendor: %q is empty", key)
+			return nil, yamlite.ErrAt(kn.Line, "vendor: %q is empty", key)
 		}
 		if key == "id" {
 			v.ID = text
@@ -408,13 +376,13 @@ func parseVendor(n *node) (*Vendor, error) {
 			v.Name = text
 		}
 	}
-	if mn, ok := n.m["manufacturer"]; ok {
-		list, err := mn.items("manufacturer")
+	if mn, ok := n.Map["manufacturer"]; ok {
+		list, err := mn.Items("manufacturer")
 		if err != nil {
 			return nil, err
 		}
 		for _, it := range list {
-			w, err := it.text("manufacturer")
+			w, err := it.Text("manufacturer")
 			if err != nil {
 				return nil, err
 			}
@@ -423,36 +391,36 @@ func parseVendor(n *node) (*Vendor, error) {
 			}
 		}
 	}
-	if sn, ok := n.m["sources"]; ok {
-		if err := sn.mapping("sources"); err != nil {
+	if sn, ok := n.Map["sources"]; ok {
+		if err := sn.Mapping("sources"); err != nil {
 			return nil, err
 		}
-		for _, key := range sn.keys {
-			one := sn.m[key]
-			if err := one.mapping("source "+key, "title", "url"); err != nil {
+		for _, key := range sn.Keys {
+			one := sn.Map[key]
+			if err := one.Mapping("source "+key, "title", "url"); err != nil {
 				return nil, err
 			}
 			var src Source
-			if t, ok := one.m["title"]; ok {
-				if src.Title, err = t.text("title"); err != nil {
+			if t, ok := one.Map["title"]; ok {
+				if src.Title, err = t.Text("title"); err != nil {
 					return nil, err
 				}
 			}
-			u, ok := one.m["url"]
+			u, ok := one.Map["url"]
 			if !ok {
-				return nil, errAt(one.line, "source %s: no \"url\": every mapping names the public document it comes from", key)
+				return nil, yamlite.ErrAt(one.Line, "source %s: no \"url\": every mapping names the public document it comes from", key)
 			}
-			if src.URL, err = u.text("url"); err != nil {
+			if src.URL, err = u.Text("url"); err != nil {
 				return nil, err
 			}
 			if !strings.HasPrefix(src.URL, "https://") && !strings.HasPrefix(src.URL, "http://") {
-				return nil, errAt(u.line, "source %s: %q is no URL of a public document", key, clip(src.URL, 60))
+				return nil, yamlite.ErrAt(u.Line, "source %s: %q is no URL of a public document", key, clip(src.URL, 60))
 			}
 			v.Sources[key] = src
 		}
 	}
-	if sn, ok := n.m["settings"]; ok {
-		list, err := sn.items("settings")
+	if sn, ok := n.Map["settings"]; ok {
+		list, err := sn.Items("settings")
 		if err != nil {
 			return nil, err
 		}
@@ -463,23 +431,23 @@ func parseVendor(n *node) (*Vendor, error) {
 			}
 			for _, other := range v.Maps {
 				if other.Setting == m.Setting {
-					return nil, errAt(it.line, "vendor %s: the setting %s is mapped twice", v.ID, m.Setting)
+					return nil, yamlite.ErrAt(it.Line, "vendor %s: the setting %s is mapped twice", v.ID, m.Setting)
 				}
 			}
 			v.Maps = append(v.Maps, m)
 		}
 	}
-	if un, ok := n.m["unmapped"]; ok {
-		if err := un.mapping("unmapped", Settings...); err != nil {
+	if un, ok := n.Map["unmapped"]; ok {
+		if err := un.Mapping("unmapped", Settings...); err != nil {
 			return nil, err
 		}
-		for _, key := range un.keys {
+		for _, key := range un.Keys {
 			for _, m := range v.Maps {
 				if m.Setting == key {
-					return nil, errAt(un.m[key].line, "vendor %s: the setting %s is mapped and listed as unmapped", v.ID, key)
+					return nil, yamlite.ErrAt(un.Map[key].Line, "vendor %s: the setting %s is mapped and listed as unmapped", v.ID, key)
 				}
 			}
-			if v.Unmapped[key], err = un.m[key].text("unmapped " + key); err != nil {
+			if v.Unmapped[key], err = un.Map[key].Text("unmapped " + key); err != nil {
 				return nil, err
 			}
 		}
@@ -487,19 +455,19 @@ func parseVendor(n *node) (*Vendor, error) {
 	return v, nil
 }
 
-func parseMapping(n *node, v *Vendor) (*Mapping, error) {
-	if err := n.mapping("setting", "setting", "attribute", "source", "values"); err != nil {
+func parseMapping(n *yamlite.Node, v *Vendor) (*Mapping, error) {
+	if err := n.Mapping("setting", "setting", "attribute", "source", "values"); err != nil {
 		return nil, err
 	}
 	m := &Mapping{}
 	get := func(key string) (string, error) {
-		kn, ok := n.m[key]
+		kn, ok := n.Map[key]
 		if !ok {
-			return "", errAt(n.line, "vendor %s: a mapping without %q", v.ID, key)
+			return "", yamlite.ErrAt(n.Line, "vendor %s: a mapping without %q", v.ID, key)
 		}
-		text, err := kn.text(key)
+		text, err := kn.Text(key)
 		if err == nil && text == "" {
-			err = errAt(kn.line, "vendor %s: %q is empty", v.ID, key)
+			err = yamlite.ErrAt(kn.Line, "vendor %s: %q is empty", v.ID, key)
 		}
 		return text, err
 	}
@@ -508,7 +476,7 @@ func parseMapping(n *node, v *Vendor) (*Mapping, error) {
 		return nil, err
 	}
 	if !knownSetting(m.Setting) {
-		return nil, errAt(n.m["setting"].line, "unknown setting %q (known: %s)", m.Setting, strings.Join(Settings, ", "))
+		return nil, yamlite.ErrAt(n.Map["setting"].Line, "unknown setting %q (known: %s)", m.Setting, strings.Join(Settings, ", "))
 	}
 	if m.Attribute, err = get("attribute"); err != nil {
 		return nil, err
@@ -517,44 +485,44 @@ func parseMapping(n *node, v *Vendor) (*Mapping, error) {
 		return nil, err
 	}
 	if _, ok := v.Sources[m.Source]; !ok {
-		return nil, errAt(n.m["source"].line, "vendor %s: the mapping of %s names the source %q, which the vendor does not list", v.ID, m.Attribute, m.Source)
+		return nil, yamlite.ErrAt(n.Map["source"].Line, "vendor %s: the mapping of %s names the source %q, which the vendor does not list", v.ID, m.Attribute, m.Source)
 	}
-	vn, ok := n.m["values"]
+	vn, ok := n.Map["values"]
 	if !ok {
-		return nil, errAt(n.line, "vendor %s: the mapping of %s has no values", v.ID, m.Attribute)
+		return nil, yamlite.ErrAt(n.Line, "vendor %s: the mapping of %s has no values", v.ID, m.Attribute)
 	}
-	list, err := vn.items("values")
+	list, err := vn.Items("values")
 	if err != nil {
 		return nil, err
 	}
 	seen := map[string]bool{}
 	for _, it := range list {
-		if err := it.mapping("value", "value", "means", "note", "note_ko"); err != nil {
+		if err := it.Mapping("value", "value", "means", "note", "note_ko"); err != nil {
 			return nil, err
 		}
 		var val Value
 		for key, into := range map[string]*string{"value": &val.Match, "means": &val.Means, "note": &val.Note, "note_ko": &val.NoteKO} {
-			if kn, ok := it.m[key]; ok {
-				if *into, err = kn.text(key); err != nil {
+			if kn, ok := it.Map[key]; ok {
+				if *into, err = kn.Text(key); err != nil {
 					return nil, err
 				}
 			}
 		}
-		if _, ok := it.m["value"]; !ok {
-			return nil, errAt(it.line, "vendor %s, %s: a value without \"value\"", v.ID, m.Attribute)
+		if _, ok := it.Map["value"]; !ok {
+			return nil, yamlite.ErrAt(it.Line, "vendor %s, %s: a value without \"value\"", v.ID, m.Attribute)
 		}
 		if !knownState(m.Setting, val.Means) {
-			return nil, errAt(it.line, "vendor %s, %s: value %q means %q, which is not one of %s", v.ID, m.Attribute, val.Match, val.Means,
+			return nil, yamlite.ErrAt(it.Line, "vendor %s, %s: value %q means %q, which is not one of %s", v.ID, m.Attribute, val.Match, val.Means,
 				strings.Join(states[m.Setting], ", "))
 		}
 		if seen[val.Match] {
-			return nil, errAt(it.line, "vendor %s, %s: the value %q is given twice", v.ID, m.Attribute, val.Match)
+			return nil, yamlite.ErrAt(it.Line, "vendor %s, %s: the value %q is given twice", v.ID, m.Attribute, val.Match)
 		}
 		seen[val.Match] = true
 		m.Values = append(m.Values, val)
 	}
 	if len(m.Values) == 0 {
-		return nil, errAt(vn.line, "vendor %s: the mapping of %s has no values", v.ID, m.Attribute)
+		return nil, yamlite.ErrAt(vn.Line, "vendor %s: the mapping of %s has no values", v.ID, m.Attribute)
 	}
 	return m, nil
 }
