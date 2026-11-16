@@ -71,7 +71,7 @@ The certificate of the BMC names the BMC, and the connection goes to 127.0.0.1, 
 
 Every request is a GET. A `RoundTripper` in `internal/redfish/client` refuses any other method before it reaches the network, and a test checks that. The one exception is `--session`: the client sends one POST to the session service to log in, and one DELETE of the session it got when the run ends, also after an error or an interrupt. Nothing on the BMC is changed: no setting, no log, no action, no `ClearCurrentPeriod`.
 
-Authentication is HTTP Basic unless `--session` is given. A request that got a 401 is not sent again with the same account, because a BMC can lock an account after failed logins; three 401 answers in a row end the run. A dropped session is renewed at most twice per run. A redirect to another host is refused.
+Authentication is HTTP Basic unless `--session` is given. A request that got a 401 is not sent again with the same account, because a BMC can lock an account after failed logins. A 401 before any request with the account was answered ends the run at once: the account is wrong. Later, three 401 answers in a row end it. A dropped session is renewed at most twice per run. A redirect to another host is refused.
 
 The resources, in the order they are asked for:
 
@@ -96,7 +96,7 @@ Limits of a run, with their defaults:
 | Limit | Default | Flag |
 | --- | --- | --- |
 | time for one request | 30 s | `--timeout` |
-| new attempts after a timeout, a 5xx answer or a 429 | 3, the first after 1 s, each pause twice the one before, at most 30 s | `--retries` |
+| new attempts after a timeout, a connection that broke or was refused, or the answer 408, 429, 500, 502, 503 or 504 | 3, the first after 1 s, each pause twice the one before, at most 30 s | `--retries` |
 | longest `Retry-After` that is waited for | 60 s | |
 | size of one answer | 32 MiB | |
 | size of one collection | 512 MiB | |
@@ -115,7 +115,7 @@ The certificate of the BMC is checked against the system's authorities and its n
 - `--ca-file FILE` trusts only the authorities in that PEM file.
 - `--insecure` accepts any certificate and allows plain `http://`. It prints a warning, and the manifest records it as `"tls": "insecure"`.
 
-The password is read from `MY_REDFISH_PASSWORD`, from the first line of `--password-file`, or from the terminal without echo. It is never taken from the command line. The account name may be given with `--user` or `MY_REDFISH_USER`. The password, the Basic authorization header and the session token are removed from every error text and every file the command writes; the tests run a collection and search its whole output tree, standard output and standard error for the password.
+The password is read from `MY_REDFISH_PASSWORD`, from the first line of `--password-file`, or from the terminal without echo. It is never taken from the command line. The account name may be given with `--user` or `MY_REDFISH_USER`. The password, the Basic authorization header and the session token are removed from every error text and every file the command writes. A password shorter than 8 characters is removed from a file only where it is a whole JSON string, and a session token shorter than 8 characters is not removed from files, so that a short word does not take out every place it happens to occur. The tests run a collection and search its whole output tree, standard output and standard error for the password.
 
 ## The collection on disk
 
@@ -209,7 +209,7 @@ When a module runs below the speed it is rated for, the check lists what the rec
 
 ### What the findings get from it
 
-The engine takes the settings as context for its findings, without changing a grade or a threshold:
+The engine takes the settings as context for its findings, without changing a grade or a threshold. It reads them through the built-in profile; `--profile` changes what `my bios` and the RAS column of `my inventory` say, and not the findings:
 
 - patrol scrub off: memory that is not read is not checked, so a quiet DIMM says less, and the check of the finding that rests on scrubbing stays open;
 - CE logging off: the BMC log holds no corrected errors, and its silence says nothing;

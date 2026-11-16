@@ -6,7 +6,7 @@ MemorY reads the memory error records a Linux server already keeps and shows whi
 
 It is for anyone who has to read memory errors and decide what to do: platform and datacenter engineers, SREs, field and support engineers of hardware vendors, system integrators, kernel and RAS developers.
 
-The command is `my`: one static binary that needs no configuration. It only reads, with one exception that has to be asked for: `my harvest install` puts two systemd unit files on the host and enables them, and `my harvest uninstall` removes them. It never takes a page offline, starts a repair or resets a counter.
+The command is `my`: one static binary that needs no configuration. It only reads, with one exception that has to be asked for: `my harvest install` puts a systemd unit file on the host (two with `--timer`) and enables it, and `my harvest uninstall` removes them. It never takes a page offline, starts a repair or resets a counter.
 
 ![Slot map of the example host: CPU0_C1 is marked replace now, CPU1_D1 observe](examples/figures/slotmap.svg)
 
@@ -272,7 +272,7 @@ A bundle is a ZIP archive with the ledger, a manifest, the source inventory and 
 
 ## The BMC
 
-With `--bmc ADDRESS` a command also asks the BMC of the host over Redfish, with GET requests only, for its memory modules and their error counts, the BIOS memory settings and its event logs. `my inventory` lists the DIMMs one per line and sets the corrected errors the operating system and the BMC each recorded side by side. `my bios` checks the memory RAS settings against a profile whose attribute names all come from public documents of the server vendors. `my export labels` writes the BMC's slot names as a DIMM label file for rasdaemon. When the host cannot be reached, `my collect redfish` reads the BMC alone.
+With `--bmc ADDRESS` a command also asks the BMC of the host over Redfish, with GET requests only (`--session` adds its login and logout), for its memory modules and their error counts, the BIOS memory settings and its event logs. `my inventory` lists the DIMMs one per line and sets the corrected errors the operating system and the BMC each recorded side by side. `my bios` checks the memory RAS settings against a profile whose attribute names all come from public documents of the server vendors. `my export labels` writes the slot names, or with `--names bmc` the service labels of the BMC, as a DIMM label file for rasdaemon. When the host cannot be reached, `my collect redfish` reads the BMC alone.
 
 [docs/redfish.md](docs/redfish.md) lists every request, how certificates and passwords are handled, and what has not been tried: no BMC of a real server has been read yet.
 

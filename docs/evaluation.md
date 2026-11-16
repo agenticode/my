@@ -4,7 +4,7 @@
 
 ## Summary
 
-The dataset is the DRAM error log that Alibaba published in its dcbrain repository: 75,214,692 corrected errors on 35,240 DIMMs of 30,502 servers over eight months, and 3,017 tickets of server failures. The numbers below are from engine 4 with the default thresholds. Findings are taken at six cut-off days and compared with the tickets of the 30 days after each; the first three cut-offs are the development period, the last three the held-out period.
+The dataset is the DRAM error log that Alibaba published in its dcbrain repository: 75,214,692 corrected errors on 35,240 DIMMs of 30,502 servers over eight months, and 3,017 tickets of server failures. The numbers below are from engine 6 with the default thresholds. Findings are taken at six cut-off days and compared with the tickets of the 30 days after each; the first three cut-offs are the development period, the last three the held-out period.
 
 - A server with the finding "consider replacement" got a failure ticket within 30 days in 2.48% of the cases in the development period and in 2.56% in the held-out period. A server with "observe" got one in 0.26% and 0.23%.
 - The finding was there for 39.4% and 34.6% of the servers that got a ticket and had an error before the cut-off.
@@ -92,7 +92,7 @@ The dataset does not have the DRAM device, the failing bits, a physical address,
 
 - A fault that spans several banks of one rank is reported as a device fault with the mode marked as estimated: it may lie in more than one device. A fault across both ranks is a DIMM fault.
 - A DIMM is identified by server and slot. A replaced DIMM cannot be told from the one before it.
-- Of the 15 rules, three can fire: R-ROW-03 (consider replacement), R-SOFT-01 (observe) and R-SYS-01 (hold replacement). No DIMM can reach "replace now", so that grade cannot be measured on this dataset.
+- Of the 18 rules, three can fire: R-ROW-03 (consider replacement), R-SOFT-01 (observe) and R-SYS-01 (hold replacement). No DIMM can reach "replace now", so that grade cannot be measured on this dataset.
 
 ### The layout of memoryid
 
@@ -311,7 +311,7 @@ R-ROW-03 asked a bank, device or DIMM fault to be rising, spreading or bursting.
 | 3: an area fault counts without growth | development | 3,145 | 78 | 2.48% | 39.39% (78 of 198) | 21 | 45.65% (21 of 46) |
 | | held-out | 3,285 | 84 | 2.56% | 34.57% (84 of 243) | 19 | 36.54% (19 of 52) |
 
-Both changes were proposed from numbers of the development period: the first from the age of the bursts there, the second from the counts above. The held-out period was not hidden while they were made. Its numbers for the rules as they were stood on the same printouts, and for the second change so did a held-out count of the servers it would add (8 of 351 with a ticket, 2.3%). What the changed rules give on the held-out period was computed after each change was written. Engine 1 is the tree before pull request #86 and engine 2 the tree before #88. Engine 4 added two rules for errors that name no DIMM. This dataset has none, and engine 4 gives the numbers of engine 3 on it.
+Both changes were proposed from numbers of the development period: the first from the age of the bursts there, the second from the counts above. The held-out period was not hidden while they were made. Its numbers for the rules as they were stood on the same printouts, and for the second change so did a held-out count of the servers it would add (8 of 351 with a ticket, 2.3%). What the changed rules give on the held-out period was computed after each change was written. Engine 1 is the tree before pull request #86 and engine 2 the tree before #88. Engine 4 added two rules for errors that name no DIMM. This dataset has none, and engine 4 gives the numbers of engine 3 on it. Engines 5 and 6 added the rules of crash loops and the statements about a host that stopped; they need boots that ended in a fatal error, which this dataset does not record, and engine 6 gives the numbers of engine 4 on it.
 
 With engine 1 the number of servers with "consider replacement" grew with every cut-off, from 1,711 at day 60 to 3,891 at day 210, because a burst never expired. Since engine 3 it stays between 1,016 and 1,129.
 

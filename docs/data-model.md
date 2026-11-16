@@ -188,16 +188,18 @@ These passes run after every read, in a fixed order (slots, counter events, the 
 
 | Field | Content |
 | --- | --- |
-| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `gpu`, `diff`, `verify`, `preflight` |
+| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `gpu`, `bios`, `inventory`, `diff`, `verify`, `preflight` |
 | `version` | the version of this form, 1. It changes when a field is renamed or removed; new fields do not change it |
 | `lang` | the language of the sentences |
 | `host` | the host the data is about |
-| `grade`, `exit_code` | the finding the exit code stands for, and the exit code |
+| `grade`, `exit_code` | the finding the exit code stands for (`ok`, `observe`, `consider-replacement`, `replace-now`, `hold-replacement`), and the exit code |
 | `case` | the bundle the data comes from, when it comes from one |
 | `analyzer` | the vendor analyzer the run used ([plugin-contract.md](plugin-contract.md)) |
 | `data` | the data of the screen |
 
-A statement in `data` carries its `code`, its `args` and the sentence in `text`, so that a program can read the finding without parsing sentences.
+A statement in `data` carries its `code`, its `args` and the sentence in `text`, so that a program can read the finding without parsing sentences. A field whose value is zero, false or empty is left out: a missing count is 0.
+
+The commands that write a file (`bundle`, `report`, `import -o`, `export`, `collect`) print with `--json` what they wrote, in an object of their own without this envelope. A command that fails prints its error on the standard error and nothing on the standard output.
 
 ### The view `boots`
 
