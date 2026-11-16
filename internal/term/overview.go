@@ -3,6 +3,7 @@ package term
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/agenticode/my/internal/engine"
@@ -105,6 +106,7 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 	for _, line := range wrap(st.say("ov.finding", "grade", grade), st.width()) {
 		p.add(line)
 	}
+	st.stopsLines(p, ov.Stops)
 	p.blank()
 
 	st.slotMap(p, &ov.SlotMap)
@@ -281,6 +283,9 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 	}
 
 	lw, cw := 0, 2
+	if sm.Stops > 0 {
+		lw = Width(st.say("ov.stops_row"))
+	}
 	for _, band := range bands {
 		for _, br := range band {
 			lw = max(lw, Width(br.label))
@@ -319,6 +324,26 @@ func (st Style) slotMap(p *page, sm *view.SlotMap) {
 					prev = h
 				}
 				p.add(" " + padRight(br.label, lw) + body.String())
+				// Below each row, the boots of the window that stopped
+				// with an uncorrected error of the DIMM in the slot.
+				if sm.Stops > 0 {
+					var stops strings.Builder
+					for c := from; c < to && c < len(br.cells); c++ {
+						mark := "  "
+						if cell := br.cells[c]; cell != nil {
+							switch n := cell.Stops; {
+							case n == 0:
+								mark = st.dim(st.g().shade[0]) + " "
+							case n > 9:
+								mark = st.paint(cRed, "+") + " "
+							default:
+								mark = st.paint(cRed, strconv.Itoa(n)) + " "
+							}
+						}
+						stops.WriteString(strings.Repeat(" ", gap) + mark + strings.Repeat(" ", cw-2))
+					}
+					p.add(" " + padRight(st.say("ov.stops_row"), lw) + stops.String())
+				}
 			}
 		}
 	}

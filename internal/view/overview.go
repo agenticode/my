@@ -29,6 +29,11 @@ type Overview struct {
 	// no DIMM: errors, and pages that were taken offline. It is nil for a
 	// host without such records.
 	HostFinding *Card `json:"host_finding,omitzero"`
+	// Stops sums up the boots of the window that a fatal hardware error
+	// ended, and Recurrence holds the window itself: boot by boot, which
+	// DIMM and which place of it had errors (the view "boots").
+	Stops      *Stops             `json:"stops,omitzero"`
+	Recurrence *engine.Recurrence `json:"recurrence,omitzero"`
 	// Unattributed counts the errors of the host that are tied to no DIMM,
 	// and UnattributedUE those of them that were not corrected. The host
 	// finding speaks about them.
@@ -104,6 +109,9 @@ type SlotMap struct {
 	Rows      []SlotRow `json:"rows"`
 	Slots     int       `json:"slots"`
 	Populated int       `json:"populated"`
+	// Stops is the number of boots of the window that ended in a stop;
+	// the slot map draws a row of stops per socket when it is not 0.
+	Stops int `json:"stops,omitzero"`
 }
 
 // SlotRow is the slots of one socket.
@@ -144,6 +152,9 @@ type SlotCell struct {
 	Serial string `json:"serial,omitzero"`
 	CE     int64  `json:"ce,omitzero"`
 	UE     int64  `json:"ue,omitzero"`
+	// Stops counts the boots of the window that stopped with an
+	// uncorrected error of the DIMM in the slot.
+	Stops int `json:"stops,omitzero"`
 }
 
 // TrendDays is the span of the trend column of the ranking, and
@@ -329,6 +340,7 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 	if ov.LoosePages, err = c.loosePages(ctx, h); err != nil {
 		return nil, err
 	}
+	ov.Stops, ov.Recurrence = c.stops(h), h.Recurrence
 	if ov.HostFinding, err = c.HostCard(ctx, h); err != nil {
 		return nil, err
 	}
@@ -481,6 +493,9 @@ func lastDay(t time.Time) time.Time {
 // slotMap lays the slots of a host out by socket and channel.
 func slotMap(h *engine.HostResult, slots []model.Slot) SlotMap {
 	sm := SlotMap{Rows: []SlotRow{}, Slots: len(slots)}
+	if h.Recurrence != nil {
+		sm.Stops = h.Recurrence.Stops
+	}
 	type keyed struct {
 		slot  model.Slot
 		group string // row key of a slot without a socket
@@ -547,6 +562,9 @@ func slotMap(h *engine.HostResult, slots []model.Slot) SlotMap {
 			case d != nil && !(sl.Populated.Valid && !sl.Populated.V):
 				cell.State = string(d.Verdict.Grade)
 				cell.CE, cell.UE = d.Features.CE, d.Features.UE
+				if db := h.Recurrence.DIMM(d.UID); db != nil {
+					cell.Stops = db.StopBoots
+				}
 				if d.DIMM != nil {
 					cell.Serial = d.DIMM.Serial
 				}

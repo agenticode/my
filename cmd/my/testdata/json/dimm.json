@@ -534,6 +534,261 @@
           "confined": true
         }
       ],
+      "recurrence": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "slot": "CPU0_C1",
+        "cells": [
+          {
+            "boot": 2,
+            "ce": 6
+          },
+          {
+            "boot": 3,
+            "ce": 436
+          },
+          {
+            "boot": 4,
+            "ce": 789,
+            "ue": 1
+          }
+        ],
+        "boots_with_errors": 3,
+        "boots_with_ue": 1,
+        "stop_boots": 0,
+        "places": [
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
+            "cells": [
+              {
+                "boot": 2,
+                "ce": 6
+              },
+              {
+                "boot": 3,
+                "ce": 317
+              },
+              {
+                "boot": 4,
+                "ce": 244,
+                "ue": 1
+              }
+            ],
+            "boots_with_errors": 3,
+            "boots_with_ue": 1,
+            "ce": 567,
+            "ue": 1
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x388",
+            "cells": [
+              {
+                "boot": 3,
+                "ce": 94
+              },
+              {
+                "boot": 4,
+                "ce": 200
+              }
+            ],
+            "boots_with_errors": 2,
+            "boots_with_ue": 0,
+            "ce": 294,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8",
+            "cells": [
+              {
+                "boot": 3,
+                "ce": 22
+              },
+              {
+                "boot": 4,
+                "ce": 136
+              }
+            ],
+            "boots_with_errors": 2,
+            "boots_with_ue": 0,
+            "ce": 158,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x390",
+            "cells": [
+              {
+                "boot": 3,
+                "ce": 3
+              },
+              {
+                "boot": 4,
+                "ce": 91
+              }
+            ],
+            "boots_with_errors": 2,
+            "boots_with_ue": 0,
+            "ce": 94,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x420",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 49
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 49,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 24
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 24,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x320",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 10
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 10,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x238",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 9
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 9,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 7
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 7,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 5
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 5,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x740",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 4
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 4,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x388",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 4
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 4,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x390",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 4
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 4,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x1d8",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 1
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 1,
+            "ue": 0
+          },
+          {
+            "level": "cell",
+            "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x320",
+            "cells": [
+              {
+                "boot": 4,
+                "ce": 1
+              }
+            ],
+            "boots_with_errors": 1,
+            "boots_with_ue": 0,
+            "ce": 1,
+            "ue": 0
+          }
+        ]
+      },
       "engine_version": "5",
       "as_of": "2026-11-13T00:00:00Z"
     },
@@ -548,9 +803,11 @@
               "label": "rank0",
               "parent": -1,
               "errors": 1232,
-              "share": 1
+              "share": 1,
+              "boots": 3
             }
-          ]
+          ],
+          "boots": 3
         },
         {
           "name": "device",
@@ -560,9 +817,11 @@
               "label": "dev7",
               "parent": 0,
               "errors": 1232,
-              "share": 1
+              "share": 1,
+              "boots": 3
             }
-          ]
+          ],
+          "boots": 3
         },
         {
           "name": "bank",
@@ -572,9 +831,11 @@
               "label": "bg0 bank3",
               "parent": 0,
               "errors": 1232,
-              "share": 1
+              "share": 1,
+              "boots": 3
             }
-          ]
+          ],
+          "boots": 3
         },
         {
           "name": "row",
@@ -584,17 +845,22 @@
               "label": "0x1a2f",
               "parent": 0,
               "errors": 1206,
-              "share": 0.9788961038961039
+              "share": 0.9788961038961039,
+              "boots": 3
             },
             {
               "label": "0x1a30",
               "parent": 0,
               "errors": 26,
-              "share": 0.021103896103896104
+              "share": 0.021103896103896104,
+              "boots": 1
             }
-          ]
+          ],
+          "boots": 3
         }
-      ]
+      ],
+      "window": 4,
+      "boots": 3
     },
     "address_map": {
       "host": "r12-n034",
@@ -1382,7 +1648,417 @@
             "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2, DQ3, first 2026-09-24, latest 2026-11-12"
           }
         }
-      ]
+      ],
+      "window": 4,
+      "boots": 3,
+      "ue_boots": 1
+    },
+    "boots": {
+      "host": "r12-n034",
+      "system": "Example Systems R760",
+      "slot": "CPU0_C1",
+      "dimm": {
+        "dimm_uid": "d878e1a15b6e30a44057",
+        "serial": "3B9C56",
+        "manufacturer": "Example Memory",
+        "part_number": "EXM64G48R2X4-A",
+        "kind": "DDR5 RDIMM 64 GB 2Rx4",
+        "identity": "serial"
+      },
+      "boots_on_record": 4,
+      "boots": [
+        {
+          "index": 1,
+          "boot_id": "f42e06a462aa0c13b95dd4c7a152f73b",
+          "started_at": "2026-07-31T11:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 2213760,
+          "end": ""
+        },
+        {
+          "index": 2,
+          "boot_id": "6d9126624276254e46e24386bb76fe7d",
+          "started_at": "2026-08-26T02:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 3023760,
+          "end": ""
+        },
+        {
+          "index": 3,
+          "boot_id": "9fa24819800646a1b7eb3c7393b3c6a0",
+          "started_at": "2026-09-30T02:00:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 2417160,
+          "end": ""
+        },
+        {
+          "index": 4,
+          "boot_id": "86eacf5a7c1da2880018ae7a387134c1",
+          "started_at": "2026-10-28T01:30:00Z",
+          "start_quality": "exact",
+          "ran_seconds": 1377000,
+          "end": ""
+        }
+      ],
+      "rows": [
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x238",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "ce": 6,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "ce": 317,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 244,
+              "ue": 1,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 3,
+          "boots_with_ue": 1,
+          "ce": 567,
+          "ue": 1
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x388",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "ce": 94,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 200,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 2,
+          "boots_with_ue": 0,
+          "ce": 294,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "ce": 22,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 136,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 2,
+          "boots_with_ue": 0,
+          "ce": 158,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x390",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "ce": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 91,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 2,
+          "boots_with_ue": 0,
+          "ce": 94,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x420",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 49,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 49,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 24,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 24,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x320",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 10,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 10,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x238",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 9,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 9,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 7,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 7,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 5,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 5,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a2f col 0x740",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 4,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 4,
+          "ue": 0
+        },
+        {
+          "level": "cell",
+          "place": "rank0 dev7 bg0 bank3 row 0x1a30 col 0x388",
+          "cells": [
+            {
+              "boot": 1,
+              "known": true
+            },
+            {
+              "boot": 2,
+              "known": true
+            },
+            {
+              "boot": 3,
+              "known": true
+            },
+            {
+              "boot": 4,
+              "ce": 4,
+              "known": true
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "ce": 4,
+          "ue": 0
+        }
+      ],
+      "others": {
+        "level": "others",
+        "cells": [
+          {
+            "boot": 1,
+            "known": true
+          },
+          {
+            "boot": 2,
+            "known": true
+          },
+          {
+            "boot": 3,
+            "known": true
+          },
+          {
+            "boot": 4,
+            "ce": 6,
+            "known": true
+          }
+        ],
+        "boots_with_errors": 1,
+        "boots_with_ue": 0,
+        "ce": 6,
+        "ue": 0,
+        "places": 3
+      }
     },
     "timeline": {
       "host": "r12-n034",

@@ -110,6 +110,11 @@ type Fault struct {
 	// PatrolUE lists times of uncorrected errors at the fault location
 	// that the patrol scrubber found before anything read the data.
 	PatrolUE []time.Time
+	// Stops lists times of fatal uncorrected errors at the fault location.
+	// Each ends its boot: the kernel panics, the host resets, and the next
+	// boot reads the record out of the machine check bank. A reboot must
+	// follow each of them.
+	Stops []time.Time
 	// StaysWithSlot makes the errors stay in the slot when the DIMM is
 	// moved, as a fault of the slot, channel or board does. Otherwise they
 	// follow the DIMM.
@@ -319,6 +324,28 @@ var builders = map[string]func(seed uint64) *Scenario{
 			{At: clock(2026, 11, 7, 9, 0), Fault: 0, Pages: 2},
 			{At: clock(2026, 11, 11, 9, 0), Fault: 0, Pages: 2},
 		}
+		return s
+	},
+	// A crash loop: a cell that failed with corrected errors for weeks
+	// gives a fatal error in four boots in a row, each a short boot that
+	// the next one follows within a minute.
+	"crash-loop": func(seed uint64) *Scenario {
+		s := base("crash-loop", seed)
+		s.Reboots = append(s.Reboots,
+			Reboot{At: clock(2026, 11, 12, 8, 0)},
+			Reboot{At: time.Date(2026, 11, 12, 8, 41, 44, 0, time.UTC)},
+			Reboot{At: time.Date(2026, 11, 12, 9, 23, 37, 0, time.UTC)},
+			Reboot{At: time.Date(2026, 11, 12, 9, 25, 2, 0, time.UTC)},
+			Reboot{At: time.Date(2026, 11, 12, 10, 10, 33, 0, time.UTC)})
+		s.Faults = []Fault{
+			{Mode: model.ModeSingleBit, Slot: "CPU0_C1", Start: day(2026, 10, 20), End: clock(2026, 11, 12, 8, 0), Events: 60, Trend: Flat, PatrolShare: 0.2,
+				Stops: []time.Time{
+					time.Date(2026, 11, 12, 8, 41, 12, 0, time.UTC), time.Date(2026, 11, 12, 9, 23, 5, 0, time.UTC),
+					time.Date(2026, 11, 12, 9, 24, 30, 0, time.UTC), time.Date(2026, 11, 12, 10, 10, 1, 0, time.UTC)},
+				Rank: model.Some(0), Device: model.Some(7), BankGroup: model.Some(0), Bank: model.Some(3), Row: model.Some(0x1a2f), Column: model.Some(0x238)},
+			{Mode: model.ModeSingleBit, Slot: "CPU1_D1", Events: 25, Trend: Flat, PatrolShare: 0.3},
+		}
+		s.NoisePerDIMMDay = 0
 		return s
 	},
 	// The case of the design mockups: a row fault that grows, is repaired

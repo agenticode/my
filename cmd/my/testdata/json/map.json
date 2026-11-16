@@ -791,6 +791,9 @@
           "text": "row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 1,232 errors, 9 columns in 2 rows, data lines DQ2, DQ3, first 2026-09-24, latest 2026-11-12"
         }
       }
-    ]
+    ],
+    "window": 4,
+    "boots": 3,
+    "ue_boots": 1
   }
 }
