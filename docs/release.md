@@ -15,16 +15,16 @@ The binary is pure Go, built with `CGO_ENABLED=0`, and statically linked. It nee
 
 ```
 $ my version
-my v0.1.0 (0123456789ab, 2026-11-15) go1.26.0 linux/amd64
+my v1.0.0 (0123456789ab, 2026-11-16) go1.26.11 linux/amd64
 ```
 
-The line holds the version, the commit the binary was built from, the day of that commit, the Go version and the platform. The version and commit above are placeholders. `my version --json` prints the same and the versions of what the binary reads and writes: the analysis engine, the ledger schema, the case bundle format and the `--json` output.
+The line holds the version, the commit the binary was built from, the day of that commit, the Go version and the platform. The commit above is a placeholder. `my version --json` prints the same and the versions of what the binary reads and writes: the analysis engine, the ledger schema, the case bundle format and the `--json` output.
 
 A release build is stamped by `tools/dist`. A build with `make build` is stamped with what `git describe` says. A build with `go build` or `go install` takes what the Go toolchain recorded: the module version, the revision and its time; a working tree with changes is named `<revision>-dirty`.
 
 ## Reproducible archives
 
-The same commit, built with the same Go version, gives the same archives byte for byte on any machine. What makes that so:
+The same commit, built with the same Go version, gives the same archives byte for byte on any machine. The `toolchain` line of `go.mod` names the Go version of the release builds and of CI (go1.26.11 for 1.0.0); the go command downloads it when the installed one is older, and uses an installed newer one as it is. What makes the archives the same:
 
 - the binary is built with `-trimpath`, without a build ID and without the version control stamp of the toolchain, for the baseline instruction set of each architecture;
 - the version, the commit and the time of the commit are the only values stamped into it;
@@ -36,7 +36,7 @@ To check a published release against its source:
 
 ```
 git checkout <version>
-go version                      # must be the Go version "my version" of the release prints
+export GOTOOLCHAIN=go1.26.11    # the Go version "my version" of the release prints
 make dist VERSION=<version>
 diff dist/SHA256SUMS <the SHA256SUMS of the release>
 ```
@@ -44,18 +44,30 @@ diff dist/SHA256SUMS <the SHA256SUMS of the release>
 ## Making a release
 
 1. Choose the version: `vMAJOR.MINOR.PATCH`. The workflow rejects a tag of another form.
-2. Try it without publishing. Either run the `release` workflow by hand from the Actions page (it builds, checks and keeps the archives with the run, and publishes nothing), or locally:
+2. Write its entry in [CHANGELOG.md](../CHANGELOG.md), headed `## [MAJOR.MINOR.PATCH] - YYYY-MM-DD`, and merge it. `.github/scripts/release-notes.sh <version>` prints the notes the release will carry, with links to files of the repository at the tag.
+3. Try it without publishing. Either run the `release` workflow by hand from the Actions page (it builds, checks and keeps the archives with the run, and publishes nothing), or locally:
    ```
    make lint test
    make dist-check
    .github/scripts/check-dist.sh <version>
    ```
-3. Tag the commit on `main` and push the tag:
+4. Tag the commit on `main` and push the tag:
    ```
    git tag -a <version> -m "MemorY <version>"
    git push origin <version>
    ```
-4. The `release` workflow runs the tests, builds the archives twice and compares them, unpacks them, runs the binary, and creates the GitHub release with the archives, `SHA256SUMS` and notes generated from the merged pull requests.
+5. The `release` workflow runs the tests, builds the archives twice and compares them, unpacks them, runs the binary, and creates the GitHub release "MemorY MAJOR.MINOR.PATCH" with the archives, `SHA256SUMS` and the notes of step 2.
+
+A release can also be published from a local build, before the workflow reaches its last step:
+
+```
+make dist VERSION=<version>
+.github/scripts/release-notes.sh <version> > notes.md
+gh release create <version> dist/my_<version>_*.tar.gz dist/SHA256SUMS --verify-tag \
+  --title "MemorY MAJOR.MINOR.PATCH" --notes-file notes.md
+```
+
+The workflow then leaves the release as it is and compares checksums: it fails when the `SHA256SUMS` of its own build differs from the published one. Such a release has been built on two machines, the local one and a Linux x86-64 runner.
 
 A release that turns out wrong is not replaced: its files keep the checksums users may have recorded. Fix the problem and release the next patch version.
 

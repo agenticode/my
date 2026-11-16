@@ -96,11 +96,12 @@ test:
 	$(GO) test -p $(JOBS) ./...
 
 # The race detector needs cgo; the product build stays CGO_ENABLED=0. The
-# tests of the commands scan host trees and take several minutes with the
-# detector on a small machine, more than the ten minutes a package gets by
-# default.
+# tests of the commands scan host trees into new ledgers, and SQLite runs
+# slowly under the detector: on the CI runner the package cmd/my took 1,295
+# to 1,735 seconds with go1.26.0 and went over 30 minutes with go1.26.11.
+# A package gets an hour.
 test-race:
-	CGO_ENABLED=1 $(GO) test -race -timeout 30m -p $(JOBS) ./...
+	CGO_ENABLED=1 $(GO) test -race -timeout 60m -p $(JOBS) ./...
 
 # The figures are pinned by golden files. After an intended change of the
 # output, rewrite them and review the diff.
