@@ -224,8 +224,10 @@ func (r *run) classesOf(pending bool) []model.BMCClass {
 // controller records the reading of the BMC itself: what it is, what it
 // runs, how complete the reading was and what its logs cover.
 func (r *run) controller(sink adapter.Sink) error {
-	if r.rep.Records == 0 {
-		return nil // nothing was read of any BMC
+	if r.found() == 0 {
+		// Nothing was read of any BMC. A file that is no JSON counts as
+		// a record of the report, and makes no BMC.
+		return nil
 	}
 	b := &model.BMC{ObservedAt: r.now, Source: Kind, RawRef: r.origin, LastReset: r.lastReset}
 	for _, root := range r.roots {
