@@ -143,6 +143,8 @@ type Document struct {
 	Overview *view.Overview
 	// Timeline is the timeline of the host, with one row per DIMM.
 	Timeline *view.Timeline
+	// Boots is the window of the latest boots of the host.
+	Boots *view.Boots
 	// DIMMs are the DIMMs the report describes: those with errors or a
 	// finding, the worst first, and the subject of the case.
 	DIMMs []*DIMM
@@ -191,6 +193,9 @@ type DIMM struct {
 	Topology *view.Topology
 	Map      *view.AddressMap
 	Timeline *view.Timeline
+	// Boots holds the places of the DIMM boot by boot, when it had errors
+	// in two or more boots of the window.
+	Boots *view.Boots
 	// Linked says which cells of the map lead to their records, by index
 	// in Map.Refs.
 	Linked map[int]bool
@@ -288,6 +293,9 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 		return nil, err
 	}
 	doc.Undated = doc.Timeline.Undated
+	if doc.Boots, err = c.BootsView(ctx, h, nil); err != nil {
+		return nil, err
+	}
 
 	level2 := map[string][]Level2{}
 	for _, l := range opts.Level2 {
@@ -325,7 +333,14 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 		if err != nil {
 			return nil, err
 		}
-		sec.Card, sec.Topology, sec.Map, sec.Timeline = x.Card, x.Topology, x.AddressMap, x.Timeline
+		sec.Card, sec.Topology, sec.Map, sec.Timeline, sec.Boots = x.Card, x.Topology, x.AddressMap, x.Timeline, x.Boots
+		if x.Boots != nil && x.AddressMap != nil && x.AddressMap.Bank != nil {
+			// The map counts the boots of each cell as well: cells with
+			// errors in two or more boots are outlined.
+			if sec.Map, err = c.AddressMap(ctx, h, d, view.MapOptions{Cells: MapCells, MaxLines: 16, Boots: true}); err != nil {
+				return nil, err
+			}
+		}
 		actions, err := s.Actions(ctx, store.ActionFilter{DIMMUID: d.UID})
 		if err != nil {
 			return nil, err

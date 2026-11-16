@@ -204,6 +204,8 @@ func TestGolden(t *testing.T) {
 		{"demo.fa.ko", "demo", "", i18n.KO, FA},
 		{"demo-amd.customer.en", "demo", synth.FlavorAMD, i18n.EN, Customer},
 		{"system-channel.fa.en", "system-channel", "", i18n.EN, FA},
+		{"crash-loop.customer.en", "crash-loop", "", i18n.EN, Customer},
+		{"crash-loop.fa.ko", "crash-loop", "", i18n.KO, FA},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			doc := build(t, tt.scenario, tt.flavor, tt.lang, tt.aud)
@@ -1033,7 +1035,8 @@ func TestWords(t *testing.T) {
 	}
 	more, _ := os.ReadFile("figures.go")
 	build, _ := os.ReadFile("build.go")
-	src = append(append(src, more...), build...)
+	boots, _ := os.ReadFile("boots.go")
+	src = append(append(append(src, more...), build...), boots...)
 	for _, m := range regexp.MustCompile(`doc\.say\("([a-z0-9_.]+)"`).FindAllSubmatch(src, -1) {
 		if code := string(m[1]); !Words.Has(code) && !strings.HasSuffix(code, ".") {
 			t.Errorf("the report asks for %q, which the catalog lacks", code)

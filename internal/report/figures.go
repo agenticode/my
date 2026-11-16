@@ -521,6 +521,18 @@ func (doc *Document) mapLegend(m *view.AddressMap) *node {
 		ul.add(el("li", swatch(fmt.Sprintf("ht%d", min(i+1, 4)), false), scaleText(m.Scale, i)))
 	}
 	ul.add(el("li", swatch("ue", true), doc.vsay("map.ue")))
+	// The outline of cells with errors in two or more boots.
+	multi := false
+	for _, ln := range m.Lines {
+		for _, b := range ln.Boots {
+			multi = multi || b >= 2
+		}
+	}
+	if multi {
+		ul.add(el("li", el("svg", A{"class", "sw", "viewBox", "0 0 12 12", "width", "12", "height", "12", "aria-hidden", "true"},
+			el("rect", A{"class", "ht1", "x", "0", "y", "0", "width", "12", "height", "12"}),
+			el("rect", A{"class", "multi", "x", "0.7", "y", "0.7", "width", "10.6", "height", "10.6"})), doc.say("map.outline")))
+	}
 	return ul
 }
 
@@ -666,12 +678,28 @@ func (doc *Document) addressMapFigure(d *DIMM) *node {
 			} else {
 				mark = append(mark, el("rect", A{"class", cls, "x", num(x), "y", num(y), "width", num(pitch - 1), "height", num(cellH)}))
 			}
+			// A cell with errors in two or more boots is outlined, and its
+			// title says in how many.
+			boots := 0
+			if c < len(ln.Boots) {
+				boots = ln.Boots[c]
+			}
+			if boots >= 2 {
+				mark = append(mark, el("rect", A{"class", "multi", "x", num(x + 0.7), "y", num(y + 0.7), "width", num(pitch - 2.4), "height", num(cellH - 1.4)}))
+			}
 			ri, ok := refs[[2]int{li, c}]
+			cellTitle := func() string {
+				t := doc.cellText(m, &m.Refs[ri])
+				if boots >= 2 {
+					t += "; " + doc.say("map.cell_boots", "n", boots, "of", m.Window)
+				}
+				return t
+			}
 			switch {
 			case ok && d.Linked[ri]:
-				s.add(link(cellKeys(&m.Refs[ri]), doc.cellText(m, &m.Refs[ri]), mark...).add(A{"class", "pt"}))
+				s.add(link(cellKeys(&m.Refs[ri]), cellTitle(), mark...).add(A{"class", "pt"}))
 			case ok:
-				s.add(el("g", el("title", doc.cellText(m, &m.Refs[ri])), mark))
+				s.add(el("g", el("title", cellTitle()), mark))
 			default:
 				s.add(el("g", mark))
 			}

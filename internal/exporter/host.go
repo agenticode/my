@@ -56,6 +56,13 @@ func Host(ctx context.Context, s *store.Store, h *engine.HostResult) (*Set, erro
 		set.Add(DIMMCorrected, float64(d.Features.CE), host, d.Slot, serial)
 		set.Add(DIMMUncorrected, float64(d.Features.UE), host, d.Slot, serial)
 		set.Add(DIMMOfflinedPages, float64(d.Features.Offline.Pages), host, d.Slot)
+		if r := h.Recurrence; r != nil && r.Window() > 0 {
+			stops := 0
+			if db := r.DIMM(d.UID); db != nil {
+				stops = db.StopBoots
+			}
+			set.Add(DIMMStopBoots, float64(stops), host, d.Slot, serial)
+		}
 		for _, f := range d.Faults {
 			set.Add(DIMMFaults, 1, host, d.Slot, string(f.Mode))
 		}
@@ -101,7 +108,67 @@ func Host(ctx context.Context, s *store.Store, h *engine.HostResult) (*Set, erro
 	if err := sourceMetrics(ctx, set, s, host); err != nil {
 		return nil, fmt.Errorf("metrics of %s: sources: %w", host, err)
 	}
+	stopMetrics(set, h)
+	checks, err := s.CaptureChecks(ctx, host)
+	if err != nil {
+		return nil, fmt.Errorf("metrics of %s: preflight: %w", host, err)
+	}
+	for _, c := range checks {
+		switch c.State {
+		case "kept":
+			set.Add(HostCapture, 1, host, c.Name)
+		case "lost":
+			set.Add(HostCapture, 0, host, c.Name)
+		}
+	}
 	return set, nil
+}
+
+// Causes of a stop, the values of the label cause of my_host_stops.
+const (
+	StopMemory        = "memory"
+	StopHardwareOther = "hardware-other"
+	StopPanic         = "panic"
+)
+
+// stopMetrics adds how the boots of the window of a host ended. A host
+// whose window holds a boot has the three series of my_host_stops and the
+// streak, at 0 when nothing stopped: a series that first shows up at 1
+// hides the first stop from an alert on a change.
+func stopMetrics(set *Set, h *engine.HostResult) {
+	r := h.Recurrence
+	if r == nil || r.Window() == 0 {
+		return
+	}
+	// The boots with an uncorrected memory error on record.
+	memory := map[int]bool{}
+	for _, db := range r.DIMMs {
+		for _, c := range db.Cells {
+			if c.UE > 0 {
+				memory[c.Boot] = true
+			}
+		}
+	}
+	for _, pb := range r.Loose {
+		for _, c := range pb.Cells {
+			memory[c.Boot] = true
+		}
+	}
+	counts := map[string]int{StopMemory: 0, StopHardwareOther: 0, StopPanic: 0}
+	for _, b := range r.Boots {
+		switch {
+		case b.End == model.BootStop && memory[b.Index]:
+			counts[StopMemory]++
+		case b.End == model.BootStop:
+			counts[StopHardwareOther]++
+		case b.End == model.BootPanic:
+			counts[StopPanic]++
+		}
+	}
+	for _, cause := range []string{StopMemory, StopHardwareOther, StopPanic} {
+		set.Add(HostStops, float64(counts[cause]), h.Host, cause)
+	}
+	set.Add(HostStopStreak, float64(r.Streak), h.Host)
 }
 
 // GPUKey names a GPU the way the findings do: by its serial number, else

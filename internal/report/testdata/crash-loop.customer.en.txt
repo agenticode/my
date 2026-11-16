@@ -1,0 +1,623 @@
+lang: en
+title: MemorY report: synth-crash-loop, replace now
+header.top
+  p.kicker: MemorY customer report generated 2026-11-13 09:30 UTC
+  # Memory error report host synth-crash-loop
+section#s1.sec
+  ## 1 Summary
+  p.grade: replace now host synth-crash-loop
+  p.conclusion: CPU0_C1 S/N BE8ED6: replace now (finding, confidence high). 4 uncorrected errors, the latest on 2026-11-12 10:10 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. Replace the DIMM. Attach a case bundle written from the kept ledger to the return.
+  p: 1 more with errors or a finding: CPU1_D1 observe.
+  Case ID = 0123456789ab the first 12 digits of the identity of the ledger
+  Host = synth-crash-loop
+  System = Example Systems R760
+  Period on record = 2026-07-31 to 2026-11-13, 8 boots
+  Errors = CE 85, UE 4
+  Observation grade = A (bank, row and column known)
+  DIMMs = 16 in 32 slots, 2 with errors or a finding
+  Collected = synthetic data set, 2026-11-13 00:00 UTC
+  Report = customer report, generated 2026-11-13 09:30 UTC by my test
+  Engine = version 5
+  p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
+  li: 2 Slot map
+  li: 3 Findings
+  li: 4 Topology and address map
+  li: 5 Timeline
+  li: 6 Checks against a wrong diagnosis
+  li: 7 Data quality
+  li: 8 Appendix
+section#s2.sec
+  ## 2 Slot map
+  figure
+    svg.fig.slotmap: Slot map of host synth-crash-loop
+      mark: CPU0_A1: ok, S/N 8F2453
+      mark: CPU0_A2: empty slot
+      mark: CPU0_B1: ok, S/N D6A738
+      mark: CPU0_B2: empty slot
+      mark: CPU0_C1: replace now, S/N BE8ED6, CE 60, UE 4
+      mark: CPU0_C2: empty slot
+      mark: CPU0_D1: ok, S/N 0149B5
+      mark: CPU0_D2: empty slot
+      mark: CPU0_E1: ok, S/N 3016FC
+      mark: CPU0_E2: empty slot
+      mark: CPU0_F1: ok, S/N 2BE334
+      mark: CPU0_F2: empty slot
+      mark: CPU0_G1: ok, S/N CF6088
+      mark: CPU0_G2: empty slot
+      mark: CPU0_H1: ok, S/N D849FD
+      mark: CPU0_H2: empty slot
+      mark: CPU1_A1: ok, S/N B6446C
+      mark: CPU1_A2: empty slot
+      mark: CPU1_B1: ok, S/N E17AA4
+      mark: CPU1_B2: empty slot
+      mark: CPU1_C1: ok, S/N B5DAD6
+      mark: CPU1_C2: empty slot
+      mark: CPU1_D1: observe, S/N 21FD6F, CE 25, UE 0
+      mark: CPU1_D2: empty slot
+      mark: CPU1_E1: ok, S/N EA1641
+      mark: CPU1_E2: empty slot
+      mark: CPU1_F1: ok, S/N EF9E30
+      mark: CPU1_F2: empty slot
+      mark: CPU1_G1: ok, S/N 049F4B
+      mark: CPU1_G2: empty slot
+      mark: CPU1_H1: ok, S/N 2E671F
+      mark: CPU1_H2: empty slot
+      text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
+    li: replace now
+    li: consider replacement
+    li: observe
+    li: ok
+    li: hold replacement
+    li: empty slot
+    figcaption: 32 slots, 16 DIMMs
+  p.how: One cell per slot: a line per socket and a group per memory channel, in board order. The colour and the mark of a cell give the grade of the finding for the DIMM in that slot. A slot without a module is an outline. A cell leads to the finding of its DIMM.
+  table.ranking
+    | # | slot | serial | CE | UE | fault mode | last 30 days | finding | rules
+    | 1 | CPU0_C1 | BE8ED6 | 60 | 4 | single-bit | rising | replace now | R-UE-01 R-LOOP-01
+    | 2 | CPU1_D1 | 21FD6F | 25 | 0 | single-bit | steady | observe | R-SOFT-01
+  p.how: DIMMs with errors or a finding, the worst first. CE and UE are corrected and uncorrected errors counted from the ledger, so the counts run across reboots. The trend draws the last 30 days in steps of 3 days, each line on its own scale.
+  p: 14 DIMMs without errors
+  ### Boots
+  p.stops: stops: 4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC after 44 min. 4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01).
+  figure
+    svg.fig.boots: The latest 8 boots of synth-crash-loop, and what each DIMM showed in each of them
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: boot 4, started 2026-11-12 08:00 UTC, ran 41 min, stop
+      mark: boot 5, started 2026-11-12 08:41 UTC, ran 41 min, stop
+      mark: boot 6, started 2026-11-12 09:23 UTC, ran 53 s, stop
+      mark: boot 7, started 2026-11-12 09:25 UTC, ran 44 min, stop
+      mark: boot 8, started 2026-11-12 10:10 UTC, ran 13 h, end not on record
+      mark: CPU0_C1, boot 1: no errors
+      mark: CPU0_C1, boot 2: no errors
+      mark: CPU0_C1, boot 3: 60 corrected
+      mark: CPU0_C1, boot 4: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: CPU0_C1, boot 5: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: CPU0_C1, boot 6: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: CPU0_C1, boot 7: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: CPU0_C1, boot 8: no errors
+      mark: CPU1_D1, boot 1: 8 corrected
+      mark: CPU1_D1, boot 2: 6 corrected
+      mark: CPU1_D1, boot 3: 11 corrected
+      mark: CPU1_D1, boot 4: no errors
+      mark: CPU1_D1, boot 5: no errors
+      mark: CPU1_D1, boot 6: no errors
+      mark: CPU1_D1, boot 7: no errors
+      mark: CPU1_D1, boot 8: no errors
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | CPU0_C1 | · | · | 60 | X | X | X | X | · | CPU1_D1 | 8 | 6 | 11 | · | · | · | · | ·
+    figcaption: number: corrected errors, U uncorrected, X uncorrected in a boot that stopped, ? not named, - not in the host
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record) | 4 (stop) | 5 (stop) | 6 (stop) | 7 (stop) | 8 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | ran | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | CPU0_C1 |  |  | CE 60 | UE 1, stop | UE 1, stop | UE 1, stop | UE 1, stop | 
+    | CPU1_D1 | CE 8 | CE 6 | CE 11 |  |  |  |  | 
+  p.how: One column per boot, the oldest at the left, and the letter below its number says how it ended: S a fatal hardware error ended it, p another panic, r the boot of the latest scan, - not on record. A cell gives the corrected errors of the boot as a number, U an uncorrected error, X an uncorrected error in a boot that stopped, ? a boot that stopped with no record naming a DIMM, - a DIMM that was not in the host. The table below holds the same.
+  #### CPU0_C1: its places boot by boot
+  figure
+    svg.fig.boots: The places of CPU0_C1 in the latest 8 boots
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: boot 4, started 2026-11-12 08:00 UTC, ran 41 min, stop
+      mark: boot 5, started 2026-11-12 08:41 UTC, ran 41 min, stop
+      mark: boot 6, started 2026-11-12 09:23 UTC, ran 53 s, stop
+      mark: boot 7, started 2026-11-12 09:25 UTC, ran 44 min, stop
+      mark: boot 8, started 2026-11-12 10:10 UTC, ran 13 h, end not on record
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 1: no errors
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 2: no errors
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 3: 60 corrected
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 4: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 5: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 6: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 7: 1 uncorrected and 0 corrected, in a boot that stopped
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, boot 8: no errors
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | · | · | 60 | X | X | X | X | ·
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record) | 4 (stop) | 5 (stop) | 6 (stop) | 7 (stop) | 8 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | ran | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 |  |  | CE 60 | UE 1, stop | UE 1, stop | UE 1, stop | UE 1, stop | 
+  p: R-LOOP-01 uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8 boots: each of these boots ended in a fatal hardware error.
+  #### CPU1_D1: its places boot by boot
+  figure
+    svg.fig.boots: The places of CPU1_D1 in the latest 8 boots
+      mark: boot 1, started 2026-07-31 11:00 UTC, ran 31 d, end not on record
+      mark: boot 2, started 2026-09-01 03:00 UTC, ran 29 d, end not on record
+      mark: boot 3, started 2026-10-01 03:00 UTC, ran 42 d, end not on record
+      mark: boot 4, started 2026-11-12 08:00 UTC, ran 41 min, stop
+      mark: boot 5, started 2026-11-12 08:41 UTC, ran 41 min, stop
+      mark: boot 6, started 2026-11-12 09:23 UTC, ran 53 s, stop
+      mark: boot 7, started 2026-11-12 09:25 UTC, ran 44 min, stop
+      mark: boot 8, started 2026-11-12 10:10 UTC, ran 13 h, end not on record
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 1: 8 corrected
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 2: 6 corrected
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 3: 11 corrected
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 4: no errors
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 5: no errors
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 6: no errors
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 7: no errors
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, boot 8: no errors
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 8 | 6 | 11 | · | · | · | · | ·
+  table.boots
+    | DIMM or place | 1 (end not on record) | 2 (end not on record) | 3 (end not on record) | 4 (stop) | 5 (stop) | 6 (stop) | 7 (stop) | 8 (end not on record)
+    | started | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | ran | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | CE 8 | CE 6 | CE 11 |  |  |  |  | 
+section#s3.sec
+  ## 3 Findings
+  article#dimm-CPU0_C1.card.g-replace
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    p.sub: in this slot since 2026-07-31; 0 slot changes
+    finding = replace now (finding, confidence high) R-UE-01 R-LOOP-01
+    evidence = R-UE-01 4 uncorrected errors, the latest on 2026-11-12 10:10 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 4 records R-LOOP-01 uncorrected errors at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 in 4 of the last 8 boots: each of these boots ended in a fatal hardware error 64 records
+    checks = open no other DIMM on this channel: there is nothing to compare with open no slot move or reseat on record: a cause in the board is not ruled out supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely supports no other DIMM of the host had an uncorrected error in these boots supports the uncorrected errors stay at one place of the DIMM: a fault of a contact or a trace corrupts whatever address is read
+    missing = no ECS counters no DIMM temperature history
+    baseline = own history: 3.3 errors a day over the last 7 days, percentile 93 of the 30 days before same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of them with errors
+    next = Replace the DIMM. Attach a case bundle written from the kept ledger to the return.
+    p.links: topology and address map timeline checks
+  article#dimm-CPU1_D1.card.g-observe
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    p.sub: in this slot since 2026-07-31; 0 slot changes
+    finding = observe (finding, confidence medium) R-SOFT-01
+    evidence = R-SOFT-01 one cell fails repeatedly (rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 25 errors since 2026-08-05, 4 in the last 7 days 25 records R-SOFT-01 the fault at rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 had errors in 3 of the last 8 boots
+    baseline = own history: 0.6 errors a day over the last 7 days, percentile 87 of the 30 days before same part number (EXM64G48R2X4-A): percentile 91 among the 16 DIMMs in this ledger, 2 of them with errors
+    next = No action. Look again when the count grows or a new place appears.
+    p.links: topology and address map timeline checks
+  p.how: Evidence states what each rule saw and how many ledger records it rests on; the count leads to the records. Checks test the finding against other explanations: "supports" speaks for it, "weakens" speaks against it, "open" could not be tested. Missing lists data the finding did not have.
+  ### Rules named in this report
+  table.rules
+    | rule | grade it gives | fires when
+    | R-UE-01 | replace now | an uncorrected error on this DIMM
+    | R-LOOP-01 | replace now | uncorrected errors at one place of the DIMM in several boots
+    | R-SOFT-01 | observe | corrected errors without a growing fault: stray errors at places that did not fail again, or a fault that is neither rising nor spreading
+section#s4.sec
+  ## 4 Topology and address map
+  section#where-dimm-CPU0_C1.dimm
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    figure
+      figcaption: where the errors sit (width = share of the errors of this DIMM)
+      svg.fig.topo: Topology bars of CPU0_C1
+        mark: rank rank0: 64 errors, 100% of the DIMM
+        mark: device dev7: 64 errors, 100% of the DIMM
+        mark: bank bg0 bank3: 64 errors, 100% of the DIMM
+        mark: row 0x1a2f: 64 errors, 100% of the DIMM
+        text: rank | rank0 | 100% | device | dev7 | 100% | bank | bg0 bank3 | 100% | row | 0x1a2f | 100%
+    details
+      summary: The figure as a table
+      table.tv
+        | level | branch | errors | share
+        | rank | rank0 | 64 | 100%
+        | device | dev7 | 64 | 100%
+        | bank | bg0 bank3 | 64 | 100%
+        | row | 0x1a2f | 64 | 100%
+    figure
+      figcaption: rank0 dev7 bg0 bank3, row by column, one cell = 16 columns
+      li: 0
+      li: 1-2
+      li: 3-9
+      li: 10-99
+      li: 100+
+      li: uncorrected error
+      li: outline: errors in two or more boots
+      svg.fig.amap: Address map of CPU0_C1, rank0 dev7 bg0 bank3
+        mark: row 0x1a2f, columns 0x230 to 0x23f: 64 errors in 64 records, 4 uncorrected; first 2026-10-21, latest 2026-11-12; errors in 5 of the last 8 boots
+        text: row | 0x000 | 0x3ff | 0x100 | 0x200 | 0x300 | columns | 0x1a2c | 0x1a2d | 0x1a2e | 0x1a2f | single-bit fault | 0x1a30 | 0x1a31 | 0x1a32
+    li: single-bit fault at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238: 64 errors, 1 column in 1 row, data lines DQ0, first 2026-10-21, latest 2026-11-12
+    details
+      summary: The figure as a table
+      table.tv
+        | row | columns | errors | UE | records | first | latest
+        | 0x1a2f | 0x230 - 0x23f | 64 | 4 | 64 | 2026-10-21 | 2026-11-12
+  section#where-dimm-CPU1_D1.dimm
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    figure
+      figcaption: where the errors sit (width = share of the errors of this DIMM)
+      svg.fig.topo: Topology bars of CPU1_D1
+        mark: rank rank1: 25 errors, 100% of the DIMM
+        mark: device dev10: 25 errors, 100% of the DIMM
+        mark: bank bg3 bank2: 25 errors, 100% of the DIMM
+        mark: row 0xbce2: 25 errors, 100% of the DIMM
+        text: rank | rank1 | 100% | device | dev10 | 100% | bank | bg3 bank2 | 100% | row | 0xbce2 | 100%
+    details
+      summary: The figure as a table
+      table.tv
+        | level | branch | errors | share
+        | rank | rank1 | 25 | 100%
+        | device | dev10 | 25 | 100%
+        | bank | bg3 bank2 | 25 | 100%
+        | row | 0xbce2 | 25 | 100%
+    figure
+      figcaption: rank1 dev10 bg3 bank2, row by column, one cell = 32 columns
+      li: 0
+      li: 1-2
+      li: 3-9
+      li: 10-99
+      li: 100+
+      li: uncorrected error
+      li: outline: errors in two or more boots
+      svg.fig.amap: Address map of CPU1_D1, rank1 dev10 bg3 bank2
+        mark: row 0xbce2, columns 0x4c0 to 0x4df: 25 errors in 25 records; first 2026-08-05, latest 2026-11-09; errors in 3 of the last 8 boots
+        text: row | 0x000 | 0x7ff | 0x200 | 0x400 | 0x600 | columns | 0xbcdf | 0xbce0 | 0xbce1 | 0xbce2 | single-bit fault | 0xbce3 | 0xbce4 | 0xbce5
+    li: single-bit fault at rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8: 25 errors, 1 column in 1 row, data lines DQ2, first 2026-08-05, latest 2026-11-09
+    details
+      summary: The figure as a table
+      table.tv
+        | row | columns | errors | UE | records | first | latest
+        | 0xbce2 | 0x4c0 - 0x4df | 25 | 0 | 25 | 2026-08-05 | 2026-11-09
+  p.how: Each bar splits all errors of the DIMM at one level of its memory: rank, device, bank, row. A segment lies below the segment it belongs to, so the widest path from top to bottom is where the errors are.
+  p.how: One bank of one device: rows down, columns across. The shade of a cell is the number of errors in it. A horizontal line is a row fault, a vertical line a column fault, one cell that repeats a single-bit fault, and a cloud over the bank a bank fault. A cell with errors leads to its records.
+section#s5.sec
+  ## 5 Timeline
+  section.dimm
+    ### Host synth-crash-loop: every DIMM with errors
+    figure
+      figcaption: errors per day and events
+      svg.fig.tline: Timeline of host synth-crash-loop, 2026-07-31 to 2026-11-12
+        mark: CPU0_C1, 2026-10-21: 3 corrected errors
+        mark: CPU0_C1, 2026-10-22: 3 corrected errors
+        mark: CPU0_C1, 2026-10-23: 1 corrected error
+        mark: CPU0_C1, 2026-10-24: 3 corrected errors
+        mark: CPU0_C1, 2026-10-25: 1 corrected error
+        mark: CPU0_C1, 2026-10-26: 1 corrected error
+        mark: CPU0_C1, 2026-10-27: 5 corrected errors
+        mark: CPU0_C1, 2026-10-28: 4 corrected errors
+        mark: CPU0_C1, 2026-10-29: 3 corrected errors
+        mark: CPU0_C1, 2026-10-30: 3 corrected errors
+        mark: CPU0_C1, 2026-10-31: 2 corrected errors
+        mark: CPU0_C1, 2026-11-01: 3 corrected errors
+        mark: CPU0_C1, 2026-11-02: 3 corrected errors
+        mark: CPU0_C1, 2026-11-03: 3 corrected errors
+        mark: CPU0_C1, 2026-11-04: 1 corrected error
+        mark: CPU0_C1, 2026-11-05: 2 corrected errors
+        mark: CPU0_C1, 2026-11-06: 2 corrected errors
+        mark: CPU0_C1, 2026-11-07: 4 corrected errors
+        mark: CPU0_C1, 2026-11-08: 3 corrected errors
+        mark: CPU0_C1, 2026-11-09: 4 corrected errors
+        mark: CPU0_C1, 2026-11-10: 2 corrected errors
+        mark: CPU0_C1, 2026-11-11: 3 corrected errors
+        mark: CPU0_C1, 2026-11-12: 1 corrected error
+        mark: CPU1_D1, 2026-08-05: 1 corrected error
+        mark: CPU1_D1, 2026-08-08: 1 corrected error
+        mark: CPU1_D1, 2026-08-11: 1 corrected error
+        mark: CPU1_D1, 2026-08-13: 2 corrected errors
+        mark: CPU1_D1, 2026-08-16: 1 corrected error
+        mark: CPU1_D1, 2026-08-20: 1 corrected error
+        mark: CPU1_D1, 2026-08-25: 1 corrected error
+        mark: CPU1_D1, 2026-09-08: 1 corrected error
+        mark: CPU1_D1, 2026-09-14: 1 corrected error
+        mark: CPU1_D1, 2026-09-15: 1 corrected error
+        mark: CPU1_D1, 2026-09-24: 2 corrected errors
+        mark: CPU1_D1, 2026-09-29: 1 corrected error
+        mark: CPU1_D1, 2026-10-03: 1 corrected error
+        mark: CPU1_D1, 2026-10-07: 1 corrected error
+        mark: CPU1_D1, 2026-10-13: 2 corrected errors
+        mark: CPU1_D1, 2026-10-19: 1 corrected error
+        mark: CPU1_D1, 2026-10-22: 2 corrected errors
+        mark: CPU1_D1, 2026-11-07: 2 corrected errors
+        mark: CPU1_D1, 2026-11-08: 1 corrected error
+        mark: CPU1_D1, 2026-11-09: 1 corrected error
+        mark: 2026-09-01 reboot
+        mark: 2026-10-01 reboot
+        mark: 2026-11-12 reboot, and 4 more at this mark
+        mark: CPU0_C1: 2026-11-12 UE (demand read), and 3 more at this mark
+        text: CPU0_C1 | peak 5/day | CPU1_D1 | peak 2/day | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12 | uncorrected error | 11-12
+    li: 7 reboots
+    li: 4 UE on 2026-11-12
+    li: 85 corrected and 4 uncorrected errors from 2026-07-31 to 2026-11-12
+    li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
+    details
+      summary: The figure as a table
+      table.tv
+        | day | CPU0_C1 | CPU1_D1 | event
+        | 2026-08-05 | 0 | 1 | 
+        | 2026-08-08 | 0 | 1 | 
+        | 2026-08-11 | 0 | 1 | 
+        | 2026-08-13 | 0 | 2 | 
+        | 2026-08-16 | 0 | 1 | 
+        | 2026-08-20 | 0 | 1 | 
+        | 2026-08-25 | 0 | 1 | 
+        | 2026-09-01 | 0 | 0 | reboot
+        | 2026-09-08 | 0 | 1 | 
+        | 2026-09-14 | 0 | 1 | 
+        | 2026-09-15 | 0 | 1 | 
+        | 2026-09-24 | 0 | 2 | 
+        | 2026-09-29 | 0 | 1 | 
+        | 2026-10-01 | 0 | 0 | reboot
+        | 2026-10-03 | 0 | 1 | 
+        | 2026-10-07 | 0 | 1 | 
+        | 2026-10-13 | 0 | 2 | 
+        | 2026-10-19 | 0 | 1 | 
+        | 2026-10-21 | 3 | 0 | 
+        | 2026-10-22 | 3 | 2 | 
+        | 2026-10-23 | 1 | 0 | 
+        | 2026-10-24 | 3 | 0 | 
+        | 2026-10-25 | 1 | 0 | 
+        | 2026-10-26 | 1 | 0 | 
+        | 2026-10-27 | 5 | 0 | 
+        | 2026-10-28 | 4 | 0 | 
+        | 2026-10-29 | 3 | 0 | 
+        | 2026-10-30 | 3 | 0 | 
+        | 2026-10-31 | 2 | 0 | 
+        | 2026-11-01 | 3 | 0 | 
+        | 2026-11-02 | 3 | 0 | 
+        | 2026-11-03 | 3 | 0 | 
+        | 2026-11-04 | 1 | 0 | 
+        | 2026-11-05 | 2 | 0 | 
+        | 2026-11-06 | 2 | 0 | 
+        | 2026-11-07 | 4 | 2 | 
+        | 2026-11-08 | 3 | 1 | 
+        | 2026-11-09 | 4 | 1 | 
+        | 2026-11-10 | 2 | 0 | 
+        | 2026-11-11 | 3 | 0 | 
+        | 2026-11-12 | 1 | 0 | reboot, uncorrected error
+  p.how: Each line has its own scale; its peak is printed at the right.
+  section#time-dimm-CPU0_C1.dimm
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    figure
+      figcaption: errors per day and events
+      svg.fig.tline: Timeline of CPU0_C1, 2026-07-31 to 2026-11-12
+        mark: 2026-10-21: 3 corrected errors
+        mark: 2026-10-22: 3 corrected errors
+        mark: 2026-10-23: 1 corrected error
+        mark: 2026-10-24: 3 corrected errors
+        mark: 2026-10-25: 1 corrected error
+        mark: 2026-10-26: 1 corrected error
+        mark: 2026-10-27: 5 corrected errors
+        mark: 2026-10-28: 4 corrected errors
+        mark: 2026-10-29: 3 corrected errors
+        mark: 2026-10-30: 3 corrected errors
+        mark: 2026-10-31: 2 corrected errors
+        mark: 2026-11-01: 3 corrected errors
+        mark: 2026-11-02: 3 corrected errors
+        mark: 2026-11-03: 3 corrected errors
+        mark: 2026-11-04: 1 corrected error
+        mark: 2026-11-05: 2 corrected errors
+        mark: 2026-11-06: 2 corrected errors
+        mark: 2026-11-07: 4 corrected errors
+        mark: 2026-11-08: 3 corrected errors
+        mark: 2026-11-09: 4 corrected errors
+        mark: 2026-11-10: 2 corrected errors
+        mark: 2026-11-11: 3 corrected errors
+        mark: 2026-11-12: 1 corrected error
+        mark: 2026-09-01 reboot
+        mark: 2026-10-01 reboot
+        mark: 2026-11-12 reboot, and 4 more at this mark
+        mark: 2026-11-12 UE (demand read), and 3 more at this mark
+        text: corrected errors per day | 0 | 2 | 5 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12 | uncorrected error | 11-12
+    li: 7 reboots
+    li: 4 UE on 2026-11-12
+    li: 60 corrected and 4 uncorrected errors from 2026-07-31 to 2026-11-12
+    li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
+    details
+      summary: The figure as a table
+      table.tv
+        | day | CPU0_C1 | event
+        | 2026-09-01 | 0 | reboot
+        | 2026-10-01 | 0 | reboot
+        | 2026-10-21 | 3 | 
+        | 2026-10-22 | 3 | 
+        | 2026-10-23 | 1 | 
+        | 2026-10-24 | 3 | 
+        | 2026-10-25 | 1 | 
+        | 2026-10-26 | 1 | 
+        | 2026-10-27 | 5 | 
+        | 2026-10-28 | 4 | 
+        | 2026-10-29 | 3 | 
+        | 2026-10-30 | 3 | 
+        | 2026-10-31 | 2 | 
+        | 2026-11-01 | 3 | 
+        | 2026-11-02 | 3 | 
+        | 2026-11-03 | 3 | 
+        | 2026-11-04 | 1 | 
+        | 2026-11-05 | 2 | 
+        | 2026-11-06 | 2 | 
+        | 2026-11-07 | 4 | 
+        | 2026-11-08 | 3 | 
+        | 2026-11-09 | 4 | 
+        | 2026-11-10 | 2 | 
+        | 2026-11-11 | 3 | 
+        | 2026-11-12 | 1 | reboot, uncorrected error
+  section#time-dimm-CPU1_D1.dimm
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    figure
+      figcaption: errors per day and events
+      svg.fig.tline: Timeline of CPU1_D1, 2026-07-31 to 2026-11-12
+        mark: 2026-08-05: 1 corrected error
+        mark: 2026-08-08: 1 corrected error
+        mark: 2026-08-11: 1 corrected error
+        mark: 2026-08-13: 2 corrected errors
+        mark: 2026-08-16: 1 corrected error
+        mark: 2026-08-20: 1 corrected error
+        mark: 2026-08-25: 1 corrected error
+        mark: 2026-09-08: 1 corrected error
+        mark: 2026-09-14: 1 corrected error
+        mark: 2026-09-15: 1 corrected error
+        mark: 2026-09-24: 2 corrected errors
+        mark: 2026-09-29: 1 corrected error
+        mark: 2026-10-03: 1 corrected error
+        mark: 2026-10-07: 1 corrected error
+        mark: 2026-10-13: 2 corrected errors
+        mark: 2026-10-19: 1 corrected error
+        mark: 2026-10-22: 2 corrected errors
+        mark: 2026-11-07: 2 corrected errors
+        mark: 2026-11-08: 1 corrected error
+        mark: 2026-11-09: 1 corrected error
+        mark: 2026-09-01 reboot
+        mark: 2026-10-01 reboot
+        mark: 2026-11-12 reboot, and 4 more at this mark
+        text: corrected errors per day | 0 | 2 | 4 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | reboot | 09-01 | 10-01 | 11-12
+    li: 7 reboots
+    li: 25 corrected and 0 uncorrected errors from 2026-07-31 to 2026-11-12
+    li: 0 of them since the boot of 2026-11-12: a counter that restarts at every boot shows only those
+    details
+      summary: The figure as a table
+      table.tv
+        | day | CPU1_D1 | event
+        | 2026-08-05 | 1 | 
+        | 2026-08-08 | 1 | 
+        | 2026-08-11 | 1 | 
+        | 2026-08-13 | 2 | 
+        | 2026-08-16 | 1 | 
+        | 2026-08-20 | 1 | 
+        | 2026-08-25 | 1 | 
+        | 2026-09-01 | 0 | reboot
+        | 2026-09-08 | 1 | 
+        | 2026-09-14 | 1 | 
+        | 2026-09-15 | 1 | 
+        | 2026-09-24 | 2 | 
+        | 2026-09-29 | 1 | 
+        | 2026-10-01 | 0 | reboot
+        | 2026-10-03 | 1 | 
+        | 2026-10-07 | 1 | 
+        | 2026-10-13 | 2 | 
+        | 2026-10-19 | 1 | 
+        | 2026-10-22 | 2 | 
+        | 2026-11-07 | 2 | 
+        | 2026-11-08 | 1 | 
+        | 2026-11-09 | 1 | 
+        | 2026-11-12 | 0 | reboot
+  p.how: Corrected errors per day from the ledger, the oldest day at the left. Below the axis there is one lane per kind of event, and a line runs up from a boot or a repair, so that the days before and after it can be compared. A mark leads to its record.
+section#s6.sec
+  ## 6 Checks against a wrong diagnosis
+  p.how: Each finding was tested against causes outside the DIMM: the slot, the channel, the board, and slot names that disagree between sources. "supports" speaks for the finding and "weakens" against it. An open check could not be made from the records; where a person can settle it, the test is listed below the checks.
+  section#check-dimm-CPU0_C1.dimm
+    ### CPU0_C1 replace now
+    #### Checks made from the records
+    table.checks
+      | result | check
+      | open | no other DIMM on this channel: there is nothing to compare with
+      | open | no slot move or reseat on record: a cause in the board is not ruled out
+      | supports | the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
+      | supports | no other DIMM of the host had an uncorrected error in these boots
+      | supports | the uncorrected errors stay at one place of the DIMM: a fault of a contact or a trace corrupts whatever address is read
+    #### Tests for a person
+    li: Swap the DIMM with one from another channel, or reseat it, and scan again after some days. The ledger then shows whether the errors follow the DIMM, stay in the slot or stop.
+  section#check-dimm-CPU1_D1.dimm
+    ### CPU1_D1 observe
+    #### Checks made from the records
+    p: The records gave no check for this finding.
+    #### Tests for a person
+    p: No test is open.
+section#s7.sec
+  ## 7 Data quality
+  p.how: What the findings rest on: every source that was looked for, what it yielded, and how much of the location of an error it reports. A finding only says what the observation grade of its records allows.
+  ### Errors by observation grade
+  figure
+    svg.fig.obsbar: Errors of host synth-crash-loop by observation grade
+    li: A: 89 errors (bank, row and column known)
+    li: B: 0 errors (physical address or rank known, no row and column)
+    li: C: 0 errors (a count per DIMM only)
+  details
+    summary: Observation grade per DIMM
+    table.grades
+      | DIMM | A | B | C
+      | CPU0_C1 | 64 | 0 | 0
+      | CPU1_D1 | 25 | 0 | 0
+  ### Sources
+  table.sources
+    | source | read from | status | records | errors | actions | not usable | grade | first to last record
+    | synth | synth:crash-loop | ok | 97 | 89 | 0 | 0 | A | 2026-08-05 to 2026-11-12
+  ### Modules
+  p.how: Every DIMM of the host on one line, with what SMBIOS, EDAC and the BMC say of it. A dash is a fact no source of this case gave: the table doubles as the list of what to ask for when a case starts.
+  p.sub: 16 DIMMs; the 16 empty slots are on the slot map.
+  p.sub: Slot names and module data from SMBIOS.
+  p.sub: No BIOS settings are on record, so the RAS column is empty. The BMC of the host reports them over Redfish.
+  table.modules
+    | SLOT | SERIAL | MAKER | PART NUMBER | SIZE | ORG | SPEED | CE OS | CE BMC
+    | CPU0_A1 | 8F2453 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_B1 | D6A738 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_C1 | BE8ED6 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 60 | -
+    |  | DDR5 RDIMM
+    | CPU0_D1 | 0149B5 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_E1 | 3016FC | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_F1 | 2BE334 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_G1 | CF6088 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_H1 | D849FD | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_A1 | B6446C | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_B1 | E17AA4 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_C1 | B5DAD6 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_D1 | 21FD6F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 25 | -
+    |  | DDR5 RDIMM
+    | CPU1_E1 | EA1641 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_F1 | EF9E30 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_G1 | 049F4B | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_H1 | 2E671F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+  li: ORG is ranks and device width (2Rx4). SPEED is the speed in use and the rated speed in MT/s.
+  li: CE OS counts the corrected errors in the records of the operating system. No BMC was read.
+  #### Operating system and BMC
+  p: No BMC was read, so there is nothing to set against the records of the operating system.
+  ### Not read, or read in part
+  p: Every source that was looked for was read in full.
+section#s8.sec
+  ## 8 Appendix
+  ### Records
+  p.how: The ledger records this report refers to, in time order: the records the findings cite, every record of an uncorrected error or of a repair that a timeline marks, and the first and the latest record of the cells of the address maps. The original text of a record opens when its ID is chosen. The case holds every record. Records a finding cites are printed with their original text.
+  p.sub: 10 of the 89 records of this host
+  table.records
+    | ID | time (UTC) | what | slot | place | count | obs. | source and original record
+    | e1 | 2026-08-05 00:31:34 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event1
+    raw: EDAC MC5: 1 CE memory scrubbing error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0008:0x00c1 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e2 | 2026-08-08 19:12:43 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event2
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e20 | 2026-10-21 02:59:37 | CE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event20
+    raw: EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 syndrome:0x0 - err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e21 | 2026-10-21 05:02:52 | CE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event21
+    raw: EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 syndrome:0x0 - err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e72 | 2026-11-08 06:51:55 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event72
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e75 | 2026-11-09 01:20:44 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event75
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e86 | 2026-11-12 08:41:12 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event86
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e87 | 2026-11-12 09:23:05 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event87
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e88 | 2026-11-12 09:24:30 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event88
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e89 | 2026-11-12 10:10:01 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event89
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+  ### Records in FMFM field names
+  p.how: The error records above with the field names of the FMFM runtime error log, one JSON object per line. A field a source did not report is left out. The lower-case fields are added by MemorY: the observation grade, the source and the place of the original record.
+  pre.json: 10 lines, the first: {"ErrorDT":"2026-08-05T00:31:34.431Z","ErrorScrubType":"Patrol","ErrorSeverity":"CE","HostID":"synth-crash-loop","SocketId":1,"ChannelId":1,"ChannelSlotId":0,"Rank":1,"DeviceId":10,"BankGroup":3,"Bank":2,"Row":48354,"Column":1224,"ErrorVector":"dq:0x4","OsPhysicalAddress":"0x16caf38a640","slot":"CPU1_D1","grade":"A","source":"synth","raw_ref":"synth:crash-loop#event1"}
+footer
+  p: MemorY reads records about memory errors and never changes the host. This report holds no contents of memory.
+  p.mono: my test
+aside#panel.panel
+  button#panel-close: close
+  table#panel-records.records
+    | ID | time (UTC) | what | slot | place | count | obs. | source and original record

@@ -52,6 +52,14 @@ var (
 		Help: "Memory banks of the GPU by the spare rows they have left for row remapping: max, high, partial, low, none."}
 	GPURemapFailure = &Desc{Name: "my_gpu_remap_failure", Type: Gauge, Labels: []string{"host", "gpu"},
 		Help: "1 when a row remapping of the GPU failed, 0 when the GPU reports none."}
+	HostStops = &Desc{Name: "my_host_stops", Type: Gauge, Labels: []string{"host", "cause"},
+		Help: "Boots of the window of the host (loop.window_boots) that ended in a stop, by cause: memory (an uncorrected memory error is on record in the boot), hardware-other (a fatal hardware error without one), panic (a panic with no hardware error record)."}
+	HostStopStreak = &Desc{Name: "my_host_stop_streak", Type: Gauge, Labels: []string{"host"},
+		Help: "The latest boots of the host in a row that a fatal hardware error ended; a boot still running is passed over."}
+	DIMMStopBoots = &Desc{Name: "my_dimm_stop_boots", Type: Gauge, Labels: []string{"host", "slot", "serial"},
+		Help: "Boots of the window of the host that stopped with an uncorrected error of the DIMM in the slot."}
+	HostCapture = &Desc{Name: "my_host_capture", Type: Gauge, Labels: []string{"host", "check"},
+		Help: "What my preflight found the latest live scan of the host would keep over a reset: 1 kept, 0 lost, by check. Checks the platform does not offer, or could not read, have no series."}
 	SourceGrade = &Desc{Name: "my_source_grade", Type: Gauge, Labels: []string{"host", "source", "status"},
 		Help: "Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went."}
 )
@@ -70,7 +78,8 @@ var (
 
 // Descs lists every metric in the order they are written.
 var Descs = []*Desc{
-	DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs,
+	DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs, DIMMStopBoots,
+	HostStops, HostStopStreak, HostCapture,
 	GPURemapBanks, GPURemapFailure, SourceGrade,
 	BuildInfo, LastScan, ScanDuration, ScanFailures,
 }

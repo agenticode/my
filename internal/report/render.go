@@ -439,6 +439,9 @@ func (doc *Document) slotMap() *node {
 		}
 		s.add(el("h3", doc.say("gpu.title")), scroll(t))
 	}
+	for _, n := range doc.bootsPart() {
+		s.add(n)
+	}
 	return s
 }
 

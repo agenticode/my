@@ -74,6 +74,32 @@ my_dimm_offlined_pages{host="r12-n034",slot="CPU1_E1"} 0
 my_dimm_offlined_pages{host="r12-n034",slot="CPU1_F1"} 0
 my_dimm_offlined_pages{host="r12-n034",slot="CPU1_G1"} 0
 my_dimm_offlined_pages{host="r12-n034",slot="CPU1_H1"} 0
+# HELP my_dimm_stop_boots Boots of the window of the host that stopped with an uncorrected error of the DIMM in the slot.
+# TYPE my_dimm_stop_boots gauge
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_A1",serial="5C331B"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_B1",serial="DE7FF0"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_C1",serial="3B9C56"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_D1",serial="80D01E"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_E1",serial="E2CD51"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_F1",serial="2B6332"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_G1",serial="382A8A"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU0_H1",serial="4B3B31"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_A1",serial="2C9305"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_B1",serial="DBC9CE"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_C1",serial="99B7F7"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_D1",serial="2AEB41"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_E1",serial="02AC34"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_F1",serial="848BE3"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_G1",serial="D7A399"} 0
+my_dimm_stop_boots{host="r12-n034",slot="CPU1_H1",serial="55C12A"} 0
+# HELP my_host_stops Boots of the window of the host (loop.window_boots) that ended in a stop, by cause: memory (an uncorrected memory error is on record in the boot), hardware-other (a fatal hardware error without one), panic (a panic with no hardware error record).
+# TYPE my_host_stops gauge
+my_host_stops{host="r12-n034",cause="hardware-other"} 0
+my_host_stops{host="r12-n034",cause="memory"} 0
+my_host_stops{host="r12-n034",cause="panic"} 0
+# HELP my_host_stop_streak The latest boots of the host in a row that a fatal hardware error ended; a boot still running is passed over.
+# TYPE my_host_stop_streak gauge
+my_host_stop_streak{host="r12-n034"} 0
 # HELP my_source_grade Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went.
 # TYPE my_source_grade gauge
 my_source_grade{host="r12-n034",source="edac-sysfs",status="ok"} 1

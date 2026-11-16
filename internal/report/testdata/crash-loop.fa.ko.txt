@@ -1,0 +1,627 @@
+lang: ko
+title: MemorY 리포트: synth-crash-loop, 즉시 교체
+header.top
+  p.kicker: MemorY FA용 리포트 2026-11-13 09:30 UTC 생성
+  # 메모리 오류 리포트 호스트 synth-crash-loop
+section#s1.sec
+  ## 1 요약
+  p.grade: 즉시 교체 호스트 synth-crash-loop
+  p.conclusion: CPU0_C1 S/N BE8ED6: 즉시 교체 (소견, 신뢰도 높음). UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238. DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
+  p: 오류나 소견이 1개 더 있음: CPU1_D1 관찰.
+  케이스 ID = 0123456789ab 원장 식별자 앞 12자리
+  호스트 = synth-crash-loop
+  시스템 = Example Systems R760
+  기록 기간 = 2026-07-31 ~ 2026-11-13, 부팅 8회
+  오류 = CE 85건, UE 4건
+  관측 등급 = A (bank, row, column 확인)
+  DIMM = 슬롯 32개에 DIMM 16개, 오류나 소견이 있는 DIMM 2개
+  수집 = 합성 데이터, 2026-11-13 00:00 UTC
+  리포트 = FA용 리포트, 2026-11-13 09:30 UTC 생성, 도구 my test
+  엔진 = 버전 5
+  p.how: 등급은 소견입니다. 기준 임계값은 FA 결과와 대조하기 전의 기본값입니다.
+  li: 2 슬롯 맵
+  li: 3 DIMM별 판정
+  li: 4 토폴로지 막대와 주소 맵
+  li: 5 타임라인
+  li: 6 오진 점검표
+  li: 7 데이터 품질
+  li: 8 부록
+section#s2.sec
+  ## 2 슬롯 맵
+  figure
+    svg.fig.slotmap: 호스트 synth-crash-loop의 슬롯 맵
+      mark: CPU0_A1: 정상, S/N 8F2453
+      mark: CPU0_A2: 빈 슬롯
+      mark: CPU0_B1: 정상, S/N D6A738
+      mark: CPU0_B2: 빈 슬롯
+      mark: CPU0_C1: 즉시 교체, S/N BE8ED6, CE 60건, UE 4건
+      mark: CPU0_C2: 빈 슬롯
+      mark: CPU0_D1: 정상, S/N 0149B5
+      mark: CPU0_D2: 빈 슬롯
+      mark: CPU0_E1: 정상, S/N 3016FC
+      mark: CPU0_E2: 빈 슬롯
+      mark: CPU0_F1: 정상, S/N 2BE334
+      mark: CPU0_F2: 빈 슬롯
+      mark: CPU0_G1: 정상, S/N CF6088
+      mark: CPU0_G2: 빈 슬롯
+      mark: CPU0_H1: 정상, S/N D849FD
+      mark: CPU0_H2: 빈 슬롯
+      mark: CPU1_A1: 정상, S/N B6446C
+      mark: CPU1_A2: 빈 슬롯
+      mark: CPU1_B1: 정상, S/N E17AA4
+      mark: CPU1_B2: 빈 슬롯
+      mark: CPU1_C1: 정상, S/N B5DAD6
+      mark: CPU1_C2: 빈 슬롯
+      mark: CPU1_D1: 관찰, S/N 21FD6F, CE 25건, UE 0건
+      mark: CPU1_D2: 빈 슬롯
+      mark: CPU1_E1: 정상, S/N EA1641
+      mark: CPU1_E2: 빈 슬롯
+      mark: CPU1_F1: 정상, S/N EF9E30
+      mark: CPU1_F2: 빈 슬롯
+      mark: CPU1_G1: 정상, S/N 049F4B
+      mark: CPU1_G2: 빈 슬롯
+      mark: CPU1_H1: 정상, S/N 2E671F
+      mark: CPU1_H2: 빈 슬롯
+      text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
+    li: 즉시 교체
+    li: 교체 고려
+    li: 관찰
+    li: 정상
+    li: 교체 보류
+    li: 빈 슬롯
+    figcaption: 슬롯 32개, DIMM 16개
+  p.how: 칸 하나가 슬롯 하나입니다. 소켓마다 한 줄, 메모리 채널마다 한 묶음이며 보드 순서를 따릅니다. 칸의 색과 표식이 그 슬롯 DIMM의 소견 등급입니다. 모듈이 없는 슬롯은 테두리만 그립니다. 칸을 누르면 그 DIMM의 판정으로 갑니다.
+  table.ranking
+    | # | 슬롯 | 시리얼 | CE | UE | 고장 모드 | 최근 30일 | 소견 | 규칙
+    | 1 | CPU0_C1 | BE8ED6 | 60 | 4 | single bit | 증가 | 즉시 교체 | R-UE-01 R-LOOP-01
+    | 2 | CPU1_D1 | 21FD6F | 25 | 0 | single bit | 유지 | 관찰 | R-SOFT-01
+  p.how: 오류나 소견이 있는 DIMM을 위험한 순서로 나열합니다. CE와 UE는 원장에서 센 누적값이라 재부팅해도 줄지 않습니다. 추세는 최근 30일을 3일씩 그리며 줄마다 눈금이 다릅니다.
+  p: 오류 없는 DIMM 14개
+  ### 부팅
+  p.stops: 중단: 최근 부팅 8회 중 4회가 치명적 하드웨어 오류로 끝남, 최근 2026-11-12 10:10 UTC, 부팅 후 44 min. 그중 4회에 CPU0_C1의 UE(R-LOOP-01).
+  figure
+    svg.fig.boots: synth-crash-loop의 최근 부팅 8회와 부팅마다 DIMM별로 보인 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 31 d, 종료 기록 없음
+      mark: 부팅 2, 2026-09-01 03:00 UTC 시작, 실행 시간 29 d, 종료 기록 없음
+      mark: 부팅 3, 2026-10-01 03:00 UTC 시작, 실행 시간 42 d, 종료 기록 없음
+      mark: 부팅 4, 2026-11-12 08:00 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 5, 2026-11-12 08:41 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 6, 2026-11-12 09:23 UTC 시작, 실행 시간 53 s, 중단
+      mark: 부팅 7, 2026-11-12 09:25 UTC 시작, 실행 시간 44 min, 중단
+      mark: 부팅 8, 2026-11-12 10:10 UTC 시작, 실행 시간 13 h, 종료 기록 없음
+      mark: CPU0_C1, 부팅 1: 오류 없음
+      mark: CPU0_C1, 부팅 2: 오류 없음
+      mark: CPU0_C1, 부팅 3: CE 60건
+      mark: CPU0_C1, 부팅 4: UE 1건, CE 0건, 중단된 부팅
+      mark: CPU0_C1, 부팅 5: UE 1건, CE 0건, 중단된 부팅
+      mark: CPU0_C1, 부팅 6: UE 1건, CE 0건, 중단된 부팅
+      mark: CPU0_C1, 부팅 7: UE 1건, CE 0건, 중단된 부팅
+      mark: CPU0_C1, 부팅 8: 오류 없음
+      mark: CPU1_D1, 부팅 1: CE 8건
+      mark: CPU1_D1, 부팅 2: CE 6건
+      mark: CPU1_D1, 부팅 3: CE 11건
+      mark: CPU1_D1, 부팅 4: 오류 없음
+      mark: CPU1_D1, 부팅 5: 오류 없음
+      mark: CPU1_D1, 부팅 6: 오류 없음
+      mark: CPU1_D1, 부팅 7: 오류 없음
+      mark: CPU1_D1, 부팅 8: 오류 없음
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | CPU0_C1 | · | · | 60 | X | X | X | X | · | CPU1_D1 | 8 | 6 | 11 | · | · | · | · | ·
+    figcaption: 숫자: CE 수, U UE, X 중단된 부팅의 UE, ? 지목 기록 없음, - 호스트에 없음
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (중단) | 5 (중단) | 6 (중단) | 7 (중단) | 8 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | 실행 시간 | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | CPU0_C1 |  |  | CE 60 | UE 1, 중단 | UE 1, 중단 | UE 1, 중단 | UE 1, 중단 | 
+    | CPU1_D1 | CE 8 | CE 6 | CE 11 |  |  |  |  | 
+  p.how: 부팅마다 한 열이고 왼쪽이 오래된 부팅입니다. 번호 아래 글자는 끝난 방식입니다: S 치명적 하드웨어 오류로 끝남, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음. 칸의 숫자는 그 부팅의 CE 수이고, U는 UE, X는 중단된 부팅의 UE, ?는 중단됐지만 DIMM을 지목한 기록이 없는 부팅, -는 DIMM이 호스트에 없던 때입니다. 아래 표에 같은 내용이 있습니다.
+  #### CPU0_C1: 위치별 부팅 기록
+  figure
+    svg.fig.boots: 최근 부팅 8회 동안 CPU0_C1의 위치별 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 31 d, 종료 기록 없음
+      mark: 부팅 2, 2026-09-01 03:00 UTC 시작, 실행 시간 29 d, 종료 기록 없음
+      mark: 부팅 3, 2026-10-01 03:00 UTC 시작, 실행 시간 42 d, 종료 기록 없음
+      mark: 부팅 4, 2026-11-12 08:00 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 5, 2026-11-12 08:41 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 6, 2026-11-12 09:23 UTC 시작, 실행 시간 53 s, 중단
+      mark: 부팅 7, 2026-11-12 09:25 UTC 시작, 실행 시간 44 min, 중단
+      mark: 부팅 8, 2026-11-12 10:10 UTC 시작, 실행 시간 13 h, 종료 기록 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 3: CE 60건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 4: UE 1건, CE 0건, 중단된 부팅
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 5: UE 1건, CE 0건, 중단된 부팅
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 6: UE 1건, CE 0건, 중단된 부팅
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 7: UE 1건, CE 0건, 중단된 부팅
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 8: 오류 없음
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | · | · | 60 | X | X | X | X | ·
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (중단) | 5 (중단) | 6 (중단) | 7 (중단) | 8 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | 실행 시간 | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 |  |  | CE 60 | UE 1, 중단 | UE 1, 중단 | UE 1, 중단 | UE 1, 중단 | 
+  p: R-LOOP-01 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두 치명적 하드웨어 오류로 끝남.
+  #### CPU1_D1: 위치별 부팅 기록
+  figure
+    svg.fig.boots: 최근 부팅 8회 동안 CPU1_D1의 위치별 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 31 d, 종료 기록 없음
+      mark: 부팅 2, 2026-09-01 03:00 UTC 시작, 실행 시간 29 d, 종료 기록 없음
+      mark: 부팅 3, 2026-10-01 03:00 UTC 시작, 실행 시간 42 d, 종료 기록 없음
+      mark: 부팅 4, 2026-11-12 08:00 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 5, 2026-11-12 08:41 UTC 시작, 실행 시간 41 min, 중단
+      mark: 부팅 6, 2026-11-12 09:23 UTC 시작, 실행 시간 53 s, 중단
+      mark: 부팅 7, 2026-11-12 09:25 UTC 시작, 실행 시간 44 min, 중단
+      mark: 부팅 8, 2026-11-12 10:10 UTC 시작, 실행 시간 13 h, 종료 기록 없음
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 1: CE 8건
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 2: CE 6건
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 3: CE 11건
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 4: 오류 없음
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 5: 오류 없음
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 6: 오류 없음
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 7: 오류 없음
+      mark: rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8, 부팅 8: 오류 없음
+      text: 1 | - | 2 | - | 3 | - | 4 | S | 5 | S | 6 | S | 7 | S | 8 | - | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 8 | 6 | 11 | · | · | · | · | ·
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (중단) | 5 (중단) | 6 (중단) | 7 (중단) | 8 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-09-01 03:00 UTC | 2026-10-01 03:00 UTC | 2026-11-12 08:00 UTC | 2026-11-12 08:41 UTC | 2026-11-12 09:23 UTC | 2026-11-12 09:25 UTC | 2026-11-12 10:10 UTC
+    | 실행 시간 | 31 d | 29 d | 42 d | 41 min | 41 min | 53 s | 44 min | 13 h
+    | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | CE 8 | CE 6 | CE 11 |  |  |  |  | 
+section#s3.sec
+  ## 3 DIMM별 판정
+  article#dimm-CPU0_C1.card.g-replace
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
+    판정 = 즉시 교체 (소견, 신뢰도 높음, 95) R-UE-01 R-LOOP-01
+    근거 = R-UE-01 UE 4건, 최근 2026-11-12 10:10 UTC, rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 기록 4건 R-LOOP-01 최근 부팅 8회 중 4회 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE: 해당 부팅 모두 치명적 하드웨어 오류로 끝남 기록 64건
+    반례 = 미확인 이 채널에 다른 DIMM 없음: 비교 대상 없음 미확인 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함 뒷받침 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음 뒷받침 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음 뒷받침 UE가 DIMM의 한 위치에 머묾: 접촉이나 배선 고장이면 읽는 주소마다 오류가 남
+    부족 = ECS 카운터 없음 DIMM 온도 이력 없음
+    기준 = 자체 이력: 최근 7일 하루 3.3건, 그 앞 30일의 93 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 97 백분위, 오류 있는 DIMM 2개
+    다음 = DIMM 교체. 보관 원장에서 만든 케이스 번들을 반품에 첨부.
+    신뢰도 = 90 등급 근거 규칙: R-UE-01 +10 소견을 뒷받침하는 점검 3건 -4 하지 못한 점검 2건
+    고장 = single bit 고장(rank0 dev7 bg0 bank3 row 0x1a2f col 0x238): CE 60건, UE 4건; 2026-10-21 ~ 2026-11-12; 증가; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
+    p.links: 토폴로지 막대와 주소 맵 타임라인 점검표
+  article#dimm-CPU1_D1.card.g-observe
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    p.sub: 이 슬롯 첫 관측 2026-07-31; 슬롯 이동 0회
+    판정 = 관찰 (소견, 신뢰도 보통, 65) R-SOFT-01
+    근거 = R-SOFT-01 셀 하나가 반복 실패(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 2026-08-05부터 25건, 최근 7일 4건 기록 25건 R-SOFT-01 rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 고장: 최근 부팅 8회 중 3회에서 오류
+    기준 = 자체 이력: 최근 7일 하루 0.6건, 그 앞 30일의 87 백분위 같은 부품번호(EXM64G48R2X4-A): 이 원장의 DIMM 16개 중 91 백분위, 오류 있는 DIMM 2개
+    다음 = 조치 없음. 건수가 늘거나 새 위치가 나오면 다시 확인.
+    신뢰도 = 65 등급 근거 규칙: R-SOFT-01
+    고장 = single bit 고장(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): CE 25건, UE 0건; 2026-08-05 ~ 2026-11-09; 유지; 나중에 다시 발생; 한 위치에 국한; row 1개, column 1개, bank 1개; 관측 등급 A
+    p.links: 토폴로지 막대와 주소 맵 타임라인 점검표
+  p.how: 근거는 규칙마다 본 것과 그 바탕이 된 원장 기록 수입니다. 건수를 누르면 기록이 나옵니다. 반례는 소견을 다른 설명과 견준 점검입니다. "뒷받침"은 소견에 힘을 싣고, "약화"는 소견과 어긋나며, "미확인"은 하지 못한 점검입니다. 부족은 소견에 없던 데이터입니다.
+  ### 이 리포트에 나온 규칙
+  table.rules
+    | 규칙 | 주는 등급 | 발동 조건
+    | R-UE-01 | 즉시 교체 | 이 DIMM에서 UE 발생
+    | R-LOOP-01 | 즉시 교체 | 여러 부팅에서 DIMM의 같은 위치에 UE
+    | R-SOFT-01 | 관찰 | 커지는 고장 없이 CE만 있음: 위치 반복 없는 산발적 CE, 또는 증가도 확산도 없는 고장
+section#s4.sec
+  ## 4 토폴로지 막대와 주소 맵
+  section#where-dimm-CPU0_C1.dimm
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    figure
+      figcaption: 오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)
+      svg.fig.topo: CPU0_C1의 토폴로지 막대
+        mark: rank rank0: 64건, 이 DIMM의 100%
+        mark: device dev7: 64건, 이 DIMM의 100%
+        mark: bank bg0 bank3: 64건, 이 DIMM의 100%
+        mark: row 0x1a2f: 64건, 이 DIMM의 100%
+        text: rank | rank0 | 100% | device | dev7 | 100% | bank | bg0 bank3 | 100% | row | 0x1a2f | 100%
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | 단계 | 가지 | 오류 | 비중
+        | rank | rank0 | 64 | 100%
+        | device | dev7 | 64 | 100%
+        | bank | bg0 bank3 | 64 | 100%
+        | row | 0x1a2f | 64 | 100%
+    figure
+      figcaption: rank0 dev7 bg0 bank3, row x column, 한 칸 = column 16개
+      li: 0
+      li: 1-2
+      li: 3-9
+      li: 10-99
+      li: 100+
+      li: UE
+      li: 테두리: 두 부팅 이상에서 오류
+      svg.fig.amap: CPU0_C1의 주소 맵, rank0 dev7 bg0 bank3
+        mark: row 0x1a2f, column 0x230 ~ 0x23f: 오류 64건, 기록 64건, 그중 UE 4건; 처음 2026-10-21, 최근 2026-11-12; 최근 부팅 8회 중 5회에 오류
+        text: row | 0x000 | 0x3ff | 0x100 | 0x200 | 0x300 | column | 0x1a2c | 0x1a2d | 0x1a2e | 0x1a2f | single bit 고장 | 0x1a30 | 0x1a31 | 0x1a32
+    li: single bit 고장(rank0 dev7 bg0 bank3 row 0x1a2f col 0x238): 64건, row 1개에 column 1개, DQ0, 첫 발생 2026-10-21, 최근 2026-11-12
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | row | column | 오류 | UE | 기록 | 처음 | 최근
+        | 0x1a2f | 0x230 - 0x23f | 64 | 4 | 64 | 2026-10-21 | 2026-11-12
+  section#where-dimm-CPU1_D1.dimm
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    figure
+      figcaption: 오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)
+      svg.fig.topo: CPU1_D1의 토폴로지 막대
+        mark: rank rank1: 25건, 이 DIMM의 100%
+        mark: device dev10: 25건, 이 DIMM의 100%
+        mark: bank bg3 bank2: 25건, 이 DIMM의 100%
+        mark: row 0xbce2: 25건, 이 DIMM의 100%
+        text: rank | rank1 | 100% | device | dev10 | 100% | bank | bg3 bank2 | 100% | row | 0xbce2 | 100%
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | 단계 | 가지 | 오류 | 비중
+        | rank | rank1 | 25 | 100%
+        | device | dev10 | 25 | 100%
+        | bank | bg3 bank2 | 25 | 100%
+        | row | 0xbce2 | 25 | 100%
+    figure
+      figcaption: rank1 dev10 bg3 bank2, row x column, 한 칸 = column 32개
+      li: 0
+      li: 1-2
+      li: 3-9
+      li: 10-99
+      li: 100+
+      li: UE
+      li: 테두리: 두 부팅 이상에서 오류
+      svg.fig.amap: CPU1_D1의 주소 맵, rank1 dev10 bg3 bank2
+        mark: row 0xbce2, column 0x4c0 ~ 0x4df: 오류 25건, 기록 25건; 처음 2026-08-05, 최근 2026-11-09; 최근 부팅 8회 중 3회에 오류
+        text: row | 0x000 | 0x7ff | 0x200 | 0x400 | 0x600 | column | 0xbcdf | 0xbce0 | 0xbce1 | 0xbce2 | single bit 고장 | 0xbce3 | 0xbce4 | 0xbce5
+    li: single bit 고장(rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8): 25건, row 1개에 column 1개, DQ2, 첫 발생 2026-08-05, 최근 2026-11-09
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | row | column | 오류 | UE | 기록 | 처음 | 최근
+        | 0xbce2 | 0x4c0 - 0x4df | 25 | 0 | 25 | 2026-08-05 | 2026-11-09
+  p.how: 막대마다 이 DIMM의 오류 전체를 한 단계에서 나눕니다: rank, device, bank, row. 조각은 자기가 속한 윗줄 조각 아래에 놓이므로, 위에서 아래로 가장 넓게 이어지는 길이 오류가 몰린 곳입니다.
+  p.how: 디바이스 하나의 bank 하나입니다. 아래로 row, 옆으로 column입니다. 칸의 농도는 그 칸의 오류 수입니다. 가로줄은 row 고장, 세로줄은 column 고장, 반복되는 한 칸은 single bit 고장, bank에 퍼진 점 구름은 bank 고장입니다. 오류가 있는 칸을 누르면 그 기록이 나옵니다.
+section#s5.sec
+  ## 5 타임라인
+  section.dimm
+    ### 호스트 synth-crash-loop: 오류가 있는 모든 DIMM
+    figure
+      figcaption: 일별 오류와 이벤트
+      svg.fig.tline: 호스트 synth-crash-loop의 타임라인, 2026-07-31 ~ 2026-11-12
+        mark: CPU0_C1, 2026-10-21: CE 3건
+        mark: CPU0_C1, 2026-10-22: CE 3건
+        mark: CPU0_C1, 2026-10-23: CE 1건
+        mark: CPU0_C1, 2026-10-24: CE 3건
+        mark: CPU0_C1, 2026-10-25: CE 1건
+        mark: CPU0_C1, 2026-10-26: CE 1건
+        mark: CPU0_C1, 2026-10-27: CE 5건
+        mark: CPU0_C1, 2026-10-28: CE 4건
+        mark: CPU0_C1, 2026-10-29: CE 3건
+        mark: CPU0_C1, 2026-10-30: CE 3건
+        mark: CPU0_C1, 2026-10-31: CE 2건
+        mark: CPU0_C1, 2026-11-01: CE 3건
+        mark: CPU0_C1, 2026-11-02: CE 3건
+        mark: CPU0_C1, 2026-11-03: CE 3건
+        mark: CPU0_C1, 2026-11-04: CE 1건
+        mark: CPU0_C1, 2026-11-05: CE 2건
+        mark: CPU0_C1, 2026-11-06: CE 2건
+        mark: CPU0_C1, 2026-11-07: CE 4건
+        mark: CPU0_C1, 2026-11-08: CE 3건
+        mark: CPU0_C1, 2026-11-09: CE 4건
+        mark: CPU0_C1, 2026-11-10: CE 2건
+        mark: CPU0_C1, 2026-11-11: CE 3건
+        mark: CPU0_C1, 2026-11-12: CE 1건
+        mark: CPU1_D1, 2026-08-05: CE 1건
+        mark: CPU1_D1, 2026-08-08: CE 1건
+        mark: CPU1_D1, 2026-08-11: CE 1건
+        mark: CPU1_D1, 2026-08-13: CE 2건
+        mark: CPU1_D1, 2026-08-16: CE 1건
+        mark: CPU1_D1, 2026-08-20: CE 1건
+        mark: CPU1_D1, 2026-08-25: CE 1건
+        mark: CPU1_D1, 2026-09-08: CE 1건
+        mark: CPU1_D1, 2026-09-14: CE 1건
+        mark: CPU1_D1, 2026-09-15: CE 1건
+        mark: CPU1_D1, 2026-09-24: CE 2건
+        mark: CPU1_D1, 2026-09-29: CE 1건
+        mark: CPU1_D1, 2026-10-03: CE 1건
+        mark: CPU1_D1, 2026-10-07: CE 1건
+        mark: CPU1_D1, 2026-10-13: CE 2건
+        mark: CPU1_D1, 2026-10-19: CE 1건
+        mark: CPU1_D1, 2026-10-22: CE 2건
+        mark: CPU1_D1, 2026-11-07: CE 2건
+        mark: CPU1_D1, 2026-11-08: CE 1건
+        mark: CPU1_D1, 2026-11-09: CE 1건
+        mark: 2026-09-01 재부팅
+        mark: 2026-10-01 재부팅
+        mark: 2026-11-12 재부팅 외 4건
+        mark: CPU0_C1: 2026-11-12 UE(demand read) 외 3건
+        text: CPU0_C1 | 최대 하루 5건 | CPU1_D1 | 최대 하루 2건 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | 재부팅 | 09-01 | 10-01 | 11-12 | UE | 11-12
+    li: 재부팅 7회
+    li: 2026-11-12 UE 4건
+    li: 2026-07-31 ~ 2026-11-12: CE 85건, UE 4건
+    li: 그중 2026-11-12 부팅 이후 0건: 부팅마다 0에서 시작하는 카운터에는 이것만 보임
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | 날짜 | CPU0_C1 | CPU1_D1 | 이벤트
+        | 2026-08-05 | 0 | 1 | 
+        | 2026-08-08 | 0 | 1 | 
+        | 2026-08-11 | 0 | 1 | 
+        | 2026-08-13 | 0 | 2 | 
+        | 2026-08-16 | 0 | 1 | 
+        | 2026-08-20 | 0 | 1 | 
+        | 2026-08-25 | 0 | 1 | 
+        | 2026-09-01 | 0 | 0 | 재부팅
+        | 2026-09-08 | 0 | 1 | 
+        | 2026-09-14 | 0 | 1 | 
+        | 2026-09-15 | 0 | 1 | 
+        | 2026-09-24 | 0 | 2 | 
+        | 2026-09-29 | 0 | 1 | 
+        | 2026-10-01 | 0 | 0 | 재부팅
+        | 2026-10-03 | 0 | 1 | 
+        | 2026-10-07 | 0 | 1 | 
+        | 2026-10-13 | 0 | 2 | 
+        | 2026-10-19 | 0 | 1 | 
+        | 2026-10-21 | 3 | 0 | 
+        | 2026-10-22 | 3 | 2 | 
+        | 2026-10-23 | 1 | 0 | 
+        | 2026-10-24 | 3 | 0 | 
+        | 2026-10-25 | 1 | 0 | 
+        | 2026-10-26 | 1 | 0 | 
+        | 2026-10-27 | 5 | 0 | 
+        | 2026-10-28 | 4 | 0 | 
+        | 2026-10-29 | 3 | 0 | 
+        | 2026-10-30 | 3 | 0 | 
+        | 2026-10-31 | 2 | 0 | 
+        | 2026-11-01 | 3 | 0 | 
+        | 2026-11-02 | 3 | 0 | 
+        | 2026-11-03 | 3 | 0 | 
+        | 2026-11-04 | 1 | 0 | 
+        | 2026-11-05 | 2 | 0 | 
+        | 2026-11-06 | 2 | 0 | 
+        | 2026-11-07 | 4 | 2 | 
+        | 2026-11-08 | 3 | 1 | 
+        | 2026-11-09 | 4 | 1 | 
+        | 2026-11-10 | 2 | 0 | 
+        | 2026-11-11 | 3 | 0 | 
+        | 2026-11-12 | 1 | 0 | 재부팅, UE
+  p.how: 줄마다 눈금이 다르며 최댓값을 오른쪽에 적습니다.
+  section#time-dimm-CPU0_C1.dimm
+    ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N BE8ED6
+    figure
+      figcaption: 일별 오류와 이벤트
+      svg.fig.tline: CPU0_C1의 타임라인, 2026-07-31 ~ 2026-11-12
+        mark: 2026-10-21: CE 3건
+        mark: 2026-10-22: CE 3건
+        mark: 2026-10-23: CE 1건
+        mark: 2026-10-24: CE 3건
+        mark: 2026-10-25: CE 1건
+        mark: 2026-10-26: CE 1건
+        mark: 2026-10-27: CE 5건
+        mark: 2026-10-28: CE 4건
+        mark: 2026-10-29: CE 3건
+        mark: 2026-10-30: CE 3건
+        mark: 2026-10-31: CE 2건
+        mark: 2026-11-01: CE 3건
+        mark: 2026-11-02: CE 3건
+        mark: 2026-11-03: CE 3건
+        mark: 2026-11-04: CE 1건
+        mark: 2026-11-05: CE 2건
+        mark: 2026-11-06: CE 2건
+        mark: 2026-11-07: CE 4건
+        mark: 2026-11-08: CE 3건
+        mark: 2026-11-09: CE 4건
+        mark: 2026-11-10: CE 2건
+        mark: 2026-11-11: CE 3건
+        mark: 2026-11-12: CE 1건
+        mark: 2026-09-01 재부팅
+        mark: 2026-10-01 재부팅
+        mark: 2026-11-12 재부팅 외 4건
+        mark: 2026-11-12 UE(demand read) 외 3건
+        text: 일별 CE | 0 | 2 | 5 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | 재부팅 | 09-01 | 10-01 | 11-12 | UE | 11-12
+    li: 재부팅 7회
+    li: 2026-11-12 UE 4건
+    li: 2026-07-31 ~ 2026-11-12: CE 60건, UE 4건
+    li: 그중 2026-11-12 부팅 이후 0건: 부팅마다 0에서 시작하는 카운터에는 이것만 보임
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | 날짜 | CPU0_C1 | 이벤트
+        | 2026-09-01 | 0 | 재부팅
+        | 2026-10-01 | 0 | 재부팅
+        | 2026-10-21 | 3 | 
+        | 2026-10-22 | 3 | 
+        | 2026-10-23 | 1 | 
+        | 2026-10-24 | 3 | 
+        | 2026-10-25 | 1 | 
+        | 2026-10-26 | 1 | 
+        | 2026-10-27 | 5 | 
+        | 2026-10-28 | 4 | 
+        | 2026-10-29 | 3 | 
+        | 2026-10-30 | 3 | 
+        | 2026-10-31 | 2 | 
+        | 2026-11-01 | 3 | 
+        | 2026-11-02 | 3 | 
+        | 2026-11-03 | 3 | 
+        | 2026-11-04 | 1 | 
+        | 2026-11-05 | 2 | 
+        | 2026-11-06 | 2 | 
+        | 2026-11-07 | 4 | 
+        | 2026-11-08 | 3 | 
+        | 2026-11-09 | 4 | 
+        | 2026-11-10 | 2 | 
+        | 2026-11-11 | 3 | 
+        | 2026-11-12 | 1 | 재부팅, UE
+  section#time-dimm-CPU1_D1.dimm
+    ### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 21FD6F
+    figure
+      figcaption: 일별 오류와 이벤트
+      svg.fig.tline: CPU1_D1의 타임라인, 2026-07-31 ~ 2026-11-12
+        mark: 2026-08-05: CE 1건
+        mark: 2026-08-08: CE 1건
+        mark: 2026-08-11: CE 1건
+        mark: 2026-08-13: CE 2건
+        mark: 2026-08-16: CE 1건
+        mark: 2026-08-20: CE 1건
+        mark: 2026-08-25: CE 1건
+        mark: 2026-09-08: CE 1건
+        mark: 2026-09-14: CE 1건
+        mark: 2026-09-15: CE 1건
+        mark: 2026-09-24: CE 2건
+        mark: 2026-09-29: CE 1건
+        mark: 2026-10-03: CE 1건
+        mark: 2026-10-07: CE 1건
+        mark: 2026-10-13: CE 2건
+        mark: 2026-10-19: CE 1건
+        mark: 2026-10-22: CE 2건
+        mark: 2026-11-07: CE 2건
+        mark: 2026-11-08: CE 1건
+        mark: 2026-11-09: CE 1건
+        mark: 2026-09-01 재부팅
+        mark: 2026-10-01 재부팅
+        mark: 2026-11-12 재부팅 외 4건
+        text: 일별 CE | 0 | 2 | 4 | 07-31 | 11-12 | 09-01 | 10-01 | 11-01 | 재부팅 | 09-01 | 10-01 | 11-12
+    li: 재부팅 7회
+    li: 2026-07-31 ~ 2026-11-12: CE 25건, UE 0건
+    li: 그중 2026-11-12 부팅 이후 0건: 부팅마다 0에서 시작하는 카운터에는 이것만 보임
+    details
+      summary: 그림을 표로 보기
+      table.tv
+        | 날짜 | CPU1_D1 | 이벤트
+        | 2026-08-05 | 1 | 
+        | 2026-08-08 | 1 | 
+        | 2026-08-11 | 1 | 
+        | 2026-08-13 | 2 | 
+        | 2026-08-16 | 1 | 
+        | 2026-08-20 | 1 | 
+        | 2026-08-25 | 1 | 
+        | 2026-09-01 | 0 | 재부팅
+        | 2026-09-08 | 1 | 
+        | 2026-09-14 | 1 | 
+        | 2026-09-15 | 1 | 
+        | 2026-09-24 | 2 | 
+        | 2026-09-29 | 1 | 
+        | 2026-10-01 | 0 | 재부팅
+        | 2026-10-03 | 1 | 
+        | 2026-10-07 | 1 | 
+        | 2026-10-13 | 2 | 
+        | 2026-10-19 | 1 | 
+        | 2026-10-22 | 2 | 
+        | 2026-11-07 | 2 | 
+        | 2026-11-08 | 1 | 
+        | 2026-11-09 | 1 | 
+        | 2026-11-12 | 0 | 재부팅
+  p.how: 원장에서 센 일별 CE이고 왼쪽이 오래된 날입니다. 축 아래에는 이벤트 종류마다 한 줄이 있고, 부팅과 리페어에서는 위로 선이 올라가 그 앞뒤 날을 견줄 수 있습니다. 표식을 누르면 그 기록이 나옵니다.
+section#s6.sec
+  ## 6 오진 점검표
+  p.how: 소견마다 DIMM 밖 원인과 견주어 점검했습니다: 슬롯, 채널, 보드, 소스마다 다른 슬롯 이름. "뒷받침"은 소견에 힘을 싣고 "약화"는 소견과 어긋납니다. "미확인"은 기록만으로 하지 못한 점검이며, 사람이 가릴 수 있으면 그 시험을 점검 아래에 적습니다.
+  section#check-dimm-CPU0_C1.dimm
+    ### CPU0_C1 즉시 교체
+    #### 기록으로 한 점검
+    table.checks
+      | 결과 | 점검
+      | 미확인 | 이 채널에 다른 DIMM 없음: 비교 대상 없음
+      | 미확인 | 슬롯 교차 시험이나 reseat 기록 없음: 보드 원인을 배제하지 못함
+      | 뒷받침 | 이 호스트의 다른 DIMM 15개에는 한 위치에 국한되지 않은 오류 없음: 보드 원인 가능성 낮음
+      | 뒷받침 | 이 부팅들에서 호스트의 다른 DIMM에는 UE 없음
+      | 뒷받침 | UE가 DIMM의 한 위치에 머묾: 접촉이나 배선 고장이면 읽는 주소마다 오류가 남
+    #### 사람이 할 시험
+    li: 다른 채널의 DIMM과 맞바꾸거나 reseat한 뒤 며칠 지나 다시 스캔합니다. 오류가 DIMM을 따라가는지, 슬롯에 남는지, 멈추는지 원장에 남습니다.
+  section#check-dimm-CPU1_D1.dimm
+    ### CPU1_D1 관찰
+    #### 기록으로 한 점검
+    p: 기록으로 할 수 있는 점검이 없었습니다.
+    #### 사람이 할 시험
+    p: 남은 시험 없음.
+section#s7.sec
+  ## 7 데이터 품질
+  p.how: 소견의 바탕입니다: 찾아본 모든 소스, 소스마다 얻은 것, 오류 위치를 어디까지 보고하는지. 소견은 기록의 관측 등급이 허락하는 만큼만 말합니다.
+  ### 관측 등급별 오류
+  figure
+    svg.fig.obsbar: 호스트 synth-crash-loop의 관측 등급별 오류
+    li: A: 89건(bank, row, column 확인)
+    li: B: 0건(물리 주소나 rank까지 확인, row와 column 없음)
+    li: C: 0건(DIMM별 카운트만)
+  details
+    summary: DIMM별 관측 등급
+    table.grades
+      | DIMM | A | B | C
+      | CPU0_C1 | 64 | 0 | 0
+      | CPU1_D1 | 25 | 0 | 0
+  ### 소스
+  table.sources
+    | 소스 | 읽은 곳 | 상태 | 기록 | 오류 기록 | 조치 | 쓰지 못함 | 등급 | 처음 ~ 마지막 기록
+    | synth | synth:crash-loop | 읽음 | 97 | 89 | 0 | 0 | A | 2026-08-05 ~ 2026-11-12
+  ### 모듈
+  p.how: 호스트의 DIMM을 한 줄에 하나씩 적고, SMBIOS, EDAC, BMC가 알려 준 내용을 함께 싣습니다. 줄표(-)는 이 케이스의 어떤 소스도 주지 않은 값이며, 케이스를 시작할 때 요청할 목록으로도 씁니다.
+  p.sub: DIMM 16개. 빈 슬롯 16개는 슬롯 맵에 있습니다.
+  p.sub: 슬롯 이름과 모듈 정보의 출처: SMBIOS.
+  p.sub: BIOS 설정 기록이 없어 RAS 열이 비어 있습니다. 호스트의 BMC가 Redfish로 알려 줍니다.
+  table.modules
+    | 슬롯 | 시리얼 | 제조사 | 파트 넘버 | 용량 | 구성 | 속도 | CE OS | CE BMC
+    | CPU0_A1 | 8F2453 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_B1 | D6A738 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_C1 | BE8ED6 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 60 | -
+    |  | DDR5 RDIMM
+    | CPU0_D1 | 0149B5 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_E1 | 3016FC | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_F1 | 2BE334 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_G1 | CF6088 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_H1 | D849FD | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_A1 | B6446C | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_B1 | E17AA4 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_C1 | B5DAD6 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_D1 | 21FD6F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 25 | -
+    |  | DDR5 RDIMM
+    | CPU1_E1 | EA1641 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_F1 | EF9E30 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_G1 | 049F4B | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_H1 | 2E671F | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+  li: 구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s).
+  li: CE OS는 운영체제 기록의 CE 수. BMC는 읽지 않음.
+  #### 운영체제와 BMC
+  p: BMC를 읽지 않아 운영체제 기록과 맞대어 볼 대상이 없습니다.
+  ### 읽지 못했거나 일부만 읽은 것
+  p: 찾아본 소스를 모두 다 읽었습니다.
+section#s8.sec
+  ## 8 부록
+  ### 원시 이벤트 표
+  p.how: 이 리포트가 가리키는 원장 기록을 시간순으로 나열합니다: 소견이 인용한 기록, 타임라인에 표시한 UE와 리페어 기록, 주소 맵 칸마다 처음과 최근 기록. ID를 누르면 원본이 나옵니다. 모든 기록은 케이스에 들어 있습니다. 소견이 인용한 기록은 원본과 함께 인쇄됩니다.
+  p.sub: 이 호스트의 기록 89건 중 10건
+  table.records
+    | ID | 시각(UTC) | 종류 | 슬롯 | 위치 | 건수 | 관측 | 소스와 원본 위치
+    | e1 | 2026-08-05 00:31:34 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event1
+    raw: EDAC MC5: 1 CE memory scrubbing error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0008:0x00c1 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e2 | 2026-08-08 19:12:43 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event2
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e20 | 2026-10-21 02:59:37 | CE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event20
+    raw: EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 syndrome:0x0 - err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e21 | 2026-10-21 05:02:52 | CE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event21
+    raw: EDAC MC1: 1 CE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 syndrome:0x0 - err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e72 | 2026-11-08 06:51:55 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event72
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e75 | 2026-11-09 01:20:44 | CE * | CPU1_D1 | rank1 dev10 bg3 bank2 row 0xbce2 col 0x4c8 | 1 | A | synth synth:crash-loop#event75
+    raw: EDAC MC5: 1 CE memory read error on CPU_SrcID#1_MC#1_Chan#1_DIMM#0 (channel:1 slot:0 page:0x16caf38a offset:0x640 grain:32 syndrome:0x0 - err_code:0x0101:0x0091 SystemAddress:0x16caf38a640 ProcessorSocketId:0x1 MemoryControllerId:0x1 ChannelId:0x1 PhysicalRankId:0x1 DimmSlotId:0x0 DimmRankId:0x1 Row:0xbce2 Column:0x4c8 Bank:0x2 BankGroup:0x3 ChipSelect:0x1 ChipId:0x0)
+    | e86 | 2026-11-12 08:41:12 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event86
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e87 | 2026-11-12 09:23:05 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event87
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e88 | 2026-11-12 09:24:30 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event88
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+    | e89 | 2026-11-12 10:10:01 ~ | UE * | CPU0_C1 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | 1 | A | synth synth:crash-loop#event89
+    raw: EDAC MC1: 1 UE memory read error on CPU_SrcID#0_MC#1_Chan#0_DIMM#0 (channel:0 slot:0 page:0x41c68bd offset:0x1c0 grain:32 - recoverable err_code:0x0101:0x0090 SystemAddress:0x41c68bd1c0 ProcessorSocketId:0x0 MemoryControllerId:0x1 ChannelId:0x0 PhysicalRankId:0x0 DimmSlotId:0x0 DimmRankId:0x0 Row:0x1a2f Column:0x238 Bank:0x3 BankGroup:0x0 ChipSelect:0x0 ChipId:0x0)
+  ### FMFM 필드명 기록
+  p.how: 위 오류 기록을 FMFM runtime error log 필드명으로 적은 것입니다. 한 줄이 JSON 객체 하나입니다. 소스가 보고하지 않은 필드는 뺍니다. 소문자 필드는 MemorY가 더한 것입니다: 관측 등급, 소스, 원본 위치.
+  pre.json: 10 lines, the first: {"ErrorDT":"2026-08-05T00:31:34.431Z","ErrorScrubType":"Patrol","ErrorSeverity":"CE","HostID":"synth-crash-loop","SocketId":1,"ChannelId":1,"ChannelSlotId":0,"Rank":1,"DeviceId":10,"BankGroup":3,"Bank":2,"Row":48354,"Column":1224,"ErrorVector":"dq:0x4","OsPhysicalAddress":"0x16caf38a640","slot":"CPU1_D1","grade":"A","source":"synth","raw_ref":"synth:crash-loop#event1"}
+footer
+  p: MemorY는 메모리 오류 기록을 읽기만 하며 호스트를 바꾸지 않습니다. 이 리포트에는 메모리 내용이 없습니다.
+  p.mono: my test
+aside#panel.panel
+  button#panel-close: 닫기
+  table#panel-records.records
+    | ID | 시각(UTC) | 종류 | 슬롯 | 위치 | 건수 | 관측 | 소스와 원본 위치
