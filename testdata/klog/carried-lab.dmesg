@@ -1,0 +1,31 @@
+[ 1539.815789] mce: [Hardware Error]: CPU 0: Machine Check Exception: 4 Bank 7: be00000000010090
+[ 1539.821228] mce: [Hardware Error]: TSC 607c3d8fa8d ADDR 12345040 MISC 86 
+[ 1539.823522] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794798096 SOCKET 0 APIC 0 microcode 1
+[ 1539.824390] mce: [Hardware Error]: Run the above through 'mcelog --ascii'
+[ 1539.829807] mce: [Hardware Error]: Machine check: Processor context corrupt
+[ 1539.831142] Kernel panic - not syncing: Fatal machine check
+[ 1539.836233] Kernel Offset: 0x2a800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[    0.000000] Linux version 6.19.10-300.fc44.x86_64 (mockbuild@4ae50e2f6b614b1a809cc64e77352d92) (gcc (GCC) 16.0.1 20260321 (Red Hat 16.0.1-0), GNU ld version 2.46-1.fc44) #1 SMP PREEMPT_DYNAMIC Wed Mar 25 18:23:49 UTC 2026
+[    4.194643] rtc_cmos 00:04: setting system clock to 2026-11-16T03:02:33 UTC (1794798153)
+[    4.303459] mce: [Hardware Error]: Machine check events logged
+[    4.305277] mce: [Hardware Error]: CPU 0: Machine Check: 0 Bank 7: be00000000010090
+[    4.308127] IPI shorthand broadcast: enabled
+[    4.309971] mce: [Hardware Error]: TSC 0 ADDR 12345040 MISC 86 
+[    4.310470] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794798147 SOCKET 0 APIC 0 microcode 0
+[    4.312001] mce: [Hardware Error]: Machine check events logged
+[    4.312303] mce: [Hardware Error]: CPU 1: Machine Check: 0 Bank 1: a000000000000000
+[    4.312777] mce: [Hardware Error]: TSC 0 
+[    4.313362] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794798147 SOCKET 0 APIC 1 microcode 1
+[    4.314274] mce: [Hardware Error]: CPU 2: Machine Check: 0 Bank 1: a000000000000000
+[    4.314637] mce: [Hardware Error]: TSC 0 
+[    4.315357] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794798147 SOCKET 0 APIC 2 microcode 1
+[    4.316050] mce: [Hardware Error]: CPU 3: Machine Check: 0 Bank 1: a000000000000000
+[    4.316410] mce: [Hardware Error]: TSC 0 
+[    4.316610] mce: [Hardware Error]: PROCESSOR 0:50654 TIME 1794798147 SOCKET 0 APIC 3 microcode 1
+[    4.370446] sched_clock: Marking stable (4390423158, -20426133)->(5683960380, -1313963355)
+[    4.383227] registered taskstats version 1
+[    4.423457] Loading compiled-in X.509 certificates
+[    4.444557] ata4: SATA link down (SStatus 0 SControl 300)
+[    4.452225] ata5: SATA link down (SStatus 0 SControl 300)
+[    4.453452] ata1: SATA link down (SStatus 0 SControl 300)
+[    4.454571] ata2: SATA link down (SStatus 0 SControl 300)
