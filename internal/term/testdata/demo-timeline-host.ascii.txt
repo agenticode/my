@@ -3,11 +3,11 @@ host r12-n034  2026-07-31 to 2026-11-12  105 days
            07-31     09-01     10-01     11-12
  CPU0_C1   __________________....::::---==++*#  peak 73/day
  CPU1_D1   _=:=-:_+=:-_-+__:-:_-:___+_-#:-:--_  peak 3/day
- events            B           B        BP  OU
-                   |           |        ||  |+ CPU0_C1: 2026-11-12 UE (demand read)
-                   |           |        ||  +- 7 pages offline, 2026-11-11 to 2026-11-12
-                   |           |        |+---- CPU0_C1: 2026-10-28 hard PPR
-                   +-----------+--------+----- 3 reboots
+ events            B           B        BP   OU
+                   |           |        ||   |+ CPU0_C1: 2026-11-12 UE (demand read)
+                   |           |        ||   +- 7 pages offline, 2026-11-11 to 2026-11-12
+                   |           |        |+----- CPU0_C1: 2026-10-28 hard PPR
+                   +-----------+--------+------ 3 reboots
 
  1,284 corrected and 1 uncorrected error from 2026-07-31 to 2026-11-12
  797 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those

@@ -364,6 +364,24 @@ func TestTimelineWithMoreEventsThanDays(t *testing.T) {
 			t.Errorf("%q is not on the timeline:\n%s", text, b.String())
 		}
 	}
+
+	// Three days, every event on the last: the letters start at that day
+	// and run past it. None stands under a day before its own.
+	three := *day
+	three.To, three.Days = now.AddDate(0, 0, 2), 3
+	three.Series = []view.Series{{Label: "no DIMM", CE: []int64{4, 4, 5}, Total: 13, Peak: 5}}
+	three.Markers = []view.MarkerGroup{
+		group(view.MarkBoot, "B", "2026-11-15 reboot", 2),
+		group(view.MarkUE, "U", "1 UE, 2026-11-15", 2),
+		group("page-offline", "O", "1 page offline, 2026-11-15", 2),
+	}
+	b.Reset()
+	if err := Timeline(&b, &three, en.st); err != nil {
+		t.Fatal(err)
+	}
+	if got := b.String(); !strings.Contains(got, " events      BUO\n") {
+		t.Errorf("three days, three letters on the last:\n%s", got)
+	}
 }
 
 func TestHosts(t *testing.T) {

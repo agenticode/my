@@ -47,11 +47,11 @@ in this slot since 2026-07-31  0 slot changes
  errors per day and events
            07-31     09-01     10-01     11-12
  CPU0_C1   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▃▃▃▃▄▄▄▅▅▆▆▇█  peak 73/day
- events            B           B        BP  OU
-                   │           │        ││  │└ 2026-11-12 UE (demand read)
-                   │           │        ││  └─ 7 pages offline, 2026-11-11 to 2026-11-12
-                   │           │        │└──── 2026-10-28 hard PPR
-                   └───────────┴────────┴───── 3 reboots
+ events            B           B        BP   OU
+                   │           │        ││   │└ 2026-11-12 UE (demand read)
+                   │           │        ││   └─ 7 pages offline, 2026-11-11 to 2026-11-12
+                   │           │        │└───── 2026-10-28 hard PPR
+                   └───────────┴────────┴────── 3 reboots
 
  1,231 corrected and 1 uncorrected error from 2026-07-31 to 2026-11-12
  790 of them since the boot of 2026-10-28: a counter that restarts at every boot shows only those
