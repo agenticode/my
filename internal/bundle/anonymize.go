@@ -81,6 +81,12 @@ var columns = map[string]treatment{
 
 	"boot.host": hostName, "boot.boot_id": bootID, "boot.started_at": keep, "boot.start_quality": keep, "boot.last_seen": keep,
 	"boot.kernel": keep, "boot.bios": keep, "boot.bmc": keep, "boot.cmdline": commandLine, "boot.source": keep, "boot.raw_ref": freeText,
+	"boot.end": keep, "boot.end_at": keep, "boot.end_ref": keep, "boot.end_source": keep,
+
+	// What preflight read names files and quotes them: the kernel command
+	// line among them.
+	"capture_check.host": hostName, "capture_check.name": keep, "capture_check.state": keep,
+	"capture_check.detail": commandLine, "capture_check.evidence": commandLine,
 
 	"counter_sample.host": hostName, "counter_sample.observed_at": keep, "counter_sample.mc_name": keep, "counter_sample.location": keep,
 	"counter_sample.label": keep, "counter_sample.bank_locator": keep, "counter_sample.reset_at": keep, "counter_sample.mem_type": keep,
@@ -98,7 +104,7 @@ var columns = map[string]treatment{
 	"event.ErrorVector": keep, "event.source": keep, "event.raw_ref": freeText, "event.grade": keep, "event.boot_id": bootID,
 	"event.dimm_uid": dimmUID, "event.dimm_link": keep, "event.dup_fingerprint": derived, "event.time_quality": keep,
 	"event.window_start": keep, "event.edac_location": keep, "event.label": keep, "event.slot": keep, "event.error_type": keep,
-	"event.decoder": keep, "event.fingerprint": derived,
+	"event.decoder": keep, "event.fingerprint": derived, "event.read_boot_id": bootID, "event.not_before": keep,
 
 	"event_raw.text": freeText,
 

@@ -4,8 +4,9 @@
 // One run reads the sources of one host. Every source gets an entry in the
 // source inventory, whether it could be read or not. After the sources are
 // in, the ledger passes run in a fixed order: slots and DIMM identities,
-// counter events, the slots of events, actions and ECS readings, boots, DIMM
-// attribution, duplicates, counter coverage. Each pass recomputes its result from the ledger, so importing
+// counter events, the slots of events, actions and ECS readings, boots,
+// carried records, DIMM attribution, duplicates, boot outcomes, counter
+// coverage. Each pass recomputes its result from the ledger, so importing
 // sources in another order, or importing a source again, gives the same
 // ledger.
 package ingest
@@ -271,11 +272,15 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 			// Records that got a date belong to the boot of that date.
 			return s.LinkBoots(ctx, host)
 		}},
+		// Records kept over a reset belong to the boot before the one
+		// that read them.
+		{"carried records", func() error { return s.LinkCarried(ctx, host) }},
 		{"DIMM attribution", func() error { return s.LinkDIMMs(ctx, host) }},
 		{"duplicates", func() (err error) {
 			res.Duplicates, err = s.MarkDuplicates(ctx, host, opts.Tolerance)
 			return err
 		}},
+		{"boot outcomes", func() error { return s.BootOutcomes(ctx, host) }},
 		{"counter coverage", func() error { return s.ReconcileCounters(ctx, host) }},
 		{"orphans", func() error { return s.PruneOrphans(ctx, host) }},
 	}

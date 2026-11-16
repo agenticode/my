@@ -22,28 +22,30 @@ import (
 // reading of a host from its time: a record belongs to the latest boot that
 // started at or before it. Records before the first known boot keep an
 // empty boot. Records whose time is only known relative to boot keep the
-// boot their source gave them.
+// boot their source gave them. A boot whose start is not on record (the
+// one LinkCarried puts before a boot that read a carried record) takes no
+// record by time.
 func (s *Store) LinkBoots(ctx context.Context, host string) error {
 	return s.Update(ctx, func(w *Writer) error {
 		for _, q := range []string{
 			`UPDATE event SET boot_id = (
    SELECT b.boot_id FROM boot b
-   WHERE b.host = event.host AND b.start_quality != 'relative' AND b.started_at <= event."ErrorDT"
+   WHERE b.host = event.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= event."ErrorDT"
    ORDER BY b.started_at DESC LIMIT 1)
  WHERE host = ? AND time_quality != 'relative'`,
 			`UPDATE action SET boot_id = (
    SELECT b.boot_id FROM boot b
-   WHERE b.host = action.host AND b.start_quality != 'relative' AND b.started_at <= action.at
+   WHERE b.host = action.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= action.at
    ORDER BY b.started_at DESC LIMIT 1)
  WHERE host = ? AND time_quality != 'relative'`,
 			`UPDATE gpu_mem SET boot_id = (
    SELECT b.boot_id FROM boot b
-   WHERE b.host = gpu_mem.host AND b.start_quality != 'relative' AND b.started_at <= gpu_mem.observed_at
+   WHERE b.host = gpu_mem.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= gpu_mem.observed_at
    ORDER BY b.started_at DESC LIMIT 1)
  WHERE host = ? AND time_quality != 'relative'`,
 			`UPDATE ecs_sample SET boot_id = (
    SELECT b.boot_id FROM boot b
-   WHERE b.host = ecs_sample.host AND b.start_quality != 'relative' AND b.started_at <= ecs_sample.observed_at
+   WHERE b.host = ecs_sample.host AND b.start_quality NOT IN ('relative', 'unknown') AND b.started_at <= ecs_sample.observed_at
    ORDER BY b.started_at DESC LIMIT 1)
  WHERE host = ? AND time_quality != 'relative'`,
 		} {
@@ -583,8 +585,10 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		}
 	}
 
+	// Carried records are matched by their boot afterwards (markCarried):
+	// their time is a bound, not the time of the error.
 	rows, err := s.db.QueryContext(ctx, `SELECT id, "ErrorDT", "ErrorSeverity", "OsPhysicalAddress", slot, label, source, grade, time_quality
- FROM event WHERE host = ? AND kind = 'error' AND dup_of IS NULL AND time_quality != 'relative'
+ FROM event WHERE host = ? AND kind = 'error' AND dup_of IS NULL AND time_quality != 'relative' AND carried = 0
  ORDER BY "ErrorDT", id`, host)
 	if err != nil {
 		return 0, fmt.Errorf("mark duplicates: %w", err)
@@ -760,6 +764,9 @@ func (s *Store) MarkDuplicates(ctx context.Context, host string, tol DuplicateTo
 		return errors.New("duplicate chain does not settle")
 	})
 	if err != nil {
+		return 0, fmt.Errorf("mark duplicates: %w", err)
+	}
+	if err := s.markCarried(ctx, host); err != nil {
 		return 0, fmt.Errorf("mark duplicates: %w", err)
 	}
 	var n int

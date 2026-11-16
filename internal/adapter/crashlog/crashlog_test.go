@@ -114,13 +114,60 @@ func (l *ledger) run(adapters ...adapter.Adapter) *ingest.Result {
 	return res
 }
 
+// events returns the error records of the ledger; panics returns the
+// Informational records that say a boot ended in a panic.
 func (l *ledger) events() []*model.Event {
+	l.t.Helper()
+	var out []*model.Event
+	for _, e := range l.all() {
+		if e.ErrorSeverity != model.SevInformational {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
+func (l *ledger) panics() []*model.Event {
+	l.t.Helper()
+	var out []*model.Event
+	for _, e := range l.all() {
+		if e.ErrorSeverity == model.SevInformational && e.ErrorType == model.ErrorTypePanic {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
+func (l *ledger) all() []*model.Event {
 	l.t.Helper()
 	ev, err := l.EventList(context.Background(), store.EventFilter{WithDuplicates: true, WithRaw: true})
 	if err != nil {
 		l.t.Fatal(err)
 	}
 	return ev
+}
+
+// ended checks that every boot with a dump of a panic is known to have
+// ended: in a panic, or in a stop when the text shows the hardware error
+// that caused it.
+func (l *ledger) ended(want int) {
+	l.t.Helper()
+	boots, err := l.Boots(context.Background(), "h1")
+	if err != nil {
+		l.t.Fatal(err)
+	}
+	n := 0
+	for _, b := range boots {
+		if b.End != "" {
+			n++
+			if !strings.HasPrefix(b.EndRef, "event:") || b.EndSource == "" {
+				l.t.Errorf("boot %s ended %q without its record (%q, %q)", b.BootID, b.End, b.EndRef, b.EndSource)
+			}
+		}
+	}
+	if n != want {
+		l.t.Errorf("%d boots with an end, want %d: %+v", n, want, boots)
+	}
 }
 
 func source(t *testing.T, res *ingest.Result, kind string) model.Source {
@@ -143,9 +190,13 @@ func TestEFIDump(t *testing.T) {
 	l := newLedger(t)
 	res := l.run(NewDir(KindPstore, dir, Options{ModTime: true}))
 	src := source(t, res, KindPstore)
-	if src.Status != model.SourceOK || src.Events != 1 {
+	if src.Status != model.SourceOK || src.Events != 2 {
 		t.Fatalf("source %+v", src)
 	}
+	if p := l.panics(); len(p) != 1 || p[0].Raw != "" || p[0].Source != "pstore/panic" {
+		t.Errorf("panic records %+v", p)
+	}
+	l.ended(1)
 	ev := l.events()
 	if len(ev) != 1 {
 		t.Fatalf("%d events", len(ev))
@@ -192,7 +243,8 @@ func TestSameAsTheConsole(t *testing.T) {
 	l := newLedger(t)
 	l.run(klog.NewFile(console, klog.Options{}))
 	res := l.run(NewDir(KindPstore, dir, Options{ModTime: true}))
-	if src := source(t, res, KindPstore); src.Events != 1 || res.Events != 0 {
+	// The dump adds the record of its panic and no error.
+	if src := source(t, res, KindPstore); src.Events != 2 || res.Events != 1 {
 		t.Errorf("the dump added %d events (source %+v)", res.Events, src)
 	}
 	if ev := l.events(); len(ev) != 1 {
@@ -223,8 +275,8 @@ func TestStoreAndArchive(t *testing.T) {
 	write(t, arch, sub+"/dmesg.txt", whole.String(), time.Unix(dumpTime+60, 0))
 	l := newLedger(t)
 	res := l.run(NewDir(KindPstore, live, Options{ModTime: true}), NewDir(KindPstore, arch, Options{}))
-	if res.Events != 1 {
-		t.Errorf("%d events added, want 1", res.Events)
+	if res.Events != 2 || len(l.events()) != 1 || len(l.panics()) != 1 {
+		t.Errorf("%d events added, want the error and the panic", res.Events)
 	}
 	var archSrc model.Source
 	for _, s := range res.Sources {
@@ -232,10 +284,10 @@ func TestStoreAndArchive(t *testing.T) {
 			archSrc = s
 		}
 	}
-	if archSrc.Events != 1 {
+	if archSrc.Events != 2 {
 		t.Errorf("archive source %+v", archSrc)
 	}
-	wantNote(t, archSrc.Notes, "1 dmesg.txt files that repeat the parts beside them: not read", "1 records were already in the ledger")
+	wantNote(t, archSrc.Notes, "1 dmesg.txt files that repeat the parts beside them: not read", "2 records were already in the ledger")
 	if boots, _ := l.Boots(context.Background(), "h1"); len(boots) != 1 {
 		t.Errorf("%d boots, want 1: %+v", len(boots), boots)
 	}
@@ -322,7 +374,7 @@ func TestEdges(t *testing.T) {
 	l := newLedger(t)
 	res := l.run(NewDir(KindPstore, dir, Options{}))
 	src := source(t, res, KindPstore)
-	if src.Status != model.SourcePartial || src.Events != 1 {
+	if src.Status != model.SourcePartial || len(l.events()) != 1 {
 		t.Errorf("source %+v", src)
 	}
 	notes := []string{"Panic dump in 2 parts, part 2 missing", "1 compressed records the kernel could not decompress (.enc.z): not read", "1 pmsg records: not read", "1 ftrace records: not read"}
@@ -383,9 +435,11 @@ func TestKdump(t *testing.T) {
 	l := newLedger(t)
 	res := l.run(NewDir(KindKdump, root, Options{}))
 	src := source(t, res, KindKdump)
-	if src.Events != 2 || res.Events != 1 {
+	// Each log adds the record of its crash; the error is one record.
+	if src.Events != 4 || res.Events != 3 || len(l.panics()) != 2 {
 		t.Errorf("source %+v, %d events added", src, res.Events)
 	}
+	l.ended(1)
 	wantNote(t, src.Notes, "kexec-dmesg.log, the log of the capture kernel: not read", "2 memory dumps (vmcore): not read", "kdump text log")
 	ev := l.events()
 	if len(ev) != 1 {
