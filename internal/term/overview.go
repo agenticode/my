@@ -163,6 +163,10 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 		}
 		switch s.Status {
 		case model.SourceOK, model.SourcePartial:
+			if s.Unread > 0 {
+				read = append(read, st.say("ov.source_unread", "kind", sourceName(s), "n", s.Records, "u", s.Unread))
+				break
+			}
 			read = append(read, st.say("ov.source", "kind", sourceName(s), "n", s.Records))
 		case model.SourceEmpty:
 			read = append(read, st.say("ov.source_empty", "kind", sourceName(s)))

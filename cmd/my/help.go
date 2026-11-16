@@ -122,6 +122,9 @@ var words = i18n.Catalog{
 	"import.informational": {EN: "{n} {n|record|records} that {n|is|are} no error", KO: "오류 외 기록 {n}건"},
 	"import.actions":       {EN: "{n} {n|action|actions}", KO: "조치 {n}건"},
 	"import.skipped":       {EN: "{n} not usable", KO: "쓰지 못한 기록 {n}건"},
+	"import.unread":        {EN: "{n} not understood", KO: "해석하지 못한 기록 {n}건"},
+	"import.failed":        {EN: "the reader failed", KO: "읽는 코드가 멈춤"},
+	"import.unknown":       {EN: "not recognised", KO: "알아보지 못한 입력"},
 	"import.total":         {EN: "host {host}: {events} error {events|record|records} and {actions} {actions|action|actions} added, {dup} reported by more than one source and counted once", KO: "호스트 {host}: 오류 기록 {events}건과 조치 {actions}건 추가, 여러 소스가 함께 보고한 {dup}건은 한 번만 계산"},
 	"import.finding":       {EN: "host {host}, finding: {grade}", KO: "호스트 {host}, 소견: {grade}"},
 
@@ -366,7 +369,7 @@ var words = i18n.Catalog{
 	},
 
 	"help.import.usage": {EN: "my import <file|directory>... [-o FILE] [flags]", KO: "my import <파일|디렉터리>... [-o FILE] [옵션]"},
-	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, nvidia-smi output (-q, or a query in CSV form), the answer of the mcelog daemon to its client, an FMFM log, a crash log (a pstore file, a dmesg.txt of systemd-pstore, a kdump text log, or a directory of them), or a directory that is a copy of a host's files. An input that is not recognised stops the import. All inputs are taken to be one host. From a log that holds the records of several hosts, the records of the host named with --host are read. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, nvidia-smi 출력(-q 또는 CSV 형식 쿼리), mcelog 데몬이 클라이언트에 답한 출력, FMFM 로그, 크래시 로그(pstore 파일, systemd-pstore의 dmesg.txt, kdump 텍스트 로그, 또는 그것이 든 디렉터리), 호스트 파일 사본 디렉터리. 알아보지 못한 입력이 있으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. 여러 호스트의 기록이 든 로그에서는 --host로 지정한 호스트의 기록을 읽습니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
+	"help.import.text":  {EN: "Builds a case from files, without the host they came from. Each input is recognised by its content: a rasdaemon database, a kernel log (dmesg, syslog, journal export), dmidecode output, a BMC event log, a Redfish dump, nvidia-smi output (-q, or a query in CSV form), the answer of the mcelog daemon to its client, an FMFM log, a crash log (a pstore file, a dmesg.txt of systemd-pstore, a kdump text log, or a directory of them), or a directory that is a copy of a host's files. An input that is not recognised is listed in the summary as such and the import goes on; with --strict, or when no input is recognised, it stops the import. All inputs are taken to be one host. From a log that holds the records of several hosts, the records of the host named with --host are read. With -o the case is written as a bundle and the exit code is 0; without it the overview is drawn at once and the exit code is the grade of the host.", KO: "호스트 없이 파일만으로 케이스를 만듭니다. 입력은 내용으로 가려냅니다: rasdaemon DB, 커널 로그(dmesg, syslog, journal 내보내기), dmidecode 출력, BMC 이벤트 로그, Redfish 덤프, nvidia-smi 출력(-q 또는 CSV 형식 쿼리), mcelog 데몬이 클라이언트에 답한 출력, FMFM 로그, 크래시 로그(pstore 파일, systemd-pstore의 dmesg.txt, kdump 텍스트 로그, 또는 그것이 든 디렉터리), 호스트 파일 사본 디렉터리. 알아보지 못한 입력은 요약에 그렇게 적고 가져오기를 계속합니다. --strict를 주거나 알아본 입력이 하나도 없으면 가져오기를 멈춥니다. 모든 입력을 한 호스트의 것으로 봅니다. 여러 호스트의 기록이 든 로그에서는 --host로 지정한 호스트의 기록을 읽습니다. -o를 주면 케이스를 번들로 저장하고 종료 코드는 0입니다. -o가 없으면 바로 개요를 그리고 종료 코드는 호스트 등급입니다."},
 	"help.import.flags": {
 		EN: "-o FILE             write the case as a bundle (case.mycase); \"-\" writes it to standard output\n" +
 			"--host NAME         the host the files come from, when they do not say\n" +
@@ -380,6 +383,7 @@ var words = i18n.Catalog{
 			"                    home directories in file paths; DIMM serial numbers stay\n" +
 			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force             replace FILE when it exists\n" +
+			"--strict            stop when an input is not recognised\n" +
 			"--all               in the overview, list every DIMM",
 		KO: "-o FILE             케이스를 번들로 저장 (case.mycase). \"-\"는 표준 출력\n" +
 			"--host NAME         파일에 호스트 이름이 없을 때 쓸 이름\n" +
@@ -393,6 +397,7 @@ var words = i18n.Catalog{
 			"                    바꿈. DIMM 시리얼은 그대로 둠\n" +
 			"--key-file FILE     --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
 			"--force             FILE이 있으면 덮어씀\n" +
+			"--strict            알아보지 못한 입력이 있으면 멈춤\n" +
 			"--all               개요에 모든 DIMM을 나열",
 	},
 

@@ -67,6 +67,15 @@ type Report struct {
 	HostHint string
 	// SinkErr is the error a Sink returned, if that is what stopped the read.
 	SinkErr error
+	// Unread is the number of records among Skipped the reader did not
+	// understand; UnreadRecords keeps those whose text names memory.
+	Unread        int
+	UnreadRecords []model.UnreadRecord
+	// Faults counts the faults of the reader that were caught.
+	Faults int
+	// Failed says that the reader itself failed: what it gave is rolled
+	// back and the source counts as not read.
+	Failed bool
 }
 
 // Adapter reads one source.
@@ -87,6 +96,10 @@ type Tally struct {
 	counts  map[string]int
 	example map[string]string
 	total   int
+	// Records not understood, faults caught, and the texts kept of the
+	// records not understood that name memory.
+	unread, faults int
+	kept           []model.UnreadRecord
 }
 
 // Skip records that the record at ref could not be used for the given reason.
@@ -184,4 +197,21 @@ func (c *Collected) BMCMemory(m *model.BMCMemory) error {
 func (c *Collected) Firmware(f *model.FirmwareRecord) error {
 	c.Firmwares = append(c.Firmwares, f)
 	return nil
+}
+
+// KindUnknown is the source kind of an input no reader recognised. Such a
+// source is listed with what the input looks like; it is no source that
+// was missed, since nobody knows whether it held memory records.
+const KindUnknown = model.SourceKindUnknown
+
+// Unrecognised returns an adapter that reads nothing and reports an input
+// no reader recognised, with the reason as its detail.
+func Unrecognised(origin, reason string) Adapter { return &unrecognised{origin: origin, reason: reason} }
+
+type unrecognised struct{ origin, reason string }
+
+func (u *unrecognised) Kind() string   { return KindUnknown }
+func (u *unrecognised) Origin() string { return u.origin }
+func (u *unrecognised) Collect(context.Context, Sink) Report {
+	return Report{Kind: KindUnknown, Origin: u.origin, Status: model.SourceError, Detail: u.reason}
 }

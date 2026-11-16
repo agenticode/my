@@ -54,7 +54,11 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | a `SOCKET n CHANNEL n DIMM n` line, or a line of the page table of the mcelog daemon | `mcelog --client` output |
 | JSON with `ErrorDT`, `EcsModeRegisters`, `CurrentBootDT`, `InstalledMemory`, `SystemCrashDT` or `OsCrashDT` among its field names | FMFM log |
 
-A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are refused with a message that says what the content looks like.
+A file compressed with gzip is read through, except a database. A MemorY ledger, a zip archive and anything else are not read; the message says what the content looks like. `my import` lists such an input as a source of the kind `unknown` with that message and reads the other inputs; it is no source a finding missed, since nobody knows whether it held memory records. With `--strict`, or when no input is recognised, the import stops with exit code 70.
+
+A fault inside a reader stays there. A record that a reader cannot parse, or whose reading fails, is skipped and counted as not understood; its text is kept with the case when it names memory, a DIMM or ECC (at most 50 per source, 4 KiB each). A reader that fails as a whole loses its own source: nothing of it is added, its row in the source inventory says where it failed, and the other sources and the exit code are what they would be without it. A recogniser that fails does not recognise the input. `MY_DEBUG=panic` lets such a failure through with its whole stack, for a developer.
+
+In a copy of a host's files, a kernel log file that holds no line of a kernel log is listed and the next one in the order of preference is read, and SMBIOS tables that hold no structure are listed and the text of dmidecode is read in their place.
 
 A copy of a host's files is read as of the moment it was made, because its counters and its seconds since boot count back from that moment. The moment is the boot time in `proc/stat` plus the uptime in `proc/uptime` when the copy holds both. Otherwise it is the newest modification time among the files that are read, which is right for a copy that kept the times of its files and wrong for one that did not (an archive unpacked without them, a checkout of a repository).
 

@@ -190,7 +190,7 @@ func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.A
 	}
 	// Crash logs: pstore files, an archive of systemd-pstore, the dump
 	// path of kdump, or a copy of any of them.
-	if kinds := crashlog.Kinds(dir); len(kinds) > 0 {
+	if kinds := adapter.Guard(func() []string { return crashlog.Kinds(dir) }); len(kinds) > 0 {
 		var out []adapter.Adapter
 		for _, k := range kinds {
 			out = append(out, crashlog.NewDir(k, dir, crashlog.Options{ModTime: opts.ModTime, TempDir: opts.TempDir}))
@@ -211,7 +211,7 @@ func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.A
 			return fs.SkipAll
 		}
 		head, _, err := readHead(p)
-		if err == nil && redfish.Sniff(head) {
+		if err == nil && adapter.Sniffs(redfish.Sniff, head) {
 			found = true
 			return fs.SkipAll
 		}
@@ -334,13 +334,13 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 		return nil, "", unknownInput("zip")
 
 	case isBinary(head):
-		if sel.Sniff(head) {
+		if adapter.Sniffs(sel.Sniff, head) {
 			if zipped {
 				return sel.NewReader(stream(), path, sel.Options{Location: opts.Location}), WhatSEL, nil
 			}
 			return sel.NewFile(path, sel.Options{Location: opts.Location}), WhatSEL, nil
 		}
-		if !zipped && bert.Sniff(head) {
+		if !zipped && adapter.Sniffs(bert.Sniff, head) {
 			// A saved region: dated by the capture time, else by the file.
 			return bert.New(path, bert.Options{ReadAt: captured}), WhatBERT, nil
 		}
@@ -352,7 +352,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 	// A crash log is known by its name or by the header of a pstore dump.
 	// It is a kernel log of the boot that crashed; its own reader puts the
 	// parts in order and takes the time of the record from the file.
-	if kind := crashlog.Sniff(path, text); kind != "" && !zipped {
+	if kind := adapter.Guard(func() string { return crashlog.Sniff(path, text) }); kind != "" && !zipped {
 		what := WhatPstore
 		if kind == crashlog.KindKdump {
 			what = WhatKdump
@@ -371,10 +371,10 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = klog.NewFile(path, kopts)
 		}
 
-	case nvidia.Sniff(text), nvidia.SniffCSV(text):
+	case adapter.Sniffs(nvidia.Sniff, text), adapter.Sniffs(nvidia.SniffCSV, text):
 		// The timestamp in the output is the local time of the host.
 		what = WhatNvidiaSMI
-		if !nvidia.Sniff(text) {
+		if !adapter.Sniffs(nvidia.Sniff, text) {
 			what = WhatNvidiaCSV
 		}
 		nopts := nvidia.Options{Now: seen, Location: opts.Location, Query: opts.NvidiaQuery}
@@ -384,7 +384,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = nvidia.NewFile(path, nopts)
 		}
 
-	case redfish.Sniff(text):
+	case adapter.Sniffs(redfish.Sniff, text):
 		what = WhatRedfish
 		if zipped {
 			a = redfish.NewReader(stream(), path, redfish.Options{Now: seen})
@@ -392,7 +392,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = redfish.New(path, redfish.Options{Now: opts.Now, ModTimeAsObserved: opts.ModTime})
 		}
 
-	case fmfm.Sniff(text):
+	case adapter.Sniffs(fmfm.Sniff, text):
 		what = WhatFMFM
 		fopts := fmfm.Options{HostID: opts.Host, Now: seen, Location: opts.Location}
 		if zipped {
@@ -414,7 +414,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = sel.NewFile(path, sel.Options{Location: opts.Location})
 		}
 
-	case mcelog.Sniff(text):
+	case adapter.Sniffs(mcelog.Sniff, text):
 		// The answer of the daemon carries no time: it is read as of the
 		// import, or of the file when that was asked for.
 		what = WhatMcelog
@@ -432,7 +432,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = smbios.NewDmidecodeFile(path, smbios.Options{Now: seen})
 		}
 
-	case sel.Sniff(text):
+	case adapter.Sniffs(sel.Sniff, text):
 		what = WhatSEL
 		if zipped {
 			a = sel.NewReader(stream(), path, sel.Options{Location: opts.Location})

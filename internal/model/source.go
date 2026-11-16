@@ -41,6 +41,11 @@ const (
 	SourceError SourceStatus = "error"
 )
 
+// SourceKindUnknown is the kind of a source that is an input no reader
+// recognised. It is listed with what the input looks like, and it is no
+// source a finding missed: nobody knows whether it held memory records.
+const SourceKindUnknown = "unknown"
+
 // Source is one entry of the source inventory of a scan. Every source that
 // was looked for has an entry, including the ones that could not be read, so
 // that a reader can tell what a finding did not see.
