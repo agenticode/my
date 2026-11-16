@@ -81,6 +81,7 @@ var Messages = i18n.Catalog{
 	// The check as a whole.
 	"check.title":           {EN: "BIOS memory RAS settings", KO: "BIOS 메모리 RAS 설정"},
 	"check.none":            {EN: "No BIOS settings are on record for this host. A BMC reports them over Redfish: \"my collect redfish --bmc ADDRESS -o DIR\", then \"my import DIR\".", KO: "이 호스트의 BIOS 설정 기록이 없습니다. BIOS 설정은 BMC가 Redfish로 알려 줍니다: \"my collect redfish --bmc ADDRESS -o DIR\" 실행 뒤 \"my import DIR\"."},
+	"check.none_memory":     {EN: "The BMC reported the BIOS settings of this host, and none of them bears on memory, by its name or by its entry in the attribute registry.", KO: "BMC가 이 호스트의 BIOS 설정을 보고했지만 메모리와 관련된 설정은 없습니다. 이름으로도, 속성 레지스트리의 항목으로도 메모리 설정에 해당하는 속성이 없습니다."},
 	"check.read":            {EN: "{n} memory {n|setting|settings} of the BIOS on record, read {when}", KO: "BIOS 메모리 설정 {n}개 기록됨, 읽은 시각 {when}"},
 	"check.read_from":       {EN: "{n} memory {n|setting|settings} of the BIOS on record, read {when} from the BMC at {address}", KO: "BIOS 메모리 설정 {n}개 기록됨, {when}에 BMC {address}에서 읽음"},
 	"check.registry":        {EN: "attribute registry {registry}", KO: "속성 레지스트리 {registry}"},

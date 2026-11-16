@@ -410,6 +410,37 @@ func TestSessionLoginFailures(t *testing.T) {
 			t.Errorf("Login: %v", err)
 		}
 	})
+	t.Run("204 with a token", func(t *testing.T) {
+		// The DMTF mockup server answers a login with 204 No Content, the
+		// token and the location of the session in the headers.
+		var deleted atomic.Int32
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch {
+			case r.Method == http.MethodPost && r.URL.Path == DefaultSessions:
+				w.Header().Set("X-Auth-Token", "token-of-the-mockup")
+				w.Header().Set("Location", DefaultSessions+"/7")
+				w.WriteHeader(http.StatusNoContent)
+			case r.Method == http.MethodDelete && r.URL.Path == DefaultSessions+"/7":
+				deleted.Add(1)
+				w.WriteHeader(http.StatusNoContent)
+			case r.Header.Get("X-Auth-Token") != "token-of-the-mockup":
+				w.WriteHeader(http.StatusUnauthorized)
+			default:
+				w.Write([]byte(`{"Id":"1"}`))
+			}
+		}))
+		defer srv.Close()
+		c := plain(t, srv, Config{User: testUser, Password: testPassword, Session: true})
+		if err := c.Login(ctx, ""); err != nil {
+			t.Fatalf("Login: %v", err)
+		}
+		if _, err := c.Get(ctx, "/redfish/v1/Systems/1"); err != nil {
+			t.Fatalf("after login: %v", err)
+		}
+		if err := c.Logout(ctx); err != nil || deleted.Load() != 1 {
+			t.Errorf("Logout: %v, %d deletes", err, deleted.Load())
+		}
+	})
 	t.Run("no token", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusCreated) }))
 		defer srv.Close()

@@ -794,7 +794,10 @@ func (c *Client) loginLocked(ctx context.Context) error {
 	case res.StatusCode >= 300 && res.StatusCode < 400:
 		e.Kind, e.Detail = KindRefused, "the session service answers with a redirect; the login is not sent anywhere else"
 		return e
-	case res.StatusCode != http.StatusCreated && res.StatusCode != http.StatusOK:
+	// Redfish asks for 201 Created. Some services answer 200, and the DMTF
+	// mockup server answers 204 with the token and the location in the
+	// headers: any success with a token is a login.
+	case res.StatusCode < 200 || res.StatusCode > 299:
 		if res.StatusCode == http.StatusNotFound || res.StatusCode == http.StatusMethodNotAllowed || res.StatusCode == http.StatusNotImplemented {
 			e.Kind = KindUnsupported
 		}

@@ -175,6 +175,14 @@ func TestBIOSWithoutSettings(t *testing.T) {
 	if code != cli.ExitOK || !strings.Contains(stdout, "BIOS 설정 기록이 없습니다") {
 		t.Errorf("--root: exit code %d\n%s", code, stdout)
 	}
+	// The DMTF mockup has a Bios resource whose attributes are about boot,
+	// processors and power: the BIOS was read and holds no memory setting.
+	file := bmcCase(t, "dmtf-rackmount1")
+	code, stdout, _ = runEnv(fixed, "open", file, "bios")
+	if flat := strings.Join(strings.Fields(stdout), " "); code != cli.ExitOK || !strings.Contains(flat, "The BMC reported the BIOS settings of this host, and none of them bears on memory") ||
+		strings.Contains(flat, "my collect redfish") {
+		t.Errorf("BIOS without memory settings: exit code %d\n%s", code, stdout)
+	}
 }
 
 func TestBIOSHelp(t *testing.T) {

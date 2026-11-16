@@ -624,6 +624,8 @@ func (c *Case) Inventory(ctx context.Context, h *engine.HostResult, opts Invento
 		v.RASCommon = ""
 	}
 	switch {
+	case check.Settings == 0 && biosWithoutMemory(data.bmcs):
+		v.Lead = append(v.Lead, c.inv("inv.ras_none_memory"))
 	case check.Settings == 0:
 		v.Lead = append(v.Lead, c.inv("inv.ras_none"))
 	case check.Vendor == "":
@@ -806,7 +808,13 @@ func (c *Case) compareSides(d *sideData, check *memras.Result, bmcOf map[string]
 			if secs < 0 {
 				code, secs = "sides.clock_behind", -secs
 			}
-			s.Lead = append(s.Lead, c.inv(code, "minutes", (secs+30)/60))
+			// An offset of days is told in days: a BMC whose clock was
+			// never set can be years off.
+			if secs >= 2*86400 {
+				s.Lead = append(s.Lead, c.inv(code+"_days", "days", (secs+43200)/86400))
+			} else {
+				s.Lead = append(s.Lead, c.inv(code, "minutes", (secs+30)/60))
+			}
 		}
 	}
 	if !d.os.Read || !d.bmc.Read {
