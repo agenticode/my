@@ -222,9 +222,15 @@ class Runner:
             problems.append("exit code %d, expected one of %s" % (code, sorted(expect)))
         err = read(base + ".err") or ""
         outtext = "" if stdout else (read(base + ".out", 8 << 20) or "")
-        for mark in ("panic:", "goroutine ", "runtime error", "fatal error:", "SIGSEGV", "nil pointer"):
-            if mark in err or mark in outtext:
-                problems.append("crash text %r in the output" % mark)
+        # What the Go runtime prints when a program crashes, at the start of
+        # a line. Words such as "panic:" inside a text of the tool are none
+        # ("/proc/sys/kernel/panic: 0" is evidence of my preflight).
+        crash = re.compile(r"^(panic: |fatal error: |goroutine \d+ \[|\[signal SIG|runtime error: )", re.M)
+        for text in (err, outtext):
+            m = crash.search(text)
+            if m:
+                problems.append("crash text %r in the output" % m.group(1).strip())
+                break
         if code in GRADES and expect == GRADES and rec["stdout_bytes"] == 0:
             problems.append("printed nothing")
         if code in (USAGE, FAILURE) and not err:
