@@ -265,8 +265,10 @@ class Runner:
             rec["problems"].append("exit_code %r in the JSON, %d from the process" % (d.get("exit_code"), rec["exit"]))
         return d
 
-    def check_bundle(self, rec, path, anonymized):
-        """A bundle: a ZIP with the four members; an anonymized one holds no name of this host."""
+    def check_bundle(self, rec, path, anonymized, inputs=False):
+        """A bundle: a ZIP with the four members (and the files read, under
+        inputs/, when they were asked for); an anonymized one holds no name of
+        this host."""
         if not os.path.exists(path):
             rec["problems"].append("no bundle at %s" % os.path.basename(path))
             return
@@ -275,8 +277,11 @@ class Runner:
         try:
             with zipfile.ZipFile(path) as z:
                 names = sorted(z.namelist())
-                if names != ["README.txt", "ledger.db", "manifest.json", "sources.json"]:
+                base = [n for n in names if not n.startswith("inputs/")]
+                if base != ["README.txt", "ledger.db", "manifest.json", "sources.json"]:
                     rec["problems"].append("members: %s" % names)
+                if inputs != (len(base) < len(names)):
+                    rec["problems"].append("inputs/ members: %d, asked for: %s" % (len(names) - len(base), inputs))
                 bad = z.testzip()
                 if bad:
                     rec["problems"].append("damaged member %s" % bad)
@@ -337,8 +342,15 @@ class Runner:
         self.run("bios", ["bios", "--lang", "en"], {0})
         rec, text = self.run("preflight-json", ["preflight", "--json"], {0, 1})
         self.check_json(rec, text, "preflight")
+        # The short screens hold at most three statements; --detail draws
+        # everything the finding rests on.
+        self.run("scan-detail", ["--detail", "--lang", "en"])
+        self.run("why-detail", ["why", "--detail", "--lang", "ko"])
+        self.run("boots-detail", ["boots", "--detail", "--lang", "en"])
+        self.run("preflight-detail", ["preflight", "--detail", "--lang", "en"], {0, 1})
         if slot:
             self.run("dimm", ["dimm", slot, "--lang", "en"])
+            self.run("dimm-detail", ["dimm", slot, "--detail", "--lang", "ko"])
             self.run("map", ["map", slot, "--lang", "en"])
             self.run("timeline-dimm", ["timeline", slot, "--lang", "ko"])
         rec, _ = self.run("bundle", ["bundle", "-o", self.path("case.mycase"), "--lang", "en"], {0})
@@ -387,6 +399,12 @@ class Runner:
                 f.write(text + "\n")
             self.run("import-dmesg", ["import", self.path("dmesg.txt"), "--lang", "en"])
             self.run("import-dmesg-case", ["import", self.path("dmesg.txt"), "-o", self.path("dmesg.mycase")], {0})
+            rec, _ = self.run("import-dmesg-inputs", ["import", self.path("dmesg.txt"), "-o", self.path("dmesg-in.mycase"),
+                                                      "--with-inputs"], {0})
+            self.check_bundle(rec, self.path("dmesg-in.mycase"), False, inputs=True)
+            # The files read are not anonymized: the two flags together are refused.
+            self.run("import-inputs-anonymize", ["import", self.path("dmesg.txt"), "-o", self.path("dmesg-anon.mycase"),
+                                                 "--with-inputs", "--anonymize"], {USAGE})
         code, text = output(["journalctl", "--no-pager", "-k", "-b", "-o", "json"], 120)
         if code == 0 and text:
             with open(self.path("journal.json"), "w") as f:
@@ -432,6 +450,21 @@ class Runner:
         if not re.search("[\uac00-\ud7a3]", err.split("\n")[0]):
             rec["problems"].append("the error is not in Korean: %r" % err[:80])
         self.run("export-fmfm", ["export", "fmfm", "-o", self.path("fmfm.json"), "--records"], {0})
+        # Every event of the case as one line of JSON (my-events/1).
+        rec, _ = self.run("export-events", ["open", case, "export", "events", "-o", self.path("events.jsonl")], {0})
+        lines = (read(self.path("events.jsonl"), 64 << 20) or "").splitlines()
+        rec["events"] = len(lines)
+        for i, line in enumerate(lines):
+            try:
+                json.loads(line)
+            except ValueError as e:
+                rec["problems"].append("line %d of the events does not parse: %s" % (i + 1, e))
+                break
+        # The firmware message tables, and what the BMCs of the case published
+        # (none without --bmc).
+        self.run("vendors", ["vendors", "--lang", "en"], {0})
+        rec, text = self.run("vendors-seen-json", ["open", case, "vendors", "--seen", "--json"], {0})
+        self.check_json(rec, text, "vendors")
         self.run("bad-threshold", ["--set", "rule.row.min_errors=many"], {USAGE})
 
 

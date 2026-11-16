@@ -1,8 +1,8 @@
 # Validation on real hosts
 
-This page records what the release binary did on five running Linux hosts, as an unprivileged user and as root, on x86_64 and aarch64. The hosts were run on 2026-11-15 in two passes and on 2026-11-16 in three; the numbers below are those of the last pass. All five are virtual machines without a memory controller in EDAC, so the runs prove the binary, its commands and the degraded paths of a scan. They do not prove the decoding of errors from real memory controllers. [validation-lab.md](validation-lab.md) covers injected errors in a lab, and the section "What these hosts cannot exercise" says what is still open.
+This page records what the release binary did on five running Linux hosts, as an unprivileged user and as root, on x86_64 and aarch64. The hosts were run on 2026-11-15 in two passes and on 2026-11-16 in five; the numbers below are those of the last pass. All five are virtual machines without a memory controller in EDAC, so the runs prove the binary, its commands and the degraded paths of a scan. They do not prove the decoding of errors from real memory controllers. [validation-lab.md](validation-lab.md) covers injected errors in a lab, and the section "What these hosts cannot exercise" says what is still open.
 
-The binary is the build of commit `73268e9` for linux/amd64 and linux/arm64 (`make dist`, Go 1.26.4, statically linked). The same build for darwin/arm64 opened the bundles afterwards.
+The binary is the build of commit `70d430c` for linux/amd64 and linux/arm64 (`make dist`, Go 1.26.4, statically linked). The same build for darwin/arm64 opened the bundles afterwards.
 
 ## Hosts
 
@@ -12,7 +12,7 @@ The binary is the build of commit `73268e9` for linux/amd64 and linux/arm64 (`ma
 | B | x86_64 | Rocky Linux 9.6 | 5.14.0-570.33.2.el9_6 | KVM | 2, 764 MB | 108 days | a user, and root through `sudo` |
 | C | aarch64 | Rocky Linux 9.6 | 5.14.0-570.33.2.el9_6 | KVM | 1, 5.5 GB | 138 days | a user, and root through `sudo` |
 | D | aarch64 | Rocky Linux 9.6 | 5.14.0-570.33.2.el9_6 | KVM | 1, 5.5 GB | 128 days | a user, and root through `sudo` |
-| lab | x86_64 | Fedora 44 | 7.3.0, built for the lab | VMware | 16, 48 GB | 22 hours | root, and the user `nobody` |
+| lab | x86_64 | Fedora 44 | 7.3.0, built for the lab | VMware | 16, 48 GB | 1 day | root, and the user `nobody` |
 
 A to D are cloud instances that run other services. Nothing was installed or changed on them: the binary and the script were copied into one temporary directory, which was removed afterwards. The lab host is the machine of [validation-lab.md](validation-lab.md); it runs rasdaemon and keeps a journal of 21 boots with the page offlines of earlier injection runs.
 
@@ -25,8 +25,8 @@ What each host offers to a scan:
 | ACPI error source (HEST), error injection (EINJ) | no | no | no | no | no |
 | rasdaemon | not installed | not installed | not installed | not installed | running, 6 rows |
 | mcelog daemon | running | not installed | not installed | not installed | installed, not running |
-| Kernel lines in the journal | 3 | none | none | 39 | 33,542 from 21 boots |
-| Kernel lines in the ring buffer | 653 | 650 | 2,445 | 5,357 | 1,541 |
+| Kernel lines in the journal | 3 | none | none | 52 | 33,542 from 21 boots |
+| Kernel lines in the ring buffer | 653 | 650 | 2,445 | 5,370 | 1,541 |
 | pstore, kdump | empty | empty | empty | empty | pstore empty; 6 records in the text logs of kdump |
 | `kernel.dmesg_restrict` | 0 | 0 | 0 | 0 | 1 |
 | SMBIOS tables | root only | root only | root only | root only | root only |
@@ -34,38 +34,40 @@ What each host offers to a scan:
 
 ## What was run
 
-`tools/validate/host.py` runs the binary the way an operator would and records, per command, the exit code, the time, the peak memory and what was printed. One pass as the user who starts it holds 56 to 60 commands:
+`tools/validate/host.py` runs the binary the way an operator would and records, per command, the exit code, the time, the peak memory and what was printed. One pass as the user who starts it holds 65 to 69 commands:
 
 - the scan as text in English and Korean, in ASCII at 80 columns, and as JSON;
 - `why` as text, as one line and as JSON, and `timeline`;
+- the full forms behind the short screens, `--detail` on the scan, `why`, `boots`, `preflight` and `dimm` (where a slot is known);
 - `boots` as text and as JSON, `inventory`, `bios` (no BMC: no settings on record), and `preflight` as text, as JSON and as a script;
 - `bundle` to a file, anonymized, and to the standard output;
 - `open` on the bundles: overview, `why`, `timeline`, JSON;
 - `report` from a scan and from a bundle, in English and in Korean for failure analysis, with `--figures`, and to the standard output;
 - a scan into a ledger twice, and `open` on that ledger;
-- `import` of `dmesg` output, of `journalctl -k -o json` and of `/var/log/messages` where the user may read it;
+- `import` of `dmesg` output, of `journalctl -k -o json` and of `/var/log/messages` where the user may read it, and of the `dmesg` output with `--with-inputs`, whose bundle has to carry the file under `inputs/`;
 - `gpu`, `export fmfm`, `export labels` (no EDAC counters, so no label: exit code 70), `harvest status` on the ledger of the pass, `version`, four help texts;
-- twelve command lines that must fail: an unknown command, an unknown flag, the same with `--lang ko` behind it (the error must be in Korean), a slot that does not exist, a file that is not there, a file that is no case, an output directory that is not there, a bundle that exists, a directory that holds nothing of a host, a root that is not there, a command after the flags, a threshold that is no number.
+- `export events` on the bundle (every line has to parse as JSON), `vendors`, and `vendors --seen --json` on the bundle;
+- thirteen command lines that must fail: an unknown command, an unknown flag, the same with `--lang ko` behind it (the error must be in Korean), a slot that does not exist, a file that is not there, a file that is no case, an output directory that is not there, a bundle that exists, a directory that holds nothing of a host, a root that is not there, a command after the flags, a threshold that is no number, an import with both `--with-inputs` and `--anonymize`.
 
-A second pass runs the scan, the views, `boots`, `inventory`, `bios`, `preflight` and the three bundles as the other user: as root through `sudo -n` where the first pass was unprivileged, as `nobody` where the login is root. That is 16 commands.
+A second pass runs the scan, the views, `boots`, `inventory`, `bios`, `preflight` and the three bundles as the other user: as root through `sudo -n` where the first pass was unprivileged, as `nobody` where the login is root, with `--detail` on the scan, `why`, `boots` and `preflight`. That is 20 commands.
 
-Beyond the exit code the script checks that no command printed the text of a crash, that the JSON parses and names the exit code the process ended with, that a bundle is a ZIP archive with its four members intact, that the temporary directory of the binary is empty after every command, and that a bundle sent to a pipe belongs to the reader of the pipe. In an anonymized bundle it searches every member for the host name, the fully qualified name, the IP addresses, the hardware addresses of the network interfaces and the machine ID of the host.
+Beyond the exit code the script checks that no command printed the text of a crash, that the JSON parses and names the exit code the process ended with, that a bundle is a ZIP archive with its four members intact and has `inputs/` exactly when it was asked for, that the temporary directory of the binary is empty after every command, and that a bundle sent to a pipe belongs to the reader of the pipe. In an anonymized bundle it searches every member for the host name, the fully qualified name, the IP addresses, the hardware addresses of the network interfaces and the machine ID of the host.
 
 On hosts B, C, D and the lab a bundle and a report were also written to `/dev/null`, with a check that it is still the same character device afterwards. On the lab host the exporter was started on a loopback port, and a scan and a bundle ran under `strace`.
 
 ## Results
 
-368 commands ran on the five hosts in the last pass. None crashed, none ended with an exit code other than the expected one, none left a file in the temporary directory, and no anonymized bundle held a name or an address of its host.
+433 commands ran on the five hosts in the last pass. None crashed, none ended with an exit code other than the expected one, none left a file in the temporary directory, and no anonymized bundle held a name or an address of its host.
 
 | | A | B | C | D | lab |
 | --- | --- | --- | --- | --- | --- |
-| Commands, first and second pass | 56 + 16 | 57 + 16 | 57 + 16 | 58 + 16 | 60 + 16 |
+| Commands, first and second pass | 65 + 20 | 66 + 20 | 66 + 20 | 67 + 20 | 69 + 20 |
 | Host finding as root | ok | ok | ok | ok | observe |
 | Exit code of the scan | 0 | 0 | 0 | 0 | 1 |
-| Time of one scan as root, median | 0.20 s | 0.33 s | 0.10 s | 0.11 s | 1.67 s |
-| Peak memory of the binary | 28 MB | 25 MB | 24 MB | 23 MB | 52 MB |
-| Bundle of a scan as root, bytes | 15,373 | 15,047 | 14,747 | 15,011 | 37,685 |
-| Bundle of a scan as an unprivileged user, bytes | 14,677 | 14,392 | 14,095 | 14,357 | 16,495 |
+| Time of one scan as root, median | 0.20 s | 0.40 s | 0.10 s | 0.16 s | 1.71 s |
+| Peak memory of the binary | 29 MB | 25 MB | 25 MB | 25 MB | 52 MB |
+| Bundle of a scan as root, bytes | 16,294 | 15,965 | 15,676 | 15,950 | 38,554 |
+| Bundle of a scan as an unprivileged user, bytes | 15,590 | 15,301 | 15,004 | 15,284 | 17,431 |
 | Hypervisor the scan named | KVM | KVM | KVM | KVM | VMware |
 
 `GOMEMLIMIT` was not set. On A and B, the two hosts with 765 MB of memory, the binary set a soft limit of 191 MiB for its heap by itself ([performance.md](performance.md)). The peak is the largest resident set of any command of a pass.
@@ -75,21 +77,18 @@ On hosts B, C, D and the lab a bundle and a report were also written to `/dev/nu
 The scan of host D as root, from its anonymized bundle:
 
 ```
-host host-347fefed  QEMU KVM Virtual Machine  2026-07-11 to 2026-11-16  no errors on record
+host host-f129da3a  QEMU KVM Virtual Machine  2026-07-11 to 2026-11-16  no errors on record
 host finding: ok
 
     DIMM 0
     ░░
 
- ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement
- 1 slot, 1 DIMM
+ ░░ ok    1 slot, 1 DIMM
 
  no DIMM has errors on record
 
  1 DIMM without errors
- sources  hostinfo 2 records, klog (journal) without records, klog (ring buffer) 3 records, pstore
-          (/sys/fs/pstore) without records, pstore (/var/lib/systemd/pstore) without records, kdump
-          without records, edac-sysfs without records, smbios 1 record
+ sources  klog
  missing  rasdaemon: not present (no rasdaemon database: rasdaemon is not installed or has stored
           nothing. Error records then come from the kernel log and the counters only)
  note     This host is a virtual machine (KVM): a guest is not shown the corrected errors of the
@@ -117,21 +116,17 @@ A scan that could not read a source names it on a "missing" line with the reason
 The lab host has no errors on record and 63 pages that the kernel took offline in earlier injection runs. No record ties them to a DIMM, so the host finding speaks about them:
 
 ```
-host host-5244a2dd  tied to no DIMM  63 pages offline
+host host-ddbbc111  observe  R-HOST-02  63 pages taken offline and tied to no DIMM, the last on
+                                        2026-11-16
 
- finding     observe (finding, confidence medium, 70)                                      R-HOST-02
- evidence    [R-HOST-02] 63 pages taken offline and tied to no DIMM, the last on 2026-11-16
-             68 records: first journalctl -o json _TRANSPORT=kernel +
-             SYSLOG_IDENTIFIER=mcelog#L5997, last journalctl -o json _TRANSPORT=kernel +
-             SYSLOG_IDENTIFIER=mcelog#L15353
- checks      weakens: 16 of the pages were taken offline because a program asked the kernel to, as a
-             test of that path does: no error of the hardware is behind them
- missing     this host is a virtual machine (VMware): a guest is not shown the corrected errors of
-             the machine it runs on, and of the uncorrected ones at most those that hit its own
-             memory
- next        No action in the guest. The DIMM behind such records is found by a scan of the
-             hypervisor host.
+ evidence  weakens: 16 of the pages were taken offline because a program asked the kernel to, as a
+           test of that path does: no error of the hardware is behind them
+ next      No action in the guest. The DIMM behind such records is found by a scan of the hypervisor
+           host.
+ confidence medium, 1 kind of data missing: --detail
 ```
+
+`my why --detail` adds the 68 records behind the statement, the note that the host is a virtual machine, and the confidence of 70.
 
 The scan read 33,542 kernel lines of 21 boots from the journal and 1,541 from the ring buffer, and the text logs kdump left of the boots that ended in a crash.
 
@@ -145,7 +140,7 @@ Under `strace -f`, a scan created 7 files and directories and `my bundle` 11. Al
 
 ### The bundles on another machine
 
-The 30 bundles of the five hosts (two passes, three bundles each) were opened on macOS on arm64 with the build of the same commit: `my open`, `my open FILE why --json`, `my report` in English, and `my report --lang ko --audience fa --all`. Every command succeeded. The 30 English reports are well-formed XML (`xmllint`), and the 30 Korean reports have no line-break violation at widths of 1440, 1000, 820 and 560 pixels.
+The 41 bundles of the five hosts were opened on macOS on arm64 with the build of the same commit: three per pass, the two imports of `dmesg` output per host, and the bundle written under `strace`. Each got `my open`, `my open FILE why --json`, `my report` in English, and `my report --lang ko --audience fa --all`. Every command succeeded. The 41 English reports are well-formed XML (`xmllint`), and the 41 Korean reports have no line-break violation at widths of 1440, 1000, 820 and 560 pixels.
 
 ## What the runs changed
 
@@ -173,7 +168,17 @@ On 2026-11-16 the script also ran the commands added since (`boots`, `inventory`
 | `my --frobnicate --lang ko` answered in English on every host: the flags are parsed up to the first wrong one, so the `--lang` behind it was never read | When the flags cannot be parsed, `--lang` is read from the arguments by hand (#153) |
 | The script took `/proc/sys/kernel/panic: 0`, a line of evidence of `my preflight --json`, for the text of a crash | The script looks for what the Go runtime prints when a program crashes, at the start of a line (#153) |
 
-The second pass, with the build of `f7b15ca`, found no problem of the binary. It showed one wrong answer: on A and B a crash kernel is loaded and pstore has no backend, and `my preflight` called `pstore-vs-kdump` lost and printed `crash_kexec_post_notifiers` as the fix, which does nothing while pstore has no backend. That check is now `info` there (#155). The third pass, with the build of `73268e9`, gave the numbers above.
+The second pass, with the build of `f7b15ca`, found no problem of the binary. It showed one wrong answer: on A and B a crash kernel is loaded and pstore has no backend, and `my preflight` called `pstore-vs-kdump` lost and printed `crash_kexec_post_notifiers` as the fix, which does nothing while pstore has no backend. That check is now `info` there (#155). The third pass, with the build of `73268e9`, found no problem.
+
+Two more passes ran on 2026-11-16 with the commands added since the third: `--detail` on the short screens, `vendors`, `export events` and `--with-inputs`. The first, with the build of `6d585aa`, found no failed check and three wrong outputs:
+
+| Seen | Change |
+| --- | --- |
+| `my boots --detail` on the lab host, whose boots hold no error, ended its legend with " ; ended: - not on record" | The legend joins only the parts that have text (#179) |
+| As `nobody` on A the overview named the ring buffer it read and the journal it could not read both "klog" | Sources of one kind are named apart when more than one was tried: "klog (journal): not readable" (#178) |
+| Under `--lang ko` a scan without root gave three reasons in English: the closed journal, pstore and the mcelog daemon | The reasons are in Korean; what the mcelog client printed stays as it printed it (#180) |
+
+The second, with the build of `70d430c`, gave the numbers above.
 
 ## Captures of injected errors
 
