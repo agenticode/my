@@ -75,6 +75,7 @@ var Messages = i18n.Catalog{
 	"kind.mark-failed":       {EN: "failure mark", KO: "failed 표시"},
 	"kind.ppr":               {EN: "PPR", KO: "PPR"},
 	"kind.device-sparing":    {EN: "ADDDC or SDDC sparing", KO: "ADDDC 또는 SDDC sparing"},
+	"kind.memory-sparing":    {EN: "memory sparing", KO: "memory sparing"},
 	"kind.predicted-failure": {EN: "failure prediction", KO: "고장 예측"},
 	"kind.mirror-failover":   {EN: "mirror failover", KO: "미러 전환"},
 	"kind.training-failure":  {EN: "training failure", KO: "트레이닝 실패"},

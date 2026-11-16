@@ -212,6 +212,7 @@ var Messages = i18n.Catalog{
 	"tl.kind.training-failure":  {EN: "memory training failed", KO: "메모리 트레이닝 실패"},
 	"tl.kind.mirror-failover":   {EN: "the memory mirror failed over", KO: "메모리 미러 전환"},
 	"tl.kind.device-sparing":    {EN: "ADDDC or SDDC sparing", KO: "ADDDC 또는 SDDC sparing"},
+	"tl.kind.memory-sparing":    {EN: "memory sparing", KO: "memory sparing"},
 	"tl.kind.ppr":               {EN: "PPR", KO: "PPR"},
 	"tl.move.one":               {EN: "{when} moved from {from} to {to}", KO: "{when} 슬롯 이동({from} → {to})"},
 	"tl.move.many":              {EN: "{n} slot changes, {first} to {last}", KO: "슬롯 이동 {n}회, {first} ~ {last}"},

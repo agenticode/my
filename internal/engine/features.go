@@ -521,7 +521,7 @@ func (m *measurer) scrub(idx []int32) Scrub {
 // repairKinds are the actions that repair a place inside a DIMM.
 func repairKind(k model.ActionKind) bool {
 	switch k {
-	case model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionRowRemap, model.ActionSparing, model.ActionDeviceSparing:
+	case model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionRowRemap, model.ActionSparing, model.ActionDeviceSparing, model.ActionMemorySparing:
 		return true
 	}
 	return false

@@ -47,7 +47,7 @@ var (
 	DIMMOfflinedPages = &Desc{Name: "my_dimm_offlined_pages", Type: Gauge, Labels: []string{"host", "slot"},
 		Help: "Pages of the DIMM in the slot that were taken offline. An empty slot counts pages that are tied to no DIMM."}
 	DIMMRepairs = &Desc{Name: "my_dimm_repairs_total", Type: Counter, Labels: []string{"host", "slot", "type"},
-		Help: "Repairs on record for the DIMM in the slot by type: sppr, hppr, ppr (a post package repair the record does not call soft or hard), sparing, device-sparing (ADDDC, SDDC), row-remap. Attempts that failed count too; a repair that waits for the next boot does not."}
+		Help: "Repairs on record for the DIMM in the slot by type: sppr, hppr, ppr (a post package repair the record does not call soft or hard), sparing, device-sparing (ADDDC, SDDC), memory-sparing (a CXL device that has spares left), row-remap. Attempts that failed count too; a repair that waits for the next boot does not."}
 	DIMMFirmwareEvents = &Desc{Name: "my_dimm_firmware_events_total", Type: Counter, Labels: []string{"host", "slot", "serial", "event"},
 		Help: "Firmware records about the DIMM by common event: predicted-failure, disabled, ppr-scheduled, ppr-done, ppr-failed, sparing, device-sparing, spare-copy-started, sparing-failed, mirror-failover, mirror-lost, training-failure, config-error. A record that repeats another one is not counted."}
 	SourceUnread = &Desc{Name: "my_source_unread_records", Type: Gauge, Labels: []string{"host", "source"},
