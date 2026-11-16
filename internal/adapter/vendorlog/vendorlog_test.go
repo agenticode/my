@@ -258,3 +258,41 @@ func TestSlotsOfSMBIOS(t *testing.T) {
 		t.Errorf("slots %v", slots)
 	}
 }
+
+// TestTwoDumpsOfOneLog: a later dump of the same Lifecycle log holds the
+// records of the earlier one, with one more record in front. Read into one
+// ledger, each record is there once.
+func TestTwoDumpsOfOneLog(t *testing.T) {
+	data, err := os.ReadFile(testutil.Testdata(t, "vendorlog", "racadm-lclog.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	later := "SeqNumber = 9307\nMessage ID = MEM0004\nCategory = System Health\nAgentID = BIOS\nSeverity = Critical\n" +
+		"Timestamp = 2026-11-07 08:00:00\nMessage = Memory device at location DIMM A3 is disabled.\nMessage Arg 1 = DIMM A3\n" +
+		"FQDD = DIMM.Socket.A3\n" + strings.Repeat("-", 79) + "\n" + string(data)
+	s, err := store.Open(ctx, filepath.Join(t.TempDir(), "ledger.db"), store.Create)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	now := time.Date(2026, 11, 13, 0, 0, 0, 0, time.UTC)
+	for _, a := range []adapter.Adapter{NewReader(strings.NewReader(string(data)), "dump-1.txt", Options{}),
+		NewReader(strings.NewReader(later), "dump-2.txt", Options{})} {
+		if _, err := ingest.Run(ctx, s, []adapter.Adapter{a}, ingest.Options{Host: "h1", Now: now}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	acts, err := s.Actions(ctx, store.ActionFilter{Host: "h1", Duplicates: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	evs, err := s.EventList(ctx, store.EventFilter{Host: "h1", WithDuplicates: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// One dump gives 3 actions and 2 events; the later one adds the
+	// disable.
+	if len(acts) != 4 || len(evs) != 2 {
+		t.Errorf("%d actions, %d events; want 4 and 2", len(acts), len(evs))
+	}
+}

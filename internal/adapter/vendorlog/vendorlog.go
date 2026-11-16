@@ -111,8 +111,12 @@ func Sniff(data []byte) bool { return FormatOf(data) != "" }
 
 // entry is one record of a saved output.
 type entry struct {
-	ref, raw  string
+	ref, raw string
+	// n is the place of the record in the input; key the number the tool
+	// printed for it (Record:, SeqNumber), which names the record in every
+	// dump of the same log.
 	n         int
+	key       string
 	stamp     string
 	id        string
 	args      []string
@@ -300,12 +304,16 @@ func (r *run) one(e *entry, source string) error {
 	if location == "" && len(labels) > 0 {
 		location = strings.Join(labels, ", ")
 	}
-	fp := model.Fingerprint(source, fmt.Sprint(e.n), e.stamp, e.id, e.message)
+	recKey := e.key
+	if recKey == "" {
+		recKey = fmt.Sprint(e.n)
+	}
+	fp := model.Fingerprint(source, recKey, e.stamp, e.id, e.message)
 	rec := &fwevent.Record{Event: ev, Flags: res.Flags, Clears: clears, At: at, Count: p.Count, Labels: labels,
 		SocketId: p.Socket, ChannelId: p.Channel, ChannelSlotId: p.Position, Rank: p.Rank, Address: p.Address,
 		Decoder: source, Method: "bmc", Text: text, Source: source, RawRef: e.ref, Raw: e.raw, Fingerprint: fp,
 		Firmware: model.FirmwareRecord{Vendor: res.Vendor, VendorID: key, VendorSeverity: e.severity, Origin: origin, Log: log,
-			Location: location, Args: p.Args, Text: e.message, EntryKey: model.Fingerprint(source, fmt.Sprint(e.n), e.stamp),
+			Location: location, Args: p.Args, Text: e.message, EntryKey: model.Fingerprint(source, recKey, e.stamp),
 			Mapping: res.Mapping, MapRef: res.Ref, Basis: res.Basis}}
 	if err := fwevent.Emit(r.sink, rec); err != nil {
 		if errors.Is(err, fwevent.ErrRecord) {
