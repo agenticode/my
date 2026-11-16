@@ -254,7 +254,7 @@ Adapter `crashlog`, package `internal/adapter/crashlog`, source kinds `pstore` a
 | Place | What is there | How it is read |
 | --- | --- | --- |
 | `/sys/fs/pstore` | `dmesg-<backend>-<id>` files: the end of the kernel log at the panic, in parts of the size the backend takes; `console-ramoops-<n>`: the console of the boot before, with ramoops | the parts of one dump are grouped and read from the highest part number down; the header line of each part is taken out |
-| `/var/lib/systemd/pstore` | the same files after `systemd-pstore` moved them: `<time>/<count>/` for EFI variables, `<first record id>/` for ERST, loose files at the top, and a `dmesg.txt` per dump | the original parts; the `dmesg.txt` only where the parts are gone |
+| `/var/lib/systemd/pstore` | the same files after `systemd-pstore` moved them. Its source (`src/pstore/pstore.c`) files a dump below `<time>/<count>/` for EFI variables and `<first record id>/` for ERST, with a `dmesg.txt` per dump; systemd 259 of Fedora 44 put the three ERST parts of the lab's dump at the top, with their times kept and no `dmesg.txt` | the original parts wherever they lie; the `dmesg.txt` only where the parts are gone |
 | `/var/crash/<dir>/vmcore-dmesg.txt` | the kernel log kdump-utils takes out of the memory dump (`vmcore-dmesg-incomplete.txt` when that failed half way) | as one kernel log |
 | `/var/crash/<stamp>/dmesg.<stamp>` | the same, by Debian's kdump-tools | as one kernel log |
 
@@ -278,11 +278,11 @@ Whatever the lines give: a printed machine check record with an address is grade
 
 The lines carry seconds since the start of the boot that crashed. The start is taken as the kernel log reader takes it (see "Times" under [Kernel log](#kernel-log)): a machine check record's own `TIME` field (exact), else a capture time, else the RTC line of the boot. The time of the dump is given as the capture time only when the text has neither a machine check record with a time nor an RTC line, because the reader ranks a capture time above the RTC line. The time of a dump is:
 
-- in `/sys/fs/pstore`, the modification time of the file, which the kernel sets to the time of the record (`pstore_mkfile()`);
+- in `/sys/fs/pstore`, the modification time of the file, which the kernel sets to the time of the record (`pstore_mkfile()`), and in the archive the same time, which systemd-pstore 259 kept when it moved the files;
 - for EFI variables also in the archive, the time in the id;
 - for a kdump log, the modification time of the file, which is later than the crash by the time the capture kernel took to start.
 
-The ERST id is not used as a time: its seed is the time of the first record of the boot, which need not be the time of the dump. A dump with no time and no anchor in its text stays relative to its boot.
+The ERST id is not used as a time: its seed is the time of the first record of the boot, which need not be the time of the dump. A dump with no time and no anchor in its text stays relative to its boot. A dump without a record and without the boot banner is still the end of a boot: the reader places that boot from the same anchors and stores it, so the panic has a boot to belong to.
 
 ### Duplicates
 
@@ -290,7 +290,7 @@ A line is identified by the kernel's stamp and its text, as in every kernel log.
 
 ### Known gaps
 
-- No pstore file or kdump log of a real server was read. The tests build pstore files from the kernel lines of the lab capture `7.3.0-mce-fatal`, with the framing taken from the kernel source; the lab captures of [validation-lab.md](validation-lab.md) are the next check.
+- No pstore file or kdump log of a real server was read. The tests read the three ERST files of a real panic of the lab guest (`internal/adapter/crashlog/testdata/erst-fedora44`) and pstore files built from the kernel lines of the lab capture `7.3.0-mce-fatal` with the framing of the kernel source. EFI variables and ramoops were not seen on a running kernel.
 - Line numbers in the record references of a dump of several parts count in the text as it is read, Part N first; the reference names Part 1 and the number of further parts (`dmesg-efi_pstore-<id>+2#L12`).
 - A copy of `/sys/fs/pstore` whose files lost their times, and an ERST archive, date a dump only by what its text says.
 
