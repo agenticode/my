@@ -36,6 +36,9 @@ type loop struct {
 	// rule is the statement that says it boot over boot: the code of an
 	// evidence of the host finding, or "" for none.
 	rule string
+	// dimmRule is the rule every DIMM of the plan fires, when the records
+	// name a DIMM.
+	dimmRule string
 }
 
 var loops = []loop{
@@ -48,9 +51,15 @@ type loopBoot struct {
 	Boot     int       `json:"boot"`
 	BootID   string    `json:"boot_id"`
 	Injected time.Time `json:"injected"`
-	Address  string    `json:"address"`
-	Bank     int       `json:"bank"`
-	Status   string    `json:"status"`
+	// Slot names the DIMM of the record, when the plan puts it on one.
+	Slot   string `json:"slot"`
+	Record struct {
+		Time    time.Time `json:"time"`
+		Address string    `json:"address"`
+	} `json:"record"`
+	Address string `json:"address"`
+	Bank    int    `json:"bank"`
+	Status  string `json:"status"`
 }
 
 func loopBoots(t *testing.T, l loop) []loopBoot {
@@ -157,6 +166,12 @@ func checkLoop(t *testing.T, name string, l loop, plan []loopBoot, h *engine.Hos
 		return 0
 	}
 	for _, pb := range plan {
+		if pb.Injected.IsZero() {
+			pb.Injected = pb.Record.Time
+		}
+		if pb.Address == "" {
+			pb.Address = pb.Record.Address
+		}
 		i := bootOf(pb)
 		if i == 0 {
 			t.Errorf("%s: boot %d of the plan (%s) is not in the window", name, pb.Boot, pb.BootID)
@@ -165,9 +180,27 @@ func checkLoop(t *testing.T, name string, l loop, plan []loopBoot, h *engine.Hos
 		if end := r.Boots[i-1].End; end != model.BootStop {
 			t.Errorf("%s: boot %d ended %q, want a stop", name, pb.Boot, end)
 		}
-		// The place of the boot: the cache line of the injected address,
-		// among the uncorrected errors that name no DIMM.
+		// The place of the boot: on the DIMM of the plan, or the cache line
+		// of the injected address among the errors that name no DIMM.
 		found := false
+		if pb.Slot != "" {
+			for _, db := range r.DIMMs {
+				if db.Slot != pb.Slot {
+					continue
+				}
+				for _, c := range db.Cells {
+					found = found || (c.Boot == i && c.UE > 0 && c.Stopped)
+				}
+				if l.dimmRule != "" {
+					switch d := h.DIMM(db.UID); {
+					case d == nil:
+						t.Errorf("%s: %s: no finding", name, pb.Slot)
+					case !hasRule(d.Verdict.Rules, l.dimmRule):
+						t.Errorf("%s: %s: rules %v, want %s", name, pb.Slot, d.Verdict.Rules, l.dimmRule)
+					}
+				}
+			}
+		}
 		for _, place := range r.Loose {
 			if place.Level != engine.PlaceAddress || !sameLine(place.Place, pb.Address) {
 				continue
@@ -193,6 +226,15 @@ func checkLoop(t *testing.T, name string, l loop, plan []loopBoot, h *engine.Hos
 	if l.rule != "" && !has || l.rule == "" && strings.Contains(strings.Join(codes, " "), "loop") {
 		t.Errorf("%s: the host finding says %v, want %q", name, codes, l.rule)
 	}
+}
+
+func hasRule(rules []string, id string) bool {
+	for _, r := range rules {
+		if r == id {
+			return true
+		}
+	}
+	return false
 }
 
 // sameLine says whether two addresses lie in one cache line.

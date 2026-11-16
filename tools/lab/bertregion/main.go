@@ -45,6 +45,7 @@ func main() {
 	row := flag.Int("row", 0x1a2f, "row")
 	col := flag.Int("col", 0x238, "column")
 	fru := flag.String("fru", "DIMM 0", "FRU text of the entry")
+	handle := flag.Int("handle", 0x1100, "SMBIOS type 17 handle of the DIMM; -1 for none")
 	flag.Parse()
 
 	m := cper.MemError{
@@ -52,6 +53,9 @@ func main() {
 		Node: model.Some(*node), Card: model.Some(*card), Module: model.Some(*module), Rank: model.Some(*rank),
 		Bank: model.Some(*bank), BankGroup: model.Some(*bg), Device: model.Some(*dev), Row: model.Some(*row), Column: model.Some(*col),
 		ErrorType: model.Some(3), // multi-bit ECC
+	}
+	if *handle >= 0 {
+		m.ModuleHandle = model.Some(*handle)
 	}
 	region := cper.StatusBlockBytes(1, cper.SevFatal, cper.Entry{SectionType: cper.SectionPlatformMemory, Severity: cper.SevFatal,
 		FRUText: *fru, Data: cper.MemSection(m)})
