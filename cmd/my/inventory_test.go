@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -209,4 +211,51 @@ func TestInventoryAsJSON(t *testing.T) {
 		t.Errorf("A1: %+v", a1)
 	}
 	testutil.Golden(t, "json/inventory.json", []byte(stdout))
+}
+
+// The report has the table of "my inventory" in its section on data
+// quality: one line per DIMM with what the BMC says of it, and the
+// comparison of the corrected errors of the two sides.
+func TestReportHasTheInventory(t *testing.T) {
+	root := hostTree(t)
+	alone, _ := overview(t, fixed, "--root", root)
+	srv := bmcOf(t, alone)
+	dir := t.TempDir()
+	for _, lang := range []string{"en", "ko"} {
+		file := filepath.Join(dir, "report."+lang+".html")
+		code, stdout, stderr := runEnv(account(), "report", "--root", root, "--bmc", srv.URL, "--insecure", "-o", file, "--lang", lang)
+		if code != cli.ExitOK {
+			t.Fatalf("%s: exit code %d\n%s\n%s", lang, code, stdout, stderr)
+		}
+		raw, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		html := string(raw)
+		if dump := os.Getenv("MY_DUMP_REPORT"); dump != "" {
+			if err := os.WriteFile(filepath.Join(dump, "inventory-report."+lang+".html"), raw, 0o644); err != nil {
+				t.Fatal(err)
+			}
+		}
+		noSecret(t, "", html, stdout, stderr)
+		want := []string{`<table class="modules">`, "BMC: BMC.Slot.1, DIMM A1, DIMM1", `<a href="#dimm-CPU0_C1">CPU0_C1</a>`}
+		if lang == "en" {
+			want = append(want, "<h3>Modules</h3>", "<h4>Operating system and BMC</h4>",
+				"CPU0_C1: the OS has 604 corrected errors, the logs of the BMC 6 entries", "Candidates for the reason, none established")
+		} else {
+			want = append(want, "<h3>모듈</h3>", "<h4>운영체제와 BMC</h4>")
+		}
+		for _, w := range want {
+			if !strings.Contains(html, w) {
+				t.Errorf("%s: the report lacks %q", lang, w)
+			}
+		}
+		// A report has no command line to run: the texts of the table that
+		// name a flag are replaced.
+		for _, w := range []string{"--all lists them", "my bios --bmc", "my inventory --bmc", "--all로 표시"} {
+			if strings.Contains(html, w) {
+				t.Errorf("%s: the report says %q", lang, w)
+			}
+		}
+	}
 }

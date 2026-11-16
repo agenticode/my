@@ -151,6 +151,9 @@ type Document struct {
 	// Host is the card of the host finding, which speaks about the errors
 	// and page offlines that are tied to no DIMM, or nil.
 	Host *view.Card
+	// Inventory lists the DIMMs of the host one per line and sets what the
+	// operating system and the BMC each recorded side by side.
+	Inventory *view.Inventory
 	// Present is the number of DIMMs in the host.
 	Present int
 
@@ -356,6 +359,9 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 	}
 	sort.SliceStable(doc.GPUs, func(i, j int) bool { return doc.GPUs[i].Grade.ExitCode() > doc.GPUs[j].Grade.ExitCode() })
 	if doc.Host, err = c.HostCard(ctx, h); err != nil {
+		return nil, err
+	}
+	if doc.Inventory, err = c.Inventory(ctx, h, view.InventoryOptions{}); err != nil {
 		return nil, err
 	}
 

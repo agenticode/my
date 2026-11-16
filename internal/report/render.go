@@ -1157,6 +1157,9 @@ func (doc *Document) quality() *node {
 		}
 		s.add(scroll(t))
 	}
+	for _, n := range doc.modules() {
+		s.add(n)
+	}
 
 	s.add(el("h3", doc.say("q.missing")))
 	if len(doc.Overview.Missing) == 0 && doc.Overview.Root == nil {
@@ -1198,6 +1201,134 @@ func (doc *Document) quality() *node {
 		s.add(el("h3", doc.say("q.notes")), notes)
 	}
 	return s
+}
+
+// modules is the part of section 7 that lists the DIMMs of the host one
+// per line, with what SMBIOS, EDAC and the BMC say of each, and then sets
+// the corrected errors the operating system and the BMC each recorded side
+// by side. It is the table of "my inventory".
+func (doc *Document) modules() []*node {
+	v := doc.Inventory
+	if v == nil || len(v.Rows) == 0 {
+		return nil
+	}
+	out := []*node{el("h3", doc.say("q.modules")), how(doc.say("cap.modules"))}
+	for _, t := range v.Lead {
+		out = append(out, el("p", A{"class", "sub"}, R(sentence(upperFirst(doc.modText(t))))))
+	}
+	c := v.Columns
+	// The RAS column is there when the modules differ in it; what holds
+	// for all of them alike is a sentence of the lead.
+	differ := false
+	for _, r := range v.Rows {
+		differ = differ || (r.Populated && r.RAS != v.RASCommon)
+	}
+	heads := []string{c.Slot, c.Serial, c.Maker, c.Part, ">" + c.Size, c.Org, ">" + c.Speed}
+	if differ {
+		heads = append(heads, c.RAS)
+	}
+	heads = append(heads, ">"+c.CEOS, ">"+c.CEBMC)
+	t, body := table("modules", heads...)
+	cell := func(class, s string) *node {
+		if s == "" {
+			s = "-"
+		}
+		if class == "" {
+			return el("td", s)
+		}
+		return el("td", A{"class", class}, s)
+	}
+	count := func(n model.Opt[int64]) *node {
+		if !n.Valid {
+			return cell("r", "")
+		}
+		return numCell(n.V)
+	}
+	links := doc.anchors()
+	for i := range v.Rows {
+		r := &v.Rows[i]
+		slot := el("td", A{"class", "id"}, r.Slot)
+		if a := links[r.Slot]; a != "" {
+			slot = el("td", A{"class", "id"}, el("a", A{"href", "#" + a}, r.Slot))
+		}
+		tr := el("tr", slot)
+		if !r.Populated {
+			tr.add(el("td", A{"class", "sub", "colspan", strconv.Itoa(len(heads) - 1)}, c.Empty))
+			body.add(tr)
+			continue
+		}
+		tr.add(cell("id", r.Serial), cell("", r.Maker), cell("id", r.PartNumber), cell("r", r.Size), cell("nw", r.Org), cell("r", r.Speed))
+		if differ {
+			tr.add(cell("", r.RAS))
+		}
+		tr.add(count(r.CEOS), count(r.CEBMC))
+		body.add(tr)
+		// The remarks of a module stand in a row of their own below it.
+		if len(r.Lines) > 0 {
+			tr.set("class", "lead")
+			td := el("td", A{"colspan", strconv.Itoa(len(heads) - 1)})
+			for j, l := range r.Lines {
+				if j > 0 {
+					td.add(el("br"))
+				}
+				td.add(R(l.Text))
+			}
+			body.add(el("tr", A{"class", "more"}, el("td"), td))
+		}
+	}
+	out = append(out, scroll(t))
+	if len(v.Legend)+len(v.Notes) > 0 {
+		ul := el("ul", A{"class", "notes"})
+		for _, l := range append(append([]view.Text{}, v.Legend...), v.Notes...) {
+			ul.add(el("li", R(l.Text)))
+		}
+		out = append(out, ul)
+	}
+
+	sd := v.Sides
+	if sd == nil {
+		return out
+	}
+	out = append(out, el("h4", doc.say("q.sides")))
+	for _, t := range sd.Lead {
+		out = append(out, el("p", R(sentence(upperFirst(doc.modText(t))))))
+	}
+	if len(sd.Rows) > 0 {
+		ul := el("ul", A{"class", "notes"})
+		for _, r := range sd.Rows {
+			ul.add(el("li", R(r.Text.Text)))
+			if r.Count != nil && r.Count.Text.Text != r.Text.Text {
+				ul.add(el("li", R(r.Count.Text.Text)))
+			}
+		}
+		out = append(out, ul)
+	}
+	for _, g := range sd.Candidates {
+		ul := el("ul", A{"class", "notes"})
+		for _, t := range g.Items {
+			ul.add(el("li", R(t.Text)))
+		}
+		out = append(out, el("p", R(g.Head.Text)), ul)
+	}
+	return out
+}
+
+// modWords are the texts of the inventory that name a flag of a command.
+// A report says the same without the command line.
+var modWords = map[string]string{
+	"inv.count_empty":  "mod.count_empty",
+	"inv.ras_none":     "mod.ras_none",
+	"inv.ras_unmapped": "mod.ras_unmapped",
+	"inv.ras_off":      "mod.ras_off",
+	"sides.no_bmc":     "mod.no_bmc",
+}
+
+// modText is a text of the inventory as the report writes it.
+func (doc *Document) modText(t view.Text) string {
+	if code, ok := modWords[t.Code]; ok {
+		return Words.Text(doc.Lang, code, t.Args)
+	}
+	return t.Text
 }
 
 // recordHeads are the column heads of the table of records.

@@ -653,6 +653,49 @@ section#s7.sec
   table.sources
     | 소스 | 읽은 곳 | 상태 | 기록 | 오류 기록 | 조치 | 쓰지 못함 | 등급 | 처음 ~ 마지막 기록
     | synth | synth:demo | 읽음 | 1,297 | 1,285 | 8 | 0 | A | 2026-08-03 ~ 2026-11-12
+  ### 모듈
+  p.how: 호스트의 DIMM을 한 줄에 하나씩 적고, SMBIOS, EDAC, BMC가 알려 준 내용을 함께 싣습니다. 줄표(-)는 이 케이스의 어떤 소스도 주지 않은 값이며, 케이스를 시작할 때 요청할 목록으로도 씁니다.
+  p.sub: DIMM 16개. 빈 슬롯 16개는 슬롯 맵에 있습니다.
+  p.sub: 슬롯 이름과 모듈 정보의 출처: SMBIOS.
+  p.sub: BIOS 설정 기록이 없어 RAS 열이 비어 있습니다. 호스트의 BMC가 Redfish로 알려 줍니다.
+  table.modules
+    | 슬롯 | 시리얼 | 제조사 | 파트 넘버 | 용량 | 구성 | 속도 | CE OS | CE BMC
+    | CPU0_A1 | 5C331B | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_B1 | DE7FF0 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_C1 | 3B9C56 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 1,231 | -
+    |  | DDR5 RDIMM
+    | CPU0_D1 | 80D01E | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_E1 | E2CD51 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_F1 | 2B6332 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_G1 | 382A8A | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU0_H1 | 4B3B31 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_A1 | 2C9305 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_B1 | DBC9CE | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_C1 | 99B7F7 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_D1 | 2AEB41 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 53 | -
+    |  | DDR5 RDIMM
+    | CPU1_E1 | 02AC34 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_F1 | 848BE3 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_G1 | D7A399 | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+    | CPU1_H1 | 55C12A | Example Memory | EXM64G48R2X4-A | 64 GB | 2Rx4 | 4800/4800 | 0 | -
+    |  | DDR5 RDIMM
+  li: 구성은 rank 수와 디바이스 폭(2Rx4). 속도는 동작 속도/정격 속도(MT/s).
+  li: CE OS는 운영체제 기록의 CE 수. BMC는 읽지 않음.
+  #### 운영체제와 BMC
+  p: BMC를 읽지 않아 운영체제 기록과 맞대어 볼 대상이 없습니다.
   ### 읽지 못했거나 일부만 읽은 것
   p: 찾아본 소스를 모두 다 읽었습니다.
 section#s8.sec
