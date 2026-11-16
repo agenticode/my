@@ -1,0 +1,23 @@
+# DIMM labels for rasdaemon, written by my dev for host r12-n034.
+# Install: copy to /etc/ras/dimm_labels.d/ and run "ras-mc-ctl --register-labels".
+# "ras-mc-ctl --mainboard" prints the vendor and model this file has to name; "ras-mc-ctl --print-labels" shows what was matched.
+# A label is the name of the slot in the ledger: the SMBIOS locator where SMBIOS was read. A position is the memory controller and the location of the DIMM in the EDAC driver.
+#
+Vendor: Example Systems
+  Product: R760
+    CPU0_A1: 0.0.0;
+    CPU0_B1: 0.1.0;
+    CPU0_C1: 1.0.0;
+    CPU0_D1: 1.1.0;
+    CPU0_E1: 2.0.0;
+    CPU0_F1: 2.1.0;
+    CPU0_G1: 3.0.0;
+    CPU0_H1: 3.1.0;
+    CPU1_A1: 4.0.0;
+    CPU1_B1: 4.1.0;
+    CPU1_C1: 5.0.0;
+    CPU1_D1: 5.1.0;
+    CPU1_E1: 6.0.0;
+    CPU1_F1: 6.1.0;
+    CPU1_G1: 7.0.0;
+    CPU1_H1: 7.1.0;
