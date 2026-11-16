@@ -30,6 +30,7 @@ my open testdata/real/7.3.0-mce/my/case.mycase
 | --- | --- |
 | `dmesg` | the kernel log of the running boot as `dmesg` prints it |
 | `journal-k.json` | `journalctl -k -o json`, on hosts with a journal |
+| `journal-all.json` | in `6.19.10-ghes-multi`: the kernel messages of every boot the journal holds (`journalctl -o json _TRANSPORT=kernel`); `-k` gives the running boot only |
 | `var/lib/rasdaemon/ras-mc_event.db` | the rasdaemon database as it was on disk |
 | `sys/devices/system/edac/`, `edac-sysfs.txt` | the EDAC tree file by file, and as one listing |
 | `dmidecode.txt` | `dmidecode -t 17` |

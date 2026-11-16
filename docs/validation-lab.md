@@ -113,6 +113,7 @@ $LAB/tools/cxl.sh                # needs rasdaemon with CXL support at $RASDAEMO
 $LAB/tools/ghes.sh image         # once, from a Fedora cloud image for aarch64 under $LAB/img
 $LAB/tools/ghes.sh boot && $LAB/tools/ghes.sh prepare && $LAB/tools/ghes.sh run
 $LAB/tools/ghes.sh clock-step    # in a boot of its own
+$LAB/tools/ghes.sh multi         # another guest: six DIMMs, three boots a day apart
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 

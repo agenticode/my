@@ -53,6 +53,11 @@ type capture struct {
 	notes []string
 	// journal says that the capture holds journalctl -k -o json.
 	journal bool
+	// boots is the number of boots in journal-all.json, the kernel
+	// messages of every boot the journal of the host held, in a capture
+	// whose errors span several boots. The kernel log of the running boot
+	// (dmesg, journal-k.json) has only the errors of the last one.
+	boots int
 	// clock is what the ledger adds to the times of the rasdaemon records,
 	// to the second: on a host without machine check records whose clock
 	// was set after rasdaemon started. The other captures must be left as
@@ -76,16 +81,19 @@ type capture struct {
 	// taken offline.
 	loose []string
 	asked bool
-	// dimm is the DIMM the errors belong to, when the host names one.
-	dimm *dimm
+	// dimms are the DIMMs the errors belong to, when the host names them.
+	// Every other DIMM of the host must be without errors and found ok.
+	dimms []dimm
 	// forms says what the kernel log of the boot gives when it is read
 	// alone, in each of the forms under formats/.
 	forms *forms
 }
 
-// dimm is what the engine must say about the DIMM of a capture.
+// dimm is what the engine must say about a DIMM of a capture.
 type dimm struct {
 	slot, serial string
+	ce, ue       int64
+	grade        model.VerdictGrade
 	mode         model.FaultMode
 	rules        []string
 }
@@ -176,7 +184,8 @@ var captures = []capture{
 		reports: []string{"rasdaemon/cxl_dram_event", "rasdaemon/cxl_general_media_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
 		finding: model.VerdictReplaceNow,
-		dimm:    &dimm{slot: "cxl:mem0", serial: "0x4c41420001", mode: model.ModeRow, rules: []string{"R-UE-01", "R-FW-01"}},
+		dimms: []dimm{{slot: "cxl:mem0", serial: "0x4c41420001", ce: 11, ue: 1, grade: model.VerdictReplaceNow, mode: model.ModeRow,
+			rules: []string{"R-UE-01", "R-FW-01"}}},
 	},
 	{
 		// Firmware error records on an aarch64 guest: every error is in
@@ -188,8 +197,9 @@ var captures = []capture{
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
 		finding: model.VerdictReplaceNow,
-		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeMultiRow, rules: []string{"R-UE-01", "R-SCRUB-01"}},
-		forms:   &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64", idle: 40 * time.Second},
+		dimms: []dimm{{slot: "DIMM 0", serial: "LAB00A64", ce: 24, ue: 2, grade: model.VerdictReplaceNow, mode: model.ModeMultiRow,
+			rules: []string{"R-UE-01", "R-SCRUB-01"}}},
+		forms: &forms{events: 47, actions: 2, kernel: "6.19.10-300.fc44.aarch64", idle: 40 * time.Second},
 	},
 	{
 		// The next boot of that guest. Its clock was set back by 10
@@ -204,7 +214,23 @@ var captures = []capture{
 		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
 		finding: model.VerdictReplaceNow,
 		notes:   []string{"time-align: rasdaemon stamped 11 records of one boot"},
-		dimm:    &dimm{slot: "DIMM 0", serial: "LAB00A64", mode: model.ModeRow, rules: []string{"R-UE-01"}},
+		dimms:   []dimm{{slot: "DIMM 0", serial: "LAB00A64", ce: 10, ue: 1, grade: model.VerdictReplaceNow, mode: model.ModeRow, rules: []string{"R-UE-01"}}},
+	},
+	{
+		// Another guest with six DIMMs, booted three times a day apart. Four
+		// DIMMs have a fault each, of another shape; two have nothing. The
+		// kernel log of the copy is that of the third boot: the errors of
+		// the first two are in the rasdaemon database alone.
+		dir: "6.19.10-ghes-multi", host: "lab-arm6", virtual: "QEMU", journal: true, boots: 3, ce: 35, ue: 1, gradeA: 36, hard: 1,
+		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		finding: model.VerdictConsiderReplacement,
+		dimms: []dimm{
+			{slot: "CPU0_A1", serial: "LABM0001", ce: 3, grade: model.VerdictObserve, mode: model.ModeSingleBit, rules: []string{"R-SOFT-01"}},
+			{slot: "CPU0_B1", serial: "LABM0002", ce: 10, grade: model.VerdictConsiderReplacement, mode: model.ModeColumn, rules: []string{"R-ROW-03"}},
+			{slot: "CPU0_D1", serial: "LABM0004", ce: 10, ue: 1, grade: model.VerdictConsiderReplacement, mode: model.ModeRow, rules: []string{"R-ROW-03", "R-SCRUB-01"}},
+			{slot: "CPU0_E1", serial: "LABM0005", ce: 12, grade: model.VerdictConsiderReplacement, mode: model.ModeBank, rules: []string{"R-ROW-03"}},
+		},
 	},
 }
 
@@ -468,27 +494,35 @@ func TestCopyOfTheHost(t *testing.T) {
 					t.Errorf("first statement of the host finding: %+v", v.Evidence)
 				}
 			}
-			if c.dimm != nil {
-				d := out.Hosts[0].InSlot(c.dimm.slot)
+			listed := map[string]bool{}
+			for _, want := range c.dimms {
+				listed[want.slot] = true
+				d := out.Hosts[0].InSlot(want.slot)
 				if d == nil || d.Verdict == nil {
-					t.Fatalf("no finding for slot %q", c.dimm.slot)
+					t.Errorf("no finding for slot %q", want.slot)
+					continue
 				}
-				var ce, ue int64
 				modes := map[model.FaultMode]bool{}
 				for _, f := range d.Faults {
-					ce += f.CE
-					ue += f.UE
 					modes[f.Mode] = true
 				}
-				if d.DIMM.Serial != c.dimm.serial || d.Verdict.Grade != c.finding || !modes[c.dimm.mode] ||
-					strings.Join(d.Verdict.Rules, " ") != strings.Join(c.dimm.rules, " ") {
+				if d.DIMM.Serial != want.serial || d.Verdict.Grade != want.grade || !modes[want.mode] ||
+					strings.Join(d.Verdict.Rules, " ") != strings.Join(want.rules, " ") {
 					t.Errorf("slot %s: serial %q, finding %s, rules %v, fault modes %v\n want serial %q, %s, %v, a %s fault",
-						c.dimm.slot, d.DIMM.Serial, d.Verdict.Grade, d.Verdict.Rules, modes, c.dimm.serial, c.finding, c.dimm.rules, c.dimm.mode)
+						want.slot, d.DIMM.Serial, d.Verdict.Grade, d.Verdict.Rules, modes, want.serial, want.grade, want.rules, want.mode)
 				}
-				if d.Features.CE != c.ce || d.Features.UE != c.ue {
-					t.Errorf("slot %s: CE %d, UE %d; want %d, %d", c.dimm.slot, d.Features.CE, d.Features.UE, c.ce, c.ue)
+				if d.Features.CE != want.ce || d.Features.UE != want.ue {
+					t.Errorf("slot %s: CE %d, UE %d; want %d, %d", want.slot, d.Features.CE, d.Features.UE, want.ce, want.ue)
 				}
-				_, _ = ce, ue
+			}
+			// The DIMMs that were left alone have nothing.
+			for _, d := range out.Hosts[0].DIMMs {
+				if !d.Present || listed[d.Slot] {
+					continue
+				}
+				if d.Features.CE != 0 || d.Features.UE != 0 || len(d.Faults) != 0 || (d.Verdict != nil && d.Verdict.Grade != model.VerdictOK) {
+					t.Errorf("slot %s: CE %d, UE %d, %d faults, finding %+v; want nothing", d.Slot, d.Features.CE, d.Features.UE, len(d.Faults), d.Verdict)
+				}
 			}
 
 			// A second reading of the same copy adds nothing.
@@ -539,6 +573,60 @@ func TestLooseFiles(t *testing.T) {
 				t.Errorf("ledger: %+v\n  want: %+v", got, c.want())
 			}
 			compare(t, c, s, res.Host, c.earlier)
+		})
+	}
+}
+
+// TestEveryBootOfTheJournal reads the kernel messages of every boot the
+// journal of a host held, alone: a journal export of a host that was
+// restarted between its errors holds them all, each boot under its own
+// banner.
+func TestEveryBootOfTheJournal(t *testing.T) {
+	for _, c := range captures {
+		if c.boots == 0 {
+			continue
+		}
+		t.Run(c.dir, func(t *testing.T) {
+			at := capturedAt(t, c)
+			as, what, err := scan.Detect(ctx, dir(t, c, "journal-all.json"), scan.DetectOptions{Now: at, CapturedAt: at})
+			if err != nil || what != scan.WhatJournal {
+				t.Fatalf("detected as %q, %v", what, err)
+			}
+			s := ledger(t)
+			res, err := ingest.Run(ctx, s, as, ingest.Options{Now: at})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if res.Host != c.host {
+				t.Errorf("host %q, want %q", res.Host, c.host)
+			}
+			if got, want := stateOf(t, s, res.Host), (state{ce: c.ce, ue: c.ue, gradeA: c.gradeA, gradeB: c.gradeB, gradeC: c.gradeC, hard: c.hard, soft: c.soft}); got != want {
+				t.Errorf("ledger: %+v\n  want: %+v", got, want)
+			}
+			compare(t, c, s, res.Host, 0)
+			boots, err := s.Boots(ctx, res.Host)
+			if err != nil || len(boots) != c.boots {
+				t.Fatalf("%d boots, want %d (%v)", len(boots), c.boots, err)
+			}
+			// Every boot started on a day of its own and holds errors.
+			events, err := s.EventList(ctx, store.EventFilter{Host: res.Host, Kinds: []model.EventKind{model.KindError}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			perBoot := map[string]int{}
+			for _, e := range events {
+				perBoot[e.BootID]++
+			}
+			days := map[string]bool{}
+			for _, b := range boots {
+				days[b.StartedAt.UTC().Format(time.DateOnly)] = true
+				if perBoot[b.BootID] == 0 || b.Kernel == "" {
+					t.Errorf("boot %s of %s, kernel %q: %d errors", b.BootID, b.StartedAt.Format(time.RFC3339), b.Kernel, perBoot[b.BootID])
+				}
+			}
+			if len(days) != c.boots || perBoot[""] != 0 {
+				t.Errorf("boots on %d days, %d errors outside every boot", len(days), perBoot[""])
+			}
 		})
 	}
 }
