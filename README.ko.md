@@ -105,13 +105,17 @@ CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev
 
 ## 빠른 시작
 
-아직 태그한 버전이 없어서 소스에서 빌드합니다. Go 1.26 이상이 필요합니다.
+[릴리스](https://github.com/agenticode/my/releases)마다 linux/amd64, linux/arm64, darwin/arm64 아카이브와 체크섬 파일이 있습니다. x86-64 서버에 1.0.0을 받는 예입니다.
 
 ```
-go install github.com/agenticode/my/cmd/my@latest
+curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_amd64.tar.gz
+curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/SHA256SUMS
+sha256sum -c --ignore-missing SHA256SUMS
+tar -xzf my_v1.0.0_linux_amd64.tar.gz
+sudo cp my_v1.0.0_linux_amd64/my /usr/local/bin/
 ```
 
-저장소를 체크아웃했다면 `make build`가 `bin/my`를 만들고, `make cross`가 linux/amd64, linux/arm64, darwin/arm64용 바이너리를 만듭니다. 정적 링크 바이너리라서 파일 하나만 서버에 복사하면 됩니다.
+정적 링크 바이너리라서 서버에는 이 파일 하나만 있으면 됩니다. Red Hat Enterprise Linux와 그 재빌드 배포판의 `sudo`는 검색 경로에 `/usr/local/bin`을 넣지 않으므로 `sudo /usr/local/bin/my`로 실행합니다. Go 1.26 이상이 있으면 `go install github.com/agenticode/my/cmd/my@v1.0.0`으로 소스에서 빌드할 수 있고, 저장소를 체크아웃했다면 `make build`가 `bin/my`를 만듭니다.
 
 서버에서 실행합니다.
 
@@ -282,7 +286,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 
 ## 현재 상태
 
-개발 초기이고 태그한 버전이 없습니다.
+버전 1.0.0을 2026-11-16에 냈습니다. 담긴 내용은 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
 
 - 합성 호스트와 픽스처로 시험했습니다. 고장 모드, 규칙, 입력마다 시험이 있습니다.
 - 실제 호스트 5대에서 일반 사용자와 root로 실행했습니다. x86_64와 aarch64이고 5대 모두 가상 머신입니다. 결과는 [docs/validation.md](docs/validation.md)에 있습니다.
@@ -296,7 +300,6 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 ## 로드맵
 
 - 베어메탈에서 Intel, AMD, ARM 서버의 EDAC 드라이버로 오류를 주입하고 `my verify`로 대조합니다.
-- linux/amd64, linux/arm64, darwin/arm64 아카이브가 든 첫 태그 릴리스를 냅니다([docs/release.md](docs/release.md)).
 - 임계값을 불량 분석 결과와 대조합니다.
 - DDR5의 ECS 값과 DIMM의 리페어 예산을 그림으로 그립니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행합니다.

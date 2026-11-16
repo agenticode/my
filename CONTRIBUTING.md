@@ -16,7 +16,7 @@ The tables that read the memory messages of each BMC vendor rest on registries a
 
 ## Building and testing
 
-The build needs Go 1.26 or newer. The binary is pure Go and statically linked (`CGO_ENABLED=0`).
+The build needs Go 1.26 or newer. The `toolchain` line of `go.mod` names the Go version of CI and of the release archives; the go command downloads it when the installed one is older. The binary is pure Go and statically linked (`CGO_ENABLED=0`).
 
 | Command | What it does |
 | --- | --- |

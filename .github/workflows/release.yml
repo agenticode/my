@@ -1,7 +1,9 @@
 name: release
 
 # Builds the release archives when a version tag is pushed and attaches
-# them, with their checksums, to a GitHub release of that tag.
+# them, with their checksums and the entry of CHANGELOG.md for the version,
+# to a GitHub release of that tag. When the release was already published
+# from a local build, it compares the checksums instead.
 #
 # Started by hand from the Actions page it does the same up to the last
 # step: the archives are kept with the run for a few days and nothing is
@@ -58,10 +60,25 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 7
-      - name: publish the release
+      - name: notes of the release from CHANGELOG.md
+        if: github.ref_type == 'tag'
+        run: .github/scripts/release-notes.sh "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+      # A release published by hand from a local build before this step is
+      # left as it is, and its checksums must be those of this build.
+      - name: publish the release, or compare it with this build
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          gh release create "$GITHUB_REF_NAME" dist/my_"$GITHUB_REF_NAME"_*.tar.gz dist/SHA256SUMS
-          --verify-tag --title "MemorY $GITHUB_REF_NAME" --generate-notes
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release download "$GITHUB_REF_NAME" --pattern SHA256SUMS --dir "$RUNNER_TEMP/published"
+            if diff "$RUNNER_TEMP/published/SHA256SUMS" dist/SHA256SUMS; then
+              echo "the published release $GITHUB_REF_NAME has the checksums of this build"
+            else
+              echo "FAILED: the published release $GITHUB_REF_NAME differs from this build"
+              exit 1
+            fi
+          else
+            gh release create "$GITHUB_REF_NAME" dist/my_"$GITHUB_REF_NAME"_*.tar.gz dist/SHA256SUMS \
+              --verify-tag --title "MemorY ${GITHUB_REF_NAME#v}" --notes-file "$RUNNER_TEMP/notes.md"
+          fi

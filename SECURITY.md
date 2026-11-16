@@ -10,7 +10,7 @@ You will get an answer that the report arrived. The fix is published with a note
 
 ## Supported versions
 
-No version is tagged yet. Fixes go to the `main` branch.
+Security fixes go into the latest release, as its next patch version, and into the `main` branch. [CHANGELOG.md](CHANGELOG.md) lists the releases.
 
 ## What counts
 

@@ -105,13 +105,17 @@ In the address map a horizontal line is a row fault, a vertical line a column fa
 
 ## Quick start
 
-No version is tagged yet, so the binary is built from source with Go 1.26 or newer:
+Each [release](https://github.com/agenticode/my/releases) has an archive for linux/amd64, linux/arm64 and darwin/arm64, and their checksums. For version 1.0.0 on an x86-64 server:
 
 ```
-go install github.com/agenticode/my/cmd/my@latest
+curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_amd64.tar.gz
+curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/SHA256SUMS
+sha256sum -c --ignore-missing SHA256SUMS
+tar -xzf my_v1.0.0_linux_amd64.tar.gz
+sudo cp my_v1.0.0_linux_amd64/my /usr/local/bin/
 ```
 
-In a checkout, `make build` writes `bin/my`, and `make cross` the binaries for linux/amd64, linux/arm64 and darwin/arm64. The binary is statically linked: copy the one file to the server.
+The binary is statically linked: the one file is all a server needs. The `sudo` of Red Hat Enterprise Linux and its rebuilds leaves `/usr/local/bin` out of its search path; there, run it as `sudo /usr/local/bin/my`. With Go 1.26 or newer, `go install github.com/agenticode/my/cmd/my@v1.0.0` builds it from source; in a checkout, `make build` writes `bin/my`.
 
 On the server:
 
@@ -282,7 +286,7 @@ The program gets the error records of each DIMM in FMFM field names on its stand
 
 ## Status
 
-Early development; no version is tagged.
+Version 1.0.0, released on 2026-11-16. [CHANGELOG.md](CHANGELOG.md) lists what it holds.
 
 - Tested with synthetic hosts and fixtures: every fault mode, every rule and every input has tests.
 - Run on five real hosts, x86_64 and aarch64, as an unprivileged user and as root: [docs/validation.md](docs/validation.md). All five are virtual machines.
@@ -296,7 +300,6 @@ Early development; no version is tagged.
 ## Roadmap
 
 - Error injection on bare metal with the EDAC drivers of Intel, AMD and ARM servers, compared with `my verify`.
-- A first tagged release with archives for linux/amd64, linux/arm64 and darwin/arm64 ([docs/release.md](docs/release.md)).
 - Thresholds compared with failure analysis results.
 - ECS readings of DDR5 and the repair budget of a DIMM as figures.
 - A run of the analyzer of a memory vendor against the plugin contract.
