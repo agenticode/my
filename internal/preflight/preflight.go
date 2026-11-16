@@ -182,6 +182,9 @@ func Run(opts Options) *Report {
 		r.rasdaemon, r.harvest,
 	} {
 		ck := c()
+		if ck.Name == "pstore-backend" {
+			r.backendState = ck.State
+		}
 		if ck.State == Lost {
 			rep.Lost++
 		}
@@ -227,9 +230,11 @@ type run struct {
 
 	// backend is the registered pstore backend, as the pstore-backend
 	// check found it.
-	backend     string
-	crashLoaded int // -1 unknown, 0 no, 1 yes
-	mcelogd     bool
+	backend string
+	// backendState is the state of the pstore-backend check.
+	backendState State
+	crashLoaded  int // -1 unknown, 0 no, 1 yes
+	mcelogd      bool
 }
 
 // x86 reports whether the host is an x86 machine: machine check banks and

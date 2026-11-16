@@ -320,6 +320,12 @@ func (r *run) pstoreVsKdump() Check {
 	const rel = "sys/module/kernel/parameters/crash_kexec_post_notifiers"
 	v, err := r.h.read(rel)
 	c.Evidence = append(c.Evidence, r.evidence(rel, v, err))
+	if r.backend == "" && (r.backendState == Lost || r.backendState == None) {
+		// Nothing goes to pstore either way: the order of the two decides
+		// nothing until pstore has a backend, which pstore-backend says.
+		c.State, c.Detail = Info, statement("pf.kexec.no_backend")
+		return c
+	}
 	if (err == nil && strings.EqualFold(v, "Y")) || r.cmd.has("crash_kexec_post_notifiers") {
 		c.State, c.Detail = Kept, statement("pf.kexec.post")
 		return c
