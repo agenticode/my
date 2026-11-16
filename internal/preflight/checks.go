@@ -562,6 +562,18 @@ func (r *run) mcelogDaemon(c *Check) bool {
 func (r *run) resetKind() Check {
 	c := Check{Name: "reset-kind", State: Info}
 	if nc, not := r.notX86(c.Name); not {
+		// A firmware error source on another architecture: a fatal
+		// record ends in __ghes_panic (drivers/acpi/apei/ghes.c), which
+		// panics with the timeout as it is; with panic=0 the host stays
+		// down until something outside restarts it. The aarch64 guest of
+		// the lab did (docs/validation-lab.md).
+		if nc.State == None && r.h.there("sys/firmware/acpi/tables/HEST") {
+			if v, err := r.h.read("proc/sys/kernel/panic"); err == nil && strings.TrimSpace(v) == "0" {
+				c.Evidence = append(c.Evidence, "/sys/firmware/acpi/tables/HEST: there", "/proc/sys/kernel/panic: 0")
+				c.Detail = statement("pf.reset.ghes_stays", "arch", r.info.Arch)
+				return c
+			}
+		}
 		return nc
 	}
 	const rel = "sys/kernel/reboot/mode"

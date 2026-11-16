@@ -154,6 +154,10 @@ func TestStates(t *testing.T) {
 		{name: "reset after 10 s", base: kept, with: pt.Files{"proc/sys/kernel/panic": "10\n"}, check: "reset-kind", state: preflight.Info, code: "pf.reset.mode_after"},
 		{name: "reset at once", base: kept, with: pt.Files{"proc/sys/kernel/panic": "-1\n"}, check: "reset-kind", state: preflight.Info, code: "pf.reset.mode_now"},
 		{name: "reset on arm", base: kept, with: arm, check: "reset-kind", state: preflight.None, code: "pf.not_x86"},
+		{name: "reset on arm with a firmware error source", base: kept, with: merge(arm, pt.Files{"sys/firmware/acpi/tables/HEST": "HEST", "proc/sys/kernel/panic": "0\n"}),
+			check: "reset-kind", state: preflight.Info, code: "pf.reset.ghes_stays"},
+		{name: "reset on arm with a panic timeout", base: kept, with: merge(arm, pt.Files{"sys/firmware/acpi/tables/HEST": "HEST", "proc/sys/kernel/panic": "30\n"}),
+			check: "reset-kind", state: preflight.None, code: "pf.not_x86"},
 
 		// bert
 		{name: "bert there", base: kept, check: "bert", state: preflight.Kept, code: "pf.bert.kept"},
@@ -385,4 +389,15 @@ func TestCatalog(t *testing.T) {
 			t.Errorf("%s lacks a language", code)
 		}
 	}
+}
+
+// merge returns the files of all sets, later sets winning.
+func merge(sets ...pt.Files) pt.Files {
+	out := pt.Files{}
+	for _, set := range sets {
+		for k, v := range set {
+			out[k] = v
+		}
+	}
+	return out
 }
