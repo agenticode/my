@@ -102,15 +102,22 @@ func logPath(res *resource) string {
 }
 
 // entryTime reads the time of a log entry.
+//
+// EventTimestamp is when the event happened, Created when the entry was
+// written: the time of the record is the first, when it is given. The
+// text that identifies the entry is Created as it stands.
 func entryTime(o object) (string, time.Time, bool) {
-	for _, key := range []string{"Created", "EventTimestamp"} {
-		if text := str(o, key); text != "" {
-			if at, ok := parseTime(text); ok {
-				return text, at, true
-			}
+	created := str(o, "Created")
+	if at, ok := parseTime(str(o, "EventTimestamp")); ok {
+		if created == "" {
+			created = str(o, "EventTimestamp")
 		}
+		return created, at, true
 	}
-	return str(o, "Created"), time.Time{}, false
+	if at, ok := parseTime(created); ok {
+		return created, at, true
+	}
+	return created, time.Time{}, false
 }
 
 // cover notes one entry of a log, of any kind, for the period the log

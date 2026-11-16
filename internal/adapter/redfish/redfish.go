@@ -333,6 +333,9 @@ func odataType(o object) string {
 // object without a type is recognised by the properties only that kind of
 // resource has, because some tools strip the type when they save a log.
 func kindOf(o object) string {
+	if isMessageRegistry(o) {
+		return "MessageRegistry"
+	}
 	switch t := odataType(o); t {
 	case "LogEntry", "Memory", "ComputerSystem", "MemoryMetrics", "Bios", "AttributeRegistry", "ServiceRoot", "Manager", "LogService":
 		return t
@@ -380,9 +383,15 @@ type run struct {
 	// What the BMC says beyond events and the inventory.
 	bios       []resource
 	registries []resource
-	roots      []resource
-	managers   []resource
-	logSvcs    []resource
+	// msgRegistries are the message registries of the dump, read into
+	// msgRegs by prefix.
+	msgRegistries []resource
+	msgRegs       map[string][]*bmcRegistry
+	// docSize is the size of the file being walked.
+	docSize  int
+	roots    []resource
+	managers []resource
+	logSvcs  []resource
 	// metrics are the MemoryMetrics resources by their URI.
 	metrics map[string]*resource
 	// counts is what collections say about how many members they have,
@@ -502,6 +511,7 @@ func (r *run) scan(d *document) {
 			return
 		}
 	}
+	r.docSize = len(d.data)
 	dec := json.NewDecoder(bytes.NewReader(bytes.TrimPrefix(d.data, []byte("\xef\xbb\xbf"))))
 	dec.UseNumber()
 	values := 0
@@ -565,6 +575,12 @@ func (r *run) walk(v any, name, file, pos string, depth int) {
 					r.bios = append(r.bios, res)
 				case "AttributeRegistry":
 					r.registries = append(r.registries, res)
+				case "MessageRegistry":
+					if len(r.msgRegistries) < 64 && r.docSize <= maxRegistryBytes {
+						r.msgRegistries = append(r.msgRegistries, res)
+					} else {
+						r.tally.Skip(res.ref, "a message registry larger than 16 MiB, or beyond the 64th, is not read")
+					}
 				case "ServiceRoot":
 					r.roots = append(r.roots, res)
 				case "Manager":
@@ -675,7 +691,11 @@ func (r *run) emit(sink adapter.Sink) error {
 	if err := r.settings(sink); err != nil {
 		return err
 	}
+	r.readRegistries()
 	if err := r.logs(sink); err != nil {
+		return err
+	}
+	if err := r.registriesSeen(sink); err != nil {
 		return err
 	}
 	return r.controller(sink)

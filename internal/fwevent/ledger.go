@@ -31,6 +31,8 @@ type Record struct {
 	// Place by numbers, when the record gives them.
 	SocketId, ChannelId, ChannelSlotId, Rank, DeviceId, BankGroup, Bank, Row, Column model.Opt[int]
 	Address                                                                          model.Opt[uint64]
+	// SMBIOSHandle is the SMBIOS type 17 handle a record names.
+	SMBIOSHandle model.Opt[int]
 	// Decoder names the format the place fields were read from.
 	Decoder string
 	// Method is the actor of a step: "bios", "bmc", or the generator of a
@@ -131,7 +133,7 @@ func (r *Record) Ledger() (Out, error) {
 		e := &model.Event{Kind: model.KindError, ErrorDT: r.At, TimeQuality: quality, ErrorSeverity: sev, ErrorScrubType: scrub,
 			ErrorType: r.Text, Count: 1, SocketId: r.SocketId, ChannelId: r.ChannelId, ChannelSlotId: r.ChannelSlotId,
 			Rank: r.Rank, DeviceId: r.DeviceId, BankGroup: r.BankGroup, Bank: r.Bank, Row: r.Row, Column: r.Column,
-			OsPhysicalAddress: r.Address, Source: r.Source, Decoder: r.Decoder, RawRef: r.RawRef, Raw: r.Raw,
+			OsPhysicalAddress: r.Address, SMBIOSHandle: r.SMBIOSHandle, Source: r.Source, Decoder: r.Decoder, RawRef: r.RawRef, Raw: r.Raw,
 			Fingerprint: r.Fingerprint}
 		if e.ErrorType == "" {
 			e.ErrorType = string(r.Event)
