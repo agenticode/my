@@ -41,13 +41,13 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N BE8ED6
 
  이 DIMM의 부팅별 오류
  부팅         1  2  3  4  5  6  7  8   부팅        오류
- 종료         -  -  -  S  S  S  S  -
+ 종료         -  -  -  H  H  H  H  -
  rank0 dev7 bg0 bank3 row 0x1a2f
    col 0x238  ·  ·  ▒  X  X  X  X  ·   8회 중 5회  CE 60, UE 4
 
  · 없음, ░ CE 1-9, ▒ 10-99, ▓ 100+, U UE, X 중단된 부팅의 UE, ? 부팅이 중단됐고 DIMM을 지목한 기록
  없음, - 호스트에 없던 때
- 종료: S 치명적 하드웨어 오류로 끝남, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음
+ 종료: H 치명적 하드웨어 오류로 멈춤, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음
 
  일별 오류와 이벤트
            07-31     09-01     10-01     11-12

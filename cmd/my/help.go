@@ -57,7 +57,7 @@ var words = i18n.Catalog{
 	"err.not_case":       {EN: "{path} is neither a MemorY ledger nor a case bundle", KO: "{path}은 MemorY 원장도 케이스 번들도 아님"},
 	"err.case_dir":       {EN: "{path} is a directory; a case is a ledger file or a .mycase bundle", KO: "{path}은 디렉터리임. 케이스는 원장 파일이나 .mycase 번들임"},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
-	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, 또는 생략하면 개요)"},
+	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, boots, gpu, bios, inventory, verify, report, bundle, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, boots, gpu, bios, inventory, verify, report, bundle, export, 또는 생략하면 개요)"},
 
 	"err.bundle_out":  {EN: "name the file to write with -o, for example -o case.mycase", KO: "저장할 파일을 -o로 지정해야 함 (예: -o case.mycase)"},
 	"err.key_without": {EN: "--key-file goes with --anonymize", KO: "--key-file은 --anonymize와 함께 써야 함"},
@@ -331,8 +331,8 @@ var words = i18n.Catalog{
 			"--all             슬롯이 그대로이고 오류가 없는 DIMM도 모두 나열",
 	},
 
-	"help.open.usage": {EN: "my open FILE [dimm|why|map|timeline|boots|gpu|verify ...] [flags]", KO: "my open FILE [dimm|why|map|timeline|boots|gpu|verify ...] [옵션]"},
-	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. Without a command it draws the overview; with one, the arguments of that command follow. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령을 생략하면 개요를 그리고, 명령을 쓰면 그 명령의 인자가 이어집니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
+	"help.open.usage": {EN: "my open FILE [COMMAND ...] [flags]", KO: "my open FILE [명령 ...] [옵션]"},
+	"help.open.text":  {EN: "Shows a stored case the way the commands show this host: FILE is a case bundle (.mycase) or a ledger file. COMMAND is one of dimm, why, map, timeline, boots, gpu, bios, inventory, verify, report, bundle and export, followed by the arguments of that command; without one it draws the overview. The file is not changed and the host is not scanned.", KO: "저장된 케이스를 이 호스트를 볼 때와 같은 화면으로 보여줍니다. FILE은 케이스 번들(.mycase)이나 원장 파일입니다. 명령은 dimm, why, map, timeline, boots, gpu, bios, inventory, verify, report, bundle, export 중 하나이고 그 명령의 인자가 뒤에 옵니다. 명령을 생략하면 개요를 그립니다. 파일을 바꾸지 않고 호스트를 스캔하지 않습니다."},
 
 	"help.bundle.usage": {EN: "my bundle [slot|serial] -o FILE [--anonymize] [flags]", KO: "my bundle [슬롯|시리얼] -o FILE [--anonymize] [옵션]"},
 	"help.bundle.text":  {EN: "Scans this host and writes what it found as one file, a case bundle: the ledger with the error records, DIMM identities, boots and actions, the findings of this run, a manifest of what was collected, and the source inventory. A bundle holds records about memory errors and never the contents of memory. Naming a DIMM makes it the subject of the case; the bundle still holds the whole host, because a finding about one DIMM rests on its neighbours too. The file is a ZIP archive: \"unzip -l\" lists it. The exit code is 0 when the bundle was written.", KO: "이 호스트를 스캔해 찾은 것을 파일 하나(케이스 번들)로 저장합니다. 오류 기록, DIMM 신원, 부팅과 조치 이력이 든 원장, 이번 실행의 소견, 수집 항목 목록, 소스 인벤토리가 들어갑니다. 번들에는 메모리 오류 기록만 들어가며 메모리 내용은 들어가지 않습니다. DIMM을 지정하면 그 DIMM이 케이스 대상이 됩니다. 그래도 번들에는 호스트 전체가 들어갑니다. DIMM 하나의 소견이 이웃 DIMM에도 기대기 때문입니다. 파일은 ZIP 형식이라 \"unzip -l\"로 목록을 볼 수 있습니다. 번들을 저장하면 종료 코드는 0입니다."},
@@ -362,7 +362,8 @@ var words = i18n.Catalog{
 			"--nvidia-query LIST the fields of an nvidia-smi query that was saved without its\n" +
 			"                    header line (index,uuid,remapped_rows.failure)\n" +
 			"--ledger FILE       keep the import in the ledger FILE and add to it on every run\n" +
-			"--anonymize         with -o: replace host names and network addresses\n" +
+			"--anonymize         with -o: replace host names, IP and MAC addresses, and the names of\n" +
+			"                    home directories in file paths; DIMM serial numbers stay\n" +
 			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force             replace FILE when it exists\n" +
 			"--all               in the overview, list every DIMM",
@@ -374,7 +375,8 @@ var words = i18n.Catalog{
 			"--nvidia-query LIST 헤더 줄 없이 저장한 nvidia-smi 쿼리 출력의 필드 목록\n" +
 			"                    (index,uuid,remapped_rows.failure)\n" +
 			"--ledger FILE       가져온 것을 원장 FILE에 남기고 실행할 때마다 누적\n" +
-			"--anonymize         -o와 함께: 호스트 이름과 네트워크 주소를 바꿈\n" +
+			"--anonymize         -o와 함께: 호스트 이름, IP 주소, MAC 주소, 파일 경로의 홈 디렉터리 이름을\n" +
+			"                    바꿈. DIMM 시리얼은 그대로 둠\n" +
 			"--key-file FILE     --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
 			"--force             FILE이 있으면 덮어씀\n" +
 			"--all               개요에 모든 DIMM을 나열",

@@ -143,7 +143,7 @@ var Messages = i18n.Catalog{
 	"boots.quiet":          {EN: "{n} {n|DIMM|DIMMs} without errors in these boots", KO: "이 부팅 동안 오류 없는 DIMM {n}개"},
 	"boots.legend":         {EN: "{g0} none, {g1} 1-9 corrected, {g2} 10-99, {g3} 100+, U uncorrected, {ue} uncorrected in a boot that stopped, ? the boot stopped and no record names a DIMM, - not in the host", KO: "{g0} 없음, {g1} CE 1-9, {g2} 10-99, {g3} 100+, U UE, {ue} 중단된 부팅의 UE, ? 부팅이 중단됐고 DIMM을 지목한 기록 없음, - 호스트에 없던 때"},
 	"boots.legend_words":   {EN: "ended: STOP a fatal hardware error ended the boot, panic another panic, running the boot of the latest scan, - not on record", KO: "종료: 중단은 치명적 하드웨어 오류로 끝난 부팅, panic은 다른 panic, 실행중은 최근 스캔 때의 부팅, -는 기록 없음"},
-	"boots.legend_letters": {EN: "ended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, - not on record", KO: "종료: S 치명적 하드웨어 오류로 끝남, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음"},
+	"boots.legend_letters": {EN: "ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, - not on record", KO: "종료: H 치명적 하드웨어 오류로 멈춤, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음"},
 	"boots.title":          {EN: "boots of this DIMM", KO: "이 DIMM의 부팅별 오류"},
 
 	"tl.boots":            {EN: "the latest boots: a day above can hold several of them", KO: "최근 부팅: 위의 하루 칸에 여러 부팅이 들어갈 수 있음"},

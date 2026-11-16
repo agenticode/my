@@ -52,7 +52,7 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4  Example Memory EXM64G48R2X4-A  S/N 3B9C56  in th
 
  · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X uncorrected in a boot that stopped, ? the boot stopped and no record names a
  DIMM, - not in the host
- ended: S a fatal hardware error ended the boot, p another panic, r the boot of the latest scan, - not on record
+ ended: H a fatal hardware error halted the boot, p another panic, r the boot of the latest scan, - not on record
 
  errors per day and events
            07-31           09-01          10-01            11-12
