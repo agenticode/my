@@ -49,6 +49,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	keyFile := o.fs.String("key-file", "", "")
 	force := o.fs.Bool("force", false, "")
 	all := o.fs.Bool("all", false, "")
+	strict := o.fs.Bool("strict", false, "")
 	pos, lang, code, done := o.parse(env, args)
 	if done {
 		return code
@@ -106,23 +107,31 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	defer os.RemoveAll(tmp)
 	dopts.TempDir = tmp
 
-	// Every input is recognised before anything is read: a file that is
-	// not understood stops the import, it is never passed over.
+	// Every input is recognised before anything is read. An input that is
+	// not recognised is never passed over in silence: it is a source of
+	// its own that says what the input looks like, and with --strict, or
+	// when nothing else is readable, it stops the import.
 	inputs := make([]input, len(pos))
 	counts := make([]int, len(pos))
 	var adapters []adapter.Adapter
 	var unknown []string
+	recognised := 0
 	for i, p := range pos {
 		as, what, err := scan.Detect(ctx, p, dopts)
 		if err != nil {
-			unknown = append(unknown, errText(lang, err))
+			text := errText(lang, err)
+			unknown = append(unknown, text)
+			inputs[i] = input{Path: p, What: say(lang, "import.unknown"), Sources: []model.Source{}}
+			counts[i] = 1
+			adapters = append(adapters, adapter.Unrecognised(p, text))
 			continue
 		}
+		recognised++
 		inputs[i] = input{Path: p, What: what, Sources: []model.Source{}}
 		counts[i] = len(as)
 		adapters = append(adapters, as...)
 	}
-	if len(unknown) > 0 {
+	if len(unknown) > 0 && (*strict || recognised == 0) {
 		for _, u := range unknown {
 			fmt.Fprintf(env.Stderr, "%s: %s\n", o.name, u)
 		}
@@ -288,8 +297,14 @@ func importLine(w io.Writer, lang i18n.Lang, st term.Style, src model.Source) {
 	if src.Actions > 0 {
 		parts = append(parts, say(lang, "import.actions", "n", src.Actions))
 	}
-	if src.Skipped > 0 {
-		parts = append(parts, say(lang, "import.skipped", "n", src.Skipped))
+	if n := src.Skipped - src.Unread; n > 0 {
+		parts = append(parts, say(lang, "import.skipped", "n", n))
+	}
+	if src.Unread > 0 {
+		parts = append(parts, say(lang, "import.unread", "n", src.Unread))
+	}
+	if src.Faults > 0 && src.Status == model.SourceError {
+		parts = append(parts, say(lang, "import.failed"))
 	}
 	if len(parts) > 0 {
 		line += ", " + strings.Join(parts, ", ")

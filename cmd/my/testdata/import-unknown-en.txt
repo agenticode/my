@@ -1,0 +1,16 @@
+kern.log: kernel log
+  klog: ok, 7 records, 3 error records (grade A), 1 action
+notes.txt: not recognised
+  unknown: read failed
+      notes.txt: not an input this tool reads: text of no known kind (it starts "rack 12, slot 4:
+      replaced the fan on Tuesday")
+sel.txt: BMC event log (SEL)
+  sel: partly read, 2 records, 1 error record (grade C), 1 not understood
+      2 records read (ipmitool sel list)
+      1 times carry no zone and were read as UTC; ipmitool prints the local time of the machine it
+      runs on
+      skipped sel.txt#L2: memory sensor record has no readable time
+host r07-n011: 4 error records and 1 action added, 0 reported by more than one source and counted once
+case bundle written: case-en.mycase (15.8 kB)
+  host r07-n011, finding: consider replacement
+look at it: my open case-en.mycase

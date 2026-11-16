@@ -217,6 +217,10 @@ type Source struct {
 	Events     int    `json:"events"`
 	Actions    int    `json:"actions"`
 	Skipped    int    `json:"skipped"`
+	// Unread counts the records among Skipped the reader did not
+	// understand, Faults the faults of the reader that were caught.
+	Unread int `json:"unread,omitzero"`
+	Faults int `json:"faults,omitzero"`
 	// Grade is the best observation grade among the events of the source.
 	Grade model.Grade `json:"grade,omitzero"`
 	First time.Time   `json:"first,omitzero"`
@@ -350,9 +354,13 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 	for i, s := range srcs {
 		ov.Sources = append(ov.Sources, Source{
 			Kind: s.Kind, Name: names[i], Origin: s.Origin, Status: s.Status, StatusText: c.statusText(s.Status), Detail: s.Detail,
-			Records: s.Records, Events: s.Events, Actions: s.Actions, Skipped: s.Skipped, Grade: s.BestGrade(),
+			Records: s.Records, Events: s.Events, Actions: s.Actions, Skipped: s.Skipped, Unread: s.Unread, Faults: s.Faults, Grade: s.BestGrade(),
 			First: s.FirstTS, Last: s.LastTS, Notes: s.Notes,
 		})
+		if s.Kind == model.SourceKindUnknown {
+			// An input no reader recognised: listed, not missed.
+			continue
+		}
 		switch s.Status {
 		case model.SourceUnreadable:
 			unreadable = append(unreadable, s.Kind)

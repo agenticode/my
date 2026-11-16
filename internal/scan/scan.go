@@ -32,9 +32,11 @@
 package scan
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -302,9 +304,15 @@ func sourceList(ctx context.Context, opts Options) []tagged {
 	add(false, daemonCounts(&opts, now)...)
 
 	sm := adapter.Adapter(smbios.NewRoot(opts.root(), smbios.Options{Now: now}))
-	if !opts.Live && !exists(opts.path(smbios.TablesDir+"/DMI")) {
+	if !opts.Live && !tablesReadable(opts.path(smbios.TablesDir+"/DMI")) {
 		for _, rel := range DmidecodeFiles {
 			if p := opts.path(rel); exists(p) {
+				// Tables that are there and hold no structure are listed;
+				// the text of dmidecode stands in for them.
+				if exists(opts.path(smbios.TablesDir + "/DMI")) {
+					add(false, report{kind: smbios.Kind, origin: opts.path(smbios.TablesDir + "/DMI"), status: model.SourceError,
+						detail: "the SMBIOS tables of the copy hold no structure that can be read; " + rel + " was read in their place"})
+				}
 				sm = smbios.NewDmidecodeFile(p, smbios.Options{Now: now})
 				break
 			}
@@ -512,6 +520,7 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 	}
 
 	var denied []adapter.Adapter
+	var notLog []adapter.Adapter
 	for _, rel := range LogFiles {
 		p := opts.path(rel)
 		fi, err := os.Stat(p)
@@ -527,10 +536,19 @@ func kernelLog(ctx context.Context, opts *Options, info hostinfo.Info) []adapter
 			}
 			continue
 		}
+		head := make([]byte, 64<<10)
+		n, _ := io.ReadFull(f, head)
 		f.Close()
-		return append(out, klog.NewFile(p, kopts))
+		// A file that holds no line of a kernel log does not stand in for
+		// the next one: it is listed, and the next one is read.
+		if text := bytes.TrimLeft(head[:n], " \t\r\n\xef\xbb\xbf"); len(text) > 0 && !looksLikeKernelLog(text) {
+			notLog = append(notLog, report{kind: klog.Kind, origin: p, status: model.SourceError,
+				detail: "holds no line of a kernel log; the next kernel log file was read"})
+			continue
+		}
+		return append(append(out, klog.NewFile(p, kopts)), notLog...)
 	}
-	out = append(out, denied...)
+	out = append(append(out, notLog...), denied...)
 	if len(out) == 0 {
 		// Nothing was found at all: one entry says so.
 		where := opts.path(LogFiles[0])
@@ -613,4 +631,19 @@ func (r report) Kind() string   { return r.kind }
 func (r report) Origin() string { return r.origin }
 func (r report) Collect(context.Context, adapter.Sink) adapter.Report {
 	return adapter.Report{Kind: r.kind, Origin: r.origin, Status: r.status, Detail: r.detail}
+}
+
+// tablesReadable reports whether the SMBIOS tables of a copy are there and
+// hold at least one structure.
+func tablesReadable(path string) bool {
+	fi, err := os.Stat(path)
+	if err != nil || fi.IsDir() || fi.Size() > 16<<20 {
+		return false
+	}
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	structs := adapter.Guard(func() []smbios.Structure { st, _ := smbios.ParseTable(b); return st })
+	return len(structs) > 0
 }

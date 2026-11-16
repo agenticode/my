@@ -479,7 +479,8 @@ func newHostFacts(in *Input, name string, h *HostResult) *hostFacts {
 		if !ids[src.ScanID] {
 			continue
 		}
-		if latest != nil && src.ScanID == latest.ID {
+		// An input no reader recognised is no source that was missed.
+		if latest != nil && src.ScanID == latest.ID && src.Kind != model.SourceKindUnknown {
 			hf.sources = append(hf.sources, src)
 		}
 		if errorSourceKinds[src.Kind] {

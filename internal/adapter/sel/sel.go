@@ -171,8 +171,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		return rep
 	}
 	rep.Notes = append(rep.Notes, r.notes()...)
-	rep.Skipped = r.tally.Total()
-	rep.Notes = append(rep.Notes, r.tally.Notes()...)
+	rep.AddTally(&r.tally)
 	switch {
 	case rep.Records == 0:
 		rep.Status, rep.Detail = model.SourceEmpty, "no SEL records"
@@ -388,131 +387,141 @@ func (r *reader) emit(sink adapter.Sink, form string) error {
 				return stopped{err}
 			}
 		}
+		if i == adapter.MaxRecords {
+			// The rest is counted and left out; the log is read in part.
+			r.tally.Skip(r.entries[i].ref, fmt.Sprintf("%d records after the first %d were not read", len(r.entries)-i, adapter.MaxRecords))
+			break
+		}
 		e := &r.entries[i]
-		if e.other != "" {
-			if r.otherRecords == nil {
-				r.otherRecords = map[string]int{}
-			}
-			r.otherRecords[e.other]++
-			continue
-		}
-		isMemory := e.typeCode == ipmi.SensorMemory || (e.typeCode < 0 && sensorTypeIs(e.sensorType, "Memory"))
-		isLogging := e.typeCode == ipmi.SensorEventLogging || (e.typeCode < 0 && sensorTypeIs(e.sensorType, "Event Logging Disabled"))
-		if isLogging {
-			r.logging(e)
-		}
-		if !isMemory {
-			r.otherSensors++
-			continue
-		}
-		r.memory++
-		if !e.hasTime {
-			r.tally.Skip(e.ref, "memory sensor record has no readable time")
-			continue
-		}
-
-		// What happened: from the event bytes when they are known, from the
-		// description otherwise.
-		ev, rest := ipmi.MemUnknown, ""
-		switch {
-		case e.rec != nil && e.rec.EventType == ipmi.EventTypeSensorSpecific:
-			ev = ipmi.MemoryEventOf(*e.rec)
-			_, rest = ipmi.MemoryEventFromText(e.desc)
-		case e.rec == nil:
-			ev, rest = ipmi.MemoryEventFromText(e.desc)
-		}
-		labels := r.labels(e, rest)
-		fp := model.Fingerprint(Kind, e.id, e.wall, fmt.Sprint(int(ev)), strings.ToLower(strings.TrimSpace(e.desc)), fmt.Sprint(e.deassert))
-		info := func(text string) *model.Event {
-			return &model.Event{Kind: model.KindError, ErrorSeverity: model.SevInformational, ErrorType: text, Count: 1,
-				Source: source, Decoder: "ipmi/sel", RawRef: e.ref, Raw: e.raw, Fingerprint: fp}
-		}
-
-		if ev == ipmi.MemUnknown {
-			// A memory sensor said something this reader has no class for.
-			text := strings.TrimSpace(e.desc)
-			if text == "" && e.rec != nil {
-				text = fmt.Sprintf("event type %02xh, data %02x%02x%02x", e.rec.EventType, e.rec.Data[0], e.rec.Data[1], e.rec.Data[2])
-			}
-			if text == "" {
-				r.tally.Skip(e.ref, "memory sensor record has no description")
-				continue
-			}
-			if e.deassert {
-				text += " (deasserted)"
-			}
-			if r.unclassified == nil {
-				r.unclassified = map[string]int{}
-			}
-			r.unclassified[text]++
-			x := info(text)
-			if len(labels) == 1 {
-				x.Label = labels[0]
-			}
-			outs = append(outs, out{ev: x, e: e, name: ev})
-			continue
-		}
-
-		m := ev.Meaning()
-		if e.deassert {
-			if ev == ipmi.MemDeviceDisabled {
-				// The module is in use again. A disable this log recorded
-				// before for the same module no longer holds.
-				for j := len(outs) - 1; j >= 0; j-- {
-					o := &outs[j]
-					if o.act == nil || o.act.Kind != model.ActionDisable || !sameModule(o.e, e, o.act.Label, labels) {
-						continue
-					}
-					was := info(ev.String() + " (enabled again later)")
-					was.RawRef, was.Raw, was.Label, was.Fingerprint = o.act.RawRef, o.act.Raw, o.act.Label, o.act.Fingerprint
-					o.ev, o.act = was, nil
-					r.cancelled++
+		if err := adapter.Each(&r.tally, e.ref, e.raw, func() error {
+			if e.other != "" {
+				if r.otherRecords == nil {
+					r.otherRecords = map[string]int{}
 				}
-				x := info(ev.String() + " (deasserted: in use again)")
+				r.otherRecords[e.other]++
+				return nil
+			}
+			isMemory := e.typeCode == ipmi.SensorMemory || (e.typeCode < 0 && sensorTypeIs(e.sensorType, "Memory"))
+			isLogging := e.typeCode == ipmi.SensorEventLogging || (e.typeCode < 0 && sensorTypeIs(e.sensorType, "Event Logging Disabled"))
+			if isLogging {
+				r.logging(e)
+			}
+			if !isMemory {
+				r.otherSensors++
+				return nil
+			}
+			r.memory++
+			if !e.hasTime {
+				r.tally.Unread(e.ref, "memory sensor record has no readable time", e.raw)
+				return nil
+			}
+
+			// What happened: from the event bytes when they are known, from the
+			// description otherwise.
+			ev, rest := ipmi.MemUnknown, ""
+			switch {
+			case e.rec != nil && e.rec.EventType == ipmi.EventTypeSensorSpecific:
+				ev = ipmi.MemoryEventOf(*e.rec)
+				_, rest = ipmi.MemoryEventFromText(e.desc)
+			case e.rec == nil:
+				ev, rest = ipmi.MemoryEventFromText(e.desc)
+			}
+			labels := r.labels(e, rest)
+			fp := model.Fingerprint(Kind, e.id, e.wall, fmt.Sprint(int(ev)), strings.ToLower(strings.TrimSpace(e.desc)), fmt.Sprint(e.deassert))
+			info := func(text string) *model.Event {
+				return &model.Event{Kind: model.KindError, ErrorSeverity: model.SevInformational, ErrorType: text, Count: 1,
+					Source: source, Decoder: "ipmi/sel", RawRef: e.ref, Raw: e.raw, Fingerprint: fp}
+			}
+
+			if ev == ipmi.MemUnknown {
+				// A memory sensor said something this reader has no class for.
+				text := strings.TrimSpace(e.desc)
+				if text == "" && e.rec != nil {
+					text = fmt.Sprintf("event type %02xh, data %02x%02x%02x", e.rec.EventType, e.rec.Data[0], e.rec.Data[1], e.rec.Data[2])
+				}
+				if text == "" {
+					r.tally.Unread(e.ref, "memory sensor record has no description", e.raw)
+					return nil
+				}
+				if e.deassert {
+					text += " (deasserted)"
+				}
+				if r.unclassified == nil {
+					r.unclassified = map[string]int{}
+				}
+				r.unclassified[text]++
+				x := info(text)
 				if len(labels) == 1 {
 					x.Label = labels[0]
 				}
 				outs = append(outs, out{ev: x, e: e, name: ev})
-				continue
+				return nil
 			}
-			r.cleared++
-			continue
-		}
 
-		switch m.Class {
-		case ipmi.ClassNone:
-			r.presence++
-		case ipmi.ClassError, ipmi.ClassInfo:
-			x := info(ev.String())
-			x.ErrorSeverity, x.ErrorScrubType = m.Severity, m.Scrub
-			switch len(labels) {
-			case 1:
-				x.Label = labels[0]
-			case 0:
-				if m.Class == ipmi.ClassError {
+			m := ev.Meaning()
+			if e.deassert {
+				if ev == ipmi.MemDeviceDisabled {
+					// The module is in use again. A disable this log recorded
+					// before for the same module no longer holds.
+					for j := len(outs) - 1; j >= 0; j-- {
+						o := &outs[j]
+						if o.act == nil || o.act.Kind != model.ActionDisable || !sameModule(o.e, e, o.act.Label, labels) {
+							continue
+						}
+						was := info(ev.String() + " (enabled again later)")
+						was.RawRef, was.Raw, was.Label, was.Fingerprint = o.act.RawRef, o.act.Raw, o.act.Label, o.act.Fingerprint
+						o.ev, o.act = was, nil
+						r.cancelled++
+					}
+					x := info(ev.String() + " (deasserted: in use again)")
+					if len(labels) == 1 {
+						x.Label = labels[0]
+					}
+					outs = append(outs, out{ev: x, e: e, name: ev})
+					return nil
+				}
+				r.cleared++
+				return nil
+			}
+
+			switch m.Class {
+			case ipmi.ClassNone:
+				r.presence++
+			case ipmi.ClassError, ipmi.ClassInfo:
+				x := info(ev.String())
+				x.ErrorSeverity, x.ErrorScrubType = m.Severity, m.Scrub
+				switch len(labels) {
+				case 1:
+					x.Label = labels[0]
+				case 0:
+					if m.Class == ipmi.ClassError {
+						r.unnamedModule++
+					}
+				default:
+					// One record that names several modules is one error on
+					// one of them.
+					x.ErrorType += " on one of " + strings.Join(labels, ", ")
+					r.multiDIMM++
+				}
+				if ev == ipmi.MemLogLimit {
+					r.logLimit = append(r.logLimit, e.t)
+				}
+				outs = append(outs, out{ev: x, e: e, name: ev})
+			case ipmi.ClassAction:
+				targets := labels
+				if len(targets) == 0 {
+					targets = []string{""}
 					r.unnamedModule++
 				}
-			default:
-				// One record that names several modules is one error on
-				// one of them.
-				x.ErrorType += " on one of " + strings.Join(labels, ", ")
-				r.multiDIMM++
+				for n, label := range targets {
+					a := &model.Action{Kind: m.Action, Method: e.generator, Result: m.Result, Label: label, Detail: ev.String(),
+						Source: source, RawRef: e.ref, Raw: e.raw, Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}
+					outs = append(outs, out{act: a, e: e, name: ev})
+				}
 			}
-			if ev == ipmi.MemLogLimit {
-				r.logLimit = append(r.logLimit, e.t)
-			}
-			outs = append(outs, out{ev: x, e: e, name: ev})
-		case ipmi.ClassAction:
-			targets := labels
-			if len(targets) == 0 {
-				targets = []string{""}
-				r.unnamedModule++
-			}
-			for n, label := range targets {
-				a := &model.Action{Kind: m.Action, Method: e.generator, Result: m.Result, Label: label, Detail: ev.String(),
-					Source: source, RawRef: e.ref, Raw: e.raw, Fingerprint: model.Fingerprint(fp, fmt.Sprint(n))}
-				outs = append(outs, out{act: a, e: e, name: ev})
-			}
+			return nil
+		}); err != nil {
+			return err
 		}
 	}
 

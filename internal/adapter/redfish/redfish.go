@@ -457,8 +457,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		}
 		return rep
 	}
-	rep.Skipped = r.tally.Total()
-	rep.Notes = append(rep.Notes, r.tally.Notes()...)
+	rep.AddTally(&r.tally)
 	switch {
 	case len(docs) == 0:
 		rep.Status, rep.Detail = model.SourceEmpty, "no JSON files"
@@ -514,7 +513,7 @@ func (r *run) scan(d *document) {
 		}
 		if err != nil {
 			r.badDocs++
-			r.tally.Skip(name, "not readable as JSON: "+err.Error())
+			r.tally.Unread(name, "not readable as JSON: "+err.Error(), string(d.data[:min(len(d.data), 4<<10)]))
 			return
 		}
 		values++
