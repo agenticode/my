@@ -55,7 +55,7 @@ case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C
 | `anonymized` | whether names and addresses were replaced |
 | `anonymization` | on an anonymized bundle: how many host names (`hosts`), network addresses (`addresses`) and home directories (`users`) were replaced, and whether the sender gave a key (`keyed`) |
 | `subject` | the DIMM the case is about, when the sender named one: `host`, `slot`, `serial`, `dimm_uid` |
-| `hosts` | per host: `name`, the number of DIMMs, `ce` and `ue`, the number of records, and the first and the last time |
+| `hosts` | per host: `name`, the number of DIMMs, `ce` and `ue`, the number of records, the first and the last time, the boots on record with those of them a fatal hardware error ended (`boots`, `stops`, `panics`), and the kinds of the sources that gave records (`sources`: `klog`, `rasdaemon`, `pstore`, `kdump`, `bert` and the others) |
 | `collected` | per table of the ledger: its name, the number of rows, and what a row is |
 | `not_collected` | what a bundle never holds, as text |
 

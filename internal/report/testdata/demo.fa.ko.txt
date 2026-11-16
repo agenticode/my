@@ -77,6 +77,124 @@ section#s2.sec
     | 2 | CPU1_D1 | 2AEB41 | 53 | 0 | single bit | 감소 | 관찰 | R-SOFT-01
   p.how: 오류나 소견이 있는 DIMM을 위험한 순서로 나열합니다. CE와 UE는 원장에서 센 누적값이라 재부팅해도 줄지 않습니다. 추세는 최근 30일을 3일씩 그리며 줄마다 눈금이 다릅니다.
   p: 오류 없는 DIMM 14개
+  ### 부팅
+  figure
+    svg.fig.boots: r12-n034의 최근 부팅 4회와 부팅마다 DIMM별로 보인 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 25 d, 종료 기록 없음
+      mark: 부팅 2, 2026-08-26 02:00 UTC 시작, 실행 시간 34 d, 종료 기록 없음
+      mark: 부팅 3, 2026-09-30 02:00 UTC 시작, 실행 시간 27 d, 종료 기록 없음
+      mark: 부팅 4, 2026-10-28 01:30 UTC 시작, 실행 시간 15 d, 종료 기록 없음
+      mark: CPU0_C1, 부팅 1: 오류 없음
+      mark: CPU0_C1, 부팅 2: CE 6건
+      mark: CPU0_C1, 부팅 3: CE 436건
+      mark: CPU0_C1, 부팅 4: UE 1건, CE 789건
+      mark: CPU1_D1, 부팅 1: CE 16건
+      mark: CPU1_D1, 부팅 2: CE 14건
+      mark: CPU1_D1, 부팅 3: CE 16건
+      mark: CPU1_D1, 부팅 4: CE 7건
+      text: 1 | - | 2 | - | 3 | - | 4 | - | CPU0_C1 | · | 6 | 99+ | U | CPU1_D1 | 16 | 14 | 16 | 7
+    figcaption: 숫자: CE 수, U UE, X 중단된 부팅의 UE, ? 지목 기록 없음, - 호스트에 없음
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-08-26 02:00 UTC | 2026-09-30 02:00 UTC | 2026-10-28 01:30 UTC
+    | 실행 시간 | 25 d | 34 d | 27 d | 15 d
+    | CPU0_C1 |  | CE 6 | CE 436 | CE 789, UE 1
+    | CPU1_D1 | CE 16 | CE 14 | CE 16 | CE 7
+  p.how: 부팅마다 한 열이고 왼쪽이 오래된 부팅입니다. 번호 아래 글자는 끝난 방식입니다: S 치명적 하드웨어 오류로 끝남, p 다른 panic, r 최근 스캔 때의 부팅, - 기록 없음. 칸의 숫자는 그 부팅의 CE 수이고, U는 UE, X는 중단된 부팅의 UE, ?는 중단됐지만 DIMM을 지목한 기록이 없는 부팅, -는 DIMM이 호스트에 없던 때입니다. 아래 표에 같은 내용이 있습니다.
+  #### CPU0_C1: 위치별 부팅 기록
+  figure
+    svg.fig.boots: 최근 부팅 4회 동안 CPU0_C1의 위치별 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 25 d, 종료 기록 없음
+      mark: 부팅 2, 2026-08-26 02:00 UTC 시작, 실행 시간 34 d, 종료 기록 없음
+      mark: 부팅 3, 2026-09-30 02:00 UTC 시작, 실행 시간 27 d, 종료 기록 없음
+      mark: 부팅 4, 2026-10-28 01:30 UTC 시작, 실행 시간 15 d, 종료 기록 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 2: CE 6건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 3: CE 317건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x238, 부팅 4: UE 1건, CE 244건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x388, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x388, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x388, 부팅 3: CE 94건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x388, 부팅 4: CE 200건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8, 부팅 3: CE 22건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8, 부팅 4: CE 136건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x390, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x390, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x390, 부팅 3: CE 3건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x390, 부팅 4: CE 91건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x420, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x420, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x420, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x420, 부팅 4: CE 49건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8, 부팅 4: CE 24건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x320, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x320, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x320, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x320, 부팅 4: CE 10건
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x238, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x238, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x238, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x238, 부팅 4: CE 9건
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8, 부팅 4: CE 7건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8, 부팅 4: CE 5건
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x740, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x740, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x740, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a2f col 0x740, 부팅 4: CE 4건
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x388, 부팅 1: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x388, 부팅 2: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x388, 부팅 3: 오류 없음
+      mark: rank0 dev7 bg0 bank3 row 0x1a30 col 0x388, 부팅 4: CE 4건
+      mark: 그 밖의 위치 3곳, 부팅 1: 오류 없음
+      mark: 그 밖의 위치 3곳, 부팅 2: 오류 없음
+      mark: 그 밖의 위치 3곳, 부팅 3: 오류 없음
+      mark: 그 밖의 위치 3곳, 부팅 4: CE 6건
+      text: 1 | - | 2 | - | 3 | - | 4 | - | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 | · | 6 | 99+ | U | rank0 dev7 bg0 bank3 row 0x1a2f col 0x388 | · | · | 94 | 99+ | rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8 | · | · | 22 | 99+ | rank0 dev7 bg0 bank3 row 0x1a2f col 0x390 | · | · | 3 | 91 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x420 | · | · | · | 49 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8 | · | · | · | 24 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x320 | · | · | · | 10 | rank0 dev7 bg0 bank3 row 0x1a30 col 0x238 | · | · | · | 9 | rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8 | · | · | · | 7 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8 | · | · | · | 5 | rank0 dev7 bg0 bank3 row 0x1a2f col 0x740 | · | · | · | 4 | rank0 dev7 bg0 bank3 row 0x1a30 col 0x388 | · | · | · | 4 | 그 밖의 위치 3곳 | · | · | · | 6
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-08-26 02:00 UTC | 2026-09-30 02:00 UTC | 2026-10-28 01:30 UTC
+    | 실행 시간 | 25 d | 34 d | 27 d | 15 d
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 |  | CE 6 | CE 317 | CE 244, UE 1
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x388 |  |  | CE 94 | CE 200
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x2f8 |  |  | CE 22 | CE 136
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x390 |  |  | CE 3 | CE 91
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x420 |  |  |  | CE 49
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x1d8 |  |  |  | CE 24
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x320 |  |  |  | CE 10
+    | rank0 dev7 bg0 bank3 row 0x1a30 col 0x238 |  |  |  | CE 9
+    | rank0 dev7 bg0 bank3 row 0x1a30 col 0x2f8 |  |  |  | CE 7
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x7d8 |  |  |  | CE 5
+    | rank0 dev7 bg0 bank3 row 0x1a2f col 0x740 |  |  |  | CE 4
+    | rank0 dev7 bg0 bank3 row 0x1a30 col 0x388 |  |  |  | CE 4
+    | 그 밖의 위치 3곳 |  |  |  | CE 6
+  #### CPU1_D1: 위치별 부팅 기록
+  figure
+    svg.fig.boots: 최근 부팅 4회 동안 CPU1_D1의 위치별 오류
+      mark: 부팅 1, 2026-07-31 11:00 UTC 시작, 실행 시간 25 d, 종료 기록 없음
+      mark: 부팅 2, 2026-08-26 02:00 UTC 시작, 실행 시간 34 d, 종료 기록 없음
+      mark: 부팅 3, 2026-09-30 02:00 UTC 시작, 실행 시간 27 d, 종료 기록 없음
+      mark: 부팅 4, 2026-10-28 01:30 UTC 시작, 실행 시간 15 d, 종료 기록 없음
+      mark: rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110, 부팅 1: CE 16건
+      mark: rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110, 부팅 2: CE 14건
+      mark: rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110, 부팅 3: CE 16건
+      mark: rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110, 부팅 4: CE 7건
+      text: 1 | - | 2 | - | 3 | - | 4 | - | rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 | 16 | 14 | 16 | 7
+  table.boots
+    | DIMM 또는 위치 | 1 (종료 기록 없음) | 2 (종료 기록 없음) | 3 (종료 기록 없음) | 4 (종료 기록 없음)
+    | 시작 | 2026-07-31 11:00 UTC | 2026-08-26 02:00 UTC | 2026-09-30 02:00 UTC | 2026-10-28 01:30 UTC
+    | 실행 시간 | 25 d | 34 d | 27 d | 15 d
+    | rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110 | CE 16 | CE 14 | CE 16 | CE 7
 section#s3.sec
   ## 3 DIMM별 판정
   article#dimm-CPU0_C1.card.g-replace
@@ -139,12 +257,13 @@ section#s4.sec
       li: 10-99
       li: 100+
       li: UE
+      li: 테두리: 두 부팅 이상에서 오류
       svg.fig.amap: CPU0_C1의 주소 맵, rank0 dev7 bg0 bank3
         mark: row 0x1a2f, column 0x1c0 ~ 0x1df: 오류 24건, 기록 24건; 처음 2026-11-03, 최근 2026-11-12
-        mark: row 0x1a2f, column 0x220 ~ 0x23f: 오류 568건, 기록 568건, 그중 UE 1건; 처음 2026-09-24, 최근 2026-11-12
-        mark: row 0x1a2f, column 0x2e0 ~ 0x2ff: 오류 158건, 기록 158건; 처음 2026-10-20, 최근 2026-11-12
+        mark: row 0x1a2f, column 0x220 ~ 0x23f: 오류 568건, 기록 568건, 그중 UE 1건; 처음 2026-09-24, 최근 2026-11-12; 최근 부팅 4회 중 3회에 오류
+        mark: row 0x1a2f, column 0x2e0 ~ 0x2ff: 오류 158건, 기록 158건; 처음 2026-10-20, 최근 2026-11-12; 최근 부팅 4회 중 2회에 오류
         mark: row 0x1a2f, column 0x320 ~ 0x33f: 오류 10건, 기록 10건; 처음 2026-11-06, 최근 2026-11-12
-        mark: row 0x1a2f, column 0x380 ~ 0x39f: 오류 388건, 기록 388건; 처음 2026-10-10, 최근 2026-11-12
+        mark: row 0x1a2f, column 0x380 ~ 0x39f: 오류 388건, 기록 388건; 처음 2026-10-10, 최근 2026-11-12; 최근 부팅 4회 중 2회에 오류
         mark: row 0x1a2f, column 0x420 ~ 0x43f: 오류 49건, 기록 49건; 처음 2026-10-30, 최근 2026-11-12
         mark: row 0x1a2f, column 0x740 ~ 0x75f: 오류 4건, 기록 4건; 처음 2026-11-11, 최근 2026-11-12
         mark: row 0x1a2f, column 0x7c0 ~ 0x7df: 오류 5건, 기록 5건; 처음 2026-11-09, 최근 2026-11-11
@@ -198,8 +317,9 @@ section#s4.sec
       li: 10-99
       li: 100+
       li: UE
+      li: 테두리: 두 부팅 이상에서 오류
       svg.fig.amap: CPU1_D1의 주소 맵, rank0 dev17 bg5 bank3
-        mark: row 0xa4e9, column 0x110 ~ 0x11f: 오류 53건, 기록 53건; 처음 2026-08-03, 최근 2026-11-08
+        mark: row 0xa4e9, column 0x110 ~ 0x11f: 오류 53건, 기록 53건; 처음 2026-08-03, 최근 2026-11-08; 최근 부팅 4회 중 4회에 오류
         text: row | 0x000 | 0x3ff | 0x100 | 0x200 | 0x300 | column | 0xa4e6 | 0xa4e7 | 0xa4e8 | 0xa4e9 | single bit 고장 | 0xa4ea | 0xa4eb | 0xa4ec
     li: single bit 고장(rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110): 53건, row 1개에 column 1개, DQ1, 첫 발생 2026-08-03, 최근 2026-11-08
     details

@@ -35,6 +35,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -136,6 +137,15 @@ type Host struct {
 	Records int64     `json:"records"`
 	First   time.Time `json:"first,omitzero"`
 	Last    time.Time `json:"last,omitzero"`
+	// Boots is the number of boots of the host on record, Stops those of
+	// them that a fatal hardware error ended, and Panics those that ended
+	// in another panic.
+	Boots  int `json:"boots,omitzero"`
+	Stops  int `json:"stops,omitzero"`
+	Panics int `json:"panics,omitzero"`
+	// Sources are the kinds of the sources that gave records of the host:
+	// "klog", "rasdaemon", "pstore", "kdump", "bert" and the others.
+	Sources []string `json:"sources,omitzero"`
 }
 
 // Item is one kind of record the ledger holds.
@@ -416,6 +426,22 @@ func describe(ctx context.Context, s *store.Store, m *Manifest) (*Sources, error
 			return nil, err
 		}
 		row.DIMMs = len(occupants)
+		boots, err := s.Boots(ctx, h.Name)
+		if err != nil {
+			return nil, err
+		}
+		for _, b := range boots {
+			if b.StartQuality == store.QualityUnknown {
+				continue // a boot the ledger put before a record it read
+			}
+			row.Boots++
+			switch b.End {
+			case model.BootStop:
+				row.Stops++
+			case model.BootPanic:
+				row.Panics++
+			}
+		}
 		m.Hosts = append(m.Hosts, row)
 	}
 
@@ -451,6 +477,18 @@ func describe(ctx context.Context, s *store.Store, m *Manifest) (*Sources, error
 			list = []model.Source{}
 		}
 		src.Scans = append(src.Scans, ScanSources{Scan: sc, Sources: list})
+		for i := range m.Hosts {
+			h := &m.Hosts[i]
+			if h.Name != sc.Host {
+				continue
+			}
+			for _, x := range list {
+				if x.Records > 0 && !slices.Contains(h.Sources, x.Kind) {
+					h.Sources = append(h.Sources, x.Kind)
+				}
+			}
+			sort.Strings(h.Sources)
+		}
 	}
 	return src, nil
 }
