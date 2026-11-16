@@ -48,6 +48,8 @@ type source struct {
 type options struct {
 	name string // "my dimm", for messages
 	fs   *flag.FlagSet
+	// said is the language of the messages, once the flags are parsed.
+	said i18n.Lang
 
 	lang   string
 	asJSON bool
@@ -133,10 +135,15 @@ func say(lang i18n.Lang, code string, kv ...any) string {
 
 // usageError reports a mistake in the command line.
 func (o *options) usageError(env *cli.Env, lang i18n.Lang, format string, a ...any) int {
-	// "my open dimm" and "my dimm" share one help text: "my help dimm".
+	// "my open dimm" and "my dimm" share one help text: "my help dimm";
+	// "my harvest install" is in "my help harvest".
 	help := "my help"
 	if f := strings.Fields(o.name); len(f) > 1 {
-		help += " " + f[len(f)-1]
+		cmd := f[1]
+		if cmd == "open" && len(f) > 2 {
+			cmd = f[2]
+		}
+		help += " " + cmd
 	}
 	fmt.Fprintf(env.Stderr, "%s: %s\n%s\n", o.name, fmt.Sprintf(format, a...), say(lang, "err.see_help", "cmd", help))
 	return cli.ExitUsage
@@ -144,8 +151,43 @@ func (o *options) usageError(env *cli.Env, lang i18n.Lang, format string, a ...a
 
 // failure reports that the command could not do its work.
 func (o *options) failure(env *cli.Env, err error) int {
-	fmt.Fprintf(env.Stderr, "%s: %v\n", o.name, err)
+	fmt.Fprintf(env.Stderr, "%s: %s\n", o.name, errText(o.said, err))
 	return cli.ExitFailure
+}
+
+// wordedError is an error of a command whose words are in the catalog, so
+// that it can be said in the reader's language.
+type wordedError struct {
+	code string
+	kv   []any
+}
+
+func worded(code string, kv ...any) error { return &wordedError{code: code, kv: kv} }
+
+func (e *wordedError) Error() string { return say(i18n.EN, e.code, e.kv...) }
+
+// errText says err in the reader's language where the tool words the
+// error itself: a threshold that cannot be set, an output file that cannot
+// be written, an input of no known kind, a wrong flag, a file that cannot
+// be read. Any other error keeps its own text.
+func errText(lang i18n.Lang, err error) string {
+	var ce *engine.ConfigError
+	if errors.As(err, &ce) {
+		return ce.Text(lang)
+	}
+	var pe *outfile.PathError
+	if errors.As(err, &pe) {
+		return targetText(lang, err)
+	}
+	var we *wordedError
+	if errors.As(err, &we) {
+		return say(lang, we.code, we.kv...)
+	}
+	var ue *scan.UnknownInputError
+	if errors.As(err, &ue) {
+		return say(lang, "err.input."+ue.Code, "path", ue.Path, "start", ue.Start)
+	}
+	return cli.ErrorText(lang, err)
 }
 
 // parse reads the command line. done is set when the command has nothing
@@ -164,17 +206,19 @@ func (o *options) parse(env *cli.Env, args []string) (pos []string, lang i18n.La
 	if o.lang != "" {
 		l, lerr := i18n.ParseLang(o.lang)
 		if lerr != nil && err == nil {
-			return nil, lang, o.usageError(env, lang, "%v", lerr), true
+			o.said = lang
+			return nil, lang, o.usageError(env, lang, "%s", errText(lang, lerr)), true
 		}
 		if lerr == nil {
 			lang = l
 		}
 	}
+	o.said = lang
 	if errors.Is(err, flag.ErrHelp) || o.help {
 		return nil, lang, cli.ExitOK, false
 	}
 	if err != nil {
-		return nil, lang, o.usageError(env, lang, "%v", err), true
+		return nil, lang, o.usageError(env, lang, "%s", errText(lang, err)), true
 	}
 	switch o.color {
 	case term.ColorAuto, term.ColorAlways, term.ColorNever:
@@ -269,7 +313,7 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 	s := &session{ctx: ctx, env: env, o: o, lang: lang, st: o.style(env, lang), prefix: "my", src: src}
 	cfg, err := o.cf.Config()
 	if err != nil {
-		return nil, o.usageError(env, lang, "%v", err)
+		return nil, o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	now := clock(env)
 	host := o.host

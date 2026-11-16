@@ -318,7 +318,7 @@ func runMap(ctx context.Context, env *cli.Env, args []string, src *source) int {
 	m, err := s.c.AddressMap(ctx, s.h, d, mo)
 	if err != nil {
 		// A bank without errors is a wrong choice, not a failure.
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	return s.emit("map", d.Verdict.Grade, m, func(w io.Writer) error { return term.AddressMap(w, m, s.st) })
 }

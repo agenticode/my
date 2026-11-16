@@ -99,7 +99,7 @@ func (f *fleetFlags) open(ctx context.Context, env *cli.Env, lang i18n.Lang, now
 	if f.envFile != "" {
 		file, err := os.Open(f.envFile)
 		if err != nil {
-			return nil, opts, usage{"--fleet-env " + err.Error()}
+			return nil, opts, usage{"--fleet-env " + errText(lang, err)}
 		}
 		settings, err := rasdaemon.ParseEnvFile(file)
 		file.Close()
@@ -112,6 +112,13 @@ func (f *fleetFlags) open(ctx context.Context, env *cli.Env, lang i18n.Lang, now
 			}
 			return env.Getenv(name)
 		}
+	}
+	if f.backend != "" && rasdaemon.BackendName(f.backend) == "" {
+		code := "err.fleet_kind"
+		if k := strings.ToLower(f.backend); k == "sqlite3" || k == "sqlite" {
+			code = "err.fleet_sqlite"
+		}
+		return nil, opts, usage{"--fleet: " + say(lang, code, "value", f.backend)}
 	}
 	cfg, err := rasdaemon.StoreConfigFromEnv(f.backend, getenv)
 	if err != nil {

@@ -152,7 +152,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 
 	cfg, err := o.cf.Config()
 	if err != nil {
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	eopts := engine.Options{Config: &cfg, Now: now}
 	analyzer, code, ok := o.analyze(ctx, env, lang, ledger, &eopts, now)

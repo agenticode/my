@@ -23,6 +23,19 @@ var Messages = i18n.Catalog{
 	"confidence.medium":          {EN: "medium", KO: "보통"},
 	"confidence.low":             {EN: "low", KO: "낮음"},
 
+	// Thresholds that cannot be set (ConfigError).
+	"config.unknown":            {EN: "unknown threshold \"{key}\"", KO: "알 수 없는 임계값 \"{key}\""},
+	"config.not_number":         {EN: "{key}: \"{value}\" is not a number", KO: "{key}: \"{value}\": 숫자가 아님"},
+	"config.not_whole":          {EN: "{key}: \"{value}\" is not a whole number", KO: "{key}: \"{value}\": 정수가 아님"},
+	"config.too_large":          {EN: "{key}: \"{value}\" is larger than {max}", KO: "{key}: \"{value}\": {max} 이하여야 함"},
+	"config.not_above_zero":     {EN: "{key}: {value} is not above zero", KO: "{key}: {value}: 0 초과여야 함"},
+	"config.below_min":          {EN: "{key}: {value} is below the minimum of {min}", KO: "{key}: {value}: {min} 이상이어야 함"},
+	"config.outside_above_zero": {EN: "{key}: {value} is outside the range above 0 to {max}", KO: "{key}: {value}: 0 초과 {max} 이하여야 함"},
+	"config.outside":            {EN: "{key}: {value} is outside the range {min} to {max}", KO: "{key}: {value}: {min} 이상 {max} 이하여야 함"},
+	"config.syntax":             {EN: "want \"key = value\", found \"{line}\"", KO: "\"key = value\" 형식이어야 함. 읽은 줄: \"{line}\""},
+	"config.twice":              {EN: "{key} is already set on line {first}", KO: "{key}: {first}번째 줄에서 이미 정함"},
+	"config.set_syntax":         {EN: "{value}: want key=value", KO: "{value}: key=value 형식이어야 함"},
+
 	// Fault modes. The Level 1 names are terms of their own and stay as
 	// they are in both languages.
 	"mode.single-bit":   {EN: "single-bit", KO: "single bit"},

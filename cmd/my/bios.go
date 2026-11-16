@@ -41,7 +41,7 @@ func runBIOS(ctx context.Context, env *cli.Env, args []string, src *source) int 
 	if *profilePath != "" {
 		var err error
 		if profile, err = memras.ReadFile(*profilePath); err != nil {
-			return o.usageError(env, lang, "--profile %v", err)
+			return o.usageError(env, lang, "--profile %s", errText(lang, err))
 		}
 	}
 	s, code := o.start(ctx, env, lang, src)

@@ -82,9 +82,48 @@ const (
 	WhatBERT      = "boot error region (BERT)"
 )
 
-// ErrUnknownInput is returned by Detect, wrapped with what the input looks
-// like, for a file or directory that is none of the inputs.
+// ErrUnknownInput is returned by Detect, as an *UnknownInputError that says
+// what the input looks like, for a file or directory that is none of the
+// inputs.
 var ErrUnknownInput = errors.New("not an input this tool reads")
+
+// UnknownInputError is an input Detect does not recognise. Code says what
+// it looks like (a key of UnknownInputs), Start is the first line of a
+// text of no known kind.
+type UnknownInputError struct {
+	Path  string
+	Code  string
+	Start string
+}
+
+// UnknownInputs are the English texts of the codes of UnknownInputError.
+var UnknownInputs = map[string]string{
+	"not_regular": "not a regular file",
+	"dir":         "a directory that is neither a copy of a host's files (no proc, sys or var below it) nor a Redfish dump",
+	"empty":       "the file is empty",
+	"ledger":      "a MemorY ledger is the result of an import, not an input; show it with \"my open\"",
+	"gzip_db":     "a compressed database; unpack it first",
+	"zip":         "a zip archive; a case bundle is shown with \"my open\", any other archive has to be unpacked",
+	"binary":      "binary data of no known kind",
+	"json":        "JSON that is neither a journal export, a Redfish resource, an FMFM log nor a list of event log entries",
+	"text":        "text of no known kind (it starts %q)",
+}
+
+func (e *UnknownInputError) Error() string {
+	why := UnknownInputs[e.Code]
+	if e.Code == "text" {
+		why = fmt.Sprintf(why, e.Start)
+	}
+	s := ErrUnknownInput.Error() + ": " + why
+	if e.Path != "" {
+		s = e.Path + ": " + s
+	}
+	return s
+}
+
+func (e *UnknownInputError) Unwrap() error { return ErrUnknownInput }
+
+func unknownInput(code string) error { return &UnknownInputError{Code: code} }
 
 // sniffSize is how much of a file is looked at to tell what it is.
 const sniffSize = 256 << 10
@@ -119,7 +158,7 @@ func Detect(ctx context.Context, path string, opts DetectOptions) (adapters []ad
 		return detectDir(ctx, path, opts)
 	}
 	if !fi.Mode().IsRegular() {
-		return nil, "", fmt.Errorf("%s: %w: not a regular file", path, ErrUnknownInput)
+		return nil, "", &UnknownInputError{Path: path, Code: "not_regular"}
 	}
 	head, zipped, err := readHead(path)
 	if err != nil {
@@ -127,6 +166,11 @@ func Detect(ctx context.Context, path string, opts DetectOptions) (adapters []ad
 	}
 	a, what, err := detectFile(path, fi, head, zipped, opts)
 	if err != nil {
+		var ue *UnknownInputError
+		if errors.As(err, &ue) {
+			ue.Path = path
+			return nil, "", ue
+		}
 		return nil, "", fmt.Errorf("%s: %w", path, err)
 	}
 	return []adapter.Adapter{a}, what, nil
@@ -179,7 +223,7 @@ func detectDir(ctx context.Context, dir string, opts DetectOptions) ([]adapter.A
 	if found {
 		return []adapter.Adapter{redfish.New(dir, redfish.Options{Now: opts.Now, ModTimeAsObserved: opts.ModTime})}, WhatRedfish, nil
 	}
-	return nil, "", fmt.Errorf("%s: %w: a directory that is neither a copy of a host's files (no proc, sys or var below it) nor a Redfish dump", dir, ErrUnknownInput)
+	return nil, "", &UnknownInputError{Path: dir, Code: "dir"}
 }
 
 // readHead returns the start of a file, decompressed when the file is
@@ -274,20 +318,20 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 	trimmed := bytes.TrimLeft(bytes.TrimPrefix(head, []byte("\xef\xbb\xbf")), " \t\r\n")
 	switch {
 	case len(trimmed) == 0:
-		return nil, "", fmt.Errorf("%w: the file is empty", ErrUnknownInput)
+		return nil, "", unknownInput("empty")
 
 	case bytes.HasPrefix(head, []byte(sqliteMagic)):
 		if len(head) >= 72 && binary.BigEndian.Uint32(head[68:72]) == ledgerAppID {
-			return nil, "", fmt.Errorf("%w: a MemorY ledger is the result of an import, not an input; show it with \"my open\"", ErrUnknownInput)
+			return nil, "", unknownInput("ledger")
 		}
 		if zipped {
-			return nil, "", fmt.Errorf("%w: a compressed database; unpack it first", ErrUnknownInput)
+			return nil, "", unknownInput("gzip_db")
 		}
 		// A file nothing writes to any more is read in place.
 		return rasdaemon.New(path, rasdaemon.Options{Direct: true, TempDir: opts.TempDir}), WhatRasdaemon, nil
 
 	case bytes.HasPrefix(head, []byte("PK\x03\x04")):
-		return nil, "", fmt.Errorf("%w: a zip archive; a case bundle is shown with \"my open\", any other archive has to be unpacked", ErrUnknownInput)
+		return nil, "", unknownInput("zip")
 
 	case isBinary(head):
 		if sel.Sniff(head) {
@@ -300,7 +344,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			// A saved region: dated by the capture time, else by the file.
 			return bert.New(path, bert.Options{ReadAt: captured}), WhatBERT, nil
 		}
-		return nil, "", fmt.Errorf("%w: binary data of no known kind", ErrUnknownInput)
+		return nil, "", unknownInput("binary")
 	}
 
 	kopts := klog.Options{CapturedAt: captured, Location: opts.Location, TempDir: opts.TempDir}
@@ -361,7 +405,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 		// JSON that is no journal, no Redfish resource and no FMFM log: a
 		// list of event log entries names sensors.
 		if !bytes.Contains(bytes.ToLower(text), []byte("sensor")) {
-			return nil, "", fmt.Errorf("%w: JSON that is neither a journal export, a Redfish resource, an FMFM log nor a list of event log entries", ErrUnknownInput)
+			return nil, "", unknownInput("json")
 		}
 		what = WhatSEL
 		if zipped {
@@ -417,7 +461,7 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 
 	default:
 		first, _, _ := strings.Cut(string(text[:min(len(text), 80)]), "\n")
-		return nil, "", fmt.Errorf("%w: text of no known kind (it starts %q)", ErrUnknownInput, strings.TrimSpace(first))
+		return nil, "", &UnknownInputError{Code: "text", Start: strings.TrimSpace(first)}
 	}
 	return a, what, nil
 }

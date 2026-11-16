@@ -2,13 +2,17 @@ package engine
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/agenticode/my/internal/i18n"
 )
 
 // TestParamsCoverTheConfig: every threshold has a key, a description and a
@@ -148,7 +152,7 @@ storm.count = 250
 	if err != nil || loaded != c {
 		t.Errorf("LoadConfig: %v", err)
 	}
-	if _, err := LoadConfig(filepath.Join(dir, "absent.conf")); err == nil || !strings.Contains(err.Error(), "configuration file") {
+	if _, err := LoadConfig(filepath.Join(dir, "absent.conf")); !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("missing file: err = %v", err)
 	}
 	if _, err := LoadConfig(dir); err == nil {
@@ -189,14 +193,20 @@ func TestConfigFlags(t *testing.T) {
 		args []string
 		want string
 	}{
-		{[]string{"-set", "storm.count"}, "-set storm.count: want key=value"},
-		{[]string{"-set", "storm.cuont=4"}, `-set unknown threshold "storm.cuont"`},
-		{[]string{"-set", "storm.count=0"}, "-set storm.count: 0 is below the minimum of 1"},
-		{[]string{"-config", filepath.Join(dir, "absent.conf")}, "configuration file"},
+		{[]string{"-set", "storm.count"}, "--set: storm.count: want key=value"},
+		{[]string{"-set", "storm.cuont=4"}, `--set: unknown threshold "storm.cuont"`},
+		{[]string{"-set", "storm.count=0"}, "--set: storm.count: 0 is below the minimum of 1"},
+		{[]string{"-config", filepath.Join(dir, "absent.conf")}, "--config open " + filepath.Join(dir, "absent.conf")},
 	} {
 		if _, err := parse(tt.args...); err == nil || !strings.Contains(err.Error(), tt.want) {
 			t.Errorf("%v: err = %v, want %q", tt.args, err, tt.want)
 		}
+	}
+	// A threshold that cannot be set is said in the reader's language.
+	_, err = parse("-set", "storm.count=0")
+	var ce *ConfigError
+	if !errors.As(err, &ce) || ce.Text(i18n.KO) != "--set: storm.count: 0: 1 이상이어야 함" {
+		t.Errorf("in Korean: %v", err)
 	}
 }
 
