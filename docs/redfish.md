@@ -179,7 +179,7 @@ profile built-in, mapping for Dell (by the system manufacturer)
  1 pending value will not be as expected after the next reboot
 ```
 
-`dell-shaped.mycase` is `my import testdata/redfish/dell-shaped -o dell-shaped.mycase`: a hand-built tree in the shape of the Dell documents below, with no real addresses or serial numbers. The exit code of `my bios` is 1 when a setting in effect does not meet an expectation.
+`dell-shaped.mycase` is `my import testdata/redfish/dell-shaped -o dell-shaped.mycase`: a hand-built tree in the shape of the Dell documents below, with no real addresses or serial numbers. The exit code of `my bios` is 1 when a setting in effect does not meet an expectation; a pending value that will not does not change it.
 
 ### Where the mappings come from
 

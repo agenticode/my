@@ -429,6 +429,18 @@ func (c *Case) sourceNames(srcs []model.Source) []string {
 			names[i] = s.Kind + " (" + which + ")"
 		}
 	}
+	// Two sources whose last path element is the same, as the pstore
+	// files and their archive (/sys/fs/pstore, /var/lib/systemd/pstore):
+	// the whole origin tells them apart.
+	seen := map[string]int{}
+	for _, n := range names {
+		seen[n]++
+	}
+	for i, s := range srcs {
+		if seen[names[i]] > 1 && names[i] != s.Kind && s.Origin != "" {
+			names[i] = s.Kind + " (" + s.Origin + ")"
+		}
+	}
 	return names
 }
 

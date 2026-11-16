@@ -187,6 +187,27 @@ func (c *Case) CheckBIOS(ctx context.Context, h *engine.HostResult, opts BIOSOpt
 // settings and none of them was kept: the BIOS has no attribute that bears
 // on memory, by its name or by its entry in the registry. "bios" is the
 // class of the Bios resource in the manifest of a collection.
+// biosNotRead returns what became of the Bios resource at the latest BMC
+// that was read, when it did not come back: "denied", "unsupported",
+// "timeout", "error", "skipped", "not offered" or "not reached"; ""
+// otherwise.
+func biosNotRead(bmcs []model.BMC) string {
+	if len(bmcs) == 0 {
+		return ""
+	}
+	for _, cl := range bmcs[len(bmcs)-1].Classes {
+		if cl.Class == "bios" {
+			switch cl.State {
+			case "ok", "partial", "present", "absent", "":
+				// read, or a dump that does not say what was asked
+				return ""
+			}
+			return cl.State
+		}
+	}
+	return ""
+}
+
 func biosWithoutMemory(bmcs []model.BMC) bool {
 	if len(bmcs) == 0 {
 		return false
@@ -224,7 +245,11 @@ func (c *Case) BIOS(ctx context.Context, h *engine.HostResult, opts BIOSOptions)
 	}
 	if res.Settings == 0 {
 		v.None = true
-		if biosWithoutMemory(bmcs) {
+		if state := biosNotRead(bmcs); state != "" {
+			// The BMC was asked: what to run next is no help.
+			b := bmcs[len(bmcs)-1]
+			v.Lead = append(v.Lead, c.ras("check.none_bmc", "address", b.Address, "state", "@check.state."+state))
+		} else if biosWithoutMemory(bmcs) {
 			v.Lead = append(v.Lead, c.ras("check.none_memory"))
 		} else {
 			v.Lead = append(v.Lead, c.ras("check.none"))
@@ -244,14 +269,18 @@ func (c *Case) BIOS(ctx context.Context, h *engine.HostResult, opts BIOSOptions)
 	} else {
 		v.Lead = append(v.Lead, c.ras("check.no_registry"))
 	}
+	profile := res.Profile
+	if opts.Profile == nil {
+		profile = "@check.builtin"
+	}
 	if res.Vendor != "" {
-		v.Lead = append(v.Lead, c.ras("check.profile", "profile", res.Profile, "vendor", res.Vendor, "by", "@check.by."+res.By))
+		v.Lead = append(v.Lead, c.ras("check.profile", "profile", profile, "vendor", res.Vendor, "by", "@check.by."+res.By))
 	} else {
 		manufacturer := res.Manufacturer
 		if manufacturer == "" {
 			manufacturer = "@check.unknown"
 		}
-		v.Lead = append(v.Lead, c.ras("check.no_vendor", "profile", res.Profile, "manufacturer", manufacturer))
+		v.Lead = append(v.Lead, c.ras("check.no_vendor", "profile", profile, "manufacturer", manufacturer))
 	}
 
 	expected, met := 0, 0

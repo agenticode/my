@@ -25,8 +25,8 @@ profile built-in, mapping for Dell (by the system manufacturer)
  4 of 4 DIMMs run below the speed they are rated for: A1, A2, B1, B2 at 2666, rated 2933
  What the records show that can be the reason. These are candidates; the records prove none of them:
    - the BIOS limits the memory frequency (MemFrequency = 2666MHz)
-   - every DIMM with a known speed runs at 2666: the processor and the board are what is left, and
-     the ledger holds no processor model to check that against
+   - every DIMM with a known speed runs at 2666 MT/s: the processor and the board are what is left,
+     and the ledger holds no processor model to check that against
 
  5 other memory settings on record that the profile maps to nothing:
    MemTest = Disabled, NodeInterleave = Disabled, SysMemSize = 128 GB, SysMemSpeed = 2666 Mhz

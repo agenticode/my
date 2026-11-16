@@ -287,7 +287,7 @@ func TestSpeed(t *testing.T) {
 		t.Errorf("candidate: %s", got)
 	}
 	// A speed is written as a number, not with separators.
-	if got := Text(i18n.EN, r.Speed.Candidates[1]); !strings.Contains(got, "runs at 2666:") {
+	if got := Text(i18n.EN, r.Speed.Candidates[1]); !strings.Contains(got, "runs at 2666 MT/s:") {
 		t.Errorf("candidate: %s", got)
 	}
 

@@ -1529,3 +1529,37 @@ func TestOneDayIsNamedOnce(t *testing.T) {
 		t.Errorf("demo: %v", tl.Notes)
 	}
 }
+
+// TestSourceNamesApart: sources of one kind are told apart on the sources
+// line, by what they read or, when their last path element is the same, by
+// their whole origin.
+func TestSourceNamesApart(t *testing.T) {
+	c := &Case{Lang: i18n.EN}
+	got := c.sourceNames([]model.Source{
+		{Kind: "klog", Origin: "journalctl -o json _TRANSPORT=kernel", Status: model.SourceOK},
+		{Kind: "klog", Origin: "/dev/kmsg", Status: model.SourceOK},
+		{Kind: "pstore", Origin: "/sys/fs/pstore", Status: model.SourceEmpty},
+		{Kind: "pstore", Origin: "/var/lib/systemd/pstore", Status: model.SourceEmpty},
+		{Kind: "smbios", Origin: "/sys/firmware/dmi/tables", Status: model.SourceOK},
+	})
+	want := []string{"klog (journal)", "klog (ring buffer)", "pstore (/sys/fs/pstore)", "pstore (/var/lib/systemd/pstore)", "smbios"}
+	if strings.Join(got, "|") != strings.Join(want, "|") {
+		t.Errorf("names %q, want %q", got, want)
+	}
+}
+
+// TestBIOSNotRead: when the BMC was read and its Bios resource did not come
+// back, the check says so instead of naming the collection to run.
+func TestBIOSNotRead(t *testing.T) {
+	bmc := func(state string) []model.BMC {
+		return []model.BMC{{Address: "10.0.0.5", Classes: []model.BMCClass{{Class: "memory", State: "ok"}, {Class: "bios", State: state}}}}
+	}
+	for state, want := range map[string]string{"denied": "denied", "unsupported": "unsupported", "timeout": "timeout", "ok": "", "partial": ""} {
+		if got := biosNotRead(bmc(state)); got != want {
+			t.Errorf("%s: %q", state, got)
+		}
+	}
+	if biosNotRead(nil) != "" {
+		t.Error("no BMC")
+	}
+}

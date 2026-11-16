@@ -17,7 +17,7 @@ section#s1.sec
   DIMMs = 32 in 32 slots, 14 with errors or a finding
   Collected = synthetic data set, 2026-11-13 00:00 UTC
   Report = failure analysis report, generated 2026-11-13 09:30 UTC by my test
-  Engine = version 6
+  Engine = version 7
   p.how: A grade is a finding. The thresholds behind it are defaults that have not been compared with failure analysis results.
   li: 2 Slot map
   li: 3 Findings

@@ -193,7 +193,7 @@ func TestEveryMessageIsStated(t *testing.T) {
 	for _, c := range Messages.Codes() {
 		family, _, _ := strings.Cut(c, ".")
 		switch family {
-		case "grade", "label", "confidence", "mode", "word", "kind", "name", "status", "rule":
+		case "grade", "label", "confidence", "mode", "word", "kind", "name", "status", "rule", "unit":
 			continue // looked up by name, not stated
 		}
 		// A code is stated as a literal, or built from a literal prefix

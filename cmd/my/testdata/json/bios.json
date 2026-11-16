@@ -39,7 +39,7 @@
         "code": "check.profile",
         "args": {
           "by": "@check.by.manufacturer",
-          "profile": "built-in",
+          "profile": "@check.builtin",
           "vendor": "Dell"
         },
         "text": "profile built-in, mapping for Dell (by the system manufacturer)"
@@ -215,7 +215,7 @@
         "args": {
           "speed": "2666"
         },
-        "text": "every DIMM with a known speed runs at 2666: the processor and the board are what is left, and the ledger holds no processor model to check that against"
+        "text": "every DIMM with a known speed runs at 2666 MT/s: the processor and the board are what is left, and the ledger holds no processor model to check that against"
       }
     ],
     "related": [

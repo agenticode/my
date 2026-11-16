@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/view"
@@ -157,7 +158,7 @@ func (doc *Document) bootsFigure(b *view.Boots, title string) *node {
 	for i, bc := range b.Boots {
 		x := labelW + float64(i)*pitch
 		letter, words := doc.endMark(bc.End)
-		t := doc.say("boots.col", "n", bc.Index, "when", minute(bc.StartedAt), "ran", ranText(bc.RanSeconds), "end", words)
+		t := doc.say("boots.col", "n", bc.Index, "when", minute(bc.StartedAt), "ran", ranText(doc.Lang, bc.RanSeconds), "end", words)
 		cls := "tick"
 		if bc.End == model.BootStop {
 			cls = "tick stopmark"
@@ -209,7 +210,7 @@ func (doc *Document) bootsTable(b *view.Boots) *node {
 	ran := el("tr", el("th", A{"scope", "row"}, doc.say("boots.head_ran")))
 	for _, bc := range b.Boots {
 		start.add(el("td", A{"class", "r nw"}, minute(bc.StartedAt)))
-		ran.add(el("td", A{"class", "r nw"}, ranText(bc.RanSeconds)))
+		ran.add(el("td", A{"class", "r nw"}, ranText(doc.Lang, bc.RanSeconds)))
 	}
 	body.add(start, ran)
 	rows, labels := doc.bootRows(b)
@@ -240,17 +241,16 @@ func (doc *Document) bootsTable(b *view.Boots) *node {
 	return t
 }
 
-// ranText writes how long a boot ran.
-func ranText(seconds int64) string {
-	switch {
-	case seconds <= 0:
+// ranText writes how long a boot ran. The number and its unit do not
+// break apart: a no-break space in English, none in Korean ("3분").
+func ranText(lang i18n.Lang, seconds int64) string {
+	if seconds <= 0 {
 		return "?"
-	case seconds >= 48*3600:
-		return strconv.FormatInt(seconds/86400, 10) + " d"
-	case seconds >= 2*3600:
-		return strconv.FormatInt(seconds/3600, 10) + " h"
-	case seconds >= 120:
-		return strconv.FormatInt(seconds/60, 10) + " min"
 	}
-	return strconv.FormatInt(seconds, 10) + " s"
+	n, unit := engine.Duration(seconds)
+	sep := "\u00a0"
+	if lang == i18n.KO {
+		sep = ""
+	}
+	return i18n.Thousands(n) + sep + engine.Messages.Text(lang, unit, nil)
 }

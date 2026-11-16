@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/view"
@@ -151,19 +152,12 @@ func (st Style) endLetter(end string) string {
 	return "-"
 }
 
-// RanText writes how long a boot ran, in the unit that fits it.
-func RanText(seconds int64) string {
-	switch {
-	case seconds <= 0:
+// ranText writes how long a boot ran, in the unit that fits it.
+func (st Style) ranText(seconds int64) string {
+	if seconds <= 0 {
 		return "?"
-	case seconds >= 48*3600:
-		return strconv.FormatInt(seconds/86400, 10) + " d"
-	case seconds >= 2*3600:
-		return strconv.FormatInt(seconds/3600, 10) + " h"
-	case seconds >= 120:
-		return strconv.FormatInt(seconds/60, 10) + " min"
 	}
-	return strconv.FormatInt(seconds, 10) + " s"
+	return engine.DurationText(st.Lang, seconds)
 }
 
 // shown returns the index of the first boot drawn: the latest boots that
@@ -194,7 +188,7 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 	// A column fits the widest of its texts and one space.
 	cw := 6
 	for _, bc := range b.Boots {
-		cw = max(cw, Width(RanText(bc.RanSeconds)), Width(st.say("boots.end.stop")), Width(st.say("boots.end.panic")),
+		cw = max(cw, Width(st.ranText(bc.RanSeconds)), Width(st.say("boots.end.stop")), Width(st.say("boots.end.panic")),
 			Width(st.say("boots.end.running")))
 	}
 	cw++
@@ -217,7 +211,7 @@ func (st Style) bootsGrid(p *page, b *view.Boots, show int) {
 			t := bc.StartedAt.UTC()
 			day, clock = append(day, t.Format("01-02")), append(clock, t.Format("15:04"))
 		}
-		ran = append(ran, RanText(bc.RanSeconds))
+		ran = append(ran, st.ranText(bc.RanSeconds))
 		ended = append(ended, st.endWord(bc.End))
 	}
 	line(heads[0], idx)
