@@ -211,7 +211,7 @@ var captures = []capture{
 		// lab host three weeks before.
 		live: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "pstore empty", "pstore empty", "kdump ok", "edac-sysfs empty",
 			"mcelog absent", "smbios ok"},
-		before: state{hard: 1},
+		before:  state{hard: 1},
 		finding: model.VerdictConsiderReplacement,
 		dimms: []dimm{
 			{slot: "cxl:mem0", serial: "0x4c41420012", ce: 9, grade: model.VerdictConsiderReplacement, mode: model.ModeRow,
