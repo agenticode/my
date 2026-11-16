@@ -232,6 +232,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 		rep.Notes = append(rep.Notes, note)
 	}
 	rep.Notes = append(rep.Notes, p.stopNotes()...)
+	rep.Notes = append(rep.Notes, p.daemonNotes()...)
 	rep.Notes = append(rep.Notes, p.tally.Notes()...)
 	switch {
 	case rep.Records == 0:
@@ -380,6 +381,9 @@ type segment struct {
 	// ended it (stop.go).
 	last *lastRecord
 	stop *stopRec
+	// consumed holds, by page frame number, what the kernel said about the
+	// program an uncorrected error reached (daemon.go).
+	consumed map[uint64]*consumer
 }
 
 // injection is an announced software injection of a memory failure.
@@ -462,6 +466,11 @@ type parser struct {
 	bigPages      string
 	// stops, panics and fakePanics count the ends of boots (stop.go).
 	stops, panics, fakePanics int
+	// mcelog holds what the lines of mcelog said about a page, by its
+	// address; the others count lines for notes (daemon.go).
+	mcelog                                         map[uint64]*mcelogPage
+	untiedThresholds, unoffered, selLost, poisonVM int
+	poisonLast                                     time.Time
 
 	seg  *segment
 	segs int
@@ -519,6 +528,9 @@ func (p *parser) run(r io.Reader) error {
 		}
 	}
 	if err := p.ctx.Err(); err != nil {
+		return err
+	}
+	if err := p.expireMcelog(-1, true); err != nil {
 		return err
 	}
 	return p.closeSegment(true)
@@ -627,7 +639,7 @@ func (p *parser) handle(raw string) error {
 			return nil
 		}
 		if !l.kernel {
-			return nil
+			return p.daemonLine(&l)
 		}
 		if p.seg == nil || (l.bootID != "" && p.seg.bootID != l.bootID) {
 			if p.seg != nil {
@@ -653,8 +665,11 @@ func (p *parser) handle(raw string) error {
 		return nil
 	}
 	l, ok := p.fr.frame(p.lineNo, raw)
-	if !ok || !l.kernel {
+	if !ok {
 		return nil
+	}
+	if !l.kernel {
+		return p.daemonLine(&l)
 	}
 	if p.seg == nil {
 		p.newSegment()
@@ -845,9 +860,16 @@ func (p *parser) dispatch(l *line) error {
 			return nil
 		}
 	}
+	if p.consumerLine(l) {
+		return nil
+	}
 	if o, ok := parseOffline(msg); ok {
 		p.records++
 		seg.records++
+		if o.method == "hard" {
+			p.tieConsumer(&o, l.n)
+		}
+		p.tieMcelog(&o, l.n)
 		if inj, ok := seg.injecting[o.pfn]; ok && o.method == "hard" {
 			delete(seg.injecting, o.pfn)
 			if l.n-inj.n <= injectionReach {
@@ -999,6 +1021,11 @@ func (p *parser) expire(n int) error {
 			if err := p.ghesEvents(b); err != nil {
 				return err
 			}
+		}
+	}
+	if len(p.mcelog) > 0 {
+		if err := p.expireMcelog(n, false); err != nil {
+			return err
 		}
 	}
 	if p.amd != nil && n-p.amd.lastN > 12 {
@@ -1423,6 +1450,7 @@ func (p *parser) closeSegment(last bool) error {
 	if err := p.closeStop(); err != nil {
 		return err
 	}
+	p.expireConsumers(-1)
 	if err := p.flushGHES(); err != nil {
 		return err
 	}
