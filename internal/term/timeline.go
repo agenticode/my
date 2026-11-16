@@ -121,7 +121,9 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 		// A short period has fewer day columns than events: on the first
 		// day of a host an uncorrected error, the offline of its page and
 		// the reboot share one column. The row of letters then runs past
-		// the last day, so that no kind of event goes unmentioned.
+		// the last day, so that no kind of event goes unmentioned and no
+		// letter stands before its day. Only a row wider than the chart
+		// moves letters left.
 		mcols := max(cols, min(len(marks), chart))
 		if len(marks) > mcols {
 			marks = marks[len(marks)-mcols:] // more letters than the chart is wide: the latest stay
@@ -129,6 +131,7 @@ func (st Style) timeline(p *page, tl *view.Timeline) {
 		for i := 1; i < len(marks); i++ {
 			marks[i].col = max(marks[i].col, marks[i-1].col+1)
 		}
+		mcols = max(mcols, min(marks[len(marks)-1].col+1, chart))
 		for i := len(marks) - 1; i >= 0; i-- {
 			limit := mcols - 1
 			if i+1 < len(marks) {
