@@ -321,6 +321,16 @@ class Runner:
         rec, text = self.run("why-json", ["why", "--json"])
         self.check_json(rec, text, "why")
         self.run("timeline", ["timeline", "--lang", "en"])
+        # The commands that came after the first validation: the boots, the
+        # inventory, the BIOS settings (none without a BMC: exit 0) and the
+        # preflight (0, or 1 when a check is lost; no grade).
+        self.run("boots", ["boots", "--lang", "ko"])
+        rec, text = self.run("boots-json", ["boots", "--json"])
+        self.check_json(rec, text, "boots")
+        self.run("inventory", ["inventory", "--lang", "en"], {0})
+        self.run("bios", ["bios", "--lang", "en"], {0})
+        rec, text = self.run("preflight-json", ["preflight", "--json"], {0, 1})
+        self.check_json(rec, text, "preflight")
         if slot:
             self.run("dimm", ["dimm", slot, "--lang", "en"])
             self.run("map", ["map", slot, "--lang", "en"])
@@ -402,6 +412,19 @@ class Runner:
         self.run("root-absent", ["--root", self.path("absent"), "--lang", "en"], {USAGE})
         self.run("command-after-flags", ["--root", self.path("empty"), "why"], {USAGE})
         self.run("gpu", ["gpu", "--lang", "en"])
+        self.run("preflight", ["preflight", "--lang", "ko"], {0, 1})
+        rec, text = self.run("preflight-script", ["preflight", "--script"], {0, 1})
+        if text and not text.startswith("#!"):
+            rec["problems"].append("the script does not start with #!")
+        self.run("harvest-status", ["harvest", "status", "--ledger", self.path("host.db")], {0})
+        self.run("open-boots", ["open", case, "boots", "--lang", "en"])
+        # Without EDAC counters there is no position to label: exit 70.
+        self.run("export-labels", ["export", "labels", "-o", self.path("labels.txt")], {0, FAILURE})
+        rec, _ = self.run("bad-flag-ko", ["--frobnicate", "--lang", "ko"], {USAGE})
+        errs = sorted(glob.glob(os.path.join(self.dir, "*-bad-flag-ko.err")))
+        err = (read(errs[-1]) if errs else "") or ""
+        if not re.search("[\uac00-\ud7a3]", err.split("\n")[0]):
+            rec["problems"].append("the error is not in Korean: %r" % err[:80])
         self.run("export-fmfm", ["export", "fmfm", "-o", self.path("fmfm.json"), "--records"], {0})
         self.run("bad-threshold", ["--set", "rule.row.min_errors=many"], {USAGE})
 
