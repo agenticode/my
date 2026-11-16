@@ -146,3 +146,18 @@ The thresholds are defaults that were compared with no field data.
 
 What MemorY never touches: kernel parameters, boot loader files, sysctls, files in `/sys` and `/proc`, the configuration of journald, systemd-pstore, kdump and rasdaemon, EFI variables, pstore files (removing one erases the record in the backend), the ERST and the boot error region. It never opens `/dev/mcelog`: a read hands the record over and clears it from ERST and from the kernel's buffer (`__mce_read_apei()`).
 
+
+## What the lab shows, and what it does not
+
+The lab of [validation-lab.md](validation-lab.md) runs crash loops in guests that QEMU emulates. What they showed:
+
+- QEMU keeps the contents of the machine check banks over the reset of the guest, and the next boot prints the record left in the bank (`TSC 0`, the time of the poll as `TIME`). With `mce=print_all` the line is in the kernel log of every such boot. `testdata/real/6.19.10-mce-loop` and `6.19.10-mce-loop-scatter` hold three such boots each.
+- With an ACPI error record store as the pstore backend, each panic left the end of the kernel log in three parts and the record of `mce_panic()`; systemd-pstore 259 archived both at the next boot.
+- `my harvest` ran at every boot of a loop, kept what each boot left in `/var/lib/my/ledger.db`, and `my boots` of that ledger shows the stops (`testdata/real/*-loop*/var/lib/my/ledger.db`).
+
+What the lab cannot show, and what MemorY has therefore not been checked against:
+
+- whether a real board keeps a record in its banks over the reset after a fatal error; `my preflight` says so as `info` and names the first stop after `my harvest install` as the test;
+- the boot error region of real firmware, and an ERST or EFI variable store of real firmware under repeated panics;
+- the entries a BMC makes about a crash, and its serial log;
+- errors that name a DIMM on x86: the guest has no EDAC driver for its memory controller, so the loops of `lab-x86` give the host finding and not R-LOOP-01, R-LOOP-02 or R-LOOP-03. Those rules are tested on synthetic ledgers (`internal/engine`) and on the example `examples/crash-loop.mycase`.
