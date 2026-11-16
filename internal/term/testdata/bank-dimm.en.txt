@@ -6,6 +6,7 @@ in this slot since 2026-07-31  0 slot changes
            the daily rate of the 30 days before
            [R-ROW-03] bank fault at rank1 dev12 bg1 bank1: 461 new places in the last 30 days, 600
            in total
+           [R-ROW-03] the fault at rank1 dev12 bg1 bank1 had errors in 2 of the last 3 boots
  checks    open: no other DIMM on this channel: there is nothing to compare with
            open: no slot move or reseat on record: a cause in the board is not ruled out
  missing   no ECS counters

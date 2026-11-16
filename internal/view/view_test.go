@@ -319,7 +319,7 @@ func TestCard(t *testing.T) {
 	if card.Grade != model.VerdictReplaceNow || card.ConfidenceLevel != "high" || strings.Join(card.Rules, " ") != "R-UE-01 R-ROW-03 R-REP-02" {
 		t.Errorf("card = %+v", card)
 	}
-	if len(card.Evidence) != 5 || card.Evidence[0].Rule != "R-UE-01" || card.Evidence[0].Records != 1 || card.Evidence[0].First == "" {
+	if len(card.Evidence) != 6 || card.Evidence[0].Rule != "R-UE-01" || card.Evidence[0].Records != 1 || card.Evidence[0].First == "" {
 		t.Errorf("evidence = %+v", card.Evidence)
 	}
 	if len(card.Checks) != 3 || card.Next == nil || len(card.Baseline) != 2 || len(card.Factors) == 0 || len(card.Faults) != 1 {

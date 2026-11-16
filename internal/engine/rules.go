@@ -20,6 +20,9 @@ const (
 	RuleMapping    = "R-MAP-01"   // the slot names of different sources disagree
 	RuleHostUE     = "R-HOST-01"  // uncorrected errors of the host that name no DIMM
 	RuleHostCE     = "R-HOST-02"  // corrected errors or page offlines of the host that name no DIMM
+	RuleLoopPlace  = "R-LOOP-01"  // uncorrected errors at one place of the DIMM in several boots
+	RuleLoopDIMM   = "R-LOOP-02"  // uncorrected errors on the DIMM in several boots, at places not the same or not known
+	RuleLoopSpread = "R-LOOP-03"  // uncorrected errors in several boots, spread over DIMMs
 )
 
 // HostRule reports whether a rule speaks about a host as a whole and not
@@ -42,6 +45,8 @@ var Rules = []Rule{
 	{RuleUE, model.VerdictReplaceNow, "rule.R-UE-01"},
 	{RuleFirmware, model.VerdictReplaceNow, "rule.R-FW-01"},
 	{RuleRepairGone, model.VerdictReplaceNow, "rule.R-REP-01"},
+	{RuleLoopPlace, model.VerdictReplaceNow, "rule.R-LOOP-01"},
+	{RuleLoopDIMM, model.VerdictReplaceNow, "rule.R-LOOP-02"},
 	{RuleRow, model.VerdictConsiderReplacement, "rule.R-ROW-03"},
 	{RuleOffline, model.VerdictConsiderReplacement, "rule.R-OFF-02"},
 	{RuleScrub, model.VerdictConsiderReplacement, "rule.R-SCRUB-01"},
@@ -54,6 +59,7 @@ var Rules = []Rule{
 	{RuleReseat, model.VerdictHoldReplacement, "rule.R-SYS-03"},
 	{RuleMapping, model.VerdictHoldReplacement, "rule.R-MAP-01"},
 	{RuleHostUE, model.VerdictHoldReplacement, "rule.R-HOST-01"},
+	{RuleLoopSpread, model.VerdictHoldReplacement, "rule.R-LOOP-03"},
 }
 
 // RuleByID returns the rule with the given ID.

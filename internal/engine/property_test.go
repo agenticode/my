@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
 )
@@ -101,6 +102,14 @@ func randomInput(rng *rand.Rand) (*Input, int64) {
 		e := b.event(uid, at(), l)
 		s := slots[rng.IntN(len(slots))]
 		e.Host, e.Slot = s.host, s.name
+		if rng.IntN(4) > 0 {
+			hi := 0
+			if s.host == "h2" {
+				hi = 1
+			}
+			e.BootID = fmt.Sprintf("boot-%d-%d", hi, rng.IntN(4))
+			e.Carried = rng.IntN(8) == 0
+		}
 		switch rng.IntN(12) {
 		case 0:
 			e.Slot = ""
@@ -166,9 +175,23 @@ func randomInput(rng *rand.Rand) (*Input, int64) {
 		b.in.Actions = append(b.in.Actions, a)
 	}
 	for i, h := range hosts {
-		for k := range rng.IntN(4) {
-			b.in.Boots = append(b.in.Boots, model.Boot{Host: h, BootID: fmt.Sprintf("boot-%d-%d", i, k), StartedAt: at(), StartQuality: model.TimeExact,
-				BIOS: []string{"", "2.4.4", "2.5.1"}[rng.IntN(3)], Kernel: []string{"", "5.14.0-570", "6.12.0-55"}[rng.IntN(3)]})
+		for k := range rng.IntN(5) {
+			bt := model.Boot{Host: h, BootID: fmt.Sprintf("boot-%d-%d", i, k), StartedAt: at(), StartQuality: model.TimeExact,
+				BIOS: []string{"", "2.4.4", "2.5.1"}[rng.IntN(3)], Kernel: []string{"", "5.14.0-570", "6.12.0-55"}[rng.IntN(3)],
+				End: []string{"", "", model.BootStop, model.BootPanic}[rng.IntN(4)]}
+			switch rng.IntN(5) {
+			case 0:
+				bt.StartQuality = model.TimeRelative
+			case 1:
+				bt.StartQuality = "unknown"
+			}
+			if rng.IntN(2) == 0 {
+				bt.LastSeen = bt.StartedAt.Add(time.Duration(rng.Int64N(int64(3 * day))))
+			}
+			if bt.End != "" && rng.IntN(2) == 0 {
+				bt.EndAt = bt.StartedAt.Add(time.Duration(rng.Int64N(int64(day))) - time.Hour)
+			}
+			b.in.Boots = append(b.in.Boots, bt)
 		}
 		for k := range rng.IntN(3) {
 			id := int64(len(b.in.Scans) + 1)
@@ -311,6 +334,32 @@ func TestAnyInputGivesAConsistentResult(t *testing.T) {
 					worst = g.Verdict.Grade
 				}
 			}
+			// The boots: counts within the window, sentences that render.
+			if r := h.Recurrence; r != nil {
+				if r.Window() > DefaultConfig().LoopWindowBoots || r.Window() > r.OnRecord || r.Stops+r.Panics > r.Window() ||
+					r.Streak > r.Stops || (r.Latest == 0) != (r.Stops == 0) {
+					t.Errorf("%s: boots %+v", name, r)
+				}
+				for _, db := range r.DIMMs {
+					if db.BootsWithUE > db.BootsWithErrors || db.BootsWithErrors > r.Window() || db.StopBoots > db.BootsWithUE ||
+						len(db.Cells) != db.BootsWithErrors || h.DIMM(db.UID) == nil {
+						t.Errorf("%s: boots of %s: %+v", name, db.UID, db)
+					}
+					for i, c := range db.Cells {
+						if c.Boot < 1 || c.Boot > r.Window() || (i > 0 && c.Boot <= db.Cells[i-1].Boot) || (c.Stopped && c.UE == 0) {
+							t.Errorf("%s: boots of %s: cell %+v", name, db.UID, c)
+						}
+					}
+				}
+				for _, st := range r.Statements {
+					seen[st.Code] = true
+					for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
+						if s := Text(lang, st); !Messages.Has(st.Code) || unfilled.MatchString(s) {
+							t.Errorf("%s: %s: %q", name, st.Code, s)
+						}
+					}
+				}
+			}
 			// The host finding: about what names no DIMM, and only then.
 			var loose int64
 			for _, u := range h.Unattributed {
@@ -327,7 +376,7 @@ func TestAnyInputGivesAConsistentResult(t *testing.T) {
 					t.Errorf("%s: host finding %+v", name, l)
 				}
 				for _, r := range l.Rules {
-					if !HostRule(r) {
+					if !HostRule(r) && r != RuleLoopSpread {
 						t.Errorf("%s: host finding with rule %s", name, r)
 					}
 				}
@@ -360,5 +409,10 @@ func TestAnyInputGivesAConsistentResult(t *testing.T) {
 	}
 	if len(seen) < 60 {
 		t.Errorf("the random inputs state only %d different sentences", len(seen))
+	}
+	for _, c := range []string{"loop.stops", "loop.place", "loop.dimm_places", "loop.spread", "check.loop_other"} {
+		if !seen[c] {
+			t.Errorf("no random input states %s", c)
+		}
 	}
 }

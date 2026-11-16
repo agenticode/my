@@ -300,6 +300,16 @@
           "text": "errors of the fault at rank0 dev7 bg0 bank3 row 0x1a2f involve 2 data lines of one device"
         },
         {
+          "rule": "R-ROW-03",
+          "code": "loop.fault_boots",
+          "args": {
+            "n": 3,
+            "of": 4,
+            "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+          },
+          "text": "the fault at rank0 dev7 bg0 bank3 row 0x1a2f had errors in 3 of the last 4 boots"
+        },
+        {
           "rule": "R-REP-02",
           "code": "rep.recurred",
           "args": {
@@ -524,7 +534,7 @@
           "confined": true
         }
       ],
-      "engine_version": "4",
+      "engine_version": "5",
       "as_of": "2026-11-13T00:00:00Z"
     },
     "topology": {
