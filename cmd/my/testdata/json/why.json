@@ -216,6 +216,59 @@
           "confined": true
         }
       ],
+      "recurrence": {
+        "dimm_uid": "d6abde8014f7764becd7",
+        "slot": "CPU1_D1",
+        "cells": [
+          {
+            "boot": 1,
+            "ce": 16
+          },
+          {
+            "boot": 2,
+            "ce": 14
+          },
+          {
+            "boot": 3,
+            "ce": 16
+          },
+          {
+            "boot": 4,
+            "ce": 7
+          }
+        ],
+        "boots_with_errors": 4,
+        "boots_with_ue": 0,
+        "stop_boots": 0,
+        "places": [
+          {
+            "level": "cell",
+            "place": "rank0 dev17 bg5 bank3 row 0xa4e9 col 0x110",
+            "cells": [
+              {
+                "boot": 1,
+                "ce": 16
+              },
+              {
+                "boot": 2,
+                "ce": 14
+              },
+              {
+                "boot": 3,
+                "ce": 16
+              },
+              {
+                "boot": 4,
+                "ce": 7
+              }
+            ],
+            "boots_with_errors": 4,
+            "boots_with_ue": 0,
+            "ce": 53,
+            "ue": 0
+          }
+        ]
+      },
       "engine_version": "5",
       "as_of": "2026-11-13T00:00:00Z"
     }

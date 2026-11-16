@@ -552,7 +552,7 @@ func TestOverviewNamesTheKeptLedger(t *testing.T) {
 	s := &session{o: &options{}, lang: "en", prefix: "my"}
 	has := func() bool {
 		for _, h := range s.hints(&view.Overview{}) {
-			if h.Command == "my open "+harvestLedger {
+			if h.Command == "my open "+harvestLedger+" boots" {
 				return true
 			}
 		}

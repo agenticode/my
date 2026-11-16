@@ -41,6 +41,7 @@ func TestScenarioFindings(t *testing.T) {
 		"system-channel":  {{grade: model.VerdictHoldReplacement, rules: []string{RuleChannel}}, {grade: model.VerdictHoldReplacement, rules: []string{RuleChannel}}},
 		"system-slot":     {{grade: model.VerdictHoldReplacement, rules: []string{RuleSlot}}},
 		"demo":            {{grade: model.VerdictReplaceNow, rules: []string{RuleUE, RuleRow, RuleRecurred}}, {grade: model.VerdictObserve, rules: []string{RuleSoft}}},
+		"crash-loop":      {{grade: model.VerdictReplaceNow, rules: []string{RuleUE, RuleLoopPlace}}, {grade: model.VerdictObserve, rules: []string{RuleSoft}}},
 	}
 	for _, name := range synth.Names() {
 		wants, ok := tests[name]

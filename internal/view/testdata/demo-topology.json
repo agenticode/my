@@ -9,9 +9,11 @@
           "label": "rank0",
           "parent": -1,
           "errors": 1232,
-          "share": 1
+          "share": 1,
+          "boots": 3
         }
-      ]
+      ],
+      "boots": 3
     },
     {
       "name": "device",
@@ -21,9 +23,11 @@
           "label": "dev7",
           "parent": 0,
           "errors": 1232,
-          "share": 1
+          "share": 1,
+          "boots": 3
         }
-      ]
+      ],
+      "boots": 3
     },
     {
       "name": "bank",
@@ -33,9 +37,11 @@
           "label": "bg0 bank3",
           "parent": 0,
           "errors": 1232,
-          "share": 1
+          "share": 1,
+          "boots": 3
         }
-      ]
+      ],
+      "boots": 3
     },
     {
       "name": "row",
@@ -45,15 +51,20 @@
           "label": "0x1a2f",
           "parent": 0,
           "errors": 1206,
-          "share": 0.9788961038961039
+          "share": 0.9788961038961039,
+          "boots": 3
         },
         {
           "label": "0x1a30",
           "parent": 0,
           "errors": 26,
-          "share": 0.021103896103896104
+          "share": 0.021103896103896104,
+          "boots": 1
         }
-      ]
+      ],
+      "boots": 3
     }
-  ]
+  ],
+  "window": 4,
+  "boots": 3
 }

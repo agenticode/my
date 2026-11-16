@@ -1,0 +1,216 @@
+{
+  "view": "boots",
+  "version": 1,
+  "lang": "en",
+  "host": "synth-crash-loop",
+  "grade": "replace-now",
+  "exit_code": 3,
+  "data": {
+    "host": "synth-crash-loop",
+    "system": "Example Systems R760",
+    "boots_on_record": 8,
+    "boots": [
+      {
+        "index": 1,
+        "boot_id": "f42e06a462aa0c13b95dd4c7a152f73b",
+        "started_at": "2026-07-31T11:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 2735760,
+        "end": ""
+      },
+      {
+        "index": 2,
+        "boot_id": "6d9126624276254e46e24386bb76fe7d",
+        "started_at": "2026-09-01T03:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 2591760,
+        "end": ""
+      },
+      {
+        "index": 3,
+        "boot_id": "9fa24819800646a1b7eb3c7393b3c6a0",
+        "started_at": "2026-10-01T03:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 3646560,
+        "end": ""
+      },
+      {
+        "index": 4,
+        "boot_id": "86eacf5a7c1da2880018ae7a387134c1",
+        "started_at": "2026-11-12T08:00:00Z",
+        "start_quality": "exact",
+        "ran_seconds": 2472,
+        "end": "stop",
+        "end_record": "event:86",
+        "stop_slot": "CPU0_C1"
+      },
+      {
+        "index": 5,
+        "boot_id": "5c331bcde7ff0c3b9c56a80d01eae2cd",
+        "started_at": "2026-11-12T08:41:44Z",
+        "start_quality": "exact",
+        "ran_seconds": 2481,
+        "end": "stop",
+        "end_record": "event:87",
+        "stop_slot": "CPU0_C1"
+      },
+      {
+        "index": 6,
+        "boot_id": "51d2b63322382a8a64b3b31d2c93056d",
+        "started_at": "2026-11-12T09:23:37Z",
+        "start_quality": "exact",
+        "ran_seconds": 53,
+        "end": "stop",
+        "end_record": "event:88",
+        "stop_slot": "CPU0_C1"
+      },
+      {
+        "index": 7,
+        "boot_id": "bc9cee99b7f782aeb41102ac34d848be",
+        "started_at": "2026-11-12T09:25:02Z",
+        "start_quality": "exact",
+        "ran_seconds": 2699,
+        "end": "stop",
+        "end_record": "event:89",
+        "stop_slot": "CPU0_C1"
+      },
+      {
+        "index": 8,
+        "boot_id": "33d7a399a55c12ae349098671f24b4b8",
+        "started_at": "2026-11-12T10:10:33Z",
+        "start_quality": "exact",
+        "ran_seconds": 49767,
+        "end": ""
+      }
+    ],
+    "rows": [
+      {
+        "level": "dimm",
+        "dimm_uid": "d30546d4429ff5fa9071",
+        "slot": "CPU0_C1",
+        "serial": "BE8ED6",
+        "cells": [
+          {
+            "boot": 1,
+            "known": true
+          },
+          {
+            "boot": 2,
+            "known": true
+          },
+          {
+            "boot": 3,
+            "ce": 60,
+            "known": true
+          },
+          {
+            "boot": 4,
+            "ue": 1,
+            "stopped": true,
+            "known": true
+          },
+          {
+            "boot": 5,
+            "ue": 1,
+            "stopped": true,
+            "known": true
+          },
+          {
+            "boot": 6,
+            "ue": 1,
+            "stopped": true,
+            "known": true
+          },
+          {
+            "boot": 7,
+            "ue": 1,
+            "stopped": true,
+            "known": true
+          },
+          {
+            "boot": 8,
+            "known": true
+          }
+        ],
+        "boots_with_errors": 5,
+        "boots_with_ue": 4,
+        "ce": 60,
+        "ue": 4,
+        "stop_boots": 4
+      },
+      {
+        "level": "dimm",
+        "dimm_uid": "d836c59c05db4fc8f840",
+        "slot": "CPU1_D1",
+        "serial": "21FD6F",
+        "cells": [
+          {
+            "boot": 1,
+            "ce": 8,
+            "known": true
+          },
+          {
+            "boot": 2,
+            "ce": 6,
+            "known": true
+          },
+          {
+            "boot": 3,
+            "ce": 11,
+            "known": true
+          },
+          {
+            "boot": 4,
+            "known": true
+          },
+          {
+            "boot": 5,
+            "known": true
+          },
+          {
+            "boot": 6,
+            "known": true
+          },
+          {
+            "boot": 7,
+            "known": true
+          },
+          {
+            "boot": 8,
+            "known": true
+          }
+        ],
+        "boots_with_errors": 3,
+        "boots_with_ue": 0,
+        "ce": 25,
+        "ue": 0
+      }
+    ],
+    "stops": {
+      "stops": 4,
+      "window": 8,
+      "where": "R-LOOP-01",
+      "lines": [
+        {
+          "code": "loop.stops",
+          "args": {
+            "n": 4,
+            "of": 8,
+            "ran": "44 min",
+            "when": "2026-11-12 10:10 UTC"
+          },
+          "text": "4 of the last 8 boots ended in a fatal hardware error, the latest on 2026-11-12 10:10 UTC after 44 min"
+        },
+        {
+          "code": "loop.where_dimm",
+          "args": {
+            "n": 4,
+            "rule": "R-LOOP-01",
+            "slot": "CPU0_C1"
+          },
+          "text": "4 of them had an uncorrected error of CPU0_C1 (R-LOOP-01)"
+        }
+      ]
+    }
+  }
+}

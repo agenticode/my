@@ -115,14 +115,17 @@ examples:
 	$(MY_EXAMPLE) report examples/demo.mycase -o examples/demo-report.html --figures examples/figures --force
 	$(MY_EXAMPLE) report examples/demo.mycase -o examples/ko/demo-report.html --figures examples/ko/figures --lang ko --force
 
-# The example case: a bundle of the synthetic demo host with CPU0_C1 as its
-# subject. A bundle holds a ledger, which names itself anew every time it
-# is made; make the case again only when it has to change (a new ledger
-# schema, another demo scenario), then run "make examples".
+# The example cases: bundles of the synthetic demo host and of a host in a
+# crash loop, with CPU0_C1 as their subject. A bundle holds a ledger, which
+# names itself anew every time it is made; make the cases again only when
+# they have to change (a new ledger schema, another scenario), then run
+# "make examples".
 examples-case:
 	@set -e; tmp="$$(mktemp -d)"; trap 'rm -rf "$$tmp"' EXIT; \
 	$(GO) run -buildvcs=false ./cmd/my synth -scenario demo -ledger "$$tmp/demo.db" > /dev/null; \
-	$(MY_EXAMPLE) open "$$tmp/demo.db" bundle CPU0_C1 -o examples/demo.mycase --force
+	$(MY_EXAMPLE) open "$$tmp/demo.db" bundle CPU0_C1 -o examples/demo.mycase --force; \
+	$(GO) run -buildvcs=false ./cmd/my synth -scenario crash-loop -ledger "$$tmp/loop.db" > /dev/null; \
+	$(MY_EXAMPLE) open "$$tmp/loop.db" bundle CPU0_C1 -o examples/crash-loop.mycase --force
 
 fuzz:
 	@GO="$(GO)" tools/fuzz.sh $(FUZZTIME) $(FUZZMINIMIZE) $(JOBS) $(FUZZ_TARGETS)

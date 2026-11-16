@@ -59,6 +59,16 @@ type AddressMap struct {
 	Faults []MapFault `json:"faults"`
 	// Stray counts the errors of the bank that belong to none of them.
 	Stray int64 `json:"stray,omitzero"`
+	// Window is the number of boots of the window of the host; Boots and
+	// UEBoots count those of them in which the bank had errors and
+	// uncorrected errors.
+	Window  int `json:"window,omitzero"`
+	Boots   int `json:"boots,omitzero"`
+	UEBoots int `json:"ue_boots,omitzero"`
+	// ByBoots is set when the cells count boots (my map --boots): Boots
+	// and UEBoots of the lines hold, per cell, the boots of the window with
+	// errors there.
+	ByBoots bool `json:"by_boots,omitzero"`
 }
 
 // Modes of an AddressMap.
@@ -99,6 +109,10 @@ type MapLine struct {
 	// UE lists the cells that hold an uncorrected error.
 	UE     []int `json:"ue,omitzero"`
 	Errors int64 `json:"errors,omitzero"`
+	// Boots and UEBoots hold per cell the boots of the window with errors
+	// and with uncorrected errors there, on a map by boots.
+	Boots   []int `json:"boots,omitzero"`
+	UEBoots []int `json:"ue_boots,omitzero"`
 	// Note says what the line shows, where a fault explains it.
 	Note *Text `json:"note,omitzero"`
 }
@@ -163,6 +177,8 @@ type MapOptions struct {
 	RowFrom, RowTo model.Opt[int]
 	// Cells is the widest grid allowed, in cells; 0 means 64.
 	Cells int
+	// Boots makes the cells count the boots of the window with errors.
+	Boots bool
 	// MaxLines is the tallest grid allowed, in lines; 0 means 24.
 	MaxLines int
 }
@@ -308,9 +324,19 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	}
 	type cellKey struct{ row, col int }
 	type cellVal struct {
-		ce, ue int64
-		refs   cellRefs
+		ce, ue        int64
+		refs          cellRefs
+		boots, ueBoot map[int]bool
 	}
+	// The boots of the window, by boot ID.
+	window := map[string]int{}
+	if h.Recurrence != nil {
+		for _, b := range h.Recurrence.Boots {
+			window[b.BootID] = b.Index
+		}
+	}
+	m.Window = len(window)
+	bankBoots, bankUE := map[int]bool{}, map[int]bool{}
 	type faultStat struct {
 		errors, ue  int64
 		rows, cols  map[int]struct{}
@@ -346,6 +372,15 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			v.ce += n
 		}
 		v.refs.add(e, ue)
+		if bi, ok := window[e.BootID]; ok && e.Kind != model.KindCounter {
+			if v.boots == nil {
+				v.boots, v.ueBoot = map[int]bool{}, map[int]bool{}
+			}
+			v.boots[bi], bankBoots[bi] = true, true
+			if ue {
+				v.ueBoot[bi], bankUE[bi] = true, true
+			}
+		}
 		colMax = max(colMax, e.Column.V)
 
 		fi, ok := faultOf[e.ID]
@@ -444,6 +479,8 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 	// refs collects, per line and cell of the grid, the records behind it.
 	type gridKey struct{ line, cell int }
 	refs := map[gridKey]*cellRefs{}
+	type bootSets struct{ all, ue map[int]bool }
+	gridBoots := map[gridKey]*bootSets{}
 	refer := func(line, cell int, v *cellVal) {
 		k := gridKey{line, cell}
 		r := refs[k]
@@ -452,6 +489,19 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			refs[k] = r
 		}
 		r.merge(&v.refs)
+		if len(v.boots) > 0 {
+			bs := gridBoots[k]
+			if bs == nil {
+				bs = &bootSets{all: map[int]bool{}, ue: map[int]bool{}}
+				gridBoots[k] = bs
+			}
+			for b := range v.boots {
+				bs.all[b] = true
+			}
+			for b := range v.ueBoot {
+				bs.ue[b] = true
+			}
+		}
 	}
 	fill := func(index int, ln *MapLine) {
 		ue := map[int]bool{}
@@ -527,6 +577,21 @@ func (c *Case) AddressMap(ctx context.Context, h *engine.HostResult, d *engine.D
 			ln := line(r, step)
 			fill(len(m.Lines), &ln)
 			m.Lines = append(m.Lines, ln)
+		}
+	}
+	m.Boots, m.UEBoots = len(bankBoots), len(bankUE)
+	if opts.Boots {
+		m.ByBoots = true
+		for i := range m.Lines {
+			ln := &m.Lines[i]
+			if ln.Gap {
+				continue
+			}
+			ln.Boots, ln.UEBoots = make([]int, len(ln.Cells)), make([]int, len(ln.Cells))
+		}
+		for k, bs := range gridBoots {
+			ln := &m.Lines[k.line]
+			ln.Boots[k.cell], ln.UEBoots[k.cell] = len(bs.all), len(bs.ue)
 		}
 	}
 	for k, r := range refs {

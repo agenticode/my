@@ -23,3 +23,4 @@ CPU0_E1  S/N 34C15C  DDR5 RDIMM 64 GB 2Rx4
 
  column fault at rank1 dev12 bg1 bank1 col 0x110: 250 errors, 1 column in 14 rows, data lines DQ3,
    first 2026-08-20, latest 2026-11-12
+ errors in 3 of the last 3 boots, uncorrected in 0

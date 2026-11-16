@@ -5,6 +5,7 @@ A case of a synthetic host, and what `my report` makes of it. The host, `r12-n03
 | File | What it is |
 | --- | --- |
 | `demo.mycase` | the case bundle, with `CPU0_C1` as its subject |
+| `crash-loop.mycase` | a second case: a cell of `CPU0_C1` of the host `synth-crash-loop` gives a fatal error in four boots in a row, each read back by the next boot from the machine check bank |
 | `demo-report.html` | the report of the case; download it and open it in a browser |
 | `figures/*.svg` | the figures of the report as files of their own |
 | `ko/demo-report.html`, `ko/figures/*.svg` | the same report and figures in Korean (`--lang ko`) |
@@ -15,6 +16,7 @@ Look at the case with the commands of the tool:
 ```
 my open examples/demo.mycase
 my open examples/demo.mycase dimm CPU0_C1
+my open examples/crash-loop.mycase boots
 ```
 
 The files are made by the tool. `make examples` writes the reports and the figures again from the case, and a test fails when they differ from what the command writes:
@@ -29,6 +31,8 @@ The case itself comes from the synthetic generator (`make examples-case`):
 ```
 my synth -scenario demo -ledger demo.db
 my open demo.db bundle CPU0_C1 -o examples/demo.mycase
+my synth -scenario crash-loop -ledger loop.db
+my open loop.db bundle CPU0_C1 -o examples/crash-loop.mycase
 ```
 
 No real host and no real DIMM is behind these records: the names, serial numbers and part numbers are made up.
