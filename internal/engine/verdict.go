@@ -12,10 +12,12 @@ import (
 
 // judge turns the measurements of the DIMMs into findings.
 type judge struct {
-	in  *Input
-	cfg *Config
-	sys *systemView
-	now time.Time
+	// loop is the view of the boots (recurrence.go).
+	loop *loopView
+	in   *Input
+	cfg  *Config
+	sys  *systemView
+	now  time.Time
 
 	// extra holds record references added to the evidence of a rule after
 	// the statement was made.
@@ -64,6 +66,9 @@ type hostFacts struct {
 	bios       biosFacts
 	bmcSource  bool
 	hostSource bool
+	// live is set when the latest scan of the host read the running host:
+	// its latest boot was running then.
+	live bool
 }
 
 func (j *judge) asOf(d *DIMMResult) int64 { return d.clk.asOf }
@@ -1037,6 +1042,8 @@ func (j *judge) next(fs *findings, grade model.VerdictGrade) model.Statement {
 	switch grade {
 	case model.VerdictHoldReplacement:
 		switch {
+		case fs.has(RuleLoopSpread):
+			return statement("next.loop_spread")
 		case fs.has(RuleMapping):
 			return statement("next.mapping")
 		case fs.has(RuleSlot):
@@ -1053,6 +1060,12 @@ func (j *judge) next(fs *findings, grade model.VerdictGrade) model.Statement {
 		}
 		return statement("next.contact")
 	case model.VerdictReplaceNow:
+		switch {
+		case fs.has(RuleLoopPlace):
+			return statement("next.loop_place")
+		case fs.has(RuleLoopDIMM):
+			return statement("next.loop_dimm")
+		}
 		return statement("next.replace")
 	case model.VerdictConsiderReplacement:
 		return statement("next.plan")
@@ -1072,6 +1085,7 @@ var baseConfidence = map[string]int{
 	RuleQuiet: 70, RuleSoft: 65,
 	RuleSlot: 80, RuleMapping: 75, RuleChannel: 65, RuleReseat: 60,
 	RuleHostUE: 85, RuleHostCE: 70,
+	RuleLoopPlace: 90, RuleLoopDIMM: 80, RuleLoopSpread: 70,
 }
 
 // confidence rates the finding from 0 to 100 and lists the steps.
@@ -1148,8 +1162,12 @@ func (j *judge) confidence(fs *findings, rules []string, missing []model.Stateme
 // verdict puts the finding of one DIMM together.
 func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 	fs := &findings{d: d, basis: map[string]*basis{}, covered: map[*Fault]bool{}}
-	// The system rules ran before; their evidence comes first.
+	// The system rules ran before; their evidence comes first, then that
+	// of the boots.
 	fs.evidence = append(fs.evidence, j.sys.fired[d]...)
+	if j.loop != nil {
+		fs.evidence = append(fs.evidence, j.loop.fired[d]...)
+	}
 	for i := range fs.evidence {
 		if refs := j.extra[d][fs.evidence[i].Rule]; len(refs) > 0 {
 			fs.evidence[i].Records = append(refs, fs.evidence[i].Records...)
@@ -1178,6 +1196,7 @@ func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 	j.offline(fs)
 	j.repaired(fs)
 	j.soft(fs)
+	j.faultBoots(fs)
 
 	sort.SliceStable(fs.evidence, func(a, b int) bool {
 		return rulePosition(fs.evidence[a].Rule) < rulePosition(fs.evidence[b].Rule)
@@ -1193,6 +1212,9 @@ func (j *judge) verdict(d *DIMMResult) *model.Verdict {
 		}
 	}
 	j.check(fs, v.Grade)
+	if j.loop != nil {
+		fs.checks = append(fs.checks, j.loop.checks[d]...)
+	}
 	v.CounterEvidence = fs.checks
 	v.Missing = j.missing(fs, v.Grade)
 	v.NextAction = j.next(fs, v.Grade)

@@ -68,6 +68,18 @@ The BMC or the BIOS marks the DIMM as failed or disabled. The records are a "mem
 
 Repair resources are used up: a post package repair or a row remap failed, or sparing is in use, which leaves no spare. For a GPU the rule fires when a row remapping failed: XID 64 in the kernel log, or the failure flag in the state `nvidia-smi` reports.
 
+### R-LOOP-01
+
+Uncorrected errors at one place of the DIMM in at least `rule.loop.min_boots` boots of the window (see "Boots" below). A place is a cell (rank, device, bank and row and column) when the records give one, and a cache line of the physical address when they give only the address. One fatal error ends its boot, so on a hard fault every boot ends at the same place. A check supports the finding when no other DIMM of the host had an uncorrected error in these boots. For a place known by address, a check speaks against it when the BIOS version or the DIMMs of the host changed between the boots: one address may then have been two cells.
+
+Next step: replace the DIMM and attach a case bundle to the return.
+
+### R-LOOP-02
+
+Uncorrected errors on the DIMM in at least `rule.loop.min_boots` boots of the window, at no place that repeats: the places differ, or the records name the DIMM only. A check stays open: with no place that repeats, a cause outside the DIMM is not ruled out.
+
+Next step: replace the DIMM and watch the boots that follow; if the stops go on with another DIMM, inspect the channel and the board.
+
 ## Consider replacement
 
 ### R-ROW-03
@@ -141,6 +153,12 @@ Next step: before a DIMM is pulled, confirm which physical slot the errors belon
 
 Uncorrected errors of the host that no record ties to a DIMM. It is a rule of the host finding.
 
+### R-LOOP-03
+
+Uncorrected errors tied to DIMMs in at least `rule.loop.scatter_boots` boots of the window, spread so that no DIMM had them in more than `rule.loop.scatter_share` of those boots. Every DIMM involved gets the rule, with a statement of what the DIMMs share: one channel, one socket, or several sockets. A DIMM that had a confined fault of its own before the first of these boots gets a check against it. A DIMM that fires R-LOOP-01 or R-LOOP-02 as well keeps them, and hold replacement outranks them: while the errors are spread, the finding asks what the DIMMs share before one is pulled.
+
+Next step: do not pull a DIMM yet; check what the DIMMs share first: the channel, the socket, the power and the BIOS.
+
 ## The host finding
 
 Some records name no DIMM: machine checks of a host whose memory controller has no EDAC driver, firmware records without a location, pages the kernel took offline by address. They are in the finding of no DIMM. The host finding speaks about them, one finding per host next to those of its DIMMs.
@@ -151,6 +169,18 @@ Some records name no DIMM: machine checks of a host whose memory controller has 
 | R-HOST-02 | observe | at least one corrected error names no DIMM, or at least one page was taken offline and is tied to no DIMM |
 
 The finding lists why the records name no DIMM (no slot in them, or a slot that held two DIMMs with an unknown time of the swap), says where no EDAC driver reports a memory controller, and counts the pages a program asked the kernel to take offline, which is what a test of that path does. Its next step is to find the DIMM through the EDAC driver of the memory controller or the event log of the BMC. On a virtual machine the next step names the hypervisor host.
+
+## Boots
+
+A fatal memory error ends its boot. A host that resets after it and fails again shows the same place in boot after boot, and the records of each stop are read by the next boot ([crash-loop.md](crash-loop.md)). The engine looks at the latest `loop.window_boots` boots of every host, oldest first. Boots whose start is known only relative to another boot are left out.
+
+For every DIMM and boot it counts the corrected and the uncorrected errors, at the finest place the records give. A boot ended in a stop when a record shows a fatal hardware error in it: a fatal machine check, a panic text that names one, or a record the next boot read out of the banks or the boot error region. The view `my boots` shows the window; the rules R-LOOP-01, R-LOOP-02 and R-LOOP-03 read it.
+
+Two boots with an uncorrected error each on two different DIMMs fire no rule; each DIMM gets a check that names the other, since a cause the two share fits as well. A fault of corrected errors that had errors in two or more boots of the window says so in its R-ROW-03 or R-SOFT-01 statement.
+
+On the host finding, an address that had uncorrected errors in at least `rule.loop.min_boots` boots gets a statement of its own. When boots stopped and no record of them names a DIMM, the finding lists what `my preflight` found a reset loses on the host.
+
+The thresholds of the R-LOOP rules are defaults. They have not been compared with field data: the lab loops of [validation-lab.md](validation-lab.md) show that the rules fire on the records a loop leaves, and say nothing about how often a host in service loops.
 
 ## What a finding carries beside its rules
 
@@ -173,7 +203,9 @@ The confidence starts at a value of the rule that set the grade and moves with t
 | R-REP-02 | 80 | R-SYS-01 | 65 |
 | R-ROW-03 | 75 | R-SYS-03 | 60 |
 | R-OFF-02 | 70 | R-HOST-01 | 85 |
-| no rule (ok) | 85 | R-HOST-02 | 70 |
+| R-LOOP-01 | 90 | R-HOST-02 | 70 |
+| R-LOOP-02 | 80 | R-LOOP-03 | 70 |
+| no rule (ok) | 85 | | |
 
 | Condition | Change |
 | --- | --- |
@@ -219,6 +251,10 @@ The confidence starts at a value of the rule that set the grade and moves with t
 | `rule.quiet.days` | 7 | R-QUIET-01, R-SYS-03: days without errors after a repair, page offline or reseat |
 | `rule.system.min_errors` | 5 | R-SYS-01, R-SYS-02, R-SYS-03: unconfined errors each side needs before it is compared |
 | `rule.system.overlap_days` | 7 | R-SYS-01: days the error periods of two DIMMs of a channel may lie apart |
+| `loop.window_boots` | 16 | latest boots of a host the recurrence across boots looks at |
+| `rule.loop.min_boots` | 2 | R-LOOP-01, R-LOOP-02: boots with uncorrected errors at one place or on one DIMM |
+| `rule.loop.scatter_boots` | 3 | R-LOOP-03: boots with uncorrected errors tied to a DIMM before their spread is judged |
+| `rule.loop.scatter_share` | 0.5 | R-LOOP-03: largest share of those boots one DIMM may have for the errors to count as spread |
 | `check.host_wide_min_dimms` | 3 | DIMMs of a host with unconfined errors in the same period from which a common cause is mentioned |
 | `evidence.max_records` | 20 | record references listed with one statement |
 

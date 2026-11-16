@@ -106,6 +106,19 @@ type Config struct {
 	// MaxEvidenceRecords caps the record references listed with one
 	// statement. The first and the last records are kept.
 	MaxEvidenceRecords int
+	// LoopWindowBoots is the number of latest boots of a host the
+	// recurrence across boots looks at.
+	LoopWindowBoots int
+	// LoopMinBoots is the number of boots with uncorrected errors at one
+	// place (R-LOOP-01) or on one DIMM (R-LOOP-02) from which the errors
+	// recur across boots.
+	LoopMinBoots int
+	// LoopScatterBoots is the number of boots with uncorrected errors tied
+	// to a DIMM from which R-LOOP-03 asks whether they share a DIMM.
+	LoopScatterBoots int
+	// LoopScatterShare is the largest share of those boots one DIMM may
+	// have for the errors to count as spread over DIMMs (R-LOOP-03).
+	LoopScatterShare float64
 }
 
 // DefaultConfig returns the default thresholds.
@@ -140,6 +153,11 @@ func DefaultConfig() Config {
 		SystemOverlapDays:  7,
 		HostWideMinDIMMs:   3,
 		MaxEvidenceRecords: 20,
+
+		LoopWindowBoots:  16,
+		LoopMinBoots:     2,
+		LoopScatterBoots: 3,
+		LoopScatterShare: 0.5,
 	}
 }
 
@@ -245,6 +263,14 @@ var params = []Param{
 		func(c *Config) *int { return &c.HostWideMinDIMMs }),
 	intParam("evidence.max_records", "record references listed with one statement", 1, inf,
 		func(c *Config) *int { return &c.MaxEvidenceRecords }),
+	intParam("loop.window_boots", "latest boots of a host the recurrence across boots looks at", 2, 1000,
+		func(c *Config) *int { return &c.LoopWindowBoots }),
+	intParam("rule.loop.min_boots", "R-LOOP-01, R-LOOP-02: boots with uncorrected errors at one place or on one DIMM", 2, inf,
+		func(c *Config) *int { return &c.LoopMinBoots }),
+	intParam("rule.loop.scatter_boots", "R-LOOP-03: boots with uncorrected errors tied to a DIMM before their spread is judged", 2, inf,
+		func(c *Config) *int { return &c.LoopScatterBoots }),
+	floatParam("rule.loop.scatter_share", "R-LOOP-03: largest share of those boots one DIMM may have for the errors to count as spread", tiny, 1,
+		func(c *Config) *float64 { return &c.LoopScatterShare }),
 }
 
 func formatValue(v float64, integer bool) string {
