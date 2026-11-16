@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
@@ -78,6 +79,7 @@ const (
 	WhatPstore    = "pstore dump"
 	WhatKdump     = "kdump text log"
 	WhatCrashLogs = "crash logs (pstore, kdump)"
+	WhatBERT      = "boot error region (BERT)"
 )
 
 // ErrUnknownInput is returned by Detect, wrapped with what the input looks
@@ -102,7 +104,8 @@ const maxBinary = 16 << 20
 //   - a file is a rasdaemon database, a kernel log in one of its forms, the
 //     output of dmidecode, of nvidia-smi (-q, or a selective query in CSV
 //     form) or of mcelog --client, a BMC event log, a Redfish resource, an
-//     FMFM boot, runtime or crash log, a pstore dump or a kdump text log.
+//     FMFM boot, runtime or crash log, a pstore dump, a kdump text log or
+//     a saved boot error region (BERT).
 //
 // A file compressed with gzip is read through, except a database.
 // Nothing is read beyond what is needed to recognise the input; the
@@ -292,6 +295,10 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 				return sel.NewReader(stream(), path, sel.Options{Location: opts.Location}), WhatSEL, nil
 			}
 			return sel.NewFile(path, sel.Options{Location: opts.Location}), WhatSEL, nil
+		}
+		if !zipped && bert.Sniff(head) {
+			// A saved region: dated by the capture time, else by the file.
+			return bert.New(path, bert.Options{ReadAt: captured}), WhatBERT, nil
 		}
 		return nil, "", fmt.Errorf("%w: binary data of no known kind", ErrUnknownInput)
 	}

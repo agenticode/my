@@ -165,6 +165,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | rasdaemon | `/var/lib/rasdaemon/ras-mc_event.db`. `--fleet`을 쓰면 MySQL, MariaDB, PostgreSQL에 둔 저장소 | EDAC 드라이버가 디코딩한 위치가 든 오류 기록, machine check, page offline, CXL 이벤트 |
 | 커널 로그 | 호스트에서는 저널과 `/dev/kmsg`. 파일로는 `dmesg` 출력, syslog, `journalctl -o json` | EDAC 줄, 펌웨어 오류 기록, machine check, page offline, 부팅, NVIDIA 드라이버의 Xid 줄 |
 | 크래시 로그 | `/sys/fs/pstore`, `/var/lib/systemd/pstore`, `/var/crash` | panic으로 끝난 부팅의 커널 로그: reset 전에 출력한 기록 |
+| 부팅 오류 영역 | `/sys/firmware/acpi/tables/data/BERT` | 펌웨어가 호스트를 reset시킨 오류에 대해 남긴 기록 |
 | EDAC 카운터 | `/sys/devices/system/edac/mc` | 부팅 이후 DIMM별 건수 |
 | mcelog 데몬 | `mcelog --client` | DIMM별 건수 |
 | SMBIOS | `/sys/firmware/dmi/tables` 또는 `dmidecode` 출력 | 슬롯, DIMM 시리얼과 부품번호 |

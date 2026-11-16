@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
@@ -27,7 +28,7 @@ func Reads(src model.Source) bool {
 	switch src.Kind {
 	case hostinfo.Kind, smbios.Kind, ingest.SlotMapKind, ingest.TimeAlignKind:
 		return false
-	case edacsysfs.Kind, crashlog.KindPstore, crashlog.KindKdump:
+	case edacsysfs.Kind, crashlog.KindPstore, crashlog.KindKdump, bert.Kind:
 		// An empty crash log place says that no boot crashed into it,
 		// nothing about the errors of the host.
 		return src.Status == model.SourceOK || src.Status == model.SourcePartial
@@ -68,6 +69,9 @@ func HoldsErrorSource(opts *Options) bool {
 		if there(c.Dir) {
 			return true
 		}
+	}
+	if there(bert.Path) {
+		return true
 	}
 	for _, list := range [][]string{RasdaemonPaths, LogFiles, NvidiaSMIFiles} {
 		for _, rel := range list {

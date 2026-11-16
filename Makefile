@@ -37,6 +37,7 @@ FUZZ_TARGETS := \
 	./internal/decode/edac:FuzzParseDetail \
 	./internal/decode/cper:FuzzParseText \
 	./internal/decode/cper:FuzzParseBinary \
+	./internal/decode/cper:FuzzParseStatusBlocks \
 	./internal/decode/mce:FuzzDecode \
 	./internal/decode/ipmi:FuzzParseRecord \
 	./internal/decode/ipmi:FuzzLabels \
@@ -46,6 +47,7 @@ FUZZ_TARGETS := \
 	./internal/adapter/smbios:FuzzDmidecode \
 	./internal/adapter/klog:FuzzCollect \
 	./internal/adapter/crashlog:FuzzParts \
+	./internal/adapter/bert:FuzzCollect \
 	./internal/adapter/rasdaemon:FuzzRows \
 	./internal/adapter/rasdaemon:FuzzDatabase \
 	./internal/adapter/rasdaemon:FuzzStoreSettings \
