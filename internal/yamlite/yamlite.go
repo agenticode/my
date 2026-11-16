@@ -16,7 +16,7 @@ import (
 const (
 	MaxBytes = 1 << 20
 	MaxLines = 20000
-	MaxDepth        = 12
+	MaxDepth = 12
 )
 
 // kind of a node.

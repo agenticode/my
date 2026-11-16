@@ -377,3 +377,11 @@ func (c *Classifier) forRegistry(prefix string) []*Table {
 	}
 	return append(named, any...)
 }
+
+// ShippedText returns a shipped table as it is written, by name.
+func ShippedText(name string) ([]byte, error) {
+	if !nameRE.MatchString(name) {
+		return nil, fmt.Errorf("no table %q", name)
+	}
+	return shippedFS.ReadFile("tables/" + name + ".yaml")
+}
