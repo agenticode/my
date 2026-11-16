@@ -13,6 +13,7 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `7.3.0-mce-fatal` | the same guest | 1 fatal machine check; only the console is left |
 | `7.3.0-mce-rasdaemon-1.0` | the same guest, rasdaemon 1.0.0 | the machine checks of `7.3.0-mce` |
 | `7.3.0-cxl` | the same guest with an emulated CXL memory device, rasdaemon 1.0.0 | 11 corrected and 1 uncorrected error of the device, a health record, 2 poison ranges |
+| `7.3.0-cxl-repair` | the same guest with two CXL memory devices under QEMU 11.1.3, rasdaemon 1.0.0 | errors in one row of each device, a soft post package repair of that row through the kernel's EDAC interface, errors again in the repaired row of one device |
 | `6.19.10-ghes` | aarch64 guest with a firmware error source | 24 corrected and 2 uncorrected errors on one DIMM, as firmware error records with row and column |
 | `6.19.10-ghes-clock-step` | the same guest in its next boot, clock set back after rasdaemon started | 10 corrected and 1 uncorrected error; rasdaemon's times are 10 seconds ahead and no record holds the kernel's time |
 | `6.19.10-ghes-multi` | another aarch64 guest with six DIMMs, booted three times a day apart | a row, a column, a bank and a single cell fault on four DIMMs, 35 corrected and 1 uncorrected error; two DIMMs without errors |

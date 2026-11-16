@@ -1,0 +1,437 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-guest",
+  "grade": "consider-replacement",
+  "exit_code": 2,
+  "data": {
+    "host": {
+      "name": "lab-guest",
+      "system": "QEMU Standard PC (Q35 + ICH9, 2009)",
+      "virtual": "VMware",
+      "from": "2026-10-27T03:36:03.18314Z",
+      "to": "2026-11-16T23:35:00.291065Z",
+      "ce": 15,
+      "ue": 0,
+      "records": 15,
+      "grade_a": 15,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "consider-replacement",
+      "grade_text": "consider replacement",
+      "boots": 2,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-16T23:34:58.030119Z",
+        "privileged": true,
+        "tool_version": "d7515eb"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "DIMM 0",
+                  "label": "DIMM 0",
+                  "state": "ok"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "cxl",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "cxl:mem0",
+                  "label": "mem0",
+                  "state": "consider-replacement",
+                  "serial": "0x4c41420012",
+                  "ce": 9
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "cxl:mem1",
+                  "label": "mem1",
+                  "state": "observe",
+                  "serial": "0x4c41420011",
+                  "ce": 6
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 3,
+      "populated": 3
+    },
+    "ranking": [
+      {
+        "n": 1,
+        "slot": "cxl:mem0",
+        "dimm": {
+          "dimm_uid": "d3636eff4e23b9d4d6b3",
+          "serial": "0x4c41420012",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 9,
+        "ue": 0,
+        "mode": "row",
+        "mode_text": "row",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9
+        ],
+        "direction": "new",
+        "grade": "consider-replacement",
+        "grade_text": "consider replacement",
+        "rules": [
+          "R-REP-02"
+        ],
+        "confidence": 66
+      },
+      {
+        "n": 2,
+        "slot": "cxl:mem1",
+        "dimm": {
+          "dimm_uid": "d5427925bd125e195674",
+          "serial": "0x4c41420011",
+          "identity": "serial"
+        },
+        "present": true,
+        "ce": 6,
+        "ue": 0,
+        "mode": "row",
+        "mode_text": "row",
+        "faults": 1,
+        "trend": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6
+        ],
+        "direction": "new",
+        "grade": "observe",
+        "grade_text": "observe",
+        "rules": [
+          "R-SOFT-01"
+        ],
+        "confidence": 55
+      }
+    ],
+    "quiet": 1,
+    "recurrence": {
+      "boots": [
+        {
+          "index": 1,
+          "boot_id": "derived-c7dafffc72b1e3c6",
+          "started_at": "2026-10-27T03:36:03.18314Z",
+          "start_quality": "estimated",
+          "ran_seconds": 325,
+          "end": "panic",
+          "end_record": "event:16"
+        },
+        {
+          "index": 2,
+          "boot_id": "e40301b284404e9fb2ef8ae6c0b3d262",
+          "started_at": "2026-11-16T23:32:51Z",
+          "start_quality": "exact",
+          "ran_seconds": 127,
+          "end": "running"
+        }
+      ],
+      "boots_on_record": 2,
+      "stops": 0,
+      "panics": 1,
+      "dimms": [
+        {
+          "dimm_uid": "d3636eff4e23b9d4d6b3",
+          "slot": "cxl:mem0",
+          "cells": [
+            {
+              "boot": 2,
+              "ce": 9
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "stop_boots": 0,
+          "places": [
+            {
+              "level": "cell",
+              "place": "rank1 bg3 bank0 row 0xa7c col 0x40",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 4
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 4,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank1 bg3 bank0 row 0xa7c col 0x200",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 3
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 3,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank1 bg3 bank0 row 0xa7c col 0x2c0",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 1
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 1,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank1 bg3 bank0 row 0xa7c col 0x3c0",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 1
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 1,
+              "ue": 0
+            }
+          ]
+        },
+        {
+          "dimm_uid": "d5427925bd125e195674",
+          "slot": "cxl:mem1",
+          "cells": [
+            {
+              "boot": 2,
+              "ce": 6
+            }
+          ],
+          "boots_with_errors": 1,
+          "boots_with_ue": 0,
+          "stop_boots": 0,
+          "places": [
+            {
+              "level": "cell",
+              "place": "rank0 bg1 bank2 row 0x1f40 col 0x80",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 3
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 3,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 bg1 bank2 row 0x1f40 col 0x1c0",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 2
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 2,
+              "ue": 0
+            },
+            {
+              "level": "cell",
+              "place": "rank0 bg1 bank2 row 0x1f40 col 0x300",
+              "cells": [
+                {
+                  "boot": 2,
+                  "ce": 1
+                }
+              ],
+              "boots_with_errors": 1,
+              "boots_with_ue": 0,
+              "ce": 1,
+              "ue": 0
+            }
+          ]
+        }
+      ]
+    },
+    "loose_pages": 1,
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "name": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "name": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 17,
+        "events": 15,
+        "actions": 2,
+        "skipped": 0,
+        "grade": "A",
+        "first": "2026-11-16T23:33:58Z",
+        "last": "2026-11-16T23:34:24Z"
+      },
+      {
+        "kind": "klog",
+        "name": "klog",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "621 lines read",
+          "its lines run from 2026-11-16 23:32 to 2026-11-16 23:34 UTC"
+        ]
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/sys/fs/pstore)",
+        "origin": "/sys/fs/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/var/lib/systemd/pstore)",
+        "origin": "/var/lib/systemd/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "kdump",
+        "name": "kdump",
+        "origin": "/var/crash",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 6,
+        "events": 2,
+        "actions": 1,
+        "skipped": 0,
+        "grade": "C",
+        "first": "2026-10-27T03:41:28.248659Z",
+        "last": "2026-10-27T03:41:28.381949Z",
+        "notes": [
+          "1 kexec-dmesg.log, the log of the capture kernel: not read",
+          "1 memory dumps (vmcore): not read",
+          "127.0.0.1-2026-10-27-03:41:43/vmcore-dmesg.txt: kdump text log, written 2026-10-27 03:41:44 UTC; 1506 lines read; its lines run from 0 s to 5 minutes after boot"
+        ]
+      },
+      {
+        "kind": "edac-sysfs",
+        "name": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "mcelog",
+        "name": "mcelog",
+        "origin": "/bin/mcelog --client",
+        "status": "absent",
+        "status_text": "not present",
+        "detail": "no mcelog daemon is running on this host (mcelog: client connect: No such file or directory): there are no counts to read",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "name": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 1,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.8",
+          "1 memory slot, 1 populated"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "code": "missing.virtual",
+        "args": {
+          "what": "VMware"
+        },
+        "text": "this host is a virtual machine (VMware): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory"
+      }
+    ]
+  }
+}

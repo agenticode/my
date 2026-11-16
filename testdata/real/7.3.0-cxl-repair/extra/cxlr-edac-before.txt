@@ -1,0 +1,192 @@
+# ls /sys/bus/edac/devices
+cxl_mem0
+cxl_mem1
+mc
+# mem0 serial 0x4c41420012
+## /sys/bus/edac/devices/cxl_mem0/ecs_fru0/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem0/ecs_fru0/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem0/ecs_fru1/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem0/ecs_fru1/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem0/ecs_fru2/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem0/ecs_fru2/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem0/mem_repair0/
+bank: 0
+bank_group: 0
+channel: 0
+column: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem0/mem_repair0/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: cacheline-sparing
+row: 0x0
+sub_channel: 0
+## /sys/bus/edac/devices/cxl_mem0/mem_repair1/
+bank: 0
+bank_group: 0
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem0/mem_repair1/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: row-sparing
+row: 0x0
+## /sys/bus/edac/devices/cxl_mem0/mem_repair2/
+bank: 0
+bank_group: 0
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem0/mem_repair2/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: bank-sparing
+## /sys/bus/edac/devices/cxl_mem0/mem_repair3/
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem0/mem_repair3/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: rank-sparing
+## /sys/bus/edac/devices/cxl_mem0/mem_repair4/
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem0/mem_repair4/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: ppr
+## /sys/bus/edac/devices/cxl_mem0/power/
+autosuspend_delay_ms: cat: /sys/bus/edac/devices/cxl_mem0/power/autosuspend_delay_ms: Input/output error
+control: auto
+runtime_active_time: 0
+runtime_status: unsupported
+runtime_suspended_time: 0
+## /sys/bus/edac/devices/cxl_mem0/scrub0/
+current_cycle_duration: 43200
+enable_background: 0
+max_cycle_duration: 918000
+min_cycle_duration: 3600
+## /sys/bus/edac/devices/cxl_mem0/subsystem/
+drivers_autoprobe: 1
+drivers_probe: cat: /sys/bus/edac/devices/cxl_mem0/subsystem/drivers_probe: Permission denied
+uevent: cat: /sys/bus/edac/devices/cxl_mem0/subsystem/uevent: Permission denied
+# mem1 serial 0x4c41420011
+## /sys/bus/edac/devices/cxl_mem1/ecs_fru0/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem1/ecs_fru0/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem1/ecs_fru1/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem1/ecs_fru1/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem1/ecs_fru2/
+log_entry_type: 1
+mode: 0
+reset: cat: /sys/bus/edac/devices/cxl_mem1/ecs_fru2/reset: Permission denied
+threshold: 256
+## /sys/bus/edac/devices/cxl_mem1/mem_repair0/
+bank: 0
+bank_group: 0
+channel: 0
+column: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem1/mem_repair0/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: cacheline-sparing
+row: 0x0
+sub_channel: 0
+## /sys/bus/edac/devices/cxl_mem1/mem_repair1/
+bank: 0
+bank_group: 0
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem1/mem_repair1/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: row-sparing
+row: 0x0
+## /sys/bus/edac/devices/cxl_mem1/mem_repair2/
+bank: 0
+bank_group: 0
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem1/mem_repair2/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: bank-sparing
+## /sys/bus/edac/devices/cxl_mem1/mem_repair3/
+channel: 0
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+rank: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem1/mem_repair3/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: rank-sparing
+## /sys/bus/edac/devices/cxl_mem1/mem_repair4/
+dpa: 0x0
+max_dpa: 0xfffffff
+min_dpa: 0x0
+nibble_mask: 0x0
+persist_mode: 0
+repair: cat: /sys/bus/edac/devices/cxl_mem1/mem_repair4/repair: Permission denied
+repair_safe_when_in_use: 1
+repair_type: ppr
+## /sys/bus/edac/devices/cxl_mem1/power/
+autosuspend_delay_ms: cat: /sys/bus/edac/devices/cxl_mem1/power/autosuspend_delay_ms: Input/output error
+control: auto
+runtime_active_time: 0
+runtime_status: unsupported
+runtime_suspended_time: 0
+## /sys/bus/edac/devices/cxl_mem1/scrub0/
+current_cycle_duration: 43200
+enable_background: 0
+max_cycle_duration: 918000
+min_cycle_duration: 3600
+## /sys/bus/edac/devices/cxl_mem1/subsystem/
+drivers_autoprobe: 1
+drivers_probe: cat: /sys/bus/edac/devices/cxl_mem1/subsystem/drivers_probe: Permission denied
+uevent: cat: /sys/bus/edac/devices/cxl_mem1/subsystem/uevent: Permission denied

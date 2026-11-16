@@ -1,0 +1,2 @@
+{"id": "ppr-mem1", "time": "2026-11-16T23:34:14.091Z", "repair": "soft PPR", "dpa": "0x1002000", "device_name": "mem1", "serial": "0x4c41420011", "control": "/sys/bus/edac/devices/cxl_mem1/mem_repair4", "persist_mode": "0", "result": "ok"}
+{"id": "ppr-mem0", "time": "2026-11-16T23:34:16.711Z", "repair": "soft PPR", "dpa": "0x1001000", "device_name": "mem0", "serial": "0x4c41420012", "control": "/sys/bus/edac/devices/cxl_mem0/mem_repair4", "persist_mode": "0", "result": "ok"}
