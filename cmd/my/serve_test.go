@@ -345,7 +345,7 @@ func TestServeMistakes(t *testing.T) {
 		{"interval of zero", []string{"serve", "--interval", "0s"}, "--interval 0s: want a time"},
 		{"stray argument", []string{"serve", "CPU0_C1"}, `unexpected argument "CPU0_C1"`},
 		{"root that is a file", []string{"serve", "--root", file}, "--root " + file + ": not a directory"},
-		{"unknown flag", []string{"serve", "--ledger", "x.db"}, "flag provided but not defined: -ledger"},
+		{"unknown flag", []string{"serve", "--ledger", "x.db"}, "unknown flag --ledger"},
 		{"unknown threshold", []string{"serve", "--set", "nope=1"}, "nope"},
 		{"unknown language", []string{"serve", "--lang", "fr"}, `unknown language "fr"`},
 	} {

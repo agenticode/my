@@ -115,7 +115,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 	for i, p := range pos {
 		as, what, err := scan.Detect(ctx, p, dopts)
 		if err != nil {
-			unknown = append(unknown, err.Error())
+			unknown = append(unknown, errText(lang, err))
 			continue
 		}
 		inputs[i] = input{Path: p, What: what, Sources: []model.Source{}}
@@ -152,7 +152,7 @@ func runImport(ctx context.Context, env *cli.Env, args []string) int {
 
 	cfg, err := o.cf.Config()
 	if err != nil {
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	eopts := engine.Options{Config: &cfg, Now: now}
 	analyzer, code, ok := o.analyze(ctx, env, lang, ledger, &eopts, now)

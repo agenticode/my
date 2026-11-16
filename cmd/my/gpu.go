@@ -46,7 +46,7 @@ func runGPU(ctx context.Context, env *cli.Env, args []string, src *source) int {
 	case errors.Is(err, view.ErrNoSuchGPU):
 		return o.usageError(env, lang, "%s", say(lang, "err.no_gpu", "ref", opts.Ref, "host", s.h.Host))
 	case errors.Is(err, view.ErrAmbiguousDIMM):
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	case err != nil:
 		return o.failure(env, err)
 	}

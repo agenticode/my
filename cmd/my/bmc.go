@@ -82,11 +82,11 @@ func (o *options) readBMC(ctx context.Context, env *cli.Env, lang i18n.Lang, tmp
 	}
 	cfg, err := b.clientConfig(lang)
 	if err != nil {
-		return nil, usage{err.Error()}
+		return nil, usage{errText(lang, err)}
 	}
 	targets := []target{{address: b.bmc, name: u.Host}}
 	if err := bmcCredentials(ctx, env, lang, o.name, b, targets); err != nil {
-		return nil, usage{err.Error()}
+		return nil, usage{errText(lang, err)}
 	}
 	if b.insecure {
 		fmt.Fprintln(env.Stderr, o.name+": "+say(lang, "collect.insecure"))

@@ -3,6 +3,7 @@ package engine
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -11,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/agenticode/my/internal/i18n"
 )
 
 // Config holds the thresholds of the engine. Every value is a default that
@@ -320,21 +323,21 @@ func (c *Config) Get(key string) (string, bool) {
 func (c *Config) Set(key, value string) error {
 	p := findParam(key)
 	if p == nil {
-		return fmt.Errorf("unknown threshold %q", strings.TrimSpace(key))
+		return configError("config.unknown", "key", strings.TrimSpace(key))
 	}
 	value = strings.TrimSpace(value)
 	v, err := strconv.ParseFloat(value, 64)
 	if err != nil || math.IsNaN(v) || math.IsInf(v, 0) {
-		return fmt.Errorf("%s: %q is not a number", p.Key, value)
+		return configError("config.not_number", "key", p.Key, "value", value)
 	}
 	if p.Integer && v != math.Trunc(v) {
-		return fmt.Errorf("%s: %q is not a whole number", p.Key, value)
+		return configError("config.not_whole", "key", p.Key, "value", value)
 	}
 	// A count has no upper bound of its own, and a float beyond the range
 	// of int converts to a value that depends on the processor (the
 	// smallest int on amd64). Above 2^53 not every whole number is exact.
 	if p.Integer && v > maxWhole {
-		return fmt.Errorf("%s: %q is larger than %s", p.Key, value, formatValue(maxWhole, true))
+		return configError("config.too_large", "key", p.Key, "value", value, "max", formatValue(maxWhole, true))
 	}
 	if err := p.check(v); err != nil {
 		return err
@@ -344,21 +347,61 @@ func (c *Config) Set(key, value string) error {
 }
 
 func (p *Param) check(v float64) error {
+	value := formatValue(v, p.Integer)
 	switch {
 	case math.IsNaN(v):
-		return fmt.Errorf("%s: not a number", p.Key)
+		return configError("config.not_number", "key", p.Key, "value", value)
 	case v >= p.Min && v <= p.Max:
 		return nil
 	case p.Min == tiny && v <= 0:
-		return fmt.Errorf("%s: %s is not above zero", p.Key, formatValue(v, p.Integer))
+		return configError("config.not_above_zero", "key", p.Key, "value", value)
 	case math.IsInf(p.Max, 1):
-		return fmt.Errorf("%s: %s is below the minimum of %s", p.Key, formatValue(v, p.Integer), formatValue(p.Min, p.Integer))
+		return configError("config.below_min", "key", p.Key, "value", value, "min", formatValue(p.Min, p.Integer))
+	case p.Min == tiny:
+		return configError("config.outside_above_zero", "key", p.Key, "value", value, "max", formatValue(p.Max, p.Integer))
 	}
-	lo := formatValue(p.Min, p.Integer)
-	if p.Min == tiny {
-		lo = "above 0"
+	return configError("config.outside", "key", p.Key, "value", value, "min", formatValue(p.Min, p.Integer), "max", formatValue(p.Max, p.Integer))
+}
+
+// ConfigError is a threshold that cannot be set: a key the engine does not
+// know, a value that is no number or lies outside the bounds, a line of a
+// configuration file that is no "key = value". Code names its sentence in
+// Messages and Args fill it, so that a command can say it in the reader's
+// language. Where is the file and line, or the flag, it came from.
+type ConfigError struct {
+	Where string
+	Code  string
+	Args  map[string]any
+}
+
+func configError(code string, kv ...any) *ConfigError {
+	e := &ConfigError{Code: code, Args: make(map[string]any, len(kv)/2)}
+	for i := 0; i+1 < len(kv); i += 2 {
+		e.Args[kv[i].(string)] = kv[i+1]
 	}
-	return fmt.Errorf("%s: %s is outside the range %s to %s", p.Key, formatValue(v, p.Integer), lo, formatValue(p.Max, p.Integer))
+	return e
+}
+
+func (e *ConfigError) Error() string { return e.Text(i18n.EN) }
+
+// Text says the error in the given language.
+func (e *ConfigError) Text(lang i18n.Lang) string {
+	s := Messages.Text(lang, e.Code, e.Args)
+	if e.Where != "" {
+		s = e.Where + ": " + s
+	}
+	return s
+}
+
+// at returns err with the place it came from, when it is a ConfigError.
+func at(where string, err error) error {
+	var ce *ConfigError
+	if errors.As(err, &ce) {
+		c := *ce
+		c.Where = where
+		return &c
+	}
+	return fmt.Errorf("%s: %w", where, err)
 }
 
 // Validate checks every threshold against its bounds. A Config built in
@@ -412,20 +455,21 @@ func (c *Config) Read(r io.Reader, name string) error {
 		if line == "" {
 			continue
 		}
+		where := fmt.Sprintf("%s:%d", name, n)
 		key, value, ok := strings.Cut(line, "=")
 		if !ok {
-			return fmt.Errorf("%s:%d: want \"key = value\", found %q", name, n, line)
+			return at(where, configError("config.syntax", "line", line))
 		}
 		p := findParam(key)
 		if p == nil {
-			return fmt.Errorf("%s:%d: unknown threshold %q", name, n, strings.TrimSpace(key))
+			return at(where, configError("config.unknown", "key", strings.TrimSpace(key)))
 		}
 		if first, dup := seen[p.Key]; dup {
-			return fmt.Errorf("%s:%d: %s is already set on line %d", name, n, p.Key, first)
+			return at(where, configError("config.twice", "key", p.Key, "first", first))
 		}
 		seen[p.Key] = n
 		if err := c.Set(key, value); err != nil {
-			return fmt.Errorf("%s:%d: %w", name, n, err)
+			return at(where, err)
 		}
 	}
 	if err := sc.Err(); err != nil {
@@ -440,7 +484,7 @@ func LoadConfig(path string) (Config, error) {
 	c := DefaultConfig()
 	f, err := os.Open(path)
 	if err != nil {
-		return c, fmt.Errorf("configuration file: %w", err)
+		return c, err
 	}
 	defer f.Close()
 	if err := c.Read(f, path); err != nil {
@@ -476,16 +520,20 @@ func (f *ConfigFlags) Config() (Config, error) {
 	if f.file != "" {
 		var err error
 		if c, err = LoadConfig(f.file); err != nil {
-			return c, err
+			var ce *ConfigError
+			if errors.As(err, &ce) {
+				return c, err // it names the file and the line
+			}
+			return c, fmt.Errorf("--config %w", err)
 		}
 	}
 	for _, s := range f.sets {
 		key, value, ok := strings.Cut(s, "=")
 		if !ok {
-			return c, fmt.Errorf("-set %s: want key=value", s)
+			return c, at("--set", configError("config.set_syntax", "value", s))
 		}
 		if err := c.Set(key, value); err != nil {
-			return c, fmt.Errorf("-set %w", err)
+			return c, at("--set", err)
 		}
 	}
 	return c, nil

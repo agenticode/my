@@ -211,7 +211,7 @@ func TestFleetSettings(t *testing.T) {
 	}{
 		{"unknown backend", []string{"--fleet", "oracle"}, `--fleet: unknown backend "oracle": want mysql or postgresql`},
 		{"sqlite3", []string{"--fleet", "sqlite3"}, "--fleet: the sqlite3 backend keeps a file on each host"},
-		{"file that is not there", []string{"--fleet-env", filepath.Join(t.TempDir(), "none.env")}, "--fleet-env open "},
+		{"file that is not there", []string{"--fleet-env", filepath.Join(t.TempDir(), "none.env")}, "none.env: no such file or directory"},
 		{"with --root", []string{"--fleet", "mysql", "--root", t.TempDir()}, "--fleet reads a store and --root a copy of a host's files: give one of the two"},
 		{"--since without a store", []string{"--since", "30d"}, "--since goes with --fleet"},
 		{"--since that is no time", []string{"--fleet", "mysql", "--since", "lately"}, "--since lately: want a date (2026-10-01)"},

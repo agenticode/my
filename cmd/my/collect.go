@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"crypto/x509"
 	"errors"
 	"flag"
 	"fmt"
@@ -216,7 +217,7 @@ func bmcCredentials(ctx context.Context, env *cli.Env, lang i18n.Lang, name stri
 	fromFile := func(path string) (string, error) {
 		pw, loose, err := passwordFromFile(path)
 		if err != nil {
-			return "", fmt.Errorf("--password-file %s: %v", path, err)
+			return "", fmt.Errorf("--password-file %w", err)
 		}
 		if loose && !warned[path] {
 			warned[path] = true
@@ -232,6 +233,9 @@ func bmcCredentials(ctx context.Context, env *cli.Env, lang i18n.Lang, name stri
 		if t.user == "" {
 			if t.passwordFile != "" {
 				return errors.New(say(lang, "err.collect_no_user"))
+			}
+			if bf.session {
+				return errors.New(say(lang, "err.collect_session_user"))
 			}
 			continue // no account: the requests carry no credentials
 		}
@@ -321,6 +325,17 @@ func (b *bmcFlags) clientConfig(lang i18n.Lang) (client.Config, error) {
 			return client.Config{}, errors.New(say(lang, "err.collect_fingerprint"))
 		}
 	}
+	if b.caFile != "" {
+		// Read here so that a wrong file is a mistake of the command line,
+		// said before any BMC is asked; the client reads it again.
+		pem, err := os.ReadFile(b.caFile)
+		if err != nil {
+			return client.Config{}, fmt.Errorf("--ca-file %w", err)
+		}
+		if !x509.NewCertPool().AppendCertsFromPEM(pem) {
+			return client.Config{}, errors.New(say(lang, "err.collect_ca_pem", "file", b.caFile))
+		}
+	}
 	retries := b.retries
 	if retries == 0 {
 		retries = -1 // for the client 0 means its default
@@ -360,13 +375,13 @@ func (o *collectOptions) redfish(ctx context.Context, env *cli.Env, lang i18n.La
 	}
 	base, err := o.bf.clientConfig(lang)
 	if err != nil {
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 
 	var targets []target
 	if o.targets != "" {
 		if targets, err = readTargets(o.targets); err != nil {
-			return o.usageError(env, lang, "--targets %v", err)
+			return o.usageError(env, lang, "--targets %s", errText(lang, err))
 		}
 	} else {
 		if _, err := client.ParseTarget(o.bf.bmc); err != nil {
@@ -406,11 +421,11 @@ func (o *collectOptions) redfish(ctx context.Context, env *cli.Env, lang i18n.La
 		}
 		defer os.RemoveAll(tmp)
 		work = tmp
-	} else if err := newDirectory(o.out); err != nil {
-		return o.usageError(env, lang, "%s", say(lang, "err.collect_dir", "dir", o.out, "why", err.Error()))
+	} else if why, args := newDirectory(o.out); why != "" {
+		return o.usageError(env, lang, "%s", say(lang, "err.collect_dir", "dir", o.out, "why", say(lang, why, args...)))
 	}
 	if err := bmcCredentials(ctx, env, lang, o.name, &o.bf, targets); err != nil {
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	if o.bf.insecure {
 		fmt.Fprintln(env.Stderr, "my collect: "+say(lang, "collect.insecure"))
@@ -562,29 +577,30 @@ func importHint(out string, results []collected, perBMC bool) string {
 }
 
 // newDirectory checks that a collection can be written to dir: it does
-// not exist yet, or it is an empty directory.
-func newDirectory(dir string) error {
+// not exist yet, or it is an empty directory. What stands against it is
+// returned as the code of a message and its arguments.
+func newDirectory(dir string) (code string, args []any) {
 	fi, err := os.Stat(dir)
 	switch {
 	case errors.Is(err, os.ErrNotExist):
 		parent := filepath.Dir(dir)
 		if pfi, perr := os.Stat(parent); perr != nil || !pfi.IsDir() {
-			return fmt.Errorf("the directory %s does not exist", parent)
+			return "err.no_dir", []any{"file", parent}
 		}
-		return nil
+		return "", nil
 	case err != nil:
-		return err
+		return "err.collect_unreadable", []any{"why", cli.ErrorText(i18n.EN, err)}
 	case !fi.IsDir():
-		return errors.New("it is a file; a collection is a directory, and a case bundle has a name that ends in " + bundle.Extension)
+		return "err.collect_file", []any{"ext", bundle.Extension}
 	}
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return err
+		return "err.collect_unreadable", []any{"why", cli.ErrorText(i18n.EN, err)}
 	}
 	if len(entries) > 0 {
-		return errors.New("it is not empty; a collection goes into a new directory")
+		return "err.collect_not_empty", nil
 	}
-	return nil
+	return "", nil
 }
 
 // collectSummary writes what came back from one BMC.

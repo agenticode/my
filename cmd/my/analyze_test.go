@@ -246,7 +246,7 @@ func TestAnalyzeUsage(t *testing.T) {
 		{[]string{"analyze", "-ledger", ledger, "-lang", "fr"}, cli.ExitUsage, `unknown language "fr"`},
 		{[]string{"analyze", "-ledger", ledger, "-set", "trend.rise_ratoi=3"}, cli.ExitUsage, `unknown threshold "trend.rise_ratoi"`},
 		{[]string{"analyze", "-ledger", ledger, "-set", "trend.rise_ratio=0"}, cli.ExitUsage, "trend.rise_ratio: 0 is below the minimum of 1"},
-		{[]string{"analyze", "-ledger", ledger, "-config", filepath.Join(t.TempDir(), "absent.conf")}, cli.ExitUsage, "configuration file"},
+		{[]string{"analyze", "-ledger", ledger, "-config", filepath.Join(t.TempDir(), "absent.conf")}, cli.ExitUsage, "--config "},
 		{[]string{"analyze", "-ledger", ledger, "-as-of", "yesterday"}, cli.ExitUsage, "-as-of yesterday: want a date"},
 		{[]string{"analyze", "-no-such-flag"}, cli.ExitUsage, "flag provided but not defined"},
 		{[]string{"analyze", "-ledger", filepath.Join(t.TempDir(), "absent.db")}, cli.ExitFailure, "absent.db"},

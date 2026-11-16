@@ -146,7 +146,7 @@ func (a *App) Run(ctx context.Context, env *Env, args []string) int {
 		case !strings.HasPrefix(args[0], "-"):
 			cmd := a.Lookup(args[0])
 			if cmd == nil {
-				fmt.Fprintf(env.Stderr, "%s: unknown command %q\n\n", a.Name, args[0])
+				fmt.Fprintf(env.Stderr, "%s: %s\n\n", a.Name, Messages.Text(Lang(env), "cli.unknown_command", map[string]any{"cmd": args[0]}))
 				a.usage(env.Stderr, Lang(env))
 				return ExitUsage
 			}
@@ -157,7 +157,7 @@ func (a *App) Run(ctx context.Context, env *Env, args []string) int {
 		return a.Default.Run(ctx, env, args)
 	}
 	if len(args) > 0 {
-		fmt.Fprintf(env.Stderr, "%s: unknown flag %s\n\n", a.Name, args[0])
+		fmt.Fprintf(env.Stderr, "%s: %s\n\n", a.Name, Messages.Text(Lang(env), "cli.unknown_flag", map[string]any{"flag": args[0]}))
 	}
 	a.usage(env.Stderr, Lang(env))
 	return ExitUsage
@@ -198,7 +198,7 @@ func (a *App) help(ctx context.Context, env *Env, args []string) int {
 	}
 	cmd := a.Lookup(name)
 	if cmd == nil {
-		fmt.Fprintf(env.Stderr, "%s help: unknown command %q\n\n", a.Name, name)
+		fmt.Fprintf(env.Stderr, "%s help: %s\n\n", a.Name, Messages.Text(lang, "cli.unknown_command", map[string]any{"cmd": name}))
 		a.usage(env.Stderr, lang)
 		return ExitUsage
 	}

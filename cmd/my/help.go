@@ -54,6 +54,8 @@ var words = i18n.Catalog{
 	"err.diff_files":     {EN: "name two cases, the earlier one first: my diff before.mycase after.mycase", KO: "케이스 둘을 앞선 것부터 지정해야 함: my diff before.mycase after.mycase"},
 	"err.diff_order":     {EN: "{second} ({second_at}) is older than {first} ({first_at}): name the earlier case first", KO: "{second}({second_at})의 시점이 {first}({first_at}) 이전임: 앞선 케이스를 먼저 지정해야 함"},
 	"err.diff_at":        {EN: "--at {value}: want a time after the earlier case ({first_at}) and up to the later one ({second_at})", KO: "--at {value}: 앞 케이스({first_at}) 뒤이고 뒤 케이스({second_at})까지인 시각이어야 함"},
+	"err.not_case":       {EN: "{path} is neither a MemorY ledger nor a case bundle", KO: "{path}은 MemorY 원장도 케이스 번들도 아님"},
+	"err.case_dir":       {EN: "{path} is a directory; a case is a ledger file or a .mycase bundle", KO: "{path}은 디렉터리임. 케이스는 원장 파일이나 .mycase 번들임"},
 	"err.open_file":      {EN: "name the case to open: a .mycase bundle or a ledger file", KO: "열 케이스를 지정해야 함: .mycase 번들 또는 원장 파일"},
 	"err.open_command":   {EN: "unknown command \"{cmd}\" (after the file: dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, or nothing for the overview)", KO: "알 수 없는 명령 \"{cmd}\" (파일 뒤에는 dimm, why, map, timeline, boots, gpu, bios, inventory, verify, export, 또는 생략하면 개요)"},
 
@@ -73,14 +75,27 @@ var words = i18n.Catalog{
 	"err.report_scan":   {EN: "--root and --ledger go with a scan of the host; a case file is read as it is", KO: "--root와 --ledger는 호스트 스캔에 쓰는 옵션임. 케이스 파일은 그대로 읽음"},
 	"err.audience":      {EN: "--audience {value}: want customer or fa", KO: "--audience {value}: customer 또는 fa여야 함"},
 
-	"err.import_files":  {EN: "name the files to import", KO: "가져올 파일을 지정해야 함"},
-	"err.anonymize_out": {EN: "--anonymize goes with -o: it applies to the bundle that is written", KO: "--anonymize는 -o와 함께 써야 함: 저장하는 번들에 적용됨"},
-	"err.time":          {EN: "{flag} {value}: want a date (2026-11-12) or a time (2026-11-12T03:14:00Z)", KO: "{flag} {value}: 날짜(2026-11-12) 또는 시각(2026-11-12T03:14:00Z)이어야 함"},
-	"err.tz":            {EN: "--tz {value}: want a time zone name such as Asia/Seoul or UTC", KO: "--tz {value}: Asia/Seoul이나 UTC 같은 시간대 이름이어야 함"},
+	"err.import_files": {EN: "name the files to import", KO: "가져올 파일을 지정해야 함"},
+
+	// Inputs of no known kind (scan.UnknownInputError).
+	"err.input.not_regular": {EN: "{path}: not an input this tool reads: not a regular file", KO: "{path}: 이 도구가 읽는 입력이 아님: 일반 파일이 아님"},
+	"err.input.dir":         {EN: "{path}: not an input this tool reads: a directory that is neither a copy of a host's files (no proc, sys or var below it) nor a Redfish dump", KO: "{path}: 이 도구가 읽는 입력이 아님: 호스트 파일 사본(아래에 proc, sys, var가 있음)도 Redfish 덤프도 아닌 디렉터리"},
+	"err.input.empty":       {EN: "{path}: not an input this tool reads: the file is empty", KO: "{path}: 이 도구가 읽는 입력이 아님: 빈 파일"},
+	"err.input.ledger":      {EN: "{path}: not an input this tool reads: a MemorY ledger is the result of an import, not an input; show it with \"my open\"", KO: "{path}: 이 도구가 읽는 입력이 아님: MemorY 원장은 가져오기의 결과물임. \"my open\"으로 열어 봄"},
+	"err.input.gzip_db":     {EN: "{path}: not an input this tool reads: a compressed database; unpack it first", KO: "{path}: 이 도구가 읽는 입력이 아님: 압축된 데이터베이스. 먼저 압축을 풀어야 함"},
+	"err.input.zip":         {EN: "{path}: not an input this tool reads: a zip archive; a case bundle is shown with \"my open\", any other archive has to be unpacked", KO: "{path}: 이 도구가 읽는 입력이 아님: zip 압축 파일. 케이스 번들은 \"my open\"으로 열고, 다른 압축 파일은 먼저 풀어야 함"},
+	"err.input.binary":      {EN: "{path}: not an input this tool reads: binary data of no known kind", KO: "{path}: 이 도구가 읽는 입력이 아님: 알 수 없는 종류의 바이너리 데이터"},
+	"err.input.json":        {EN: "{path}: not an input this tool reads: JSON that is neither a journal export, a Redfish resource, an FMFM log nor a list of event log entries", KO: "{path}: 이 도구가 읽는 입력이 아님: 저널 내보내기, Redfish 리소스, FMFM 로그, 이벤트 로그 항목 목록 중 어느 것도 아닌 JSON"},
+	"err.input.text":        {EN: "{path}: not an input this tool reads: text of no known kind (it starts \"{start}\")", KO: "{path}: 이 도구가 읽는 입력이 아님: 알 수 없는 종류의 텍스트 (첫 줄 \"{start}\")"},
+	"err.anonymize_out":     {EN: "--anonymize goes with -o: it applies to the bundle that is written", KO: "--anonymize는 -o와 함께 써야 함: 저장하는 번들에 적용됨"},
+	"err.time":              {EN: "{flag} {value}: want a date (2026-11-12) or a time (2026-11-12T03:14:00Z)", KO: "{flag} {value}: 날짜(2026-11-12) 또는 시각(2026-11-12T03:14:00Z)이어야 함"},
+	"err.tz":                {EN: "--tz {value}: want a time zone name such as Asia/Seoul or UTC", KO: "--tz {value}: Asia/Seoul이나 UTC 같은 시간대 이름이어야 함"},
 
 	"err.listen":   {EN: "--listen {value}: want an address such as 127.0.0.1:10163 or :10163", KO: "--listen {value}: 127.0.0.1:10163이나 :10163 같은 주소여야 함"},
 	"err.interval": {EN: "--interval {value}: want a time of at least 1s, such as 30s or 5m", KO: "--interval {value}: 30s나 5m처럼 1s 이상의 시간이어야 함"},
 
+	"err.fleet_kind":     {EN: "unknown backend \"{value}\": want mysql or postgresql", KO: "알 수 없는 백엔드 \"{value}\": mysql 또는 postgresql이어야 함"},
+	"err.fleet_sqlite":   {EN: "the sqlite3 backend keeps a file on each host, which a scan of the host or an import reads; a store is mysql or postgresql", KO: "sqlite3 백엔드는 호스트마다 파일을 남기며, 그 파일은 호스트 스캔이나 import로 읽음. 저장소는 mysql 또는 postgresql임"},
 	"err.fleet_root":     {EN: "--fleet reads a store and --root a copy of a host's files: give one of the two", KO: "--fleet은 저장소를, --root는 호스트 파일 사본을 읽음: 둘 중 하나만 지정"},
 	"err.fleet_host":     {EN: "no host named {host} in {store} ({n} {n|host|hosts}: {hosts})", KO: "{store}에 {host} 호스트 없음 (호스트 {n}개: {hosts})"},
 	"err.fleet_one_host": {EN: "the store holds {n} hosts: name one with --host ({hosts})", KO: "저장소에 호스트가 {n}개임: --host로 하나를 지정 ({hosts})"},

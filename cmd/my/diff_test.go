@@ -167,7 +167,7 @@ func TestDiffCommandLine(t *testing.T) {
 			"--at 2026-09-01: want a time after the earlier case (2026-09-28 12:00 UTC) and up to the later one (2026-11-13 00:00 UTC)"},
 		{[]string{"before.db", "after.db", "--at", "2026-12-01"}, cli.ExitUsage, "--at 2026-12-01: want a time after the earlier case"},
 		{[]string{"before.db", "after.db", "--host", "elsewhere"}, cli.ExitUsage, "no host named elsewhere in the ledger (hosts: synth-moved-dimm)"},
-		{[]string{"before.db", "after.db", "--ledger", "x.db"}, cli.ExitUsage, "flag provided but not defined: -ledger"},
+		{[]string{"before.db", "after.db", "--ledger", "x.db"}, cli.ExitUsage, "unknown flag --ledger"},
 		{[]string{"before.db", "missing.db"}, cli.ExitFailure, "my diff: open missing.db: no such file or directory"},
 		{[]string{"notes.txt", "after.db"}, cli.ExitFailure, "my diff: notes.txt is neither a MemorY ledger nor a case bundle"},
 		{[]string{"after.db", "before.db", "--lang", "ko"}, cli.ExitUsage, "앞선 케이스를 먼저 지정해야 함"},

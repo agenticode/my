@@ -95,7 +95,7 @@ func runServe(ctx context.Context, env *cli.Env, args []string) int {
 	}
 	cfg, err := o.cf.Config()
 	if err != nil {
-		return o.usageError(env, lang, "%v", err)
+		return o.usageError(env, lang, "%s", errText(lang, err))
 	}
 	if o.root != "" && filepath.Clean(o.root) != "/" {
 		if fi, err := os.Stat(o.root); err != nil || !fi.IsDir() {

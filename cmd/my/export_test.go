@@ -114,7 +114,7 @@ func TestExportCommandLine(t *testing.T) {
 		{[]string{"export"}, "name what to write: my export fmfm, or my export labels"},
 		{[]string{"export", "cper"}, `unknown format "cper"; this version writes fmfm (an FMFM analysis log) and labels`},
 		{[]string{"export", "fmfm", "more"}, `unexpected argument "more"`},
-		{[]string{"export", "fmfm", "--audience", "fa"}, "flag provided but not defined"},
+		{[]string{"export", "fmfm", "--audience", "fa"}, "unknown flag"},
 	} {
 		code, out, errOut := run(append([]string{"open", ledger}, tt.args...)...)
 		if code != cli.ExitUsage || out != "" || !strings.Contains(errOut, tt.want) || !strings.Contains(errOut, `run "my help export" for usage`) {
