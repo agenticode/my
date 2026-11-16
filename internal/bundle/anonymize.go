@@ -112,6 +112,15 @@ var columns = map[string]treatment{
 	"fault.host": hostName, "fault.dimm_uid": dimmUID, "fault.slot": keep, "fault.mode": keep, "fault.grade": keep,
 	"fault.first_seen": keep, "fault.last_seen": keep, "fault.engine_version": keep,
 
+	// A firmware record keeps the vendor's words: the place as written, the
+	// arguments and the text may name a host or an address.
+	"fw_record.host": hostName, "fw_record.at": keep, "fw_record.common": keep, "fw_record.flags": keep, "fw_record.clears": keep,
+	"fw_record.vendor": keep, "fw_record.vendor_id": keep, "fw_record.registry": keep, "fw_record.registry_version": keep,
+	"fw_record.vendor_severity": keep, "fw_record.origin": keep, "fw_record.log": keep, "fw_record.location": freeText,
+	"fw_record.args": freeText, "fw_record.text": freeText, "fw_record.last_at": keep, "fw_record.entry_key": keep,
+	"fw_record.mapping": keep, "fw_record.map_ref": keep, "fw_record.basis": keep, "fw_record.source": keep,
+	"fw_record.raw_ref": freeText, "fw_record.fingerprint": derived, "fw_record.raw": freeText,
+
 	"gpu_mem.host": hostName, "gpu_mem.observed_at": keep, "gpu_mem.kind": keep, "gpu_mem.gpu_serial": keep, "gpu_mem.gpu_uuid": keep,
 	"gpu_mem.pci_bus": keep, "gpu_mem.model": keep, "gpu_mem.xid_text": freeText, "gpu_mem.boot_id": bootID, "gpu_mem.source": keep,
 	"gpu_mem.raw_ref": freeText, "gpu_mem.raw": freeText, "gpu_mem.fingerprint": derived, "gpu_mem.time_quality": keep,
@@ -124,6 +133,9 @@ var columns = map[string]treatment{
 	"placement.dimm_uid": dimmUID, "placement.host": hostName, "placement.slot": keep, "placement.first_seen": keep,
 	"placement.last_seen": keep, "placement.source": keep,
 
+	"registry_seen.host": hostName, "registry_seen.seen_at": keep, "registry_seen.prefix": keep, "registry_seen.version": keep,
+	"registry_seen.owner": keep, "registry_seen.language": keep, "registry_seen.unmapped": keep, "registry_seen.source": freeText,
+
 	"scan.host": hostName, "scan.kind": keep, "scan.started_at": keep, "scan.finished_at": keep, "scan.tool_version": keep, "scan.note": freeText,
 
 	"slot.host": hostName, "slot.name": keep, "slot.locator": keep, "slot.bank_locator": keep, "slot.edac_location": keep,
@@ -133,6 +145,8 @@ var columns = map[string]treatment{
 
 	"source.kind": keep, "source.origin": freeText, "source.status": keep, "source.detail": freeText, "source.first_ts": keep,
 	"source.last_ts": keep, "source.notes": freeText,
+
+	"unread_record.ref": freeText, "unread_record.reason": freeText, "unread_record.text": freeText,
 
 	"verdict.host": hostName, "verdict.dimm_uid": dimmUID, "verdict.slot": keep, "verdict.grade": keep, "verdict.rules": keep,
 	"verdict.evidence": freeText, "verdict.counter_evidence": freeText, "verdict.missing": freeText, "verdict.next_action": freeText,

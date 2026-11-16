@@ -63,6 +63,13 @@ type Source struct {
 	Informational int `json:"informational,omitzero"`
 	Actions       int `json:"actions"` // actions produced
 	Skipped       int `json:"skipped"` // records that could not be used
+	// Unread counts the records among Skipped that the reader did not
+	// understand: a record it could not parse, or one whose reading
+	// failed.
+	Unread int `json:"unread,omitzero"`
+	// Faults counts the faults of the reader that were caught: a record
+	// whose reading panicked, or the whole source when the reader failed.
+	Faults int `json:"faults,omitzero"`
 	// Samples counts the readings produced that are neither events nor
 	// actions: GPU memory records and ECS register readings.
 	Samples int `json:"samples,omitzero"`

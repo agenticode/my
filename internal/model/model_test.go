@@ -277,12 +277,12 @@ func TestDerivedBootID(t *testing.T) {
 
 func TestActionKinds(t *testing.T) {
 	for _, k := range []ActionKind{ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat,
-		ActionDisable, ActionMarkFailed} {
+		ActionDisable, ActionMarkFailed, ActionPPR, ActionDeviceSparing, ActionPredictedFailure, ActionMirrorFailover, ActionTrainingFailure} {
 		if !k.Valid() {
 			t.Errorf("%q is not valid", k)
 		}
 	}
-	for _, k := range []ActionKind{"", "offline", "ppr", "enable"} {
+	for _, k := range []ActionKind{"", "offline", "PPR", "enable", "predicted"} {
 		if k.Valid() {
 			t.Errorf("%q is valid", k)
 		}

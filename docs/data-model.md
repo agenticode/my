@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 8 in this release |
+| schema version | `PRAGMA user_version`, 9 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -40,6 +40,7 @@ Records read from the sources:
 | `bmc` | one reading of a BMC: its firmware, the BIOS version, which resources it gave, the period its logs cover |
 | `bios_setting` | a setting of the system firmware that bears on memory errors, with the value that waits for the next boot |
 | `bmc_memory` | a memory module as a BMC describes it, with the error counts the BMC keeps |
+| `fw_record` | what the BIOS or a BMC said about memory, in the vendor's words: the common event it was read as, message ID, registry, the vendor's severity, the place as written, arguments, text, and how the common event was found. It is tied to the event or action made from it; a record that makes neither (a module detected, the RAS mode in effect, a log cleared) has the row alone, with its raw text |
 
 Identities and places:
 
@@ -59,6 +60,8 @@ Collection runs:
 | `scan` | one run: a scan of a host, an import of files, or a synthetic data set; when, by which tool version, whether as root |
 | `source` | one source the run looked for: what was read, its status, the number of records, events and actions, the observation grades, the first and the last time, and remarks |
 | `capture_check` | what a reset right after a fatal memory error would have lost on the host when a live scan ran: one row per check of `my preflight`, with its state, the statement and what was read ([crash-loop.md](crash-loop.md)) |
+| `unread_record` | a record a reader could not use and whose text names memory: the reference, the reason and the text, at most 50 per source and 4 KiB each |
+| `registry_seen` | a message registry a BMC published: prefix, version, owner, language, the number of its messages, of those about memory, and of those this version classes, with the keys of the ones it does not |
 
 Derived by the engine:
 
@@ -180,7 +183,42 @@ These passes run after every read, in a fixed order (slots, counter events, the 
 
 ## Actions
 
-`action.kind` is one of `page-offline`, `sppr`, `hppr`, `sparing`, `row-remap`, `replacement`, `reseat`, `disable` and `mark-failed`, with a `result` of `ok`, `failed`, `pending` or `unknown`. They are steps the kernel, the firmware, a daemon or a person took and a source recorded. MemorY records them and takes none.
+`action.kind` is one of `page-offline`, `sppr`, `hppr`, `ppr`, `sparing`, `device-sparing`, `row-remap`, `replacement`, `reseat`, `disable`, `mark-failed`, `predicted-failure`, `mirror-failover` and `training-failure`, with a `result` of `ok`, `failed`, `pending` or `unknown`. They are steps the kernel, the firmware, a daemon or a person took and a source recorded, and marks firmware put on a module. MemorY records them and takes none. `ppr` is a post package repair the record does not call soft or hard; `device-sparing` is ADDDC, SDDC, bank sparing or partial cache line sparing. `dup_of` names the action that reports the same step through another log of the same BMC: views, rules and the exporter leave such an action out. `withdrawn_by` names the record that took a mark back.
+
+## Firmware records
+
+A BMC or a BIOS says what happened to memory in the words of its vendor. Each such record is read as one of 27 common events, the same for every vendor, and the common event decides what the ledger keeps. The vendor's severity is kept in `fw_record.vendor_severity` and decides nothing.
+
+| Common event | Meaning | Ledger record |
+| --- | --- | --- |
+| `ce` | one corrected error, or as many as the record counts | event, CE |
+| `ce-threshold` | the firmware's own limit or rate of corrected errors was passed | event, CE, count 1 |
+| `ce-log-limit` | firmware stopped logging corrected errors | informational event |
+| `ue` | an uncorrected error; flag `contained`: the system kept running, `fatal`: the context was lost | event, UE (`Recoverable`, `Fatal`) |
+| `scrub-ce`, `scrub-ue` | found by the patrol scrubber | event with scrub type `Patrol` |
+| `predicted-failure` | firmware expects the module to fail | action `predicted-failure` |
+| `disabled` | module, rank or channel taken out of use or mapped out | action `disable` |
+| `ppr-scheduled`, `ppr-done`, `ppr-failed` | a post package repair waits for the next boot, ran, or failed | action `sppr` (flag `soft`), `hppr` (flag `hard`) or `ppr`: `pending`, `ok`, `failed` |
+| `sparing` | rank sparing, or sparing of a kind the record does not name, took over | action `sparing` |
+| `device-sparing` | ADDDC, SDDC, bank sparing or partial cache line sparing engaged | action `device-sparing` |
+| `spare-copy-started` | the copy to the spare began | action `sparing`, `pending` |
+| `sparing-failed` | sparing or the copy failed, or no spare is left | action `sparing` or `device-sparing`, `failed` |
+| `mirror-failover` | the memory mirror took over from a module | action `mirror-failover` |
+| `mirror-lost` | redundancy lost and no module named, or the failover failed | informational event |
+| `training-failure` | the module failed training, the memory test or initialisation at boot | action `training-failure` |
+| `config-error` | population or configuration the firmware rejects | informational event |
+| `replaced` | firmware saw another module in the slot | action `replacement`, method `bmc` |
+| `log-cleared`, `log-full` | the log was cleared, or is full | `fw_record` row alone |
+| `thermal` | throttled, over temperature | informational event |
+| `presence`, `config-state` | a module added, removed or detected; a configuration without an error | `fw_record` row alone |
+| `cleared` | a state ended; `clears` names it when known | informational event |
+| `unclassified` | about memory, in words no table and no rule explains | informational event with the text |
+
+Flags narrow a name: `contained`, `fatal`, `soft`, `hard`, `runtime`, `boot`, `adddc`, `sddc`, `rank`, `bank`, `pcls`, `previous-boot`. A record that names several modules is one error tied to none of them, and one action per module. An entry that folds repeats (`fw_record.repeat`) counts each.
+
+`fw_record.mapping` says how the common event was found: `table` (a line of a mapping table, named in `map_ref` as table, version and key), `bmc-registry` (the text the BMC's own registry gives for the message), `wording` (the text of the entry), `ipmi` (the state of the IPMI memory sensor) or `none`. `basis` says how far the table was checked: `capture`, `sample`, `registry` or `documents`.
+
+A record a reader could not use is counted in `source.unread`; its text is kept in `unread_record` only when it names memory, a DIMM or ECC. `source.faults` counts the faults of a reader that were caught.
 
 ## JSON output
 

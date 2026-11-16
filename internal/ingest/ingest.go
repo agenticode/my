@@ -526,6 +526,19 @@ func (k *sink) BMCMemory(m *model.BMCMemory) error {
 	return nil
 }
 
+// Firmware keeps a firmware record that makes neither an event nor an
+// action. It is counted as a record of the source, in no total.
+func (k *sink) Firmware(f *model.FirmwareRecord) error {
+	f.Host, f.ScanID = k.host, k.scanID
+	f.Fingerprint = model.Fingerprint(k.host, f.Fingerprint)
+	inserted, err := k.w.InsertFirmware(f)
+	if err != nil {
+		return k.refuse(f.RawRef, err)
+	}
+	k.sample(f.At, model.TimeExact, inserted)
+	return nil
+}
+
 // sample counts a reading that is neither an event nor an action: a GPU
 // memory record, an ECS reading, or what a BMC says about itself, the BIOS
 // settings and a memory module.

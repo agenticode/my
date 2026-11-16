@@ -267,6 +267,10 @@ type Event struct {
 	// source twice does not add it twice.
 	Fingerprint string `json:"fingerprint"`
 	ScanID      int64  `json:"scan_id,omitzero"`
+
+	// Firmware is what the BIOS or the BMC said, when the event was made
+	// from a firmware record. The ledger keeps it in fw_record.
+	Firmware *FirmwareRecord `json:"firmware,omitzero"`
 }
 
 // ComputeGrade returns the observation grade the location fields of e justify.

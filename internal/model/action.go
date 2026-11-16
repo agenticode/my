@@ -21,13 +21,27 @@ const (
 	// ActionMarkFailed: the BIOS or the BMC reports the module as failed
 	// and left it in use.
 	ActionMarkFailed ActionKind = "mark-failed"
+	// ActionPPR: a post package repair the record does not call soft or
+	// hard.
+	ActionPPR ActionKind = "ppr"
+	// ActionDeviceSparing: ADDDC, SDDC, bank sparing or partial cache line
+	// sparing took a device, a bank or a part of a cache line out of use.
+	ActionDeviceSparing ActionKind = "device-sparing"
+	// ActionPredictedFailure: firmware expects the module to fail. A mark.
+	ActionPredictedFailure ActionKind = "predicted-failure"
+	// ActionMirrorFailover: the memory mirror took over from the module.
+	ActionMirrorFailover ActionKind = "mirror-failover"
+	// ActionTrainingFailure: the module failed training, the memory test or
+	// its initialisation at boot. A mark.
+	ActionTrainingFailure ActionKind = "training-failure"
 )
 
 // Valid reports whether k is a defined action kind.
 func (k ActionKind) Valid() bool {
 	switch k {
 	case ActionPageOffline, ActionSPPR, ActionHPPR, ActionSparing, ActionRowRemap, ActionReplacement, ActionReseat,
-		ActionDisable, ActionMarkFailed:
+		ActionDisable, ActionMarkFailed, ActionPPR, ActionDeviceSparing, ActionPredictedFailure, ActionMirrorFailover,
+		ActionTrainingFailure:
 		return true
 	}
 	return false
@@ -74,9 +88,22 @@ type Action struct {
 	// result of a memory failure record.
 	Detail string `json:"detail,omitzero"`
 
+	// DupOf is the ID of the action that reports the same step through
+	// another log or reader of the same BMC. Such an action is kept for
+	// traceability and left out of what views and rules read.
+	DupOf int64 `json:"dup_of,omitzero"`
+	// WithdrawnBy is the ID of the informational event that took a mark
+	// back: the module was enabled again, the prediction was cleared. A
+	// withdrawn mark is history; it no longer holds.
+	WithdrawnBy int64 `json:"withdrawn_by,omitzero"`
+
 	Source      string `json:"source"`
 	RawRef      string `json:"raw_ref"`
 	Raw         string `json:"raw,omitzero"`
 	Fingerprint string `json:"fingerprint"`
 	ScanID      int64  `json:"scan_id,omitzero"`
+
+	// Firmware is what the BIOS or the BMC said, when the action was made
+	// from a firmware record. The ledger keeps it in fw_record.
+	Firmware *FirmwareRecord `json:"firmware,omitzero"`
 }

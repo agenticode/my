@@ -191,6 +191,9 @@ var tables = map[string]string{
 	"bmc":            "readings of a BMC: its firmware, the BIOS version, which resources it gave, the period its logs cover",
 	"bios_setting":   "settings of the system firmware that bear on memory errors, as a BMC reports them, with the pending values",
 	"bmc_memory":     "memory modules as a BMC describes them: names, state, speed, and the BMC's own error counts",
+	"fw_record":      "what the BIOS or a BMC said about memory, in the vendor's words: the common event it was read as, message ID, registry, severity, place, arguments, text",
+	"unread_record":  "records a reader could not use and whose text names memory, with the reason, at most 50 per source",
+	"registry_seen":  "message registries a BMC published, with the number of memory messages this version classes",
 	"meta":           "ledger identity, schema history and what the findings were computed with",
 }
 
