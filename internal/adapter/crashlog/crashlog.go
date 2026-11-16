@@ -674,11 +674,12 @@ func (a *Adapter) read(ctx context.Context, d *dump, sink adapter.Sink, tally *a
 	if !anchored(text) && !d.time.IsZero() {
 		kopts.CapturedAt = d.time
 	}
+	bs := &bootSink{Sink: sink}
 	var r adapter.Report
 	if d.stream {
-		r = klog.NewFile(d.parts[0].path, kopts).Collect(ctx, sink)
+		r = klog.NewFile(d.parts[0].path, kopts).Collect(ctx, bs)
 	} else {
-		r = klog.NewReader(bytes.NewReader(text), d.origin, kopts).Collect(ctx, sink)
+		r = klog.NewReader(bytes.NewReader(text), d.origin, kopts).Collect(ctx, bs)
 	}
 	if r.SinkErr != nil {
 		return r, false
@@ -687,7 +688,59 @@ func (a *Adapter) read(ctx context.Context, d *dump, sink adapter.Sink, tally *a
 		tally.Skip(d.origin, r.Detail)
 		return r, false
 	}
+	if d.kind == KindKdump || d.reason == "Panic" {
+		if err := a.panicRecord(d, text, bs.last, sink); err != nil {
+			r.Status, r.Detail, r.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
+			return r, false
+		}
+	}
 	return r, true
+}
+
+// bootSink passes every record on and keeps the last boot the kernel log
+// reader made of the text.
+type bootSink struct {
+	adapter.Sink
+	last *model.Boot
+}
+
+func (b *bootSink) Boot(x *model.Boot) error {
+	c := *x
+	b.last = &c
+	return b.Sink.Boot(x)
+}
+
+// panicRecord stores the fact that the boot of a dump ended in a panic:
+// a pstore dump written for a panic (the header says "Panic"), or a kdump
+// text log, which the capture kernel writes after a crash. The record is
+// Informational: it is no error and counts in no total. It carries no
+// text of the panic, whose message can be about anything on the host; the
+// ledger keeps the kernel lines about memory errors and machine checks
+// only. A hardware error that the text shows is a stop of the boot, which
+// outranks it (store.BootOutcomes).
+func (a *Adapter) panicRecord(d *dump, text []byte, boot *model.Boot, sink adapter.Sink) error {
+	e := &model.Event{
+		Kind: model.KindError, ErrorSeverity: model.SevInformational, ErrorType: model.ErrorTypePanic,
+		Source: d.kind + "/panic", RawRef: d.origin, Count: 1, Grade: model.GradeC,
+		// The same dump read from two places is one record.
+		Fingerprint: model.Fingerprint("crashlog-panic", d.kind, model.Fingerprint(string(text))),
+	}
+	switch {
+	case boot != nil && boot.StartQuality == model.TimeRelative:
+		// The boot is not placed in time: the record stays in it.
+		e.ErrorDT, e.TimeQuality, e.BootID = boot.LastSeen, model.TimeRelative, boot.BootID
+	case boot != nil && !boot.LastSeen.IsZero():
+		e.ErrorDT, e.TimeQuality = boot.LastSeen, model.TimeEstimated
+	case !d.time.IsZero():
+		e.ErrorDT, e.TimeQuality = d.time, model.TimeEstimated
+	default:
+		// Nothing dates the dump.
+		return nil
+	}
+	if e.ErrorDT.IsZero() {
+		return nil
+	}
+	return sink.Event(e)
 }
 
 // text puts the parts of a dump together without their header lines.

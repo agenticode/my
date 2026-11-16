@@ -32,6 +32,7 @@ package scan
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -52,6 +53,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/preflight"
 	"github.com/agenticode/my/internal/store"
 )
 
@@ -96,6 +98,9 @@ type Options struct {
 	Location *time.Location
 	// Note is free text stored with the scan.
 	Note string
+	// Preflight changes what the checks of "my preflight" ask the running
+	// system (the process list, free space); tests set it.
+	Preflight func(*preflight.Options)
 	// Extra are sources read after those of the host, into the same run:
 	// what the BMC of the host answered, when the caller asked it. A scan
 	// finds no such source by itself.
@@ -493,9 +498,37 @@ func Run(ctx context.Context, s *store.Store, opts Options) (*ingest.Result, err
 	if opts.Now.IsZero() && !opts.Live {
 		opts.Now = treeTime(&opts)
 	}
-	return ingest.Run(ctx, s, append(Sources(ctx, opts), opts.Extra...), ingest.Options{
+	res, err := ingest.Run(ctx, s, append(Sources(ctx, opts), opts.Extra...), ingest.Options{
 		Host: opts.Host, Kind: kind, Now: opts.Now, Privileged: opts.Privileged, Note: opts.Note,
 	})
+	if err != nil || !opts.Live {
+		return res, err
+	}
+	// What a reset would lose on this host, as "my preflight" says it: a
+	// bundle of the scan tells its reader why crash records may be
+	// missing. Only a live host is asked; a copy of a host's files lacks
+	// what several checks read.
+	if err := s.Update(ctx, func(w *store.Writer) error {
+		return w.PutCaptureChecks(res.Scan.ID, res.Host, CaptureChecks(opts.Root, opts.Preflight))
+	}); err != nil {
+		return nil, fmt.Errorf("scan: capture checks: %w", err)
+	}
+	return res, nil
+}
+
+// CaptureChecks makes the checks of "my preflight" on the running host
+// below root and returns them as ledger rows.
+func CaptureChecks(root string, probe func(*preflight.Options)) []model.CaptureCheck {
+	po := preflight.Options{Root: root, Live: true}
+	if probe != nil {
+		probe(&po)
+	}
+	rep := preflight.Run(po)
+	out := make([]model.CaptureCheck, 0, len(rep.Checks))
+	for _, c := range rep.Checks {
+		out = append(out, model.CaptureCheck{Name: c.Name, State: string(c.State), Detail: c.Detail, Evidence: c.Evidence})
+	}
+	return out
 }
 
 // report is a source that was looked for and could not be read. It adds

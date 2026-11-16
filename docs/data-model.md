@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 6 in this release |
+| schema version | `PRAGMA user_version`, 7 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -46,7 +46,7 @@ Identities and places:
 | Table | A row is |
 | --- | --- |
 | `host` | a host: name, architecture, system vendor and product, and the hypervisor when it is a virtual machine |
-| `boot` | one boot: start time, kernel release, BIOS and BMC version, kernel command line |
+| `boot` | one boot: start time, kernel release, BIOS and BMC version, kernel command line, and how it ended when a record shows it |
 | `dimm` | a DIMM identity: manufacturer, part number, serial number, size, type, ranks, device width, speed |
 | `slot` | a physical slot of a board, with the names the sources use for it |
 | `slot_alias` | one name a source uses for a slot |
@@ -58,6 +58,7 @@ Collection runs:
 | --- | --- |
 | `scan` | one run: a scan of a host, an import of files, or a synthetic data set; when, by which tool version, whether as root |
 | `source` | one source the run looked for: what was read, its status, the number of records, events and actions, the observation grades, the first and the last time, and remarks |
+| `capture_check` | what a reset right after a fatal memory error would have lost on the host when a live scan ran: one row per check of `my preflight`, with its state, the statement and what was read ([crash-loop.md](crash-loop.md)) |
 
 Derived by the engine:
 
@@ -110,6 +111,7 @@ An `event` row is one of two kinds. `kind = 'error'` is one report of a source t
 | `time_quality` | `exact` for a wall-clock time, `estimated` for a time worked out from seconds since boot, `relative` when only seconds since boot are known |
 | `dimm_uid`, `dimm_link` | the DIMM the error is attributed to, and how |
 | `decoder` | the format the place was decoded from (`edac/skx-adxl`, `cper`), which tells a reader how to check it |
+| `carried`, `read_boot_id`, `not_before` | see [Records kept over a reset](#records-kept-over-a-reset) |
 
 Every total is computed from this table by one rule:
 
@@ -120,6 +122,32 @@ errors = SUM(count - covered) over rows with dup_of IS NULL
 ### Duplicates
 
 One error often reaches the ledger through several sources: the rasdaemon database, the kernel log, the event log of the BMC. An adapter marks two of its own records as one error where it knows that (a machine check record and the EDAC record decoded from it). Records of different sources are one error when they have the same severity class and the same cache line address, or the same slot where neither has an address, and their times lie within 5 seconds. The tolerance is 2 minutes when a time was worked out from seconds since boot, and 2 minutes between a BMC log and the logs of the host, which two clocks stamped. A group holds at most one record per source. The record with the best observation grade is counted; the others stay in the ledger and point at it.
+
+### Records kept over a reset
+
+Some records outlive the reset that ended their boot: the contents of a machine check bank that the next boot polled, a record of the boot error region of the firmware. Such a record is `carried = 1`. Its source dates it to the boot that read it; the error happened in the boot before. A pass after the boots are set (`LinkCarried`) puts it there:
+
+| Column | Value |
+| --- | --- |
+| `read_boot_id` | the boot that read the record |
+| `boot_id` | the boot before that one, by start time |
+| `"ErrorDT"` | the last time the boot before was seen, which is the latest time on record for it; `time_quality` is `estimated` |
+| `not_before` | the start of the boot before: the error happened after it |
+
+When the ledger holds no boot before, the pass adds one with `start_quality = 'unknown'`, one second before the reading boot, and removes it again once the real boot before is read. Records of pstore and kdump are not carried: they are lines of the crashed boot with its own stamps.
+
+A carried record has no time to compare. For it the duplicate rule takes the boot in place of the time tolerance: same boot, same severity class, same cache line, or the same slot when neither has an address; without an address on either side, the one uncorrected record of the boot. Records of one source may pair when one of them is carried, because the kernel log holds both the panic text and the bank record the next boot printed. At equal grade the record with the exact time is counted; of the boot error region and the lines the kernel printed of it, the region.
+
+### How a boot ended
+
+`boot.end` is `stop` when a hardware error stopped the boot, `panic` when a crash log shows a panic and no record shows a hardware error, and empty when nothing tells. A clean end is not claimed: the records do not tell a shutdown from a power loss. A pass after the duplicates (`BootOutcomes`) sets it from the records:
+
+| Evidence | `end` |
+| --- | --- |
+| a carried record of an uncorrected error, or a fatal block of the boot error region, read in the next boot | `stop` |
+| a pstore dump written for a panic, or a kdump text log, and none of the above | `panic` |
+
+`end_ref` names the record (`event:<id>`), `end_source` its source and `end_at` its time when known. The panic of a crash log is kept as a record of severity `Informational` and type `panic`, which no total counts; it holds no text of the panic, whose message can be about anything on the host. The number of boots is a lower bound: a boot that stopped before its journal reached the disk and left nothing in pstore, the boot error region or a bank is not in the ledger.
 
 ### Counters
 
@@ -142,7 +170,7 @@ An event is tied to a slot first and to a DIMM through the placements of that sl
 
 A swap happens at a boot. With one boot between the sightings of two DIMMs, the events are split there. A page offline names an address and no slot; it takes the slot of an error on the same page.
 
-These passes run after every read, in a fixed order, and each computes its result from the rows of the ledger. Reading the sources in another order, or reading one again, gives the same ledger.
+These passes run after every read, in a fixed order (slots, counter events, the slots of events and actions, boots, clocks and times, carried records, DIMM attribution, duplicates, boot outcomes, counter coverage), and each computes its result from the rows of the ledger. Reading the sources in another order, or reading one again, gives the same ledger.
 
 ## Readings that are not events
 

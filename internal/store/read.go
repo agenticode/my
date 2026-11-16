@@ -103,6 +103,8 @@ func scanEvent(r rowScanner, withRaw bool) (*model.Event, error) {
 		scrub, bootID, dimmUID, windowStart, raw                      sql.NullString
 		socket, channel, chSlot, subCh, rank, dev, bg, bank, row, col sql.NullInt64
 		addr, dupOf, utcOff, imc, edacMC, handle, syndrome, scanID    sql.NullInt64
+		carried                                                       int64
+		readBoot, notBefore                                           sql.NullString
 	)
 	dest := []any{
 		&e.ID, &e.Host, &kind, &dt, &sev, &scrub,
@@ -110,6 +112,7 @@ func scanEvent(r rowScanner, withRaw bool) (*model.Event, error) {
 		&e.ErrorVector, &addr, &e.Source, &e.RawRef, &grade, &bootID, &dimmUID, &e.DIMMLink,
 		&e.Count, &e.Covered, &dupOf, &e.DupOfFingerprint, &quality, &windowStart, &utcOff,
 		&imc, &edacMC, &e.EdacLocation, &handle, &e.Label, &e.Slot, &syndrome, &e.ErrorType, &e.Decoder, &e.Fingerprint, &scanID,
+		&carried, &readBoot, &notBefore,
 	}
 	if withRaw {
 		dest = append(dest, &raw)
@@ -134,6 +137,7 @@ func scanEvent(r rowScanner, withRaw bool) (*model.Event, error) {
 	e.IMC, e.EdacMC, e.SMBIOSHandle = toOptInt(imc), toOptInt(edacMC), toOptInt(handle)
 	e.Syndrome = toOptU64(syndrome)
 	e.ScanID = scanID.Int64
+	e.Carried, e.ReadBootID, e.NotBefore = carried != 0, readBoot.String, parseTS(notBefore)
 	e.Raw = raw.String
 	return &e, nil
 }
@@ -1059,6 +1063,34 @@ func (s *Store) ECS(ctx context.Context, f ECSFilter) ([]model.ECSSample, error)
 		e.MR14, e.MR15, e.MR16, e.MR17 = toOptInt(mr[0]), toOptInt(mr[1]), toOptInt(mr[2]), toOptInt(mr[3])
 		e.MR18, e.MR19, e.MR20 = toOptInt(mr[4]), toOptInt(mr[5]), toOptInt(mr[6])
 		out = append(out, e)
+	}
+	return out, rows.Err()
+}
+
+// CaptureChecks returns what "my preflight" found during the latest scan
+// of the host that stored its checks, in the order of the checks; nil when
+// no scan did.
+func (s *Store) CaptureChecks(ctx context.Context, host string) ([]model.CaptureCheck, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT scan_id, host, name, state, detail, evidence FROM capture_check
+ WHERE host = ? AND scan_id = (SELECT MAX(scan_id) FROM capture_check WHERE host = ?) ORDER BY rowid`, host, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []model.CaptureCheck
+	for rows.Next() {
+		var c model.CaptureCheck
+		var detail, evidence string
+		if err := rows.Scan(&c.ScanID, &c.Host, &c.Name, &c.State, &detail, &evidence); err != nil {
+			return nil, err
+		}
+		if detail != "" {
+			if err := json.Unmarshal([]byte(detail), &c.Detail); err != nil {
+				c.Detail = model.Statement{Text: detail}
+			}
+		}
+		_ = json.Unmarshal([]byte(evidence), &c.Evidence)
+		out = append(out, c)
 	}
 	return out, rows.Err()
 }
