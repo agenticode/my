@@ -331,3 +331,54 @@ func TestLayoutOfTheSourceTree(t *testing.T) {
 		}
 	}
 }
+
+// TestDataModelNamesEveryView keeps the list of JSON views in
+// docs/data-model.md equal to the names the commands write in the envelope.
+func TestDataModelNamesEveryView(t *testing.T) {
+	root := testutil.RepoRoot(t)
+	written := regexp.MustCompile(`(?:\.emit(?:Code)?\(|newEnvelope\(|envelope\{View: )"([a-z-]+)"`)
+	views := map[string]bool{}
+	files, err := filepath.Glob(filepath.Join(root, "cmd", "my", "*.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range files {
+		if strings.HasSuffix(f, "_test.go") {
+			continue
+		}
+		b, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range written.FindAllStringSubmatch(string(b), -1) {
+			views[m[1]] = true
+		}
+	}
+	if len(views) < 10 {
+		t.Fatalf("found only the views %v in the code", views)
+	}
+	doc, err := os.ReadFile(filepath.Join(root, "docs", "data-model.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var row string
+	for _, line := range strings.Split(string(doc), "\n") {
+		if strings.HasPrefix(line, "| `view` |") {
+			row = line
+		}
+	}
+	listed := map[string]bool{}
+	for _, m := range regexp.MustCompile("`([a-z-]+)`").FindAllStringSubmatch(row, -1) {
+		listed[m[1]] = true
+	}
+	for v := range views {
+		if !listed[v] {
+			t.Errorf("docs/data-model.md does not list the view %q", v)
+		}
+	}
+	for v := range listed {
+		if v != "view" && v != "data" && !views[v] {
+			t.Errorf("docs/data-model.md lists the view %q, which no command writes", v)
+		}
+	}
+}
