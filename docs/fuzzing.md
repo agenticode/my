@@ -27,6 +27,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | detail string, layer position and label of the EDAC drivers | `internal/decode/edac` | `FuzzParseDetail` |
 | CPER memory error section as the kernel prints it | `internal/decode/cper` | `FuzzParseText` |
 | CPER memory error section in binary form, full and compact | `internal/decode/cper` | `FuzzParseBinary` |
+| Generic Error Status Blocks of an error region: lengths, entry revisions, time stamps | `internal/decode/cper` | `FuzzParseStatusBlocks` |
 | machine check registers, and the location text rasdaemon stores | `internal/decode/mce` | `FuzzDecode` |
 | event log record of 16 bytes, event data, event description | `internal/decode/ipmi` | `FuzzParseRecord` |
 | sensor names and messages of a BMC | `internal/decode/ipmi` | `FuzzLabels` |
@@ -36,6 +37,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | `dmidecode` output | `internal/adapter/smbios` | `FuzzDmidecode` |
 | kernel log: `dmesg`, syslog file, `/dev/kmsg` records, journal export | `internal/adapter/klog` | `FuzzCollect` |
 | pstore files and the archive of systemd-pstore: file names, the header of each part, the grouping of parts into dumps | `internal/adapter/crashlog` | `FuzzParts` |
+| the Boot Error Region (BERT), as the file of sysfs or a saved copy | `internal/adapter/bert` | `FuzzCollect` |
 | rows of the rasdaemon tables, with values of every SQLite type in every column | `internal/adapter/rasdaemon` | `FuzzRows` |
 | rasdaemon database file, as bytes | `internal/adapter/rasdaemon` | `FuzzDatabase` |
 | environment file with the settings of a rasdaemon store on a database server | `internal/adapter/rasdaemon` | `FuzzStoreSettings` |

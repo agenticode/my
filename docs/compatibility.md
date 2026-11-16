@@ -45,6 +45,7 @@ These grades are what the adapters and decoders give on the fixtures and test ca
 | lines with a kernel stamp, `/dev/kmsg` records, `dmesg -T` dates or syslog lines | kernel log |
 | JSON objects with `MESSAGE` and journal fields | kernel log from `journalctl -o json` |
 | a pstore file name, a first line such as `Panic#1 Part1`, `vmcore-dmesg.txt` or `dmesg.<12 digits>` | crash log: a pstore dump or a kdump text log |
+| binary data that is a chain of Generic Error Status Blocks whose entries fill their data length | boot error region (BERT), a saved copy |
 | `# dmidecode` or `Handle 0x..., DMI type` lines | dmidecode output |
 | lines or blocks of `ipmitool sel`, the table of `ipmi-sel`, 16-byte records, or a JSON list that names sensors | BMC event log |
 | JSON with `@odata` properties | Redfish resource |
@@ -292,6 +293,33 @@ A line is identified by the kernel's stamp and its text, as in every kernel log.
 - No pstore file or kdump log of a real server was read. The tests build pstore files from the kernel lines of the lab capture `7.3.0-mce-fatal`, with the framing taken from the kernel source; the lab captures of [validation-lab.md](validation-lab.md) are the next check.
 - Line numbers in the record references of a dump of several parts count in the text as it is read, Part N first; the reference names Part 1 and the number of further parts (`dmesg-efi_pstore-<id>+2#L12`).
 - A copy of `/sys/fs/pstore` whose files lost their times, and an ERST archive, date a dump only by what its text says.
+
+## Boot error region (BERT)
+
+Adapter `bert`, package `internal/adapter/bert`, framing in `internal/decode/cper`. Firmware that handles errors before the operating system does keeps a record of an error it could not report, typically the one that reset the machine, in the Boot Error Region for the next boot. The ACPI table BERT points at it. Linux shows the region as `/sys/firmware/acpi/tables/data/BERT` (`acpi_bert_data_init()`), readable by root only, and prints up to five of its records at boot (`bert_print_all()`).
+
+A scan reads the region on a host whose ACPI tables include BERT, and in a copy of a host's files that holds the file. `my import` takes a saved copy of the region.
+
+| Part | Layout | Handling |
+| --- | --- | --- |
+| Generic Error Status Block | block status, raw data offset and length, data length, severity (20 bytes) | the blocks follow each other; the walk goes on while the data length is not zero and the entries fill it exactly, as `cper_estatus_check()` requires, and stops at the first block that does not. It does not stop at a block status of zero: the kernel clears that field in the region after printing a block |
+| Generic Error Data Entry | section type, severity, revision, validation bits, length, FRU id and text (72 bytes); from revision 0x300 also a time stamp (80 bytes) | every length is checked against what is left before it is used |
+| Platform memory error section | `struct cper_sec_mem_err` | decoded like a firmware error record of the kernel log: address, node, card, module, rank, device, bank group, bank, row, column, error type, SMBIOS handle |
+
+One event per memory section, source `bert`, decoder `cper`, with the severity of the entry. A section without a time stamp of its own is carried: the error happened in the boot before the one that read the region, and the ledger puts it there ([data-model.md](data-model.md#records-kept-over-a-reset)). An entry of revision 0x300 with a valid time stamp is dated by it and is not carried; the specification does not state the zone of the time stamp, so the time is marked as estimated. The FRU text, when the firmware filled it, is kept as the label of the record. A fatal block without a memory section is kept as an `Informational` record that marks the boot before as stopped. Sections of other types are counted in a note. The block status is left out of what identifies a record, so the region read before and after the kernel printed it gives the same records.
+
+### Grade
+
+From the fields the firmware marked valid: A with row, column and bank, B with an address or a rank, C otherwise.
+
+### Duplicates
+
+The lines the kernel printed of the region are a second report of it: the region is counted. A record of the region and the machine check or firmware record of the same error in the boot before are one error: the best grade is counted ([data-model.md](data-model.md#records-kept-over-a-reset)).
+
+### Known gaps
+
+- No region of a real firmware was read. QEMU builds no BERT table; the tests use regions made from the layouts of the ACPI specification as Linux declares them (`include/acpi/actbl1.h`). Which fields real firmware fills, whether it writes a record after a machine check at all, and the zone of its time stamps are not known.
+- Raw data after the entries of a block is skipped.
 
 ## EDAC counters
 

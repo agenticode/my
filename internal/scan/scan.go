@@ -16,6 +16,8 @@
 //	             under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
+//	boot errors  the Boot Error Region of the firmware
+//	             (/sys/firmware/acpi/tables/data/BERT, root only)
 //	crash logs   the kernel log of a boot that crashed, where it outlived
 //	             the crash: pstore files in /sys/fs/pstore, their archive
 //	             in /var/lib/systemd/pstore, the text logs of kdump in
@@ -42,6 +44,7 @@ import (
 	"time"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
@@ -248,6 +251,7 @@ func Sources(ctx context.Context, opts Options) []adapter.Adapter {
 
 	out = append(out, kernelLog(ctx, &opts, info)...)
 	out = append(out, CrashLogs(&opts)...)
+	out = append(out, bootErrors(&opts, now, info)...)
 
 	out = append(out, edacsysfs.NewRoot(opts.root(), edacsysfs.Options{Now: now}))
 	out = append(out, daemonCounts(&opts, now)...)
@@ -294,6 +298,25 @@ func CrashLogs(opts *Options) []adapter.Adapter {
 		out = append(out, crashlog.NewDir(c.Kind, p, crashlog.Options{ModTime: c.Dir == crashlog.StoreDir, TempDir: opts.TempDir}))
 	}
 	return out
+}
+
+// bootErrors picks the Boot Error Region of the firmware: on a host whose
+// ACPI tables include BERT, the region the kernel shows at bert.Path. A
+// host without the table gets no entry. The region is read as of the scan,
+// which is in the boot that holds it; a copy of a host's files is read as
+// of its own time.
+func bootErrors(opts *Options, now time.Time, info hostinfo.Info) []adapter.Adapter {
+	p := opts.path(bert.Path)
+	if _, err := os.Lstat(p); err != nil {
+		// drivers/acpi/sysfs.c makes the file for a BERT table only.
+		if _, terr := os.Lstat(opts.path("sys/firmware/acpi/tables/BERT")); terr != nil || !opts.Live {
+			return nil
+		}
+	}
+	if now.IsZero() {
+		now = time.Now()
+	}
+	return []adapter.Adapter{bert.New(p, bert.Options{ReadAt: now, BootID: info.BootID})}
 }
 
 // SELDir is where a copy of a host's files keeps the output of ipmitool, as
