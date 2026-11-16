@@ -276,6 +276,8 @@ The commands that write a file (`bundle`, `report`, `import -o`, `export`, `coll
 | `stops` | `stops`, `window`, `streak` (the latest boots in a row that stopped), `panics`, `where` (`R-LOOP-01`, `R-LOOP-02`, `R-LOOP-03`, `dimm`, `none`) and `lines[]`, the stops lines as statements |
 | `rules[]` | the statements of the R-LOOP rules on the finding of the DIMM |
 
+The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above, and the window as the engine sees it (per DIMM `cells`, `places` and the boots each had uncorrected errors in). The topology of `dimm` adds `window` and `boots` to the levels, the address map `window`, `boots` and `ue_boots`, and `my map --boots` per line the `boots` and `ue_boots` of each cell.
+
 ### Firmware records in the views
 
 The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]`, and every row of `inventory` carries `firmware[]` and `firmware_marks`. A record of `firmware[]` holds:
@@ -291,8 +293,46 @@ The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]
 | `basis` | for a table, what it rests on; a table whose basis is not `capture` was not checked on real hardware |
 | `raw_ref` | where the raw record is, in the views of a DIMM |
 | `withdrawn` | a later record took the mark back |
-| `duplicate` | the step repeats one another log of the same BMC reported |
+| `duplicate` | the step repeats one that another log of the same BMC reported |
 
 `firmware_marks` is the marks of the DIMM in a few words, newest first, the latest two and the number of the others: `PPR ok 11-03, PFA 11-09 +2`. Marks taken back and steps that repeat another are left out.
 
-The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above, and the window as the engine sees it (per DIMM `cells`, `places` and the boots each had uncorrected errors in). The topology of `dimm` adds `window` and `boots` to the levels, the address map `window`, `boots` and `ue_boots`, and `my map --boots` per line the `boots` and `ue_boots` of each cell.
+## The event stream
+
+`my export events` writes every event and action of a host as one line of JSON, oldest first, in the schema `my-events/1`: the records of the host's own logs and those of its BIOS and BMC in one vocabulary. A firmware record that made neither an event nor an action (a log cleared, a mode in effect) is a line of its own. It goes to the standard output, or with `-o FILE` into a file; it works on a scan, behind `my open CASE`, and with `--ledger`. `--since TIME` leaves out the records before TIME and those that know no date; `--raw` adds the raw text. Duplicates are in the stream with `dup_of` set: a consumer that counts the lines without it counts by the rule of the ledger. `my` sends the stream nowhere.
+
+```
+{"schema":"my-events/1","host":"h1","time":"2026-11-10T04:00:00Z","time_quality":"exact","record":"action","event":"ppr-scheduled","count":1,"action":"ppr","result":"pending","text":"post package repair scheduled","slot":"DIMM_A4","location":"DIMM_A4","origin":"bmc-log","source":"redfish/log","log":"EventLog","vendor":{"name":"DMTF","id":"MemoryRowRemappingPending","registry":"Platform","registry_version":"1.5","severity":"Warning","message":"Example text of the entry about DIMM_A4.","args":["DIMM_A4"]},"mapping":{"by":"table","ref":"dmtf@1:MemoryRowRemappingPending","basis":"registry"},"fingerprint":"31c134be7c4921bf5c8135f5bea40a7b","raw_ref":"standard-log.json#/redfish/v1/Systems/1/LogServices/EventLog/Entries/4"}
+```
+
+A field whose value is zero, false or empty is left out.
+
+| Field | Content |
+| --- | --- |
+| `schema` | `my-events/1`. A later form that renames or removes a field gets another name; new fields do not change it |
+| `host` | the host |
+| `time` | when the record was written, in UTC (RFC 3339) |
+| `time_quality` | `exact`, `estimated` (the time was worked out, see Times above) or `relative` |
+| `uptime_seconds` | for a record whose time is `relative`, the seconds since its boot; such a record has no `time` |
+| `record` | `event`, `action`, or `firmware` for a firmware record that made neither |
+| `event` | for a record of the BIOS or the BMC, its common event (see Firmware records); for one of the host's own logs `ce`, `ue`, `scrub-ce`, `scrub-ue`, `counter` (the growth of a counter), `stop` and `panic` (the end of a boot), `informational`, or the kind of the action (`page-offline`, `sppr`, `hppr`, `reseat` and the others of Actions) |
+| `flags` | the flags of a common event |
+| `severity` | the severity of an event in the ledger: `CE`, `UE`, `Recoverable`, `Fatal`, `Informational` |
+| `count` | the errors an event counts, the pages or steps an action counts |
+| `action`, `result` | the kind of an action and its result (`ok`, `failed`, `pending`, `unknown`) |
+| `text` | the error type of an event or the detail of an action, in a few words |
+| `slot`, `location` | the slot the record is tied to, and how the record itself named the place |
+| `dimm` | the module the record is tied to: `serial`, `part`, `manufacturer` |
+| `place` | where in the memory, as far as the record says: `socket`, `channel`, `channel_slot`, `rank`, `device`, `bank_group`, `bank`, `row`, `column`, `address` (the physical address) |
+| `origin` | `os` for the host's own logs; for firmware records `bmc-log`, `bmc-state`, `sel` or `tool-export` |
+| `source`, `log` | the reader that read the record, and the log of the BMC it is from |
+| `vendor` | what the BIOS or the BMC said: `name` (the vendor or the standard), `id` (its message ID), `registry`, `registry_version`, `severity` (its own), `message` (its text), `args` (the arguments of the message) |
+| `mapping` | how the common event was found: `by` (as `mapping` in Firmware records in the views), `ref` (the table and line), `basis` (what the table rests on) |
+| `fingerprint` | the record across ledgers |
+| `dup_of` | the fingerprint of the record this one reports again |
+| `withdrawn_by` | for a mark, the fingerprint of the record that took it back |
+| `boot_id` | the boot the record belongs to |
+| `raw_ref` | where the raw record is |
+| `raw` | with `--raw`, the raw text: a log line, an entry of a BMC as JSON |
+
+`my export fmfm --records` stays what it is: the error records in the form of the FMFM runtime log, for an analyzer that reads that form. The event stream is for anything else that wants every record of a host in one schema.

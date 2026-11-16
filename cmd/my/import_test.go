@@ -129,6 +129,8 @@ func TestImportMistakes(t *testing.T) {
 		{"a missing file", []string{"import", filepath.Join(dir, "none.log")}, cli.ExitFailure, "no such file"},
 		{"a ledger", []string{"import", demo(t)}, cli.ExitFailure, `show it with "my open"`},
 		{"anonymizing nothing", []string{"import", root, "--anonymize"}, cli.ExitUsage, "--anonymize goes with -o"},
+		{"inputs without a bundle", []string{"import", root, "--with-inputs"}, cli.ExitUsage, "--with-inputs goes with -o"},
+		{"inputs anonymized", []string{"import", root, "--with-inputs", "--anonymize", "-o", filepath.Join(dir, "x.mycase")}, cli.ExitUsage, "--with-inputs and --anonymize do not go together"},
 		{"a key without anonymizing", []string{"import", root, "--key-file", gomod}, cli.ExitUsage, "--key-file goes with --anonymize"},
 		{"a bad time", []string{"import", root, "--captured-at", "yesterday"}, cli.ExitUsage, "--captured-at yesterday: want a date"},
 		{"a bad time zone", []string{"import", root, "--tz", "Mars/Olympus"}, cli.ExitUsage, "--tz Mars/Olympus: want a time zone name"},
@@ -300,5 +302,70 @@ func TestImportGoesOnPastAnUnknownInput(t *testing.T) {
 	code, out, _ := runEnv(fixed, "open", filepath.Join(dir, "case-en.mycase"))
 	if code > 4 || strings.Contains(out, "unknown") {
 		t.Errorf("open: exit code %d, the unknown input is a source the finding missed:\n%s", code, out)
+	}
+}
+
+// TestImportInputs: a directory that is none of the known trees is read
+// file by file, and the manifest of the bundle lists every file that was
+// read; with --with-inputs the files travel in the bundle.
+func TestImportInputs(t *testing.T) {
+	dir := t.TempDir()
+	archive := filepath.Join(dir, "vendor-archive")
+	put := func(from, to string) string {
+		t.Helper()
+		data, err := os.ReadFile(from)
+		if err != nil {
+			t.Fatal(err)
+		}
+		to = filepath.Join(archive, filepath.FromSlash(to))
+		if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(to, data, 0o644); err != nil {
+			t.Fatal(err)
+		}
+		return to
+	}
+	put(testutil.Testdata(t, "sel", "ipmitool-elist.txt"), "bmc/sel.txt")
+	put(testutil.Testdata(t, "klog", "ghes-6.x.dmesg"), "host/dmesg.txt")
+	put(filepath.Join(testutil.RepoRoot(t), "go.mod"), "notes/go.mod")
+	log := testutil.Testdata(t, "redfish", "standard-log.json")
+
+	file := filepath.Join(dir, "case.mycase")
+	code, out, errOut := runEnv(fixed, "import", archive, log, "-o", file)
+	if code != cli.ExitOK || errOut != "" {
+		t.Fatalf("exit code %d, stderr %q\n%s", code, errOut, out)
+	}
+	for _, want := range []string{archive + ": directory of files", "  sel: ", "  klog: ", "1 file was not recognised and left out"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("the summary lacks %q:\n%s", want, out)
+		}
+	}
+	m, err := bundle.ReadManifest(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var names []string
+	for _, in := range m.Inputs {
+		names = append(names, in.Name)
+		if in.Member != "" || len(in.SHA256) != 64 || in.Bytes == 0 {
+			t.Errorf("input %+v", in)
+		}
+	}
+	if strings.Join(names, ",") != "vendor-archive/bmc/sel.txt,vendor-archive/host/dmesg.txt,vendor-archive/notes/go.mod,standard-log.json" {
+		t.Errorf("inputs %v", names)
+	}
+
+	// With the files.
+	code, out, errOut = runEnv(fixed, "import", archive, log, "-o", file, "--force", "--with-inputs")
+	if code != cli.ExitOK || errOut != "" {
+		t.Fatalf("--with-inputs: exit code %d, stderr %q", code, errOut)
+	}
+	m, err = bundle.ReadManifest(file)
+	if err != nil || len(m.Inputs) != 4 || m.Inputs[3].Member != "inputs/standard-log.json" {
+		t.Fatalf("--with-inputs: %+v, %v", m, err)
+	}
+	if code, _, errOut := runEnv(fixed, "open", file, "export", "events"); code != cli.ExitOK || errOut != "" {
+		t.Errorf("open: exit code %d, %s", code, errOut)
 	}
 }

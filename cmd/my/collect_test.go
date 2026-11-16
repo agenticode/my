@@ -176,6 +176,11 @@ func TestCollectRedfishToCase(t *testing.T) {
 	if !strings.Contains(stdout, `"host": "web483"`) || strings.Contains(stdout, "my-collect-") || strings.Contains(stdout, os.TempDir()) {
 		t.Errorf("the case as JSON:\n%s", stdout)
 	}
+	// The manifest names the manifest of the collection; no answer travels.
+	m, err := bundle.ReadManifest(file)
+	if err != nil || len(m.Inputs) != 1 || !strings.HasSuffix(m.Inputs[0].Name, "/manifest.json") || m.Inputs[0].Member != "" || len(m.Inputs[0].SHA256) != 64 {
+		t.Errorf("inputs %+v, %v", m, err)
+	}
 
 	// An existing bundle is replaced only when asked.
 	code, _, stderr = runEnv(fixed, "collect", "redfish", "--bmc", srv.URL, "--insecure", "--session", "--user", bmcUser, "--password-file", pw, "-o", file)
@@ -189,6 +194,33 @@ func TestCollectRedfishToCase(t *testing.T) {
 	code, _, _ = runEnv(fixed, "collect", "redfish", "--bmc", srv.URL, "--insecure", "--session", "--user", bmcUser, "--password-file", pw, "-o", file, "--force", "--quiet")
 	if code != cli.ExitOK || len(srv.Requests()) == before {
 		t.Errorf("--force: exit code %d", code)
+	}
+
+	// --with-inputs: every answer travels, and the password in none.
+	code, stdout, stderr = runEnv(fixed, "collect", "redfish", "--bmc", srv.URL, "--insecure", "--session", "--user", bmcUser, "--password-file", pw, "-o", file, "--force", "--quiet", "--with-inputs")
+	if code != cli.ExitOK {
+		t.Fatalf("--with-inputs: exit code %d\n%s", code, stderr)
+	}
+	noSecret(t, "", stdout, stderr)
+	m, err = bundle.ReadManifest(file)
+	if err != nil || len(m.Inputs) < 10 {
+		t.Fatalf("--with-inputs: %d inputs, %v", len(m.Inputs), err)
+	}
+	manifests := 0
+	for _, in := range m.Inputs {
+		if in.Member != "inputs/"+in.Name {
+			t.Errorf("input %+v does not travel", in)
+		}
+		if strings.HasSuffix(in.Name, "/manifest.json") {
+			manifests++
+		}
+	}
+	data, err = os.ReadFile(file)
+	if err != nil || bytes.Contains(data, []byte(bmcPassword)) || manifests != 1 {
+		t.Errorf("bundle with inputs: %v, %d manifests", err, manifests)
+	}
+	if code, _, stderr := runEnv(fixed, "open", file); code == cli.ExitUsage || code == cli.ExitFailure {
+		t.Errorf("a bundle with inputs does not open: %d %s", code, stderr)
 	}
 }
 
@@ -344,6 +376,7 @@ func TestCollectUsage(t *testing.T) {
 		{nil, []string{"collect", "redfish", "--bmc", "https://reader:" + bmcPassword + "@10.0.0.5", "-o", out}, "carries credentials"},
 		{nil, []string{"collect", "redfish", "--bmc", "http://10.0.0.5", "-o", out}, "plain http sends the password unencrypted"},
 		{nil, []string{"collect", "redfish", "--bmc", "10.0.0.5", "-o", file}, "it is a file"},
+		{nil, []string{"collect", "redfish", "--bmc", "10.0.0.5", "-o", out, "--with-inputs"}, "--with-inputs goes with -o NAME.mycase"},
 		{nil, []string{"collect", "redfish", "--bmc", "10.0.0.5", "-o", filepath.Join(dir, "no", "such", "dir")}, "does not exist"},
 		{nil, []string{"collect", "redfish", "--bmc", "10.0.0.5", "-o", out, "--parallel", "0"}, "--parallel 0"},
 		{nil, []string{"collect", "redfish", "--bmc", "10.0.0.5", "-o", out, "--timeout", "soon"}, "--timeout soon"},

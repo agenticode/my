@@ -74,6 +74,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | URI of a resource, turned into a file name | `internal/redfish/collect` | `FuzzFilePath` |
 | manifest of a Redfish collection | `internal/redfish/collect` | `FuzzParseManifest` |
 | a Redfish service made of arbitrary resources: collected by `my collect redfish`, then read as a dump | `internal/redfish/collect` | `FuzzCrawl` |
+| a line of `my export events` made of an event, an action and a firmware record with arbitrary texts, times and counts: one line of JSON that reads back to them | `internal/eventstream` | `FuzzLine` |
 
 ## What a target checks
 

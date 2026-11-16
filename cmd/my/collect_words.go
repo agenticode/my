@@ -12,6 +12,7 @@ var collectWords = i18n.Catalog{
 	"err.collect_out":          {EN: "name where the answers go with -o: a new directory, or a case bundle such as case.mycase", KO: "응답을 저장할 곳을 -o로 지정해야 함: 새 디렉터리 또는 case.mycase 같은 케이스 번들"},
 	"err.collect_dir":          {EN: "-o {dir}: {why}", KO: "-o {dir}: {why}"},
 	"err.collect_not_empty":    {EN: "it is not empty; a collection goes into a new directory", KO: "비어 있지 않음. 수집 결과는 새 디렉터리에 저장함"},
+	"err.collect_inputs":       {EN: "--with-inputs goes with -o NAME.mycase: the answers travel in a case bundle", KO: "--with-inputs는 -o NAME.mycase와 함께 써야 함: 응답은 케이스 번들에 들어감"},
 	"err.collect_file":         {EN: "it is a file; a collection is a directory, and a case bundle has a name that ends in {ext}", KO: "파일임. 수집 결과는 디렉터리이고, 케이스 번들은 이름이 {ext}로 끝남"},
 	"err.collect_unreadable":   {EN: "{why}", KO: "{why}"},
 	"err.collect_parallel":     {EN: "--parallel {value}: want a number from 1 to {max}", KO: "--parallel {value}: 1에서 {max} 사이의 수여야 함"},
@@ -82,7 +83,7 @@ var collectWords = i18n.Catalog{
 	"help.collect.text": {
 		EN: "Asks the BMC of a server over Redfish for what MemorY reads about its memory, and writes the answers to OUT: the memory modules and their error counts, the BIOS settings with the registry that explains them, the event logs, the firmware versions and the chassis. " +
 			"It only reads. Every request is a GET, and nothing on the BMC is changed: no setting, no log, no action. With --session the command logs in to the session service and deletes its session at the end; these are the only two requests that are no GET. " +
-			"OUT is a new directory, laid out the way the DMTF mockup tools lay out a service (one index.json per URI), with a manifest.json that lists every URI and what became of it. When the name of OUT ends in .mycase, a case bundle is made from the collection instead. " +
+			"OUT is a new directory, laid out the way the DMTF mockup tools lay out a service (one index.json per URI), with a manifest.json that lists every URI and what became of it. When the name of OUT ends in .mycase, a case bundle is made from the collection instead; its manifest lists the manifest.json of each collection with its size and SHA-256, and with --with-inputs every answer of the BMC travels in the bundle. " +
 			"A BMC that lacks a resource, denies one or stops answering still yields a collection: what came back is kept, and the manifest says what did not. " +
 			"The password comes from the environment variable MY_REDFISH_PASSWORD, from --password-file, or from the terminal. It is never given on the command line, and it is in no file the command writes. " +
 			"The certificate of the BMC is checked. Most BMCs ship with a certificate they signed themselves: --fingerprint accepts exactly that certificate, --ca-file a private authority. " +
@@ -91,7 +92,7 @@ var collectWords = i18n.Catalog{
 			"The exit code is 0 when everything that was asked for came back, 1 when a collection was written and lacks something that was denied, timed out or failed, and 70 when no BMC answered.",
 		KO: "서버의 BMC에 Redfish로 MemorY가 메모리에 관해 읽는 항목을 요청하고 응답을 OUT에 저장합니다. 메모리 모듈과 오류 카운트, BIOS 설정과 그 설정을 설명하는 레지스트리, 이벤트 로그, 펌웨어 버전, 섀시입니다. " +
 			"이 명령은 읽기만 합니다. 모든 요청이 GET이며 BMC의 설정, 로그, 액션 어느 것도 바꾸지 않습니다. --session을 주면 세션 서비스에 로그인하고 끝날 때 자기 세션을 삭제합니다. 이 두 요청에만 다른 메서드(POST와 DELETE)를 씁니다. " +
-			"OUT은 새 디렉터리이고, DMTF 목업 도구와 같은 구조(URI마다 index.json 하나)로 저장하며, 모든 URI와 그 결과를 적은 manifest.json을 함께 둡니다. OUT의 이름이 .mycase로 끝나면 수집 결과로 케이스 번들을 만듭니다. " +
+			"OUT은 새 디렉터리이고, DMTF 목업 도구와 같은 구조(URI마다 index.json 하나)로 저장하며, 모든 URI와 그 결과를 적은 manifest.json을 함께 둡니다. OUT의 이름이 .mycase로 끝나면 수집 결과로 케이스 번들을 만듭니다. 번들의 manifest에는 수집마다 manifest.json의 크기와 SHA-256이 적히고, --with-inputs를 주면 BMC의 응답 전부가 번들에 들어갑니다. " +
 			"BMC에 없는 리소스, 거부된 리소스, 도중에 응답이 끊긴 경우에도 수집 결과는 남습니다. 받은 응답은 저장하고, 받지 못한 요청은 매니페스트에 적습니다. " +
 			"암호는 환경 변수 MY_REDFISH_PASSWORD, --password-file, 또는 터미널 입력에서 받습니다. 명령줄 인자로는 받지 않으며 명령이 쓰는 어떤 파일에도 남지 않습니다. " +
 			"BMC 인증서는 검증합니다. BMC 대부분은 자체 서명 인증서로 출하됩니다. --fingerprint는 그 인증서 하나만 받아들이고, --ca-file은 사설 인증 기관을 지정합니다. " +
@@ -121,6 +122,8 @@ var collectWords = i18n.Catalog{
 			"--no-logs             read no logs\n" +
 			"--parallel N          with --targets: BMCs asked at the same time (default 4)\n" +
 			"--force               replace OUT when it is a case bundle that exists\n" +
+			"--with-inputs         with -o NAME.mycase: put every answer of the BMC into the bundle;\n" +
+			"                      the answers can hold account names and addresses\n" +
 			"--quiet               print no progress\n" +
 			"--event-map FILE      with -o NAME.mycase: a table of firmware messages of one's own,\n" +
 			"                      asked before the shipped tables; may be repeated\n" +
@@ -147,6 +150,8 @@ var collectWords = i18n.Catalog{
 			"--no-logs             로그를 읽지 않음\n" +
 			"--parallel N          --targets와 함께: 동시에 요청할 BMC 수 (기본 4)\n" +
 			"--force               OUT이 이미 있는 케이스 번들이면 덮어씀\n" +
+			"--with-inputs         -o NAME.mycase와 함께: BMC의 응답 전부를 번들에 넣음. 응답에는\n" +
+			"                      계정 이름과 주소가 들어 있을 수 있음\n" +
 			"--quiet               진행 상황을 출력하지 않음\n" +
 			"--event-map FILE      -o NAME.mycase와 함께: 내장 표보다 먼저 볼, 직접 만든\n" +
 			"                      펌웨어 메시지 표. 여러 번 줄 수 있음\n" +

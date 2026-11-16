@@ -161,6 +161,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | GPU 메모리 | `nvidia-smi -q`와 쿼리 출력 | GPU별 row remapping 상태와 ECC 카운터 |
 | FMFM 로그 | JSON 파일 | 런타임, 부팅, 크래시 기록과 ECS 값 |
 | 호스트 파일 사본 | 아래에 `proc`, `sys`, `var`가 있는 디렉터리(`--root`, `my import`) | 위 입력을 파일로 |
+| 그 밖의 디렉터리 | 벤더 도구의 압축을 푼 것, 로그를 모은 폴더(`my import`) | 그 아래에서 리더가 알아보는 파일 |
 
 파일은 내용으로 종류를 알아내므로 `my import`에 섞어서 줘도 됩니다. 오류 위치를 얼마나 자세히 알려 주는지는 플랫폼마다 다릅니다. 그래서 기록마다 관측 등급이 붙고, 소견은 기록의 등급이 허락하는 데까지만 말합니다.
 
@@ -193,6 +194,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my bios` | BIOS의 메모리 RAS 설정을 프로필과 대조([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my vendors` | BMC와 BIOS 벤더별 메모리 메시지를 읽는 표, 표마다 확인한 정도, 케이스에서 어느 표도 분류하지 못한 메시지([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |
+| `my export events` | 호스트의 모든 기록을 `my-events/1` 형식의 JSON 한 줄씩 저장. 로그 파이프라인이나 데이터베이스용([docs/data-model.md](docs/data-model.md#the-event-stream)) |
 | `my export labels` | 슬롯 이름을 rasdaemon용 DIMM 라벨 파일로 저장 |
 | `my verify --expect plan.yaml` | 오류 주입 계획과 호스트가 기록한 것을 대조([docs/verify.md](docs/verify.md)) |
 | `my harvest` | 부팅마다 이전 부팅이 남긴 것(pstore, 부팅 오류 영역, kdump 로그, 머신 체크 뱅크에 남은 기록)을 보관 원장 `/var/lib/my/ledger.db`에 읽어 넣음. `install`, `uninstall`, `status`([docs/crash-loop.md](docs/crash-loop.md)) |

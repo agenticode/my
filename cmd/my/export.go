@@ -9,12 +9,14 @@ import (
 	"github.com/agenticode/my/internal/buildinfo"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/eventstream"
 	"github.com/agenticode/my/internal/fmfmlog"
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/outfile"
 )
 
 // exportFormats are the forms "my export" writes.
-var exportFormats = []string{"fmfm", "labels"}
+var exportFormats = []string{"fmfm", "events", "labels"}
 
 // runExport is "my export fmfm": the findings of a host as an analysis
 // log in the form of the FMFM framework. The log goes to standard output,
@@ -26,6 +28,13 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	records := o.fs.Bool("records", false, "")
 	all := o.fs.Bool("all", false, "")
 	force := o.fs.Bool("force", false, "")
+	// A scan of this host already takes --since for the store of a fleet;
+	// for the stream it also cuts the records.
+	since, ownSince := &o.sf.since, false
+	if o.fs.Lookup("since") == nil {
+		since, ownSince = o.fs.String("since", "", ""), true
+	}
+	raw := o.fs.Bool("raw", false, "")
 	var lf labelFlags
 	o.fs.StringVar(&lf.names, "names", "", "")
 	o.fs.StringVar(&lf.vendor, "vendor", "", "")
@@ -41,10 +50,29 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	switch {
 	case len(pos) == 0:
 		return o.usageError(env, lang, "%s", say(lang, "err.export_format"))
-	case pos[0] != "fmfm" && pos[0] != "labels":
+	case pos[0] != "fmfm" && pos[0] != "labels" && pos[0] != "events":
 		return o.usageError(env, lang, "%s", say(lang, "err.export_unknown", "format", pos[0]))
 	case len(pos) > 1:
 		return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
+	}
+	if pos[0] != "events" {
+		for name, set := range map[string]bool{"--since": ownSince && *since != "", "--raw": *raw} {
+			if set {
+				return o.usageError(env, lang, "%s", say(lang, "err.events_flag", "flag", name))
+			}
+		}
+	}
+	if pos[0] == "events" {
+		cut := *since
+		at, err := parseSince(cut, clock(env))
+		if err != nil {
+			return o.usageError(env, lang, "%s", say(lang, "err.since", "value", cut))
+		}
+		if !o.sf.set() {
+			// Without a fleet the flag is the cut of the stream alone.
+			o.sf.since = ""
+		}
+		return exportEvents(ctx, env, o, lang, src, *out, *force, eventstream.Options{Since: at, Raw: *raw})
 	}
 	if pos[0] == "labels" {
 		// The DIMM label file of rasdaemon, written from the slot names.
@@ -111,5 +139,61 @@ func runExport(ctx context.Context, env *cli.Env, args []string, src *source) in
 	fmt.Fprintln(env.Stdout, "  "+say(lang, "export.holds", "host", s.h.Host, "dimms", len(doc.AnalysisLog), "records", written,
 		"grade", engine.GradeText(lang, s.h.Grade)))
 	fmt.Fprintln(env.Stdout, "  "+say(lang, "export.no_cpad"))
+	return cli.ExitOK
+}
+
+// exportEvents is "my export events": every record of the host as one line
+// of JSON in the schema my-events/1, to standard output or with -o into a
+// file.
+func exportEvents(ctx context.Context, env *cli.Env, o *options, lang i18n.Lang, src *source, out string, force bool, opts eventstream.Options) int {
+	toFile := out != "" && out != "-"
+	if toFile {
+		if code, ok := o.checkTarget(env, lang, out, force); !ok {
+			return code
+		}
+	}
+	s, code := o.start(ctx, env, lang, src)
+	if s == nil {
+		return code
+	}
+	defer s.close()
+	if code, ok := s.needHost(); !ok {
+		return code
+	}
+	var written int
+	var failed error
+	write := func(w io.Writer) error {
+		written, failed = eventstream.Write(ctx, w, s.c.Store(), s.h.Host, opts)
+		return failed
+	}
+	if !toFile {
+		// The stream is the output, with or without --json.
+		if err := write(env.Stdout); err != nil {
+			return o.failure(env, err)
+		}
+		return cli.ExitOK
+	}
+	size, err := outfile.Write(out, force, write)
+	switch {
+	case failed != nil:
+		return o.failure(env, failed)
+	case err != nil:
+		return o.failure(env, errors.New(targetText(lang, err)))
+	}
+	if o.asJSON {
+		res := struct {
+			Path    string `json:"path"`
+			Bytes   int    `json:"bytes"`
+			Format  string `json:"format"`
+			Host    string `json:"host"`
+			Records int    `json:"records"`
+		}{out, int(size), eventstream.Schema, s.h.Host, written}
+		if err := writeJSON(env.Stdout, res); err != nil {
+			return o.failure(env, err)
+		}
+		return cli.ExitOK
+	}
+	fmt.Fprintln(env.Stdout, say(lang, "events.written", "file", out, "size", sizeText(size)))
+	fmt.Fprintln(env.Stdout, "  "+say(lang, "events.holds", "host", s.h.Host, "n", written, "schema", eventstream.Schema))
 	return cli.ExitOK
 }
