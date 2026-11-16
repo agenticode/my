@@ -70,6 +70,9 @@ type options struct {
 	// detail draws everything a screen has (--detail, on the commands
 	// that have a short form).
 	detail bool
+	// maps are user tables of firmware messages (--event-map), on the
+	// commands that read sources.
+	maps eventMaps
 }
 
 // withDetail registers --detail: the command has a short form, and the flag
@@ -95,6 +98,7 @@ func newOptions(env *cli.Env, name string, src *source) *options {
 		o.fs.StringVar(&o.root, "root", "", "")
 		o.sf.register(o.fs)
 		o.bmc.registerScan(o.fs)
+		o.fs.Var(&o.maps, "event-map", "")
 	}
 	o.cf.Register(o.fs)
 	o.pf.register(o)
@@ -436,6 +440,10 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	if o.ledger != "" {
 		path = o.ledger
 	}
+	if err := useEventMaps(env, s.lang, o.maps); err != nil {
+		return nil, "", usage{errText(s.lang, err)}
+	}
+	s.closers = append(s.closers, func() { useEventMaps(env, s.lang, nil) })
 	if flag := o.bmc.alone(); flag != "" {
 		return nil, "", usage{say(s.lang, "err.bmc_alone", "flag", flag)}
 	}

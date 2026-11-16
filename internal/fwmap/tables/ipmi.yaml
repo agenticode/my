@@ -1,0 +1,51 @@
+format: 1
+table: ipmi
+version: 1
+vendor: IPMI
+basis: registry
+applies:
+  ipmi: yes
+key: ipmi
+location: plain
+sources:
+  ipmitool:
+    title: "ipmitool include/ipmitool/ipmi_sel.h, sensor_specific_event_types: the states of the memory sensor (sensor type 0Ch) of IPMI v2.0 table 42-3"
+    url: https://github.com/ipmitool/ipmitool/blob/be11d94/include/ipmitool/ipmi_sel.h
+    read: 2026-11-16
+
+# The states of the IPMI memory sensor, by the offset of a sensor-specific
+# event (event type 6Fh). The key is "memory-" and the offset in hex.
+messages:
+  - id: memory-00
+    event: ce
+    source: ipmitool
+  - id: memory-01
+    event: ue
+    source: ipmitool
+  - id: memory-02
+    event: ue
+    source: ipmitool
+  - id: memory-03
+    event: scrub-ce
+    source: ipmitool
+  - id: memory-04
+    event: disabled
+    source: ipmitool
+  - id: memory-05
+    event: ce-log-limit
+    source: ipmitool
+  - id: memory-06
+    event: presence
+    source: ipmitool
+  - id: memory-07
+    event: config-error
+    source: ipmitool
+  - id: memory-08
+    event: sparing
+    source: ipmitool
+  - id: memory-09
+    event: thermal
+    source: ipmitool
+  - id: memory-0a
+    event: thermal
+    source: ipmitool

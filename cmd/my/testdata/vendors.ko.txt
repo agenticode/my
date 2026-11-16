@@ -1,0 +1,7 @@
+ 표         벤더 또는 표준     메시지  근거
+ dell@1     Dell                   15  registry: 실물 장비에서 확인하지 않음
+ dmtf@1     DMTF                   19  registry: 실물 장비에서 확인하지 않음
+ ipmi@1     IPMI                   11  registry: 실물 장비에서 확인하지 않음
+ openbmc@1  OpenBMC                15  registry: 실물 장비에서 확인하지 않음
+ wording@1  모든 벤더, 문구로      15  이 도구의 규칙
+ my vendors TABLE: 표의 메시지, my vendors --seen: 케이스의 BMC가 내놓은 것

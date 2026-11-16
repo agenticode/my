@@ -6,8 +6,8 @@
  슬롯           시리얼    제조사          파트 넘버        용량  구성  속도       CE OS  CE BMC
  PROC 1 DIMM 3  H1D30002  Example Memory  EXM32G29R2X4-B  32 GB  2R    2933/2933      -       2
                 DDR4 RDIMM; BMC: proc1dimm3
-                BMC 로그 2026-11-03 06:14 UTC: correctable ECC
-                BMC 로그 2026-11-09 17:45 UTC: correctable ECC
+                BMC 로그 2026-11-03 06:14 UTC: corrected-error limit passed
+                BMC 로그 2026-11-09 17:45 UTC: corrected-error limit passed
  PROC 1 DIMM 1  H1D10001  Example Memory  EXM32G29R2X4-B  32 GB  2R    2933/2933      -       0
                 DDR4 RDIMM; BMC: proc1dimm1
  PROC 2 DIMM 3  H2D30004  Example Memory  EXM32G29R2X4-B  32 GB  2R    2933/2933      -       0

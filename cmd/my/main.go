@@ -74,6 +74,12 @@ func app() *cli.App {
 				Run:       live(runInventory),
 			},
 			{
+				Name:      "vendors",
+				Summary:   "the tables that read the memory messages of each BMC and BIOS vendor, and what a case's BMC published",
+				SummaryKO: "BMC와 BIOS 벤더별 메모리 메시지를 읽는 표, 그리고 케이스의 BMC가 내놓은 것",
+				Run:       live(runVendors),
+			},
+			{
 				Name:      "bundle",
 				Summary:   "write the records of this host as one case file to send or attach",
 				SummaryKO: "이 호스트의 기록을 보내거나 첨부할 케이스 파일 하나로 저장",

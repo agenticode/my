@@ -1,0 +1,109 @@
+{
+  "view": "vendors",
+  "version": 1,
+  "lang": "en",
+  "exit_code": 0,
+  "data": {
+    "tables": [
+      {
+        "table": "dell",
+        "version": 1,
+        "vendor": "Dell",
+        "messages": 15,
+        "basis": "registry",
+        "not_checked_on_real_hardware": true,
+        "applies": [
+          "registry IDRAC",
+          "bare-id"
+        ],
+        "sources": [
+          {
+            "name": "registry",
+            "title": "message registry IDRAC 2.9.0 as an iDRAC9 7.20 serves it (R660xs mockup in dell/iDRAC-Redfish-Scripting, iDRAC Redfish Mockup Clients)",
+            "url": "https://github.com/dell/iDRAC-Redfish-Scripting/tree/3bc6e7b/iDRAC%20Redfish%20Mockup%20Clients",
+            "read": "2026-11-16"
+          }
+        ]
+      },
+      {
+        "table": "dmtf",
+        "version": 1,
+        "vendor": "DMTF",
+        "messages": 19,
+        "basis": "registry",
+        "not_checked_on_real_hardware": true,
+        "applies": [
+          "registry Platform",
+          "registry LogService",
+          "registry ResourceEvent"
+        ],
+        "sources": [
+          {
+            "name": "platform",
+            "title": "DMTF Redfish message registry Platform 1.5.0",
+            "url": "https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/Platform.1.5.0.json",
+            "read": "2026-11-16"
+          },
+          {
+            "name": "logservice",
+            "title": "DMTF Redfish message registry LogService 1.2.1",
+            "url": "https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/LogService.1.2.1.json",
+            "read": "2026-11-16"
+          },
+          {
+            "name": "resourceevent",
+            "title": "DMTF Redfish message registry ResourceEvent 1.5.0",
+            "url": "https://github.com/DMTF/Redfish-Publications/blob/fa6d23d/registries/ResourceEvent.1.5.0.json",
+            "read": "2026-11-16"
+          }
+        ]
+      },
+      {
+        "table": "ipmi",
+        "version": 1,
+        "vendor": "IPMI",
+        "messages": 11,
+        "basis": "registry",
+        "not_checked_on_real_hardware": true,
+        "applies": [
+          "ipmi"
+        ],
+        "sources": [
+          {
+            "name": "ipmitool",
+            "title": "ipmitool include/ipmitool/ipmi_sel.h, sensor_specific_event_types: the states of the memory sensor (sensor type 0Ch) of IPMI v2.0 table 42-3",
+            "url": "https://github.com/ipmitool/ipmitool/blob/be11d94/include/ipmitool/ipmi_sel.h",
+            "read": "2026-11-16"
+          }
+        ]
+      },
+      {
+        "table": "openbmc",
+        "version": 1,
+        "vendor": "OpenBMC",
+        "messages": 15,
+        "basis": "registry",
+        "not_checked_on_real_hardware": true,
+        "applies": [
+          "registry OpenBMC",
+          "any registry"
+        ],
+        "sources": [
+          {
+            "name": "registry",
+            "title": "OpenBMC message registry OpenBMC.0.5.0 (bmcweb redfish-core/include/registries/openbmc.json)",
+            "url": "https://github.com/openbmc/bmcweb/blob/3cdd1fa/redfish-core/include/registries/openbmc.json",
+            "read": "2026-11-16"
+          },
+          {
+            "name": "hooks",
+            "title": "intel-ipmi-oem src/ipmi_to_redfish_hooks.cpp: the SEL records of the BIOS behind these messages",
+            "url": "https://github.com/openbmc/intel-ipmi-oem/blob/b36a530/src/ipmi_to_redfish_hooks.cpp",
+            "read": "2026-11-16"
+          }
+        ]
+      }
+    ],
+    "wording_rules": 15
+  }
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -286,8 +287,11 @@ func TestImportGoesOnPastAnUnknownInput(t *testing.T) {
 			t.Errorf("--strict: exit code %d, stdout %q, stderr %q", code, out, errOut)
 		}
 	})
+	// The size of a bundle moves with anything it holds; it is not what
+	// this test is about.
+	size := regexp.MustCompile(`\(\d+(?:\.\d+)? [kM]B\)`)
 	for lang, out := range outs {
-		testutil.Golden(t, "import-unknown-"+lang+".txt", []byte(out))
+		testutil.Golden(t, "import-unknown-"+lang+".txt", size.ReplaceAll([]byte(out), []byte("(size)")))
 	}
 	if !strings.Contains(outs["en"], "notes.txt: not recognised") || !strings.Contains(outs["en"], "1 not understood") {
 		t.Errorf("summary:\n%s", outs["en"])

@@ -29,6 +29,7 @@ var viewCommands = map[string]viewFunc{
 	"gpu":       runGPU,
 	"bios":      runBIOS,
 	"inventory": runInventory,
+	"vendors":   runVendors,
 	"verify":    runVerify,
 	"export":    runExport,
 	"bundle":    runBundle,

@@ -234,7 +234,9 @@ var words = i18n.Catalog{
 			"--user NAME       with --bmc: the account (or MY_REDFISH_USER). The password comes from\n" +
 			"                  MY_REDFISH_PASSWORD, from --password-file FILE, or from the terminal\n" +
 			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
-			"                  with --bmc: as in \"my help collect\"; the deadline is 5m by default",
+			"                  with --bmc: as in \"my help collect\"; the deadline is 5m by default\n" +
+			"--event-map FILE  a table of firmware messages of one's own, asked before the shipped\n" +
+			"                  tables (\"my help vendors\"); may be repeated",
 		KO: "--ledger FILE     스캔을 원장 FILE에 남기고 실행할 때마다 누적\n" +
 			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음\n" +
 			"--fleet KIND      플릿의 rasdaemon이 함께 쓰는 저장소(mysql 또는 postgresql)를 읽음.\n" +
@@ -247,7 +249,9 @@ var words = i18n.Catalog{
 			"--user NAME       --bmc와 함께: 계정 (또는 MY_REDFISH_USER). 암호는 MY_REDFISH_PASSWORD,\n" +
 			"                  --password-file FILE, 터미널 입력 중 하나로 받음\n" +
 			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
-			"                  --bmc와 함께: \"my help collect\"와 같음. 제한 시간 기본값은 5m",
+			"                  --bmc와 함께: \"my help collect\"와 같음. 제한 시간 기본값은 5m\n" +
+			"--event-map FILE  내장 표보다 먼저 볼, 직접 만든 펌웨어 메시지 표\n" +
+			"                  (\"my help vendors\"). 여러 번 줄 수 있음",
 	},
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
@@ -384,6 +388,8 @@ var words = i18n.Catalog{
 			"--key-file FILE     with --anonymize: a key that makes every bundle replace a name alike\n" +
 			"--force             replace FILE when it exists\n" +
 			"--strict            stop when an input is not recognised\n" +
+			"--event-map FILE    a table of firmware messages of one's own, asked before the\n" +
+			"                    shipped tables (\"my help vendors\"); may be repeated\n" +
 			"--all               in the overview, list every DIMM",
 		KO: "-o FILE             케이스를 번들로 저장 (case.mycase). \"-\"는 표준 출력\n" +
 			"--host NAME         파일에 호스트 이름이 없을 때 쓸 이름\n" +
@@ -398,6 +404,8 @@ var words = i18n.Catalog{
 			"--key-file FILE     --anonymize와 함께: 같은 이름이 번들마다 같은 단어로 바뀌게 하는 키\n" +
 			"--force             FILE이 있으면 덮어씀\n" +
 			"--strict            알아보지 못한 입력이 있으면 멈춤\n" +
+			"--event-map FILE    내장 표보다 먼저 볼, 직접 만든 펌웨어 메시지 표\n" +
+			"                    (\"my help vendors\"). 여러 번 줄 수 있음\n" +
 			"--all               개요에 모든 DIMM을 나열",
 	},
 
@@ -536,7 +544,7 @@ func printHelp(env *cli.Env, lang i18n.Lang, st term.Style, topic string, src *s
 			fmt.Fprintln(w, "  "+line)
 		}
 	}
-	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" && topic != "collect" && topic != "bios" && topic != "inventory" && topic != "preflight" && topic != "harvest" {
+	if topic != "bundle" && topic != "import" && topic != "serve" && topic != "report" && topic != "verify" && topic != "export" && topic != "collect" && topic != "bios" && topic != "inventory" && topic != "preflight" && topic != "harvest" && topic != "vendors" {
 		fmt.Fprintln(w)
 		for _, line := range st.Wrap(say(lang, "help.exit"), 0) {
 			fmt.Fprintln(w, line)

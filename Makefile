@@ -78,6 +78,8 @@ FUZZ_TARGETS := \
 	./internal/redfish/collect:FuzzParseManifest \
 	./internal/redfish/collect:FuzzCrawl \
 	./internal/memras:FuzzParse \
+	./internal/fwmap:FuzzParse \
+	./internal/fwmap:FuzzClassify \
 	./internal/preflight:FuzzHost
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean

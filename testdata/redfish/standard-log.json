@@ -1,0 +1,313 @@
+{
+ "@odata.type": "#LogEntryCollection.LogEntryCollection",
+ "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries",
+ "Name": "Example event log",
+ "Members@odata.count": 21,
+ "Members": [
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/1",
+   "Id": "1",
+   "Name": "Log Entry 1",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T01:00:00Z",
+   "MessageId": "Platform.1.5.MemoryUncorrectableError",
+   "Message": "Example text of the entry about DIMM_A1.",
+   "MessageArgs": [
+    "DIMM_A1"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/2",
+   "Id": "2",
+   "Name": "Log Entry 2",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T02:00:00Z",
+   "MessageId": "Platform.1.5.MemoryContainedError",
+   "Message": "Example text of the entry about DIMM_A2.",
+   "MessageArgs": [
+    "DIMM_A2"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/3",
+   "Id": "3",
+   "Name": "Log Entry 3",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T03:00:00Z",
+   "MessageId": "Platform.1.5.MemoryParityError",
+   "Message": "Example text of the entry about DIMM_A3.",
+   "MessageArgs": [
+    "DIMM_A3"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/4",
+   "Id": "4",
+   "Name": "Log Entry 4",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T04:00:00Z",
+   "MessageId": "Platform.1.5.MemoryRowRemappingPending",
+   "Message": "Example text of the entry about DIMM_A4.",
+   "MessageArgs": [
+    "DIMM_A4"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/5",
+   "Id": "5",
+   "Name": "Log Entry 5",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T05:00:00Z",
+   "MessageId": "Platform.1.5.MemoryRowRemappingError",
+   "Message": "Example text of the entry about DIMM_A5.",
+   "MessageArgs": [
+    "DIMM_A5"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/6",
+   "Id": "6",
+   "Name": "Log Entry 6",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T06:00:00Z",
+   "MessageId": "Platform.1.5.MemoryMirroringDegraded",
+   "Message": "Example text of the entry about DIMM_A6.",
+   "MessageArgs": [
+    "DIMM_A6"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/7",
+   "Id": "7",
+   "Name": "Log Entry 7",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T07:00:00Z",
+   "MessageId": "Platform.1.5.MemoryMirroringFailed",
+   "Message": "Example text of the entry about DIMM_A7.",
+   "MessageArgs": [
+    "DIMM_A7"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/8",
+   "Id": "8",
+   "Name": "Log Entry 8",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T08:00:00Z",
+   "MessageId": "Platform.1.5.MemorySparingActivated",
+   "Message": "Example text of the entry about DIMM_A8.",
+   "MessageArgs": [
+    "DIMM_A8"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/9",
+   "Id": "9",
+   "Name": "Log Entry 9",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T09:00:00Z",
+   "MessageId": "Platform.1.5.MemorySparingFailed",
+   "Message": "Example text of the entry about DIMM_A9.",
+   "MessageArgs": [
+    "DIMM_A9"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/10",
+   "Id": "10",
+   "Name": "Log Entry 10",
+   "EntryType": "Event",
+   "Severity": "Critical",
+   "Created": "2026-11-10T10:00:00Z",
+   "MessageId": "Platform.1.5.MemoryTrainingFailed",
+   "Message": "Example text of the entry about DIMM_A10.",
+   "MessageArgs": [
+    "DIMM_A10"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/11",
+   "Id": "11",
+   "Name": "Log Entry 11",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T11:00:00Z",
+   "MessageId": "LogService.1.2.LogCleared",
+   "Message": "Example text: the log was cleared.",
+   "MessageArgs": [
+    "Event Log"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/12",
+   "Id": "12",
+   "Name": "Log Entry 12",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T12:00:00Z",
+   "MessageId": "ExampleCo.0.1.MemoryECCCorrectable",
+   "Message": "Example text with the place.",
+   "MessageArgs": [
+    "1",
+    "A",
+    "0",
+    "0"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/13",
+   "Id": "13",
+   "Name": "Log Entry 13",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T13:00:00Z",
+   "MessageId": "OpenBMC.0.1.ADDDCCorrectable",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "1",
+    "B",
+    "0",
+    "1"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/14",
+   "Id": "14",
+   "Name": "Log Entry 14",
+   "EntryType": "Event",
+   "Severity": "Warning",
+   "Created": "2026-11-10T14:00:00Z",
+   "MessageId": "OpenBMC.0.1.MirroringRedundancyDegraded",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "1",
+    "C",
+    "0",
+    "1",
+    "0"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/15",
+   "Id": "15",
+   "Name": "Log Entry 15",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T15:15:00Z",
+   "MessageId": "OpenBMC.0.1.MemoryRASConfigurationDisabled",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "None",
+    "Mirroring"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/16",
+   "Id": "16",
+   "Name": "Log Entry 16",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T15:16:00Z",
+   "MessageId": "OpenBMC.0.1.MemoryRASConfigurationEnabled",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "None",
+    "Mirroring"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/17",
+   "Id": "17",
+   "Name": "Log Entry 17",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T15:17:00Z",
+   "MessageId": "OpenBMC.0.1.MemoryRASModeDisabled",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "None",
+    "Mirroring"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/18",
+   "Id": "18",
+   "Name": "Log Entry 18",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T15:18:00Z",
+   "MessageId": "OpenBMC.0.1.MemoryRASModeEnabled",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "None",
+    "Mirroring"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/19",
+   "Id": "19",
+   "Name": "Log Entry 19",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T16:00:00Z",
+   "MessageId": "OpenBMC.0.1.EventLogCleared",
+   "Message": "Example text.",
+   "MessageArgs": []
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/20",
+   "Id": "20",
+   "Name": "Log Entry 20",
+   "EntryType": "Event",
+   "Severity": "OK",
+   "Created": "2026-11-10T17:00:00Z",
+   "MessageId": "OpenBMC.0.1.SELEntryAdded",
+   "Message": "Example text.",
+   "MessageArgs": [
+    "01000200AB45652000040C876F00FF01"
+   ]
+  },
+  {
+   "@odata.type": "#LogEntry.v1_15_0.LogEntry",
+   "@odata.id": "/redfish/v1/Systems/1/LogServices/EventLog/Entries/21",
+   "Id": "21",
+   "Name": "Log Entry 21",
+   "EntryType": "SEL",
+   "Severity": "Critical",
+   "Created": "2026-11-10T18:00:00Z",
+   "MessageId": "6F01FFFF",
+   "Message": "Example SEL text.",
+   "SensorType": "Memory",
+   "SensorNumber": "0x10"
+  }
+ ]
+}

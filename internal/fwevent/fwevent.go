@@ -190,3 +190,49 @@ func deviceSparing(fs []Flag) bool {
 	}
 	return false
 }
+
+// texts are the words of the ledger for the common events: the error type
+// of an event, the detail of an action. Where a state of the IPMI memory
+// sensor says the same, its name is used, so that a record reads alike
+// whichever vocabulary it came in.
+var texts = map[Name]string{
+	CE:               "correctable ECC",
+	CEThreshold:      "corrected-error limit passed",
+	CELogLimit:       "correctable ECC logging limit reached",
+	UE:               "uncorrectable ECC",
+	ScrubCE:          "corrected error found by the patrol scrubber",
+	ScrubUE:          "uncorrected error found by the patrol scrubber",
+	PredictedFailure: "predicted failure",
+	Disabled:         "memory device disabled",
+	PPRScheduled:     "post package repair scheduled",
+	PPRDone:          "post package repair done",
+	PPRFailed:        "post package repair failed",
+	Sparing:          "spare",
+	DeviceSparing:    "device sparing engaged",
+	SpareCopyStarted: "copy to the spare started",
+	SparingFailed:    "sparing failed",
+	MirrorFailover:   "mirror failover",
+	MirrorLost:       "mirror redundancy lost",
+	TrainingFailure:  "memory training failed",
+	ConfigError:      "configuration error",
+	Replaced:         "module replaced",
+	LogCleared:       "log cleared",
+	LogFull:          "log full",
+	Thermal:          "throttled or over temperature",
+	Presence:         "presence detected",
+	ConfigState:      "memory configuration",
+	Cleared:          "state ended",
+	Unclassified:     "about memory, not classified",
+}
+
+// Text returns the words of the ledger for a common event; for "cleared"
+// the event it ends, when known.
+func Text(n, clears Name) string {
+	if n == Cleared && clears != "" {
+		return texts[clears] + " (cleared)"
+	}
+	if t, ok := texts[n]; ok {
+		return t
+	}
+	return string(n)
+}

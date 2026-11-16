@@ -13,7 +13,7 @@
     "@odata.type": "#LogEntry.v1_6_1.LogEntry",
     "Id": "102", "Name": "Log Entry 102", "EntryType": "Oem", "OemRecordFormat": "Example", "Severity": "Critical",
     "Created": "2026-11-05T13:40:10-06:00",
-    "MessageId": "EXM.2.9.MEM0001",
+    "MessageId": "IDRAC.2.9.MEM0001",
     "Message": "Multi-bit memory errors detected on a memory device at location(s) DIMM_A1, DIMM_A2.",
     "MessageArgs": ["DIMM_A1, DIMM_A2"]
   },
