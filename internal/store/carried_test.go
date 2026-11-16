@@ -237,6 +237,12 @@ func TestCarriedDuplicates(t *testing.T) {
 		{"the region and the lines the kernel printed of it: the region",
 			[]*model.Event{carried("lines", model.SevFatal, "klog/bert", model.GradeA, addr, ""), carried("region", model.SevFatal, "bert", model.GradeA, addr, "")},
 			map[string]string{"lines": "region"}},
+		{"the region and its lines without an address: the same cell",
+			[]*model.Event{cellOf(carried("lines", model.SevFatal, "klog/bert", model.GradeA, model.Opt[uint64]{}, "")), cellOf(carried("region", model.SevFatal, "bert", model.GradeA, model.Opt[uint64]{}, ""))},
+			map[string]string{"lines": "region"}},
+		{"the region and its lines at two cells",
+			[]*model.Event{cellOf(carried("lines", model.SevFatal, "klog/bert", model.GradeA, model.Opt[uint64]{}, "")), otherCell(cellOf(carried("region", model.SevFatal, "bert", model.GradeA, model.Opt[uint64]{}, "")))},
+			nil},
 		{"a record of a BMC log anywhere in the boot",
 			[]*model.Event{exact("sel", 5*time.Minute, model.SevUE, "sel/memory", model.GradeC, model.Opt[uint64]{}, "CPU0_C1"), carried("bank", model.SevUE, "klog/mce", model.GradeB, addr, "CPU0_C1")},
 			map[string]string{"sel": "bank"}},
@@ -394,4 +400,16 @@ func TestCaptureChecks(t *testing.T) {
 	if err == nil {
 		t.Error("a check of unknown state was stored")
 	}
+}
+
+// cellOf gives a record a cell: rank 0, bank group 1, bank 3, row 0x1a2f,
+// column 0x238.
+func cellOf(e *model.Event) *model.Event {
+	e.Rank, e.BankGroup, e.Bank, e.Row, e.Column = model.Some(0), model.Some(1), model.Some(3), model.Some(0x1a2f), model.Some(0x238)
+	return e
+}
+
+func otherCell(e *model.Event) *model.Event {
+	e.Column = model.Some(0x240)
+	return e
 }

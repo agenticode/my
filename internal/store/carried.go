@@ -349,8 +349,13 @@ func (s *Store) markCarried(ctx context.Context, host string) error {
 		addr                       sql.NullInt64
 		grade                      model.Grade
 		carried                    bool
+		// place is the cell the record names (rank, bank group, bank, row,
+		// column), or "" when it names none.
+		place string
 	}
-	rows, err := s.db.QueryContext(ctx, `SELECT id, boot_id, COALESCE(read_boot_id, ''), source, "ErrorSeverity", slot, "OsPhysicalAddress", grade, carried
+	rows, err := s.db.QueryContext(ctx, `SELECT id, boot_id, COALESCE(read_boot_id, ''), source, "ErrorSeverity", slot, "OsPhysicalAddress", grade, carried,
+ CASE WHEN "Row" IS NOT NULL AND "Column" IS NOT NULL
+  THEN printf('%d/%d/%d/%d/%d', COALESCE("Rank", -1), COALESCE("BankGroup", -1), COALESCE("Bank", -1), "Row", "Column") ELSE '' END
  FROM event WHERE host = ? AND kind = 'error' AND dup_of IS NULL AND boot_id IS NOT NULL
  AND boot_id IN (SELECT boot_id FROM event WHERE host = ? AND carried = 1 AND dup_of IS NULL AND boot_id IS NOT NULL)
  ORDER BY id`, host, host)
@@ -363,7 +368,7 @@ func (s *Store) markCarried(ctx context.Context, host string) error {
 		var r rec
 		var sev, grade string
 		var carried int64
-		if err := rows.Scan(&r.id, &r.boot, &r.readBoot, &r.src, &sev, &r.slot, &r.addr, &grade, &carried); err != nil {
+		if err := rows.Scan(&r.id, &r.boot, &r.readBoot, &r.src, &sev, &r.slot, &r.addr, &grade, &carried, &r.place); err != nil {
 			rows.Close()
 			return err
 		}
@@ -422,6 +427,10 @@ func (s *Store) markCarried(ctx context.Context, host string) error {
 					same = c.slot != "" && r.slot == c.slot
 				case c.addr.Valid && r.addr.Valid:
 					same = uint64(c.addr.Int64)>>6 == uint64(r.addr.Int64)>>6
+				case r.carried && c.place != "" && r.place == c.place:
+					// The region and the lines printed of it, without an
+					// address: the same cell.
+					same = true
 				case c.addr.Valid || r.addr.Valid:
 				case c.slot != "" && r.slot == c.slot:
 					same = true

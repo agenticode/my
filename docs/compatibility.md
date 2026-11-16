@@ -218,6 +218,19 @@ Every kernel log source notes when its first and its last line were written ("it
 
 A line read from `dmesg` and the same line read from the journal are one record: a record is identified by the kernel's own stamp and its text.
 
+### What the next boot prints of the boot before
+
+Two kinds of record in a kernel log belong to the boot before the one that printed them. They are stored as carried records and moved into that boot ([data-model.md](data-model.md#records-kept-over-a-reset)).
+
+| Lines | When a record is carried |
+| --- | --- |
+| a machine check record of `__print_mce()` | the head line has no ` Exception` (the record was polled) and the status is uncorrected with the processor context corrupt, or uncorrected and signaled. The running boot does not log such a record from a poll: `should_log_poll_error()` logs an uncorrected record only in the poll of every bank at CPU bring-up, which logs "the machine checks left over from the previous reset" (`__mcheck_cpu_init_prepare_banks()`), or when it is UCNA. Second rule, for a platform that keeps `MCG_STATUS.MCIP` over the reset: the head has ` Exception`, the status has PCC, `TSC 0`, and the boot goes on for at least 10 seconds after the record; a record with PCC raised in the boot ends it within the second |
+| the block that follows `BERT: Error records from previous boot:` | always: the `[Hardware Error]:` lines without the `{N}` tag of a GHES source, in the form of `cper_estatus_print()` and `cper_print_mem()`, up to `BERT: Total records found` |
+
+The `TIME` field of a carried machine check record is the time the boot read the bank, not the time of the error. Its fingerprint takes that field in: two boots that print the same record left in a bank at the same stamp are two records. Records that are not carried keep the fingerprint they always had. The lines of the boot error region are a second report of the region when the region was read too: the region is counted.
+
+The lab guest shows the first rule on real kernel output (`testdata/klog/carried-lab.dmesg`: a fatal machine check, a panic, and the next boot printing the record from bank 7 as `CPU 0: Machine Check: 0 Bank 7: be00000000010090`, `TSC 0`). The second rule and the lines of the boot error region rest on the kernel source; QEMU clears `MCG_STATUS` at reset and builds no BERT table. On AMD processors with SMCA a poll logs any valid record (`smca_should_log_poll_error()`), so a polled uncorrected record with PCC could in principle come from the running boot; the decode block `mce_amd` prints does not say whether a record was polled and is never taken as carried.
+
 A page a program asked the kernel to give up is told from a page the kernel gave up after an error. The kernel announces the first kind (`Injecting memory failure for pfn ...` for `madvise`, `Injecting memory failure at pfn ...` for the hwpoison injector); the action then says "asked for through madvise" and the source report counts such pages. A boot in which the machine check injector (`mce-inject`) or the ACPI error injection interface (EINJ) was set up is named in the source report, because its records may come from a test.
 
 ### Host name

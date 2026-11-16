@@ -370,6 +370,10 @@ type segment struct {
 	// injecting maps a page frame number to the line that announced its
 	// offline as asked for by a program.
 	injecting map[uint64]injection
+
+	// held are machine check records whose carry is known at the end of
+	// the boot (carried.go).
+	held []heldMCE
 }
 
 // injection is an announced software injection of a memory failure.
@@ -408,6 +412,10 @@ type mceBlock struct {
 	raw                           []string
 	bank                          int
 	status, addr, misc, synd, ipd uint64
+	// exception says that the head line names a machine check exception;
+	// tsc is the value of the TSC line.
+	exception bool
+	tsc       uint64
 }
 
 type amdBlock struct {
@@ -454,6 +462,7 @@ type parser struct {
 	ghes    map[string]*ghesBlock
 	mce     *mceBlock
 	amd     *amdBlock
+	bert    *bertBlock
 	lastGH  *tie
 	hostDMI string
 	// hypervisor is what the kernel of the latest boot in the log says it
@@ -712,6 +721,9 @@ func (p *parser) dispatch(l *line) error {
 	}
 
 	msg := l.msg
+	if done, err := p.bertLine(l); done || err != nil {
+		return err
+	}
 	if m := ghesTagRE.FindStringSubmatch(msg); m != nil {
 		return p.ghesLine(l, m[1], m[2])
 	}
@@ -1156,7 +1168,7 @@ func (p *parser) hwLine(l *line, body string) error {
 		if err := p.flushAMD(); err != nil {
 			return err
 		}
-		b := &mceBlock{first: *l, raw: []string{l.msg}}
+		b := &mceBlock{first: *l, raw: []string{l.msg}, exception: strings.Contains(body, "Machine Check Exception:")}
 		b.bank, _ = strconv.Atoi(m[3])
 		b.status, _ = strconv.ParseUint(m[4], 16, 64)
 		p.mce = b
@@ -1169,6 +1181,7 @@ func (p *parser) hwLine(l *line, body string) error {
 			return nil
 		case mceTSCRE.MatchString(body):
 			p.mce.raw = append(p.mce.raw, l.msg)
+			p.mce.tsc, _ = strconv.ParseUint(mceTSCRE.FindStringSubmatch(body)[1], 16, 64)
 			for _, kv := range mceKVRE.FindAllStringSubmatch(body, -1) {
 				v, err := strconv.ParseUint(kv[2], 16, 64)
 				if err != nil {
@@ -1263,10 +1276,20 @@ func (p *parser) mceEvent(b *mceBlock, lastN, vendor int, unix int64, socket mod
 		return nil
 	}
 	amd := vendor == mce.VendorAMD || vendor == mce.VendorHygon
+	carried := carriedMCE(b.exception, b.status, b.tsc)
+	extra := ""
+	if carried == carryYes {
+		extra = carryFingerprint(unix)
+	}
 	e := &model.Event{
 		Kind: model.KindError, ErrorSeverity: dec.Severity, ErrorScrubType: dec.Scrub, ErrorType: dec.ErrorType,
 		Source: Kind + "/mce", Decoder: "mce/intel", Count: 1, SocketId: socket, ChannelId: dec.Channel,
-		RawRef: ref, Raw: strings.Join(b.raw, "\n"), Fingerprint: p.fingerprint("mce", &b.first, ""),
+		RawRef: ref, Raw: strings.Join(b.raw, "\n"), Carried: carried == carryYes,
+	}
+	if carried != carryIfGoesOn {
+		e.Fingerprint = p.fingerprint("mce", &b.first, extra)
+	} else {
+		e.Fingerprint = p.fingerprint("mce", &b.first, "")
 	}
 	if amd {
 		e.Decoder = "mce/amd"
@@ -1283,6 +1306,9 @@ func (p *parser) mceEvent(b *mceBlock, lastN, vendor int, unix int64, socket mod
 		if first.hasMono && p.seg.startQuality == "" && p.seg.mceStart.IsZero() {
 			p.seg.mceStart = first.wall.Add(-first.mono)
 		}
+	}
+	if carried == carryIfGoesOn {
+		return p.holdRule2(e, &first, unix)
 	}
 	return p.emit(e, nil, &first)
 }
@@ -1384,6 +1410,9 @@ func (p *parser) closeSegment(last bool) error {
 	if err := p.flushAMD(); err != nil {
 		return err
 	}
+	if err := p.flushBERT(); err != nil {
+		return err
+	}
 	p.lastGH = nil
 
 	bootID := seg.bootID
@@ -1415,6 +1444,11 @@ func (p *parser) closeSegment(last bool) error {
 		eventBoot = ""
 	}
 
+	// Records of rule 2 are decided now that the end of the boot is known;
+	// those whose time waits for the boot join the others.
+	if err := p.closeCarried(seg); err != nil {
+		return err
+	}
 	err := p.pend.each(func(pd pending) error {
 		t := seg.start
 		if pd.hasMono {
