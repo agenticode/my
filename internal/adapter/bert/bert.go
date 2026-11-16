@@ -31,6 +31,9 @@ import (
 	"github.com/agenticode/my/internal/model"
 )
 
+// RegionDenied is the detail of a BERT region the user may not read.
+const RegionDenied = "permission denied; the region is readable as root only"
+
 // Kind is the adapter name in the source inventory.
 const Kind = "bert"
 
@@ -73,7 +76,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	if err != nil {
 		rep.Status, rep.Detail = adapter.StatusForError(err)
 		if rep.Status == model.SourceUnreadable {
-			rep.Detail += "; the region is readable as root only"
+			rep.Detail = RegionDenied
 		}
 		return rep
 	}

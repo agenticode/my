@@ -253,6 +253,19 @@ func TestSourceDetailsAreWritten(t *testing.T) {
 			t.Errorf("translation of %q: %q", en, ko)
 		}
 	}
+	// The sentences that carry a value: both halves are written by an
+	// adapter, and the value comes through.
+	for _, f := range sourceDetailForms {
+		for _, half := range f.en {
+			if half != "" && !strings.Contains(code.String(), strconv.Quote(half)) {
+				t.Errorf("no adapter writes %q", half)
+			}
+		}
+		en := f.en[0] + "mcelog: client connect: Permission denied" + f.en[1]
+		if ko := DetailText(i18n.KO, en); ko == en || !strings.Contains(ko, "mcelog: client connect: Permission denied") || DetailText(i18n.EN, en) != en {
+			t.Errorf("translation of %q: %q", en, ko)
+		}
+	}
 	st := model.Statement{Code: "missing.source_detail", Args: map[string]any{"kind": "rasdaemon", "status": "@status.absent",
 		"detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only"}}
 	if got := Text(i18n.KO, st); strings.ContainsAny(got, "abcdefghijklmnopqrstuvwxyz ") && strings.Contains(got, "is not installed") {
