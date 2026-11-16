@@ -114,7 +114,7 @@ var preflightWords = i18n.Catalog{
 			"--lang en|ko          language of the output (default: from the locale, English otherwise)\n" +
 			"--json                print the checks as JSON\n" +
 			"--ascii               draw with ASCII characters only\n" +
-			"--color auto|always|never\n" +
+			"--color WHEN          auto (on a terminal, unless NO_COLOR is set), always or never\n" +
 			"--width N             columns to fill (default: the terminal, 100 otherwise)",
 		KO: "--script              잃음인 점검의 해결책을 셸 스크립트로 출력. my는 실행하지 않음\n" +
 			"--root DIR            DIR 아래의 호스트 파일 사본을 읽음\n" +
@@ -122,7 +122,7 @@ var preflightWords = i18n.Catalog{
 			"--lang en|ko          출력 언어 (기본: 로캘, 그 밖에는 영어)\n" +
 			"--json                점검 결과를 JSON으로 출력\n" +
 			"--ascii               ASCII 문자로만 그림\n" +
-			"--color auto|always|never\n" +
+			"--color WHEN          auto(터미널일 때, NO_COLOR가 없을 때), always, never\n" +
 			"--width N             채울 칸 수 (기본: 터미널, 그 밖에는 100)",
 	},
 }

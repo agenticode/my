@@ -49,11 +49,11 @@ var harvestWords = i18n.Catalog{
 	"help.harvest.text": {
 		EN: "Reads what the boot before left into a kept ledger, at every boot. A fatal memory error resets the host before the journal or rasdaemon store anything, and on a hard fault every boot ends the same way. What survives a reset is read first (phase A): the pstore files and their archive, the boot error region of the firmware, the text logs of kdump, and the ring buffer of this boot, which holds the records the kernel found in the machine check banks. Then the ledger is written to disk, so that a reset seconds later cannot take it, and the rest of the host is read (phase B): the journal from the boot of the last run on, rasdaemon, the counters, SMBIOS. One line per phase goes to standard error, which the journal keeps. " +
 			"The ledger is " + preflight.DefaultLedgerDoc + " unless --ledger names another. One run at a time holds it; a second run ends at once. A run that added nothing leaves no scan entry behind. Below 32 MiB of free space only phase A is read. --deadline bounds the reading; the sources not read by then are named, and the run ends with exit code 0. A ledger that cannot be written ends the run with exit code 70 and stays as it was. " +
-			"\"my harvest install\" writes the unit my-harvest.service, and with --timer my-harvest.timer, to /etc/systemd/system, and runs systemctl daemon-reload and systemctl enable for them; --now starts the service as well, and --dry-run prints the files and commands and does nothing. It is the one command of MemorY that changes the host, and it needs root. A unit file of that name that install did not write is left alone. \"my harvest uninstall\" disables the units and removes the files; the ledger stays. \"my harvest status\" says whether the units are installed and enabled, what the ledger holds, and when the last run was. The units are in contrib/systemd for those who install them by hand. " +
+			"\"my harvest install\" writes the unit my-harvest.service, and with --timer my-harvest.timer, to /etc/systemd/system, and runs systemctl daemon-reload and systemctl enable for them; --now starts the service as well, and --dry-run prints the paths of the files and the commands and does nothing. It is the one command of MemorY that changes the host, and it needs root. A unit file of that name that install did not write is left alone. \"my harvest uninstall\" disables the units and removes the files; the ledger stays. \"my harvest status\" says whether the units are installed and enabled, what the ledger holds, and when the last run was. The units are in contrib/systemd for those who install them by hand. " +
 			"\"my open " + preflight.DefaultLedgerDoc + "\" shows the kept ledger with every command.",
 		KO: "부팅할 때마다 이전 부팅이 남긴 것을 보관 원장에 읽어 넣습니다. 치명적 메모리 오류는 저널이나 rasdaemon이 무엇이든 저장하기 전에 호스트를 reset시키고, 고장이 굳은 경우에는 부팅마다 같은 일이 되풀이됩니다. reset을 견딘 것을 먼저 읽습니다(A 단계): pstore 파일과 그 보관본, 펌웨어의 부팅 오류 영역, kdump 텍스트 로그, 그리고 커널이 머신 체크 뱅크에서 찾은 기록이 든 이번 부팅의 링 버퍼입니다. 그다음 원장을 디스크에 기록해 몇 초 뒤의 reset에도 남게 하고, 호스트의 나머지를 읽습니다(B 단계): 지난 실행의 부팅부터의 저널, rasdaemon, 카운터, SMBIOS입니다. 단계마다 한 줄을 표준 오류로 내보내며 저널이 이를 보관합니다. " +
 			"원장은 --ledger로 다른 파일을 지정하지 않으면 " + preflight.DefaultLedgerDoc + "입니다. 한 번에 한 실행만 원장을 잡고, 두 번째 실행은 바로 끝납니다. 새로 더한 것이 없는 실행은 스캔 항목을 남기지 않습니다. 여유 공간이 32 MiB 미만이면 A 단계만 읽습니다. --deadline은 읽는 시간을 제한하며, 그때까지 읽지 못한 소스를 적고 종료 코드 0으로 끝납니다. 원장에 쓸 수 없으면 종료 코드 70으로 끝나고 원장은 그대로 남습니다. " +
-			"\"my harvest install\"은 my-harvest.service 유닛과, --timer를 주면 my-harvest.timer를 /etc/systemd/system에 쓰고 systemctl daemon-reload와 systemctl enable을 실행합니다. --now는 서비스도 시작하고, --dry-run은 파일과 명령을 출력만 하고 아무것도 하지 않습니다. MemorY에서 호스트를 바꾸는 유일한 명령이며 root가 필요합니다. install이 쓰지 않은 같은 이름의 유닛 파일은 그대로 둡니다. \"my harvest uninstall\"은 유닛을 비활성화하고 파일을 지웁니다. 원장은 남습니다. \"my harvest status\"는 유닛의 설치와 활성화 여부, 원장 내용, 마지막 실행 시각을 알려 줍니다. 손으로 설치할 사람을 위해 유닛 파일은 contrib/systemd에도 있습니다. " +
+			"\"my harvest install\"은 my-harvest.service 유닛과, --timer를 주면 my-harvest.timer를 /etc/systemd/system에 쓰고 systemctl daemon-reload와 systemctl enable을 실행합니다. --now는 서비스도 시작하고, --dry-run은 파일 경로와 명령을 출력만 하고 아무것도 하지 않습니다. MemorY에서 호스트를 바꾸는 유일한 명령이며 root가 필요합니다. install이 쓰지 않은 같은 이름의 유닛 파일은 그대로 둡니다. \"my harvest uninstall\"은 유닛을 비활성화하고 파일을 지웁니다. 원장은 남습니다. \"my harvest status\"는 유닛의 설치와 활성화 여부, 원장 내용, 마지막 실행 시각을 알려 줍니다. 손으로 설치할 사람을 위해 유닛 파일은 contrib/systemd에도 있습니다. " +
 			"\"my open " + preflight.DefaultLedgerDoc + "\"로 보관 원장을 모든 명령으로 볼 수 있습니다.",
 	},
 	"help.harvest.flags": {
@@ -61,13 +61,13 @@ var harvestWords = i18n.Catalog{
 			"--deadline TIME       time for reading the sources (default 10m)\n" +
 			"--timer               install: also my-harvest.timer, a run every hour of a long boot\n" +
 			"--now                 install: start the service at once\n" +
-			"--dry-run             install, uninstall: print the files and commands, do nothing\n" +
+			"--dry-run             install, uninstall: print the paths of the files and the commands, do nothing\n" +
 			"--lang en|ko          language of the output (default: from the locale, English otherwise)",
 		KO: "--ledger FILE         보관 원장 (기본 " + preflight.DefaultLedgerDoc + ")\n" +
 			"--deadline TIME       소스를 읽는 시간 (기본 10m)\n" +
 			"--timer               install: my-harvest.timer도 설치. 긴 부팅 중 한 시간마다 실행\n" +
 			"--now                 install: 서비스를 바로 시작\n" +
-			"--dry-run             install, uninstall: 파일과 명령을 출력만 하고 아무것도 안 함\n" +
+			"--dry-run             install, uninstall: 파일 경로와 명령을 출력만 하고 아무것도 안 함\n" +
 			"--lang en|ko          출력 언어 (기본: 로캘, 그 밖에는 영어)",
 	},
 }

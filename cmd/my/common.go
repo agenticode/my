@@ -102,9 +102,9 @@ type session struct {
 	st   term.Style
 	c    *view.Case
 	h    *engine.HostResult // nil when the ledger holds several hosts and none was named
-	// prefix is how the reader runs a further command on the same data:
-	// "my", or "my open FILE".
-	prefix string
+	// rescan are the flags that point a further command at the data this
+	// one scanned: --root, --ledger, the store of a fleet.
+	rescan []string
 	// scanned says that the data comes from a scan of this run.
 	scanned bool
 	// src is the case that was opened, or nil.
@@ -113,6 +113,38 @@ type session struct {
 	// for with --plugin.
 	analyzer *plugin.Result
 	closers  []func()
+}
+
+// next writes the command line of a further command on the same data:
+// "my open FILE dimm X" for a case that was opened, else "my dimm X" with
+// the flags that point the scan where this one went. The flags come after
+// the command, the only order the commands take. Words the shell would
+// split or expand are quoted.
+func (s *session) next(cmd string, args ...string) string {
+	words := []string{"my"}
+	if s.src != nil {
+		words = append(words, "open", shellWord(s.src.path))
+	}
+	words = append(words, cmd)
+	for _, a := range args {
+		words = append(words, shellWord(a))
+	}
+	if s.src == nil {
+		for _, a := range s.rescan {
+			words = append(words, shellWord(a))
+		}
+	}
+	return strings.Join(words, " ")
+}
+
+// shellWord quotes w for a POSIX shell when it holds anything other than
+// letters, digits and the marks of paths and flags: "DIMM 0" becomes
+// 'DIMM 0'.
+func shellWord(w string) string {
+	if w != "" && strings.Trim(w, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-./:=@%+,") == "" {
+		return w
+	}
+	return "'" + strings.ReplaceAll(w, "'", `'\''`) + "'"
 }
 
 func (s *session) close() {
@@ -310,7 +342,7 @@ func clock(env *cli.Env) time.Time {
 // start opens the data of a command: the case the reader opened, or a scan
 // of the host. It runs the engine and picks the host.
 func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *source) (*session, int) {
-	s := &session{ctx: ctx, env: env, o: o, lang: lang, st: o.style(env, lang), prefix: "my", src: src}
+	s := &session{ctx: ctx, env: env, o: o, lang: lang, st: o.style(env, lang), src: src}
 	cfg, err := o.cf.Config()
 	if err != nil {
 		return nil, o.usageError(env, lang, "%s", errText(lang, err))
@@ -319,7 +351,6 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 	host := o.host
 	var ledger *store.Store
 	if src != nil {
-		s.prefix = "my open " + src.path
 		ledger, err = store.Open(ctx, src.ledger, store.ReadOnly)
 		if err != nil {
 			return nil, o.failure(env, err)
@@ -339,14 +370,14 @@ func (o *options) start(ctx context.Context, env *cli.Env, lang i18n.Lang, src *
 			host = scanned
 		}
 		s.scanned = true
+		switch {
+		case o.sf.set():
+			s.rescan = o.sf.args(o.host)
+		case o.root != "":
+			s.rescan = []string{"--root", o.root}
+		}
 		if o.ledger != "" {
-			s.prefix = "my --ledger " + o.ledger
-		}
-		if o.root != "" {
-			s.prefix = "my --root " + o.root
-		}
-		if o.sf.set() {
-			s.prefix = "my " + o.sf.args(o.host)
+			s.rescan = append(s.rescan, "--ledger", o.ledger)
 		}
 	}
 	s.closers = append(s.closers, func() { ledger.Close() })

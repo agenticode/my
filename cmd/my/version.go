@@ -7,12 +7,14 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"strings"
 
 	"github.com/agenticode/my/internal/buildinfo"
 	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/store"
+	"github.com/agenticode/my/internal/term"
 )
 
 // versionInfo is what "my version --json" prints: what the binary was
@@ -46,7 +48,12 @@ func runVersion(_ context.Context, env *cli.Env, args []string) int {
 	lang := cli.Lang(env)
 	if err := fs.Parse(args); err != nil || fs.NArg() > 0 {
 		if err == flag.ErrHelp {
-			fmt.Fprintln(env.Stdout, say(lang, "help.version"))
+			// Wrapped like the help of the other commands.
+			usage, text, _ := strings.Cut(say(lang, "help.version"), "\n\n")
+			fmt.Fprintf(env.Stdout, "%s\n\n", usage)
+			for _, line := range (term.Style{Lang: lang}).Wrap(text, 0) {
+				fmt.Fprintln(env.Stdout, line)
+			}
 			return cli.ExitOK
 		}
 		fmt.Fprintf(env.Stderr, "my version: %s\n", say(lang, "err.version"))

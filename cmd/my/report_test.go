@@ -383,7 +383,7 @@ func TestErrorsThatNameNoDIMM(t *testing.T) {
 		"     3 uncorrected errors tied to no DIMM, the latest on 2026-11-15 10:36 UTC at address 0x1060c4340",
 		"     7 corrected errors tied to no DIMM on 2026-11-15",
 		"     5 pages taken offline and tied to no DIMM, the last on 2026-11-15",
-		" my --root "+root+" why: what the finding rests on")
+		" my why --root "+root+": what the finding rests on")
 	if strings.Contains(out, "in no finding") {
 		t.Errorf("the overview says that no finding covers the errors:\n%s", out)
 	}

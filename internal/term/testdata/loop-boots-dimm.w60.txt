@@ -2,7 +2,7 @@ CPU0_C1  DDR5 RDIMM 64 GB 2Rx4
 Example Memory EXM64G48R2X4-A  S/N BE8ED6
 
  boot         2  3  4  5  6  7  8   boots   errors
- ended        -  -  S  S  S  S  -
+ ended        -  -  H  H  H  H  -
  rank0 dev7 bg0 bank3 row 0x1a2f
    col 0x238  ·  ▒  X  X  X  X  ·   5 of 8  CE 60, UE 4
 
@@ -11,7 +11,7 @@ Example Memory EXM64G48R2X4-A  S/N BE8ED6
  · none, ░ 1-9 corrected, ▒ 10-99, ▓ 100+, U uncorrected, X
  uncorrected in a boot that stopped, ? the boot stopped and
  no record names a DIMM, - not in the host
- ended: S a fatal hardware error ended the boot, p another
+ ended: H a fatal hardware error halted the boot, p another
  panic, r the boot of the latest scan, - not on record
 
  uncorrected errors at rank0 dev7 bg0 bank3 row   R-LOOP-01

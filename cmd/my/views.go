@@ -87,10 +87,17 @@ func runOverview(ctx context.Context, env *cli.Env, args []string, src *source) 
 	if err != nil {
 		return o.failure(env, err)
 	}
-	return s.emit("overview", s.h.Grade, ov, func(w io.Writer) error { return term.Overview(w, ov, s.st, s.hints(ov)) })
+	hints := s.hints(ov)
+	if shownHints != nil {
+		shownHints(hints)
+	}
+	return s.emit("overview", s.h.Grade, ov, func(w io.Writer) error { return term.Overview(w, ov, s.st, hints) })
 }
 
 // hints names the commands that go on from the overview.
+// shownHints, when set, is handed the hints of a screen. A test runs them.
+var shownHints func([]term.Hint)
+
 func (s *session) hints(ov *view.Overview) []term.Hint {
 	var out []term.Hint
 	// The DIMM to look at next: the subject of the case when it has one,
@@ -104,30 +111,26 @@ func (s *session) hints(ov *view.Overview) []term.Hint {
 	}
 	if slot != "" {
 		out = append(out,
-			term.Hint{Command: s.prefix + " dimm " + slot, Text: say(s.lang, "hint.dimm")},
-			term.Hint{Command: s.prefix + " why " + slot, Text: say(s.lang, "hint.why")})
+			term.Hint{Command: s.next("dimm", slot), Text: say(s.lang, "hint.dimm")},
+			term.Hint{Command: s.next("why", slot), Text: say(s.lang, "hint.why")})
 	} else if ov.HostFinding != nil {
 		// No DIMM to point at: the finding of the host is what to read.
-		out = append(out, term.Hint{Command: s.prefix + " why", Text: say(s.lang, "hint.why")})
+		out = append(out, term.Hint{Command: s.next("why"), Text: say(s.lang, "hint.why")})
 	}
 	if s.src == nil {
-		bundle := "my bundle -o case.mycase"
-		if s.o.sf.set() {
-			// The bundle of this host of the fleet, not of the machine the
-			// command runs on.
-			bundle = s.prefix + " bundle -o case.mycase"
-		}
-		out = append(out, term.Hint{Command: bundle, Text: say(s.lang, "hint.bundle")})
+		// The bundle of what was scanned: this host, the copy of --root,
+		// or this host of the fleet.
+		out = append(out, term.Hint{Command: s.next("bundle", "-o", "case.mycase"), Text: say(s.lang, "hint.bundle")})
 	}
 	if s.src == nil && s.o.root == "" && !s.o.sf.set() {
 		// The kept ledger of the boot harvest holds what this scan cannot
 		// see: the boots before that ended in a reset.
 		if fi, err := os.Stat(harvestLedger); err == nil && fi.Mode().IsRegular() {
-			out = append(out, term.Hint{Command: "my open " + harvestLedger + " boots", Text: say(s.lang, "hint.kept")})
+			out = append(out, term.Hint{Command: "my open " + shellWord(harvestLedger) + " boots", Text: say(s.lang, "hint.kept")})
 		}
 	}
 	if ov.Stops != nil {
-		out = append(out, term.Hint{Command: s.prefix + " boots", Text: say(s.lang, "hint.boots_host")})
+		out = append(out, term.Hint{Command: s.next("boots"), Text: say(s.lang, "hint.boots_host")})
 	}
 	out = append(out, term.Hint{Command: "my help", Text: say(s.lang, "hint.help")})
 	return out
@@ -409,12 +412,15 @@ func runBoots(ctx context.Context, env *cli.Env, args []string, src *source) int
 		// uncorrected errors.
 		for _, r := range b.Rows {
 			if r.Level == view.RowDIMM && r.Slot != "" {
-				hints = append(hints, term.Hint{Command: s.prefix + " boots " + r.Slot, Text: say(lang, "hint.boots")})
+				hints = append(hints, term.Hint{Command: s.next("boots", r.Slot), Text: say(lang, "hint.boots")})
 				break
 			}
 		}
 	} else {
-		hints = append(hints, term.Hint{Command: s.prefix + " dimm " + d.Slot, Text: say(lang, "hint.dimm")})
+		hints = append(hints, term.Hint{Command: s.next("dimm", d.Slot), Text: say(lang, "hint.dimm")})
+	}
+	if shownHints != nil {
+		shownHints(hints)
 	}
 	return s.emit("boots", grade, b, func(w io.Writer) error { return term.Boots(w, b, s.st, *show, hints) })
 }

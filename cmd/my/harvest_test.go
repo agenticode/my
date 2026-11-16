@@ -549,7 +549,7 @@ func TestOverviewNamesTheKeptLedger(t *testing.T) {
 	old := harvestLedger
 	t.Cleanup(func() { harvestLedger = old })
 	harvestLedger = filepath.Join(t.TempDir(), "ledger.db")
-	s := &session{o: &options{}, lang: "en", prefix: "my"}
+	s := &session{o: &options{}, lang: "en"}
 	has := func() bool {
 		for _, h := range s.hints(&view.Overview{}) {
 			if h.Command == "my open "+harvestLedger+" boots" {

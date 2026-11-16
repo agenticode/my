@@ -297,7 +297,7 @@ func TestScanOfAHostTree(t *testing.T) {
 		" CPU0   ░░   ░░   ██   ░░   ░░   ░░   ░░   ░░",
 		"CPU0_C1  3B9C56  1,231   1  row",
 		" sources  hostinfo 2 records, rasdaemon 1,286 records, klog",
-		"my --root "+root+" dimm CPU0_C1",
+		"my dimm CPU0_C1 --root "+root,
 	)
 	if strings.Contains(out, "missing") {
 		t.Errorf("every source was readable, yet something is missing:\n%s", out)
