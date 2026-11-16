@@ -408,7 +408,7 @@ var DefaultDuplicateTolerance = DuplicateTolerance{Exact: 5 * time.Second, Estim
 // bmcSource reports whether a record comes from a log a BMC keeps. Such a
 // record names a module at best and never an address.
 func bmcSource(source string) bool {
-	return strings.HasPrefix(source, "sel/") || strings.HasPrefix(source, "redfish/")
+	return strings.HasPrefix(source, "sel/") || strings.HasPrefix(source, "redfish/") || strings.HasPrefix(source, "vendorlog/")
 }
 
 // reporter names what a record came through, for the rule that one error

@@ -42,6 +42,10 @@ type Sink interface {
 	// BMCMemory takes a memory module as a BMC describes it, with the
 	// error counts the BMC keeps for it.
 	BMCMemory(*model.BMCMemory) error
+	// Firmware takes a firmware record about memory that makes neither an
+	// event nor an action: a module detected, a configuration in effect.
+	// A firmware record that makes an event or an action travels on it.
+	Firmware(*model.FirmwareRecord) error
 }
 
 // Report says how reading a source went. Every adapter returns one, also
@@ -143,17 +147,18 @@ func StatusForError(err error) (model.SourceStatus, string) {
 // Collected is a Sink that keeps everything in memory. Tests and small
 // tools use it; the ledger has its own Sink that writes as records arrive.
 type Collected struct {
-	Hosts    []*model.Host
-	Boots    []*model.Boot
-	Modules  []*model.Module
-	Counters []*model.CounterSample
-	Events   []*model.Event
-	Actions  []*model.Action
-	GPUs     []*model.GPUMem
-	ECSs     []*model.ECSSample
-	BMCs     []*model.BMC
-	Settings []*model.BIOSSetting
-	Memory   []*model.BMCMemory
+	Hosts     []*model.Host
+	Boots     []*model.Boot
+	Modules   []*model.Module
+	Counters  []*model.CounterSample
+	Events    []*model.Event
+	Actions   []*model.Action
+	GPUs      []*model.GPUMem
+	ECSs      []*model.ECSSample
+	BMCs      []*model.BMC
+	Settings  []*model.BIOSSetting
+	Memory    []*model.BMCMemory
+	Firmwares []*model.FirmwareRecord
 }
 
 func (c *Collected) Host(h *model.Host) error     { c.Hosts = append(c.Hosts, h); return nil }
@@ -174,5 +179,9 @@ func (c *Collected) BIOSSetting(s *model.BIOSSetting) error {
 }
 func (c *Collected) BMCMemory(m *model.BMCMemory) error {
 	c.Memory = append(c.Memory, m)
+	return nil
+}
+func (c *Collected) Firmware(f *model.FirmwareRecord) error {
+	c.Firmwares = append(c.Firmwares, f)
 	return nil
 }

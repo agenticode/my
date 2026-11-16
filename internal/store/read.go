@@ -565,6 +565,9 @@ type ActionFilter struct {
 	Slot     string
 	From, To time.Time
 	Kinds    []model.ActionKind
+	// Duplicates includes the actions that repeat another action (dup_of
+	// set). They are left out by default.
+	Duplicates bool
 }
 
 // Actions returns the actions selected by f in time order.
@@ -597,8 +600,11 @@ func (s *Store) Actions(ctx context.Context, f ActionFilter) ([]model.Action, er
 		}
 		add(`kind IN (`+placeholders(len(a))+`)`, a...)
 	}
+	if !f.Duplicates {
+		add(`dup_of IS NULL`)
+	}
 	q := `SELECT id, host, at, time_quality, kind, method, result, "OsPhysicalAddress", "Rank", "DeviceId", "BankGroup", "Bank", "Row",
- label, slot, dimm_uid, count, boot_id, detail, source, raw_ref, raw, fingerprint, scan_id FROM action`
+ label, slot, dimm_uid, count, boot_id, detail, source, raw_ref, raw, fingerprint, scan_id, dup_of, withdrawn_by FROM action`
 	if len(conds) > 0 {
 		q += ` WHERE ` + strings.Join(conds, ` AND `)
 	}
@@ -611,12 +617,14 @@ func (s *Store) Actions(ctx context.Context, f ActionFilter) ([]model.Action, er
 	for rows.Next() {
 		var a model.Action
 		var at, quality, kind, result string
-		var addr, rank, dev, bg, bank, row, scanID sql.NullInt64
+		var addr, rank, dev, bg, bank, row, scanID, dupOf, withdrawn sql.NullInt64
 		var dimmUID, bootID sql.NullString
 		if err := rows.Scan(&a.ID, &a.Host, &at, &quality, &kind, &a.Method, &result, &addr, &rank, &dev, &bg, &bank, &row,
-			&a.Label, &a.Slot, &dimmUID, &a.Count, &bootID, &a.Detail, &a.Source, &a.RawRef, &a.Raw, &a.Fingerprint, &scanID); err != nil {
+			&a.Label, &a.Slot, &dimmUID, &a.Count, &bootID, &a.Detail, &a.Source, &a.RawRef, &a.Raw, &a.Fingerprint, &scanID,
+			&dupOf, &withdrawn); err != nil {
 			return nil, err
 		}
+		a.DupOf, a.WithdrawnBy = dupOf.Int64, withdrawn.Int64
 		a.At = parseTS(sql.NullString{String: at, Valid: true})
 		a.TimeQuality, a.Kind, a.Result = model.TimeQuality(quality), model.ActionKind(kind), model.ActionResult(result)
 		a.OsPhysicalAddress = toOptU64(addr)
@@ -650,7 +658,8 @@ func (s *Store) Scans(ctx context.Context) ([]model.Scan, error) {
 
 // Sources returns the source inventory of a scan; scanID 0 selects all scans.
 func (s *Store) Sources(ctx context.Context, scanID int64) ([]model.Source, error) {
-	q, args := `SELECT id, scan_id, kind, origin, status, detail, records, events, actions, skipped, samples, grade_a, grade_b, grade_c, first_ts, last_ts, notes FROM source`, []any{}
+	q, args := `SELECT id, scan_id, kind, origin, status, detail, records, events, actions, skipped, samples, grade_a, grade_b, grade_c, first_ts, last_ts, notes,
+ unread, faults FROM source`, []any{}
 	if scanID != 0 {
 		q, args = q+` WHERE scan_id = ?`, append(args, scanID)
 	}
@@ -665,7 +674,7 @@ func (s *Store) Sources(ctx context.Context, scanID int64) ([]model.Source, erro
 		var status, notes string
 		var first, last sql.NullString
 		if err := rows.Scan(&src.ID, &src.ScanID, &src.Kind, &src.Origin, &status, &src.Detail, &src.Records, &src.Events, &src.Actions,
-			&src.Skipped, &src.Samples, &src.GradeA, &src.GradeB, &src.GradeC, &first, &last, &notes); err != nil {
+			&src.Skipped, &src.Samples, &src.GradeA, &src.GradeB, &src.GradeC, &first, &last, &notes, &src.Unread, &src.Faults); err != nil {
 			return nil, err
 		}
 		src.Status = model.SourceStatus(status)
@@ -1097,7 +1106,7 @@ func (s *Store) CaptureChecks(ctx context.Context, host string) ([]model.Capture
 
 // recordTables are the tables that hold what sources read; a run that adds
 // to none of them added nothing.
-var recordTables = []string{"event", "action", "boot", "placement", "gpu_mem", "ecs_sample", "bmc", "bmc_memory", "bios_setting"}
+var recordTables = []string{"event", "action", "boot", "placement", "gpu_mem", "ecs_sample", "bmc", "bmc_memory", "bios_setting", "fw_record"}
 
 // RecordCounts returns the number of rows of each table that holds what
 // sources read, for all hosts.
