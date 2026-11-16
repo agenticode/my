@@ -32,7 +32,13 @@ func TestVerifyCaptures(t *testing.T) {
 		}
 		t.Run(e.Name(), func(t *testing.T) {
 			var forms [][]string
-			if _, err := os.Stat(filepath.Join(dir, "proc")); err == nil {
+			// A capture of a loop holds the kept ledger of my harvest:
+			// that is what knows every boot of the plan. A copy of the host
+			// holds the files of the last boot, which internal/labcase
+			// checks with what they can tell.
+			if kept := filepath.Join(dir, "var", "lib", "my", "ledger.db"); fileExists(kept) {
+				forms = append(forms, []string{"open", kept, "verify", "--expect", plan})
+			} else if _, err := os.Stat(filepath.Join(dir, "proc")); err == nil {
 				forms = append(forms, []string{"verify", "--root", dir, "--expect", plan})
 			}
 			if b := filepath.Join(dir, "my", "case.mycase"); fileExists(b) {
