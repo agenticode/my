@@ -444,7 +444,7 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 	}
 	// A file that cannot be read as JSON was looked at and skipped: it is
 	// part of the count, like the resources that were found.
-	found := len(r.entries) + len(r.modules) + len(r.systems) + len(r.bios) + len(r.metrics)
+	found := r.found()
 	rep.Records = found + r.badDocs
 
 	err = r.emit(sink)
@@ -478,6 +478,12 @@ func (a *Adapter) Collect(ctx context.Context, sink adapter.Sink) adapter.Report
 type stopped struct{ err error }
 
 func (s stopped) Error() string { return s.err.Error() }
+
+// found counts the resources of the dump that records are made from. A
+// dump without any is empty, or unreadable, and yields no record.
+func (r *run) found() int {
+	return len(r.entries) + len(r.modules) + len(r.systems) + len(r.bios) + len(r.metrics)
+}
 
 // scan parses one file and collects the resources in it.
 func (r *run) scan(d *document) {
