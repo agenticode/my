@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"runtime/debug"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -44,8 +45,8 @@ func setMemoryLimit(fsys fs.FS, getenv func(string) string) int64 {
 }
 
 // machineMemory returns the memory this process may use in bytes: MemTotal
-// of /proc/meminfo, or the smallest limit of its control groups (version
-// 2) when that is smaller. It returns 0 when neither can be read.
+// of /proc/meminfo, or the smallest limit of its control groups when that
+// is smaller. It returns 0 when neither can be read.
 func machineMemory(fsys fs.FS) int64 {
 	var total int64
 	if f, err := fsys.Open("proc/meminfo"); err == nil {
@@ -70,25 +71,47 @@ func machineMemory(fsys fs.FS) int64 {
 	return total
 }
 
-// cgroupMemory returns the smallest memory.max of the control group of the
-// process and of the groups above it, or 0 when none sets one. The group
-// is the line "0::/path" of /proc/self/cgroup: "/" in a container that has
-// a group of its own, "/system.slice/x.service" for a systemd unit.
+// cgroupMemory returns the smallest memory limit of the control group of
+// the process and of the groups above it, or 0 when none sets one.
+// /proc/self/cgroup names the group (cgroups(7)): the line "0::/path" in
+// version 2, the line of the memory controller ("4:memory:/path") in
+// version 1 and on hosts that mount both. The path is "/" in a container
+// with a group of its own and "/system.slice/x.service" for a systemd
+// unit. Version 2 keeps the limit in memory.max, version 1 in
+// memory/<path>/memory.limit_in_bytes, whose "no limit" is a number larger
+// than any machine. Inside a container the path of the host may not exist
+// below the mount: the walk up ends at the container's own group.
 func cgroupMemory(fsys fs.FS) int64 {
-	group := "/"
+	v2, v1 := "/", "/"
 	if f, err := fsys.Open("proc/self/cgroup"); err == nil {
 		sc := bufio.NewScanner(io.LimitReader(f, 64<<10))
 		for sc.Scan() {
-			if rest, ok := strings.CutPrefix(sc.Text(), "0::"); ok && strings.HasPrefix(rest, "/") {
-				group = path.Clean(rest)
+			fields := strings.SplitN(sc.Text(), ":", 3)
+			if len(fields) != 3 || !strings.HasPrefix(fields[2], "/") {
+				continue
+			}
+			switch {
+			case fields[0] == "0" && fields[1] == "":
+				v2 = path.Clean(fields[2])
+			case slices.Contains(strings.Split(fields[1], ","), "memory"):
+				v1 = path.Clean(fields[2])
 			}
 		}
 		f.Close()
 	}
+	least := groupLimit(fsys, "sys/fs/cgroup", v2, "memory.max")
+	if n := groupLimit(fsys, "sys/fs/cgroup/memory", v1, "memory.limit_in_bytes"); n > 0 && (least == 0 || n < least) {
+		least = n
+	}
+	return least
+}
+
+// groupLimit returns the smallest number in the file name of the group
+// below base and of the groups above it, or 0 when no file holds one.
+func groupLimit(fsys fs.FS, base, group, name string) int64 {
 	var least int64
 	for depth := 0; depth < 64; depth++ {
-		name := path.Join("sys/fs/cgroup", group, "memory.max")
-		if b, err := fs.ReadFile(fsys, name); err == nil && len(b) < 64 {
+		if b, err := fs.ReadFile(fsys, path.Join(base, group, name)); err == nil && len(b) < 64 {
 			// "max", or a number of bytes.
 			if n, err := strconv.ParseInt(strings.TrimSpace(string(b)), 10, 64); err == nil && n > 0 && (least == 0 || n < least) {
 				least = n
