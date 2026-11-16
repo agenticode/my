@@ -327,6 +327,21 @@ func (r *run) unparam(param string, what, cost model.Statement, source string) *
 
 // notInCopy is the outcome of a check whose file a copy of a host's files
 // does not hold.
+// copyLacks reports whether the host is a copy of its files that holds
+// none of the directories: a check that decides by them cannot tell what
+// the host has.
+func (r *run) copyLacks(dirs ...string) bool {
+	if r.opts.Live {
+		return false
+	}
+	for _, d := range dirs {
+		if r.h.isDir(d) {
+			return false
+		}
+	}
+	return true
+}
+
 func (r *run) notInCopy(name, rel string) Check {
 	return Check{Name: name, State: Unknown, Live: true, Detail: statement("pf.copy.missing", "file", "/"+rel),
 		Evidence: []string{"/" + rel + ": not there"}}

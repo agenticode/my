@@ -304,13 +304,25 @@ func TestCopyOfAHost(t *testing.T) {
 	if r.Root != root {
 		t.Errorf("Root = %q", r.Root)
 	}
-	for _, name := range []string{"pstore-backend", "pstore-vs-kdump", "kdump", "mce-bootlog", "bert", "console"} {
+	// A copy without /etc/systemd cannot tell whether the host keeps a
+	// journal, archives pstore files or runs the harvest: as in the lab
+	// captures, which hold the archive and the kept ledger but no unit.
+	for _, name := range []string{"journal", "pstore-backend", "pstore-archive", "pstore-vs-kdump", "kdump", "mce-bootlog", "bert", "console", "harvest"} {
 		if c := check(t, r, name); c.State != preflight.Unknown || c.Detail.Code != "pf.copy.missing" || !c.Live {
 			t.Errorf("%s = %s %s", name, c.State, c.Detail.Code)
 		}
 	}
-	if c := check(t, r, "harvest"); !c.Live {
-		t.Errorf("harvest is not marked as needing the running host")
+	if r.Lost != 0 {
+		t.Errorf("a copy that lacks the files says %d checks would lose records", r.Lost)
+	}
+	// With /etc/systemd in the copy the checks decide as on the host.
+	root = pt.Tree(t, pt.Files{"proc/sys/kernel/hostname": "h\n", "etc/os-release": "ID=fedora\n", "etc/systemd/system": pt.Dir,
+		"usr/lib/systemd/systemd": "\x7fELF"})
+	r = preflight.Run(preflight.Options{Root: root})
+	for _, name := range []string{"journal", "pstore-archive", "rasdaemon", "harvest"} {
+		if c := check(t, r, name); c.State != preflight.Lost {
+			t.Errorf("with /etc/systemd: %s = %s %s", name, c.State, c.Detail.Code)
+		}
 	}
 }
 

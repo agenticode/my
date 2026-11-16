@@ -468,7 +468,7 @@ func (p *part) readHeader() error {
 		return err
 	}
 	defer f.Close()
-	line, err := bufio.NewReaderSize(f, 512).ReadString('\n')
+	line, err := bufio.NewReaderSize(io.LimitReader(f, 512), 512).ReadString('\n')
 	if err != nil && err != io.EOF {
 		return err
 	}
@@ -978,7 +978,8 @@ func Kinds(dir string) []string {
 			kdump = true
 		case nameRE.MatchString(name):
 			pstore = true
-		case name == "dmesg.txt":
+		case name == "dmesg.txt" && d.Type().IsRegular():
+			// A pipe of that name would hold up the walk.
 			if f, err := os.Open(p); err == nil {
 				h := make([]byte, 128)
 				n, _ := io.ReadFull(f, h)

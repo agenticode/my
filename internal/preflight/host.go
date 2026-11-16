@@ -37,11 +37,15 @@ func (h *host) path(rel string) string {
 // copy of a host's files can hold anything.
 const maxSmall = 256 << 10
 
+// maxConfig bounds what is read of the build options of a kernel; the
+// configuration of a distribution kernel is about 250 KiB.
+const maxConfig = 16 << 20
+
 // read returns the contents of a small file, its trailing white space
 // removed. A file that is not there returns fs.ErrNotExist; one that is
 // closed to this user returns fs.ErrPermission.
 func (h *host) read(rel string) (string, error) {
-	f, err := os.Open(h.path(rel))
+	f, err := openRegular(h.path(rel))
 	if err != nil {
 		return "", err
 	}
@@ -58,9 +62,25 @@ func (h *host) read(rel string) (string, error) {
 
 var errTooLarge = errors.New("file is larger than 256 KiB")
 
+// errNotRegular is a path that is no regular file: a pipe or a device in a
+// copy of a host's files, which an open would wait on or read without end.
+// The files of /proc and /sys are regular files.
+var errNotRegular = errors.New("not a regular file")
+
+func openRegular(path string) (*os.File, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+	if !fi.Mode().IsRegular() {
+		return nil, &fs.PathError{Op: "open", Path: path, Err: errNotRegular}
+	}
+	return os.Open(path)
+}
+
 // head returns the first n bytes of a file.
 func (h *host) head(rel string, n int64) (string, error) {
-	f, err := os.Open(h.path(rel))
+	f, err := openRegular(h.path(rel))
 	if err != nil {
 		return "", err
 	}
@@ -253,13 +273,15 @@ func (h *host) kernelConfig(release string) (map[string]string, string) {
 			return parseConfig(s), rel
 		}
 		// The configuration of a distribution kernel can be larger than
-		// what read takes: read it line by line.
-		if f, err := os.Open(h.path(rel)); err == nil {
+		// what read takes: read it line by line, up to the size the
+		// compressed copy may unpack to. Only a regular file: opening a
+		// pipe of that name in a copy would wait for a writer.
+		if f, err := openRegular(h.path(rel)); err == nil {
 			defer f.Close()
-			return parseConfigReader(f), rel
+			return parseConfigReader(io.LimitReader(f, maxConfig)), rel
 		}
 	}
-	f, err := os.Open(h.path("proc/config.gz"))
+	f, err := openRegular(h.path("proc/config.gz"))
 	if err != nil {
 		return nil, ""
 	}
@@ -268,7 +290,7 @@ func (h *host) kernelConfig(release string) (map[string]string, string) {
 	if err != nil {
 		return nil, ""
 	}
-	return parseConfigReader(io.LimitReader(zr, 16<<20)), "proc/config.gz"
+	return parseConfigReader(io.LimitReader(zr, maxConfig)), "proc/config.gz"
 }
 
 func parseConfig(s string) map[string]string { return parseConfigReader(strings.NewReader(s)) }
