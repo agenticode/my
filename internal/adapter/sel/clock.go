@@ -10,10 +10,12 @@ import (
 
 // clock turns the dates and times of a text dump into times.
 //
-// ipmitool up to 1.8.18 prints "11/12/2026 | 03:14:07" in the zone of the
-// machine it runs on and does not say which zone that is. Later versions
-// use the locale of that machine: the date may be day first or two-digit,
-// the time may have AM or PM, and the zone abbreviation follows.
+// ipmitool up to 1.8.18 prints "11/12/2026 | 03:14:07" through gmtime(): the
+// clock of the BMC as it stands, without a zone (ipmi_sel.c of 1.8.18,
+// ipmi_sel_timestamp). From 1.8.19 on it prints the local time of the
+// machine it runs on in the locale of that machine: the date may be day
+// first or two-digit, the time may have AM or PM, and the zone
+// abbreviation follows.
 type clock struct {
 	loc *time.Location
 	// dayFirst is set when the dates of the dump are day/month/year.

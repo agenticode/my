@@ -532,7 +532,7 @@ A label is matched to a known slot by name, ignoring case and separators: `DIMM 
 
 ### Times
 
-ipmitool prints the local time of the machine it runs on. Versions up to 1.8.18 do not name the zone; later versions follow the locale of that machine and append the zone abbreviation.
+ipmitool up to 1.8.18 prints the stamp of a record through `gmtime()`: the clock of the BMC as it stands, without a zone. A BMC whose clock runs on UTC gives UTC; one set to local time gives that local time, and `--tz` names it. From 1.8.19 on, ipmitool turns the stamp into the local time of the machine it runs on (UTC with `-Z`), follows the locale of that machine and appends the zone abbreviation.
 
 - A zone abbreviation with one meaning (UTC, KST, CEST, PDT and others) or a numeric zone (`+09`) is applied.
 - A time without a zone, or with an abbreviation that has several meanings (CST, IST), is read as UTC, and the report says so. Give the zone with `my import --tz ZONE` to read such a dump correctly.
