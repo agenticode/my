@@ -127,16 +127,16 @@ boot)
 	fi
 	pgrep -f "[h]ttp.server $SEEDPORT" >/dev/null || (cd "$X86/seed" && nohup python3 -m http.server "$SEEDPORT" --bind 127.0.0.1 </dev/null >"$X86/http.log" 2>&1 &)
 	fw=()
+	if [ "$FIRMWARE" = efi ]; then
+		fw=(-drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd -drive if=pflash,format=raw,file="$X86/vars.fd")
+	else
+		fw=(-object memory-backend-file,id=erstnvram,mem-path="$X86/erst.backing",size=0x10000,share=on -device acpi-erst,memdev=erstnvram)
+	fi
 	# BERT=DIR: a boot error region made by hand (tools/lab/bertregion), and
 	# the table that points at it. The loader writes the region at every
 	# reset; the guest keeps the page out of its RAM (memmap=, see "bert").
 	if [ -n "${BERT:-}" ]; then
 		fw+=(-acpitable "sig=BERT,rev=1,oem_id=LABMY,data=$BERT/bert.bin" -device "loader,file=$BERT/region.bin,addr=$BERTADDR")
-	fi
-	if [ "$FIRMWARE" = efi ]; then
-		fw=(-drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd -drive if=pflash,format=raw,file="$X86/vars.fd")
-	else
-		fw=(-object memory-backend-file,id=erstnvram,mem-path="$X86/erst.backing",size=0x10000,share=on -device acpi-erst,memdev=erstnvram)
 	fi
 	rm -f "$MON" "$QMP"
 	# No -no-reboot: the guest restarts itself after a panic, inside the
@@ -184,7 +184,7 @@ bert)
 	# bert: keep the page of the boot error region out of the guest's RAM,
 	# so that bert_init may map it (drivers/acpi/apei/bert.c); then a
 	# reboot. GRUB expands "$" in kernel parameters: the backslash keeps it.
-	guest "grubby --update-kernel=ALL --args='memmap=4K\\\$$BERTADDR'"
+	guest "grubby --update-kernel=ALL --args='memmap=4K\\\\\\\$$BERTADDR'"
 	guest 'grep -h memmap /boot/loader/entries/*.conf | head -1'
 	guest 'systemctl reboot' || true
 	;;

@@ -14,17 +14,23 @@ import (
 //
 //	struct acpi_hest_generic_status      20 bytes: block_status,
 //	    raw_data_offset, raw_data_length, data_length, error_severity
-//	struct acpi_hest_generic_data        72 bytes: section_type (GUID),
-//	    error_severity, revision, validation_bits, flags,
-//	    error_data_length, fru_id (16), fru_text (20)
-//	struct acpi_hest_generic_data_v300   80 bytes: the same and a
-//	    time_stamp, for a revision of 0x300 and above
-//	    (include/acpi/ghes.h, acpi_hest_get_version: revision >> 8)
+//	struct acpi_hest_generic_data        64 bytes: section_type (GUID,
+//	    0-15), error_severity (16), revision (20), validation_bits (22),
+//	    flags (23), error_data_length (24), fru_id (28-43), fru_text
+//	    (44-63)
+//	struct acpi_hest_generic_data_v300   72 bytes: the same and a
+//	    time_stamp (64-71), for a revision of 0x300 and above
+//	    (include/acpi/ghes.h, acpi_hest_get_version: revision >> 8;
+//	    acpi_hest_get_size)
+//
+// The lab showed the kernel taking a region of this layout and refusing
+// one with a header 8 bytes longer ("Invalid error record",
+// cper_estatus_check in drivers/firmware/efi/cper.c).
 
 const (
 	statusLen    = 20
-	entryLen     = 72
-	entryV300Len = 80
+	entryLen     = 64
+	entryV300Len = 72
 )
 
 // Validation bits of a Generic Error Data Entry (actbl1.h,
@@ -156,10 +162,10 @@ func parseEntries(data []byte) ([]DataEntry, string) {
 			return nil, fmt.Sprintf("entry at %d: section length %d runs past the block", off, errLen)
 		}
 		if valid&entryValidFRUText != 0 {
-			e.FRUText = cString(rest[52:72])
+			e.FRUText = cString(rest[44:64])
 		}
 		if head == entryV300Len && valid&entryValidTimestamp != 0 {
-			e.Time, e.Precise = timestamp(rest[72:80])
+			e.Time, e.Precise = timestamp(rest[64:72])
 		}
 		e.Data = append([]byte(nil), rest[head:head+int(errLen)]...)
 		out = append(out, e)

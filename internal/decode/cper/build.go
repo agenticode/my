@@ -108,11 +108,11 @@ func StatusBlockBytes(blockStatus uint32, severity int, entries ...Entry) []byte
 		le.PutUint16(head[20:], rev)
 		var valid byte
 		if e.FRUText != "" {
-			copy(head[52:72], e.FRUText)
+			copy(head[44:64], e.FRUText)
 			valid |= entryValidFRUText
 		}
 		if e.V300 && e.Timestamp != [8]byte{} {
-			copy(head[72:80], e.Timestamp[:])
+			copy(head[64:72], e.Timestamp[:])
 			valid |= entryValidTimestamp
 		}
 		head[22] = valid
