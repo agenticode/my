@@ -26,6 +26,8 @@ const (
 	MappingWording = "wording"
 	// MappingIPMI: the state of the IPMI memory sensor.
 	MappingIPMI = "ipmi"
+	// MappingCPER: the memory section of CPER the entry carries.
+	MappingCPER = "cper"
 	// MappingNone: nothing explained the record.
 	MappingNone = "none"
 )

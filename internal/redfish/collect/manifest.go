@@ -51,11 +51,14 @@ const (
 	ClassLogEntries   = "log-entries"
 	ClassFirmware     = "firmware-inventory"
 	ClassChassis      = "chassis"
+	// ClassMessageRegistry: the message registries a BMC serves, for the
+	// meaning of the message IDs of its logs.
+	ClassMessageRegistry = "message-registry"
 )
 
 // Classes lists the classes in the order of the support table.
 var Classes = []string{ClassRoot, ClassSystem, ClassMemory, ClassMetrics, ClassBios, ClassBiosSettings, ClassRegistry,
-	ClassManager, ClassLogService, ClassLogEntries, ClassFirmware, ClassChassis}
+	ClassManager, ClassLogService, ClassLogEntries, ClassFirmware, ClassChassis, ClassMessageRegistry}
 
 // States of a class in one collection.
 const (

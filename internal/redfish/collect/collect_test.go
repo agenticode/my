@@ -166,6 +166,7 @@ log-service=ok
 log-entries=ok
 firmware-inventory=ok
 chassis=ok
+message-registry=not offered
 `
 	if got := states(m); got != want {
 		t.Errorf("classes:\n%s\nwant:\n%s", got, want)
@@ -245,7 +246,9 @@ func TestMachine(t *testing.T) {
 		t.Fatalf("complete %v, partial %v, failed %d, stopped %q\n%s", m.Complete, m.Partial(), m.Failed(), m.Stopped, states(m))
 	}
 	for _, c := range m.Classes {
-		if c.State != StateOK {
+		// No log entry names a registry of the vendor, and the Base
+		// registry is the standard's: no message registry is needed.
+		if c.State != StateOK && !(c.Class == ClassMessageRegistry && c.State == StateNotOffered) {
 			t.Errorf("%s = %s", c.Class, c.State)
 		}
 	}
@@ -536,6 +539,7 @@ log-service=partial
 log-entries=unsupported
 firmware-inventory=partial
 chassis=ok
+message-registry=not offered
 `
 	if got := states(m); got != want {
 		t.Errorf("classes:\n%s\nwant:\n%s", got, want)

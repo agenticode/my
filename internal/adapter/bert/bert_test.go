@@ -33,6 +33,7 @@ func (*sink) BMC(*model.BMC) error                 { return nil }
 func (*sink) BIOSSetting(*model.BIOSSetting) error { return nil }
 func (*sink) BMCMemory(*model.BMCMemory) error     { return nil }
 func (*sink) Firmware(*model.FirmwareRecord) error { return nil }
+func (*sink) Registry(*model.RegistrySeen) error   { return nil }
 
 var cell = cper.MemError{
 	PhysicalAddress: model.Some(uint64(0x1a2f3c40)), Node: model.Some(0), Card: model.Some(2), Module: model.Some(1),

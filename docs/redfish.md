@@ -85,9 +85,10 @@ The resources, in the order they are asked for:
 | pending BIOS settings | the resource `@Redfish.Settings.SettingsObject` of the `Bios` resource points to |
 | attribute registry | the entry of the `Registries` collection named by `Bios.AttributeRegistry`, then the copy on the BMC its `Location[].Uri` points to (in English when there is a choice). A registry the BMC holds no copy of is not fetched from its `PublicationUri`, which is another host |
 | manager | the `Managers` collection and each `Manager` (firmware version, model, clock) |
-| log services, log entries | the `LogServices` of each system and manager, and the entries of each log |
+| log services, log entries | the `LogServices` of each system, manager and chassis, and the entries of each log |
 | firmware inventory | `UpdateService` and its `FirmwareInventory` |
 | chassis | the `Chassis` collection and each chassis |
+| message registries | after the logs: the entries of the `Registries` collection whose prefix a log entry of the run uses, and those that are not a DMTF standard registry; then the copy on the BMC each one's `Location[].Uri` points to (in English when there is a choice). A registry the BMC holds no copy of is named and not fetched from its `PublicationUri`, which is another host. A registry offered only as an archive (`ArchiveUri`) is named and not read |
 
 Logs that hold no hardware events are skipped unless named with `--log`: the BMC's own journal, the host console, POST codes, audit logs, dumps and telemetry. `--no-logs` skips every log.
 
@@ -102,6 +103,7 @@ Limits of a run, with their defaults:
 | size of one collection | 512 MiB | |
 | time for one BMC | 20 min (5 min with `--bmc` on the other commands) | `--deadline`, `--bmc-deadline` |
 | entries read of one log | 5,000 | `--max-log-entries` |
+| message registries | 16 per run, and none after 64 MiB of them | |
 | pages followed through `Members@odata.nextLink` | 500 per collection | |
 | resources in a row without any answer before the BMC counts as gone | 3 | |
 

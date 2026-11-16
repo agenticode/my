@@ -110,7 +110,7 @@ func TestDetectKnowsEveryFixture(t *testing.T) {
 	// lie next to fixtures.
 	skip := func(rel string) bool {
 		return strings.HasPrefix(rel, "edac-sysfs/") || strings.HasPrefix(rel, "smbios/tables-") || strings.HasSuffix(rel, ".sql") ||
-			strings.HasSuffix(rel, ".hex") || strings.HasPrefix(rel, "redfish/bmc-tree/") || strings.HasPrefix(rel, "real/") ||
+			strings.HasSuffix(rel, ".hex") || strings.HasSuffix(rel, ".cperhex") || strings.HasPrefix(rel, "redfish/bmc-tree/") || strings.HasPrefix(rel, "real/") ||
 			strings.HasPrefix(rel, "dcbrain/") || strings.HasSuffix(rel, "/README.md") || strings.HasSuffix(rel, "/LICENSE.md")
 	}
 	n := 0

@@ -671,6 +671,15 @@ Every entry about memory also keeps a row of `fw_record`: message ID, registry a
 
 Entries of type `CXL` are counted and not read.
 
+A dump that holds message registries (`MessageRegistry` resources, or objects with `RegistryPrefix` and `Messages` saved without their type) gives each entry the registry its `MessageId` names: the one of the same major and minor version, else the newest of that prefix. The registry's `NumberOfArgs` picks the variant of a table line that is written for a number of arguments; when no variant fits, the roles of the line are not used and the place comes from `OriginOfCondition` or from the text. The registry's severity is the vendor's severity of an entry. A message no table names is classed by the wording of the registry's text (`fw_record.mapping` `bmc-registry`). Of each registry, at most 20,000 messages and 2 KiB of each text are read, and a file of more than 16 MiB is left out; a registry that cannot be read is named and the entries are read without it. Per registry, the ledger keeps how many of its messages are about memory and how many of those a table or the wording rules class (`registry_seen`, shown by `my vendors --seen`).
+
+Further fields of an entry:
+
+- `EventTimestamp` is the time of the event when it is given; `Created` is when the entry was written.
+- `Resolved` is kept in the firmware record.
+- `OverflowErrorCount` of an entry is told in the source inventory: the BMC lost that many entries of the log.
+- `DiagnosticDataType` `CPER` or `CPERSection` with `DiagnosticData` in base64: the platform memory error section of the CPER record is read as the kernel's CPER records are. It gives the place (address, rank, bank, row, column, device, the SMBIOS handle of the module), and, for a message that is about no memory by itself (`PlatformErrorAtLocation`), the event: the section's severity and error type (`fw_record.mapping` `cper`). A section of another type is left alone. `AdditionalDataURI` is not followed.
+
 ### Grade
 
 C for most entries: they name a module at best. An OpenBMC registry entry that carries the rank has grade B, and an entry whose arguments carry an address or a rank by their role in the table has grade B.
