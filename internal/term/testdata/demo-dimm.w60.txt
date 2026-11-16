@@ -12,6 +12,9 @@ CPU0_C1  replace now  R-UE-01
            supports: the other 15 DIMMs of this host have no
            unconfined errors: a cause in the board is
            unlikely
+ repair    hard PPR at rank0 dev7 bg0 bank3 row 0x1a2f on
+           2026-10-28 01:30 UTC: 442 errors before, 764
+           after
  next      Replace the DIMM. Attach a case bundle of this
            DIMM to the return.
  confidence high, 3 more statements, 2 checks not made, 2

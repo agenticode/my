@@ -193,6 +193,7 @@ section#s3.sec
     ### CPU0_C1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 3B9C56
     finding = replace now R-UE-01 1 uncorrected error, the latest on 2026-11-12 03:14 UTC at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 1 record
     evidence = R-ROW-03 row fault at rank0 dev7 bg0 bank3 row 0x1a2f: 421 errors in the last 7 days, 2.3 times the daily rate of the 30 days before 421 records R-REP-02 764 errors at rank0 dev7 bg0 bank3 row 0x1a2f after the hard PPR of 2026-10-28 765 records supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
+    repair = hard PPR at rank0 dev7 bg0 bank3 row 0x1a2f on 2026-10-28 01:30 UTC: 442 errors before, 764 after
     next = Replace the DIMM. Attach a case bundle of this DIMM to the return.
     p.sub: confidence high, 3 more statements, 2 checks not made, 2 kinds of data missing: the whole finding
     p.links: topology and address map timeline checks
@@ -815,6 +816,7 @@ section#s8.sec
     checks = open no other DIMM on this channel: there is nothing to compare with open no slot move or reseat on record: a cause in the board is not ruled out supports the other 15 DIMMs of this host have no unconfined errors: a cause in the board is unlikely
     missing = no ECS counters no DIMM temperature history
     baseline = own history: 60.1 errors a day over the last 7 days, percentile 100 of the 30 days before same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2 of them with errors
+    repair = hard PPR at rank0 dev7 bg0 bank3 row 0x1a2f on 2026-10-28 01:30 UTC: 442 errors before, 764 after
     next = Replace the DIMM. Attach a case bundle of this DIMM to the return.
   article#full-dimm-CPU1_D1.card.g-observe
     #### CPU1_D1 DDR5 RDIMM 64 GB 2Rx4 Example Memory EXM64G48R2X4-A S/N 2AEB41

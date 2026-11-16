@@ -13,7 +13,7 @@ import (
 // repairKinds are the actions my_dimm_repairs_total counts, and the value
 // of its type label for each.
 var repairKinds = []model.ActionKind{model.ActionSPPR, model.ActionHPPR, model.ActionPPR, model.ActionSparing, model.ActionDeviceSparing,
-	model.ActionRowRemap}
+	model.ActionMemorySparing, model.ActionRowRemap}
 
 // firmwareEvents are the common events my_dimm_firmware_events_total
 // counts: the families prediction, out of use, repair, sparing, mirror and

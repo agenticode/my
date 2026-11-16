@@ -153,7 +153,7 @@ func randomInput(rng *rand.Rand) (*Input, int64) {
 	}
 
 	kinds := []model.ActionKind{model.ActionPageOffline, model.ActionSPPR, model.ActionHPPR, model.ActionSparing, model.ActionRowRemap,
-		model.ActionReplacement, model.ActionReseat, model.ActionDisable, model.ActionMarkFailed}
+		model.ActionReplacement, model.ActionReseat, model.ActionDisable, model.ActionMarkFailed, model.ActionMemorySparing}
 	for range rng.IntN(12) {
 		s := slots[rng.IntN(len(slots))]
 		a := model.Action{ID: int64(len(b.in.Actions) + 1), Host: s.host, Slot: s.name, At: at(), Kind: kinds[rng.IntN(len(kinds))],

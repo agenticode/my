@@ -526,6 +526,28 @@
       "confined": true
     }
   ],
+  "repairs": [
+    {
+      "kind": "hppr",
+      "kind_text": "hard PPR",
+      "method": "bios",
+      "result": "ok",
+      "at": "2026-10-28T01:30:40Z",
+      "where": "rank0 dev7 bg0 bank3 row 0x1a2f",
+      "before": 442,
+      "after": 764,
+      "raw_ref": "synth:demo#action1",
+      "code": "card.repair_line",
+      "args": {
+        "after": 764,
+        "before": 442,
+        "kind": "hard PPR",
+        "when": "2026-10-28 01:30 UTC",
+        "where": "rank0 dev7 bg0 bank3 row 0x1a2f"
+      },
+      "text": "hard PPR at rank0 dev7 bg0 bank3 row 0x1a2f on 2026-10-28 01:30 UTC: 442 errors before, 764 after"
+    }
+  ],
   "recurrence": {
     "dimm_uid": "d878e1a15b6e30a44057",
     "slot": "CPU0_C1",

@@ -50,7 +50,7 @@ func TestCatalogIsComplete(t *testing.T) {
 		}
 	}
 	for _, k := range []model.ActionKind{model.ActionPageOffline, model.ActionSPPR, model.ActionHPPR, model.ActionSparing, model.ActionRowRemap,
-		model.ActionReseat, model.ActionReplacement, model.ActionDisable, model.ActionMarkFailed} {
+		model.ActionReseat, model.ActionReplacement, model.ActionDisable, model.ActionMarkFailed, model.ActionDeviceSparing, model.ActionMemorySparing} {
 		if !Messages.Has("kind." + string(k)) {
 			t.Errorf("action kind %s has no name", k)
 		}

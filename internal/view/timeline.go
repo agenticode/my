@@ -94,6 +94,7 @@ var MarkerLetters = map[string]string{
 	// either kind S.
 	string(model.ActionPPR):              "P",
 	string(model.ActionDeviceSparing):    "S",
+	string(model.ActionMemorySparing):    "S",
 	string(model.ActionPredictedFailure): "A",
 	string(model.ActionTrainingFailure):  "N",
 	string(model.ActionMirrorFailover):   "V",

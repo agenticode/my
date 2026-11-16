@@ -187,7 +187,7 @@ func TestCXLDeviceReachesTheRules(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if src := run.Sources[0]; src.Events != 11 || src.Actions != 3 || src.GradeA != 1 {
+	if src := run.Sources[0]; src.Events != 11 || src.Actions != 4 || src.GradeA != 1 {
 		t.Errorf("source inventory entry = %+v", src)
 	}
 	res, err := engine.Run(ctx, s, engine.Options{})
@@ -209,10 +209,13 @@ func TestCXLDeviceReachesTheRules(t *testing.T) {
 	if err != nil || d == nil || d.Serial != "0x5678" || d.Identity != model.IdentitySerial || d.Technology != "CXL" {
 		t.Errorf("identity of cxl:mem1 = %+v, %v", d, err)
 	}
-	// mem0 had one corrected error and a row spared for good: the spare is
-	// taken. No firmware mark, no uncorrected error.
+	// mem0 had one corrected error, and a spare took over its row with 3
+	// spares left: a repair of the row, which uses up nothing (no
+	// R-REP-01). No firmware mark, no uncorrected error: the one error is
+	// watched.
 	mem0 := got["cxl:mem0"]
-	if mem0 == nil || !slices.Contains(mem0.Rules, engine.RuleRepairGone) || slices.Contains(mem0.Rules, engine.RuleFirmware) || slices.Contains(mem0.Rules, engine.RuleUE) {
+	if mem0 == nil || mem0.Grade != model.VerdictObserve || slices.Contains(mem0.Rules, engine.RuleRepairGone) ||
+		slices.Contains(mem0.Rules, engine.RuleFirmware) || slices.Contains(mem0.Rules, engine.RuleUE) {
 		t.Errorf("cxl:mem0 = %+v", mem0)
 	}
 	// Informational records are in the ledger and in no total.

@@ -94,6 +94,7 @@ CPU1_D1  observe  R-SOFT-01  one cell fails repeatedly (rank0 dev17 bg5 bank3 ro
 | first | the decision: the slot, the grade, the rule that set it and what that rule saw |
 | second | the module and its serial number; for a DIMM that changed slots, since when it is in this one |
 | evidence | at most three statements that bear on the decision: checks that weaken the finding, what the other rules saw, checks that support it |
+| repair | each repair of a place of the DIMM on record (post package repair, sparing, row remap): the place, the time, the errors of the fault before it and the errors at the repaired place after it |
 | next | the step that follows |
 | last | the confidence, and what `--detail` adds: further statements, the checks that could not be made, the kinds of data that were missing |
 
@@ -106,6 +107,7 @@ CPU1_D1  observe  R-SOFT-01  one cell fails repeatedly (rank0 dev17 bg5 bank3 ro
 | checks | tests of the finding against other explanations: "supports" speaks for it, "weakens" against it, "open" could not be tested and names what would settle it |
 | missing | data the finding did not have |
 | baseline | how unusual the errors are, against the past of this DIMM and against the DIMMs of its part number in the ledger |
+| repair | the repairs, as in the short card |
 | next | the step that follows |
 | confidence | the steps that led to the number |
 | faults | the groups of errors the engine made out, with mode, place, counts, period and trend |

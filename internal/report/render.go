@@ -639,6 +639,7 @@ func (doc *Document) briefCard(c *view.Card, full string) *node {
 		}
 		row("card.evidence", ul)
 	}
+	doc.repairRow(c, row)
 	if c.Next != nil {
 		row("card.next", el("strong", R(c.Next.Text)))
 	}
@@ -654,6 +655,19 @@ func (doc *Document) briefCard(c *view.Card, full string) *node {
 	}
 	return el("div", dl, el("p", A{"class", "sub"}, R(strings.Join(rest, ", ")+": "),
 		el("a", A{"href", "#" + full}, doc.say("card.to_full"))))
+}
+
+// repairRow lists the repairs of a DIMM: what was repaired, when, and the
+// errors before and after.
+func (doc *Document) repairRow(c *view.Card, row func(string, ...any)) {
+	if len(c.Repairs) == 0 {
+		return
+	}
+	ul := el("ul")
+	for _, r := range c.Repairs {
+		ul.add(el("li", R(r.Text.Text)))
+	}
+	row("card.repair", ul)
 }
 
 // fullCard is the whole finding of a DIMM, as the appendix holds it: every
@@ -700,6 +714,7 @@ func (doc *Document) fullCard(d *DIMM) *node {
 	if d.Detail {
 		list("card.baseline", c.Baseline)
 	}
+	doc.repairRow(c, row)
 	if c.Next != nil {
 		row("card.next", el("strong", R(c.Next.Text)))
 	}

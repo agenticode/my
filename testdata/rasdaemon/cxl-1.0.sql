@@ -44,6 +44,9 @@ INSERT INTO cxl_memory_sparing_event (id, timestamp, memdev, host, serial, log_t
   VALUES (3, '2026-11-11 02:35:00 +0000', 'mem1', '0000:36:00.0', 0x5678, 'Warning', 'e71f3a40-2d29-4092-8a39-4d1c966c7c65', 2, 2, 4, 1, 24, 0, 0, 0, 0, 0, 0, 5, 0, 0);
 INSERT INTO cxl_memory_sparing_event (id, timestamp, memdev, host, serial, log_type, hdr_uuid, flags, result, validity_flags, res_avail)
   VALUES (4, '', 'mem1', '0000:36:00.0', 0x5678, 'Warning', 'e71f3a40-2d29-4092-8a39-4d1c966c7c65', 2, 0, 0, 0);
+-- A soft post package repair of a row of mem1, reported in the class of PPR.
+INSERT INTO cxl_memory_sparing_event (id, timestamp, memdev, host, serial, log_type, hdr_uuid, hdr_maint_op_class, hdr_maint_op_sub_class, flags, result, validity_flags, res_avail, channel, sub_channel, rank, nibble_mask, bank_group, bank, row, "column")
+  VALUES (5, '2026-11-12 05:00:00 +0000', 'mem1', '0000:36:00.0', 0x5678, 'Informational', 'e71f3a40-2d29-4092-8a39-4d1c966c7c65', 1, 0, 0, 0, 59, 1, 0, 0, 0, 0, 3, 1, 0x0c11, 0);
 
 -- The poison list of mem1, read out twice, and an injection that was cleared.
 INSERT INTO cxl_poison_event VALUES (1, '2026-11-11 03:00:00 +0000', 'mem1', '0000:36:00.0', 0x5678, 'List', 'region1', '5b0c3f2e-0000-4000-8000-000000000001', 0x3c007f000, 0x7f000, 64, 'Internal', 0, '1970-01-01 00:00:00 +0000', -1);

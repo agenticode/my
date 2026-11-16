@@ -626,6 +626,36 @@ func TestRuleRecurrenceAfterRepair(t *testing.T) {
 		wantVerdict(t, verdictOf(t, b, asOf, "d1"), model.VerdictReplaceNow, RuleRepairGone, RuleRecurred)
 	})
 
+	t.Run("memory sparing that leaves spares is a repair of its row", func(t *testing.T) {
+		// A CXL device took a spare for the row and has spares left: errors
+		// in the row after it fire R-REP-02, and nothing is used up.
+		b := ruleBuilder()
+		b.rowFault("d1", 3, 20, t0.Add(day), asOf)
+		b.act("d1", model.ActionMemorySparing, t0.Add(30*day), repairRow)
+		v := verdictOf(t, b, asOf, "d1")
+		wantVerdict(t, v, model.VerdictConsiderReplacement, RuleRecurred)
+		if has(v.Rules, RuleRepairGone) {
+			t.Errorf("rules = %v", v.Rules)
+		}
+		e := evidenceOf(t, v, RuleRecurred)
+		if want := "31 errors at rank0 bg0 bank3 row 0x1a2f after the memory sparing of 2026-10-31"; e.Text != want {
+			t.Errorf("text = %q", e.Text)
+		}
+
+		// The same row quiet since: no rule about the repair yet, and a
+		// check counts the days of quiet.
+		b = ruleBuilder()
+		b.rowFault("d1", 3, 10, t0.Add(day), t0.Add(29*day))
+		b.act("d1", model.ActionMemorySparing, asOf.Add(-2*day), repairRow)
+		v = verdictOf(t, b, asOf, "d1")
+		if has(v.Rules, RuleRepairGone) || has(v.Rules, RuleRecurred) {
+			t.Errorf("rules = %v", v.Rules)
+		}
+		if !has(checkCodes(v), "open check.quiet_short") {
+			t.Errorf("checks = %v", checkCodes(v))
+		}
+	})
+
 	t.Run("errors elsewhere after the repair do not", func(t *testing.T) {
 		b := ruleBuilder()
 		b.rowFault("d1", 3, 10, t0.Add(day), t0.Add(29*day))

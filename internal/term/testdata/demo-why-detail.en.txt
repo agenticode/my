@@ -28,6 +28,8 @@ in this slot since 2026-07-31  0 slot changes
              before
              same part number (EXM64G48R2X4-A): percentile 97 among the 16 DIMMs in this ledger, 2
              of them with errors
+ repair      hard PPR at rank0 dev7 bg0 bank3 row 0x1a2f on 2026-10-28 01:30 UTC: 442 errors before,
+             764 after
  next        Replace the DIMM. Attach a case bundle of this DIMM to the return.
  confidence  90 the grade rests on R-UE-01
              +5 1 check supports the finding
