@@ -58,6 +58,10 @@ type capture struct {
 	notes []string
 	// journal says that the capture holds journalctl -k -o json.
 	journal bool
+	// journalHost is the host name of the kernel messages in the journal,
+	// where it is not the name of the host: a guest that cloud-init
+	// renamed after its last kernel message.
+	journalHost string
 	// boots is the number of boots in journal-all.json, the kernel
 	// messages of every boot the journal of the host held, in a capture
 	// whose errors span several boots. The kernel log of the running boot
@@ -265,6 +269,30 @@ var captures = []capture{
 			{slot: "CPU0_D1", serial: "LABM0004", ce: 10, ue: 1, grade: model.VerdictConsiderReplacement, mode: model.ModeRow, rules: []string{"R-ROW-03", "R-SCRUB-01"}},
 			{slot: "CPU0_E1", serial: "LABM0005", ce: 12, grade: model.VerdictConsiderReplacement, mode: model.ModeBank, rules: []string{"R-ROW-03"}},
 		},
+	},
+	// The guests of tools/lab/boards.sh: nothing injected, slot names of
+	// forms no public dump has, and the readings of my collect host
+	// (TestBoardsOfTheLabGuests).
+	{
+		// The disk the guests boot from was prepared as lab-prep: the
+		// journal files the kernel messages under that name and
+		// localhost, and cloud-init renames the guest after the last.
+		dir: "6.19.10-board-two-sockets", host: "lab-two-sockets", virtual: "QEMU", journal: true, journalHost: "lab-prep",
+		sources: []string{"hostinfo ok", "rasdaemon absent", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		live:    []string{"hostinfo ok", "rasdaemon absent", "klog ok", "klog ok", "pstore empty", "pstore empty", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		finding: model.VerdictOK,
+	},
+	{
+		dir: "6.19.10-board-digits", host: "lab-digits", virtual: "QEMU", journal: true, journalHost: "lab-prep",
+		sources: []string{"hostinfo ok", "rasdaemon absent", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		live:    []string{"hostinfo ok", "rasdaemon absent", "klog ok", "klog ok", "pstore empty", "pstore empty", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		finding: model.VerdictOK,
+	},
+	{
+		dir: "6.19.10-board-letters", host: "lab-letters", virtual: "QEMU", journal: true, journalHost: "lab-prep",
+		sources: []string{"hostinfo ok", "rasdaemon absent", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		live:    []string{"hostinfo ok", "rasdaemon absent", "klog ok", "klog ok", "pstore empty", "pstore empty", "edac-sysfs empty", "smbios ok", "host-memory ok"},
+		finding: model.VerdictOK,
 	},
 }
 
@@ -603,6 +631,10 @@ func TestLooseFiles(t *testing.T) {
 			}
 			var adapters []adapter.Adapter
 			for _, f := range files {
+				// The guests of tools/lab/boards.sh run no rasdaemon.
+				if _, err := os.Stat(dir(t, c, f)); err != nil && strings.HasSuffix(f, ".db") && strings.HasPrefix(c.dir, "6.19.10-board-") {
+					continue
+				}
 				as, _, err := scan.Detect(ctx, dir(t, c, f), scan.DetectOptions{Now: at, CapturedAt: at, TempDir: t.TempDir()})
 				if err != nil {
 					t.Fatalf("%s: %v", f, err)
@@ -618,6 +650,9 @@ func TestLooseFiles(t *testing.T) {
 			want := "localhost"
 			if c.journal {
 				want = c.host
+			}
+			if c.journalHost != "" {
+				want = c.journalHost
 			}
 			if res.Host != want {
 				t.Errorf("host %q, want %q", res.Host, want)
@@ -920,15 +955,17 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 			if c.live != nil {
 				want = c.live
 			}
-			// The live runs were made before the readings of the Memory
-			// Explorer existed.
-			var older []string
-			for _, w := range want {
-				if !strings.HasPrefix(w, "host-memory ") {
-					older = append(older, w)
+			// The live runs of the captures before the board guests were
+			// made before the readings of the Memory Explorer existed.
+			if !strings.HasPrefix(c.dir, "6.19.10-board-") {
+				var older []string
+				for _, w := range want {
+					if !strings.HasPrefix(w, "host-memory ") {
+						older = append(older, w)
+					}
 				}
+				want = older
 			}
-			want = older
 			if strings.Join(got, ", ") != strings.Join(want, ", ") {
 				t.Errorf("live sources: %s\n        want: %s", strings.Join(got, ", "), strings.Join(want, ", "))
 			}

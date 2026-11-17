@@ -71,6 +71,24 @@ No firmware of the lab writes a boot error region, so `tools/lab/bertregion` mak
 
 The guest names no DIMM for a machine check: the errors of the machine check loops are the host's. In `6.19.10-mce-loop` the host finding says that one address had uncorrected errors in 3 of the last 4 boots; in `6.19.10-mce-loop-scatter` it says nothing of the kind. R-LOOP-01, R-LOOP-02 and R-LOOP-03 need records that name a DIMM; the region of `6.19.10-bert-loop` names one, and R-LOOP-01 fires on it. The aarch64 loop of `tools/lab/loop-arm.sh` (`6.19.10-ghes-loop-spread`) has the firmware error records of lane B's guest with six DIMMs: one fatal record on another DIMM in each of three boots, and R-LOOP-03 fires on all three with "these DIMMs are all on socket 0, on more than one channel".
 
+## Boards
+
+`tools/lab/boards.sh` boots x86 guests whose SMBIOS memory devices carry slot names that no public dump under `testdata/explorer` has, and runs `capture.sh` in each with nothing injected. `smbios17.py` writes one structure per slot: as many populated slots of 16 GiB as QEMU describes for the guest's memory, then the empty ones. Each guest has a disk of its own over one disk prepared once from the Fedora 44 cloud image with `numactl`, `sysstat`, `lshw` and `dmidecode`. Before the capture `sa1 10 6` takes six samples ten seconds apart, so that `sar -B` has a table.
+
+| Capture | Guest | Slots | What the board draws |
+| --- | --- | --- | --- |
+| `6.19.10-board-two-sockets` | 2 sockets of 2 cores, 2 NUMA nodes of 32 GiB | `CPU0_CH0_DIMM0` to `CPU1_CH1_DIMM1`, the `DIMM0` slots populated | 2 CPUs with 2 channels each, every slot placed |
+| `6.19.10-board-digits` | 1 socket, 2 CPUs, 32 GiB | `DIMM000` and `DIMM010` populated, `DIMM001` and `DIMM011` empty | 1 CPU with 2 channels, every slot placed |
+| `6.19.10-board-letters` | 1 socket, 2 CPUs, 32 GiB | `DIMMA1` and `DIMMB1` populated, `DIMMA2` and `DIMMB2` empty | 1 CPU with 2 channels, every slot placed |
+
+| What the guests showed | Where |
+| --- | --- |
+| `lshw -c memory -c processor` did not answer within the 15 seconds `my collect host` gives it; run again without the limit it took 16.6 seconds in `6.19.10-board-digits` and 16.6 seconds in `6.19.10-board-letters`. The board then takes the cache sizes from sysfs | `collect.json`, `extra/lshw-seconds.txt` |
+| `numastat` printed one column per node and `sar -B` a 12-hour clock with `AM` and `PM`, as the hand-written fixtures `made-two-nodes` and `made-sar-12h` assumed | `numastat.txt`, `sar-B.txt` |
+| The memory array QEMU makes (type 16) keeps its own device count when the type 17 structures come from files: `Number Of Devices: 1` beside 8 memory devices | `extra/dmidecode-all.txt` |
+| The journal filed every kernel message of the boot under `localhost` or the name of the prepared disk, `lab-prep`: cloud-init renamed the guest after the last one. An import of the journal alone names the host `lab-prep` | `journal-k.json` |
+| Three guests booted at once on the lab host were so slow that systemd stopped waiting for the disk of `/home`, and two of them stayed in emergency mode. `boards.sh` runs one guest at a time | the consoles of the first attempt |
+
 ## What the captures changed
 
 Each of these was wrong or missing before the capture showed it.
@@ -155,6 +173,8 @@ go run ./tools/lab/bertregion -o $LAB/loop/x86/bert && $LAB/tools/loop.sh stop
 BERT=$LAB/loop/x86/bert $LAB/tools/loop.sh boot && $LAB/tools/loop.sh bert    # then reboot the guest and capture bert
 $LAB/tools/loop-arm.sh disk && $LAB/tools/loop-arm.sh boot && $LAB/tools/loop-arm.sh prepare
 $LAB/tools/loop-arm.sh run $LAB/tools/loop-arm-spread.plan && $LAB/tools/loop-arm.sh capture spread    # set kernel.panic=30 first: see 6.19.10-ghes-loop-spread
+$LAB/tools/boards.sh image && $LAB/tools/boards.sh prepare
+for g in two-sockets digits letters; do $LAB/tools/boards.sh boot $g && $LAB/tools/boards.sh collect $g && $LAB/tools/boards.sh stop $g; done
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 

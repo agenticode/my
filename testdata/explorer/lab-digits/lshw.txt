@@ -1,0 +1,60 @@
+  *-firmware
+       description: BIOS
+       vendor: SeaBIOS
+       physical id: 0
+       version: 1.17.0-10.fc44
+       date: 06/10/2025
+       size: 96KiB
+  *-memory
+       description: System memory
+       physical id: 1
+       size: 32GiB
+     *-bank:0
+          description: DIMM DDR4 Synchronous Registered (Buffered) 3200 MHz (0.3 ns)
+          product: LABDDR4-16G
+          vendor: Lab Memory
+          physical id: 0
+          serial: LABB0001
+          slot: DIMM000
+          size: 16GiB
+          width: 64 bits
+          clock: 3200MHz (0.3ns)
+     *-bank:1
+          description: DIMM DDR4 Synchronous Registered (Buffered) 3200 MHz (0.3 ns)
+          product: LABDDR4-16G
+          vendor: Lab Memory
+          physical id: 1
+          serial: LABB0002
+          slot: DIMM010
+          size: 16GiB
+          width: 64 bits
+          clock: 3200MHz (0.3ns)
+     *-bank:2
+          description: DIMM DDR4 Synchronous [empty]
+          product: Not Specified
+          vendor: Not Specified
+          physical id: 2
+          serial: Not Specified
+          slot: DIMM001
+          width: 64 bits
+     *-bank:3
+          description: DIMM DDR4 Synchronous [empty]
+          product: Not Specified
+          vendor: Not Specified
+          physical id: 3
+          serial: Not Specified
+          slot: DIMM011
+          width: 64 bits
+  *-cpu
+       description: CPU
+       product: Intel Xeon Processor (Skylake)
+       vendor: Intel Corp.
+       physical id: 400
+       bus info: cpu@0
+       version: 6.85.4
+       slot: CPU 0
+       size: 2GHz
+       capacity: 2GHz
+       width: 64 bits
+       capabilities: fpu fpu_exception wp de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx pdpe1gb rdtscp x86-64 rep_good nopl xtopology cpuid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch pti fsgsbase bmi1 avx2 smep bmi2 erms rdseed adx smap clflushopt clwb xsaveopt xgetbv1 arat pku ospke
+       configuration: cores=2 enabledcores=2 microcode=1 threads=2

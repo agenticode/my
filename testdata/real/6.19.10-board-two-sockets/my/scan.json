@@ -1,0 +1,290 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-two-sockets",
+  "grade": "ok",
+  "exit_code": 0,
+  "data": {
+    "host": {
+      "name": "lab-two-sockets",
+      "system": "QEMU lab-two-sockets",
+      "virtual": "QEMU",
+      "from": "2026-11-17T06:08:41Z",
+      "to": "2026-11-17T06:15:58.263497Z",
+      "ce": 0,
+      "ue": 0,
+      "records": 0,
+      "grade_a": 0,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "ok",
+      "grade_text": "ok",
+      "boots": 1,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-17T06:15:56.028248Z",
+        "privileged": true,
+        "tool_version": "dev"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "label": "CPU0_CH0",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "CPU0_CH0_DIMM0",
+                  "label": "DIMM0",
+                  "state": "ok",
+                  "serial": "LABB0001"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "CPU0_CH0_DIMM1",
+                  "label": "DIMM1",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "CPU0_CH1",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "CPU0_CH1_DIMM0",
+                  "label": "DIMM0",
+                  "state": "ok",
+                  "serial": "LABB0002"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "CPU0_CH1_DIMM1",
+                  "label": "DIMM1",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "CPU1_CH0",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "CPU1_CH0_DIMM0",
+                  "label": "DIMM0",
+                  "state": "ok",
+                  "serial": "LABB0003"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "CPU1_CH0_DIMM1",
+                  "label": "DIMM1",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "CPU1_CH1",
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "CPU1_CH1_DIMM0",
+                  "label": "DIMM0",
+                  "state": "ok",
+                  "serial": "LABB0004"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "CPU1_CH1_DIMM1",
+                  "label": "DIMM1",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 8,
+      "populated": 4
+    },
+    "ranking": [],
+    "quiet": 4,
+    "recurrence": {
+      "boots": [
+        {
+          "index": 1,
+          "boot_id": "60262bbcfd66427ba7071d541c764686",
+          "started_at": "2026-11-17T06:08:41Z",
+          "start_quality": "exact",
+          "ran_seconds": 435,
+          "end": "running"
+        }
+      ],
+      "boots_on_record": 1,
+      "stops": 0
+    },
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "name": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "name": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "absent",
+        "status_text": "not present",
+        "detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "klog",
+        "name": "klog (journal)",
+        "origin": "journalctl -o json _TRANSPORT=kernel + SYSLOG_IDENTIFIER=mcelog",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "723 lines read",
+          "its lines run from 2026-11-17 06:09 to 2026-11-17 06:12 UTC"
+        ]
+      },
+      {
+        "kind": "klog",
+        "name": "klog (ring buffer)",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "723 lines read",
+          "its lines run from 2026-11-17 06:08 to 2026-11-17 06:12 UTC"
+        ]
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/sys/fs/pstore)",
+        "origin": "/sys/fs/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/var/lib/systemd/pstore)",
+        "origin": "/var/lib/systemd/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "edac-sysfs",
+        "name": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "name": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 8,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.8",
+          "8 memory slots, 4 populated"
+        ]
+      },
+      {
+        "kind": "host-memory",
+        "name": "host-memory",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 9,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "lshw: lshw runs only in my collect host"
+        ]
+      }
+    ],
+    "missing": [
+      {
+        "code": "missing.source_detail",
+        "args": {
+          "detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only",
+          "kind": "rasdaemon",
+          "status": "@status.absent"
+        },
+        "text": "rasdaemon: not present (no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only)"
+      }
+    ],
+    "notes": [
+      {
+        "code": "missing.virtual",
+        "args": {
+          "what": "QEMU"
+        },
+        "text": "this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+case bundle written: my/case.mycase (20.1 kB)
+  host host-90cf9161: 2 DIMMs, CE 0, UE 0, finding: ok
+  not in the bundle: rasdaemon: not present (no rasdaemon database: rasdaemon is not installed or
+    has stored nothing. Error records then come from the kernel log and the counters only)
+  note: this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the
+    machine it runs on, and of the uncorrected ones at most those that hit its own memory
+  host names replaced:
+    lab-letters -> host-90cf9161
+  Keep these lines: the bundle does not hold the names, and an answer about it will use the new
+  ones.
+look at it: my open my/case.mycase

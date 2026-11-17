@@ -1,0 +1,115 @@
+{
+ "fn": "collectPageStats",
+ "in": {
+  "vmstat": "@file:proc/vmstat",
+  "sarB": "@file:sar-B.txt"
+ },
+ "out": {
+  "vmstat": {
+   "workingset_nodes": 0,
+   "workingset_refault_anon": 0,
+   "workingset_refault_file": 0,
+   "workingset_activate_anon": 0,
+   "workingset_activate_file": 0,
+   "workingset_restore_anon": 0,
+   "workingset_restore_file": 0,
+   "workingset_nodereclaim": 0,
+   "pgdemote_kswapd": 0,
+   "pgdemote_direct": 0,
+   "pgdemote_khugepaged": 0,
+   "pgdemote_proactive": 0,
+   "pgfault": 503372,
+   "pgmajfault": 170,
+   "pgsteal_kswapd": 0,
+   "pgsteal_direct": 0,
+   "pgsteal_khugepaged": 0,
+   "pgsteal_proactive": 0,
+   "pgscan_kswapd": 0,
+   "pgscan_direct": 0,
+   "pgscan_khugepaged": 0,
+   "pgscan_proactive": 0,
+   "pgscan_direct_throttle": 0,
+   "pgscan_anon": 0,
+   "pgscan_file": 0,
+   "pgsteal_anon": 0,
+   "pgsteal_file": 0
+  },
+  "sarB": [
+   {
+    "time": "06:14",
+    "values": {
+     "pgpgin/s": 0,
+     "pgpgout/s": 237.2,
+     "fault/s": 0.3,
+     "majflt/s": 0,
+     "pgfree/s": 7.3,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "pgprom/s": 0,
+     "pgdem/s": 0
+    }
+   },
+   {
+    "time": "06:14",
+    "values": {
+     "pgpgin/s": 0,
+     "pgpgout/s": 1737.6,
+     "fault/s": 0,
+     "majflt/s": 0,
+     "pgfree/s": 62.6,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "pgprom/s": 0,
+     "pgdem/s": 0
+    }
+   },
+   {
+    "time": "06:15",
+    "values": {
+     "pgpgin/s": 0,
+     "pgpgout/s": 1.2,
+     "fault/s": 0.2,
+     "majflt/s": 0,
+     "pgfree/s": 1,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "pgprom/s": 0,
+     "pgdem/s": 0
+    }
+   },
+   {
+    "time": "06:15",
+    "values": {
+     "pgpgin/s": 6.4,
+     "pgpgout/s": 135.6,
+     "fault/s": 2.6,
+     "majflt/s": 0,
+     "pgfree/s": 1.8,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "pgprom/s": 0,
+     "pgdem/s": 0
+    }
+   },
+   {
+    "time": "06:15",
+    "values": {
+     "pgpgin/s": 9.6,
+     "pgpgout/s": 28.8,
+     "fault/s": 760.5,
+     "majflt/s": 0.1,
+     "pgfree/s": 525.4,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "pgprom/s": 0,
+     "pgdem/s": 0
+    }
+   }
+  ]
+ }
+}

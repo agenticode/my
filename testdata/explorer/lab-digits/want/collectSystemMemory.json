@@ -1,0 +1,185 @@
+{
+ "fn": "collectSystemMemory",
+ "in": {
+  "meminfo": "@file:proc/meminfo",
+  "vmstat": "@file:proc/vmstat",
+  "slabinfo": "@file:proc/slabinfo",
+  "pressure": "@file:proc/pressure/memory"
+ },
+ "out": {
+  "totalBytes": 33643892736,
+  "freeBytes": 33163776000,
+  "availableBytes": 32993845248,
+  "usedBytes": 264601600,
+  "cachedBytes": 197521408,
+  "buffersBytes": 3088384,
+  "activeFileBytes": 107319296,
+  "inactiveFileBytes": 88567808,
+  "activeAnonBytes": 45596672,
+  "inactiveAnonBytes": 0,
+  "slabBytes": 66977792,
+  "sreclaimableBytes": 14905344,
+  "sunreclaimBytes": 52072448,
+  "dirtyBytes": 1540096,
+  "writebackBytes": 0,
+  "shmemBytes": 4796416,
+  "swapTotalBytes": 8589930496,
+  "swapFreeBytes": 8589930496,
+  "swapUsedBytes": 0,
+  "psiSomeAvg10": 0,
+  "psiSomeAvg60": 0,
+  "psiFullAvg10": 0,
+  "psiFullAvg60": 0,
+  "hugePagesTotal": 0,
+  "hugePagesFree": 0,
+  "hugePageSize": 2097152,
+  "vmstat": {
+   "pswpin": 0,
+   "pswpout": 0,
+   "pgfault": 441629,
+   "pgmajfault": 167
+  },
+  "topSlabs": [
+   {
+    "name": "avtab_node",
+    "activeObjs": 94860,
+    "totalObjs": 94860,
+    "objSize": 24,
+    "totalSize": 2276640
+   },
+   {
+    "name": "ebitmap_node",
+    "activeObjs": 51712,
+    "totalObjs": 51712,
+    "objSize": 64,
+    "totalSize": 3309568
+   },
+   {
+    "name": "kernfs_node_cache",
+    "activeObjs": 34740,
+    "totalObjs": 34740,
+    "objSize": 136,
+    "totalSize": 4724640
+   },
+   {
+    "name": "hashtab_node",
+    "activeObjs": 21080,
+    "totalObjs": 21080,
+    "objSize": 24,
+    "totalSize": 505920
+   },
+   {
+    "name": "dentry",
+    "activeObjs": 15057,
+    "totalObjs": 15057,
+    "objSize": 192,
+    "totalSize": 2890944
+   },
+   {
+    "name": "lsm_inode_cache",
+    "activeObjs": 14212,
+    "totalObjs": 14212,
+    "objSize": 120,
+    "totalSize": 1705440
+   },
+   {
+    "name": "kmalloc-rnd-11-16",
+    "activeObjs": 7936,
+    "totalObjs": 7936,
+    "objSize": 16,
+    "totalSize": 126976
+   },
+   {
+    "name": "inode_cache",
+    "activeObjs": 7722,
+    "totalObjs": 7722,
+    "objSize": 624,
+    "totalSize": 4818528
+   },
+   {
+    "name": "kmalloc-rnd-08-16",
+    "activeObjs": 7168,
+    "totalObjs": 7168,
+    "objSize": 16,
+    "totalSize": 114688
+   },
+   {
+    "name": "kmalloc-rnd-15-16",
+    "activeObjs": 6912,
+    "totalObjs": 6912,
+    "objSize": 16,
+    "totalSize": 110592
+   },
+   {
+    "name": "kmalloc-rnd-15-32",
+    "activeObjs": 6784,
+    "totalObjs": 6784,
+    "objSize": 32,
+    "totalSize": 217088
+   },
+   {
+    "name": "kmalloc-rnd-13-16",
+    "activeObjs": 5888,
+    "totalObjs": 5888,
+    "objSize": 16,
+    "totalSize": 94208
+   },
+   {
+    "name": "kmalloc-rnd-13-64",
+    "activeObjs": 5760,
+    "totalObjs": 5760,
+    "objSize": 64,
+    "totalSize": 368640
+   },
+   {
+    "name": "ftrace_event_field",
+    "activeObjs": 5475,
+    "totalObjs": 5475,
+    "objSize": 56,
+    "totalSize": 306600
+   },
+   {
+    "name": "kmalloc-rnd-11-8",
+    "activeObjs": 4608,
+    "totalObjs": 4608,
+    "objSize": 8,
+    "totalSize": 36864
+   },
+   {
+    "name": "kmalloc-rnd-11-32",
+    "activeObjs": 4480,
+    "totalObjs": 4480,
+    "objSize": 32,
+    "totalSize": 143360
+   },
+   {
+    "name": "kmalloc-rnd-12-16",
+    "activeObjs": 3550,
+    "totalObjs": 3584,
+    "objSize": 16,
+    "totalSize": 57344
+   },
+   {
+    "name": "btrfs_inode",
+    "activeObjs": 3440,
+    "totalObjs": 3440,
+    "objSize": 1024,
+    "totalSize": 3522560
+   },
+   {
+    "name": "vm_area_struct",
+    "activeObjs": 2353,
+    "totalObjs": 3003,
+    "objSize": 192,
+    "totalSize": 576576
+   },
+   {
+    "name": "radix_tree_node",
+    "activeObjs": 2780,
+    "totalObjs": 2786,
+    "objSize": 584,
+    "totalSize": 1627024
+   }
+  ]
+ }
+}

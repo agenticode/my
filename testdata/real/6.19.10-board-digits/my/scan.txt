@@ -1,0 +1,16 @@
+host lab-digits  QEMU lab-digits  2026-11-17  no errors on record
+host finding: ok
+
+    DIMM000   DIMM001   DIMM010   DIMM011
+    ░░        ··        ░░        ··
+
+ ░░ ok   ·· empty slot    4 slots, 2 DIMMs
+
+ no DIMM has errors on record
+
+ 2 DIMMs without errors
+ sources  klog
+ missing  rasdaemon: not present (no rasdaemon database: rasdaemon is not installed or has stored
+          nothing. Error records then come from the kernel log and the counters only)
+ note     This host is a virtual machine (QEMU): a guest is not shown the corrected errors of the
+          machine it runs on, and of the uncorrected ones at most those that hit its own memory
