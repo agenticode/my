@@ -16,8 +16,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter/dimmspd"
+	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/mcelog"
 	"github.com/agenticode/my/internal/buildinfo"
+	"github.com/agenticode/my/internal/decode/spd"
 )
 
 // A collection of "my collect host" is a copy of the files of the running
@@ -47,6 +50,11 @@ type CollectOptions struct {
 	Kmsg func() ([]byte, error)
 	// Now is the time the collection says it was made.
 	Now time.Time
+	// Privileged says that the collection runs as root: the SPD probe then
+	// reads the SPD write disable bit of an Intel SMBus controller.
+	Privileged bool
+	// NoSPD leaves the SPD of the memory modules out.
+	NoSPD bool
 }
 
 // CollectEntry is one step of a collection.
@@ -78,6 +86,7 @@ const (
 	GroupHost     = "host"
 	GroupErrors   = "errors"
 	GroupSMBIOS   = "smbios"
+	GroupSPD      = "spd"
 	GroupReadings = "readings"
 	GroupMcelog   = "mcelog"
 )
@@ -91,9 +100,13 @@ type CollectResult struct {
 }
 
 // Partial tells a collection in which a step was denied, timed out or
-// failed.
+// failed. A step of the SPD group never makes a collection partial: on
+// most servers Linux has no path to the SPD, and the probe says why.
 func (r *CollectResult) Partial() bool {
 	for _, e := range r.Entries {
+		if e.Group == GroupSPD {
+			continue
+		}
 		if e.State == StepDenied || e.State == StepTimeout || e.State == StepFailed {
 			return true
 		}
@@ -165,6 +178,9 @@ func CollectHost(ctx context.Context, o CollectOptions) (*CollectResult, error) 
 	} else {
 		c.program(ctx, GroupSMBIOS, "dmidecode.txt", "dmidecode", []string{"-t", "memory"}, nil, 10*time.Second, o.Sudo)
 	}
+	if !o.NoSPD {
+		c.spd(ctx)
+	}
 	for _, f := range readingFiles {
 		c.copyFile(GroupReadings, f, true)
 	}
@@ -186,6 +202,49 @@ func CollectHost(ctx context.Context, o CollectOptions) (*CollectResult, error) 
 }
 
 func (c *collector) src(rel string) string { return filepath.Join(c.o.Root, filepath.FromSlash(rel)) }
+
+// spd writes what the probe of the SPD saw (spd-probe.txt) and the bytes
+// read of each SPD device (spd/<client>.bin), as a scan of the copy reads
+// them. A failed read keeps its state in the entry and in the probe.
+func (c *collector) spd(ctx context.Context) {
+	start := time.Now()
+	fsys, ok := os.DirFS(c.o.Root).(dimmspd.FS)
+	if !ok {
+		return
+	}
+	info, _ := hostinfo.NewRoot(c.o.Root, hostinfo.Options{}).Read()
+	lo := dimmspd.LiveOptions{Now: c.o.Now, Privileged: c.o.Privileged, Virtual: info.Virtual, AllowVirtual: dimmspd.DebugVirtual(), Release: info.Kernel}
+	p, devs := dimmspd.ProbeHost(ctx, fsys, lo)
+	text := p.Text()
+	e := CollectEntry{Group: GroupSPD, What: dimmspd.ProbeFile, From: c.src("sys/bus/i2c/devices"), State: StepOK}
+	if _, err := c.write(dimmspd.ProbeFile, strings.NewReader(text)); err != nil {
+		e.State, e.Note = StepFailed, shortErr(err)
+	}
+	e.Bytes, e.Millis = int64(len(text)), time.Since(start).Milliseconds()
+	c.add(e)
+	for _, d := range devs {
+		if d.Path == "" {
+			continue
+		}
+		rel := dimmspd.Dir + "/" + d.Client.ID + ".bin"
+		e := CollectEntry{Group: GroupSPD, What: rel, From: c.src(d.Path), State: StepOK, Bytes: int64(len(d.Raw)), Note: "state=" + d.Client.State}
+		if d.Client.Errno != "" {
+			e.Note += " errno=" + d.Client.Errno + " at=" + strconv.Itoa(d.Client.At)
+		}
+		switch d.Client.State {
+		case spd.StateDenied:
+			e.State = StepDenied
+		case spd.StateTimeout:
+			e.State = StepTimeout
+		case spd.StateIO:
+			e.State = StepFailed
+		}
+		if _, err := c.write(rel, bytes.NewReader(d.Raw)); err != nil {
+			e.State, e.Note = StepFailed, shortErr(err)
+		}
+		c.add(e)
+	}
+}
 
 func (c *collector) dst(rel string) string { return filepath.Join(c.o.Out, filepath.FromSlash(rel)) }
 

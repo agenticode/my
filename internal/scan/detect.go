@@ -20,6 +20,7 @@ import (
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/mcelog"
@@ -29,6 +30,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/sel"
 	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/adapter/vendorlog"
+	"github.com/agenticode/my/internal/decode/spd"
 )
 
 // DetectOptions carry what a file cannot say about itself.
@@ -83,6 +85,8 @@ const (
 	WhatBERT      = "boot error region (BERT)"
 	WhatRacadmSEL = "racadm getsel output"
 	WhatRacadmLC  = "racadm lclog view output"
+	WhatSPDDump   = "SPD dump"
+	WhatSPDText   = "decode-dimms output"
 )
 
 // ErrUnknownInput is returned by Detect, as an *UnknownInputError that says
@@ -349,6 +353,11 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			// A saved region: dated by the capture time, else by the file.
 			return bert.New(path, bert.Options{ReadAt: captured}), WhatBERT, nil
 		}
+		// An SPD dump: an import guesses the kind of every file, so a
+		// binary file is taken for one only with a good base CRC.
+		if adapter.Sniffs(sniffSPDBinary, head) {
+			return dimmspd.NewFile(path, seen), WhatSPDDump, nil
+		}
 		return nil, "", unknownInput("binary")
 	}
 
@@ -467,6 +476,13 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 			a = klog.NewFile(path, kopts)
 		}
 
+	case adapter.Sniffs(sniffSPDText, text):
+		what = WhatSPDDump
+		if spd.IsDecodeDimms(string(text)) {
+			what = WhatSPDText
+		}
+		a = dimmspd.NewFile(path, seen)
+
 	case opts.NvidiaQuery != "" && commaLines(text, strings.Count(opts.NvidiaQuery, ",")):
 		// Values alone, as many per line as the caller named fields: the
 		// output of an nvidia-smi query without its header.
@@ -483,6 +499,21 @@ func detectFile(path string, fi fs.FileInfo, head []byte, zipped bool, opts Dete
 		return nil, "", &UnknownInputError{Code: "text", Start: strings.TrimSpace(first)}
 	}
 	return a, what, nil
+}
+
+// sniffSPDBinary tells a binary SPD dump: 128 to 4,096 bytes of DDR4 or
+// DDR5 with a good base CRC.
+func sniffSPDBinary(b []byte) bool {
+	return len(b) >= spd.MinBinary && len(b) <= spd.MaxBinary && spd.GoodBase(b)
+}
+
+// sniffSPDText tells hex text of an SPD and decode-dimms output.
+func sniffSPDText(text []byte) bool {
+	if len(text) > spd.MaxText {
+		return false
+	}
+	in, err := spd.Parse(text)
+	return err == nil && (in.Form == spd.FormDecodeDimms || in.Form == spd.FormHex)
 }
 
 // commaLines reports whether the first lines of text each have the given

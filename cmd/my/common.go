@@ -569,7 +569,7 @@ func blindText(lang i18n.Lang, opts *scan.Options, sources []model.Source) strin
 	}
 	for _, src := range sources {
 		switch src.Kind {
-		case "hostinfo", "smbios", "host-memory", ingest.SlotMapKind, ingest.TimeAlignKind:
+		case "hostinfo", "smbios", "host-memory", "spd", ingest.SlotMapKind, ingest.TimeAlignKind:
 			continue // they describe the machine and hold no error
 		}
 		line := "\n  " + src.Kind + ": " + engine.Messages.Text(lang, "status."+string(src.Status), nil)
