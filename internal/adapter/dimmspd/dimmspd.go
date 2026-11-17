@@ -407,3 +407,44 @@ func (a *File) Collect(ctx context.Context, sink adapter.Sink) adapter.Report {
 	}
 	return keep(sink, a.path, "", now, nil, rs, "")
 }
+
+// Replay gives again what an earlier scan of the same host read: its probe
+// and its readings. "my serve" reads the SPD in its first scan only and
+// hands what it read to every later scan, so that a scan from a timer
+// leaves the bus alone.
+func Replay(origin string, probe *model.HostReading, readings []model.SPDReading, memoryType string) adapter.Adapter {
+	return &replay{origin: origin, probe: probe, readings: readings, memoryType: memoryType}
+}
+
+type replay struct {
+	origin     string
+	probe      *model.HostReading
+	readings   []model.SPDReading
+	memoryType string
+}
+
+func (r *replay) Kind() string   { return Kind }
+func (r *replay) Origin() string { return r.origin }
+
+func (r *replay) Collect(ctx context.Context, sink adapter.Sink) adapter.Report {
+	var p *Probe
+	at := time.Time{}
+	probeOrigin := ""
+	if r.probe != nil {
+		p = ParseProbe(r.probe.Text)
+		at, probeOrigin = r.probe.TakenAt, r.probe.Origin
+	}
+	var rs []*model.SPDReading
+	for _, x := range r.readings {
+		x.ID, x.ScanID, x.DIMMUID, x.Tie, x.Host = 0, 0, "", "", ""
+		rs = append(rs, &x)
+		if at.IsZero() || x.LastSeen.After(at) {
+			at = x.LastSeen
+		}
+	}
+	if p == nil {
+		return keep(sink, r.origin, probeOrigin, at, nil, rs, r.memoryType)
+	}
+	// The probe keeps its own time.
+	return keep(sink, r.origin, probeOrigin, r.probe.TakenAt, p, rs, r.memoryType)
+}

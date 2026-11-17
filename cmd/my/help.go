@@ -241,7 +241,8 @@ var words = i18n.Catalog{
 			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
 			"                  with --bmc: as in \"my help collect\"; the deadline is 5m by default\n" +
 			"--event-map FILE  a table of firmware messages of one's own, asked before the shipped\n" +
-			"                  tables (\"my help vendors\"); may be repeated",
+			"                  tables (\"my help vendors\"); may be repeated\n" +
+			"--no-spd          leave out the SPD of the memory modules: no look at the I2C bus",
 		KO: "--ledger FILE     스캔을 원장 FILE에 남기고 실행할 때마다 누적\n" +
 			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 읽음\n" +
 			"--fleet KIND      플릿의 rasdaemon이 함께 쓰는 저장소(mysql 또는 postgresql)를 읽음.\n" +
@@ -256,7 +257,8 @@ var words = i18n.Catalog{
 			"--fingerprint SHA256, --ca-file FILE, --insecure, --session, --bmc-deadline TIME\n" +
 			"                  --bmc와 함께: \"my help collect\"와 같음. 제한 시간 기본값은 5m\n" +
 			"--event-map FILE  내장 표보다 먼저 볼, 직접 만든 펌웨어 메시지 표\n" +
-			"                  (\"my help vendors\"). 여러 번 줄 수 있음",
+			"                  (\"my help vendors\"). 여러 번 줄 수 있음\n" +
+			"--no-spd          메모리 모듈의 SPD를 읽지 않음. I2C 버스를 살피지 않음",
 	},
 
 	"help.overview.usage": {EN: "my [scan] [flags]", KO: "my [scan] [옵션]"},
@@ -442,6 +444,8 @@ var words = i18n.Catalog{
 			"--listen ADDR     where to listen (default 127.0.0.1:10163); :10163 listens on every interface\n" +
 			"--interval TIME   pause between two scans, such as 30s or 5m (default 5m)\n" +
 			"--root DIR        scan a copy of a host's files below DIR instead of this host\n" +
+			"--no-spd          leave out the SPD of the memory modules. Without it the first scan\n" +
+			"                  reads the SPD and the later scans keep what it read\n" +
 			"--fleet KIND      read the store the rasdaemons of a fleet write to, mysql or postgresql,\n" +
 			"                  instead of this host\n" +
 			"--fleet-env FILE  settings of that store: the environment file rasdaemon is started with\n" +
@@ -455,6 +459,8 @@ var words = i18n.Catalog{
 			"--listen ADDR     받을 주소 (기본 127.0.0.1:10163). :10163은 모든 인터페이스에서 받음\n" +
 			"--interval TIME   스캔 사이에 쉬는 시간. 30s, 5m 등 (기본 5m)\n" +
 			"--root DIR        이 호스트가 아닌, DIR 아래에 복사해 둔 호스트 파일을 스캔\n" +
+			"--no-spd          메모리 모듈의 SPD를 읽지 않음. 이 옵션이 없으면 첫 스캔이 SPD를\n" +
+			"                  읽고 이후 스캔은 그 결과를 그대로 씀\n" +
 			"--fleet KIND      플릿의 rasdaemon이 함께 쓰는 저장소(mysql 또는 postgresql)를 읽음.\n" +
 			"                  이 호스트는 스캔하지 않음\n" +
 			"--fleet-env FILE  그 저장소의 접속 설정: rasdaemon을 띄울 때 쓰는 환경 파일.\n" +
