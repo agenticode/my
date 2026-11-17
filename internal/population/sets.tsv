@@ -1,0 +1,19 @@
+# Population rule sets: one row per board family whose public documents state how its DIMM slots are filled, written
+# from the documents in the form of MemorY (no text, table or drawing of a document). The first row that matches a
+# board is its rule set. "-" is an empty field. Columns:
+#   id        rule set id, equal to the board family of internal/explorer/families.tsv
+#   maker     the maker whose documents describe the board, or *
+#   match     expression over "system product|board" (letters of any case)
+#   when      ";" separated: family=<board family>, S=<processor records>, cpu=<processor family>, per=<slots of every
+#             processor>; "|" between the values a condition takes
+#   first     the slot of a channel the documents fill first: 0 (position 0) or last (the highest position)
+#   order     the fill order of one processor, places as channel.position with the channel counted from 0 among the
+#             channels of the processor: "seq: c.p c.p ..." (n modules stand in the first n places that exist) or
+#             "sets: n: c.p ...; n: c.p ..." (the places per number of modules); "pN:" before a table makes it the
+#             table of the Nth processor alone, "mode=M:" the table of the memory mode M; tables separated by "||"
+#   strength  req (must, not supported, will not boot) or rec (should, recommended) for the order
+#   alt       the tables of the other memory modes and the second set a document allows for one count, as order
+#   rules     ";" separated: RULE=req|rec and the pages it stands on, for P-FIRST-01, P-CPU-01, P-BAL-01, P-MIX-01 to
+#             P-MIX-05
+#   source    the pages the order stands on: <id of internal/explorer/sources.tsv>:<pages>, separated by blanks
+id	maker	match	when	first	order	strength	alt	rules	source

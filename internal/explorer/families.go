@@ -279,6 +279,12 @@ func FamilySources(id string) []Source {
 	return out
 }
 
+// SourceByID is the document of sources.tsv with the id.
+func SourceByID(id string) (Source, bool) {
+	s, ok := sources[id]
+	return s, ok
+}
+
 // Sources are the documents of sources.tsv, in its order.
 func Sources() []Source {
 	out := make([]Source, len(sourceOrder))

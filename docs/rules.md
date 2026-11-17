@@ -204,6 +204,50 @@ Some records name no DIMM: machine checks of a host whose memory controller has 
 
 The finding lists why the records name no DIMM (no slot in them, or a slot that held two DIMMs with an unknown time of the swap), says where no EDAC driver reports a memory controller, and counts the pages a program asked the kernel to take offline, which is what a test of that path does. Its next step is to find the DIMM through the EDAC driver of the memory controller or the event log of the BMC. On a virtual machine the next step names the hypervisor host.
 
+## Population rules
+
+A vendor document says for a board how its DIMM slots are filled: which slots carry the modules for a given number of modules, which slot of a channel comes first, how the processors are balanced and what may stand together. A population rule holds the installed modules against such a statement. A population the vendor does not support can keep memory from training or lower its speed, and moving modules changes it, so the board shows it beside the findings of the DIMMs.
+
+A population finding is no finding of a DIMM. It has no grade and changes no grade, ranking, confidence, check or exit code. Each one names the document and the page it rests on, and keeps the strength of the document's wording: required where the document says must, not supported or will not boot, recommended where it says should, recommended or for best performance.
+
+A rule fires on a board only where the rule set of its board family states it ([compatibility.md](compatibility.md#slot-names-of-server-vendors) says how a board gets its family). A board gets no population check when no rule set matches it, or when the board is not placed in full; the board then says which of the two it is, once, among its lines of data quality. A rule whose input the ledger lacks (module type, ranks, rated speed or part number on older firmware, the status of a processor record) does not fire and is listed as not checked, with the number of modules that lack it.
+
+### P-ORDER-01
+
+The modules of a processor do not stand in the slots the vendor's table fills for that number of modules. The table is a fill order (n modules stand in the first n slots of the order that the board has) or a list of slots per number of modules. The finding names the empty slots the table fills, marked `+` on the board, and the modules in slots the table leaves empty, marked `-`. When the table lists no population for the number, nothing is compared, and one line says which numbers it lists. A document often gives one table per memory mode, or two sets for one number; modules that stand as another of these tables has them give one line and no mark. When the ledger holds the BIOS memory mode, the table of that mode alone counts. The strength is that of the table.
+
+### P-FIRST-01
+
+A channel holds a module in a later slot while the slot the vendor fills first is empty. Which slot comes first (position 0, or the highest position on boards whose documents fill the higher label number first) is part of the rule set.
+
+### P-CPU-01
+
+A processor that is installed holds no module.
+
+### P-BAL-01
+
+The installed processors hold different numbers of modules.
+
+### P-MIX-01
+
+Modules of types the vendor does not allow together stand in one system: RDIMMs with LRDIMMs, registered with unbuffered modules.
+
+### P-MIX-02
+
+In one channel the module with more ranks does not stand in the slot the vendor fills first.
+
+### P-MIX-03
+
+In one channel the module with more capacity does not stand in the slot the vendor fills first.
+
+### P-MIX-04
+
+Modules of different rated speed stand in one system, on a board whose documents ask for one speed.
+
+### P-MIX-05
+
+The modules of one channel carry different part numbers, on a board whose documents ask for identical modules.
+
 ## Boots
 
 A fatal memory error ends its boot. A host that resets after it and fails again shows the same place in boot after boot, and the records of each stop are read by the next boot ([crash-loop.md](crash-loop.md)). The engine looks at the latest `loop.window_boots` boots of every host, oldest first. Boots whose start is known only relative to another boot are left out.
