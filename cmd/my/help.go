@@ -9,6 +9,7 @@ import (
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/population"
 	"github.com/agenticode/my/internal/term"
 	"github.com/agenticode/my/internal/view"
 )
@@ -489,7 +490,9 @@ var words = i18n.Catalog{
 			"--force           OUT.html과 DIR의 파일이 있으면 덮어씀",
 	},
 
-	"help.rules.title":      {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
+	"help.rules.title": {EN: "Rules. A finding names the rules that fired.", KO: "규칙. 소견에는 발동한 규칙 ID가 찍힙니다."},
+	"help.population.title": {EN: "Population rules. They hold the modules of a board to the documents of its maker. A population finding has no grade and changes no finding and no exit code.",
+		KO: "장착 규칙. 보드의 모듈을 보드 제조사 문서와 견줍니다. 장착 구성 소견에는 등급이 없고 소견과 종료 코드를 바꾸지 않습니다."},
 	"help.thresholds.title": {EN: "Thresholds, with their defaults. Change one with --set KEY=VALUE or a --config file.", KO: "임계값과 기본값. --set KEY=VALUE 또는 --config 파일로 바꿉니다."},
 	"help.topics":           {EN: "More: my help reading (every figure), my help rules, my help thresholds.", KO: "더 보기: my help reading (모든 그림), my help rules, my help thresholds."},
 }
@@ -611,6 +614,27 @@ func printRuleList(w io.Writer, lang i18n.Lang, st term.Style) {
 		for i, line := range lines {
 			if i == 0 {
 				fmt.Fprintf(w, "  %-*s  %s%s  %s\n", idW, r.ID, grade, strings.Repeat(" ", gradeW-term.Width(grade)), strings.TrimLeft(line, " "))
+			} else {
+				fmt.Fprintln(w, line)
+			}
+		}
+	}
+	printPopulationRules(w, lang, st, idW)
+}
+
+// printPopulationRules lists the population rules after the rules of the
+// engine.
+func printPopulationRules(w io.Writer, lang i18n.Lang, st term.Style, idW int) {
+	fmt.Fprintln(w)
+	for _, line := range st.Wrap(say(lang, "help.population.title"), 0) {
+		fmt.Fprintln(w, strings.TrimLeft(line, " "))
+	}
+	fmt.Fprintln(w)
+	for _, id := range population.Rules {
+		lines := st.Wrap(view.BoardMessages.Text(lang, "pop.cond."+id, nil), idW+4)
+		for i, line := range lines {
+			if i == 0 {
+				fmt.Fprintf(w, "  %-*s  %s\n", idW, id, strings.TrimLeft(line, " "))
 			} else {
 				fmt.Fprintln(w, line)
 			}
