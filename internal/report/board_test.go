@@ -59,6 +59,8 @@ func TestBoardInTheReport(t *testing.T) {
 	}{
 		{"explorer/linuxhw-m70klp2sb-m90598-001-373530/dmidecode.txt", 4, 48, false, false},
 		{"explorer/netbox-sm-ssg-6028r/dmidecode.txt", 2, 16, false, false},
+		// Memory on the chipset: one controller in the place of the CPUs.
+		{"explorer/linuxhw-poweredge-2950-121ae0/dmidecode.txt", 1, 8, false, false},
 		{"explorer/linuxhw-r1g3d32-ec54ac/dmidecode.txt", 2, 32, false, false},
 		{"klog/intel-skx.messages", 0, 0, false, true},
 	} {

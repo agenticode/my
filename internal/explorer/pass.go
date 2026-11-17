@@ -66,8 +66,10 @@ type Facts struct {
 	Aside string `json:"aside,omitempty"`
 	// Hub is set for memory on the chipset.
 	Hub bool `json:"hub,omitempty"`
-	// Maker is the maker whose documents describe the board.
+	// Maker is the maker whose documents describe the board; Named says
+	// whether the records name a system product or a board at all.
 	Maker string `json:"maker,omitempty"`
+	Named bool   `json:"named,omitempty"`
 	// Letter says what the letter of A1 and the digit of 1A were taken
 	// for: "letter" (the channel), "digit" (the digit is the channel) or
 	// "label".
@@ -148,9 +150,12 @@ func placeNames(dimms []Dimm, hints textHints) Facts {
 		f.Present = append(f.Present, c.status)
 	}
 	_, proc := boardProcessor(hints.cpus)
+	if len(hints.cpus) == 0 && hints.cpuName != "" {
+		proc, _ = ProcessorFamily(hints.cpuName, "")
+	}
 	p := &pass{dimms: dimms, hints: hints, facts: &f, proc: proc, S: len(hints.cpus), maker: makerOf(hints)}
-	f.Processor, f.Maker = proc, p.maker
-	p.proc.Hub = false // memory on the chipset is not read yet
+	f.Processor, f.Maker, f.Named = proc, p.maker, hints.product != "" || hints.board != ""
+	p.proc.Hub = proc.Hub && stage(FixChipsetMemory)
 	p.slots = make([]passSlot, len(dimms))
 	p.toks = make([]tokens, len(dimms))
 	for i := range dimms {
@@ -349,6 +354,13 @@ func (p *pass) zeros() map[string]bool {
 // processor of the slots that share a channel letter, and the channel
 // letters split over the processors in order.
 func (p *pass) sockets() {
+	if p.proc.Hub {
+		// Memory on the chipset: every slot on the one controller.
+		for _, i := range p.live {
+			p.slots[i].hub, p.slots[i].by, p.slots[i].socket = true, ByHub, some(0)
+		}
+		return
+	}
 	if !stage(FixSocketRules) {
 		return
 	}

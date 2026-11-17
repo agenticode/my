@@ -131,6 +131,8 @@ func TestBoardScreens(t *testing.T) {
 		"nochannels": importBoard(t, testutil.Testdata(t, "explorer", "netbox-hp-proliant-bl460c-gen10-graphics-exp", "dmidecode.txt")),
 		"nodes":      importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-r1g3d32-ec54ac", "dmidecode.txt")),
 		"aside":      importBoard(t, asideBoard(t)),
+		"chipset":    importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-poweredge-2950-121ae0", "dmidecode.txt")),
+		"labels":     importBoard(t, testutil.Testdata(t, "explorer", "netbox-sm-ssg-6028r", "dmidecode.txt")),
 	}
 	for name, s := range cases {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {

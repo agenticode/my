@@ -500,7 +500,7 @@ The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https:/
 | --- | --- | --- | --- | --- |
 | first version | 1,077 | 48 | 226 | 692 |
 | first round of fixes | 1,502 | 51 | 239 | 251 |
-| this release | 1,946 | 2 | 12 | 83 |
+| this release | 1,959 | 2 | 9 | 73 |
 
 The first version is how the names were read when the board was first written; the first round of fixes read more parts of a name and took the channel of a numbered slot from the slot number. This release reads every name by the table of forms and takes the place of a numbered slot from the table of its board family; a numbered slot of a board without such a table is drawn without channels. Memory devices that are chips of the board (flash) and records the manual has no slot for count in none of the columns. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
 

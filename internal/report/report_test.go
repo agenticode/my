@@ -1522,7 +1522,7 @@ func TestFigures(t *testing.T) {
 		t.Fatalf("figures: %v\nwant %s", names, want)
 	}
 	for name, wants := range map[string][]string{
-		"slotmap":          {"Board of host r12-n034", "replace now", "hold replacement", "empty slot", "32 slots, 16 DIMMs", "CPU 0", "CPU0_H2", "Ch7"},
+		"slotmap":          {"Board of host r12-n034", "replace now", "hold replacement", "empty slot", "32 slots, 16 DIMMs", "CPU 0", "CPU0_H2", "ChH"},
 		"timeline":         {"Host r12-n034: every DIMM with errors, 2026-07-31 to 2026-11-12", "peak 73/day", "3 reboots", "CPU0_C1: 2026-11-12 UE (demand read)"},
 		"CPU0_C1-topology": {"CPU0_C1 S/N 3B9C56: where the errors sit (width = share of the errors of this DIMM)", "bg0 bank3", "98%"},
 		"CPU0_C1-map": {"CPU0_C1 S/N 3B9C56: rank0 dev7 bg0 bank3, row by column, one cell = 32 columns", "10-99", "100+", "uncorrected error", "0x1a2f", "row fault",

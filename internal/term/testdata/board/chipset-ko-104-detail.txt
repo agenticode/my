@@ -1,0 +1,24 @@
+호스트 board-host  Dell Inc. PowerEdge 2950  슬롯 8개 중 8개, 16 GB  DDR2 FB-DIMM 667 MT/s
+
+ ch       1            0                        2            3
+     ░░    ░░     ░░    ░░     ══╡칩셋╞══  ░░    ░░     ░░    ░░
+     DIMM6 DIMM2  DIMM5 DIMM1              DIMM3 DIMM7  DIMM4 DIMM8
+
+ ░░ 정상
+
+ 칩셋  DIMM 8개, 16 GB
+
+ 슬롯   위치       크기  부품 번호     일련번호  CE  UE  소견
+ DIMM6  칩셋 ch 1  2 GB  EXM32G32R2X4  EX000032  0   0   정상
+ DIMM2  칩셋 ch 1  2 GB  EXM32G32R2X4  EX000016  0   0   정상
+ DIMM5  칩셋 ch 0  2 GB  EXM32G32R2X4  EX000028  0   0   정상
+ DIMM1  칩셋 ch 0  2 GB  EXM32G32R2X4  EX000012  0   0   정상
+ DIMM3  칩셋 ch 2  2 GB  EXM32G32R2X4  EX000020  0   0   정상
+ DIMM7  칩셋 ch 2  2 GB  EXM32G32R2X4  EX000036  0   0   정상
+ DIMM4  칩셋 ch 3  2 GB  EXM32G32R2X4  EX000024  0   0   정상
+ DIMM8  칩셋 ch 3  2 GB  EXM32G32R2X4  EX000040  0   0   정상
+
+ - 보드에 그린 슬롯 8개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+ - 메모리 컨트롤러는 칩셋 안에 있고 슬롯을 가진 프로세서가 없어, 보드는 CPU 자리에 컨트롤러 하나를 그림
+ - 보드 계열 dell-pe-1950-2950의 표로 놓은 슬롯 8개 (문서: Dell PowerEdge 1950 Systems Hardware Owner's
+   Manual, P/N HH176, Rev. A02, September 2009, pp. 26, 63-65)

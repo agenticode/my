@@ -1,0 +1,39 @@
+호스트 board-host  Supermicro SSG-6028R-OSD072P  슬롯 16개 중 4개, 64 GB  DDR4 2133 MT/s
+
+ ch            3                      2                      1                      0
+     ··         ░░          ··         ░░          ··         ░░          ··         ░░
+     P1-DIMMD2* P1_DIMMD1   P1-DIMMC2* P1_DIMMC1   P1-DIMMB2* P1_DIMMB1   P1-DIMMA2* P1_DIMMA1
+ 이름          D                      C                      B                      A
+
+     ══╡CPU 0╞══
+
+ ch                       0                1                2                3
+      ══╡CPU 1╞══  ··      ··       ··      ··       ··      ··       ··      ··
+ P2-               DIMME1* DIMME2*  DIMMF1* DIMMF2*  DIMMG1* DIMMG2*  DIMMH1* DIMMH2*
+ 이름                     E                F                G                H
+
+ ░░ 정상   ·· 빈 슬롯   * 보드 설명서의 라벨 (펌웨어가 이름을 주지 않음)
+
+ CPU 0  DIMM 4개, 64 GB
+ CPU 1  DIMM 0개
+
+ 슬롯        위치          크기   부품 번호     일련번호  CE  UE  소견
+ P1-DIMMD2*  CPU 0 ch 3 D                                 0   0   빈 슬롯
+ P1_DIMMD1   CPU 0 ch 3 D  16 GB  EXM32G32R2X4  EX000019  0   0   정상
+ P1-DIMMC2*  CPU 0 ch 2 C                                 0   0   빈 슬롯
+ P1_DIMMC1   CPU 0 ch 2 C  16 GB  EXM32G32R2X4  EX000015  0   0   정상
+ P1-DIMMB2*  CPU 0 ch 1 B                                 0   0   빈 슬롯
+ P1_DIMMB1   CPU 0 ch 1 B  16 GB  EXM32G32R2X4  EX000011  0   0   정상
+ P1-DIMMA2*  CPU 0 ch 0 A                                 0   0   빈 슬롯
+ P1_DIMMA1   CPU 0 ch 0 A  16 GB  EXM32G32R2X4  EX000007  0   0   정상
+ P2-DIMME1*  CPU 1 ch 0 E                                 0   0   빈 슬롯
+ P2-DIMME2*  CPU 1 ch 0 E                                 0   0   빈 슬롯
+ P2-DIMMF1*  CPU 1 ch 1 F                                 0   0   빈 슬롯
+ P2-DIMMF2*  CPU 1 ch 1 F                                 0   0   빈 슬롯
+ P2-DIMMG1*  CPU 1 ch 2 G                                 0   0   빈 슬롯
+ P2-DIMMG2*  CPU 1 ch 2 G                                 0   0   빈 슬롯
+ P2-DIMMH1*  CPU 1 ch 3 H                                 0   0   빈 슬롯
+ P2-DIMMH2*  CPU 1 ch 3 H                                 0   0   빈 슬롯
+
+ - 보드에 그린 슬롯 16개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+ - 펌웨어가 이름을 주지 않은 빈 슬롯 12개를 보드 설명서의 라벨로 그림

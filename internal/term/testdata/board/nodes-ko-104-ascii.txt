@@ -3,25 +3,31 @@
  ch                7                              6                              5
      ..             ..              ..             ::              ..             ::
      ChannelH-DIMM1 ChannelH-DIMM0  ChannelG-DIMM1 ChannelG-DIMM0  ChannelF-DIMM1 ChannelF-DIMM0
+ 이름              H                              G                              F
 
  ch                4                              3                              2
      ..             ::              ..             ..              ..             ::
      ChannelE-DIMM1 ChannelE-DIMM0  ChannelD-DIMM1 ChannelD-DIMM0  ChannelC-DIMM1 ChannelC-DIMM0
+ 이름              E                              D                              C
 
  ch                1                              0
      ..             ::              ..             ::              ==[CPU 0]==
      ChannelB-DIMM1 ChannelB-DIMM0  ChannelA-DIMM1 ChannelA-DIMM0
+ 이름              B                              A
 
  ch                             0                              1
      ==[CPU 1]==  ::             ..              ::             ..
                   ChannelI-DIMM0 ChannelI-DIMM1  ChannelJ-DIMM0 ChannelJ-DIMM1
+ 이름                           I                              J
 
  ch                2                              3                              4
      ::             ..              ..             ..              ::             ..
      ChannelK-DIMM0 ChannelK-DIMM1  ChannelL-DIMM0 ChannelL-DIMM1  ChannelM-DIMM0 ChannelM-DIMM1
+ 이름              K                              L                              M
 
  ch                5                              6                              7
      ::             ..              ::             ..              ..             ..
      ChannelN-DIMM0 ChannelN-DIMM1  ChannelO-DIMM0 ChannelO-DIMM1  ChannelP-DIMM0 ChannelP-DIMM1
+ 이름              N                              O                              P
 
  :: 정상   .. 빈 슬롯

@@ -18,6 +18,10 @@ Ledger schema 11.
 ### Changed
 
 - The SMBIOS reader skips a memory device of type Flash, ROM, EPROM, FEPROM or EEPROM (a chip of the board) with a note, and reads once a record that a text holds twice.
+- The board reads every slot name whole, by a table of 42 locator forms and 26 bank locator forms, and decides processor, channel and position of every slot: the processor word, a `Node` of the bank locator, the only processor, the processor of the other slots of a channel letter, channel letters split over the processors in order. Channels and slots are numbered from 0 in the vendor's order, and the vendor's name of each channel is drawn under it.
+- A slot number without a channel (Dell `A7`, HPE `PROC 1 DIMM 9`, Lenovo `DIMM 7`) takes its processor, channel and position from the table of the board's family: 361 tables, each written from a public document of the maker that `internal/explorer/sources.tsv` cites with title, number and pages. A numbered slot of a board without such a table is drawn without channels.
+- On a board whose memory controller is in the chipset (front-side-bus Xeon), no processor owns a slot: the board draws one controller in the place of the CPUs.
+- The board is checked against its processor: no more sockets than processor records, no more channels than the processor has (46 processor families, by name or by CPUID signature), no more slots in a channel than the platform holds, no two slots in one place. A socket that fails is drawn without channels. Lines of data quality say which document a table comes from, which slots the manual names, which modules stand on an absent processor, and what could not be checked.
 
 ## [1.0.0] - 2026-11-16
 

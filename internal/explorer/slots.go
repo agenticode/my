@@ -38,7 +38,7 @@ type SlotHost struct {
 // when known, and then the slots as WriteSlots does. Each processor record
 // carries the name and the signature of the host's processor and the status
 // of its socket. Without a socket count a known processor name is written
-// as one record without a status, as a text with one processor record.
+// in one block without a Handle line, which gives the name and no record.
 func WriteSlotsOf(h SlotHost, slots []SlotText) string {
 	var b strings.Builder
 	if h.Vendor != "" || h.Product != "" {
@@ -63,7 +63,12 @@ func WriteSlotsOf(h SlotHost, slots []SlotText) string {
 		sig = "Family " + f[0] + ", Model " + f[1] + ", Stepping " + f[2]
 	}
 	for i := 0; i < n && i < MaxBoardSockets*8; i++ {
-		b.WriteString(fmt.Sprintf("Handle 0x%04X, DMI type 4, 48 bytes\nProcessor Information\n", 0x0400+i))
+		// Without a socket count the name stands in a block without a
+		// Handle line: the readers take the name and count no record.
+		if max(h.Sockets, len(h.Present)) > 0 {
+			b.WriteString(fmt.Sprintf("Handle 0x%04X, DMI type 4, 48 bytes\n", 0x0400+i))
+		}
+		b.WriteString("Processor Information\n")
 		if sig != "" {
 			b.WriteString("\tSignature: " + sig + "\n")
 		}

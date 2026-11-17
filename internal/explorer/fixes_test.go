@@ -103,6 +103,10 @@ func TestFixes(t *testing.T) {
 		{FixSocketRules, func() string {
 			return where(ParseDmidecodeMemory(board(xeonE5, 2, "CPU0_DIMM_A1", "CPU1_DIMM_A1"), nil, nil))
 		}, "0/A/0 1/A/0", "no-socket no-socket"},
+		{FixChipsetMemory, func() string {
+			d, f := ReadSlots(board("Intel(R) Xeon(R) CPU            5160  @ 3.00GHz", 2, "DIMM_A1|Channel A", "DIMM_B1|Channel B"), nil, nil)
+			return fmt.Sprint(where(d), " hub ", f.Hub)
+		}, "0/A/0 0/B/0 hub true", "no-socket no-socket hub false"},
 		{FixChannelRank, func() string {
 			var out []string
 			for _, d := range ParseDmidecodeMemory(board(xeonE5, 1, "DIMM_A1", "DIMM_C1", "DIMM_C2"), nil, nil) {
@@ -130,7 +134,7 @@ func TestFixes(t *testing.T) {
 			}
 		})
 	}
-	if len(Fixes()) != 23 {
+	if len(Fixes()) != 24 {
 		t.Errorf("%d fixes; every fix needs a case here", len(Fixes()))
 	}
 }

@@ -159,7 +159,7 @@ func slotDiff(d Dimm, f Facts, s popSlot) string {
 		return fmt.Sprintf("want placed by %s at %s/%s, got not placed (socket by %q)", s.by, s.socket, s.channel, d.SocketBy)
 	}
 	sock := strconv.Itoa(int(d.Socket))
-	if d.PlaceBy == ByHub {
+	if f.Hub {
 		sock = "hub"
 	}
 	by := d.PlaceBy

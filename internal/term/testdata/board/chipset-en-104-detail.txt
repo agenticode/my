@@ -1,0 +1,25 @@
+host board-host  Dell Inc. PowerEdge 2950  8 of 8 slots, 16 GB  DDR2 FB-DIMM 667 MT/s
+
+ ch       1            0                           2            3
+     ░░    ░░     ░░    ░░     ══╡chipset╞══  ░░    ░░     ░░    ░░
+     DIMM6 DIMM2  DIMM5 DIMM1                 DIMM3 DIMM7  DIMM4 DIMM8
+
+ ░░ ok
+
+ chipset  8 DIMMs, 16 GB
+
+ slot   place         size  part number   serial    CE  UE  finding
+ DIMM6  chipset ch 1  2 GB  EXM32G32R2X4  EX000032  0   0   ok
+ DIMM2  chipset ch 1  2 GB  EXM32G32R2X4  EX000016  0   0   ok
+ DIMM5  chipset ch 0  2 GB  EXM32G32R2X4  EX000028  0   0   ok
+ DIMM1  chipset ch 0  2 GB  EXM32G32R2X4  EX000012  0   0   ok
+ DIMM3  chipset ch 2  2 GB  EXM32G32R2X4  EX000020  0   0   ok
+ DIMM7  chipset ch 2  2 GB  EXM32G32R2X4  EX000036  0   0   ok
+ DIMM4  chipset ch 3  2 GB  EXM32G32R2X4  EX000024  0   0   ok
+ DIMM8  chipset ch 3  2 GB  EXM32G32R2X4  EX000040  0   0   ok
+
+ - 8 slots on the board, 0 drawn without channels, 0 set aside
+ - the memory controller is in the chipset: no processor owns a slot, and the board draws one controller
+   in the place of the CPUs
+ - 8 slots placed by the table of the board family dell-pe-1950-2950, written from Dell PowerEdge 1950
+   Systems Hardware Owner's Manual, P/N HH176, Rev. A02, September 2009, pp. 26, 63-65

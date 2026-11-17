@@ -9,7 +9,7 @@ ironic-dmi-data (4 slots, 1 processor records)
 ironlib-dmidecode (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 lab-digits (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
@@ -17,7 +17,7 @@ lab-digits (4 slots, 1 processor records)
 lab-letters (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 lab-two-sockets (8 slots, 2 processor records)
   first                  placed 8, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 8, no channel 0, aside 0, CPUs 2 []
@@ -45,7 +45,7 @@ linuxhw-birchstream-1f03c9 (24 slots, 2 processor records)
 linuxhw-e3c252d4u-2t-e62cd4 (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 linuxhw-g482-z54-00-7ca16e (32 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 32, CPUs 0 [unplaced assumed 32]
   fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
@@ -74,6 +74,10 @@ linuxhw-nf5280m6-48e15d (32 slots, 2 processor records)
   first                  placed 32, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
   fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 2 []
+linuxhw-poweredge-2950-121ae0 (8 slots, 2 processor records)
+  first                  placed 0, no channel 0, aside 8, CPUs 0 [unplaced none 8]
+  fixed                  placed 8, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 8, no channel 0, aside 0, CPUs 1 []
 linuxhw-poweredge-r6615-71a1f0 (12 slots, 1 processor records)
   first                  placed 12, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 12, no channel 0, aside 0, CPUs 1 []
@@ -89,7 +93,7 @@ linuxhw-proliant-dl380-gen11-89bbba (32 slots, 2 processor records)
 linuxhw-r1g3d32-ec54ac (32 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 32, CPUs 0 [unplaced negative 32]
   fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
-  fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 32, CPUs 0 [unplaced assumed 32]
 linuxhw-rd450x-8535af (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
@@ -105,11 +109,11 @@ linuxhw-rs720a-e12-rs12-6002d3 (24 slots, 2 processor records)
 linuxhw-s2600gz-925442 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced negative 24]
   fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
-  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 24, CPUs 0 [unplaced assumed 24]
 linuxhw-sa5212m4-4250b0 (16 slots, 2 processor records)
   first                  placed 8, no channel 0, aside 8, CPUs 2 [unplaced none 8]
   fixed                  placed 8, no channel 0, aside 8, CPUs 2 [unplaced none 8]
-  fixed, sockets unknown placed 8, no channel 0, aside 8, CPUs 1 [unplaced none 8]
+  fixed, sockets unknown placed 0, no channel 0, aside 16, CPUs 0 [unplaced assumed 8 unplaced none 8]
 linuxhw-sys-6028r-wtr-fac06e (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
@@ -137,7 +141,7 @@ linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0 (24 slots, 2 processor records)
 linuxhw-ts100-e7-pi4-e88885 (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 linuxhw-volcano-59c634 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced negative 24]
   fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
@@ -145,11 +149,11 @@ linuxhw-volcano-59c634 (24 slots, 2 processor records)
 netbox-dell-dss7500 (12 slots, 2 processor records)
   first                  placed 12, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 0, no channel 12, aside 0, CPUs 2 [no-channel crowd 12]
-  fixed, sockets unknown placed 0, no channel 12, aside 0, CPUs 1 [no-channel crowd 12]
+  fixed, sockets unknown placed 0, no channel 0, aside 12, CPUs 0 [unplaced assumed 12]
 netbox-dell-poweredge-m630 (24 slots, 2 processor records)
   first                  placed 24, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel crowd 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 1 [no-channel crowd 24]
+  fixed, sockets unknown placed 0, no channel 0, aside 24, CPUs 0 [unplaced assumed 24]
 netbox-hp-bl460c-gen10 (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
@@ -177,7 +181,7 @@ netbox-hp-sl4540-gen8 (12 slots, 2 processor records)
 netbox-qct-x10e-9n (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 netbox-sm-ssg-6028r (16 slots, 2 processor records)
   first                  placed 4, no channel 0, aside 12, CPUs 1 [unplaced none 12]
   fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
@@ -193,7 +197,7 @@ netbox-sys-5039ms-h12trf-os012 (4 slots, 1 processor records)
 netbox-unknown (4 slots, 1 processor records)
   first                  placed 0, no channel 0, aside 4, CPUs 0 [unplaced none 4]
   fixed                  placed 0, no channel 4, aside 0, CPUs 1 [no-channel no-table 4]
-  fixed, sockets unknown placed 0, no channel 4, aside 0, CPUs 1 [no-channel no-table 4]
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
 uroot-supermicro-x9dbl (6 slots, 2 processor records)
   first                  placed 6, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 6, no channel 0, aside 0, CPUs 2 []
@@ -201,4 +205,4 @@ uroot-supermicro-x9dbl (6 slots, 2 processor records)
 uroot-synology-rs3614xsp (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
-  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]

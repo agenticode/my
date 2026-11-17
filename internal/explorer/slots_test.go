@@ -20,13 +20,16 @@ func TestWriteSlotsOfHints(t *testing.T) {
 			[]cpuRecord{{"Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz", "6/79/1", 1}, {"Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz", "6/79/1", 0}}},
 		{"a ledger before the populated flags", SlotHost{Vendor: "Example Systems", Processor: "AMD EPYC 7302 16-Core Processor", Sockets: 1},
 			[]cpuRecord{{"AMD EPYC 7302 16-Core Processor", "", -1}}},
-		{"a name without a socket count", SlotHost{Processor: "AMD EPYC 7302 16-Core Processor"}, []cpuRecord{{"AMD EPYC 7302 16-Core Processor", "", -1}}},
+		{"a name without a socket count", SlotHost{Processor: "AMD EPYC 7302 16-Core Processor"}, nil},
 		{"nothing known", SlotHost{}, nil},
 	} {
 		text := WriteSlotsOf(c.host, slots)
 		h := hintsOf(text)
 		if h.sysVendor != c.host.Vendor || h.product != c.host.Product || h.board != c.host.Board || !reflect.DeepEqual(h.cpus, c.cpus) {
 			t.Errorf("%s: read back %q %q %q %+v", c.name, h.sysVendor, h.product, h.board, h.cpus)
+		}
+		if c.cpus == nil && h.cpuName != c.host.Processor {
+			t.Errorf("%s: the name of the processor read back %q", c.name, h.cpuName)
 		}
 		if h.vendor != c.host.Vendor || h.processor != c.host.Processor {
 			t.Errorf("%s: the hints of the first round read %q %q", c.name, h.vendor, h.processor)

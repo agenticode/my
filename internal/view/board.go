@@ -46,8 +46,26 @@ type Board struct {
 	// Caches names where the cache sizes were read: "lshw", "sysfs", or
 	// empty when nothing gave them.
 	Caches string `json:"caches,omitzero"`
+	// Hub is set when the memory controller is in the chipset: no
+	// processor owns a slot, and the board draws one controller.
+	Hub bool `json:"hub,omitzero"`
+	// Family is the board family whose table placed slots, Documents the
+	// documents the table is written from.
+	Family    string          `json:"family,omitzero"`
+	Documents []BoardDocument `json:"documents,omitzero"`
+	// Complete says whether the board is placed in full, and why not.
+	Complete explorer.Completeness `json:"complete"`
 	// Lines are the lines of data quality of the board (design 4.4).
 	Lines []Text `json:"lines"`
+}
+
+// BoardDocument is a public document a board family is written from.
+type BoardDocument struct {
+	Title  string `json:"title"`
+	Number string `json:"number,omitzero"`
+	Date   string `json:"date,omitzero"`
+	URL    string `json:"url,omitzero"`
+	Pages  string `json:"pages,omitzero"`
 }
 
 // BoardRow is one row of the board: a bank, a CPU and a bank, or for two
@@ -71,7 +89,9 @@ type BoardPart struct {
 // BoardChannel is one channel of a bank, its sticks in drawing order.
 type BoardChannel struct {
 	Channel model.Opt[int] `json:"channel,omitzero"`
-	Sticks  []BoardStick   `json:"sticks"`
+	// Name is the vendor's name of the channel ("A", "2", "1.0").
+	Name   string       `json:"name,omitzero"`
+	Sticks []BoardStick `json:"sticks"`
 }
 
 // BoardStick is one slot.
@@ -95,6 +115,9 @@ type BoardStick struct {
 	Place     explorer.Placement `json:"place"`
 	SocketBy  string             `json:"socket_by,omitzero"`
 	ChannelBy string             `json:"channel_by,omitzero"`
+	// Label is the slot label of the board's manual of an empty slot the
+	// firmware gives no name.
+	Label string `json:"label,omitzero"`
 }
 
 // BoardModule is what the ledger knows of the module in a slot.
@@ -109,12 +132,15 @@ type BoardModule struct {
 }
 
 // BoardCPU is one CPU: the count and size of its modules and its caches.
+// On a board whose memory controller is in the chipset it is that
+// controller (Controller set), and no CPU owns a slot.
 type BoardCPU struct {
-	Socket int          `json:"socket"`
-	DIMMs  int          `json:"dimms"`
-	Bytes  int64        `json:"bytes,omitzero"`
-	Size   string       `json:"size,omitzero"`
-	Caches []BoardCache `json:"caches"`
+	Socket     int          `json:"socket"`
+	Controller bool         `json:"controller,omitzero"`
+	DIMMs      int          `json:"dimms"`
+	Bytes      int64        `json:"bytes,omitzero"`
+	Size       string       `json:"size,omitzero"`
+	Caches     []BoardCache `json:"caches"`
 }
 
 // BoardCache is one cache level of a CPU; Size is written by the bytes of
@@ -167,7 +193,7 @@ func (bh boardHost) slotHost() explorer.SlotHost {
 
 // Readers of the board, replaced by tests that make them fail.
 var (
-	boardParse  = explorer.ParseDmidecodeMemory
+	boardParse  = explorer.ReadSlots
 	boardLayout = explorer.Board
 )
 
@@ -255,42 +281,58 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 		}
 	}
 	var dimms []explorer.Dimm
+	var facts explorer.Facts
 	fault := ""
 	if len(desc) > 0 {
-		out := adapter.Guard(func() *[]explorer.Dimm {
-			d := boardParse(explorer.WriteSlotsOf(host, text), nil, nil)
-			return &d
+		type read struct {
+			d []explorer.Dimm
+			f explorer.Facts
+		}
+		out := adapter.Guard(func() *read {
+			d, f := boardParse(explorer.WriteSlotsOf(host, text), nil, nil)
+			return &read{d, f}
 		})
 		switch {
 		case out == nil:
 			fault = whyFault
-		case len(*out) != len(desc):
+		case len(out.d) != len(desc):
 			fault = whyCount
 		default:
-			dimms = *out
+			dimms, facts = out.d, out.f
 		}
 	} else if bh.lshw != "" {
-		dimms, sticks = lshwSlots(h, bh, rest)
+		dimms, facts, sticks = lshwSlots(h, bh, rest)
 		if len(sticks) > 0 {
 			rest = untied(rest, sticks)
 		}
 	}
+	facts.Packages = len(caches)
 	places := make([]explorer.Placement, len(sticks))
 	if fault != "" {
 		for i := range places {
 			places[i] = explorer.Placement{State: explorer.Unplaced, Reason: fault}
 		}
 	} else if len(dimms) > 0 {
-		p := adapter.Guard(func() []explorer.Placement { return explorer.Place(dimms, bh.sockets, len(caches)) })
+		if !facts.Pass {
+			facts.Sockets = bh.sockets
+		}
+		p := adapter.Guard(func() []explorer.Placement { return explorer.PlaceBoard(dimms, facts) })
 		if len(p) != len(dimms) {
 			for i := range places {
 				places[i] = explorer.Placement{State: explorer.Unplaced, Reason: whyFault}
 			}
 		} else {
 			copy(places, p)
+			if c := adapter.Guard(func() *explorer.Completeness { c := explorer.Complete(dimms, facts, p); return &c }); c != nil {
+				b.Complete = *c
+			}
 		}
 		for i := range sticks {
-			sticks[i].SocketBy, sticks[i].ChannelBy = dimms[i].SocketBy, dimms[i].ChannelBy
+			sticks[i].SocketBy, sticks[i].ChannelBy, sticks[i].Label = dimms[i].SocketBy, dimms[i].ChannelBy, dimms[i].Label
+		}
+		b.Hub, b.Family = facts.Hub, facts.Family
+		for _, src := range explorer.FamilySources(facts.Family) {
+			b.Documents = append(b.Documents, BoardDocument{Title: src.Title, Number: src.Number, Date: src.Date, URL: src.URL, Pages: src.Pages})
 		}
 	}
 	for i := range sticks {
@@ -298,7 +340,7 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 	}
 	held := arrange(b, sticks, dimms, places, caches)
 	for i := range sticks {
-		if places[i].State != explorer.Unplaced && !held[i] {
+		if places[i].State != explorer.Unplaced && places[i].State != explorer.NotASlot && !held[i] {
 			sticks[i].Place = explorer.Placement{State: explorer.Unplaced, Reason: whyLost}
 		}
 	}
@@ -309,6 +351,10 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 	var aside []model.Slot
 	for i, st := range sticks {
 		switch st.Place.State {
+		case explorer.NotASlot:
+			// A record the board has no slot for: left out, counted in a
+			// line of data quality.
+			continue
 		case explorer.Placed:
 			b.Counts.Placed++
 		case explorer.NoChannel:
@@ -370,7 +416,7 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 			b.Badge = t
 		}
 	}
-	b.Lines = boardLines(lang, b)
+	b.Lines = boardLines(lang, b, facts, dimms, places)
 	return b
 }
 
@@ -412,20 +458,24 @@ func stickOf(h *engine.HostResult, sl model.Slot) BoardStick {
 
 // lshwSlots reads the banks of lshw text when no inventory described a
 // slot, and ties each to a ledger slot of the same name.
-func lshwSlots(h *engine.HostResult, bh boardHost, slots []model.Slot) ([]explorer.Dimm, []BoardStick) {
-	out := adapter.Guard(func() *[]explorer.Dimm {
-		d, _ := explorer.ParseLshwDimmsOf(bh.slotHost(), bh.lshw, nil, nil)
-		return &d
+func lshwSlots(h *engine.HostResult, bh boardHost, slots []model.Slot) ([]explorer.Dimm, explorer.Facts, []BoardStick) {
+	type read struct {
+		d []explorer.Dimm
+		f explorer.Facts
+	}
+	out := adapter.Guard(func() *read {
+		d, f := explorer.ParseLshwDimmsOf(bh.slotHost(), bh.lshw, nil, nil)
+		return &read{d, f}
 	})
-	if out == nil || len(*out) > explorer.MaxSlots {
-		return nil, nil
+	if out == nil || len(out.d) > explorer.MaxSlots {
+		return nil, explorer.Facts{}, nil
 	}
 	byName := map[string]model.Slot{}
 	for _, sl := range slots {
 		byName[model.NormalizeLabel(sl.Name)] = sl
 	}
 	var sticks []BoardStick
-	for _, d := range *out {
+	for _, d := range out.d {
 		sl, ok := byName[model.NormalizeLabel(d.Locator)]
 		if !ok {
 			sl = model.Slot{Name: d.Locator, Locator: d.Locator, Populated: model.Some(d.Populated)}
@@ -434,7 +484,7 @@ func lshwSlots(h *engine.HostResult, bh boardHost, slots []model.Slot) ([]explor
 		st.Locator = d.Locator
 		sticks = append(sticks, st)
 	}
-	return *out, sticks
+	return out.d, out.f, sticks
 }
 
 // untied are the slots no lshw bank was tied to.
@@ -537,7 +587,10 @@ func arrange(b *Board, sticks []BoardStick, dimms []explorer.Dimm, places []expl
 			for _, p := range r.Parts {
 				if p.CPU != nil {
 					s, _ := p.CPU.Socket.Int()
-					cpu := &BoardCPU{Socket: s, Caches: cacheOf(s)}
+					cpu := &BoardCPU{Socket: s, Caches: cacheOf(s), Controller: b.Hub}
+					if b.Hub {
+						cpu.Caches = []BoardCache{}
+					}
 					for _, i := range bySocket[s] {
 						if st := sticks[i]; st.State != SlotEmpty && st.State != SlotUnknown {
 							cpu.DIMMs++
@@ -562,6 +615,9 @@ func arrange(b *Board, sticks []BoardStick, dimms []explorer.Dimm, places []expl
 						i := idx[st.Slot]
 						held[i] = true
 						bc.Sticks = append(bc.Sticks, sticks[i])
+						if bc.Name == "" && !noch[s] {
+							bc.Name = dimms[i].ChannelName
+						}
 					}
 					part.Channels = append(part.Channels, bc)
 				}
@@ -579,14 +635,56 @@ func arrange(b *Board, sticks []BoardStick, dimms []explorer.Dimm, places []expl
 }
 
 // boardLines are the lines of data quality of the board: what was placed,
-// drawn without channels and set aside, and where the caches came from.
-func boardLines(lang i18n.Lang, b *Board) []Text {
+// drawn without channels and set aside and why, how the names were read,
+// and where the caches came from.
+func boardLines(lang i18n.Lang, b *Board, f explorer.Facts, dimms []explorer.Dimm, places []explorer.Placement) []Text {
 	var out []Text
 	if n := b.Counts.Placed + b.Counts.NoChannel + b.Counts.Unplaced; n > 0 {
 		out = append(out, boardSay(lang, "board.counts", "placed", b.Counts.Placed, "nochannel", b.Counts.NoChannel, "unplaced", b.Counts.Unplaced))
 	}
 	for _, r := range b.Reasons {
 		out = append(out, r.Text)
+	}
+	count := func(ok func(i int) bool) int {
+		n := 0
+		for i := range dimms {
+			if i < len(places) && ok(i) {
+				n++
+			}
+		}
+		return n
+	}
+	if b.Hub {
+		out = append(out, boardSay(lang, "board.hub"))
+	}
+	if n := count(func(i int) bool {
+		return strings.HasPrefix(dimms[i].PlaceBy, "family:") && places[i].State == explorer.Placed
+	}); n > 0 && len(b.Documents) > 0 {
+		out = append(out, boardSay(lang, "board.family", "n", n, "family", b.Family, "doc", documentText(b.Documents[0])))
+	}
+	if n := count(func(i int) bool { return dimms[i].PlaceBy == explorer.ByLetters && places[i].State == explorer.Placed }); n > 0 {
+		out = append(out, boardSay(lang, "board.letters", "n", n))
+	}
+	if f.BankDisagrees {
+		out = append(out, boardSay(lang, "board.bank_disagrees"))
+	}
+	if f.Labelled > 0 {
+		out = append(out, boardSay(lang, "board.labels", "n", f.Labelled))
+	}
+	if f.Phantoms > 0 {
+		out = append(out, boardSay(lang, "board.phantoms", "n", f.Phantoms))
+	}
+	if f.PhantomsPopulated > 0 {
+		out = append(out, boardSay(lang, "board.phantoms_populated", "n", f.PhantomsPopulated))
+	}
+	if f.Nodes != "" {
+		out = append(out, boardSay(lang, "board.nodes"))
+	}
+	if b.Complete.Unchecked {
+		out = append(out, boardSay(lang, "board.unchecked"))
+	}
+	if b.Complete.Absent > 0 {
+		out = append(out, boardSay(lang, "board.absent", "n", b.Complete.Absent))
 	}
 	switch b.Caches {
 	case "lshw":
@@ -595,6 +693,17 @@ func boardLines(lang i18n.Lang, b *Board) []Text {
 		out = append(out, boardSay(lang, "board.caches.sysfs"))
 	}
 	return out
+}
+
+// documentText names a document in one line: title, number, pages.
+func documentText(d BoardDocument) string {
+	parts := []string{d.Title}
+	for _, x := range []string{d.Number, d.Date, d.Pages} {
+		if x != "" {
+			parts = append(parts, x)
+		}
+	}
+	return strings.Join(parts, ", ")
 }
 
 func boardSay(lang i18n.Lang, code string, kv ...any) Text {

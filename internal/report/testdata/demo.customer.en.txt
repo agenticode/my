@@ -59,7 +59,7 @@ section#s2.sec
       mark: CPU1_G2: empty slot
       mark: CPU1_H1: ok, 64 GB, S/N 55C12A
       mark: CPU1_H2: empty slot
-      text: CPU0_H2 | CPU0_H1 | Ch7 | CPU0_G2 | CPU0_G1 | Ch6 | CPU0_F2 | CPU0_F1 | Ch5 | CPU0_E2 | CPU0_E1 | Ch4 | CPU0_D2 | CPU0_D1 | Ch3 | CPU0_C2 | CPU0_C1 | Ch2 | CPU0_B2 | CPU0_B1 | Ch1 | CPU0_A2 | CPU0_A1 | Ch0 | CPU 0 | 8 DIMMs | 512 GB | CPU 1 | 8 DIMMs | 512 GB | CPU1_A1 | CPU1_A2 | Ch0 | CPU1_B1 | CPU1_B2 | Ch1 | CPU1_C1 | CPU1_C2 | Ch2 | CPU1_D1 | CPU1_D2 | Ch3 | CPU1_E1 | CPU1_E2 | Ch4 | CPU1_F1 | CPU1_F2 | Ch5 | CPU1_G1 | CPU1_G2 | Ch6 | CPU1_H1 | CPU1_H2 | Ch7
+      text: CPU0_H2 | CPU0_H1 | ChH | CPU0_G2 | CPU0_G1 | ChG | CPU0_F2 | CPU0_F1 | ChF | CPU0_E2 | CPU0_E1 | ChE | CPU0_D2 | CPU0_D1 | ChD | CPU0_C2 | CPU0_C1 | ChC | CPU0_B2 | CPU0_B1 | ChB | CPU0_A2 | CPU0_A1 | ChA | CPU 0 | 8 DIMMs | 512 GB | CPU 1 | 8 DIMMs | 512 GB | CPU1_A1 | CPU1_A2 | ChA | CPU1_B1 | CPU1_B2 | ChB | CPU1_C1 | CPU1_C2 | ChC | CPU1_D1 | CPU1_D2 | ChD | CPU1_E1 | CPU1_E2 | ChE | CPU1_F1 | CPU1_F2 | ChF | CPU1_G1 | CPU1_G2 | ChG | CPU1_H1 | CPU1_H2 | ChH
     li: replace now
     li: observe
     li: ok
@@ -71,7 +71,7 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel7_Dimm1
-  On the board = CPU 0, channel 7
+  On the board = CPU 0, channel 7 (H)
   Finding = empty slot
   CPU0_H1 = 
   Locator = CPU0_H1
@@ -86,14 +86,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel7_Dimm0
-  On the board = CPU 0, channel 7
+  On the board = CPU 0, channel 7 (H)
   Finding = ok
   CPU0_G2 = 
   Locator = CPU0_G2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel6_Dimm1
-  On the board = CPU 0, channel 6
+  On the board = CPU 0, channel 6 (G)
   Finding = empty slot
   CPU0_G1 = 
   Locator = CPU0_G1
@@ -108,14 +108,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel6_Dimm0
-  On the board = CPU 0, channel 6
+  On the board = CPU 0, channel 6 (G)
   Finding = ok
   CPU0_F2 = 
   Locator = CPU0_F2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel5_Dimm1
-  On the board = CPU 0, channel 5
+  On the board = CPU 0, channel 5 (F)
   Finding = empty slot
   CPU0_F1 = 
   Locator = CPU0_F1
@@ -130,14 +130,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel5_Dimm0
-  On the board = CPU 0, channel 5
+  On the board = CPU 0, channel 5 (F)
   Finding = ok
   CPU0_E2 = 
   Locator = CPU0_E2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel4_Dimm1
-  On the board = CPU 0, channel 4
+  On the board = CPU 0, channel 4 (E)
   Finding = empty slot
   CPU0_E1 = 
   Locator = CPU0_E1
@@ -152,14 +152,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel4_Dimm0
-  On the board = CPU 0, channel 4
+  On the board = CPU 0, channel 4 (E)
   Finding = ok
   CPU0_D2 = 
   Locator = CPU0_D2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel3_Dimm1
-  On the board = CPU 0, channel 3
+  On the board = CPU 0, channel 3 (D)
   Finding = empty slot
   CPU0_D1 = 
   Locator = CPU0_D1
@@ -174,14 +174,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel3_Dimm0
-  On the board = CPU 0, channel 3
+  On the board = CPU 0, channel 3 (D)
   Finding = ok
   CPU0_C2 = 
   Locator = CPU0_C2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel2_Dimm1
-  On the board = CPU 0, channel 2
+  On the board = CPU 0, channel 2 (C)
   Finding = empty slot
   CPU0_C1 = 
   Locator = CPU0_C1
@@ -196,14 +196,14 @@ section#s2.sec
   Corrected errors = 1231
   Uncorrected errors = 1
   Bank locator = P0_Node0_Channel2_Dimm0
-  On the board = CPU 0, channel 2
+  On the board = CPU 0, channel 2 (C)
   Finding = replace now
   CPU0_B2 = 
   Locator = CPU0_B2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel1_Dimm1
-  On the board = CPU 0, channel 1
+  On the board = CPU 0, channel 1 (B)
   Finding = empty slot
   CPU0_B1 = 
   Locator = CPU0_B1
@@ -218,14 +218,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel1_Dimm0
-  On the board = CPU 0, channel 1
+  On the board = CPU 0, channel 1 (B)
   Finding = ok
   CPU0_A2 = 
   Locator = CPU0_A2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel0_Dimm1
-  On the board = CPU 0, channel 0
+  On the board = CPU 0, channel 0 (A)
   Finding = empty slot
   CPU0_A1 = 
   Locator = CPU0_A1
@@ -240,7 +240,7 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P0_Node0_Channel0_Dimm0
-  On the board = CPU 0, channel 0
+  On the board = CPU 0, channel 0 (A)
   Finding = ok
   CPU 0 = 
   DIMMs = 8
@@ -261,14 +261,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel0_Dimm0
-  On the board = CPU 1, channel 0
+  On the board = CPU 1, channel 0 (A)
   Finding = ok
   CPU1_A2 = 
   Locator = CPU1_A2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel0_Dimm1
-  On the board = CPU 1, channel 0
+  On the board = CPU 1, channel 0 (A)
   Finding = empty slot
   CPU1_B1 = 
   Locator = CPU1_B1
@@ -283,14 +283,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel1_Dimm0
-  On the board = CPU 1, channel 1
+  On the board = CPU 1, channel 1 (B)
   Finding = ok
   CPU1_B2 = 
   Locator = CPU1_B2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel1_Dimm1
-  On the board = CPU 1, channel 1
+  On the board = CPU 1, channel 1 (B)
   Finding = empty slot
   CPU1_C1 = 
   Locator = CPU1_C1
@@ -305,14 +305,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel2_Dimm0
-  On the board = CPU 1, channel 2
+  On the board = CPU 1, channel 2 (C)
   Finding = ok
   CPU1_C2 = 
   Locator = CPU1_C2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel2_Dimm1
-  On the board = CPU 1, channel 2
+  On the board = CPU 1, channel 2 (C)
   Finding = empty slot
   CPU1_D1 = 
   Locator = CPU1_D1
@@ -327,14 +327,14 @@ section#s2.sec
   Corrected errors = 53
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel3_Dimm0
-  On the board = CPU 1, channel 3
+  On the board = CPU 1, channel 3 (D)
   Finding = observe
   CPU1_D2 = 
   Locator = CPU1_D2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel3_Dimm1
-  On the board = CPU 1, channel 3
+  On the board = CPU 1, channel 3 (D)
   Finding = empty slot
   CPU1_E1 = 
   Locator = CPU1_E1
@@ -349,14 +349,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel4_Dimm0
-  On the board = CPU 1, channel 4
+  On the board = CPU 1, channel 4 (E)
   Finding = ok
   CPU1_E2 = 
   Locator = CPU1_E2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel4_Dimm1
-  On the board = CPU 1, channel 4
+  On the board = CPU 1, channel 4 (E)
   Finding = empty slot
   CPU1_F1 = 
   Locator = CPU1_F1
@@ -371,14 +371,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel5_Dimm0
-  On the board = CPU 1, channel 5
+  On the board = CPU 1, channel 5 (F)
   Finding = ok
   CPU1_F2 = 
   Locator = CPU1_F2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel5_Dimm1
-  On the board = CPU 1, channel 5
+  On the board = CPU 1, channel 5 (F)
   Finding = empty slot
   CPU1_G1 = 
   Locator = CPU1_G1
@@ -393,14 +393,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel6_Dimm0
-  On the board = CPU 1, channel 6
+  On the board = CPU 1, channel 6 (G)
   Finding = ok
   CPU1_G2 = 
   Locator = CPU1_G2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel6_Dimm1
-  On the board = CPU 1, channel 6
+  On the board = CPU 1, channel 6 (G)
   Finding = empty slot
   CPU1_H1 = 
   Locator = CPU1_H1
@@ -415,14 +415,14 @@ section#s2.sec
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel7_Dimm0
-  On the board = CPU 1, channel 7
+  On the board = CPU 1, channel 7 (H)
   Finding = ok
   CPU1_H2 = 
   Locator = CPU1_H2
   Corrected errors = 0
   Uncorrected errors = 0
   Bank locator = P1_Node1_Channel7_Dimm1
-  On the board = CPU 1, channel 7
+  On the board = CPU 1, channel 7 (H)
   Finding = empty slot
   table.ranking
     | # | slot | serial | CE | UE | fault mode | last 30 days | finding | rules
@@ -1101,6 +1101,7 @@ section#s7.sec
   p.how: What the findings rest on: every source that was looked for, what it yielded, and how much of the location of an error it reports. A finding only says what the observation grade of its records allows.
   ### How the board was drawn
   li: 32 slots on the board, 0 drawn without channels, 0 set aside
+  li: the channel count of the processor is not known: the channels of the board could not be checked against it
   ### Errors by observation grade
   figure
     svg.fig.obsbar: Errors of host r12-n034 by observation grade

@@ -1,0 +1,15 @@
+host board-host  Supermicro SSG-6028R-OSD072P  4 of 16 slots, 64 GB  DDR4 2133 MT/s
+
+ ch            3                      2                      1                      0
+     ..         ::          ..         ::          ..         ::          ..         ::
+     P1-DIMMD2* P1_DIMMD1   P1-DIMMC2* P1_DIMMC1   P1-DIMMB2* P1_DIMMB1   P1-DIMMA2* P1_DIMMA1
+ name          D                      C                      B                      A
+
+     ==[CPU 0]==
+
+ ch                       0                1                2                3
+      ==[CPU 1]==  ..      ..       ..      ..       ..      ..       ..      ..
+ P2-               DIMME1* DIMME2*  DIMMF1* DIMMF2*  DIMMG1* DIMMG2*  DIMMH1* DIMMH2*
+ name                     E                F                G                H
+
+ :: ok   .. empty slot   * label of the board's manual (the firmware gives no name)

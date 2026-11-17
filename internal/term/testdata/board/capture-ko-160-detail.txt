@@ -3,18 +3,20 @@
  ch      2   1   0                3   4   5
         ░░  ▓▓  ▒▒  ══╡CPU 0╞══  ▓▓  ▓▓  ░░
  CPU0_  C1  B1  A1               D1  E1  F1
+ 이름    C   B   A                D   E   F
  오류       c   c                cU  c
 
  ▓▓ 교체 고려   ▒▒ 관찰   ░░ 정상   c 정정 오류, U 정정 불가 오류
 
  CPU 0  DIMM 6개, 96 GB
 
- 슬롯     위치        크기   부품 번호    일련번호  CE  UE  소견
- CPU0_C1  CPU 0 ch 2  16 GB  LABDDR4-16G  LABM0003  0   0   정상
- CPU0_B1  CPU 0 ch 1  16 GB  LABDDR4-16G  LABM0002  10  0   교체 고려
- CPU0_A1  CPU 0 ch 0  16 GB  LABDDR4-16G  LABM0001  3   0   관찰
- CPU0_D1  CPU 0 ch 3  16 GB  LABDDR4-16G  LABM0004  10  1   교체 고려
- CPU0_E1  CPU 0 ch 4  16 GB  LABDDR4-16G  LABM0005  12  0   교체 고려
- CPU0_F1  CPU 0 ch 5  16 GB  LABDDR4-16G  LABM0006  0   0   정상
+ 슬롯     위치          크기   부품 번호    일련번호  CE  UE  소견
+ CPU0_C1  CPU 0 ch 2 C  16 GB  LABDDR4-16G  LABM0003  0   0   정상
+ CPU0_B1  CPU 0 ch 1 B  16 GB  LABDDR4-16G  LABM0002  10  0   교체 고려
+ CPU0_A1  CPU 0 ch 0 A  16 GB  LABDDR4-16G  LABM0001  3   0   관찰
+ CPU0_D1  CPU 0 ch 3 D  16 GB  LABDDR4-16G  LABM0004  10  1   교체 고려
+ CPU0_E1  CPU 0 ch 4 E  16 GB  LABDDR4-16G  LABM0005  12  0   교체 고려
+ CPU0_F1  CPU 0 ch 5 F  16 GB  LABDDR4-16G  LABM0006  0   0   정상
 
  - 보드에 그린 슬롯 6개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+ - 프로세서의 채널 수를 몰라 보드의 채널을 그 수와 맞춰 보지 못함

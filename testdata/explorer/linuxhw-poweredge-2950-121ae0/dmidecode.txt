@@ -1,0 +1,305 @@
+# dmidecode 3.2
+Getting SMBIOS data from sysfs.
+SMBIOS 2.5 present.
+67 structures occupying 3419 bytes.
+Table at 0xBFB9C000.
+
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Dell Inc.
+	Product Name: PowerEdge 2950
+	Version: Not Specified
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: Not Specified
+	Family: Not Specified
+
+Handle 0x0200, DMI type 2, 9 bytes
+Base Board Information
+	Manufacturer: Dell Inc.
+	Product Name: 0M332H
+	Version: A00
+	Serial Number: EX000003
+	Asset Tag: EXA000004
+
+Handle 0x0400, DMI type 4, 40 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: 76 06 01 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 23, Stepping 6
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU           E5420  @ 2.50GHz
+	Voltage: 1.4 V
+	External Clock: 1333 MHz
+	Max Speed: 3600 MHz
+	Current Speed: 2500 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA771
+	L1 Cache Handle: 0x0700
+	L2 Cache Handle: 0x0701
+	L3 Cache Handle: 0x0702
+	Serial Number: EX000007
+	Asset Tag: EXA000008
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+
+Handle 0x0401, DMI type 4, 40 bytes
+Processor Information
+	Socket Designation: CPU2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: 76 06 01 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 23, Stepping 6
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU           E5420  @ 2.50GHz
+	Voltage: 1.4 V
+	External Clock: 1333 MHz
+	Max Speed: 3600 MHz
+	Current Speed: 2500 MHz
+	Status: Populated, Idle
+	Upgrade: Socket LGA771
+	L1 Cache Handle: 0x0703
+	L2 Cache Handle: 0x0704
+	L3 Cache Handle: 0x0705
+	Serial Number: EX000009
+	Asset Tag: EXA000010
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+
+Handle 0x1000, DMI type 16, 15 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 65280 MB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x1100, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 1
+	Locator: DIMM1 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000012
+	Asset Tag: EXA000013
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1101, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 1
+	Locator: DIMM2 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000016
+	Asset Tag: EXA000017
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1102, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 2
+	Locator: DIMM3 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000020
+	Asset Tag: EXA000021
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1103, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 2
+	Locator: DIMM4 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000024
+	Asset Tag: EXA000025
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1104, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 3
+	Locator: DIMM5 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000028
+	Asset Tag: EXA000029
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1105, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 3
+	Locator: DIMM6 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000032
+	Asset Tag: EXA000033
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1106, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 4
+	Locator: DIMM7 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000036
+	Asset Tag: EXA000037
+	Part Number: EXM32G32R2X4
+	Rank: 2
+
+Handle 0x1107, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 2048 MB
+	Form Factor: FB-DIMM
+	Set: 4
+	Locator: DIMM8 
+	Bank Locator: Not Specified
+	Type: DDR2 FB-DIMM
+	Type Detail: Synchronous
+	Speed: 667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000040
+	Asset Tag: EXA000041
+	Part Number: EXM32G32R2X4
+	Rank: 2
