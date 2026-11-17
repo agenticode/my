@@ -371,7 +371,7 @@ func TestNoJournalNoRingBufferFallsBackToFiles(t *testing.T) {
 	}
 	// A journalctl that is not there is the same as none.
 	srcs = Sources(ctx, Options{Root: root, Live: true, Now: ds.Scenario.End, Journalctl: filepath.Join(root, "no-such-program")})
-	if len(srcs) != 5 {
+	if len(srcs) != 6 {
 		t.Errorf("%d sources", len(srcs))
 	}
 }

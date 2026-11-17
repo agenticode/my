@@ -13,7 +13,12 @@ type Host struct {
 	// "Hyper-V"), or is "hypervisor" where one is known to be there and
 	// not known by name. It is empty for a host that is not known to be a
 	// virtual machine.
-	Virtual   string    `json:"virtual,omitzero"`
+	Virtual string `json:"virtual,omitzero"`
+	// Sockets is the number of processor records of the SMBIOS tables:
+	// the sockets of the board. 0 when no full table was read.
+	Sockets int `json:"sockets,omitzero"`
+	// CPU is the name of the processor of the first such record.
+	CPU       string    `json:"cpu,omitzero"`
 	FirstSeen time.Time `json:"first_seen,omitzero"`
 	LastSeen  time.Time `json:"last_seen,omitzero"`
 }

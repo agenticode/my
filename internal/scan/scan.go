@@ -50,6 +50,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
+	"github.com/agenticode/my/internal/adapter/hostmem"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/mcelog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
@@ -100,6 +101,11 @@ type Options struct {
 	// Mcelog is the mcelog program. Empty looks it up in PATH; "-" leaves
 	// the counts of the mcelog daemon out.
 	Mcelog string
+	// Numactl, Numastat and Sar are the programs whose output the Memory
+	// Explorer shows (numactl --hardware, numastat, sar -B). Empty looks
+	// each up in PATH; "-" does not run it. A copy of a host's files runs
+	// none of them.
+	Numactl, Numastat, Sar string
 	// Location is the time zone of log files whose times carry none
 	// (syslog files). Nil means the zone of this process on a live host
 	// and UTC otherwise.
@@ -321,6 +327,9 @@ func sourceList(ctx context.Context, opts Options) []tagged {
 	add(false, sm)
 	add(false, gpuMemory(&opts)...)
 	add(false, bmcLog(&opts)...)
+	if opts.Live || hostmem.Holds(opts.root()) {
+		add(false, hostmem.New(opts.root(), hostmem.Options{Live: opts.Live, Now: now, Numactl: opts.Numactl, Numastat: opts.Numastat, Sar: opts.Sar}))
+	}
 	return out
 }
 
@@ -411,14 +420,21 @@ func bmcLog(opts *Options) []adapter.Adapter {
 	return nil
 }
 
+// McelogClientFile is where a copy of a host's files keeps the answer of
+// "mcelog --client".
+const McelogClientFile = "mcelog-client.txt"
+
 // daemonCounts picks the source of the error counts the mcelog daemon
 // keeps. A live host that has the mcelog program is asked through its
 // client, which only reads; a host without the program gets no entry,
 // because most hosts run rasdaemon or nothing. A copy of a host's files
-// has no place where the answer of the daemon is kept: a saved answer is
-// read by an import.
+// is read from McelogClientFile when it has one.
 func daemonCounts(opts *Options, now time.Time) []adapter.Adapter {
 	if !opts.Live {
+		// A collection of my collect host keeps the answer of the client.
+		if p := opts.path(McelogClientFile); exists(p) {
+			return []adapter.Adapter{mcelog.NewFile(p, mcelog.Options{Now: now})}
+		}
 		return nil
 	}
 	prog := opts.Mcelog
