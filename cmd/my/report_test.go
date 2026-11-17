@@ -337,7 +337,7 @@ func TestReportFigures(t *testing.T) {
 	if code != cli.ExitOK || stderr != "" || !strings.Contains(stdout, "그림 저장: "+only+" (SVG 파일 8개)") || strings.Contains(stdout, "리포트 저장") {
 		t.Errorf("--figures alone: exit code %d, stderr %q\n%s", code, stderr, stdout)
 	}
-	if data, _ := os.ReadFile(filepath.Join(only, "slotmap.svg")); !bytes.Contains(data, []byte("슬롯 맵")) || !bytes.Contains(data, []byte("즉시 교체")) {
+	if data, _ := os.ReadFile(filepath.Join(only, "slotmap.svg")); !bytes.Contains(data, []byte("의 보드")) || !bytes.Contains(data, []byte("즉시 교체")) {
 		t.Error("the Korean slot map is not in Korean")
 	}
 

@@ -117,4 +117,21 @@ svg.spark { vertical-align: -3px; margin-right: 8px; }
 .fig .figtitle { font-size: 13px; font-weight: 600; fill: var(--ink); }
 .fig .figlegend { font-size: 11px; fill: var(--ink2); }
 .fig .fignote { font-size: 11px; fill: var(--ink2); }
+
+/* The board: the CPUs with the banks of their channels. */
+.mb-die { fill: var(--surface); stroke: var(--ink3); stroke-width: 1.2; }
+.fig .mb-cpu-name { font-size: 12px; font-weight: 600; fill: var(--ink); }
+.fig .mb-cpu-sub, .fig .mb-cache-label, .fig .mb-ch-label, .fig .mb-stick-cap { font-size: 9.5px; }
+.fig .mb-cache-label, .fig .mb-stick-cap { font-family: var(--mono); }
+.mb-cache-bar { fill: var(--wash); stroke: var(--line); stroke-width: 1; }
+.mb-cache-bar.cache-l1 { fill: var(--h0); }
+.mb-cache-bar.cache-l2 { fill: #e6eefb; }
+.mb-cache-bar.cache-l3 { fill: #d2e2f8; }
+.mb-bus { fill: none; stroke: var(--axis); stroke-width: 2; }
+.mb-stick-notch { fill: var(--axis); }
+.mb-stick-notch.ue { fill: var(--replace); }
+.g-observe .mb-stick-cap, .g-replace .mb-stick-cap { fill: #fff; }
+.g-consider .mb-stick-cap, .g-hold .mb-stick-cap, .g-ok .mb-stick-cap { fill: var(--ink); }
+.mb-cpu-die:hover .mb-die { stroke: var(--ink); }
+svg.board .slot .cell { pointer-events: visible; }
 </style><rect class="bg" width="736" height="165"/><text class="figtitle" x="16" y="28">CPU0_C1 S/N 3B9C56: 오류가 몰린 가지 (폭 = 이 DIMM 오류 중 비중)</text><g transform="translate(16 42)"><text class="rowlabel" x="0" y="15">rank</text><g class="seg"><title>rank rank0: 1,232건, 이 DIMM의 100%</title><rect x="55" y="0" width="648" height="22" rx="4"/><text class="seglabel" x="62" y="15">rank0</text><text class="segshare" x="696" y="15" text-anchor="end">100%</text></g><text class="rowlabel" x="0" y="42">device</text><g class="seg"><title>device dev7: 1,232건, 이 DIMM의 100%</title><rect x="55" y="27" width="648" height="22" rx="4"/><text class="seglabel" x="62" y="42">dev7</text><text class="segshare" x="696" y="42" text-anchor="end">100%</text></g><text class="rowlabel" x="0" y="69">bank</text><g class="seg"><title>bank bg0 bank3: 1,232건, 이 DIMM의 100%</title><rect x="55" y="54" width="648" height="22" rx="4"/><text class="seglabel" x="62" y="69">bg0 bank3</text><text class="segshare" x="696" y="69" text-anchor="end">100%</text></g><text class="rowlabel" x="0" y="96">row</text><g class="seg"><title>row 0x1a2f: 1,206건, 이 DIMM의 98%</title><rect x="55" y="81" width="634.28" height="22" rx="4"/><text class="seglabel" x="62" y="96">0x1a2f</text><text class="segshare" x="682.28" y="96" text-anchor="end">98%</text></g><g class="seg"><title>row 0x1a30: 26건, 이 DIMM의 2%</title><rect x="691.28" y="81" width="11.72" height="22" rx="4"/></g></g></svg>

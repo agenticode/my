@@ -379,7 +379,23 @@ func (doc *Document) slotMap() *node {
 	s := doc.section(2)
 	ov := doc.Overview
 	sm := &ov.SlotMap
-	if len(sm.Rows) == 0 {
+	subjectSlot := ""
+	for _, d := range doc.DIMMs {
+		if d.Subject && d.Card.Present {
+			subjectSlot = d.Card.Slot
+		}
+	}
+	if b := doc.Board; boardDrawn(b) {
+		cards, ids := doc.boardCards(b)
+		s.add(el("figure", A{"class", "board"}, doc.boardSummary(b), doc.boardFigure(b, doc.anchors(), subjectSlot, ids),
+			doc.slotLegend(boardStates(b), subjectSlot != ""),
+			el("figcaption", doc.vsay("ov.slots", "slots", sm.Slots, "dimms", sm.Populated))),
+			how(doc.say("cap.board")), cards)
+		if b.Aside != nil && len(b.Aside.Rows) > 0 {
+			s.add(el("figure", el("figcaption", doc.boardAside(b)), doc.slotMapFigure(b.Aside, doc.anchors(), subjectSlot), doc.slotLegend(b.Aside, false)))
+		}
+		s.add(el("div", A{"id", "mx-hover", "class", "mx-hover", "hidden", "hidden", "role", "tooltip"}))
+	} else if len(sm.Rows) == 0 {
 		s.add(el("p", doc.vsay("ov.no_slots")))
 	} else {
 		subject := ""

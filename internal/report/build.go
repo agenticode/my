@@ -18,6 +18,7 @@ package report
 import (
 	"context"
 	"fmt"
+	"github.com/agenticode/my/internal/adapter"
 	"sort"
 	"strings"
 	"time"
@@ -141,6 +142,9 @@ type Document struct {
 	CaseID string
 
 	Overview *view.Overview
+	// Board is the board of the host as the Memory Explorer draws it, or
+	// nil when it could not be built.
+	Board *view.Board
 	// Timeline is the timeline of the host, with one row per DIMM.
 	Timeline *view.Timeline
 	// Boots is the window of the latest boots of the host.
@@ -294,6 +298,14 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 	if doc.Overview, err = c.Overview(ctx, h, false); err != nil {
 		return nil, err
 	}
+	// A board that fails leaves section 2 as the slot map draws it.
+	doc.Board = adapter.Guard(func() *view.Board {
+		b, err := c.Board(ctx, h)
+		if err != nil {
+			return nil
+		}
+		return b
+	})
 	if doc.Firmware, err = s.FirmwareRecords(ctx, store.FirmwareFilter{Host: h.Host}); err != nil {
 		return nil, err
 	}

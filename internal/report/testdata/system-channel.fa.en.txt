@@ -22,46 +22,535 @@ section#s1.sec
   li: 8 Appendix
 section#s2.sec
   ## 2 Slot map
-  figure
-    svg.fig.slotmap: Slot map of host synth-system-channel
-      mark: CPU0_A1: ok, S/N 86EACF
-      mark: CPU0_A2: ok, S/N A7C1DA
-      mark: CPU0_B1: hold replacement, S/N 880018, CE 181, UE 0
-      mark: CPU0_B2: hold replacement, S/N E7A387, CE 160, UE 0
-      mark: CPU0_C1: ok, S/N 34C15C
-      mark: CPU0_C2: ok, S/N 31BCDE
-      mark: CPU0_D1: ok, S/N FF0C3B
-      mark: CPU0_D2: ok, S/N C56A80
-      mark: CPU0_E1: observe, S/N 01EAE2, CE 1, UE 0
-      mark: CPU0_E2: ok, S/N D51D2B
-      mark: CPU0_F1: observe, S/N 332238, CE 1, UE 0
-      mark: CPU0_F2: observe, S/N A8A64B, CE 1, UE 0
-      mark: CPU0_G1: observe, S/N B31D2C, CE 1, UE 0
-      mark: CPU0_G2: ok, S/N 3056DB
-      mark: CPU0_H1: ok, S/N 9CEE99
-      mark: CPU0_H2: observe, S/N 7F782A, CE 1, UE 0
-      mark: CPU1_A1: observe, S/N B41102, CE 1, UE 0
-      mark: CPU1_A2: observe, S/N C34D84, CE 1, UE 0
-      mark: CPU1_B1: ok, S/N BE33D7
-      mark: CPU1_B2: ok, S/N 399A55
-      mark: CPU1_C1: observe, S/N 12AE34, CE 1, UE 0
-      mark: CPU1_C2: observe, S/N 098671, CE 1, UE 0
-      mark: CPU1_D1: ok, S/N 24B4B8
-      mark: CPU1_D2: ok, S/N F24534
-      mark: CPU1_E1: observe, S/N 6A7388, CE 1, UE 0
-      mark: CPU1_E2: ok, S/N E8ED64
-      mark: CPU1_F1: ok, S/N 149B51
-      mark: CPU1_F2: ok, S/N 016FC5
-      mark: CPU1_G1: observe, S/N BE334C, CE 1, UE 0
-      mark: CPU1_G2: observe, S/N F6088C, CE 1, UE 0
-      mark: CPU1_H1: ok, S/N 849FD6
-      mark: CPU1_H2: ok, S/N 6446CF
-      text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
+  figure.board
+    p.board-summary: 32 of 32 slots hold a module, 2048 GB in all, CE 353, UE 0 DDR5 RDIMM 4800 MT/s
+    svg.fig.slotmap.board: Board of host synth-system-channel
+      mark: CPU0_H2: observe, 64 GB, S/N 7F782A, CE 1, UE 0
+      mark: CPU0_H1: ok, 64 GB, S/N 9CEE99
+      mark: CPU0_G2: ok, 64 GB, S/N 3056DB
+      mark: CPU0_G1: observe, 64 GB, S/N B31D2C, CE 1, UE 0
+      mark: CPU0_F2: observe, 64 GB, S/N A8A64B, CE 1, UE 0
+      mark: CPU0_F1: observe, 64 GB, S/N 332238, CE 1, UE 0
+      mark: CPU0_E2: ok, 64 GB, S/N D51D2B
+      mark: CPU0_E1: observe, 64 GB, S/N 01EAE2, CE 1, UE 0
+      mark: CPU0_D2: ok, 64 GB, S/N C56A80
+      mark: CPU0_D1: ok, 64 GB, S/N FF0C3B
+      mark: CPU0_C2: ok, 64 GB, S/N 31BCDE
+      mark: CPU0_C1: ok, 64 GB, S/N 34C15C
+      mark: CPU0_B2: hold replacement, 64 GB, S/N E7A387, CE 160, UE 0
+      mark: CPU0_B1: hold replacement, 64 GB, S/N 880018, CE 181, UE 0
+      mark: CPU0_A2: ok, 64 GB, S/N A7C1DA
+      mark: CPU0_A1: ok, 64 GB, S/N 86EACF
+      mark: CPU 0
+      mark: CPU 1
+      mark: CPU1_A1: observe, 64 GB, S/N B41102, CE 1, UE 0
+      mark: CPU1_A2: observe, 64 GB, S/N C34D84, CE 1, UE 0
+      mark: CPU1_B1: ok, 64 GB, S/N BE33D7
+      mark: CPU1_B2: ok, 64 GB, S/N 399A55
+      mark: CPU1_C1: observe, 64 GB, S/N 12AE34, CE 1, UE 0
+      mark: CPU1_C2: observe, 64 GB, S/N 098671, CE 1, UE 0
+      mark: CPU1_D1: ok, 64 GB, S/N 24B4B8
+      mark: CPU1_D2: ok, 64 GB, S/N F24534
+      mark: CPU1_E1: observe, 64 GB, S/N 6A7388, CE 1, UE 0
+      mark: CPU1_E2: ok, 64 GB, S/N E8ED64
+      mark: CPU1_F1: ok, 64 GB, S/N 149B51
+      mark: CPU1_F2: ok, 64 GB, S/N 016FC5
+      mark: CPU1_G1: observe, 64 GB, S/N BE334C, CE 1, UE 0
+      mark: CPU1_G2: observe, 64 GB, S/N F6088C, CE 1, UE 0
+      mark: CPU1_H1: ok, 64 GB, S/N 849FD6
+      mark: CPU1_H2: ok, 64 GB, S/N 6446CF
+      text: CPU0_H2 | CPU0_H1 | Ch7 | CPU0_G2 | CPU0_G1 | Ch6 | CPU0_F2 | CPU0_F1 | Ch5 | CPU0_E2 | CPU0_E1 | Ch4 | CPU0_D2 | CPU0_D1 | Ch3 | CPU0_C2 | CPU0_C1 | Ch2 | CPU0_B2 | CPU0_B1 | Ch1 | CPU0_A2 | CPU0_A1 | Ch0 | CPU 0 | 16 DIMMs | 1024 GB | CPU 1 | 16 DIMMs | 1024 GB | CPU1_A1 | CPU1_A2 | Ch0 | CPU1_B1 | CPU1_B2 | Ch1 | CPU1_C1 | CPU1_C2 | Ch2 | CPU1_D1 | CPU1_D2 | Ch3 | CPU1_E1 | CPU1_E2 | Ch4 | CPU1_F1 | CPU1_F2 | Ch5 | CPU1_G1 | CPU1_G2 | Ch6 | CPU1_H1 | CPU1_H2 | Ch7
     li: observe
     li: ok
     li: hold replacement
     figcaption: 32 slots, 32 DIMMs
-  p.how: One cell per slot: a line per socket and a group per memory channel, in board order. The colour and the mark of a cell give the grade of the finding for the DIMM in that slot. A slot without a module is an outline. A cell leads to the finding of its DIMM.
+  p.how: One stick per slot, in the arrangement of the Memory Explorer: per CPU the channels of its memory, channel 0 next to the CPU, the slots of a channel side by side. The colour and the mark of a stick give the grade of the finding for its DIMM; a red notch on top marks a module with an uncorrected error; a slot without a module is an outline. A stick leads to the finding of its DIMM and shows the details of the module under the pointer.
+  CPU0_H2 = 
+  Locator = CPU0_H2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 7F782A
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel7_Dimm1
+  On the board = CPU 0, channel 7
+  Finding = observe
+  CPU0_H1 = 
+  Locator = CPU0_H1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 9CEE99
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel7_Dimm0
+  On the board = CPU 0, channel 7
+  Finding = ok
+  CPU0_G2 = 
+  Locator = CPU0_G2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 3056DB
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel6_Dimm1
+  On the board = CPU 0, channel 6
+  Finding = ok
+  CPU0_G1 = 
+  Locator = CPU0_G1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = B31D2C
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel6_Dimm0
+  On the board = CPU 0, channel 6
+  Finding = observe
+  CPU0_F2 = 
+  Locator = CPU0_F2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = A8A64B
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel5_Dimm1
+  On the board = CPU 0, channel 5
+  Finding = observe
+  CPU0_F1 = 
+  Locator = CPU0_F1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 332238
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel5_Dimm0
+  On the board = CPU 0, channel 5
+  Finding = observe
+  CPU0_E2 = 
+  Locator = CPU0_E2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = D51D2B
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel4_Dimm1
+  On the board = CPU 0, channel 4
+  Finding = ok
+  CPU0_E1 = 
+  Locator = CPU0_E1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 01EAE2
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel4_Dimm0
+  On the board = CPU 0, channel 4
+  Finding = observe
+  CPU0_D2 = 
+  Locator = CPU0_D2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = C56A80
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel3_Dimm1
+  On the board = CPU 0, channel 3
+  Finding = ok
+  CPU0_D1 = 
+  Locator = CPU0_D1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = FF0C3B
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel3_Dimm0
+  On the board = CPU 0, channel 3
+  Finding = ok
+  CPU0_C2 = 
+  Locator = CPU0_C2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 31BCDE
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel2_Dimm1
+  On the board = CPU 0, channel 2
+  Finding = ok
+  CPU0_C1 = 
+  Locator = CPU0_C1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 34C15C
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel2_Dimm0
+  On the board = CPU 0, channel 2
+  Finding = ok
+  CPU0_B2 = 
+  Locator = CPU0_B2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = E7A387
+  Ranks = 2
+  Corrected errors = 160
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel1_Dimm1
+  On the board = CPU 0, channel 1
+  Finding = hold replacement
+  CPU0_B1 = 
+  Locator = CPU0_B1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 880018
+  Ranks = 2
+  Corrected errors = 181
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel1_Dimm0
+  On the board = CPU 0, channel 1
+  Finding = hold replacement
+  CPU0_A2 = 
+  Locator = CPU0_A2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = A7C1DA
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel0_Dimm1
+  On the board = CPU 0, channel 0
+  Finding = ok
+  CPU0_A1 = 
+  Locator = CPU0_A1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 86EACF
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P0_Node0_Channel0_Dimm0
+  On the board = CPU 0, channel 0
+  Finding = ok
+  CPU 0 = 
+  DIMMs = 16
+  Memory = 1024 GB
+  CPU 1 = 
+  DIMMs = 16
+  Memory = 1024 GB
+  CPU1_A1 = 
+  Locator = CPU1_A1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = B41102
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel0_Dimm0
+  On the board = CPU 1, channel 0
+  Finding = observe
+  CPU1_A2 = 
+  Locator = CPU1_A2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = C34D84
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel0_Dimm1
+  On the board = CPU 1, channel 0
+  Finding = observe
+  CPU1_B1 = 
+  Locator = CPU1_B1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = BE33D7
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel1_Dimm0
+  On the board = CPU 1, channel 1
+  Finding = ok
+  CPU1_B2 = 
+  Locator = CPU1_B2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 399A55
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel1_Dimm1
+  On the board = CPU 1, channel 1
+  Finding = ok
+  CPU1_C1 = 
+  Locator = CPU1_C1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 12AE34
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel2_Dimm0
+  On the board = CPU 1, channel 2
+  Finding = observe
+  CPU1_C2 = 
+  Locator = CPU1_C2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 098671
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel2_Dimm1
+  On the board = CPU 1, channel 2
+  Finding = observe
+  CPU1_D1 = 
+  Locator = CPU1_D1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 24B4B8
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel3_Dimm0
+  On the board = CPU 1, channel 3
+  Finding = ok
+  CPU1_D2 = 
+  Locator = CPU1_D2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = F24534
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel3_Dimm1
+  On the board = CPU 1, channel 3
+  Finding = ok
+  CPU1_E1 = 
+  Locator = CPU1_E1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 6A7388
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel4_Dimm0
+  On the board = CPU 1, channel 4
+  Finding = observe
+  CPU1_E2 = 
+  Locator = CPU1_E2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = E8ED64
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel4_Dimm1
+  On the board = CPU 1, channel 4
+  Finding = ok
+  CPU1_F1 = 
+  Locator = CPU1_F1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 149B51
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel5_Dimm0
+  On the board = CPU 1, channel 5
+  Finding = ok
+  CPU1_F2 = 
+  Locator = CPU1_F2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 016FC5
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel5_Dimm1
+  On the board = CPU 1, channel 5
+  Finding = ok
+  CPU1_G1 = 
+  Locator = CPU1_G1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = BE334C
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel6_Dimm0
+  On the board = CPU 1, channel 6
+  Finding = observe
+  CPU1_G2 = 
+  Locator = CPU1_G2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = F6088C
+  Ranks = 2
+  Corrected errors = 1
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel6_Dimm1
+  On the board = CPU 1, channel 6
+  Finding = observe
+  CPU1_H1 = 
+  Locator = CPU1_H1
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 849FD6
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel7_Dimm0
+  On the board = CPU 1, channel 7
+  Finding = ok
+  CPU1_H2 = 
+  Locator = CPU1_H2
+  Size = 64 GB
+  Type = DDR5 RDIMM
+  Speed = 4800 MT/s
+  Configured speed = 4800 MT/s
+  Maker = Example Memory
+  Part number = EXM64G48R2X4-A
+  Serial number = 6446CF
+  Ranks = 2
+  Corrected errors = 0
+  Uncorrected errors = 0
+  Bank locator = P1_Node1_Channel7_Dimm1
+  On the board = CPU 1, channel 7
+  Finding = ok
   table.ranking
     | # | slot | serial | CE | UE | fault mode | last 30 days | finding | rules
     | 1 | CPU0_B1 | 880018 | 181 | 0 | system issue | steady | hold replacement | R-SYS-01

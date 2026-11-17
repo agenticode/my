@@ -22,47 +22,408 @@ section#s1.sec
   li: 8 부록
 section#s2.sec
   ## 2 슬롯 맵
-  figure
-    svg.fig.slotmap: 호스트 r12-n034의 슬롯 맵
-      mark: CPU0_A1: 정상, S/N 5C331B
-      mark: CPU0_A2: 빈 슬롯
-      mark: CPU0_B1: 정상, S/N DE7FF0
-      mark: CPU0_B2: 빈 슬롯
-      mark: CPU0_C1: 즉시 교체, S/N 3B9C56, CE 1,231건, UE 1건
-      mark: CPU0_C2: 빈 슬롯
-      mark: CPU0_D1: 정상, S/N 80D01E
-      mark: CPU0_D2: 빈 슬롯
-      mark: CPU0_E1: 정상, S/N E2CD51
-      mark: CPU0_E2: 빈 슬롯
-      mark: CPU0_F1: 정상, S/N 2B6332
-      mark: CPU0_F2: 빈 슬롯
-      mark: CPU0_G1: 정상, S/N 382A8A
-      mark: CPU0_G2: 빈 슬롯
-      mark: CPU0_H1: 정상, S/N 4B3B31
+  figure.board
+    p.board-summary: 슬롯 32개 중 16개에 모듈이 있음, 모두 1024 GB, CE 1,284건, UE 1건 DDR5 RDIMM 4800 MT/s
+    svg.fig.slotmap.board: 호스트 r12-n034의 보드
       mark: CPU0_H2: 빈 슬롯
-      mark: CPU1_A1: 정상, S/N 2C9305
+      mark: CPU0_H1: 정상, 64 GB, S/N 4B3B31
+      mark: CPU0_G2: 빈 슬롯
+      mark: CPU0_G1: 정상, 64 GB, S/N 382A8A
+      mark: CPU0_F2: 빈 슬롯
+      mark: CPU0_F1: 정상, 64 GB, S/N 2B6332
+      mark: CPU0_E2: 빈 슬롯
+      mark: CPU0_E1: 정상, 64 GB, S/N E2CD51
+      mark: CPU0_D2: 빈 슬롯
+      mark: CPU0_D1: 정상, 64 GB, S/N 80D01E
+      mark: CPU0_C2: 빈 슬롯
+      mark: CPU0_C1: 즉시 교체, 64 GB, S/N 3B9C56, CE 1,231건, UE 1건
+      mark: CPU0_B2: 빈 슬롯
+      mark: CPU0_B1: 정상, 64 GB, S/N DE7FF0
+      mark: CPU0_A2: 빈 슬롯
+      mark: CPU0_A1: 정상, 64 GB, S/N 5C331B
+      mark: CPU 0
+      mark: CPU 1
+      mark: CPU1_A1: 정상, 64 GB, S/N 2C9305
       mark: CPU1_A2: 빈 슬롯
-      mark: CPU1_B1: 정상, S/N DBC9CE
+      mark: CPU1_B1: 정상, 64 GB, S/N DBC9CE
       mark: CPU1_B2: 빈 슬롯
-      mark: CPU1_C1: 정상, S/N 99B7F7
+      mark: CPU1_C1: 정상, 64 GB, S/N 99B7F7
       mark: CPU1_C2: 빈 슬롯
-      mark: CPU1_D1: 관찰, S/N 2AEB41, CE 53건, UE 0건
+      mark: CPU1_D1: 관찰, 64 GB, S/N 2AEB41, CE 53건, UE 0건
       mark: CPU1_D2: 빈 슬롯
-      mark: CPU1_E1: 정상, S/N 02AC34
+      mark: CPU1_E1: 정상, 64 GB, S/N 02AC34
       mark: CPU1_E2: 빈 슬롯
-      mark: CPU1_F1: 정상, S/N 848BE3
+      mark: CPU1_F1: 정상, 64 GB, S/N 848BE3
       mark: CPU1_F2: 빈 슬롯
-      mark: CPU1_G1: 정상, S/N D7A399
+      mark: CPU1_G1: 정상, 64 GB, S/N D7A399
       mark: CPU1_G2: 빈 슬롯
-      mark: CPU1_H1: 정상, S/N 55C12A
+      mark: CPU1_H1: 정상, 64 GB, S/N 55C12A
       mark: CPU1_H2: 빈 슬롯
-      text: CPU0 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2 | CPU1 | A1 | A2 | B1 | B2 | C1 | C2 | D1 | D2 | E1 | E2 | F1 | F2 | G1 | G2 | H1 | H2
+      text: CPU0_H2 | CPU0_H1 | Ch7 | CPU0_G2 | CPU0_G1 | Ch6 | CPU0_F2 | CPU0_F1 | Ch5 | CPU0_E2 | CPU0_E1 | Ch4 | CPU0_D2 | CPU0_D1 | Ch3 | CPU0_C2 | CPU0_C1 | Ch2 | CPU0_B2 | CPU0_B1 | Ch1 | CPU0_A2 | CPU0_A1 | Ch0 | CPU 0 | DIMM 8개 | 512 GB | CPU 1 | DIMM 8개 | 512 GB | CPU1_A1 | CPU1_A2 | Ch0 | CPU1_B1 | CPU1_B2 | Ch1 | CPU1_C1 | CPU1_C2 | Ch2 | CPU1_D1 | CPU1_D2 | Ch3 | CPU1_E1 | CPU1_E2 | Ch4 | CPU1_F1 | CPU1_F2 | Ch5 | CPU1_G1 | CPU1_G2 | Ch6 | CPU1_H1 | CPU1_H2 | Ch7
     li: 즉시 교체
     li: 관찰
     li: 정상
     li: 빈 슬롯
     figcaption: 슬롯 32개, DIMM 16개
-  p.how: 칸 하나가 슬롯 하나입니다. 소켓마다 한 줄, 메모리 채널마다 한 묶음이며 보드 순서를 따릅니다. 칸의 색과 표식이 그 슬롯 DIMM의 소견 등급입니다. 모듈이 없는 슬롯은 테두리만 그립니다. 칸을 누르면 그 DIMM의 판정으로 갑니다.
+  p.how: 막대 하나가 슬롯 하나입니다. 메모리 익스플로러의 배치를 따라 CPU마다 메모리 채널을 그리고, 채널 0을 CPU 옆에 두며, 한 채널의 슬롯은 나란히 둡니다. 막대의 색과 표식이 그 DIMM의 소견 등급입니다. 위쪽 홈이 빨간 막대는 정정 불가 오류가 난 모듈입니다. 모듈이 없는 슬롯은 테두리만 그립니다. 막대를 누르면 그 DIMM의 소견으로 가고, 포인터를 올리면 모듈 정보가 보입니다.
+  CPU0_H2 = 
+  로케이터 = CPU0_H2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel7_Dimm1
+  보드 위치 = CPU 0, 채널 7
+  소견 = 빈 슬롯
+  CPU0_H1 = 
+  로케이터 = CPU0_H1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 4B3B31
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel7_Dimm0
+  보드 위치 = CPU 0, 채널 7
+  소견 = 정상
+  CPU0_G2 = 
+  로케이터 = CPU0_G2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel6_Dimm1
+  보드 위치 = CPU 0, 채널 6
+  소견 = 빈 슬롯
+  CPU0_G1 = 
+  로케이터 = CPU0_G1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 382A8A
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel6_Dimm0
+  보드 위치 = CPU 0, 채널 6
+  소견 = 정상
+  CPU0_F2 = 
+  로케이터 = CPU0_F2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel5_Dimm1
+  보드 위치 = CPU 0, 채널 5
+  소견 = 빈 슬롯
+  CPU0_F1 = 
+  로케이터 = CPU0_F1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 2B6332
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel5_Dimm0
+  보드 위치 = CPU 0, 채널 5
+  소견 = 정상
+  CPU0_E2 = 
+  로케이터 = CPU0_E2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel4_Dimm1
+  보드 위치 = CPU 0, 채널 4
+  소견 = 빈 슬롯
+  CPU0_E1 = 
+  로케이터 = CPU0_E1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = E2CD51
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel4_Dimm0
+  보드 위치 = CPU 0, 채널 4
+  소견 = 정상
+  CPU0_D2 = 
+  로케이터 = CPU0_D2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel3_Dimm1
+  보드 위치 = CPU 0, 채널 3
+  소견 = 빈 슬롯
+  CPU0_D1 = 
+  로케이터 = CPU0_D1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 80D01E
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel3_Dimm0
+  보드 위치 = CPU 0, 채널 3
+  소견 = 정상
+  CPU0_C2 = 
+  로케이터 = CPU0_C2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel2_Dimm1
+  보드 위치 = CPU 0, 채널 2
+  소견 = 빈 슬롯
+  CPU0_C1 = 
+  로케이터 = CPU0_C1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 3B9C56
+  랭크 = 2
+  정정 오류 = 1231
+  정정 불가 오류 = 1
+  뱅크 로케이터 = P0_Node0_Channel2_Dimm0
+  보드 위치 = CPU 0, 채널 2
+  소견 = 즉시 교체
+  CPU0_B2 = 
+  로케이터 = CPU0_B2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel1_Dimm1
+  보드 위치 = CPU 0, 채널 1
+  소견 = 빈 슬롯
+  CPU0_B1 = 
+  로케이터 = CPU0_B1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = DE7FF0
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel1_Dimm0
+  보드 위치 = CPU 0, 채널 1
+  소견 = 정상
+  CPU0_A2 = 
+  로케이터 = CPU0_A2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel0_Dimm1
+  보드 위치 = CPU 0, 채널 0
+  소견 = 빈 슬롯
+  CPU0_A1 = 
+  로케이터 = CPU0_A1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 5C331B
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P0_Node0_Channel0_Dimm0
+  보드 위치 = CPU 0, 채널 0
+  소견 = 정상
+  CPU 0 = 
+  DIMM = 8
+  메모리 = 512 GB
+  CPU 1 = 
+  DIMM = 8
+  메모리 = 512 GB
+  CPU1_A1 = 
+  로케이터 = CPU1_A1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 2C9305
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel0_Dimm0
+  보드 위치 = CPU 1, 채널 0
+  소견 = 정상
+  CPU1_A2 = 
+  로케이터 = CPU1_A2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel0_Dimm1
+  보드 위치 = CPU 1, 채널 0
+  소견 = 빈 슬롯
+  CPU1_B1 = 
+  로케이터 = CPU1_B1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = DBC9CE
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel1_Dimm0
+  보드 위치 = CPU 1, 채널 1
+  소견 = 정상
+  CPU1_B2 = 
+  로케이터 = CPU1_B2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel1_Dimm1
+  보드 위치 = CPU 1, 채널 1
+  소견 = 빈 슬롯
+  CPU1_C1 = 
+  로케이터 = CPU1_C1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 99B7F7
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel2_Dimm0
+  보드 위치 = CPU 1, 채널 2
+  소견 = 정상
+  CPU1_C2 = 
+  로케이터 = CPU1_C2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel2_Dimm1
+  보드 위치 = CPU 1, 채널 2
+  소견 = 빈 슬롯
+  CPU1_D1 = 
+  로케이터 = CPU1_D1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 2AEB41
+  랭크 = 2
+  정정 오류 = 53
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel3_Dimm0
+  보드 위치 = CPU 1, 채널 3
+  소견 = 관찰
+  CPU1_D2 = 
+  로케이터 = CPU1_D2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel3_Dimm1
+  보드 위치 = CPU 1, 채널 3
+  소견 = 빈 슬롯
+  CPU1_E1 = 
+  로케이터 = CPU1_E1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 02AC34
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel4_Dimm0
+  보드 위치 = CPU 1, 채널 4
+  소견 = 정상
+  CPU1_E2 = 
+  로케이터 = CPU1_E2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel4_Dimm1
+  보드 위치 = CPU 1, 채널 4
+  소견 = 빈 슬롯
+  CPU1_F1 = 
+  로케이터 = CPU1_F1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 848BE3
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel5_Dimm0
+  보드 위치 = CPU 1, 채널 5
+  소견 = 정상
+  CPU1_F2 = 
+  로케이터 = CPU1_F2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel5_Dimm1
+  보드 위치 = CPU 1, 채널 5
+  소견 = 빈 슬롯
+  CPU1_G1 = 
+  로케이터 = CPU1_G1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = D7A399
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel6_Dimm0
+  보드 위치 = CPU 1, 채널 6
+  소견 = 정상
+  CPU1_G2 = 
+  로케이터 = CPU1_G2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel6_Dimm1
+  보드 위치 = CPU 1, 채널 6
+  소견 = 빈 슬롯
+  CPU1_H1 = 
+  로케이터 = CPU1_H1
+  크기 = 64 GB
+  종류 = DDR5 RDIMM
+  속도 = 4800 MT/s
+  설정 속도 = 4800 MT/s
+  제조사 = Example Memory
+  부품 번호 = EXM64G48R2X4-A
+  일련번호 = 55C12A
+  랭크 = 2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel7_Dimm0
+  보드 위치 = CPU 1, 채널 7
+  소견 = 정상
+  CPU1_H2 = 
+  로케이터 = CPU1_H2
+  정정 오류 = 0
+  정정 불가 오류 = 0
+  뱅크 로케이터 = P1_Node1_Channel7_Dimm1
+  보드 위치 = CPU 1, 채널 7
+  소견 = 빈 슬롯
   table.ranking
     | # | 슬롯 | 시리얼 | CE | UE | 고장 모드 | 최근 30일 | 소견 | 규칙
     | 1 | CPU0_C1 | 3B9C56 | 1,231 | 1 | row | 증가 | 즉시 교체 | R-UE-01 R-ROW-03 R-REP-02

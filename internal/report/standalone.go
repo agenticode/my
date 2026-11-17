@@ -207,7 +207,15 @@ func (doc *Document) Figures() ([]Figure, error) {
 			legend = append(legend, legendItem{[]*node{el("g", A{"class", "slot"}, el("path", A{"class", "pointer", "d", "M3 4h8l-4 6z"}))}, doc.say("sum.subject")})
 		}
 		notes := []string{doc.vsay("ov.slots", "slots", sm.Slots, "dimms", sm.Populated)}
-		if err := add("slotmap", doc.say("fig.slotmap", "host", host), legend, doc.slotMapFigure(sm, nil, subject), notes); err != nil {
+		fig, heading := doc.slotMapFigure(sm, nil, subject), doc.say("fig.slotmap", "host", host)
+		if b := doc.Board; boardDrawn(b) {
+			// The board stands for the slot map, under its name.
+			fig, heading = doc.boardFigure(b, nil, subject, nil), doc.say("fig.board", "host", host)
+			if b.Aside != nil && b.Aside.Slots > 0 {
+				notes = append(notes, doc.boardAside(b)+" "+strings.Join(asideNames(b.Aside), ", "))
+			}
+		}
+		if err := add("slotmap", heading, legend, fig, notes); err != nil {
 			return nil, err
 		}
 	}
@@ -273,4 +281,17 @@ func (doc *Document) Figures() ([]Figure, error) {
 		}
 	}
 	return out, nil
+}
+
+// asideNames are the names of the slots of a slot map.
+func asideNames(sm *view.SlotMap) []string {
+	var out []string
+	for _, r := range sm.Rows {
+		for _, c := range r.Channels {
+			for _, sl := range c.Slots {
+				out = append(out, sl.Slot)
+			}
+		}
+	}
+	return out
 }
