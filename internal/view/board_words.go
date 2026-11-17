@@ -152,4 +152,9 @@ var BoardMessages = i18n.Catalog{
 	"pop.cond.P-MIX-03":   {EN: "in a channel the module with more capacity does not stand in the slot the vendor fills first", KO: "채널에서 용량이 큰 모듈이 먼저 채우는 슬롯에 있지 않음"},
 	"pop.cond.P-MIX-04":   {EN: "modules of different rated speed stand in one system", KO: "정격 속도가 다른 모듈이 한 시스템에 있음"},
 	"pop.cond.P-MIX-05":   {EN: "the modules of a channel carry different part numbers where the vendor asks for identical modules", KO: "제조사가 같은 모듈을 요구하는 보드에서 한 채널의 부품 번호가 다름"},
+	"pop.col.n":           {EN: "modules", KO: "모듈 수"},
+	"pop.col.slots":       {EN: "slots the table fills", KO: "장착표가 채우는 슬롯"},
+	"pop.table_of":        {EN: "The vendor's table, CPU {cpu}", KO: "제조사 장착표, CPU {cpu}"},
+	"pop.unchecked_title": {EN: "Rules not checked", KO: "확인하지 않은 규칙"},
+	"pop.ranks":           {EN: "{n} {n|rank|ranks}", KO: "{n}랭크"},
 }

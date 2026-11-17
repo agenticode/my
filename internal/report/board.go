@@ -32,7 +32,39 @@ const (
 	// bMinScale is the least a row of two sockets is shrunk to; below it
 	// each socket takes a row of its own.
 	bMinScale = 0.7
+	// bMarkH is the band of the population marks under the names.
+	bMarkH = 14.0
 )
+
+// boardMarked tells a board whose sticks carry marks of the population
+// check.
+func boardMarked(b *view.Board) bool {
+	for _, r := range b.Rows {
+		for _, p := range r.Parts {
+			for _, ch := range p.Channels {
+				for _, st := range ch.Sticks {
+					if st.Mark != "" {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
+// markPath is the mark of the population check centred at cx, cy: a plus
+// on an empty slot the vendor's table fills, a minus of the same width on
+// a module in a slot the table leaves empty.
+func markPath(mark string, cx, cy float64) *node {
+	switch mark {
+	case "+":
+		return el("path", A{"class", "mb-mark mb-mark-fill", "d", "M" + num(cx-4) + " " + num(cy) + "h8M" + num(cx) + " " + num(cy-4) + "v8"})
+	case "-":
+		return el("path", A{"class", "mb-mark mb-mark-leave", "d", "M" + num(cx-4) + " " + num(cy) + "h8"})
+	}
+	return nil
+}
 
 // boardDrawn tells a board that has a CPU to draw.
 func boardDrawn(b *view.Board) bool {
@@ -116,7 +148,13 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 		stickH = 40
 	}
 	cpuH := 18 + 2*13 + float64(cpuLevels)*13 + 8
-	bankH := stickH + 6 + nameW + 6 + bText + 4
+	// The marks of the population check stand in a band between the
+	// sticks and their names.
+	markH, markY := 0.0, 0.0
+	if boardMarked(b) {
+		markH, markY = bMarkH, stickH+2+bMarkH/2
+	}
+	bankH := stickH + markH + 6 + nameW + 6 + bText + 4
 	rowH := max(bankH, cpuH) + 18
 	w := min(figW, widest*s)
 	h := rowH*float64(len(lines)) + 10
@@ -153,7 +191,11 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 					if j > 0 {
 						x += bGapIn * s
 					}
-					group.add(doc.stick(st, x, y, bStickW*s, stickH, nameW, anchors[st.Slot], cards[st.Slot], subject == st.Slot))
+					group.add(doc.stick(st, x, y, bStickW*s, stickH, markH, anchors[st.Slot], cards[st.Slot], subject == st.Slot))
+					if m := markPath(st.Mark, x+bStickW*s/2, y+markY); m != nil && markY > 0 {
+						m.add(el("title", doc.markText(st.Mark)))
+						group.add(m)
+					}
 					x += bStickW * s
 				}
 				if ch.Channel.Valid {
@@ -162,7 +204,7 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 					if ch.Name != "" {
 						label = ch.Name
 					}
-					group.add(el("text", A{"class", "mb-ch-label", "x", num((x0 + x) / 2), "y", num(y + stickH + 6 + nameW + 6 + bText), "text-anchor", "middle"},
+					group.add(el("text", A{"class", "mb-ch-label", "x", num((x0 + x) / 2), "y", num(y + stickH + markH + 6 + nameW + 6 + bText), "text-anchor", "middle"},
 						doc.say("board.ch", "n", label)))
 				}
 				bank.add(group)
@@ -176,8 +218,9 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 
 // stick draws one slot: its module with the grade of its finding, the
 // notch red when the module had an uncorrected error, the size upright on
-// it and the slot name upright below it.
-func (doc *Document) stick(st view.BoardStick, x, y, w, h, nameW float64, anchor, card string, subject bool) *node {
+// it and the slot name upright below it, below the band of the marks of
+// height markH.
+func (doc *Document) stick(st view.BoardStick, x, y, w, h, markH float64, anchor, card string, subject bool) *node {
 	title := doc.stickTitle(st)
 	cls := classes("slot", "mb-dimm-stick", gradeClass(st.State))
 	attrs := A{"class", cls, "aria-label", title}
@@ -207,7 +250,7 @@ func (doc *Document) stick(st view.BoardStick, x, y, w, h, nameW float64, anchor
 		tx, ty := x+w/2+bText*0.35, y+h-4
 		g.add(el("text", A{"class", "mb-stick-cap", "x", num(tx), "y", num(ty), "transform", "rotate(-90 " + num(tx) + " " + num(ty) + ")"}, st.Size))
 	}
-	tx, ty := x+w/2+bText*0.35, y+h+6
+	tx, ty := x+w/2+bText*0.35, y+h+markH+6
 	label := "celllabel"
 	if st.Label != "" {
 		label += " mb-label-manual"
@@ -252,7 +295,137 @@ func (doc *Document) stickTitle(st view.BoardStick) string {
 	if st.CE+st.UE > 0 {
 		t += ", " + doc.vsay("ov.errors", "ce", st.CE, "ue", st.UE)
 	}
+	if st.Mark != "" {
+		t += ", " + doc.markText(st.Mark)
+	}
 	return t
+}
+
+// markText says what a mark of the population check means.
+func (doc *Document) markText(mark string) string {
+	if mark == "+" {
+		return doc.bsay("pop.legend.plus")
+	}
+	return doc.bsay("pop.legend.minus")
+}
+
+// bsay renders a text of the board, from the catalog of package view.
+func (doc *Document) bsay(code string, kv ...any) string {
+	var args map[string]any
+	if len(kv) > 0 {
+		args = make(map[string]any, len(kv)/2)
+		for i := 0; i+1 < len(kv); i += 2 {
+			args[kv[i].(string)] = kv[i+1]
+		}
+	}
+	return view.BoardMessages.Text(doc.Lang, code, args)
+}
+
+// markLegend is the legend line of the marks, for a board that has them.
+func (doc *Document) markLegend(b *view.Board) *node {
+	if !boardMarked(b) {
+		return nil
+	}
+	sw := func(mark string) *node {
+		return el("svg", A{"class", "ic", "viewBox", "0 0 14 14", "width", "14", "height", "14", "aria-hidden", "true"}, markPath(mark, 7, 7))
+	}
+	return el("ul", A{"class", "legend mark-legend"},
+		el("li", sw("+"), doc.markText("+")), el("li", sw("-"), doc.markText("-")))
+}
+
+// populationBlock is the block under the board: one line per finding of
+// the population check, or the line that the modules stand as the
+// document has them, and the lines of the numbers the table does not
+// list. For the failure analysis audience it adds per finding the modules
+// concerned, the vendor's table for every number and the rules not
+// checked. A board without a rule set has no block: the data quality
+// lines say why.
+func (doc *Document) populationBlock(b *view.Board) *node {
+	p := b.Population
+	if p == nil || p.NoRule != "" || len(p.Findings)+len(p.Notes) == 0 {
+		return nil
+	}
+	box := el("div", A{"class", "population"}, el("h3", doc.bsay("pop.title")))
+	ul := el("ul", A{"class", "pop-lines"})
+	modules := map[string]*view.BoardStick{}
+	for _, r := range b.Rows {
+		for _, part := range r.Parts {
+			for _, ch := range part.Channels {
+				for i := range ch.Sticks {
+					modules[ch.Sticks[i].Slot] = &ch.Sticks[i]
+				}
+			}
+		}
+	}
+	for _, f := range p.Findings {
+		li := el("li", el("span", A{"class", "rule"}, f.Rule), " ", f.Text.Text,
+			el("span", A{"class", "pop-meta"}, el("span", A{"class", "pop-strength " + f.Strength}, f.StrengthText.Text), ", ", f.Source.Cite))
+		if doc.Audience == FA {
+			var mods []string
+			for _, slot := range f.Slots {
+				if st := modules[slot]; st != nil && st.State != view.SlotEmpty && st.State != view.SlotUnknown {
+					mods = append(mods, doc.moduleText(st))
+				}
+			}
+			if len(mods) > 0 {
+				mu := el("ul", A{"class", "pop-modules"})
+				for _, m := range mods {
+					mu.add(el("li", m))
+				}
+				li.add(mu)
+			}
+		}
+		ul.add(li)
+	}
+	for _, n := range p.Notes {
+		ul.add(el("li", n.Text.Text))
+	}
+	box.add(ul)
+	if doc.Audience != FA {
+		return box
+	}
+	for _, pr := range p.Processors {
+		if len(pr.Table) == 0 {
+			continue
+		}
+		t, body := table("pop-table", ">"+doc.bsay("pop.col.n"), doc.bsay("pop.col.slots"))
+		for _, row := range pr.Table {
+			body.add(el("tr", el("td", A{"class", "r"}, strconv.Itoa(row.N)), el("td", strings.Join(row.Slots, ", "))))
+		}
+		box.add(el("h4", doc.bsay("pop.table_of", "cpu", pr.Socket)), scroll(t))
+	}
+	if len(p.Unchecked) > 0 {
+		uu := el("ul", A{"class", "pop-unchecked"})
+		for _, u := range p.Unchecked {
+			uu.add(el("li", u.Text.Text))
+		}
+		box.add(el("h4", doc.bsay("pop.unchecked_title")), uu)
+	}
+	return box
+}
+
+// moduleText names a module for the population block: slot, size, ranks,
+// type and rated speed, what the ledger knows of them.
+func (doc *Document) moduleText(st *view.BoardStick) string {
+	parts := []string{}
+	if st.Size != "" {
+		parts = append(parts, st.Size)
+	}
+	if m := st.Module; m != nil {
+		if m.Ranks.Valid {
+			parts = append(parts, doc.bsay("pop.ranks", "n", m.Ranks.V))
+		}
+		if m.Type != "" {
+			parts = append(parts, m.Type)
+		}
+		if m.SpeedMTs.Valid {
+			parts = append(parts, strconv.Itoa(m.SpeedMTs.V)+" MT/s")
+		}
+	}
+	if len(parts) == 0 {
+		return st.Slot
+	}
+	return st.Slot + ": " + strings.Join(parts, ", ")
 }
 
 // cpuDie draws a CPU: its name, the count and size of its modules, and a
