@@ -1,0 +1,20 @@
+host board-host  HP ProLiant DL360 Gen9  2 of 24 slots, 32 GB  DDR4 RDIMM 2400 MT/s
+
+ ch                3         2         1         0
+               .. .. ..  .. .. ::  .. .. ..  .. .. ..  ==[CPU 0]==
+ table                         -                   +
+ PROC 1 DIMM   6  5  4   3  2  1   7  8  9   10 11 12
+ name              4         3         2         1
+
+ ch                             0         1         2         3
+               ==[CPU 1]==  .. .. ..  .. .. ..  :: .. ..  .. .. ..
+ table                      +                   -
+ PROC 2 DIMM                12 11 10  9  8  7   1  2  3   4  5  6
+ name                           1         2         3         4
+
+ :: ok   .. empty slot
+ + an empty slot the vendor's table fills for this number of modules
+ - a module in a slot the table leaves empty
+
+ P-ORDER-01  CPU 0: 1 module stands in PROC 1 DIMM 1. For 1 module the table fills PROC 1 DIMM 12.
+ P-ORDER-01  CPU 1: 1 module stands in PROC 2 DIMM 1. For 1 module the table fills PROC 2 DIMM 12.

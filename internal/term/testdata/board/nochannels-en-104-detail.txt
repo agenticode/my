@@ -32,3 +32,4 @@ host board-host  HPE ProLiant BL460c Gen10 Graphics Exp  4 of 16 slots, 128 GB  
  - 0 slots on the board, 16 drawn without channels, 0 set aside
  - 16 slots drawn without channels: the names give a slot number and no channel, and no table of the
    board is known, such as PROC 1 DIMM 1 /
+ - The population was not checked: 16 slots are not placed on the board.

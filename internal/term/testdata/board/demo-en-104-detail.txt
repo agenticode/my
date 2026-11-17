@@ -54,3 +54,4 @@ host r12-n034  Example Systems R760  16 of 32 slots, 1024 GB  DDR5 RDIMM 4800 MT
  - 32 slots on the board, 0 drawn without channels, 0 set aside
  - the channel count of the processor is not known: the channels of the board could not be checked
    against it
+ - The population was not checked: the board is not drawn in full.

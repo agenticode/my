@@ -56,6 +56,10 @@ type Card struct {
 	Evidence []Evidence `json:"evidence"`
 	// Checks are the tests of the finding against other explanations.
 	Checks []Check `json:"checks"`
+	// Population is the line of the population finding that names the
+	// slot of the DIMM (docs/rules.md, "Population rules"); it changes no
+	// check and no confidence.
+	Population *Text `json:"population,omitzero"`
 	// Missing lists the data the finding did not have.
 	Missing []Text `json:"missing"`
 	// Next is the step that follows from the finding.

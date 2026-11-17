@@ -68,3 +68,4 @@ host board-host  Example Systems E2  24 of 48 slots, 768 GB  DDR5 4800 MT/s
  - 48 slots on the board, 0 drawn without channels, 0 set aside
  - the channel count of the processor is not known: the channels of the board could not be checked
    against it
+ - The population was not checked: the board is not drawn in full.

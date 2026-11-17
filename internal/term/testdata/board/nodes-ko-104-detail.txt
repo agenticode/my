@@ -32,6 +32,10 @@
 
  ░░ 정상   ·· 빈 슬롯
 
+ 장착 구성
+ - 모듈 12개가 이 개수에서 장착표가 채우는 슬롯에 있습니다. SP2C621D32LM3 User Manual, Version 1.0, pp.
+   29-32
+
  CPU 0  DIMM 6개, 384 GB
  CPU 1  DIMM 6개, 384 GB
 

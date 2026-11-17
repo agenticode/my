@@ -23,3 +23,4 @@ CE 35, UE 1
  - 6 slots on the board, 0 drawn without channels, 0 set aside
  - the channel count of the processor is not known: the channels of the board
    could not be checked against it
+ - The population was not checked: the board is not drawn in full.

@@ -119,6 +119,14 @@ func (st Style) brief(p *page, c *view.Card) {
 		p.labelled(label, lw, text, "")
 		label = ""
 	}
+	if c.Population != nil {
+		if len(b.Lines) == 0 && c.Next == nil && len(c.Repairs) == 0 {
+			p.blank()
+		}
+		// The line of the population finding that names the slot: no
+		// evidence and no check of the finding.
+		p.labelled("", lw, c.Population.Text, "")
+	}
 	st.repairLines(p, c, lw)
 	if c.Next != nil {
 		p.labelled(st.say("card.next"), lw, c.Next.Text, "")
@@ -200,6 +208,9 @@ func (st Style) card(p *page, c *view.Card, detail bool) {
 	for _, k := range c.Checks {
 		p.labelled(label, lw, k.EffectText+": "+k.Text.Text, "")
 		label = ""
+	}
+	if c.Population != nil {
+		p.labelled("", lw, c.Population.Text, "")
 	}
 	label = labels["card.missing"]
 	for _, m := range c.Missing {

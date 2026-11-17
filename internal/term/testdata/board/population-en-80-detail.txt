@@ -1,0 +1,62 @@
+host board-host  HP ProLiant DL360 Gen9  2 of 24 slots, 32 GB
+DDR4 RDIMM 2400 MT/s
+
+ ch                3         2         1         0
+               ·· ·· ··  ·· ·· ░░  ·· ·· ··  ·· ·· ··  ══╡CPU 0╞══
+ table                         -                   +
+ PROC 1 DIMM   6  5  4   3  2  1   7  8  9   10 11 12
+ name              4         3         2         1
+
+ ch                             0         1         2         3
+               ══╡CPU 1╞══  ·· ·· ··  ·· ·· ··  ░░ ·· ··  ·· ·· ··
+ table                      +                   -
+ PROC 2 DIMM                12 11 10  9  8  7   1  2  3   4  5  6
+ name                           1         2         3         4
+
+ ░░ ok   ·· empty slot
+ + an empty slot the vendor's table fills for this number of modules
+ - a module in a slot the table leaves empty
+
+ Population
+ P-ORDER-01  CPU 0: 1 module stands in PROC 1 DIMM 1. For 1 module the table
+             fills PROC 1 DIMM 12.
+             required by the vendor, HPE ProLiant DL360 Gen9 Server User Guide,
+             767927-009, edition 9, February 2018, p. 48
+ P-ORDER-01  CPU 1: 1 module stands in PROC 2 DIMM 1. For 1 module the table
+             fills PROC 2 DIMM 12.
+             required by the vendor, HPE ProLiant DL360 Gen9 Server User Guide,
+             767927-009, edition 9, February 2018, p. 48
+
+ CPU 0  1 DIMM, 16 GB
+ CPU 1  1 DIMM, 16 GB
+
+ slot            place         size   part number   serial    CE  UE  finding
+ PROC 1 DIMM 6   CPU 0 ch 3 4                                 0   0   empty slot
+ PROC 1 DIMM 5   CPU 0 ch 3 4                                 0   0   empty slot
+ PROC 1 DIMM 4   CPU 0 ch 3 4                                 0   0   empty slot
+ PROC 1 DIMM 3   CPU 0 ch 2 3                                 0   0   empty slot
+ PROC 1 DIMM 2   CPU 0 ch 2 3                                 0   0   empty slot
+ PROC 1 DIMM 1   CPU 0 ch 2 3  16 GB  EXM32G32R2X4  EX000009  0   0   ok
+ PROC 1 DIMM 7   CPU 0 ch 1 2                                 0   0   empty slot
+ PROC 1 DIMM 8   CPU 0 ch 1 2                                 0   0   empty slot
+ PROC 1 DIMM 9   CPU 0 ch 1 2                                 0   0   empty slot
+ PROC 1 DIMM 10  CPU 0 ch 0 1                                 0   0   empty slot
+ PROC 1 DIMM 11  CPU 0 ch 0 1                                 0   0   empty slot
+ PROC 1 DIMM 12  CPU 0 ch 0 1                                 0   0   empty slot
+ PROC 2 DIMM 12  CPU 1 ch 0 1                                 0   0   empty slot
+ PROC 2 DIMM 11  CPU 1 ch 0 1                                 0   0   empty slot
+ PROC 2 DIMM 10  CPU 1 ch 0 1                                 0   0   empty slot
+ PROC 2 DIMM 9   CPU 1 ch 1 2                                 0   0   empty slot
+ PROC 2 DIMM 8   CPU 1 ch 1 2                                 0   0   empty slot
+ PROC 2 DIMM 7   CPU 1 ch 1 2                                 0   0   empty slot
+ PROC 2 DIMM 1   CPU 1 ch 2 3  16 GB  EXM32G32R2X4  EX000046  0   0   ok
+ PROC 2 DIMM 2   CPU 1 ch 2 3                                 0   0   empty slot
+ PROC 2 DIMM 3   CPU 1 ch 2 3                                 0   0   empty slot
+ PROC 2 DIMM 4   CPU 1 ch 3 4                                 0   0   empty slot
+ PROC 2 DIMM 5   CPU 1 ch 3 4                                 0   0   empty slot
+ PROC 2 DIMM 6   CPU 1 ch 3 4                                 0   0   empty slot
+
+ - 24 slots on the board, 0 drawn without channels, 0 set aside
+ - 24 slots placed by the table of the board family hp-gen9-24slot, written from
+   HPE ProLiant DL360 Gen9 Server User Guide, 767927-009, edition 9, February
+   2018, February 2018, 15, 41-48
