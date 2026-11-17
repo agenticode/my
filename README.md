@@ -101,7 +101,7 @@ CPU0_C1  replace now  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:
 
 In the address map a horizontal line is a row fault, a vertical line a column fault, one cell that repeats a single-bit fault, and a cloud over the bank a bank fault. [docs/reading-guide.md](docs/reading-guide.md) explains every figure, and `my help reading` prints the same on a terminal.
 
-`my board` draws the slots by CPU and channel, read from the SMBIOS slot names, with the grade and the errors of each DIMM.
+`my board` draws the slots by CPU and channel, read from the SMBIOS slot names, with the grade and the errors of each DIMM. Where a public document of the board's maker gives the population for the number of modules, the board marks the empty slots that table fills and the modules that stand elsewhere, and names the rule and the page of the document; such a finding has no grade and changes no exit code ([docs/rules.md](docs/rules.md#population-rules)).
 
 `my report` writes a case as one HTML file with the figures as SVG, the finding of every DIMM, the checks against a wrong diagnosis and the original records. The file loads nothing from elsewhere, opens without network access and prints to PDF. The report of the example is [examples/demo-report.html](examples/demo-report.html); this is its timeline of `CPU0_C1`:
 
@@ -304,6 +304,7 @@ Version 1.0.0, released on 2026-11-16. [CHANGELOG.md](CHANGELOG.md) lists what i
 - Not validated yet: hosts with the EDAC driver of a real memory controller. The decoding of their records rests on fixtures written from kernel and rasdaemon sources.
 - No analyzer of a memory vendor has been run against the plugin contract.
 - The board places every slot of 1,934 of the 2,044 server dumps of a public SMBIOS collection on a processor, a channel and a position, from the slot names or from the tables of 361 board families written from 385 public documents of the makers; the other 110 dumps are listed with the reason their own records do not tell the place. No board was compared with a real server ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
+- The population check holds the modules of a board to the tables and rules of 276 board families, written from the public documents of their makers with the page of each fact. No rule was checked on a real server; over the public collection 1,682 of the 2,044 dumps reach a rule set ([docs/rules.md](docs/rules.md#population-rules)).
 - No BMC of a real server has been read. The Redfish client has run against the stand-in BMCs of the tests and against the DMTF mockup server ([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## Roadmap
