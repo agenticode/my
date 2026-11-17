@@ -67,7 +67,8 @@ type Rule struct {
 	Source   []Ref
 }
 
-// Ref is a page of a document of internal/explorer/sources.tsv.
+// Ref is a page of a document of internal/explorer/sources.tsv; Pages is
+// "topic" for a web page that is cited whole.
 type Ref struct {
 	ID    string `json:"id"`
 	Pages string `json:"pages"`
@@ -254,7 +255,9 @@ func strength(s string) (string, error) {
 	return "", fmt.Errorf("%q is neither req nor rec", s)
 }
 
-var reRef = regexp.MustCompile(`^([a-z0-9][a-z0-9.+_-]*):([0-9][0-9A-Za-z,.-]*)$`)
+// reRef is a page of a document: id:pages, the pages as digits with
+// commas and ranges, or "topic" for a web page cited whole.
+var reRef = regexp.MustCompile(`^([a-z0-9][a-z0-9.+_-]*):([0-9][0-9A-Za-z,.-]*|topic)$`)
 
 func parseRefs(words []string) ([]Ref, error) {
 	var out []Ref
