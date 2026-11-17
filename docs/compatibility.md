@@ -453,19 +453,20 @@ SMBIOS gives no error records and no grade. The board of `my board` and of the r
 
 ## Slot names of server vendors
 
-The board places a slot by its locator and bank locator, the two names SMBIOS gives it. One set of tests reads a socket from the names and another a channel; each test knows a way some makers name their slots. Socket and channel numbers count from 0. The rows below are what the board draws of the first slot of each fixture under `testdata/explorer`; a test holds the table to the fixtures.
+The board places a slot by its locator and bank locator, the two names SMBIOS gives it. Each name is read whole, by the first of a table of name forms that matches all of it: a processor word and its number (`P1`, `CPU0`, `PROC 1`), a channel letter or number, the number of the slot in its channel, or a running slot number that says nothing of the channel. The board then decides the processor of each slot (the processor word of the locator, then of the bank locator; a `Node` of the bank locator; the only processor of a board with one; the processor of the other slots of the same channel letter; channel letters split evenly over the processors in order), numbers the channels of a processor from 0 in the order of their names, and the slots of a channel from 0. The rows below are what the board draws of the first slot of each fixture under `testdata/explorer`; a test holds the table to the fixtures.
 
 | Names | Locator | Bank locator | Board | Fixture |
 | --- | --- | --- | --- | --- |
 | Supermicro: `P` socket, node and channel in the bank locator | `P1-DIMMA1` | `P0_Node0_Channel0_Dimm0` | CPU 0, channel 0 | `linuxhw-sys-6028r-wtr-fac06e` |
+| Supermicro with one processor word: socket from the bank locator, channel letter from the locator | `DIMMA2` | `P0_Node0_Channel0_Dimm1` | CPU 0, channel 0 | `netbox-sys-5039ms-h12trf-os012` |
 | Huawei, Sugon, Inspur, Lenovo RD450X: node and channel in the bank locator | `DIMM000` | `_Node0_Channel0_Dimm0` | CPU 0, channel 0 | `linuxhw-1288h-v5-c98b42` |
 | socket, channel and slot as three digits | `DIMM000` | `Not Specified` | CPU 0, channel 0 | `lab-digits` |
-| Dell PowerEdge: the letter is the socket | `A1` | `Not Specified` | CPU 0, channel 0 | `netbox-dell-poweredge-m630` |
-| older Dell PowerEdge | `DIMM_A1` | `Not Specified` | CPU 0, channel 0 | `dselans-dell-centos65` |
-| HPE ProLiant | `PROC 1 DIMM 1` | `Not Specified` | CPU 0, channel 0 | `netbox-hp-bl460c-gen10` |
-| HPE ProLiant Gen8, two spaces | `PROC  1 DIMM  1` | `Not Specified` | CPU 0, channel 0 | `netbox-hp-dl380p-gen8` |
+| Dell PowerEdge: a letter and a slot number | `A1` | `Not Specified` | CPU 0, no channels | `netbox-dell-poweredge-m630` |
+| older Dell PowerEdge | `DIMM_A1` | `Not Specified` | CPU 0, no channels | `dselans-dell-centos65` |
+| HPE ProLiant: processor and a running slot number | `PROC 1 DIMM 1` | `Not Specified` | CPU 0, no channels | `netbox-hp-bl460c-gen10` |
+| HPE ProLiant Gen8, two spaces | `PROC  1 DIMM  1` | `Not Specified` | CPU 0, no channels | `netbox-hp-dl380p-gen8` |
 | Intel and ASUS boards: `CPU` and a channel letter | `CPU0_DIMM_A1` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m50cyp2sbstd-d50fc4` |
-| `CPU` counted from 1 and a channel letter, bank locator `P0 CHANNEL A` | `CPU1_DIMM_A1` | `P0 CHANNEL A` | CPU 1, channel 0 | `linuxhw-rs720a-e12-rs12-6002d3` |
+| `CPU` counted from 1 and a channel letter, bank locator `P0 CHANNEL A` | `CPU1_DIMM_A1` | `P0 CHANNEL A` | CPU 0, channel 0 | `linuxhw-rs720a-e12-rs12-6002d3` |
 | Intel reference boards, Inspur M5 and M6: `_C` channel `D` slot | `CPU0_C0D0` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m70klp2sb-m90598-001-373530` |
 | `_CH` channel `_DIMM` slot, on two sockets | `CPU0_CH0_DIMM0` | `Not Specified` | CPU 0, channel 0 | `lab-two-sockets` |
 | Intel S2600: node, channel and slot in the bank locator | `DIMM_A1` | `NODE 0 CHANNEL 0 DIMM 0` | CPU 0, channel 0 | `linuxhw-s2600gz-925442` |
@@ -474,17 +475,18 @@ The board places a slot by its locator and bank locator, the two names SMBIOS gi
 | one socket: `ChannelA-DIMM0` | `ChannelA-DIMM0` | `BANK 0` | CPU 0, channel 0 | `ironlib-dmidecode` |
 | one socket: channel letter in the bank locator | `DIMM A1` | `CHANNEL A` | CPU 0, channel 0 | `netbox-qct-x10e-9n` |
 | one socket: `DIMM` and a channel letter | `DIMMA1` | `Not Specified` | CPU 0, channel 0 | `lab-letters` |
-| lshw only, no SMBIOS text | `A0` | | CPU 0, channel 0 | `coreboot-ga-g41m-es2l` |
+| lshw only, no SMBIOS text: four slots of one letter | `A0` | | CPU 0, no channels | `coreboot-ga-g41m-es2l` |
 | Lenovo ThinkSystem and System x: `DIMM n`, socket in the bank locator | `DIMM 1` | `CPU 1` | CPU 0, no channels | `linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0` |
-| node, channel and slot in the locator, node in the bank locator | `NODE 0 CHANNEL 0 DIMM 0 (C0A0)` | `NODE 0` | CPU 0, no channels | `linuxhw-9k-23ba3b` |
-| memory controller and channel letter in the locator, node in the bank locator | `P0_MC0_DIM_CH_A0` | `NODE 1` | CPU 0, no channels | `linuxhw-b7109f77dv14hr-2t-n-91971d` |
-| `ChannelA-DIMM0` with `NODE 0` to `NODE 7` on two sockets | `ChannelA-DIMM0` | `NODE 0` | set aside | `linuxhw-r1g3d32-ec54ac` |
+| node, channel and slot in the locator, node in the bank locator | `NODE 0 CHANNEL 0 DIMM 0 (C0A0)` | `NODE 0` | CPU 0, channel 0 | `linuxhw-9k-23ba3b` |
+| memory controller and channel letter in the locator, node in the bank locator | `P0_MC0_DIM_CH_A0` | `NODE 1` | CPU 0, channel 0 | `linuxhw-b7109f77dv14hr-2t-n-91971d` |
+| `ChannelA-DIMM0` with `NODE 0` to `NODE 7` on two sockets: four memory controllers to a processor | `ChannelA-DIMM0` | `NODE 0` | CPU 0, channel 0 | `linuxhw-r1g3d32-ec54ac` |
 | no socket and no channel in the names | `DIMM 1` | `Bank 1` | set aside | `linuxhw-system-x3550-m4-7914b2a-05b91b` |
+| a name of no form beside a channel and slot in the bank locator, on one socket | `J1MY` | `CHAN A DIMM 0` | set aside | `ironic-dmi-data` |
 
-Before the board is drawn, what the tests read is checked:
+Before the board is drawn, what the names gave is checked:
 
-- A slot is set aside when no test read a socket or a channel from its names, when a number is too large for a socket or a channel, and when no test read its socket on a board of more than one socket.
-- A socket below 0 sets aside the slot and every other slot whose socket the same test read: that test counts in a way this board does not.
+- A slot is set aside when its names give no socket and no channel, when a name follows no form of the table, when a number is too large for a socket or a channel, and when its names give no socket on a board of more than one socket.
+- A socket whose slots have a number and no channel is drawn without channels.
 - When the sockets of the slots left do not run from 0 or from 1 without a gap, are more than 8, or are more than the processor records of the board, every slot is set aside.
 - A socket whose channels would hold more than 3 slots each, or which has a slot with a channel below 0, is drawn without channels: its slots in the order of the SMBIOS table.
 
@@ -495,14 +497,15 @@ The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https:/
 | Tests | Every slot placed | Some placed | Without channels | All set aside |
 | --- | --- | --- | --- | --- |
 | first version | 1,077 | 48 | 226 | 692 |
-| this release | 1,503 | 51 | 238 | 251 |
+| first round of fixes | 1,502 | 51 | 239 | 251 |
+| this release | 1,038 | 110 | 873 | 22 |
 
-The first version is how the tests read the names when they were first written, the later ones read more forms. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
+The first version is how the names were read when the board was first written; the first round of fixes read more parts of a name and took the channel of a numbered slot from the slot number. This release reads every name by the table of forms and draws a numbered slot without channels where no table of the board says its channel, so fewer boards are drawn in full and none puts a slot into a channel the names do not give. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
 
 What the checks cannot see:
 
-- Dell names of one letter and a number (`A1`): the channel comes from the number and the channel count of the processor, which a table of processor names gives (AMD EPYC 4000, 7000, 8000 and 9000 series, Xeon E3, E-2, E5 and E7, Xeon 5500 and 5600, Xeon Scalable, Xeon 6). For a processor the table does not know, the board takes half the slots of the socket as its channels, two slots to a channel. Where the board has one or three slots per channel, the slots of two channels are drawn as one.
-- A locator that counts CPUs from 1 beside a bank locator that counts them from 0 (`CPU1_DIMM_A1` with `P0 CHANNEL A`): the slots are grouped by CPU as on the board, and the CPUs are labelled 1 and 2.
+- Names with a slot number and no channel (Dell `A7`, HPE `PROC 1 DIMM 9`, Lenovo `DIMM 7`): the channel stands only in the vendor's slot table. The board draws such a socket without channels.
+- A processor word the firmware counts in another way than the board's labels: the board takes the word as the names give it.
 
 ## Memory Explorer readings
 

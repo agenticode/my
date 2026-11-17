@@ -680,8 +680,12 @@ func TestHostileText(t *testing.T) {
 		`UPDATE dimm SET manufacturer = ?, part_number = ?`,
 		`UPDATE host SET system_vendor = ?, system_product = ?`,
 		// The board writes the SMBIOS names of a slot into its figure,
-		// its card and their attributes.
-		`UPDATE slot SET locator = locator || ?, bank_locator = ?`,
+		// its card and their attributes. A locator with markup follows no
+		// form of the slot names, and its slot is drawn by name below the
+		// board; the other slots keep their locators and carry the markup
+		// in the bank locator onto their cards.
+		`UPDATE slot SET bank_locator = ?`,
+		`UPDATE slot SET locator = locator || ? WHERE COALESCE(smbios_handle, 0) % 2 = 0`,
 		`UPDATE source SET origin = ?, detail = ?`,
 	} {
 		n := strings.Count(stmt, "?")

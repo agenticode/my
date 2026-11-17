@@ -57,6 +57,46 @@ func FuzzDimms(f *testing.F) {
 	})
 }
 
+// FuzzNames writes made-up hosts and slot names as the board writes the
+// slots of a ledger: the host as "vendor|product|board|processor|signature|
+// present" and one slot per line as "locator|bank locator".
+func FuzzNames(f *testing.F) {
+	f.Add("Dell Inc.|PowerEdge R640|Dell Inc. 0W23H8|Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz|6/85/4|11", "A1|\nB1|\nA2|")
+	f.Add("Supermicro|X10DRi|Supermicro X10DRi|Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz||10", "P1-DIMMA1|P0_Node0_Channel0_Dimm0\nNO DIMM|NO DIMM\nP2-DIMME1|P1_Node1_Channel0_Dimm0")
+	f.Add("HP|ProLiant DL380 Gen9||Intel(R) Xeon(R) CPU E5-2680 v3||11", "PROC 1 DIMM 1|\nPROC 2 DIMM 12|\nBIOS|ROM0")
+	f.Add("|||AMD|25/17/1|1", "DIMM_A1|NODE 0 CHANNEL 0 DIMM 0\nDIMM_A2|NO DIMM\nController0-ChannelA-DIMM0|BANK 0")
+	f.Fuzz(func(t *testing.T, host, names string) {
+		host, names = valid(host), valid(names)
+		h := strings.SplitN(host+"|||||", "|", 7)
+		present := h[5]
+		if len(present) > 16 {
+			present = present[:16]
+		}
+		sh := SlotHost{Vendor: h[0], Product: h[1], Board: h[2], Processor: h[3], Signature: h[4], Present: present, Sockets: len(present)}
+		var slots []SlotText
+		for i, line := range strings.Split(names, "\n") {
+			if i >= 64 {
+				break
+			}
+			l, b, _ := strings.Cut(line, "|")
+			slots = append(slots, SlotText{Locator: l, BankLocator: b, Populated: i%2 == 0, Type: map[bool]string{true: "Flash"}[strings.HasPrefix(l, "BIOS")]})
+		}
+		d, facts := ReadSlots(WriteSlotsOf(sh, slots), nil, nil)
+		if len(d) != len(slots) {
+			t.Fatalf("%d slots read, %d written", len(d), len(slots))
+		}
+		checkDimms(t, d)
+		for _, x := range d {
+			if x.PlaceBy != "" && (x.Socket < 0 || x.Channel < 0 || x.Position < 0 || x.NotSlot != "") {
+				t.Fatalf("%q|%q placed at %v/%v/%v (%s)", x.Locator, x.BankLocator, x.Socket, x.Channel, x.Position, x.NotSlot)
+			}
+		}
+		if facts.Sockets != len(present) && !(len(present) == 0 && h[3] != "" && facts.Sockets == 1) {
+			t.Fatalf("%d processor records, %d written", facts.Sockets, len(present))
+		}
+	})
+}
+
 func FuzzCaches(f *testing.F) {
 	seedFiles(f, "lshw.txt", "cpu-cache.txt")
 	f.Fuzz(func(t *testing.T, s string) {

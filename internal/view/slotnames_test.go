@@ -1,6 +1,7 @@
 package view
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/explorer"
 	"github.com/agenticode/my/internal/i18n"
@@ -40,14 +43,7 @@ func fixtureBoard(t *testing.T, dir string) *Board {
 			}
 			slots = append(slots, slotNamed(fmt.Sprintf("%s#%d", d.Locator, i), loc, d.BankLocator, hd, d.Populated))
 		}
-		bh := boardHost{sockets: strings.Count(text, "DMI type 4,")}
-		if m := regexp.MustCompile(`System Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Manufacturer:[ \t]*([^\n]*)`).FindStringSubmatch(text); m != nil {
-			bh.vendor = strings.TrimSpace(m[1])
-		}
-		if m := regexp.MustCompile(`Processor Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Version:[ \t]*([^\n]*)`).FindStringSubmatch(text); m != nil {
-			bh.processor = strings.TrimSpace(m[1])
-		}
-		return boardOf(i18n.EN, h, slots, bh)
+		return boardOf(i18n.EN, h, slots, fixtureHost(filepath.Join(dir, "dmidecode.txt")))
 	}
 	raw, err := os.ReadFile(filepath.Join(dir, "lshw.txt"))
 	if err != nil {
@@ -55,6 +51,19 @@ func fixtureBoard(t *testing.T, dir string) *Board {
 		return &Board{}
 	}
 	return boardOf(i18n.EN, h, nil, boardHost{lshw: string(raw)})
+}
+
+// fixtureHost is what the ledger keeps of the host of a dmidecode text, as
+// the SMBIOS reader gives it.
+func fixtureHost(path string) boardHost {
+	var c adapter.Collected
+	smbios.NewDmidecodeFile(path, smbios.Options{}).Collect(context.Background(), &c)
+	var x model.Host
+	if len(c.Hosts) > 0 {
+		x = *c.Hosts[0]
+	}
+	return boardHost{vendor: x.SystemVendor, product: x.SystemProduct, board: x.Board, processor: x.CPU,
+		signature: x.CPUSignature, sockets: x.Sockets, present: x.CPUPresent}
 }
 
 // sticksOf are the sticks of a board, on it and set aside.

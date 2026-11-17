@@ -41,6 +41,11 @@ func TestProcessorRecords(t *testing.T) {
 	if h := hostOf(t, NewDmidecodeReader(strings.NewReader(text), "t", Options{})); h.CPU != "AMD EPYC 7302 16-Core Processor" || h.CPUSignature != "23/49/0" || h.CPUPresent != "01" {
 		t.Errorf("text, first socket empty: cpu %q, signature %q, present %q", h.CPU, h.CPUSignature, h.CPUPresent)
 	}
+	// A record without a Status line says nothing of its socket.
+	text = strings.ReplaceAll(text, "\tStatus: Unpopulated\n", "")
+	if h := hostOf(t, NewDmidecodeReader(strings.NewReader(text), "t", Options{})); h.CPUPresent != "" || h.CPU != "AMD EPYC 7302 16-Core Processor" {
+		t.Errorf("text without a status: cpu %q, present %q", h.CPU, h.CPUPresent)
+	}
 	full := testutil.Testdata(t, "explorer", "netbox-dell-poweredge-m630", "dmidecode.txt")
 	if h := hostOf(t, NewDmidecodeFile(full, Options{})); h.CPUSignature != "6/63/2" || h.CPUPresent != "11" {
 		t.Errorf("full text: signature %q, present %q", h.CPUSignature, h.CPUPresent)

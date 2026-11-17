@@ -1,60 +1,21 @@
-호스트 board-host  INFERIT R1G3D32  슬롯 32개 중 12개, 768 GB  DDR4 RDIMM 3200 MT/s
+호스트 board-host  Example Systems E3  슬롯 8개 중 4개, 128 GB  DDR4 3200 MT/s
 
- 이름으로 따로 둔 슬롯 32개: 보드에 없는 소켓 번호가 붙은 슬롯 32개 (예: ChannelA-DIMM0 / NODE 0)
+ 이름으로 따로 둔 슬롯 8개: 소켓이 여럿인 보드에서 이름에 소켓이 없는 슬롯 8개 (예: DIMM 1 / Bank 1)
 
-            DIMM0   DIMM1
- ChannelA   ░░      ··
- ChannelB   ░░      ··
- ChannelC   ░░      ··
- ChannelD   ··      ··
- ChannelE   ░░      ··
- ChannelF   ░░      ··
- ChannelG   ░░      ··
- ChannelH   ··      ··
- ChannelI   ░░      ··
- ChannelJ   ░░      ··
- ChannelK   ░░      ··
- ChannelL   ··      ··
- ChannelM   ░░      ··
- ChannelN   ░░      ··
- ChannelO   ░░      ··
- ChannelP   ··      ··
+        1    2    3    4    5    6    7    8
+ DIMM   ░░   ··   ░░   ··   ░░   ··   ░░   ··
 
- ██ 즉시 교체   ▓▓ 교체 고려   ▒▒ 관찰   ░░ 정상   ?? 교체 보류   ·· 빈 슬롯    슬롯 32개, DIMM 12개
+ ██ 즉시 교체   ▓▓ 교체 고려   ▒▒ 관찰   ░░ 정상   ?? 교체 보류   ·· 빈 슬롯    슬롯 8개, DIMM 4개
 
- 슬롯            위치     크기   부품 번호     일련번호  CE  UE  소견
- ChannelA-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000012  0   0   정상
- ChannelA-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelB-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000018  0   0   정상
- ChannelB-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelC-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000024  0   0   정상
- ChannelC-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelD-DIMM0  따로 둠                                 0   0   빈 슬롯
- ChannelD-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelE-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000030  0   0   정상
- ChannelE-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelF-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000036  0   0   정상
- ChannelF-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelG-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000042  0   0   정상
- ChannelG-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelH-DIMM0  따로 둠                                 0   0   빈 슬롯
- ChannelH-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelI-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000048  0   0   정상
- ChannelI-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelJ-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000054  0   0   정상
- ChannelJ-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelK-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000060  0   0   정상
- ChannelK-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelL-DIMM0  따로 둠                                 0   0   빈 슬롯
- ChannelL-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelM-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000066  0   0   정상
- ChannelM-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelN-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000072  0   0   정상
- ChannelN-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelO-DIMM0  따로 둠  64 GB  EXM32G32R2X4  EX000078  0   0   정상
- ChannelO-DIMM1  따로 둠                                 0   0   빈 슬롯
- ChannelP-DIMM0  따로 둠                                 0   0   빈 슬롯
- ChannelP-DIMM1  따로 둠                                 0   0   빈 슬롯
+ 슬롯    위치     크기   부품 번호     일련번호  CE  UE  소견
+ DIMM 1  따로 둠  32 GB  EXM32G32R2X4  EX000000  0   0   정상
+ DIMM 2  따로 둠                                 0   0   빈 슬롯
+ DIMM 3  따로 둠  32 GB  EXM32G32R2X4  EX000002  0   0   정상
+ DIMM 4  따로 둠                                 0   0   빈 슬롯
+ DIMM 5  따로 둠  32 GB  EXM32G32R2X4  EX000004  0   0   정상
+ DIMM 6  따로 둠                                 0   0   빈 슬롯
+ DIMM 7  따로 둠  32 GB  EXM32G32R2X4  EX000006  0   0   정상
+ DIMM 8  따로 둠                                 0   0   빈 슬롯
 
- - 보드에 그린 슬롯 0개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 32개
- - 보드에 없는 소켓 번호가 붙은 슬롯 32개 (예: ChannelA-DIMM0 / NODE 0)
+ - 보드에 그린 슬롯 0개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 8개
+ - 소켓이 여럿인 보드에서 이름에 소켓이 없는 슬롯 8개 (예: DIMM 1 / Bank 1)

@@ -40,10 +40,37 @@ type Dimm struct {
 	SocketBy  string `json:"socketBy,omitempty"`
 	ChannelBy string `json:"channelBy,omitempty"`
 
+	// What the pass of the second round decides beside socket and channel
+	// (FixNameForms). The want files hold none of these.
+	// Position is the place of the slot in its channel, from 0.
+	Position Num `json:"position,omitempty"`
+	// ChannelName is the vendor's name of the channel ("A", "2", "1.0").
+	ChannelName string `json:"channelName,omitempty"`
+	// PlaceBy says how the place was found: name, bank, node, mate,
+	// letters, one-socket, hub, family:<id>; empty for a slot not placed.
+	PlaceBy string `json:"placeBy,omitempty"`
+	// Family is the board family whose row acted.
+	Family string `json:"family,omitempty"`
+	// Idx is the DIMM index a bank locator spells, "" when none does.
+	Idx string `json:"idx,omitempty"`
+	// NotSlot says why a memory device is no slot of the board: flash, or
+	// no-slot-on-board for a record the manual has no slot for.
+	NotSlot string `json:"notSlot,omitempty"`
+	// Unnamed is set for an empty slot the firmware gives no name; Label is
+	// the slot label of the manual it takes, when a family row lists them.
+	Unnamed bool   `json:"unnamed,omitempty"`
+	Label   string `json:"label,omitempty"`
+	// Aside is why the pass placed no slot: no-name, unknown-form,
+	// no-socket, no-channel, or the reason of a family row.
+	Aside string `json:"aside,omitempty"`
+
 	// What the second passes need of the first.
 	rawSocket, rawNode, rawChannel Num
 	dellNumber                     Num
 	hasDell, notLetter             bool
+	// passLocator is the name the pass of the second round reads as the
+	// locator: the Locator field, or the slot string of lshw.
+	passLocator string
 }
 
 // Names of the tests of the readers of slots.
@@ -178,9 +205,16 @@ func (c Counts) get(key string) Num { return Or(c[key], 0) }
 
 // ParseDmidecodeMemory reads the Memory Device blocks of dmidecode text.
 func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
+	d, _ := ReadSlots(raw, ce, ue)
+	return d
+}
+
+// ReadSlots reads the Memory Device blocks of dmidecode text and what the
+// text says of the board beside them.
+func ReadSlots(raw string, ce, ue Counts) ([]Dimm, Facts) {
 	raw = lineEnds(raw)
 	if Trim(raw) == "" {
-		return nil
+		return nil, Facts{}
 	}
 	hints := hintsOf(raw)
 	var dimms []Dimm
@@ -218,7 +252,7 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 		locator := get("Locator")
 		bank := get("Bank Locator")
 
-		d := Dimm{Locator: locator, BankLocator: bank}
+		d := Dimm{Locator: locator, BankLocator: bank, passLocator: locator}
 		placeDmidecode(&d, locator, bank, hints)
 
 		ceCount := ce.get("dimm" + itoa(dimmIndex))
@@ -236,7 +270,11 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 		dimmIndex++
 	}
 	secondPasses(dimms, hints)
-	return dimms
+	f := Facts{Sockets: len(hints.cpus)}
+	if on(FixNameForms) && len(dimms) <= MaxSlots {
+		f = placeNames(dimms, hints)
+	}
+	return dimms, f
 }
 
 // deviceKey is the handle line and the fields of a memory device, the text
@@ -573,6 +611,25 @@ func blocks(text string, start, end *jsRegexp, max int) []string {
 
 // ParseLshwDimms reads the banks of the memory node of lshw text.
 func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
+	d, _ := ParseLshwDimmsOf(SlotHost{}, raw, ce, ue)
+	return d
+}
+
+// ParseLshwDimmsOf reads the banks of the memory node of lshw text, with
+// what the ledger knows of the host as the hints of the pass of the second
+// round, which reads the slot string as the locator of a slot without a
+// bank locator.
+func ParseLshwDimmsOf(host SlotHost, raw string, ce, ue Counts) ([]Dimm, Facts) {
+	dimms := parseLshwDimms(raw, ce, ue)
+	h := hintsOf(WriteSlotsOf(host, nil))
+	f := Facts{Sockets: len(h.cpus)}
+	if on(FixNameForms) && len(dimms) > 0 && len(dimms) <= MaxSlots {
+		f = placeNames(dimms, h)
+	}
+	return dimms, f
+}
+
+func parseLshwDimms(raw string, ce, ue Counts) []Dimm {
 	raw = lineEnds(raw)
 	if Trim(raw) == "" {
 		return nil
@@ -663,7 +720,7 @@ func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
 			Manufacturer: orUnknown(get("vendor")), SerialNumber: orUnknown(get("serial")),
 			PartNumber: orUnknown(get("product")), Rank: "Unknown", Channel: channel, Socket: socket,
 			Populated: populated, CeCount: ceCount, UeCount: ueCount, ErrorCount: ceCount + ueCount,
-			SocketBy: socketBy, ChannelBy: channelBy, rawSocket: rawSocket,
+			SocketBy: socketBy, ChannelBy: channelBy, rawSocket: rawSocket, passLocator: slotStr,
 		})
 	}
 	secondPasses(dimms, textHints{})

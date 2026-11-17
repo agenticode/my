@@ -77,6 +77,7 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | saved output of `racadm getsel` and `racadm lclog view`: records, wrapped messages, arguments run together, times | `internal/adapter/vendorlog` | `FuzzCollect` |
 | a line of `my export events` made of an event, an action and a firmware record with arbitrary texts, times and counts: one line of JSON that reads back to them | `internal/eventstream` | `FuzzLine` |
 | `dmidecode` memory devices and the memory banks of `lshw` text, as the Memory Explorer reads them for the board; each slot keeps the names of the tests that placed it | `internal/explorer` | `FuzzDimms` |
+| slot names, system, board and processor records as the ledger writes them for the board: the forms of the names and the pass that decides socket, channel and position; every placed slot has a socket, channel and position from 0, and no slot is lost | `internal/explorer` | `FuzzNames` |
 | cache nodes of `lshw` text and the cache lines of sysfs | `internal/explorer` | `FuzzCaches` |
 | `numactl --hardware` and `numastat`, and the slots, nodes and caches put together | `internal/explorer` | `FuzzNuma` |
 | `/proc/meminfo`, `/proc/vmstat`, `/proc/pressure/memory`, `/proc/slabinfo` | `internal/explorer` | `FuzzSystem` |

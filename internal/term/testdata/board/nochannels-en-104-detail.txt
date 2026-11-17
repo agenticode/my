@@ -35,4 +35,5 @@ host board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  8 of 24 slots, 512 GB 
  DIMM 23  CPU 1                                 0   0   empty slot
 
  - 0 slots on the board, 24 drawn without channels, 0 set aside
- - 24 slots drawn without channels: more than three fell in one channel, such as DIMM 5 / CPU 1
+ - 24 slots drawn without channels: the names give a slot number and no channel, and no table of the
+   board is known, such as DIMM 5 / CPU 1

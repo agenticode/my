@@ -1,6 +1,6 @@
 maker	dumps	placed in full before	after
 Supermicro	550	412	413
-Dell	476	187	391
+Dell	476	187	390
 other	337	124	213
 HP	270	235	235
 Intel	103	16	94
@@ -17,4 +17,4 @@ Inspur	5	4	4
 ASRock	4	0	4
 Cisco	4	0	1
 Sugon	1	1	1
-all	2043	1077	1503
+all	2043	1077	1502

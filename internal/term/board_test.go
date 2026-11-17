@@ -88,6 +88,29 @@ func twoBy24(t *testing.T) string {
 	return p
 }
 
+// asideBoard is dmidecode text of a board of two sockets whose slot names
+// give neither a socket nor a channel.
+func asideBoard(t *testing.T) string {
+	var b strings.Builder
+	b.WriteString("# dmidecode 3.6\n\nHandle 0x0001, DMI type 1, 27 bytes\nSystem Information\n\tManufacturer: Example Systems\n\tProduct Name: E3\n\n")
+	for s := 0; s < 2; s++ {
+		fmt.Fprintf(&b, "Handle 0x%04X, DMI type 4, 48 bytes\nProcessor Information\n\tVersion: Example CPU\n\tStatus: Populated, Enabled\n\n", 0x0400+s)
+	}
+	for n := 0; n < 8; n++ {
+		size := "32 GB"
+		if n%2 == 1 {
+			size = "No Module Installed"
+		}
+		fmt.Fprintf(&b, "Handle 0x%04X, DMI type 17, 92 bytes\nMemory Device\n\tSize: %s\n\tLocator: DIMM %d\n\tBank Locator: Bank %d\n\tType: DDR4\n\tSpeed: 3200 MT/s\n\tManufacturer: Example Memory\n\tSerial Number: EX%06d\n\tPart Number: EXM32G32R2X4\n\n",
+			0x1100+n, size, n+1, n+1, n)
+	}
+	p := filepath.Join(t.TempDir(), "dmidecode.txt")
+	if err := os.WriteFile(p, []byte(b.String()), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return p
+}
+
 func TestBoardScreens(t *testing.T) {
 	ctx := context.Background()
 	bc, err := bundle.Open(ctx, testutil.Testdata(t, "real", "6.19.10-ghes-multi", "my", "case.mycase"), t.TempDir())
@@ -105,7 +128,8 @@ func TestBoardScreens(t *testing.T) {
 		"demo":       testledger.Open(t, "demo", 1, ""),
 		"2x24":       importBoard(t, twoBy24(t)),
 		"nochannels": importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0", "dmidecode.txt")),
-		"aside":      importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-r1g3d32-ec54ac", "dmidecode.txt")),
+		"nodes":      importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-r1g3d32-ec54ac", "dmidecode.txt")),
+		"aside":      importBoard(t, asideBoard(t)),
 	}
 	for name, s := range cases {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {

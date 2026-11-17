@@ -1,0 +1,27 @@
+host board-host  INFERIT R1G3D32  12 of 32 slots, 768 GB  DDR4 RDIMM 3200 MT/s
+
+ ch                7                              6                              5
+     ··             ··              ··             ░░              ··             ░░
+     ChannelH-DIMM1 ChannelH-DIMM0  ChannelG-DIMM1 ChannelG-DIMM0  ChannelF-DIMM1 ChannelF-DIMM0
+
+ ch                4                              3                              2
+     ··             ░░              ··             ··              ··             ░░
+     ChannelE-DIMM1 ChannelE-DIMM0  ChannelD-DIMM1 ChannelD-DIMM0  ChannelC-DIMM1 ChannelC-DIMM0
+
+ ch                1                              0
+     ··             ░░              ··             ░░              ══╡CPU 0╞══
+     ChannelB-DIMM1 ChannelB-DIMM0  ChannelA-DIMM1 ChannelA-DIMM0
+
+ ch                            0                            1                            2
+     ══╡CPU 1╞══ ░░            ··             ░░            ··             ░░            ··
+                 ChannelI-DIMM0ChannelI-DIMM1 ChannelJ-DIMM0ChannelJ-DIMM1 ChannelK-DIMM0ChannelK-DIMM1
+
+ ch                3                              4                              5
+     ··             ··              ░░             ··              ░░             ··
+     ChannelL-DIMM0 ChannelL-DIMM1  ChannelM-DIMM0 ChannelM-DIMM1  ChannelN-DIMM0 ChannelN-DIMM1
+
+ ch                6                              7
+     ░░             ··              ··             ··
+     ChannelO-DIMM0 ChannelO-DIMM1  ChannelP-DIMM0 ChannelP-DIMM1
+
+ ░░ ok   ·· empty slot

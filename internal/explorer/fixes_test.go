@@ -21,7 +21,8 @@ func numbered(prefix string, from, to int) []string {
 
 // Each fix with an input it changes: the result with every fix, and the
 // result with every fix but this one, which is what the first
-// implementation gives for the part the fix corrects.
+// implementation gives for the part the fix corrects. A fix of the first
+// round is shown with the pass of FixNameForms off.
 func TestFixes(t *testing.T) {
 	dimms := func(s string) string { return places(ParseDmidecodeMemory(s, nil, nil)) }
 	numastat := "                           node0           node1\nnuma_hit                     1               2\n" +
@@ -90,19 +91,43 @@ func TestFixes(t *testing.T) {
 			text := fixtureText(t, "linuxhw-ts100-e7-pi4-e88885")
 			return fmt.Sprint(len(ParseDmidecodeMemory(text, nil, nil)), " slots, ", len(hintsOf(text).cpus), " processor records")
 		}, "4 slots, 1 processor records", "8 slots, 2 processor records"},
+		{FixNameForms, func() string {
+			return dimms(board(xeonE5, 2, "CPU1_DIMM_A1|P0 CHANNEL A", "CPU2_DIMM_A1|P1 CHANNEL A"))
+		}, "0/0 1/0", "1/0 2/0"},
+		{FixLetterMeaning, func() string {
+			return where(ParseDmidecodeMemory(board(xeonE5, 1, "P1-DIMM1A|P0_Node0_Channel0_Dimm0", "P1-DIMM1B|P0_Node0_Channel1_Dimm0"), nil, nil))
+		}, "0/A/0 0/B/0", "0/0/0 0/1/0"},
+		{FixSocketRules, func() string {
+			return where(ParseDmidecodeMemory(board(xeonE5, 2, "CPU0_DIMM_A1", "CPU1_DIMM_A1"), nil, nil))
+		}, "0/A/0 1/A/0", "no-socket no-socket"},
+		{FixChannelRank, func() string {
+			var out []string
+			for _, d := range ParseDmidecodeMemory(board(xeonE5, 1, "DIMM_A1", "DIMM_C1", "DIMM_C2"), nil, nil) {
+				out = append(out, fmt.Sprintf("%v.%v", d.Channel, d.Position))
+			}
+			return strings.Join(out, " ")
+		}, "0.0 1.0 1.1", "0.1 2.1 2.2"},
 	} {
 		t.Run(c.fix.Name(), func(t *testing.T) {
+			// The fixes of the first round correct the readers of the first
+			// round: they are shown with the pass of the second round off,
+			// which replaces what they place.
+			base := AllFixes
+			if c.fix < FixRepeatedTable {
+				base &^= FixNameForms
+			}
+			old := SetFixes(base)
+			defer SetFixes(old)
 			if got := c.run(); got != c.want {
 				t.Errorf("with every fix: %s, want %s", got, c.want)
 			}
-			old := SetFixes(AllFixes &^ c.fix)
-			defer SetFixes(old)
+			SetFixes(base &^ c.fix)
 			if got := c.run(); got != c.was {
 				t.Errorf("without %s: %s, want %s", c.fix.Name(), got, c.was)
 			}
 		})
 	}
-	if len(Fixes()) != 18 {
+	if len(Fixes()) != 22 {
 		t.Errorf("%d fixes; every fix needs a case here", len(Fixes()))
 	}
 }
