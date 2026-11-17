@@ -1,0 +1,2 @@
+go test fuzz v1
+string("---=== SPD EEPROM Information ===---\nSize  9999999999 GB")

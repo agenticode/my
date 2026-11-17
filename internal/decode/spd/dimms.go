@@ -144,11 +144,15 @@ func setDimmsField(m *DimmsModule, label, v string) {
 		m.ModuleType = v
 	case "Size":
 		if s := dimmsSize.FindStringSubmatch(v); s != nil {
+			// At most 1 PiB: no module comes near it, and the bytes stay
+			// within an int64.
 			n, err := strconv.ParseInt(s[1], 10, 64)
-			if err == nil && n < 1<<40 {
-				if s[2] == "GB" {
-					n <<= 10
-				}
+			if s[2] == "GB" && n < 1<<30 {
+				n <<= 10
+			} else if s[2] == "GB" {
+				err = strconv.ErrRange
+			}
+			if err == nil && n <= 1<<30 {
 				m.SizeBytes = model.Some(n << 20)
 			}
 		}
