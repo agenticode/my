@@ -1,0 +1,271 @@
+section#s7.sec
+  ## 7 Module SPD
+  p.lead: What each module says about itself in its SPD EEPROM, as read at the scan. This section holds no finding and changes no grade.
+  p: SPD of 16 of 16 DIMMs (spd5118), tied by serial number
+  p.spd-shared: 16 x Micron Technology (JEDEC bank 1, 0x2C), EXM64G48R2X4-A, DDR5 RDIMM 64 GB 2Rx4, 16 Gb dies
+  table.spd
+    | SLOT | DATE | LOC | SERIAL | ORG | PART NUMBER | MAKER | FINDING
+    | CPU0_A1 | 2023-W08 | 0x06 | 5C331BCD | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_B1 | 2023-W08 | 0x06 | 7FF0C3B9 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_C1 | 2022-W43 | 0x06 | 56A80D01 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | replace now
+    | CPU0_D1 | 2023-W08 | 0x06 | AE2CD51D | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_E1 | 2023-W08 | 0x06 | B6332238 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_F1 | 2023-W08 | 0x06 | A8A64B3B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_G1 | 2023-W08 | 0x06 | 1D2C9305 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU0_H1 | 2023-W08 | 0x06 | DBC9CEE9 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_A1 | 2023-W08 | 0x06 | B7F782AE | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_B1 | 2023-W08 | 0x06 | 41102AC3 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_C1 | 2023-W08 | 0x06 | D848BE33 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_D1 | 2022-W43 | 0x06 | 7A399A55 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | observe
+    | CPU1_E1 | 2023-W08 | 0x06 | 12AE3490 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_F1 | 2023-W08 | 0x06 | 8671F24B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_G1 | 2023-W08 | 0x06 | B88F2453 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+    | CPU1_H1 | 2023-W08 | 0x06 | D6A7388B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | ok
+  ### date codes
+  table.lots
+    | MAKER | PART NUMBER | DATE | DIMMS | FINDING | UE | SLOTS WITH A FINDING
+    | Micron Technology (JEDEC bank 1, 0x2C) | EXM64G48R2X4-A | 2022-W43 | 2 | 2 | 1 | CPU0_C1 CPU1_D1
+    | Micron Technology (JEDEC bank 1, 0x2C) | EXM64G48R2X4-A | 2023-W08 | 14 | 0 | 0 | 
+  p: 2 of the 2 DIMMs with a finding carry 2022-W43; 0 of the 14 DIMMs without one carry it too.
+  p: The table counts modules by the date code in their SPD. Whether a lot is at fault is for the maker's failure analysis to say.
+  ### Per module, for failure analysis
+  #### CPU0_A1
+  read from = ROOT/spd/0-0050.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x50 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_B1
+  read from = ROOT/spd/0-0051.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x51 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_C1
+  read from = ROOT/spd/0-0052.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x52 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_D1
+  read from = ROOT/spd/0-0053.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x53 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_E1
+  read from = ROOT/spd/0-0054.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x54 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_F1
+  read from = ROOT/spd/0-0055.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x55 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_G1
+  read from = ROOT/spd/0-0056.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x56 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU0_H1
+  read from = ROOT/spd/0-0057.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-0 0x57 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_A1
+  read from = ROOT/spd/1-0050.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x50 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_B1
+  read from = ROOT/spd/1-0051.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x51 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_C1
+  read from = ROOT/spd/1-0052.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x52 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_D1
+  read from = ROOT/spd/1-0053.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x53 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_E1
+  read from = ROOT/spd/1-0054.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x54 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_F1
+  read from = ROOT/spd/1-0055.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x55 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_G1
+  read from = ROOT/spd/1-0056.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x56 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00
+  #### CPU1_H1
+  read from = ROOT/spd/1-0057.bin
+  state = ok
+  SPD revision = 1.0
+  CRC 0-509 = 0x3353 / 0x3353 (ok)
+  package = 1 dies per package (monolithic)
+  die = 16 Gb
+  DRAM maker = Micron Technology (JEDEC bank 1, 0x2C)
+  DRAM stepping = 0x41
+  module revision = 0x31
+  bus, address, driver = i2c-1 0x57 spd5118
+  tied by = serial number
+  details
+    summary: the 1,024 bytes as read
+    pre.hex: 64 lines, the first: 0000: 30 10 12 01 04 20 00 62 00 00 00 00 a0 01 07 00

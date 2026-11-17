@@ -1,0 +1,12 @@
+/* Module SPD: the modules, the lines below them, the table of date codes,
+   and for failure analysis the fields and bytes of each module. */
+table.spd td.mono, table.lots td.mono { font-family: var(--mono); white-space: nowrap; }
+.spd-shared { font-family: var(--mono); overflow-wrap: anywhere; }
+.spd-lines { margin: 0.4rem 0; padding-left: 1.1rem; }
+.spd-lines li { margin: 2px 0; }
+.spd-fields { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.8rem; margin: 0.3rem 0 0.6rem; }
+.spd-fields div { display: contents; }
+.spd-fields dt { color: var(--ink3); }
+.spd-fields dd { margin: 0; font-family: var(--mono); overflow-wrap: anywhere; min-width: 0; }
+pre.hex { font-family: var(--mono); font-size: 0.78rem; white-space: pre; overflow-x: auto; margin: 0.3rem 0; }
+@media print { .spd-module { break-inside: avoid; } table.spd, table.lots { display: table; } }

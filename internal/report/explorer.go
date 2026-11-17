@@ -21,28 +21,44 @@ import (
 // hasExplorer tells a report with the explorer section.
 func (doc *Document) hasExplorer() bool { return !doc.Explorer.Empty() }
 
-// secQuality and secAppendix are the numbers of the sections of data
-// quality and of the appendix.
-func (doc *Document) secQuality() int {
-	if doc.hasExplorer() {
+// The optional sections stand after section 6 in this order: Module SPD,
+// the Memory Explorer; data quality and the appendix follow them.
+
+// secSPD, secExplorer, secQuality and secAppendix are the numbers of the
+// sections.
+func (doc *Document) secSPD() int { return 7 }
+
+func (doc *Document) secExplorer() int {
+	if doc.hasSPD() {
 		return 8
 	}
 	return 7
+}
+
+func (doc *Document) secQuality() int {
+	n := 7
+	if doc.hasSPD() {
+		n++
+	}
+	if doc.hasExplorer() {
+		n++
+	}
+	return n
 }
 
 func (doc *Document) secAppendix() int { return doc.secQuality() + 1 }
 
 // secWord is the heading word of a section number.
 func (doc *Document) secWord(n int) string {
-	if doc.hasExplorer() {
-		switch n {
-		case 7:
-			return doc.say("sec.explorer")
-		case 8:
-			return doc.say("sec.7")
-		case 9:
-			return doc.say("sec.8")
-		}
+	switch {
+	case doc.hasSPD() && n == doc.secSPD():
+		return doc.say("sec.spd")
+	case doc.hasExplorer() && n == doc.secExplorer():
+		return doc.say("sec.explorer")
+	case n == doc.secQuality():
+		return doc.say("sec.7")
+	case n == doc.secAppendix():
+		return doc.say("sec.8")
 	}
 	return doc.say("sec." + strconv.Itoa(n))
 }
@@ -56,7 +72,7 @@ type mxTab struct {
 // explorerSection draws section 7.
 func (doc *Document) explorerSection() *node {
 	e := doc.Explorer
-	s := doc.section(7)
+	s := doc.section(doc.secExplorer())
 	s.add(el("p", A{"class", "lead"}, doc.say("mx.lead")))
 	var tabs []mxTab
 	if sys := e.System; sys != nil {
