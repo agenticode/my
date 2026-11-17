@@ -68,6 +68,12 @@ func app() *cli.App {
 				Run:       live(runBIOS),
 			},
 			{
+				Name:      "board",
+				Summary:   "where each DIMM sits: the CPUs with the slots of their channels and the finding of each",
+				SummaryKO: "DIMM이 꽂힌 위치: CPU와 채널별 슬롯, 슬롯마다 소견",
+				Run:       live(runBoard),
+			},
+			{
 				Name:      "inventory",
 				Summary:   "one line per DIMM: slot names, module, speed, RAS settings, corrected errors of OS and BMC",
 				SummaryKO: "DIMM당 한 줄: 슬롯 이름, 모듈, 속도, RAS 설정, 운영체제와 BMC의 CE",

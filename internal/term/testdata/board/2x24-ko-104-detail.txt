@@ -1,0 +1,66 @@
+호스트 board-host  Example Systems E2  슬롯 48개 중 24개, 768 GB  DDR5 4800 MT/s
+
+ ch           11   10    9    8    7    6    5    4    3    2    1    0
+             ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ··░░ ══╡CPU 0╞══
+ CPU0_DIMM_  L2L1 K2K1 J2J1 I2I1 H2H1 G2G1 F2F1 E2E1 D2D1 C2C1 B2B1 A2A1
+
+ ch                        0    1    2    3    4    5    6    7    8    9   10   11
+             ══╡CPU 1╞══ ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░·· ░░··
+ CPU1_DIMM_              A1A2 B1B2 C1C2 D1D2 E1E2 F1F2 G1G2 H1H2 I1I2 J1J2 K1K2 L1L2
+
+ ░░ 정상   ·· 빈 슬롯
+
+ CPU 0  DIMM 12개, 384 GB
+ CPU 1  DIMM 12개, 384 GB
+
+ 슬롯          위치         크기   부품 번호     일련번호  CE  UE  소견
+ CPU0_DIMM_L2  CPU 0 ch 11                                 0   0   빈 슬롯
+ CPU0_DIMM_L1  CPU 0 ch 11  32 GB  EXM32G32R2X4  EX000022  0   0   정상
+ CPU0_DIMM_K2  CPU 0 ch 10                                 0   0   빈 슬롯
+ CPU0_DIMM_K1  CPU 0 ch 10  32 GB  EXM32G32R2X4  EX000020  0   0   정상
+ CPU0_DIMM_J2  CPU 0 ch 9                                  0   0   빈 슬롯
+ CPU0_DIMM_J1  CPU 0 ch 9   32 GB  EXM32G32R2X4  EX000018  0   0   정상
+ CPU0_DIMM_I2  CPU 0 ch 8                                  0   0   빈 슬롯
+ CPU0_DIMM_I1  CPU 0 ch 8   32 GB  EXM32G32R2X4  EX000016  0   0   정상
+ CPU0_DIMM_H2  CPU 0 ch 7                                  0   0   빈 슬롯
+ CPU0_DIMM_H1  CPU 0 ch 7   32 GB  EXM32G32R2X4  EX000014  0   0   정상
+ CPU0_DIMM_G2  CPU 0 ch 6                                  0   0   빈 슬롯
+ CPU0_DIMM_G1  CPU 0 ch 6   32 GB  EXM32G32R2X4  EX000012  0   0   정상
+ CPU0_DIMM_F2  CPU 0 ch 5                                  0   0   빈 슬롯
+ CPU0_DIMM_F1  CPU 0 ch 5   32 GB  EXM32G32R2X4  EX000010  0   0   정상
+ CPU0_DIMM_E2  CPU 0 ch 4                                  0   0   빈 슬롯
+ CPU0_DIMM_E1  CPU 0 ch 4   32 GB  EXM32G32R2X4  EX000008  0   0   정상
+ CPU0_DIMM_D2  CPU 0 ch 3                                  0   0   빈 슬롯
+ CPU0_DIMM_D1  CPU 0 ch 3   32 GB  EXM32G32R2X4  EX000006  0   0   정상
+ CPU0_DIMM_C2  CPU 0 ch 2                                  0   0   빈 슬롯
+ CPU0_DIMM_C1  CPU 0 ch 2   32 GB  EXM32G32R2X4  EX000004  0   0   정상
+ CPU0_DIMM_B2  CPU 0 ch 1                                  0   0   빈 슬롯
+ CPU0_DIMM_B1  CPU 0 ch 1   32 GB  EXM32G32R2X4  EX000002  0   0   정상
+ CPU0_DIMM_A2  CPU 0 ch 0                                  0   0   빈 슬롯
+ CPU0_DIMM_A1  CPU 0 ch 0   32 GB  EXM32G32R2X4  EX000000  0   0   정상
+ CPU1_DIMM_A1  CPU 1 ch 0   32 GB  EXM32G32R2X4  EX000024  0   0   정상
+ CPU1_DIMM_A2  CPU 1 ch 0                                  0   0   빈 슬롯
+ CPU1_DIMM_B1  CPU 1 ch 1   32 GB  EXM32G32R2X4  EX000026  0   0   정상
+ CPU1_DIMM_B2  CPU 1 ch 1                                  0   0   빈 슬롯
+ CPU1_DIMM_C1  CPU 1 ch 2   32 GB  EXM32G32R2X4  EX000028  0   0   정상
+ CPU1_DIMM_C2  CPU 1 ch 2                                  0   0   빈 슬롯
+ CPU1_DIMM_D1  CPU 1 ch 3   32 GB  EXM32G32R2X4  EX000030  0   0   정상
+ CPU1_DIMM_D2  CPU 1 ch 3                                  0   0   빈 슬롯
+ CPU1_DIMM_E1  CPU 1 ch 4   32 GB  EXM32G32R2X4  EX000032  0   0   정상
+ CPU1_DIMM_E2  CPU 1 ch 4                                  0   0   빈 슬롯
+ CPU1_DIMM_F1  CPU 1 ch 5   32 GB  EXM32G32R2X4  EX000034  0   0   정상
+ CPU1_DIMM_F2  CPU 1 ch 5                                  0   0   빈 슬롯
+ CPU1_DIMM_G1  CPU 1 ch 6   32 GB  EXM32G32R2X4  EX000036  0   0   정상
+ CPU1_DIMM_G2  CPU 1 ch 6                                  0   0   빈 슬롯
+ CPU1_DIMM_H1  CPU 1 ch 7   32 GB  EXM32G32R2X4  EX000038  0   0   정상
+ CPU1_DIMM_H2  CPU 1 ch 7                                  0   0   빈 슬롯
+ CPU1_DIMM_I1  CPU 1 ch 8   32 GB  EXM32G32R2X4  EX000040  0   0   정상
+ CPU1_DIMM_I2  CPU 1 ch 8                                  0   0   빈 슬롯
+ CPU1_DIMM_J1  CPU 1 ch 9   32 GB  EXM32G32R2X4  EX000042  0   0   정상
+ CPU1_DIMM_J2  CPU 1 ch 9                                  0   0   빈 슬롯
+ CPU1_DIMM_K1  CPU 1 ch 10  32 GB  EXM32G32R2X4  EX000044  0   0   정상
+ CPU1_DIMM_K2  CPU 1 ch 10                                 0   0   빈 슬롯
+ CPU1_DIMM_L1  CPU 1 ch 11  32 GB  EXM32G32R2X4  EX000046  0   0   정상
+ CPU1_DIMM_L2  CPU 1 ch 11                                 0   0   빈 슬롯
+
+ - 보드에 그린 슬롯 48개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개

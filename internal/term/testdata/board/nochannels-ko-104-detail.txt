@@ -1,0 +1,38 @@
+호스트 board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  슬롯 24개 중 8개, 512 GB  DDR4 2933 MT/s
+
+        ·· ·· ·· ░░ ·· ░░ ·· ·· ·· ░░ ·· ░░ ══╡CPU 0╞══ ══╡CPU 1╞══ ░░ ·· ░░ ·· ·· ·· ░░ ·· ░░ ·· ·· ··
+ DIMM   11 12 9  10 7  8  2  1  4  3  6  5                          17 18 15 16 13 14 20 19 22 21 24 23
+
+ ░░ 정상   ·· 빈 슬롯
+
+ CPU 0  DIMM 4개, 256 GB
+ CPU 1  DIMM 4개, 256 GB
+
+ 슬롯     위치   크기   부품 번호     일련번호  CE  UE  소견
+ DIMM 11  CPU 0                                 0   0   빈 슬롯
+ DIMM 12  CPU 0                                 0   0   빈 슬롯
+ DIMM 9   CPU 0                                 0   0   빈 슬롯
+ DIMM 10  CPU 0  64 GB  EXM32G32R2X4  EX000032  0   0   정상
+ DIMM 7   CPU 0                                 0   0   빈 슬롯
+ DIMM 8   CPU 0  64 GB  EXM32G32R2X4  EX000026  0   0   정상
+ DIMM 2   CPU 0                                 0   0   빈 슬롯
+ DIMM 1   CPU 0                                 0   0   빈 슬롯
+ DIMM 4   CPU 0                                 0   0   빈 슬롯
+ DIMM 3   CPU 0  64 GB  EXM32G32R2X4  EX000020  0   0   정상
+ DIMM 6   CPU 0                                 0   0   빈 슬롯
+ DIMM 5   CPU 0  64 GB  EXM32G32R2X4  EX000014  0   0   정상
+ DIMM 17  CPU 1  64 GB  EXM32G32R2X4  EX000038  0   0   정상
+ DIMM 18  CPU 1                                 0   0   빈 슬롯
+ DIMM 15  CPU 1  64 GB  EXM32G32R2X4  EX000044  0   0   정상
+ DIMM 16  CPU 1                                 0   0   빈 슬롯
+ DIMM 13  CPU 1                                 0   0   빈 슬롯
+ DIMM 14  CPU 1                                 0   0   빈 슬롯
+ DIMM 20  CPU 1  64 GB  EXM32G32R2X4  EX000050  0   0   정상
+ DIMM 19  CPU 1                                 0   0   빈 슬롯
+ DIMM 22  CPU 1  64 GB  EXM32G32R2X4  EX000056  0   0   정상
+ DIMM 21  CPU 1                                 0   0   빈 슬롯
+ DIMM 24  CPU 1                                 0   0   빈 슬롯
+ DIMM 23  CPU 1                                 0   0   빈 슬롯
+
+ - 보드에 그린 슬롯 0개, 채널 없이 그린 슬롯 24개, 따로 둔 슬롯 0개
+ - 한 채널에 넷 이상 몰려 채널 없이 그린 슬롯 24개 (예: DIMM 5 / CPU 1)

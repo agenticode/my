@@ -246,7 +246,7 @@ A record a reader could not use is counted in `source.unread`; its text is kept 
 
 | Field | Content |
 | --- | --- |
-| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `gpu`, `bios`, `inventory`, `diff`, `verify`, `preflight`, `vendors` |
+| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `board`, `gpu`, `bios`, `inventory`, `diff`, `verify`, `preflight`, `vendors` |
 | `version` | the version of this form, 1. It changes when a field is renamed or removed; new fields do not change it |
 | `lang` | the language of the sentences |
 | `host` | the host the data is about |
@@ -285,7 +285,7 @@ The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above
 
 | Field | Content |
 | --- | --- |
-| `host`, `slots`, `populated` | the host, its slots and the slots that hold a module |
+| `host`, `system`, `slots`, `populated` | the host, its maker and product, its slots and the slots that hold a module |
 | `bytes`, `size` | the size of all modules, in bytes and as text |
 | `ce`, `ue` | the corrected and uncorrected errors of the modules on record |
 | `badge` | the memory type and speed every module shares, when they share one |

@@ -1,0 +1,24 @@
+host board-host  INFERIT R1G3D32  12 of 32 slots, 768 GB  DDR4 RDIMM 3200 MT/s
+
+ 32 slots set aside, by name: 32 slots on socket numbers the board does not have, such as ChannelA-DIMM0
+ / NODE 0
+
+            DIMM0   DIMM1
+ ChannelA   ::      ..
+ ChannelB   ::      ..
+ ChannelC   ::      ..
+ ChannelD   ..      ..
+ ChannelE   ::      ..
+ ChannelF   ::      ..
+ ChannelG   ::      ..
+ ChannelH   ..      ..
+ ChannelI   ::      ..
+ ChannelJ   ::      ..
+ ChannelK   ::      ..
+ ChannelL   ..      ..
+ ChannelM   ::      ..
+ ChannelN   ::      ..
+ ChannelO   ::      ..
+ ChannelP   ..      ..
+
+ :: ok   .. empty slot    32 slots, 12 DIMMs

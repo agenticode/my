@@ -1,0 +1,8 @@
+host host-71f73b2e  QEMU lab-arm6  6 of 6 slots, 96 GB  DDR4 RDIMM 3200 MT/s  CE 35, UE 1
+
+ ch      2   1   0                3   4   5
+        ░░  ▓▓  ▒▒  ══╡CPU 0╞══  ▓▓  ▓▓  ░░
+ CPU0_  C1  B1  A1               D1  E1  F1
+ err        c   c                cU  c
+
+ ▓▓ consider replacement   ▒▒ observe   ░░ ok   c corrected, U uncorrected errors

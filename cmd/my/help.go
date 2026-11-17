@@ -497,6 +497,7 @@ var words = i18n.Catalog{
 // guides lists, per command, the reading guides of the figures it draws.
 var guides = map[string][]string{
 	"overview": {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
+	"board":    {"guide.board", "guide.grades"},
 	"dimm":     {"guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades"},
 	"why":      {"guide.card", "guide.grades", "guide.obs"},
 	"map":      {"guide.map", "guide.obs"},
@@ -510,7 +511,7 @@ var guides = map[string][]string{
 	"report":   nil,
 	"export":   nil,
 	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
-	"reading":  {"guide.slotmap", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.boots", "guide.gpu", "guide.grades", "guide.obs"},
+	"reading":  {"guide.slotmap", "guide.board", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.boots", "guide.gpu", "guide.grades", "guide.obs"},
 }
 
 // printGuides writes reading guides, each as a paragraph.

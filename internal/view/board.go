@@ -20,7 +20,9 @@ import (
 // from the slot rows of the ledger when the view is built and is stored
 // nowhere; the ledger decides what a slot holds.
 type Board struct {
-	Host      string `json:"host"`
+	Host string `json:"host"`
+	// System is the maker and product of the host.
+	System    string `json:"system,omitzero"`
 	Slots     int    `json:"slots"`
 	Populated int    `json:"populated"`
 	// Bytes is the size of all modules, Size the same as text.
@@ -172,9 +174,11 @@ func (c *Case) Board(ctx context.Context, h *engine.HostResult) (*Board, error) 
 		return nil, err
 	}
 	var bh boardHost
+	system := ""
 	for _, x := range hosts {
 		if x.Name == h.Host {
 			bh.vendor, bh.processor, bh.sockets = x.SystemVendor, x.CPU, x.Sockets
+			system = strings.TrimSpace(x.SystemVendor + " " + x.SystemProduct)
 		}
 	}
 	readings, err := c.store.Readings(ctx, h.Host)
@@ -189,7 +193,9 @@ func (c *Case) Board(ctx context.Context, h *engine.HostResult) (*Board, error) 
 			bh.cpuCache = r.Text
 		}
 	}
-	return boardOf(c.Lang, h, slots, bh), nil
+	b := boardOf(c.Lang, h, slots, bh)
+	b.System = system
+	return b, nil
 }
 
 // described tells a slot an inventory described: it has a locator or an
