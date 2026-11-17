@@ -12,6 +12,8 @@ import (
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/decode/spd"
+	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/testutil"
 )
@@ -342,4 +344,13 @@ func (f *sizeFile) Read(b []byte) (int, error) {
 	f.s.sizes = append(f.s.sizes, len(b))
 	f.s.mu.Unlock()
 	return f.File.Read(b)
+}
+
+// Every short text, the detail of the source, has its Korean form.
+func TestShortTextsInKorean(t *testing.T) {
+	for _, s := range ShortTexts() {
+		if ko := engine.DetailText(i18n.KO, s); ko == s || ko == "" {
+			t.Errorf("no Korean for the detail %q", s)
+		}
+	}
 }

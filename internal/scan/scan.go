@@ -122,6 +122,10 @@ type Options struct {
 	// NoSPD leaves the SPD of the memory modules out: no probe of the I2C
 	// bus, no eeprom file read, no spd source.
 	NoSPD bool
+	// SPDFS replaces the file system the SPD reader of a live scan looks
+	// at, and SPDDeadline its deadline; tests give a made host.
+	SPDFS       dimmspd.FS
+	SPDDeadline time.Duration
 	// Extra are sources read after those of the host, into the same run:
 	// what the BMC of the host answered, when the caller asked it. A scan
 	// finds no such source by itself.
@@ -356,10 +360,14 @@ func moduleSPD(ctx context.Context, opts *Options, now time.Time, info hostinfo.
 		return []adapter.Adapter{dimmspd.NewCopy(opts.root(), now, memoryType(ctx, sm))}
 	}
 	fsys, ok := os.DirFS(opts.root()).(dimmspd.FS)
+	if opts.SPDFS != nil {
+		fsys, ok = opts.SPDFS, true
+	}
 	if !ok {
 		return nil
 	}
-	lo := dimmspd.LiveOptions{Now: now, Privileged: opts.Privileged, Virtual: info.Virtual, AllowVirtual: dimmspd.DebugVirtual(), Release: info.Kernel}
+	lo := dimmspd.LiveOptions{Now: now, Privileged: opts.Privileged, Virtual: info.Virtual, AllowVirtual: dimmspd.DebugVirtual(), Release: info.Kernel,
+		Deadline: opts.SPDDeadline}
 	return []adapter.Adapter{dimmspd.NewLive(fsys, opts.root(), lo, memoryType(ctx, sm))}
 }
 

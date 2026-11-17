@@ -13,6 +13,7 @@ proc/sys/kernel/osrelease
 proc/sys/kernel/random/boot_id
 proc/uptime
 proc/version
+spd-probe.txt
 sys/class/dmi/id/bios_date
 sys/class/dmi/id/bios_vendor
 sys/class/dmi/id/bios_version

@@ -401,73 +401,72 @@ func (p ProbePCI) Bound() bool { return p.Driver != "" && p.Driver != "-" }
 
 // Short returns the short English text of a reason: the detail of the
 // source in the inventory and of the "missing" line. The view has the
-// same texts in both languages.
+// same texts in both languages. The texts that name a module are spelt
+// out for each module, so that the translation of source details finds
+// every one of them.
 func Short(p *Probe, code string) string {
+	if p == nil {
+		p = &Probe{}
+	}
+	var mod string
 	switch code {
-	case ReasonVirtual:
-		return "virtual machine"
-	case ReasonNoI2C:
-		return "no I2C bus in this kernel"
+	case ReasonSMBusNotLoaded, ReasonSMBusNotBuilt:
+		mod = p.SMBusModule()
+	case ReasonSPDDriverNotLoaded, ReasonSPDDriverNotBuilt:
+		mod = p.SPDDriver()
+	}
+	if s, ok := shortOfModule[code][mod]; ok {
+		return s
+	}
+	switch code {
 	case ReasonSMBusNotLoaded:
-		return "SMBus driver " + p.SMBusModule() + " not loaded"
-	case ReasonSMBusNotBuilt:
-		return "kernel built without " + p.SMBusModule()
-	case ReasonSMBusUnknown:
-		return "SMBus controller without driver"
-	case ReasonSMBusRefused:
-		return "SMBus driver did not bind the controller"
-	case ReasonNoSMBusController:
-		return "no SMBus controller on PCI"
+		return "SMBus driver " + mod + " not loaded"
+	case ReasonSMBusNotBuilt, ReasonSPDDriverNotBuilt:
+		return "kernel built without " + mod
 	case ReasonSPDDriverNotLoaded:
-		return "SPD driver " + p.SPDDriver() + " not loaded"
-	case ReasonSPDDriverNotBuilt:
-		return "kernel built without " + p.SPDDriver()
-	case ReasonSPDDriverUnknown:
-		return "SPD device without driver"
-	case ReasonSPDDriverRefused:
-		return "SPD driver did not bind"
-	case ReasonWriteDisabled:
-		return "SPD pages blocked by firmware"
-	case ReasonNoSPDDevice:
-		return "no SPD device on the bus"
-	case ReasonNoEEPROMFile:
-		return "SPD driver gives no eeprom file"
-	case ReasonReadDenied:
-		return "permission denied"
-	case ReasonReadFailed:
-		return "read failed"
-	case ReasonNotDecoded:
-		return "memory type not decoded"
-	case ReasonBlank:
-		return "only 0x00 or 0xFF bytes"
+		return "SPD driver " + mod + " not loaded"
+	}
+	if s, ok := shortTexts[code]; ok {
+		return s
 	}
 	return code
+}
+
+var shortOfModule = map[string]map[string]string{
+	ReasonSMBusNotLoaded:     {"i2c_i801": "SMBus driver i2c_i801 not loaded", "i2c_piix4": "SMBus driver i2c_piix4 not loaded"},
+	ReasonSMBusNotBuilt:      {"i2c_i801": "kernel built without i2c_i801", "i2c_piix4": "kernel built without i2c_piix4"},
+	ReasonSPDDriverNotLoaded: {"ee1004": "SPD driver ee1004 not loaded", "spd5118": "SPD driver spd5118 not loaded", "at24": "SPD driver at24 not loaded"},
+	ReasonSPDDriverNotBuilt:  {"ee1004": "kernel built without ee1004", "spd5118": "kernel built without spd5118", "at24": "kernel built without at24"},
+}
+
+var shortTexts = map[string]string{
+	ReasonVirtual:           "virtual machine",
+	ReasonNoI2C:             "no I2C bus in this kernel",
+	ReasonSMBusUnknown:      "SMBus controller without driver",
+	ReasonSMBusRefused:      "SMBus driver did not bind the controller",
+	ReasonNoSMBusController: "no SMBus controller on PCI",
+	ReasonSPDDriverUnknown:  "SPD device without driver",
+	ReasonSPDDriverRefused:  "SPD driver did not bind",
+	ReasonWriteDisabled:     "SPD pages blocked by firmware",
+	ReasonNoSPDDevice:       "no SPD device on the bus",
+	ReasonNoEEPROMFile:      "SPD driver gives no eeprom file",
+	ReasonReadDenied:        "permission denied",
+	ReasonReadFailed:        "read failed",
+	ReasonNotDecoded:        "memory type not decoded",
+	ReasonBlank:             "only 0x00 or 0xFF bytes",
 }
 
 // ShortTexts lists every short text a source detail can hold, for the
 // translation of source details and its test.
 func ShortTexts() []string {
-	seen := map[string]bool{}
 	var out []string
-	add := func(s string) {
-		if !seen[s] {
-			seen[s] = true
+	for _, m := range shortOfModule {
+		for _, s := range m {
 			out = append(out, s)
 		}
 	}
-	for _, code := range Reasons {
-		switch code {
-		case ReasonSMBusNotLoaded, ReasonSMBusNotBuilt:
-			for _, v := range []string{"8086", "1022"} {
-				add(Short(&Probe{PCI: []ProbePCI{{ID: v + ":0000", Driver: "-"}}}, code))
-			}
-		case ReasonSPDDriverNotLoaded, ReasonSPDDriverNotBuilt:
-			for _, n := range []string{"ee1004", "spd5118", "spd"} {
-				add(Short(&Probe{Clients: []ProbeClient{{Name: n}}}, code))
-			}
-		default:
-			add(Short(&Probe{}, code))
-		}
+	for _, s := range shortTexts {
+		out = append(out, s)
 	}
 	sort.Strings(out)
 	return out
@@ -500,4 +499,27 @@ func (p *Probe) SPDDriver() string {
 		return ""
 	}
 	return SPDDriverOf(p.Clients[0].Name)
+}
+
+// Evidence says, per reason, what the probe read to tell it, for the
+// table of docs/compatibility.md.
+var Evidence = map[string]string{
+	ReasonVirtual:            "the hypervisor that the host facts name (DMI strings, the CPU flag)",
+	ReasonNoI2C:              "`/sys/bus/i2c` is missing",
+	ReasonSMBusNotLoaded:     "a PCI device of class 0x0c05 without a `driver` link, its driver not registered, a module file listed",
+	ReasonSMBusNotBuilt:      "the same, and no module file listed",
+	ReasonSMBusUnknown:       "the same, and the module lists of the kernel could not be read",
+	ReasonSMBusRefused:       "the same device, its driver registered",
+	ReasonNoSMBusController:  "no adapter holds an SPD client, and no PCI device has class 0x0c05",
+	ReasonSPDDriverNotLoaded: "clients named `ee1004`, `spd5118` or `spd` without a `driver` link, the driver not registered, a module file listed",
+	ReasonSPDDriverNotBuilt:  "the same, and no module file listed",
+	ReasonSPDDriverUnknown:   "the same, and the module lists could not be read",
+	ReasonSPDDriverRefused:   "the same clients, the driver registered",
+	ReasonWriteDisabled:      "a scan as root read SPD write disable set, the modules are DDR5 (clients named `spd5118`, or the memory type of SMBIOS), and no client is bound",
+	ReasonNoSPDDevice:        "SMBus controllers with a driver, and no client at 0x50 to 0x57 named `ee1004`, `spd5118` or `spd`",
+	ReasonNoEEPROMFile:       "clients with a bound driver and no `eeprom` or `nvmem` file",
+	ReasonReadDenied:         "every open or read of an `eeprom` file ended in EACCES or EPERM",
+	ReasonReadFailed:         "the reads of the bound clients ended in errors of more than one kind, in EIO, ENXIO, or the deadline",
+	ReasonNotDecoded:         "every reading has a memory type other than DDR4 and DDR5",
+	ReasonBlank:              "every reading holds only 0x00 or only 0xFF in its first 128 bytes",
 }
