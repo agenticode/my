@@ -1,0 +1,154 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "DIMM0",
+    "bankLocator": "BANK 0",
+    "size": "8192 MB",
+    "sizeBytes": 8589934592,
+    "type": "DDR3",
+    "speed": "1600 MT/s",
+    "configuredSpeed": "1600 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000010",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM0",
+    "bankLocator": "BANK 1",
+    "size": "8192 MB",
+    "sizeBytes": 8589934592,
+    "type": "DDR3",
+    "speed": "1600 MT/s",
+    "configuredSpeed": "1600 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000014",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM1",
+    "bankLocator": "BANK 0",
+    "size": "8192 MB",
+    "sizeBytes": 8589934592,
+    "type": "DDR3",
+    "speed": "1600 MT/s",
+    "configuredSpeed": "1600 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000018",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM1",
+    "bankLocator": "BANK 1",
+    "size": "8192 MB",
+    "sizeBytes": 8589934592,
+    "type": "DDR3",
+    "speed": "1600 MT/s",
+    "configuredSpeed": "1600 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000022",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "4 / 4 slots populated",
+   "Total: 32.0 GiB"
+  ],
+  "badge": "DDR3 · 1600 MT/s",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": false,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "8.00 GiB"
+         },
+         {
+          "locator": "DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "8.00 GiB"
+         },
+         {
+          "locator": "DIMM1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "8.00 GiB"
+         },
+         {
+          "locator": "DIMM1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "8.00 GiB"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "4 DIMMs",
+        "32.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": []
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -189,6 +189,15 @@ func run(c call) (any, error) {
 		}
 		return map[string]any{"profile": r.Profile, "estabCount": r.EstabCount, "cpuLoadRatio": r.CPULoadRatio,
 			"memUsedPct": r.MemUsedPct, "reasons": kinds}, nil
+	case "layout":
+		var lin struct {
+			Dimms  []Dimm     `json:"dimms"`
+			Caches []CPUCache `json:"caches"`
+		}
+		if err := json.Unmarshal(c.In, &lin); err != nil {
+			return nil, err
+		}
+		return layoutData(Board(lin.Dimms, lin.Caches)), nil
 	case "formatBytes":
 		return FormatBytes(numArg(c.In, "n")), nil
 	case "formatNumber":
@@ -199,6 +208,40 @@ func run(c call) (any, error) {
 		return Num(Clamp(numArg(c.In, "v"), numArg(c.In, "lo"), numArg(c.In, "hi"))), nil
 	}
 	return nil, fmt.Errorf("no Go function for %s", c.Fn)
+}
+
+// layoutData is a layout in the form the harness reads the markup of the
+// reference into.
+func layoutData(l Layout) any {
+	rows := []any{}
+	for _, r := range l.Rows {
+		parts := []any{}
+		for _, p := range r.Parts {
+			if p.CPU != nil {
+				caches := []any{}
+				for _, c := range p.CPU.Caches {
+					caches = append(caches, map[string]any{"label": c.Label, "size": c.Size})
+				}
+				parts = append(parts, map[string]any{"cpu": map[string]any{"socket": p.CPU.Socket, "name": p.CPU.Name, "sub": p.CPU.Sub, "caches": caches}})
+				continue
+			}
+			chs := []any{}
+			for _, c := range p.Channels {
+				sticks := []any{}
+				for _, s := range c.Sticks {
+					sticks = append(sticks, map[string]any{"locator": s.Locator, "classes": s.Classes, "cap": s.Cap})
+				}
+				chs = append(chs, map[string]any{"channel": c.Channel, "socket": c.Socket, "sticks": sticks})
+			}
+			parts = append(parts, map[string]any{"bank": p.Bank, "channels": chs})
+		}
+		rows = append(rows, map[string]any{"socket": r.Socket, "dual": r.Dual, "parts": parts})
+	}
+	summary := l.Summary
+	if summary == nil {
+		summary = []string{}
+	}
+	return map[string]any{"empty": l.Empty, "summary": summary, "badge": l.Badge, "rows": rows}
 }
 
 // asData turns a value into plain JSON data, without the fields the

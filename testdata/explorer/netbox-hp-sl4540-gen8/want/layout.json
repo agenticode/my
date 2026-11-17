@@ -1,0 +1,404 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "PROC  1 DIMM  1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR3",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "UNKNOWN",
+    "serialNumber": "EX000008",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  1 DIMM  2",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000011",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  1 DIMM  3",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR3",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "UNKNOWN",
+    "serialNumber": "EX000013",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "Unknown",
+    "channel": 2,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  1 DIMM  4",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000016",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  1 DIMM  5",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000019",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  1 DIMM  6",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000022",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 2,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR3",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "UNKNOWN",
+    "serialNumber": "EX000024",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 1,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  2",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000027",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  3",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR3",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "UNKNOWN",
+    "serialNumber": "EX000029",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "Unknown",
+    "channel": 2,
+    "socket": 1,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  4",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000032",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  5",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000035",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC  2 DIMM  6",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR3",
+    "speed": "1600 MHz",
+    "configuredSpeed": "1333 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000038",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 2,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "8 / 12 slots populated",
+   "Total: 128 GiB"
+  ],
+  "badge": "DDR3 · 1333 MHz",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": true,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 2,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "PROC  1 DIMM  3",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "PROC  1 DIMM  6",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 1,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "PROC  1 DIMM  2",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "PROC  1 DIMM  5",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "PROC  1 DIMM  1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "PROC  1 DIMM  4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "4 DIMMs",
+        "64.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "cpu": {
+       "socket": 1,
+       "name": "CPU 1",
+       "sub": [
+        "4 DIMMs",
+        "64.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "PROC  2 DIMM  1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "PROC  2 DIMM  4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 1,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "PROC  2 DIMM  2",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "PROC  2 DIMM  5",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 2,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "PROC  2 DIMM  3",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "PROC  2 DIMM  6",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

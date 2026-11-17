@@ -1,0 +1,161 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "ChannelA-DIMM0",
+    "bankLocator": "BANK 0",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2666 MT/s",
+    "configuredSpeed": "2400 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000006",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "ChannelA-DIMM1",
+    "bankLocator": "BANK 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "Unknown",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "Not Specified",
+    "partNumber": "Not Specified",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "ChannelB-DIMM0",
+    "bankLocator": "BANK 2",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2666 MT/s",
+    "configuredSpeed": "2400 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000011",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "ChannelB-DIMM1",
+    "bankLocator": "BANK 3",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "Unknown",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "Not Specified",
+    "partNumber": "Not Specified",
+    "rank": "Unknown",
+    "channel": 1,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "2 / 4 slots populated",
+   "Total: 32.0 GiB"
+  ],
+  "badge": "DDR4 · 2400 MT/s",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": false,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "ChannelA-DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "ChannelA-DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "2 DIMMs",
+        "32.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 1,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "ChannelB-DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "ChannelB-DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}
