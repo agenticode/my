@@ -331,7 +331,7 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 			sticks[i].SocketBy, sticks[i].ChannelBy, sticks[i].Label = dimms[i].SocketBy, dimms[i].ChannelBy, dimms[i].Label
 		}
 		b.Hub, b.Family = facts.Hub, facts.Family
-		for _, src := range explorer.FamilySources(facts.Family) {
+		for _, src := range adapter.Guard(func() []explorer.Source { return explorer.FamilySources(facts.Family) }) {
 			b.Documents = append(b.Documents, BoardDocument{Title: src.Title, Number: src.Number, Date: src.Date, URL: src.URL, Pages: src.Pages})
 		}
 	}
