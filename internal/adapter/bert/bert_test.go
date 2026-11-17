@@ -34,6 +34,7 @@ func (*sink) BIOSSetting(*model.BIOSSetting) error { return nil }
 func (*sink) BMCMemory(*model.BMCMemory) error     { return nil }
 func (*sink) Firmware(*model.FirmwareRecord) error { return nil }
 func (*sink) Registry(*model.RegistrySeen) error   { return nil }
+func (*sink) SPD(*model.SPDReading) error          { return nil }
 func (*sink) Reading(*model.HostReading) error     { return nil }
 
 var cell = cper.MemError{

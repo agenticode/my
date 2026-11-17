@@ -1015,7 +1015,7 @@ func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
 		if q.sql == `DELETE FROM scan WHERE id = ?` {
 			// Records that name the scan and were there before it keep
 			// their row; they lose the reference.
-			for _, t := range []string{"event", "action", "gpu_mem", "ecs_sample", "bmc", "bios_setting", "bmc_memory", "fw_record", "registry_seen"} {
+			for _, t := range []string{"event", "action", "gpu_mem", "ecs_sample", "bmc", "bios_setting", "bmc_memory", "fw_record", "registry_seen", "spd_reading"} {
 				if _, err := w.exec(`UPDATE `+t+` SET scan_id = NULL WHERE scan_id = ?`, scanID); err != nil {
 					return fmt.Errorf("drop scan %d: %w", scanID, err)
 				}

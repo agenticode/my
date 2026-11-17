@@ -39,7 +39,7 @@ case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C
 | `manifest.json` | what the bundle is and what it holds |
 | `sources.json` | the source inventory: every source a run looked for, with what it yielded or why it could not be read |
 | `README.txt` | the same in words, for a person who receives the file and has not seen the tool |
-| `ledger.db` | the ledger: error records with their original text, DIMM identities, slots, placements, boots, actions, counter, GPU and memory readings, and the findings of the sender ([data-model.md](data-model.md)) |
+| `ledger.db` | the ledger: error records with their original text, DIMM identities, slots, placements, boots, actions, counter, GPU and memory readings, the SPD of the memory modules as read, and the findings of the sender ([data-model.md](data-model.md)) |
 | `inputs/` | only with `--with-inputs`: the files the records were read from, whole, each under the name the manifest gives it |
 
 `my import FILES... -o case.mycase --with-inputs` and `my collect redfish --bmc ADDRESS -o case.mycase --with-inputs` put the files that were read into the bundle, compressed: the files given to the import (for a directory, the files below it, as the directory reader takes them), or the answers of the BMC with the manifest of the collection. It is off by default. A log of a BMC or of a vendor tool holds logins, user names, network addresses and configuration, which a bundle otherwise never holds, and nothing in those files is replaced. `--with-inputs` and `--anonymize` together are refused: the anonymizer replaces names in the ledger and cannot vouch for a whole vendor file. The README of such a bundle says so, and `not_collected` shrinks to what is still left out.
@@ -119,7 +119,7 @@ Without `--key-file` the key is random and thrown away after the run. With `--ke
 
 The command prints which name became which word. The sender keeps these lines: the bundle does not hold the names, and an answer about the case uses the words.
 
-What stays: times, places, counts, slot names, the system vendor and product, kernel and firmware versions, and the serial numbers of DIMMs and GPUs. A return is about a serial number.
+What stays: times, places, counts, slot names, the system vendor and product, kernel and firmware versions, the serial numbers of DIMMs and GPUs, and the bytes of the SPD of each module, which hold its serial number too. A return is about a serial number.
 
 Two things are not replaced, and a sender who needs them gone has to act before the bundle is made:
 

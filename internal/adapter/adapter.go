@@ -52,6 +52,9 @@ type Sink interface {
 	// Reading takes the text of a file or command about the memory of the
 	// host (the Memory Explorer); it holds no error record.
 	Reading(*model.HostReading) error
+	// SPD takes the SPD EEPROM of a memory module as it was read, or the
+	// failed read of one; it holds no error record.
+	SPD(*model.SPDReading) error
 }
 
 // Report says how reading a source went. Every adapter returns one, also
@@ -180,6 +183,7 @@ type Collected struct {
 	Firmwares  []*model.FirmwareRecord
 	Registries []*model.RegistrySeen
 	Readings   []*model.HostReading
+	SPDs       []*model.SPDReading
 }
 
 func (c *Collected) Host(h *model.Host) error     { c.Hosts = append(c.Hosts, h); return nil }
@@ -214,6 +218,7 @@ func (c *Collected) Reading(r *model.HostReading) error {
 	c.Readings = append(c.Readings, r)
 	return nil
 }
+func (c *Collected) SPD(r *model.SPDReading) error { c.SPDs = append(c.SPDs, r); return nil }
 
 // KindUnknown is the source kind of an input no reader recognised. Such a
 // source is listed with what the input looks like; it is no source that
