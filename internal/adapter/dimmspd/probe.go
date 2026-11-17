@@ -322,6 +322,21 @@ func (p *Probe) WriteDisabled() bool {
 	return false
 }
 
+// WriteEnabled reports whether a scan as root read the SPD write disable
+// bit clear on an SMBus controller and set on none.
+func (p *Probe) WriteEnabled() bool {
+	read := false
+	for _, c := range p.PCI {
+		switch c.SPDWD {
+		case "1":
+			return false
+		case "0":
+			read = true
+		}
+	}
+	return read
+}
+
 // Reason returns the reason why no SPD was read, or "" when a reading is
 // in the state ok, crc or short. memoryType is the memory type SMBIOS
 // gives for the modules (DDR4, DDR5), or "".

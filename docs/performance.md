@@ -70,7 +70,7 @@ The two programs add 8.5 ms to the median there, 10.7 ms with the guests running
 
 ## SPD of the memory modules
 
-A scan of a running host reads the SPD of the modules from the `eeprom` files of the kernel's SPD drivers ([compatibility.md](compatibility.md#module-spd)). All readings of a host share one deadline of 5 seconds; a read the kernel does not return in time is left behind, and the readings after it are not made. No read on a real bus was timed: none of the hosts MemorY was validated on gives the SPD to Linux, so how long a read takes, and what it does on a bus a BMC uses at the same time, is not known. `TestReadInSteps` holds the deadline with a read that does not return.
+A scan of a running host reads the SPD of the modules from the `eeprom` files of the kernel's SPD drivers ([compatibility.md](compatibility.md#module-spd)). All readings of a host share one deadline of 5 seconds; a read the kernel does not return in time is left behind, and the readings after it are not made. No read on a real bus was timed: none of the hosts MemorY was validated on gives the SPD to Linux, so how long a read takes, and what it does on a bus a BMC uses at the same time, is not known. In the two lab guests every read ended in ENXIO at its first byte, which times nothing ([validation-lab.md](validation-lab.md#spd)). `TestReadInSteps` holds the deadline with a read that does not return.
 
 ## Small hosts
 

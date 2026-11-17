@@ -49,6 +49,10 @@ The hex texts were printed from `illumos/ddr4-rdimm-64g-2rx4.bin` and `illumos/d
 
 [`demo`](demo/README.md) is a made host for `my spd --root testdata/spd/demo`. Its eight files `demo/spd/0-0050.bin` to `0-0057.bin` are copies of `illumos/ddr5-rdimm-64g-2rx4.bin` with the serial number of a made DIMM (bytes 517-520) and a week (bytes 515-516) written in; `TestDemoIsCurrent` in `internal/testledger/spdhost` holds them to the generator.
 
+## Lab guests
+
+[`lab`](lab/README.md) holds what `tools/lab/spd.sh` recorded in two QEMU guests, one with DDR4 and one with DDR5 memory devices in SMBIOS: the copies `my collect host` wrote, the kernel log lines about the SMBus and the SPD clients, and what `my spd` printed. QEMU's EEPROMs hold no SPD, so these files hold no dump. `TestLabGuests` in `cmd/my` reads them.
+
 ## Licences
 
 | Directory | Licence | Text |

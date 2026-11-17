@@ -1,0 +1,3 @@
+0-0050 name=spd5118 driver= eeprom=-
+0-0051 name=spd5118 driver= eeprom=-
+i2c-0 name=SMBus I801 adapter at 0000:00:1f.3 driver= eeprom=-

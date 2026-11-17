@@ -1,0 +1,1 @@
+BOOT_IMAGE=(hd0,gpt3)/boot/vmlinuz-6.19.10-300.fc44.x86_64 no_timer_check console=tty1 console=ttyS0,115200n8 systemd.firstboot=off root=UUID=15c26993-ac30-424a-9c4b-faec4434d234 rootflags=subvol=root

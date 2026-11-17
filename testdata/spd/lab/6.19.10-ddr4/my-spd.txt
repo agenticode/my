@@ -1,0 +1,5 @@
+host lab-spd  QEMU lab-spd  SPD not read: read failed
+ 2 SPD devices did not answer (ENXIO on /sys/bus/i2c/devices/0-0050/eeprom). A bus that a BMC uses
+ at the same time can give such errors.
+ SMBIOS lists 4 slots.
+ Scan again. If it stays, ask the BMC or give a dump.

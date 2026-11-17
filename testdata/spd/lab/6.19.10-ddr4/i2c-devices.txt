@@ -1,0 +1,5 @@
+0-0036 name=dummy driver=dummy eeprom=-
+0-0037 name=dummy driver=dummy eeprom=-
+0-0050 name=ee1004 driver=ee1004 eeprom=512
+0-0051 name=ee1004 driver=ee1004 eeprom=512
+i2c-0 name=SMBus I801 adapter at 0000:00:1f.3 driver= eeprom=-
