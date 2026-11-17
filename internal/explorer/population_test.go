@@ -264,3 +264,44 @@ func TestPopulationByMaker(t *testing.T) {
 	fmt.Fprintf(&b, "all\t%d\t%d\t%d\n", tot.dumps, tot.before, tot.after)
 	testutil.Golden(t, "population-boards.txt", []byte(b.String()))
 }
+
+// The counts of docs/compatibility.md are those of the population, with the
+// socket count of each dump, without the fixes and with them.
+func TestPopulationInTheDocs(t *testing.T) {
+	doc, err := os.ReadFile(testutil.RepoRoot(t) + "/docs/compatibility.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := string(doc)
+	lists := readPopulation(t)
+	dumps := 0
+	for _, l := range lists {
+		dumps += l[0].dumps
+	}
+	for _, want := range []string{commas(dumps) + " dumps with memory devices", commas(len(lists)) + " distinct slot lists", "commit `57b21bc`"} {
+		if !strings.Contains(text, want) {
+			t.Errorf("docs/compatibility.md lacks %q", want)
+		}
+	}
+	for _, c := range []struct {
+		row   string
+		fixes Fix
+	}{{"first version", 0}, {"this release", AllFixes}} {
+		old := SetFixes(c.fixes)
+		b := tallyPopulation(lists, true)
+		SetFixes(old)
+		row := fmt.Sprintf("| %s | %s | %s | %s | %s |", c.row, commas(b.all), commas(b.some), commas(b.noChannel), commas(b.none))
+		if !strings.Contains(text, row+"\n") {
+			t.Errorf("docs/compatibility.md lacks the row %q", row)
+		}
+	}
+}
+
+// commas writes a count with thousands separated, as the docs write it.
+func commas(n int) string {
+	s := strconv.Itoa(n)
+	for i := len(s) - 3; i > 0; i -= 3 {
+		s = s[:i] + "," + s[i:]
+	}
+	return s
+}

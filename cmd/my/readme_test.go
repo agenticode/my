@@ -1,8 +1,13 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
+
+	"github.com/agenticode/my/internal/testutil"
 )
 
 // TestReadmeShowsRealOutput runs the commands the two READMEs quote and
@@ -27,5 +32,34 @@ func TestReadmeShowsRealOutput(t *testing.T) {
 				t.Errorf("%s quotes the commands %q, want %q", tt.page, ran, want)
 			}
 		})
+	}
+}
+
+// TestReadmeListsTheCommands holds the commands tables of the two READMEs
+// to the command list: every command that is not hidden has a row, and so
+// has each way of "my collect".
+func TestReadmeListsTheCommands(t *testing.T) {
+	names := []string{"collect host", "collect redfish"}
+	for _, c := range app().Commands {
+		if !c.Hidden && c.Name != "collect" && c.Name != "version" {
+			names = append(names, c.Name)
+		}
+	}
+	for _, page := range []string{"README.md", "README.ko.md"} {
+		text, err := os.ReadFile(filepath.Join(testutil.RepoRoot(t), page))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var rows []string
+		for _, line := range strings.Split(string(text), "\n") {
+			if strings.HasPrefix(line, "| `my") {
+				rows = append(rows, line)
+			}
+		}
+		for _, n := range names {
+			if !slices.ContainsFunc(rows, func(r string) bool { return strings.Contains(r, "`my "+n) }) {
+				t.Errorf("the commands table of %s has no row for my %s", page, n)
+			}
+		}
 	}
 }

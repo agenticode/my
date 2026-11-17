@@ -1,6 +1,6 @@
 # Contributing
 
-This page says how to report a problem or send a sample of a BMC log, how to build and test, what a change needs, and how the source tree is laid out.
+This page says how to report a problem, send a sample of a BMC log or the slot names of a board, how to build and test, what a change needs, and how the source tree is laid out.
 
 ## Reporting a problem
 
@@ -13,6 +13,10 @@ Security problems do not belong in an issue: see [SECURITY.md](SECURITY.md).
 ## Sending a sample of a BMC log
 
 The tables that read the memory messages of each BMC vendor rest on registries and documents; none has been compared with a log of a real machine yet ([docs/vendors.md](docs/vendors.md)). A log of a machine with a memory event, of any vendor, is the most useful thing to send: a Redfish collection (`my collect redfish --bmc ADDRESS -o DIR`), the saved output of a vendor tool, or an exported log. Open an issue with the file attached, the vendor, model and firmware version of the BMC, and what happened to the DIMM if it is known (replaced, repaired, still in use). Replace host names, addresses and user names first; `my collect` leaves out passwords and session tokens by itself. The sample becomes a fixture, and the table that reads it moves to the basis `capture`.
+
+## Sending the slot names of a board
+
+`my board` places a slot by its SMBIOS names, and a board whose names it does not read is drawn as a list below the board, with a line that says why ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)). The names of such a board are worth sending: run `sudo dmidecode -t 1 -t 2 -t 4 -t 17 > dmidecode.txt`, replace every `Serial Number`, `UUID` and `Asset Tag` value with `Not Specified`, and open an issue with the file, the output of `my board --detail`, and, if you know it, the CPU and channel of a few slots as the board or its manual labels them. The file becomes a fixture under `testdata/explorer` and a row of the table of slot names.
 
 ## Building and testing
 

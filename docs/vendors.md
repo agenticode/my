@@ -117,6 +117,8 @@ No reader is written without a public description of the format and a sample to 
 | Inspur IDL download | one memory event with its code |
 | Cisco tech-support files and UCS faults | the place of the SEL in the archive; one memory fault with its life cycle |
 
+The names of the memory slots, which `my board` reads to place a DIMM by CPU and channel, differ by server maker as well; [compatibility.md](compatibility.md#slot-names-of-server-vendors) has a table of the forms that are read.
+
 ## Sending a sample
 
 A log of a real machine with a memory event is what moves a table from `registry` or `documents` to `capture`. [CONTRIBUTING.md](../CONTRIBUTING.md) says how to send one. Before it is sent, replace host names, addresses and user names; DIMM serial numbers may stay, they tie the records to a module.

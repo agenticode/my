@@ -92,6 +92,7 @@ var Words = i18n.Catalog{
 	"mx.kpi.slab_ru":             {EN: "reclaimable {r}, unreclaimable {u}", KO: "회수 가능 {r}, 회수 불가 {u}"},
 	"mx.kpi.swap":                {EN: "Swap in use", KO: "사용 중인 스왑"},
 	"mx.kpi.no_swap":             {EN: "no swap", KO: "스왑 없음"},
+	"mx.kpi.not_read":            {EN: "not read", KO: "읽지 않음"},
 	"mx.kpi.psi":                 {EN: "Pressure some / full, avg10", KO: "압력 some / full, avg10"},
 	"mx.kpi.dirty":               {EN: "Dirty / writeback", KO: "dirty / writeback"},
 	"mx.bar":                     {EN: "Memory of the host, {total}", KO: "호스트 메모리, {total}"},

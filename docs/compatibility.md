@@ -443,13 +443,101 @@ Adapter `smbios`, package `internal/adapter/smbios`. It reads the memory device 
 
 The locator of a slot is its name in every finding. Where two slots have the same locator, the bank locator is added.
 
-SMBIOS gives no error records and no grade.
+SMBIOS gives no error records and no grade. The board of `my board` and of the report is drawn from the locators and bank locators of the slots, see "Slot names of server vendors"; that drawing ties no record to a slot.
 
 ### Known gaps
 
 - Without the raw tables or `dmidecode` output a scan has no serial numbers. DIMMs are then told apart by slot, and a replaced DIMM cannot be told from its predecessor.
 - Serial numbers that are placeholders (`NO DIMM`, `Unknown`, all zeros and the like) are not taken as identities.
 - SMBIOS does not say which EDAC position a slot is. The two are tied on evidence only, see "Which slot a record belongs to".
+
+## Slot names of server vendors
+
+The board places a slot by its locator and bank locator, the two names SMBIOS gives it. One set of tests reads a socket from the names and another a channel; each test knows a way some makers name their slots. Socket and channel numbers count from 0. The rows below are what the board draws of the first slot of each fixture under `testdata/explorer`; a test holds the table to the fixtures.
+
+| Names | Locator | Bank locator | Board | Fixture |
+| --- | --- | --- | --- | --- |
+| Supermicro: `P` socket, node and channel in the bank locator | `P1-DIMMA1` | `P0_Node0_Channel0_Dimm0` | CPU 0, channel 0 | `linuxhw-sys-6028r-wtr-fac06e` |
+| Huawei, Sugon, Inspur, Lenovo RD450X: node and channel in the bank locator | `DIMM000` | `_Node0_Channel0_Dimm0` | CPU 0, channel 0 | `linuxhw-1288h-v5-c98b42` |
+| socket, channel and slot as three digits | `DIMM000` | `Not Specified` | CPU 0, channel 0 | `lab-digits` |
+| Dell PowerEdge: the letter is the socket | `A1` | `Not Specified` | CPU 0, channel 0 | `netbox-dell-poweredge-m630` |
+| older Dell PowerEdge | `DIMM_A1` | `Not Specified` | CPU 0, channel 0 | `dselans-dell-centos65` |
+| HPE ProLiant | `PROC 1 DIMM 1` | `Not Specified` | CPU 0, channel 0 | `netbox-hp-bl460c-gen10` |
+| HPE ProLiant Gen8, two spaces | `PROC  1 DIMM  1` | `Not Specified` | CPU 0, channel 0 | `netbox-hp-dl380p-gen8` |
+| Intel and ASUS boards: `CPU` and a channel letter | `CPU0_DIMM_A1` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m50cyp2sbstd-d50fc4` |
+| `CPU` counted from 1 and a channel letter, bank locator `P0 CHANNEL A` | `CPU1_DIMM_A1` | `P0 CHANNEL A` | CPU 1, channel 0 | `linuxhw-rs720a-e12-rs12-6002d3` |
+| Intel reference boards, Inspur M5 and M6: `_C` channel `D` slot | `CPU0_C0D0` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m70klp2sb-m90598-001-373530` |
+| `_CH` channel `_DIMM` slot, on two sockets | `CPU0_CH0_DIMM0` | `Not Specified` | CPU 0, channel 0 | `lab-two-sockets` |
+| Intel S2600: node, channel and slot in the bank locator | `DIMM_A1` | `NODE 0 CHANNEL 0 DIMM 0` | CPU 0, channel 0 | `linuxhw-s2600gz-925442` |
+| AMD boards: `P` socket and a channel letter in the bank locator | `DIMM 0` | `P0 CHANNEL A` | CPU 0, channel 0 | `linuxhw-genoad12m3-2q-h-af39b8` |
+| Gigabyte: `DIMM_P` socket, channel letter | `DIMM_P0_A0` | `BANK 0` | CPU 0, channel 0 | `linuxhw-g482-z54-00-7ca16e` |
+| one socket: `ChannelA-DIMM0` | `ChannelA-DIMM0` | `BANK 0` | CPU 0, channel 0 | `ironlib-dmidecode` |
+| one socket: channel letter in the bank locator | `DIMM A1` | `CHANNEL A` | CPU 0, channel 0 | `netbox-qct-x10e-9n` |
+| one socket: `DIMM` and a channel letter | `DIMMA1` | `Not Specified` | CPU 0, channel 0 | `lab-letters` |
+| lshw only, no SMBIOS text | `A0` | | CPU 0, channel 0 | `coreboot-ga-g41m-es2l` |
+| Lenovo ThinkSystem and System x: `DIMM n`, socket in the bank locator | `DIMM 1` | `CPU 1` | CPU 0, no channels | `linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0` |
+| node, channel and slot in the locator, node in the bank locator | `NODE 0 CHANNEL 0 DIMM 0 (C0A0)` | `NODE 0` | CPU 0, no channels | `linuxhw-9k-23ba3b` |
+| memory controller and channel letter in the locator, node in the bank locator | `P0_MC0_DIM_CH_A0` | `NODE 1` | CPU 0, no channels | `linuxhw-b7109f77dv14hr-2t-n-91971d` |
+| `ChannelA-DIMM0` with `NODE 0` to `NODE 7` on two sockets | `ChannelA-DIMM0` | `NODE 0` | set aside | `linuxhw-r1g3d32-ec54ac` |
+| no socket and no channel in the names | `DIMM 1` | `Bank 1` | set aside | `linuxhw-system-x3550-m4-7914b2a-05b91b` |
+
+Before the board is drawn, what the tests read is checked:
+
+- A slot is set aside when no test read a socket or a channel from its names, when a number is too large for a socket or a channel, and when no test read its socket on a board of more than one socket.
+- A socket below 0 sets aside the slot and every other slot whose socket the same test read: that test counts in a way this board does not.
+- When the sockets of the slots left do not run from 0 or from 1 without a gap, are more than 8, or are more than the processor records of the board, every slot is set aside.
+- A socket whose channels would hold more than 3 slots each, or which has a slot with a channel below 0, is drawn without channels: its slots in the order of the SMBIOS table.
+
+The number of sockets is the number of processor records (SMBIOS type 4). `dmidecode -t memory` text and ledgers written before this release lack it; there the CPU packages of the cache reading stand in for the check of a socket no test read. Slots set aside are drawn below the board, as the slot map draws them, with the reason and an example of their names in the data quality lines.
+
+The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https://github.com/linuxhw/DMI), commit `57b21bc`, CC BY 4.0) are 2,043 dumps with memory devices, in 1,625 distinct slot lists (`testdata/explorer/population/slots.tsv`). With the processor records of each dump, the boards are drawn so:
+
+| Tests | Every slot placed | Some placed | Without channels | All set aside |
+| --- | --- | --- | --- | --- |
+| first version | 1,076 | 48 | 226 | 693 |
+| this release | 1,502 | 51 | 238 | 252 |
+
+The first version is how the tests read the names when they were first written, the later ones read more forms. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
+
+What the checks cannot see:
+
+- Dell names of one letter and a number (`A1`): the channel comes from the number and the channel count of the processor, which a table of processor names gives (AMD EPYC 4000, 7000, 8000 and 9000 series, Xeon E3, E-2, E5 and E7, Xeon 5500 and 5600, Xeon Scalable, Xeon 6). For a processor the table does not know, the board takes half the slots of the socket as its channels, two slots to a channel. Where the board has one or three slots per channel, the slots of two channels are drawn as one.
+- A locator that counts CPUs from 1 beside a bank locator that counts them from 0 (`CPU1_DIMM_A1` with `P0 CHANNEL A`): the slots are grouped by CPU as on the board, and the CPUs are labelled 1 and 2.
+
+## Memory Explorer readings
+
+Adapter `host-memory`, package `internal/adapter/hostmem`. It keeps texts about the memory of a host for the board and for section 7 of the report: no error record and no grade comes from them. The source inventory has one entry for it, with a note for every reading it did not find. A copy of a host's files without any of these files gets no entry.
+
+| Reading | Running host | Copy of a host's files, the first that exists | Kept |
+| --- | --- | --- | --- |
+| `meminfo` | `/proc/meminfo` | `proc/meminfo` | 256 KiB |
+| `vmstat` | `/proc/vmstat` | `proc/vmstat` | 256 KiB |
+| `pressure-memory` | `/proc/pressure/memory` | `proc/pressure/memory` | 4 KiB |
+| `slabinfo` | `/proc/slabinfo`, readable by root only | `proc/slabinfo` | the head line and the 20 caches that take the most memory, of at most 4 MiB read |
+| `cpu-cache` | `level`, `type` and `size` of `sys/devices/system/cpu/cpuN/cache/index*` for the first CPU of each package | the same files | 64 KiB |
+| `numactl-hardware` | `numactl --hardware`, 5 seconds | `numactl-hardware.txt`, `sos_commands/numa/numactl_--hardware` | 256 KiB |
+| `numastat` | `numastat` with `NUMASTAT_WIDTH=4096`, so that one block holds every node, 5 seconds | `numastat.txt`, `sos_commands/numa/numastat` | 256 KiB |
+| `sar-b` | `sar -B`, the paging table of the day's file of sysstat, 15 seconds | `sar-B.txt` | 1 MiB |
+| `lru-gen-enabled` | `/sys/kernel/mm/lru_gen/enabled` | the same path | 64 bytes |
+| `lshw` | only `my collect host` runs `lshw -c memory -c processor`, 15 seconds | `lshw.txt`, `sos_commands/hardware/lshw` | 4 MiB |
+
+The names under `sos_commands` are those an sos report writes. An sos report has no `sar -B` text: its `sar` files hold every table, and only `sar-B.txt` is read. A scan runs `numactl`, `numastat` and `sar` when they are installed; `my serve` and `my harvest` run none of them. A program that is missing, fails or does not answer in time leaves its reading out with a note. Text that is not UTF-8 is kept with the invalid bytes replaced.
+
+What a missing reading costs:
+
+| Missing | Effect |
+| --- | --- |
+| `meminfo` | no overview tab |
+| `slabinfo` | no slab tab |
+| `vmstat` and `sar-b` | no page tab; with one of them the tab shows what it holds |
+| `pressure-memory` | the pressure card of the overview says that it was not read |
+| `numactl-hardware` | no NUMA tab |
+| `numastat` | the NUMA tab has sizes and no hit, miss or locality counts |
+| `lru-gen-enabled` | no MGLRU state |
+| `cpu-cache` and `lshw` | the CPUs of the board carry no cache sizes |
+| `lshw`, with no SMBIOS slot | no board |
+
+The data quality part of the report names every reading the ledger lacks.
 
 ## Host facts
 

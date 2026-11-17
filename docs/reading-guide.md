@@ -7,6 +7,7 @@ Every figure has one question it answers:
 | Figure | Question | Command |
 | --- | --- | --- |
 | Slot map and ranking | which DIMM | `my` |
+| Board | where each DIMM sits by CPU and channel | `my board` |
 | Finding | what to do, and what it rests on | `my why <slot>` |
 | Topology bars | which branch of the DIMM the errors sit on | `my dimm <slot>` |
 | Address map | what kind of fault | `my map <slot>` |
@@ -73,6 +74,32 @@ Below the ranking:
 | `note` | what limits the reach of the records, such as a virtual machine |
 
 The legend names the grades the map shows (`--detail`: all of them). The last line is the command to run next: on a host with a kept ledger that ledger, else the examination of the DIMM at the top of the ranking, else the host finding.
+
+## Board
+
+```
+$ my open examples/demo.mycase board
+case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C56
+host r12-n034  Example Systems R760  16 of 32 slots, 1024 GB  DDR5 RDIMM 4800 MT/s  CE 1,284, UE 1
+
+ ch       7      6      5      4      3      2      1      0
+        ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ██  ·· ░░  ·· ░░  ══╡CPU 0╞══
+ CPU0_  H2 H1  G2 G1  F2 F1  E2 E1  D2 D1  C2 C1  B2 B1  A2 A1
+ err                                          cU
+
+ ch                    0      1      2      3      4      5      6      7
+        ══╡CPU 1╞══  ░░ ··  ░░ ··  ░░ ··  ▒▒ ··  ░░ ··  ░░ ··  ░░ ··  ░░ ··
+ CPU1_               A1 A2  B1 B2  C1 C2  D1 D2  E1 E2  F1 F2  G1 G2  H1 H2
+ err                                      c
+
+ ██ replace now   ▒▒ observe   ░░ ok   ·· empty slot   c corrected, U uncorrected errors
+```
+
+`my board` draws the board as the Memory Explorer does: a bank of slots on each side of a CPU, one column per channel, the slots of a channel side by side. The channel numbers are above the bank, the slot names below it, with the part of the name all slots of the bank share at the start of the line. The `err` line marks the slots whose DIMM has corrected (`c`) or uncorrected (`U`) errors on record. The cells are those of the slot map. `--detail` adds a table with one line per slot: where it was drawn, the DIMM in it and its errors. `--ascii` draws with ASCII characters.
+
+The board places a slot from its two SMBIOS names, the locator and the bank locator. Slots whose names it cannot read are drawn below the board as the slot map draws them, and a line says why, with an example of the names. A socket whose names give no channels is drawn as one row of slots in the order of the SMBIOS table. [compatibility.md](compatibility.md#slot-names-of-server-vendors) lists the names it reads and what it makes of each. The exit code is that of `my`: the grade of the host.
+
+In a report the board is the figure of section 2, the slot map. A slot shows its card when the pointer is on it or it has the focus: the slot, the DIMM, its errors and its finding; a slot with a finding leads to it.
 
 ## Finding
 
@@ -339,4 +366,19 @@ Every record has an observation grade, which says how much of the place of an er
 
 ## The report
 
-`my report -o case.html` writes the same figures into one HTML file with eight sections: summary, slot map (with the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. When the BIOS or a BMC wrote about memory, the data quality section names each mapping table that classed records, with what it rests on and "not checked on real hardware" for a table no capture of a real BMC confirmed yet, the message registries the BMC published, and per source the records its reader did not understand with the reasons. The appendix then lists every firmware record: its time, slot, message ID, common event, how the event was found and its text. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.
+`my report -o case.html` writes the same figures into one HTML file with eight sections, nine when the ledger holds memory readings of the host: summary, slot map (the board, and the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, the Memory Explorer when there are readings, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. When the BIOS or a BMC wrote about memory, the data quality section names each mapping table that classed records, with what it rests on and "not checked on real hardware" for a table no capture of a real BMC confirmed yet, the message registries the BMC published, and per source the records its reader did not understand with the reasons. The appendix then lists every firmware record: its time, slot, message ID, common event, how the event was found and its text. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.
+
+### Memory Explorer
+
+Section 7 holds what the kernel counted about the memory of the host when a scan or `my collect host` ran, in five tabs. A tab whose reading the ledger lacks is left out, and the data quality section names the reading. Nothing in the section changes a grade or a finding. Without a script the tabs are drawn one under the other, and a printed report shows all of them.
+
+| Tab | What it shows | Marked |
+| --- | --- | --- |
+| Overview | total, used without cache, available, page cache and buffers, slab, swap in use, memory pressure, dirty and writeback pages, and a bar of the memory: anonymous, shared, page cache, reclaimable and unreclaimable slab, other, free | available below 20 % and below 10 %; swap in use above 1 GiB; pressure `some` above 5 and `full` above 1 (avg10) |
+| Slab | the 20 slab caches that take the most memory, from `/proc/slabinfo` | |
+| Page | the page counters of `/proc/vmstat` since the boot, and from `sar -B` the day's `fault/s`, `pgfree/s`, `pgscank/s` and `pgscand/s` as four charts | counters above 10,000 and above 1,000,000 |
+| NUMA | memory in use per node, the numastat counters per node with the hit rate, miss rate and the local and remote shares, the share of local accesses per node | a node above 70 % and above 90 % in use; hit rate below 95 % and 80 %, miss rate above 5 % and 20 %, local below 90 % and 70 %, remote above 10 % and 30 % |
+| MGLRU | whether the multi-generational LRU is on, and the value of `/sys/kernel/mm/lru_gen/enabled` | |
+
+The thresholds are those of the Memory Explorer, which MemorY carries; they are hints of the explorer and no rule of MemorY. With `--audience fa` the overview adds the explorer's hints in words: available memory below 10 %, `full` pressure above 1, `some` pressure above 5, unreclaimable slab above 15 % of the memory in use, dirty pages above 10 %, page cache above 50 %, swap in use above 1 GiB, and no swap in use with more than 20 % available.
+

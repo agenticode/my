@@ -101,6 +101,8 @@ CPU0_C1  replace now  R-UE-01  1 uncorrected error, the latest on 2026-11-12 03:
 
 In the address map a horizontal line is a row fault, a vertical line a column fault, one cell that repeats a single-bit fault, and a cloud over the bank a bank fault. [docs/reading-guide.md](docs/reading-guide.md) explains every figure, and `my help reading` prints the same on a terminal.
 
+`my board` draws the slots by CPU and channel, read from the SMBIOS slot names, with the grade and the errors of each DIMM.
+
 `my report` writes a case as one HTML file with the figures as SVG, the finding of every DIMM, the checks against a wrong diagnosis and the original records. The file loads nothing from elsewhere, opens without network access and prints to PDF. The report of the example is [examples/demo-report.html](examples/demo-report.html); this is its timeline of `CPU0_C1`:
 
 ![Timeline of CPU0_C1: corrected errors per day rising from late September, with reboots, a hard PPR, page offlines and an uncorrected error marked below](examples/figures/CPU0_C1-timeline.svg)
@@ -163,6 +165,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | EDAC counters | `/sys/devices/system/edac/mc` | counts per DIMM since boot |
 | mcelog daemon | `mcelog --client` | counts per DIMM |
 | SMBIOS | `/sys/firmware/dmi/tables`, or `dmidecode` output | slots, DIMM serial and part numbers |
+| Memory readings | `/proc/meminfo`, `/proc/vmstat`, `/proc/slabinfo`, memory pressure, the CPU caches in sysfs, `numactl --hardware`, `numastat`, `sar -B`, the state of MGLRU; `lshw` from `my collect host` | the Memory Explorer section of the report and the caches of the board; no error records |
 | BMC | `ipmitool sel` listings, Redfish dumps, the Redfish service, or saved `racadm getsel` and `racadm lclog view` output | memory events, modules that firmware disabled, sparing, repairs |
 | GPU memory | `nvidia-smi -q` and its queries | row remapping state and ECC counters per GPU |
 | FMFM logs | JSON files | runtime, boot and crash records, ECS readings |
@@ -184,6 +187,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | Command | What it does |
 | --- | --- |
 | `my` or `my scan` | scan this host: slot map and DIMMs ranked by risk |
+| `my board` | the board: slots by CPU and channel, with the grade and errors of each DIMM; `--detail` adds a line per slot ([docs/reading-guide.md](docs/reading-guide.md#board)) |
 | `my dimm <slot\|serial>` | examine one DIMM: finding, topology bars, address map, timeline |
 | `my why [slot\|serial]` | the decision and at most three statements that bear on it; `--detail` adds the records, checks and confidence behind it, `--oneline` gives one line for a ticket |
 | `my map <slot\|serial>` | the address map of one bank; `--bank`, `--rank`, `--device` choose it, `--rows A-B` zooms |
@@ -195,6 +199,7 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my report [FILE] -o report.html` | write a case, or this host, as one HTML file; `--audience fa` adds the detail failure analysis needs |
 | `my diff BEFORE AFTER` | two cases of one host, before and after a reseat, a slot swap, a replacement or a firmware update: did the errors move with the DIMM or stay with the slot |
 | `my import <file\|directory>...` | build a case from files, without the host they came from |
+| `my collect host -o DIR` | copy what a scan reads of this host, and the memory readings, into a directory to import elsewhere |
 | `my collect redfish --bmc ADDRESS -o OUT` | ask a BMC over Redfish for memory, BIOS settings and logs |
 | `my inventory` | the DIMMs one per line: maker, part number, size, organisation, speed, the RAS settings in effect, and the corrected errors the operating system and the BMC each recorded |
 | `my bios` | check the memory RAS settings of the BIOS against a profile ([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
@@ -266,6 +271,7 @@ MemorY has no telemetry and contacts no server of the project. It uses the netwo
 | what `my preflight` found a reset would lose on the host, with the files it read | |
 | the host name, its architecture and system product | |
 | readings of the error counters per DIMM, GPU memory records, ECS readings, what a BMC reported | |
+| what the kernel counted about the memory of the host at the time of the scan (memory use, slab cache sizes, page counters, NUMA node sizes), and the cache sizes of the CPUs | |
 | every source that was looked for, with the path it was read from, and what it yielded | |
 | the findings of the sender's run | |
 
@@ -297,6 +303,7 @@ Version 1.0.0, released on 2026-11-16. [CHANGELOG.md](CHANGELOG.md) lists what i
 - Findings compared with the failure tickets of a public fleet dataset: [docs/evaluation.md](docs/evaluation.md).
 - Not validated yet: hosts with the EDAC driver of a real memory controller. The decoding of their records rests on fixtures written from kernel and rasdaemon sources.
 - No analyzer of a memory vendor has been run against the plugin contract.
+- The board was compared with the SMBIOS dumps of a public collection and with lab guests; no board was compared with a real server ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - No BMC of a real server has been read. The Redfish client has run against the stand-in BMCs of the tests and against the DMTF mockup server ([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## Roadmap
