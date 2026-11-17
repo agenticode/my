@@ -341,8 +341,8 @@ func maker(v string) string {
 	return "other"
 }
 
-// The counts of docs/compatibility.md are those of the population, with the
-// socket count of each dump, without the fixes and with them.
+// docs/compatibility.md names the collection as the population file holds
+// it; TestPopulationCountsInTheDocs holds its counts.
 func TestPopulationInTheDocs(t *testing.T) {
 	doc, err := os.ReadFile(testutil.RepoRoot(t) + "/docs/compatibility.md")
 	if err != nil {
@@ -354,21 +354,10 @@ func TestPopulationInTheDocs(t *testing.T) {
 	for _, l := range lists {
 		dumps += l[0].dumps
 	}
-	for _, want := range []string{commas(dumps) + " dumps with memory devices", commas(len(lists)) + " distinct slot lists", "commit `57b21bc`"} {
+	for _, want := range []string{commas(dumps) + " dumps with memory devices", commas(len(lists)) + " distinct slot lists", "commit `57b21bc`",
+		commas(len(families)) + " rows", commas(len(sourceOrder)) + " documents"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("docs/compatibility.md lacks %q", want)
-		}
-	}
-	for _, c := range []struct {
-		row   string
-		fixes Fix
-	}{{"first version", 0}, {"first round of fixes", meFixes}, {"this release", AllFixes}} {
-		old := SetFixes(c.fixes)
-		b := tallyPopulation(lists, true)
-		SetFixes(old)
-		row := fmt.Sprintf("| %s | %s | %s | %s | %s |", c.row, commas(b.all), commas(b.some), commas(b.noChannel), commas(b.none))
-		if !strings.Contains(text, row+"\n") {
-			t.Errorf("docs/compatibility.md lacks the row %q", row)
 		}
 	}
 }
