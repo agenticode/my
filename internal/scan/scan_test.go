@@ -369,9 +369,11 @@ func TestNoJournalNoRingBufferFallsBackToFiles(t *testing.T) {
 	if len(logs) != 1 || !strings.HasSuffix(logs[0], filepath.Join("var", "log", "dmesg")) {
 		t.Errorf("kernel log sources = %v", logs)
 	}
-	// A journalctl that is not there is the same as none.
+	// A journalctl that is not there is the same as none. The sources:
+	// host facts, rasdaemon, the kernel log, EDAC, SMBIOS, module SPD and
+	// the readings of the Memory Explorer.
 	srcs = Sources(ctx, Options{Root: root, Live: true, Now: ds.Scenario.End, Journalctl: filepath.Join(root, "no-such-program")})
-	if len(srcs) != 6 {
+	if len(srcs) != 7 {
 		t.Errorf("%d sources", len(srcs))
 	}
 }

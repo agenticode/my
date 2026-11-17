@@ -115,7 +115,7 @@ func runHarvest(ctx context.Context, env *cli.Env, args []string) int {
 // ledger passes run.
 func harvestRun(ctx context.Context, env *cli.Env, lang i18n.Lang, o *options, path string, deadline time.Duration) int {
 	he := &harvestEnv{
-		scan:      scan.Options{Root: "/", Live: true, Note: "harvest", Numactl: "-", Numastat: "-", Sar: "-"},
+		scan:      scan.Options{Root: "/", Live: true, Note: "harvest", Numactl: "-", Numastat: "-", Sar: "-", NoSPD: true},
 		freeBytes: freeSpace,
 		euid:      os.Geteuid(),
 	}

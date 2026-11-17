@@ -1,0 +1,5 @@
+spd-probe 1
+i2c present
+driver ee1004 module
+driver spd5118 module
+bmc present

@@ -1219,9 +1219,10 @@ func TestEveryFixtureInput(t *testing.T) {
 		case rel == "redfish/bmc-tree":
 			inputs = append(inputs, p)
 			return filepath.SkipDir
-		case d.IsDir() && (rel == "spd" || rel == "edac-sysfs" || rel == "dcbrain" || rel == "real" || rel == "explorer" || strings.HasPrefix(rel, "smbios/tables-")):
+		case d.IsDir() && (rel == "edac-sysfs" || rel == "dcbrain" || rel == "real" || rel == "explorer" || strings.HasPrefix(rel, "smbios/tables-")):
 			return filepath.SkipDir
-		case d.IsDir(), strings.HasSuffix(rel, ".hex"), strings.HasSuffix(rel, ".cperhex"), strings.HasSuffix(rel, ".md"):
+		case d.IsDir(), strings.HasSuffix(rel, ".hex"), strings.HasSuffix(rel, ".cperhex"), strings.HasSuffix(rel, ".md"),
+			strings.HasSuffix(rel, "LICENSE"), rel == "spd/rigred/ddr3-sodimm.bin":
 			return nil
 		case strings.HasSuffix(rel, ".sql"):
 			p = testutil.BuildSQLite(t, p, strings.TrimSuffix(filepath.Base(p), ".sql")+".db")

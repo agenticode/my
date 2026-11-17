@@ -1470,6 +1470,106 @@ The data quality part of the report names every reading the ledger lacks.
 
 Source `spd`, packages `internal/decode/spd` (the decoder) and `internal/adapter/dimmspd` (the reader of a host). The SPD EEPROM of a memory module holds what the module maker wrote about it: memory and module type, die capacity and package, ranks and device width, the codes of the module and DRAM makers, the manufacturing location and week, serial and part number. SMBIOS gives most of these and neither the week nor the device width. The SPD gives no error record and no grade.
 
+### When Linux gives the SPD
+
+Read in the sources of Linux 7.3 (`drivers/i2c/i2c-smbus.c`, `drivers/i2c/busses/i2c-i801.c` and `i2c-piix4.c`, `drivers/nvmem/ee1004.c`, `drivers/hwmon/spd5118.c`). Linux gives the SPD of a module only when all of these hold:
+
+1. a driver of the SMBus controller is bound: `i2c_i801` (Intel) or `i2c_piix4` (AMD);
+2. the kernel made an SPD client and its driver is bound: `ee1004` for DDR4, `spd5118` for DDR5, `at24` for older types. The SMBus driver makes the clients itself from the SMBIOS memory devices: at most 8 slots, at addresses 0x50 to 0x57, none when memory types are mixed, and on i801 not behind a multiplexer;
+3. the BMC does not hold the bus and firmware does not hide the controller;
+4. the host is no virtual machine.
+
+On a board with more than eight slots, an SMBus that the BMC owns, or SPD wired to a bus of the processor's memory controller, the kernel has no client to read. That is the common case on servers; there MemorY names the reason and reads a dump given to it.
+
+### What is read on a host
+
+Source `spd`. Only files, only for reading, below `/sys` and `/lib/modules`; no root is needed for the SPD itself:
+
+| File | For |
+| --- | --- |
+| `/sys/bus/i2c/devices/i2c-N/name` | the adapters |
+| `/sys/bus/i2c/devices/N-00AA/name`, the link `driver`, `eeprom` (AA 50 to 57) | the SPD clients, whether a driver is bound, the SPD (mode 0444) |
+| `/sys/bus/nvmem/devices/N-00AA/nvmem` | the same bytes, where a bound client has no `eeprom` file |
+| `/sys/bus/i3c/devices/*/eeprom` of a device bound to `spd5118_i3c` | DDR5 hubs on I3C; no source confirms the path there, so it is tried and never required |
+| `/sys/bus/i2c/drivers/{ee1004,spd5118,at24}`, `/sys/bus/pci/drivers/{i801_smbus,piix4_smbus}` | whether a driver is registered (built in or loaded) |
+| `/sys/bus/pci/devices/*/class`, `vendor`, `device`, the link `driver` | the SMBus controllers (class 0x0c05) |
+| byte 0x40 of `/sys/bus/pci/devices/<Intel SMBus>/config` | SPD write disable (bit 4); read only by a scan as root |
+| `/lib/modules/<release>/modules.dep`, `modules.builtin` | whether a module that is not loaded exists for this kernel |
+| `/sys/class/ipmi`, `/sys/firmware/dmi/entries/38-*` | whether the host has a BMC |
+
+MemorY runs no program for the SPD, loads no module, writes no file, opens nothing under `/dev` (no `/dev/i2c-*`), and reads no hwmon file of `spd5118`: reading an alarm file there clears the alarm. `TestReasonsAndStates` runs the reader over a recording file system that fails it for a name outside this list.
+
+An `eeprom` file is read in steps of 128 bytes, one read per step, up to the size the file reports and at most 2,048 bytes. 128 bytes is one page of `spd5118` and half a page of `ee1004`, so a step never crosses a page. For the kernel a read past the first page is a page command to the EEPROM or hub; it changes a volatile register and no stored byte. When a step fails, the bytes before it are kept: the first 128 bytes of DDR5 still give the device width. All readings of a host share one deadline of 5 seconds; a read the kernel does not return in time is left behind and the readings after it are not made.
+
+A virtual machine is not probed: the probe ends at its first line. `MY_DEBUG=spd-vm` lets it run there, for a lab.
+
+What the reader saw is kept as a probe, a reading of kind `spd-probe` in lines of MemorY's own form; `my collect host` writes it as `spd-probe.txt`:
+
+```
+spd-probe 1
+i2c present
+adapter i2c-0 "SMBus I801 adapter at 0000:00:1f.4"
+pci 0000:00:1f.4 id=8086:a323 driver=i801_smbus spd-wd=0
+driver i801_smbus registered
+driver ee1004 module
+client 0-0050 name=ee1004 driver=ee1004 eeprom=512 read=512 state=ok
+client 0-0051 name=ee1004 driver=- eeprom=- read=0 state=unbound
+bmc present
+```
+
+A driver is `registered`, `module` (not registered, a module file is listed for this kernel), `absent`, or `unknown` (the module lists could not be read). `spd-wd` is there only for a scan as root.
+
+### When it is read
+
+| Command | SPD |
+| --- | --- |
+| `my` and every view on the running host, `my bundle`, `my report`, `my collect host` | once per run; `--no-spd` leaves it out, and then there is no `spd` source |
+| `my serve` | in the first scan; the later scans keep what it read and leave the bus alone |
+| `my harvest` | never |
+| `--root DIR`, `my import DIR` | the files `spd-probe.txt` and `spd/*` of a collection, nothing under `sys` of a copy; dumps in any form may be put into `spd/` |
+
+`my collect host` writes `spd-probe.txt` and one file `spd/<bus>-<address>.bin` per SPD device with the bytes read, and lists each in `collect.json` with its state. No SPD step makes a collection partial or sets its exit code.
+
+### Reasons
+
+A host has a reason only when no reading has the state `ok`, `crc` or `short`. The reason is computed from the probe and the memory type of SMBIOS each time a view is built, so a later version reads the reason of an older case again. The tests run in this order:
+
+<!-- spd-reasons -->
+| Code | Read to tell | Short text |
+| --- | --- | --- |
+| `virtual-machine` | the hypervisor that the host facts name (DMI strings, the CPU flag) | virtual machine |
+| `no-i2c` | `/sys/bus/i2c` is missing | no I2C bus in this kernel |
+| `smbus-driver-not-loaded` | a PCI device of class 0x0c05 without a `driver` link, its driver not registered, a module file listed | SMBus driver i2c_i801 not loaded |
+| `smbus-driver-not-built` | the same, and no module file listed | kernel built without i2c_i801 |
+| `smbus-driver-unknown` | the same, and the module lists of the kernel could not be read | SMBus controller without driver |
+| `smbus-driver-refused` | the same device, its driver registered | SMBus driver did not bind the controller |
+| `no-smbus-controller` | no adapter holds an SPD client, and no PCI device has class 0x0c05 | no SMBus controller on PCI |
+| `spd-driver-not-loaded` | clients named `ee1004`, `spd5118` or `spd` without a `driver` link, the driver not registered, a module file listed | SPD driver ee1004 not loaded |
+| `spd-driver-not-built` | the same, and no module file listed | kernel built without ee1004 |
+| `spd-driver-unknown` | the same, and the module lists could not be read | SPD device without driver |
+| `spd-driver-refused` | the same clients, the driver registered | SPD driver did not bind |
+| `write-disabled` | a scan as root read SPD write disable set, the modules are DDR5 (clients named `spd5118`, or the memory type of SMBIOS), and no client is bound | SPD pages blocked by firmware |
+| `no-spd-device` | SMBus controllers with a driver, and no client at 0x50 to 0x57 named `ee1004`, `spd5118` or `spd` | no SPD device on the bus |
+| `no-eeprom-file` | clients with a bound driver and no `eeprom` or `nvmem` file | SPD driver gives no eeprom file |
+| `read-denied` | every open or read of an `eeprom` file ended in EACCES or EPERM | permission denied |
+| `read-failed` | the reads of the bound clients ended in errors of more than one kind, in EIO, ENXIO, or the deadline | read failed |
+| `not-decoded` | every reading has a memory type other than DDR4 and DDR5 | memory type not decoded |
+| `blank` | every reading holds only 0x00 or only 0xFF in its first 128 bytes | only 0x00 or 0xFF bytes |
+<!-- /spd-reasons -->
+
+With SPD write disable set and DDR5 modules, `write-disabled` takes the place of `spd-driver-refused` and `no-spd-device`; a scan without root cannot read the setting. A DDR5 reading that ends after 128 bytes is a reading of state `short`, so its host has no reason. A reason is no fault: the source `spd` is `absent` where the probe lists no SPD client, `empty` where clients are there and gave nothing, and `ok` where a reading exists. It is never partial, unreadable or in error, so it lowers the confidence of no finding.
+
+### States of one reading
+
+| State | When |
+| --- | --- |
+| `ok` | read in full, base CRC good; the DIMM row of the ledger can take its fields |
+| `crc` | base CRC bad; every field is shown with the two CRC values, nothing enters the DIMM row |
+| `short` | fewer bytes than a decoded field needs; a reading without its serial bytes is tied to no DIMM |
+| `blank` | the first 128 bytes are all 0x00 or all 0xFF |
+| `type` | byte 2 is another memory type, or none |
+| `denied`, `io`, `timeout` | the read failed before the first byte |
+
 ### Input forms
 
 `my spd FILE` and `my import` read an SPD in these forms. A file compressed with gzip is read through.

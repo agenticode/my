@@ -16,6 +16,9 @@
 //	             under /var/log
 //	EDAC         the per-DIMM counters under /sys/devices/system/edac
 //	SMBIOS       the memory device tables under /sys/firmware/dmi
+//	module SPD   the eeprom files of the SPD drivers ee1004 and spd5118
+//	             under /sys/bus/i2c (no root needed), at most 5 seconds;
+//	             a virtual machine is not probed
 //	boot errors  the Boot Error Region of the firmware
 //	             (/sys/firmware/acpi/tables/data/BERT, root only)
 //	crash logs   the kernel log of a boot that crashed, where it outlived
@@ -48,6 +51,7 @@ import (
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/hostmem"
@@ -115,6 +119,13 @@ type Options struct {
 	// Preflight changes what the checks of "my preflight" ask the running
 	// system (the process list, free space); tests set it.
 	Preflight func(*preflight.Options)
+	// NoSPD leaves the SPD of the memory modules out: no probe of the I2C
+	// bus, no eeprom file read, no spd source.
+	NoSPD bool
+	// SPDFS replaces the file system the SPD reader of a live scan looks
+	// at, and SPDDeadline its deadline; tests give a made host.
+	SPDFS       dimmspd.FS
+	SPDDeadline time.Duration
 	// Extra are sources read after those of the host, into the same run:
 	// what the BMC of the host answered, when the caller asked it. A scan
 	// finds no such source by itself.
@@ -325,12 +336,58 @@ func sourceList(ctx context.Context, opts Options) []tagged {
 		}
 	}
 	add(false, sm)
+	add(false, moduleSPD(ctx, &opts, now, info, sm)...)
 	add(false, gpuMemory(&opts)...)
 	add(false, bmcLog(&opts)...)
 	if opts.Live || hostmem.Holds(opts.root()) {
 		add(false, hostmem.New(opts.root(), hostmem.Options{Live: opts.Live, Now: now, Numactl: opts.Numactl, Numastat: opts.Numastat, Sar: opts.Sar}))
 	}
 	return out
+}
+
+// moduleSPD picks the reader of the SPD of the memory modules: the eeprom
+// files of the running host, or what a collection wrote (spd-probe.txt
+// and spd/) in a copy of a host's files. A copy without them gets no
+// entry, and NoSPD leaves the source out.
+func moduleSPD(ctx context.Context, opts *Options, now time.Time, info hostinfo.Info, sm adapter.Adapter) []adapter.Adapter {
+	if opts.NoSPD {
+		return nil
+	}
+	if !opts.Live {
+		if !dimmspd.Holds(opts.root()) {
+			return nil
+		}
+		return []adapter.Adapter{dimmspd.NewCopy(opts.root(), now, memoryType(ctx, sm))}
+	}
+	fsys, ok := os.DirFS(opts.root()).(dimmspd.FS)
+	if opts.SPDFS != nil {
+		fsys, ok = opts.SPDFS, true
+	}
+	if !ok {
+		return nil
+	}
+	lo := dimmspd.LiveOptions{Now: now, Privileged: opts.Privileged, Virtual: info.Virtual, AllowVirtual: dimmspd.DebugVirtual(), Release: info.Kernel,
+		Deadline: opts.SPDDeadline}
+	return []adapter.Adapter{dimmspd.NewLive(fsys, opts.root(), lo, memoryType(ctx, sm))}
+}
+
+// memoryType returns the memory type SMBIOS gives for the populated slots
+// when all of them have the same one, else "". It reads the SMBIOS source
+// once more into a sink that keeps nothing in the ledger.
+func memoryType(ctx context.Context, sm adapter.Adapter) string {
+	var c adapter.Collected
+	adapter.Safely(ctx, sm, &c)
+	t := ""
+	for _, m := range c.Modules {
+		if !m.Populated || m.DIMM.MemoryType == "" {
+			continue
+		}
+		if t != "" && t != m.DIMM.MemoryType {
+			return ""
+		}
+		t = m.DIMM.MemoryType
+	}
+	return t
 }
 
 // CrashPlaces are the places a host keeps the kernel log of a crashed boot

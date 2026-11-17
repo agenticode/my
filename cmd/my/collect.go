@@ -118,6 +118,7 @@ func newCollectOptions() *collectOptions {
 	o.fs.IntVar(&o.parallel, "parallel", 4, "")
 	o.fs.BoolVar(&o.quiet, "quiet", false, "")
 	o.fs.BoolVar(&o.sudo, "sudo", false, "")
+	o.fs.BoolVar(&o.noSPD, "no-spd", false, "")
 	o.fs.Var(&o.maps, "event-map", "")
 	o.fs.StringVar(&o.lang, "lang", "", "")
 	o.fs.BoolVar(&o.asJSON, "json", false, "")

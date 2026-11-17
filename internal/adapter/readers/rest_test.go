@@ -30,6 +30,7 @@ var notImported = map[string]string{
 	"redfish/tree":  "the reader of redfish/file, given a directory",
 	"sel/binary":    "the reader of sel/text and sel/json; a file is only taken for one of 16-byte records when they are records",
 	"nvidia/csv":    "the reader of nvidia/q",
+	"spd/binary":    "an import takes a binary file for an SPD only with a good CRC, which garbage does not have",
 }
 
 // outcome is what the tests compare: the records of the good sources and

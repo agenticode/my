@@ -14,6 +14,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/dcbrain"
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
@@ -146,6 +147,17 @@ func List() []Reader {
 		{Name: "vendorlog/racadm-lclog", Package: "vendorlog", Fixture: "testdata/vendorlog/racadm-lclog.txt",
 			Open: func(p string) adapter.Adapter { return vendorlog.NewFile(p, vendorlog.Options{}) },
 			Bad:  []byte("SeqNumber = 1\nMessage ID = MEM0001\nTimestamp = " + garbageText)},
+		{Name: "spd/binary", Package: "dimmspd", Fixture: "testdata/spd/illumos/ddr4-rdimm-64g-2rx4.bin",
+			Open: func(p string) adapter.Adapter { return dimmspd.NewFile(p, When) },
+			// An SPD a collection of my collect host wrote, or a dump a
+			// person put beside it.
+			HostPath: "spd/0-0050.bin"},
+		{Name: "spd/hex", Package: "dimmspd", Fixture: "testdata/spd/illumos/forms/ddr5-rdimm-64g-2rx4.hexdump-C.txt",
+			Open: func(p string) adapter.Adapter { return dimmspd.NewFile(p, When) },
+			Bad:  []byte("00000000  30 10 12 01 04 20 00 62  00 00 00 00 a0 01 07 00  |0.... .b........|\n" + garbageText)},
+		{Name: "spd/decode-dimms", Package: "dimmspd", Fixture: "testdata/spd/illumos/decode-dimms-4.4.txt",
+			Open: func(p string) adapter.Adapter { return dimmspd.NewFile(p, When) },
+			Bad:  []byte("Decoding EEPROM: /sys/bus/i2c/drivers/ee1004/0-0050\n\n---=== SPD EEPROM Information ===---\n" + garbageText)},
 		{Name: "smbios/dmidecode", Package: "smbios", Fixture: "testdata/smbios/dmidecode-t17-ddr4.txt",
 			Open: func(p string) adapter.Adapter { return smbios.NewDmidecodeFile(p, smbios.Options{Now: When}) },
 			Bad:  []byte("# dmidecode 3.5\n" + garbageText)},

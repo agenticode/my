@@ -73,6 +73,8 @@ type options struct {
 	// maps are user tables of firmware messages (--event-map), on the
 	// commands that read sources.
 	maps eventMaps
+	// noSPD leaves the SPD of the memory modules out of a scan (--no-spd).
+	noSPD bool
 }
 
 // withDetail registers --detail: the command has a short form, and the flag
@@ -99,6 +101,7 @@ func newOptions(env *cli.Env, name string, src *source) *options {
 		o.sf.register(o.fs)
 		o.bmc.registerScan(o.fs)
 		o.fs.Var(&o.maps, "event-map", "")
+		o.fs.BoolVar(&o.noSPD, "no-spd", false, "")
 	}
 	o.cf.Register(o.fs)
 	o.pf.register(o)
@@ -460,7 +463,14 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	if o.bmc.bmc != "" {
 		bmc = func() (adapter.Adapter, error) { return o.readBMC(ctx, env, s.lang, tmp, now) }
 	}
-	return scanInto(ctx, s.lang, path, o.root, tmp, now, bmc, true)
+	return scanInto(ctx, s.lang, path, o.root, tmp, now, bmc, true, spdScan{off: o.noSPD})
+}
+
+// spdScan says how a scan treats the SPD of the memory modules: off leaves
+// it out; replay, when set, gives what an earlier scan read in its place.
+type spdScan struct {
+	off    bool
+	replay adapter.Adapter
 }
 
 // scanInto scans the host, or the copy of a host's files below root, into
@@ -469,8 +479,11 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 // BMC of the host; it is called once the host is known to be worth
 // scanning, and what it returns is read in the same run. Without programs
 // the programs of the Memory Explorer are not run (my serve draws nothing).
-func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time, bmc func() (adapter.Adapter, error), programs bool) (*store.Store, string, error) {
-	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp}
+func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time, bmc func() (adapter.Adapter, error), programs bool, sp spdScan) (*store.Store, string, error) {
+	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp, NoSPD: sp.off || sp.replay != nil}
+	if sp.replay != nil {
+		opts.Extra = append(opts.Extra, sp.replay)
+	}
 	if !programs {
 		opts.Numactl, opts.Numastat, opts.Sar = "-", "-", "-"
 	}
@@ -569,7 +582,7 @@ func blindText(lang i18n.Lang, opts *scan.Options, sources []model.Source) strin
 	}
 	for _, src := range sources {
 		switch src.Kind {
-		case "hostinfo", "smbios", "host-memory", ingest.SlotMapKind, ingest.TimeAlignKind:
+		case "hostinfo", "smbios", "host-memory", "spd", ingest.SlotMapKind, ingest.TimeAlignKind:
 			continue // they describe the machine and hold no error
 		}
 		line := "\n  " + src.Kind + ": " + engine.Messages.Text(lang, "status."+string(src.Status), nil)

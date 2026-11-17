@@ -108,10 +108,10 @@ func TestDetectKnowsEveryFixture(t *testing.T) {
 	// sysfs tree, raw tables, scripts that build a database, the
 	// hexadecimal form of a binary dump, the notes and licences that lie
 	// next to fixtures, and the inputs and answers of the Memory Explorer
-	// beside its dmidecode dumps. The SPD dumps have no reader of a scan
-	// yet.
+	// beside its dmidecode dumps; of the SPD dumps the DDR3 dump, whose
+	// memory type is not decoded.
 	skip := func(rel string) bool {
-		return strings.HasPrefix(rel, "spd/") || strings.HasPrefix(rel, "edac-sysfs/") || strings.HasPrefix(rel, "smbios/tables-") || strings.HasSuffix(rel, ".sql") ||
+		return rel == "spd/rigred/ddr3-sodimm.bin" || strings.HasSuffix(rel, "LICENSE") || strings.HasPrefix(rel, "edac-sysfs/") || strings.HasPrefix(rel, "smbios/tables-") || strings.HasSuffix(rel, ".sql") ||
 			strings.HasSuffix(rel, ".hex") || strings.HasSuffix(rel, ".cperhex") || strings.HasPrefix(rel, "redfish/bmc-tree/") || strings.HasPrefix(rel, "real/") ||
 			strings.HasPrefix(rel, "dcbrain/") || strings.HasSuffix(rel, "/README.md") || strings.HasSuffix(rel, "/LICENSE.md") ||
 			strings.HasPrefix(rel, "explorer/") && !strings.HasSuffix(rel, "/dmidecode.txt")
