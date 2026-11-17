@@ -75,6 +75,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | groups the errors of a DIMM into faults, measures trend, spread and baselines, and applies the rules |
 | `internal/explorer` | the readers of the Memory Explorer: where a slot is drawn on the board, read from its locator strings, and the memory counters of the kernel |
+| `internal/population` | the population rules: which slots the documents of a board's maker fill for a number of modules and what they let stand together, held against the placed board |
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text |
 | `internal/report` | the HTML report: one file with inline SVG figures |

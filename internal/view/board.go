@@ -10,6 +10,7 @@ import (
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/explorer"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/memras"
 	"github.com/agenticode/my/internal/model"
 )
 
@@ -57,6 +58,10 @@ type Board struct {
 	Complete explorer.Completeness `json:"complete"`
 	// Lines are the lines of data quality of the board (design 4.4).
 	Lines []Text `json:"lines"`
+	// Population is the check of the modules against the population the
+	// documents of the board's maker give (docs/rules.md, "Population
+	// rules"); nil when the board has no slot to check.
+	Population *Population `json:"population,omitzero"`
 }
 
 // BoardDocument is a public document a board family is written from.
@@ -118,6 +123,10 @@ type BoardStick struct {
 	// Label is the slot label of the board's manual of an empty slot the
 	// firmware gives no name.
 	Label string `json:"label,omitzero"`
+	// Mark is the mark of the population check: "+" on an empty slot the
+	// vendor's table fills for the number of modules, "-" on a module in a
+	// slot the table leaves empty.
+	Mark string `json:"mark,omitzero"`
 }
 
 // BoardModule is what the ledger knows of the module in a slot.
@@ -183,6 +192,8 @@ type boardHost struct {
 	sockets                int
 	present                string
 	lshw, cpuCache         string
+	// mode is the BIOS memory mode the ledger holds (internal/memras).
+	mode string
 }
 
 // slotHost is what the readers of slots are told of the host.
@@ -226,6 +237,21 @@ func (c *Case) Board(ctx context.Context, h *engine.HostResult) (*Board, error) 
 			bh.lshw = r.Text
 		case model.ReadingCPUCache:
 			bh.cpuCache = r.Text
+		}
+	}
+	// The BIOS memory mode, when the ledger holds settings: the population
+	// check then reads the table of that mode alone.
+	settings, err := c.store.BIOSSettings(ctx, h.Host)
+	if err != nil {
+		return nil, err
+	}
+	if len(settings) > 0 {
+		check, err := c.CheckBIOS(ctx, h, BIOSOptions{})
+		if err != nil {
+			return nil, err
+		}
+		if it := check.Item(memras.MemoryMode); it != nil {
+			bh.mode = it.State
 		}
 	}
 	b := boardOf(c.Lang, h, slots, bh)
@@ -417,6 +443,7 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 		}
 	}
 	b.Lines = boardLines(lang, b, facts, dimms, places)
+	populationOf(lang, b, bh, facts, dimms, sticks)
 	return b
 }
 
