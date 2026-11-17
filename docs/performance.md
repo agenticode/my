@@ -68,6 +68,10 @@ On the lab host of [validation-lab.md](validation-lab.md) (a VMware guest with a
 
 The two programs add 8.5 ms to the median there, 10.7 ms with the guests running. `numactl` and `numastat` are stopped after 5 seconds and `sar` after 15, so programs that hang add at most 25 seconds.
 
+## SPD of the memory modules
+
+A scan of a running host reads the SPD of the modules from the `eeprom` files of the kernel's SPD drivers ([compatibility.md](compatibility.md#module-spd)). All readings of a host share one deadline of 5 seconds; a read the kernel does not return in time is left behind, and the readings after it are not made. No read on a real bus was timed: none of the hosts MemorY was validated on gives the SPD to Linux, so how long a read takes, and what it does on a bus a BMC uses at the same time, is not known. `TestReadInSteps` holds the deadline with a read that does not return.
+
 ## Small hosts
 
 At start the binary sets a soft limit for the Go heap: a quarter of the memory the process may use (`MemTotal` of `/proc/meminfo`, or the smallest limit of its control groups when that is less: `memory.max` of version 2, `memory.limit_in_bytes` of version 1, as in a container or a systemd unit with `MemoryMax=`), at least 64 MiB. `GOMEMLIMIT` overrides it. On a host with 765 MiB the limit is 191 MiB, and `-gomemlimit 191MiB` runs the commands that way on any machine:

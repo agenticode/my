@@ -1,0 +1,4 @@
+spd-probe 1
+i2c absent
+driver ee1004 module
+driver spd5118 module

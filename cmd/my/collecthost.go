@@ -61,7 +61,7 @@ func (o *collectOptions) host(ctx context.Context, env *cli.Env, lang i18n.Lang)
 		}
 	}
 	res, err := scan.CollectHost(ctx, scan.CollectOptions{Root: collectHostRoot, Out: o.out, Sudo: o.sudo, Deadline: deadline,
-		Programs: collectHostPrograms, Kmsg: collectHostKmsg, Now: now})
+		Programs: collectHostPrograms, Kmsg: collectHostKmsg, Now: now, Privileged: os.Geteuid() == 0, NoSPD: o.noSPD})
 	if err != nil {
 		return o.failure(env, err)
 	}

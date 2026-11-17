@@ -1,0 +1,8 @@
+spd-probe 1
+i2c present
+adapter i2c-0 "SMBus I801 adapter at 0000:00:1f.4"
+pci 0000:00:1f.4 id=8086:a323 driver=i801_smbus spd-wd=1
+driver i801_smbus registered
+driver ee1004 module
+driver spd5118 registered
+client 0-0050 name=spd5118 driver=spd5118 eeprom=1024 read=128 state=short errno=EIO at=128

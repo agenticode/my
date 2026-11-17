@@ -15,10 +15,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/cli"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/exporter"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/serve"
 	"github.com/agenticode/my/internal/store"
 	"github.com/agenticode/my/internal/term"
@@ -42,6 +45,7 @@ func newServeOptions() *serveOptions {
 	o.fs.StringVar(&o.listen, "listen", serve.DefaultListen, "")
 	o.fs.StringVar(&o.interval, "interval", serve.DefaultInterval.String(), "")
 	o.fs.StringVar(&o.root, "root", "", "")
+	o.fs.BoolVar(&o.noSPD, "no-spd", false, "")
 	o.sf.register(o.fs)
 	o.fs.StringVar(&o.host, "host", "", "")
 	o.fs.StringVar(&o.lang, "lang", "", "")
@@ -122,7 +126,7 @@ func runServe(ctx context.Context, env *cli.Env, args []string) int {
 	case o.host != "":
 		return o.usageError(env, lang, "%s", say(lang, "err.host_alone"))
 	default:
-		src = &hostSource{lang: lang, cfg: cfg, root: o.root, now: clock(env)}
+		src = &hostSource{lang: lang, cfg: cfg, root: o.root, now: clock(env), noSPD: o.noSPD}
 	}
 	// A scan is logged when it says something the log does not say yet:
 	// the first one, one that found something else than the one before,
@@ -181,11 +185,64 @@ func (l *serveLog) print(line string) {
 // removed when its state is closed. A ledger that is added to on every
 // scan would grow by a scan entry, the source inventory and a reading of
 // every counter each time.
+//
+// The SPD of the memory modules is read in the first scan only: a scan
+// from a timer leaves the bus alone, which a BMC may use as well. Later
+// scans get what the first one read.
 type hostSource struct {
 	lang i18n.Lang
 	cfg  engine.Config
 	root string
 	now  time.Time
+	// noSPD is --no-spd. spdRead is set once a scan read the SPD, and
+	// spd holds what it read.
+	noSPD   bool
+	mu      sync.Mutex
+	spdRead bool
+	spd     adapter.Adapter
+}
+
+// spdScan says how the next scan treats the SPD.
+func (h *hostSource) spdScan() spdScan {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.noSPD {
+		return spdScan{off: true}
+	}
+	if h.spdRead {
+		return spdScan{off: true, replay: h.spd}
+	}
+	return spdScan{}
+}
+
+// keepSPD keeps what the first scan read of the SPD for the later ones.
+func (h *hostSource) keepSPD(ctx context.Context, ledger *store.Store, host string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.spdRead || h.noSPD {
+		return
+	}
+	h.spdRead = true
+	readings, err := ledger.SPDReadings(ctx, host)
+	if err != nil {
+		return
+	}
+	var probe *model.HostReading
+	if rs, err := ledger.Readings(ctx, host); err == nil {
+		for i := range rs {
+			if rs[i].Kind == model.ReadingSPDProbe {
+				probe = &rs[i]
+			}
+		}
+	}
+	if probe == nil && len(readings) == 0 {
+		return
+	}
+	origin := "/sys/bus/i2c/devices"
+	if h.root != "" && filepath.Clean(h.root) != "/" {
+		origin = filepath.Join(h.root, dimmspd.Dir)
+	}
+	h.spd = dimmspd.Replay(origin, probe, readings, "")
 }
 
 func (h *hostSource) Scan(ctx context.Context) (serve.State, error) {
@@ -201,9 +258,10 @@ func (h *hostSource) Scan(ctx context.Context) (serve.State, error) {
 		}
 	}()
 	var host string
-	if st.ledger, host, err = scanInto(ctx, h.lang, filepath.Join(tmp, "ledger.db"), h.root, tmp, h.now, nil, false); err != nil {
+	if st.ledger, host, err = scanInto(ctx, h.lang, filepath.Join(tmp, "ledger.db"), h.root, tmp, h.now, nil, false, h.spdScan()); err != nil {
 		return nil, err
 	}
+	h.keepSPD(ctx, st.ledger, host)
 	if st.c, err = view.Open(ctx, st.ledger, h.lang, engine.Options{Config: &h.cfg, Now: h.now}); err != nil {
 		return nil, err
 	}

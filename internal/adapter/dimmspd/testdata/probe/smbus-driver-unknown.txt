@@ -1,0 +1,6 @@
+spd-probe 1
+i2c present
+pci 0000:00:1f.4 id=8086:a323 driver=-
+driver i801_smbus unknown
+driver ee1004 unknown
+driver spd5118 unknown

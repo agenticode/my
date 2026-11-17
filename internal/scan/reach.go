@@ -8,6 +8,7 @@ import (
 
 	"github.com/agenticode/my/internal/adapter/bert"
 	"github.com/agenticode/my/internal/adapter/crashlog"
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
 	"github.com/agenticode/my/internal/adapter/hostmem"
@@ -20,14 +21,15 @@ import (
 // source that was read and that would have shown an error of the host, had
 // there been one.
 //
-// Host facts and SMBIOS describe the machine and carry no error. The EDAC
+// Host facts, SMBIOS, the readings of the Memory Explorer and the SPD of
+// the modules describe the machine and carry no error. The EDAC
 // counters count errors only where a memory controller is registered: a
 // tree without one was read and says nothing. Every other source that was
 // read in full, in part, or read and found without records could have
 // shown an error.
 func Reads(src model.Source) bool {
 	switch src.Kind {
-	case hostinfo.Kind, smbios.Kind, hostmem.Kind, ingest.SlotMapKind, ingest.TimeAlignKind:
+	case hostinfo.Kind, smbios.Kind, hostmem.Kind, dimmspd.Kind, ingest.SlotMapKind, ingest.TimeAlignKind:
 		return false
 	case edacsysfs.Kind, crashlog.KindPstore, crashlog.KindKdump, bert.Kind:
 		// An empty crash log place says that no boot crashed into it,

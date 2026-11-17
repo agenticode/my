@@ -153,6 +153,7 @@ var collectWords = i18n.Catalog{
 			"                      the answers can hold account names and addresses\n" +
 			"--quiet               print no progress\n" +
 			"--sudo                with host: run dmidecode and lshw as sudo -n COMMAND\n" +
+			"--no-spd              with host: leave out the SPD of the memory modules\n" +
 			"--event-map FILE      with -o NAME.mycase: a table of firmware messages of one's own,\n" +
 			"                      asked before the shipped tables; may be repeated\n" +
 			"--lang en|ko          language of the output (default: from the locale, English otherwise)\n" +
@@ -182,6 +183,7 @@ var collectWords = i18n.Catalog{
 			"                      계정 이름과 주소가 들어 있을 수 있음\n" +
 			"--quiet               진행 상황을 출력하지 않음\n" +
 			"--sudo                host와 함께: dmidecode와 lshw를 sudo -n COMMAND로 실행\n" +
+			"--no-spd              host와 함께: 메모리 모듈의 SPD를 읽지 않음\n" +
 			"--event-map FILE      -o NAME.mycase와 함께: 내장 표보다 먼저 볼, 직접 만든\n" +
 			"                      펌웨어 메시지 표. 여러 번 줄 수 있음\n" +
 			"--lang en|ko          출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
