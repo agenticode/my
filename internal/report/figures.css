@@ -150,3 +150,7 @@ svg.board .slot .cell { pointer-events: visible; }
 .c-fault .mx-line { stroke: var(--consider); }
 .c-pgscand .mx-line { stroke: var(--replace); }
 .mx-dot-pt { fill: var(--series); }
+
+/* The marks of the population check under the sticks, and their legend. */
+.mb-mark { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: square; }
+.mb-mark-leave { stroke: var(--ink2); }
