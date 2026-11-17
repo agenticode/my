@@ -467,6 +467,8 @@ func TestHelp(t *testing.T) {
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised is listed in the summary as such and the import goes on", "--strict"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
 		{[]string{"board", "--help"}, "board", []string{"Usage: my board [flags]", "--detail", "The board ties no record to a slot", "The exit code is the grade of the host"}},
+		{[]string{"spd", "--help"}, "spd", []string{"Usage: my spd [FILE...] [--detail] [flags]", "--detail", "--no-spd", "SPD. One row per module", "Date codes. One row per maker code", "70 when none was"}},
+		{[]string{"help", "lots"}, "lots", []string{"Usage: my lots [flags]", "no proof that a lot is at fault", "The exit code is the worst grade the table shows"}},
 		{[]string{"report", "--help"}, "report", []string{"Usage: my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR]", "--audience WHO", "--figures DIR", "nothing is loaded from elsewhere", "Printing it from a browser gives a PDF", "The exit code is 0"}},
 	} {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
@@ -556,7 +558,7 @@ func registerFlags(o *options, topic string) {
 		o.withDetail()
 		o.fs.Bool("oneline", false, "")
 		o.fs.Bool("all", false, "")
-	case "dimm", "board":
+	case "dimm", "board", "spd":
 		o.withDetail()
 	case "map":
 		o.fs.String("bank", "", "")

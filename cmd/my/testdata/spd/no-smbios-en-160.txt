@@ -1,0 +1,30 @@
+host r12-n034  Example Systems R760  SPD of 16 modules (spd5118), tied to no slot
+16 x Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A  DDR5 RDIMM 64 GB 2Rx4  16 Gb dies
+
+ BUS         DATE      LOC   SERIAL
+ i2c-0 0x50  2022-W43  0x06  5C331BCD
+ i2c-0 0x51  2023-W08  0x06  7FF0C3B9
+ i2c-0 0x52  2022-W43  0x06  56A80D01
+ i2c-0 0x53  2023-W08  0x06  AE2CD51D
+ i2c-0 0x54  2023-W08  0x06  B6332238
+ i2c-0 0x55  2023-W08  0x06  A8A64B3B
+ i2c-0 0x56  2023-W08  0x06  1D2C9305
+ i2c-0 0x57  2023-W08  0x06  DBC9CEE9
+ i2c-1 0x50  2023-W08  0x06  B7F782AE
+ i2c-1 0x51  2023-W08  0x06  41102AC3
+ i2c-1 0x52  2023-W08  0x06  D848BE33
+ i2c-1 0x53  2022-W43  0x06  7A399A55
+ i2c-1 0x54  2023-W08  0x06  12AE3490
+ i2c-1 0x55  2023-W08  0x06  8671F24B
+ i2c-1 0x56  2023-W08  0x06  B88F2453
+ i2c-1 0x57  2023-W08  0x06  D6A7388B
+
+ The readings are listed by bus and address: SMBIOS serial numbers were not read, so no reading is tied to a slot.
+
+ date codes
+ Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+ DATE      DIMMS
+ 2022-W43      3
+ 2023-W08     13
+ The readings are tied to no DIMM, so the table counts modules and has no finding columns.
+ The table counts modules by the date code in their SPD. Whether a lot is at fault is for the maker's failure analysis to say.

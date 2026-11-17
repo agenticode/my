@@ -253,7 +253,7 @@ A record a reader could not use is counted in `source.unread`; its text is kept 
 
 | Field | Content |
 | --- | --- |
-| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `board`, `gpu`, `bios`, `inventory`, `diff`, `verify`, `preflight`, `vendors` |
+| `view` | what `data` holds: `overview`, `hosts`, `dimm`, `why`, `map`, `timeline`, `boots`, `board`, `gpu`, `bios`, `inventory`, `spd`, `spd-files`, `lots`, `diff`, `verify`, `preflight`, `vendors` |
 | `version` | the version of this form, 1. It changes when a field is renamed or removed; new fields do not change it |
 | `lang` | the language of the sentences |
 | `host` | the host the data is about |
@@ -345,6 +345,10 @@ The cards of `why` carry `population`, the line of the first population finding 
 | `shared` | what every module has in common, printed once: `count`, `maker`, `maker_id`, `part_number`, `memory_type`, `module_type`, `size_bytes`, `organisation`, `die_mbit` |
 | `lots` | the table of date codes of the host (the view `lots` below) |
 | `notes[]` | the differences that concern the host: serial numbers tied in reverse order, readings tied to no slot, DIMMs without a reading, no SMBIOS serial numbers |
+
+### The view `spd-files`
+
+`my spd FILE... --json` holds the decode of dump files that came without a host: `files[]` (per file `path`, `not_spd`, the text that says what a file that is no SPD looks like, and `modules[]` with the fields of `modules[]` of the view `spd`), `read` (the modules decoded), `head`, and `lots` (counts only, no finding columns). The exit code is 0 when one file was decoded and 70 when none was.
 
 ### The view `lots`
 

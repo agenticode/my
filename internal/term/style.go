@@ -69,6 +69,9 @@ func (st Style) say(code string, kv ...any) string {
 	if view.BoardMessages.Has(code) {
 		return view.BoardMessages.Text(st.lang(), code, args)
 	}
+	if view.SPDMessages.Has(code) {
+		return view.SPDMessages.Text(st.lang(), code, args)
+	}
 	return view.Messages.Text(st.lang(), code, args)
 }
 

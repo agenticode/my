@@ -7,6 +7,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
@@ -376,7 +377,13 @@ func (c *Case) Overview(ctx context.Context, h *engine.HostResult, all bool) (*O
 		case model.SourcePartial, model.SourceError:
 			ov.Missing = append(ov.Missing, c.missingSource(s, names[i]))
 		case model.SourceAbsent:
-			if absentMatters[s.Kind] {
+			if absentMatters[s.Kind] || s.Kind == dimmspd.Kind {
+				ov.Missing = append(ov.Missing, c.missingSource(s, names[i]))
+			}
+		case model.SourceEmpty:
+			// The SPD of the modules: present and nothing read says why,
+			// as a source that is not there does.
+			if s.Kind == dimmspd.Kind {
 				ov.Missing = append(ov.Missing, c.missingSource(s, names[i]))
 			}
 		}
@@ -459,7 +466,8 @@ func (c *Case) sourceNames(srcs []model.Source) []string {
 
 // absentMatters lists the sources whose absence a reader has to know
 // about: without them there are no located error records, or no DIMM
-// identities.
+// identities. The SPD of the modules is listed when it is absent or
+// empty, with the reason as its detail.
 var absentMatters = map[string]bool{"hostinfo": true, "rasdaemon": true, "klog": true, "edac-sysfs": true, "smbios": true}
 
 func (c *Case) statusText(s model.SourceStatus) string {
