@@ -867,6 +867,7 @@ section#s7.sec
   ### How the board was drawn
   li: 32 slots on the board, 0 drawn without channels, 0 set aside
   li: the channel count of the processor is not known: the channels of the board could not be checked against it
+  li: The population was not checked: the board is not drawn in full.
   ### Errors by observation grade
   figure
     svg.fig.obsbar: Errors of host synth-crash-loop by observation grade

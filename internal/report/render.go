@@ -396,10 +396,17 @@ func (doc *Document) slotMap() *node {
 	}
 	if b := doc.Board; boardDrawn(b) {
 		cards, ids := doc.boardCards(b)
-		s.add(el("figure", A{"class", "board"}, doc.boardSummary(b), doc.boardFigure(b, doc.anchors(), subjectSlot, ids),
-			doc.slotLegend(boardStates(b), subjectSlot != ""),
-			el("figcaption", doc.vsay("ov.slots", "slots", sm.Slots, "dimms", sm.Populated))),
-			how(doc.say("cap.board")), cards)
+		fig := el("figure", A{"class", "board"}, doc.boardSummary(b), doc.boardFigure(b, doc.anchors(), subjectSlot, ids),
+			doc.slotLegend(boardStates(b), subjectSlot != ""))
+		if l := doc.markLegend(b); l != nil {
+			fig.add(l)
+		}
+		fig.add(el("figcaption", doc.vsay("ov.slots", "slots", sm.Slots, "dimms", sm.Populated)))
+		s.add(fig, how(doc.say("cap.board")))
+		if pb := doc.populationBlock(b); pb != nil {
+			s.add(pb)
+		}
+		s.add(cards)
 		if b.Aside != nil && len(b.Aside.Rows) > 0 {
 			s.add(el("figure", el("figcaption", doc.boardAside(b)), doc.slotMapFigure(b.Aside, doc.anchors(), subjectSlot), doc.slotLegend(b.Aside, false)))
 		}
@@ -1237,6 +1244,10 @@ func (doc *Document) quality() *node {
 		ul := el("ul", A{"class", "dq-board"})
 		for _, l := range b.Lines {
 			ul.add(el("li", l.Text))
+		}
+		// Why the board got no population check, once.
+		if p := b.Population; p != nil && p.Text != nil {
+			ul.add(el("li", p.Text.Text))
 		}
 		s.add(el("h3", doc.say("dq.board")), ul)
 	}
