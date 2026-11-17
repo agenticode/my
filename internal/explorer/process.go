@@ -1,14 +1,12 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"math"
 	"sort"
 	"strings"
 )
 
-// Process is one process as the reference describes it (ProcessMemoryEntry).
+// Process is one process and its memory.
 type Process struct {
 	PID         Num     `json:"pid"`
 	Name        string  `json:"name"`
@@ -23,7 +21,7 @@ type Process struct {
 	CgroupPath  *string `json:"cgroupPath,omitempty"`
 }
 
-// MaxProcesses is the number of processes the reference keeps.
+// MaxProcesses is the number of processes kept, the largest first.
 const MaxProcesses = 100
 
 var (
@@ -43,7 +41,7 @@ func init() {
 }
 
 // ParsePsOutput reads "ps -eo pid,rss,vsz,comm": RSS in bytes, PSS taken as
-// RSS. parsePsOutput, window.ts 1931-1954.
+// RSS.
 func ParsePsOutput(raw string) []Process {
 	var out []Process
 	for _, line := range Lines(raw) {
@@ -65,7 +63,6 @@ func ParsePsOutput(raw string) []Process {
 }
 
 // parseStatusKb reads "Key:  N kB" of a status block, in bytes.
-// parseStatusKb, window.ts 2005-2009.
 func parseStatusKb(block, key string) Num {
 	if m, ok := statusKb[key].Match(block); ok {
 		return ParseInt(m.Group(1)) * 1024
@@ -74,7 +71,6 @@ func parseStatusKb(block, key string) Num {
 }
 
 // parseStatusInt reads "Key:  N" of a status block.
-// parseStatusInt, window.ts 2011-2015.
 func parseStatusInt(block, key string) Num {
 	if m, ok := statusN[key].Match(block); ok {
 		return ParseInt(m.Group(1))
@@ -85,7 +81,6 @@ func parseStatusInt(block, key string) Num {
 // ParseStatusEntries reads the blocks "PID:n NAME:c CMD:..." with the
 // status lines of each process, separated by "---": processes without a
 // name or without resident memory are left out; the 100 largest by RSS.
-// parseStatusEntries, window.ts 1960-2003.
 func ParseStatusEntries(raw string) []Process {
 	var out []Process
 	for _, block := range strings.Split(raw, "---") {
@@ -137,7 +132,6 @@ func sortByRss(p []Process) {
 
 // ParsePssLines reads the lines "<pid> <pss kB>" into PSS in bytes per pid:
 // a line without a pid or without a PSS above 0 is left out.
-// The PSS lines of collectProcessMemory, window.ts 367-381.
 func ParsePssLines(raw string) map[Num]Num {
 	m := map[Num]Num{}
 	for _, line := range Lines(raw) {
@@ -153,7 +147,7 @@ func ParsePssLines(raw string) map[Num]Num {
 	return m
 }
 
-// ProcessInput holds what the commands of collectProcessMemory printed.
+// ProcessInput holds what the commands of the process readings printed.
 type ProcessInput struct {
 	Load   string // normal, high_load or extreme_load
 	Status string // the status blocks of the thread group leaders
@@ -161,7 +155,7 @@ type ProcessInput struct {
 	Pss    string // the lines "<pid> <pss kB>" of the first 30
 }
 
-// PssPIDs are the processes whose PSS the reference reads: the first 30.
+// PssPIDs are the processes whose PSS is read: the first 30.
 func PssPIDs(entries []Process) []Num {
 	var out []Num
 	for i, e := range entries {
@@ -175,7 +169,7 @@ func PssPIDs(entries []Process) []Num {
 
 // ProcessMemory gives the processes: under load from ps alone; else from
 // the status blocks, from ps when they give nothing, with the PSS of the
-// first 30. collectProcessMemory, window.ts 301-392.
+// first 30.
 func ProcessMemory(in ProcessInput) []Process {
 	in.Ps = headLines(in.Ps, 50)
 	if in.Load != "normal" {

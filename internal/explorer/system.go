@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "strings"
 
 var (
@@ -11,7 +9,7 @@ var (
 )
 
 // ParseMeminfo reads /proc/meminfo: kB fields in bytes, the counts of huge
-// pages as they are. parseMeminfo, window.ts 1799-1811.
+// pages as they are.
 func ParseMeminfo(raw string) Record {
 	var r Record
 	for _, line := range Lines(raw) {
@@ -37,7 +35,6 @@ type Vmstat struct {
 }
 
 // ParseVmstat reads lines of two fields of /proc/vmstat.
-// parseVmstat, window.ts 1816-1830.
 func ParseVmstat(raw string) Vmstat {
 	var r Record
 	for _, line := range Lines(raw) {
@@ -57,7 +54,7 @@ type Psi struct {
 }
 
 // ParsePsi reads /proc/pressure/memory; the text "N/A" stands for a kernel
-// without it. parsePsi, window.ts 1836-1859.
+// without it.
 func ParsePsi(raw string) Psi {
 	var out Psi
 	if Trim(raw) == "N/A" {
@@ -93,7 +90,6 @@ type Slab struct {
 const MaxSlabs = 4096
 
 // ParseSlabinfo reads the lines of /proc/slabinfo, head lines skipped.
-// parseSlabinfo, window.ts 1866-1882.
 func ParseSlabinfo(raw string) []Slab {
 	var out []Slab
 	for _, line := range Lines(raw) {
@@ -113,7 +109,7 @@ func ParseSlabinfo(raw string) []Slab {
 	return out
 }
 
-// SystemSnapshot is what collectSystemMemory returns, without its time.
+// SystemSnapshot holds the memory counters of the host.
 type SystemSnapshot struct {
 	TotalBytes        Num    `json:"totalBytes"`
 	FreeBytes         Num    `json:"freeBytes"`
@@ -145,9 +141,9 @@ type SystemSnapshot struct {
 	TopSlabs          []Slab `json:"topSlabs"`
 }
 
-// SystemInput holds the files collectSystemMemory reads. Vmstat and
+// SystemInput holds the files SystemMemory reads. Vmstat and
 // Slabinfo are the files as the kernel writes them: SystemMemory makes the
-// choice of lines the shell pipes of the reference make. Pressure is nil
+// choice of lines a shell pipe would make. Pressure is nil
 // on a kernel without the file.
 type SystemInput struct {
 	Meminfo, Vmstat, Slabinfo string
@@ -156,7 +152,6 @@ type SystemInput struct {
 
 // SystemMemory puts the memory counters together; used memory is what is
 // neither free, buffers, page cache nor reclaimable slab, at least 0.
-// collectSystemMemory, window.ts 219-293.
 func SystemMemory(in SystemInput) SystemSnapshot {
 	mi := ParseMeminfo(in.Meminfo)
 	vm := ParseVmstat(GrepE(in.Vmstat, "pswpin", "pswpout", "pgfault", "pgmajfault", "nr_dirty", "nr_writeback"))

@@ -1,6 +1,6 @@
 # Test data of the Memory Explorer
 
-`internal/explorer` reads the place of a memory slot from its SMBIOS locator strings, and the memory counters of the kernel. These directories hold what it reads, and under `want/` what the reference implementation returned for each input. `TestReference` compares the two. A want file is the call (`fn`, `in`) and the answer (`out`); a value `@file:NAME` of `in` is the text of the file `NAME` of the same directory.
+`internal/explorer` reads the place of a memory slot from its SMBIOS locator strings, and the memory counters of the kernel. These directories hold what it reads, and under `want/` the answers of the first implementation of the readers, which was written in JavaScript. `TestReference` compares the two. A want file is the call (`fn`, `in`) and the answer (`out`); a value `@file:NAME` of `in` is the text of the file `NAME` of the same directory.
 
 ## Public dumps
 

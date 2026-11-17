@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "strings"
 
 // Bounds of what the readers of slots return. A reader stops one entry
@@ -12,8 +10,8 @@ const (
 	MaxNodes  = 1024 // NUMA nodes
 )
 
-// Dimm is one memory slot as the reference describes it (DimmSlotInfo),
-// with the names of the tests that gave its socket and its channel.
+// Dimm is one memory slot as the explorer describes it, with the names of
+// the tests that gave its socket and its channel.
 type Dimm struct {
 	Locator         string `json:"locator"`
 	BankLocator     string `json:"bankLocator"`
@@ -34,8 +32,8 @@ type Dimm struct {
 	ErrorCount      Num    `json:"errorCount"`
 
 	// SocketBy and ChannelBy name the test that set Socket and Channel;
-	// empty when none did (then the number is 0). The reference has no
-	// such fields: the comparison with it leaves them out.
+	// empty when none did (then the number is 0). The want files of the
+	// tests hold no such fields.
 	SocketBy  string `json:"socketBy,omitempty"`
 	ChannelBy string `json:"channelBy,omitempty"`
 }
@@ -100,7 +98,7 @@ var (
 	reBankEnd     = jsre(`\*-bank:|\*-memory:`, "")
 )
 
-// fieldGetters reads "Key: value" as the get() of the reference: the first
+// fieldGetters reads "Key: value": the first
 // line that starts with the key, white space before it allowed, and the
 // value after any white space, the end of the line included.
 type fieldGetters map[string]*jsRegexp
@@ -134,12 +132,11 @@ func orUnknown(s string) string {
 	return s
 }
 
-// Counts are the EDAC counts of the reference: "dimm<N>" to a count.
+// Counts are EDAC counts by the name "dimm<N>".
 type Counts map[string]Num
 
-// ParseEdacCounts reads the lines "dimm<N>:<count>" the reference makes of
-// the EDAC tree; a later line of the same name replaces the earlier one.
-// The EDAC lines of collectMemoryMap, window.ts 849-862.
+// ParseEdacCounts reads the lines "dimm<N>:<count>" made of the EDAC
+// tree; a later line of the same name replaces the earlier one.
 func ParseEdacCounts(raw string) Counts {
 	c := Counts{}
 	for _, line := range Lines(raw) {
@@ -153,7 +150,6 @@ func ParseEdacCounts(raw string) Counts {
 func (c Counts) get(key string) Num { return Or(c[key], 0) }
 
 // ParseDmidecodeMemory reads the Memory Device blocks of dmidecode text.
-// parseDmidecodeMemory, window.ts 906-1097.
 func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 	if Trim(raw) == "" {
 		return nil
@@ -302,8 +298,7 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 
 // secondPasses gives the slots named like A1 and like PROC 1 DIMM 9 their
 // channels: the number of the slot, counted from 1, modulo half the slots
-// of its socket. The two second passes of parseDmidecodeMemory and
-// parseLshwDimms, window.ts 1059-1094 and 1442-1478.
+// of its socket.
 func secondPasses(dimms []Dimm) {
 	pass := func(match func(d *Dimm) bool, number func(d *Dimm) (Num, bool), by string) {
 		groups := map[float64][]*Dimm{}
@@ -358,7 +353,7 @@ func lshwMemorySection(raw string) (string, bool) {
 
 // blocks cuts text into the blocks that start where start matches and end
 // before the next place where end matches, or at the end of the text: the
-// global search with a look-ahead of the reference. At most max+1 blocks.
+// global search with a look-ahead of JavaScript. At most max+1 blocks.
 func blocks(text string, start, end *jsRegexp, max int) []string {
 	var out []string
 	pos := 0
@@ -379,7 +374,6 @@ func blocks(text string, start, end *jsRegexp, max int) []string {
 }
 
 // ParseLshwDimms reads the banks of the memory node of lshw text.
-// parseLshwDimms, window.ts 1313-1481.
 func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
 	if Trim(raw) == "" {
 		return nil

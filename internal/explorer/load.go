@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "strings"
 
 // Load profiles of a host.
@@ -72,7 +70,7 @@ func before(s, sep string) string {
 }
 
 // ServerLoad reads the load of a host from the text LoadText makes and
-// sorts it into a profile. detectServerLoad, server-safety.ts 85-184.
+// sorts it into a profile.
 func ServerLoad(text string) ServerLoadResult {
 	raw := Trim(text)
 	var estab Num
@@ -130,5 +128,5 @@ func ServerLoad(text string) ServerLoadResult {
 }
 
 // FdWalkDangerous tells a host on which the walk over open files is not
-// made. isDangerousForFdWalk, server-safety.ts 204-209.
+// made.
 func FdWalkDangerous(tcpEstablished Num) bool { return tcpEstablished > FdWalkEstab }

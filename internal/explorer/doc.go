@@ -3,13 +3,12 @@
 // locator strings, and the counters of the kernel about memory (meminfo,
 // vmstat, slab, NUMA nodes, CPU caches, page statistics, processes).
 //
-// Every function is pure: text in, data out. The functions give what their
-// reference gives for every input, defects included: they decide where a
+// Every function is pure: text in, data out. The readers decide where a
 // slot is drawn and nothing else. The ledger decides what a slot holds and
 // the engine decides every finding; nothing here ties a record to a slot.
 //
-// The reference is written in JavaScript, so numbers, strings and regular
-// expressions follow its rules here (jsnum.go, jsstr.go, jsre.go).
+// The readers were first written in JavaScript, and their answers on the
+// files under testdata/explorer are kept as want files. Numbers, strings
+// and regular expressions follow the rules of that language here
+// (jsnum.go, jsstr.go, jsre.go), so that the answers stay the same.
 package explorer
-
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.

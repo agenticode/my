@@ -1,8 +1,8 @@
 package explorer
 
-// The reference reads some files through shell pipes (grep, head, sort).
-// MemorY keeps the file as the kernel wrote it and makes the same choice
-// of lines here, before a carried reader sees the text.
+// Some readings are a choice of the lines of a file, as a shell pipe of
+// grep, head and sort makes it. MemorY keeps the file as the kernel wrote
+// it and makes the choice here, before a reader sees the text.
 
 import (
 	"sort"
@@ -34,7 +34,7 @@ func GrepE(text string, words ...string) string {
 	return b.String()
 }
 
-// SlabTop is what the reference reads of /proc/slabinfo: the first line,
+// SlabTop is what is read of /proc/slabinfo: the first line,
 // then the 20 lines with the largest third field, as
 // "head -1; sort -k3 -n -r | head -20" gives them in the C locale. Ties of
 // the field are in the reverse byte order of the whole line.

@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "strings"
 
 // LruGeneration is one generation of a node of a memory cgroup.
@@ -25,7 +23,7 @@ type LruCgroup struct {
 	Nodes []LruNode `json:"nodes"`
 }
 
-// MglruResult is what memory:getMglru returns. Error is a code:
+// MglruResult is the state of MGLRU and its generations. Error is a code:
 // "debug-unreadable" when MGLRU is on and its debug file gave nothing.
 type MglruResult struct {
 	Enabled      bool        `json:"enabled"`
@@ -34,7 +32,7 @@ type MglruResult struct {
 	Error        string      `json:"error,omitempty"`
 }
 
-// MaxLruLines is what the reference reads of lru_gen (head -5000).
+// MaxLruLines is what is read of lru_gen (head -5000).
 const MaxLruLines = 5000
 
 var (
@@ -51,7 +49,6 @@ func MglruOff(enabled string) bool {
 }
 
 // ParseLruGen reads the memcg, node and generation lines of lru_gen.
-// The lru_gen lines of memory:getMglru, window.ts 1739-1774.
 func ParseLruGen(raw string) []LruCgroup {
 	cgroups := []LruCgroup{}
 	var cg *LruCgroup
@@ -79,7 +76,6 @@ func ParseLruGen(raw string) []LruCgroup {
 // Mglru gives the state of MGLRU and its generations: off when the enabled
 // value is 0x0000, 0 or missing (enabled is then "NOT_AVAILABLE"); lruGen
 // is the debug file cut at 5,000 lines, empty when it could not be read.
-// memory:getMglru, window.ts 1692-1781.
 func Mglru(enabled, lruGen string) MglruResult {
 	v := Trim(enabled)
 	if v == "NOT_AVAILABLE" || v == "0x0000" || v == "0" {

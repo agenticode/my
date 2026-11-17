@@ -1,13 +1,11 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "math"
 
 var byteUnits = []string{"B", "KiB", "MiB", "GiB", "TiB"}
 
 // FormatBytes writes a byte count in binary units with two, one or no
-// decimals below 10, 100 and from 100 on. formatBytes, memory.ts 167-176.
+// decimals below 10, 100 and from 100 on.
 func FormatBytes(bytes float64) string {
 	if bytes == 0 {
 		return "0 B"
@@ -37,7 +35,7 @@ func FormatBytes(bytes float64) string {
 	return num + " " + unit
 }
 
-// Pct is part of total in percent, 0 without a total. pct, memory.ts 178-180.
+// Pct is part of total in percent, 0 without a total.
 func Pct(part, total float64) float64 {
 	if total > 0 {
 		return part / total * 100
@@ -45,11 +43,11 @@ func Pct(part, total float64) float64 {
 	return 0
 }
 
-// Clamp keeps v between lo and hi. clamp, memory.ts 182-184.
+// Clamp keeps v between lo and hi.
 func Clamp(v, lo, hi float64) float64 { return jsMax(lo, jsMin(hi, v)) }
 
 // FormatNumber writes a count with B, M or K and one decimal from a
-// thousand on. formatNumber, memory.ts 192-197.
+// thousand on.
 func FormatNumber(n float64) string {
 	switch {
 	case n >= 1e9:
