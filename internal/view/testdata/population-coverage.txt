@@ -1,0 +1,44 @@
+# The server dumps of the public collection by system maker and how the population check reads their board: a
+# rule set with an order table, a rule set of general rules only, no rule set for the board, the board not placed
+# in full (no check), no slot to check. Counts of public uploads; they say nothing of a fleet.
+maker	dumps	order table	general rules only	no rule set	not placed in full	no slot
+Supermicro	550	460	27	38	25	0
+Dell	476	430	35	0	11	0
+other	338	98	52	147	40	1
+HP	270	245	6	0	19	0
+Intel	103	43	50	10	0	0
+Lenovo	52	42	1	6	3	0
+ASUS	44	5	18	21	0	0
+IBM	43	24	15	1	3	0
+Gigabyte	40	16	12	12	0	0
+HPE	36	32	4	0	0	0
+Fujitsu	33	9	17	7	0	0
+Huawei	27	25	1	0	1	0
+Quanta	11	0	3	7	1	0
+Tyan	7	0	0	2	5	0
+Inspur	5	4	0	0	1	0
+ASRock	4	0	4	0	0	0
+Cisco	4	1	3	0	0	0
+Sugon	1	0	0	1	0	0
+all	2044	1434	248	252	109	1
+
+# Dumps with a finding of the rule (a dump counts once per rule).
+rule	dumps
+P-ORDER-01	168
+P-FIRST-01	21
+P-CPU-01	0
+P-BAL-01	32
+P-MIX-01	1
+P-MIX-02	5
+P-MIX-03	3
+P-MIX-04	0
+P-MIX-05	2
+any rule	201
+
+# Dumps with a line that is no finding.
+line	dumps
+agrees	1042
+holds	238
+not-compared	199
+other-mode	6
+second-set	6

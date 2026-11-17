@@ -100,7 +100,7 @@ CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev
 
 주소 맵에서 가로줄은 row 고장, 세로줄은 column 고장, 반복되는 한 칸은 single bit 고장, bank에 퍼진 구름은 bank 고장입니다. 터미널에서 `my help reading`을 실행하면 그림마다 읽는 법이 한국어로 나옵니다. 같은 내용을 자세히 쓴 문서가 [docs/reading-guide.md](docs/reading-guide.md)입니다. `docs/` 아래 문서는 영어입니다.
 
-`my board`는 SMBIOS 슬롯 이름을 읽어 슬롯을 CPU와 채널별로 그리고, DIMM마다 등급과 오류를 표시합니다.
+`my board`는 SMBIOS 슬롯 이름을 읽어 슬롯을 CPU와 채널별로 그리고, DIMM마다 등급과 오류를 표시합니다. 보드 제조사의 공개 문서에 모듈 수별 장착 구성이 있으면, 그 장착표가 채우는 빈 슬롯과 다른 자리에 있는 모듈을 표시하고 규칙과 문서 쪽수를 적습니다. 이 소견에는 등급이 없고 종료 코드도 바꾸지 않습니다([docs/rules.md](docs/rules.md#population-rules)).
 
 `my report`는 케이스를 HTML 파일 하나로 저장합니다. 그림은 SVG로 들어가고 DIMM별 소견, 오진 점검표, 원본 기록이 함께 담깁니다. 밖에서 불러오는 것이 없어서 네트워크 없이 열리고, 브라우저에서 인쇄하면 PDF가 됩니다. 예제의 리포트는 [examples/ko/demo-report.html](examples/ko/demo-report.html)이고, 아래는 그 안에 든 `CPU0_C1`의 타임라인입니다.
 
@@ -303,6 +303,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 실제 메모리 컨트롤러의 EDAC 드라이버가 올라간 호스트에서는 아직 검증하지 못했습니다. 그런 호스트의 기록 디코딩은 커널과 rasdaemon 소스를 따라 만든 픽스처로만 시험했습니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
 - 공개 SMBIOS 모음의 서버 덤프 2,044개 중 1,934개는 모든 슬롯을 프로세서, 채널, 채널 안 위치에 놓습니다. 슬롯 이름이나, 제조사 공개 문서 385개로 만든 보드 계열 표 361개를 씁니다. 나머지 110개는 자기 기록만으로 위치를 알 수 없는 까닭과 함께 따로 적어 둡니다. 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
+- 장착 구성 검사는 보드 계열 276개의 장착표와 규칙으로 모듈을 견줍니다. 규칙마다 제조사 공개 문서와 쪽수를 적었습니다. 실제 서버에서 확인한 규칙은 없습니다. 공개 모음의 덤프 2,044개 중 1,682개가 규칙 세트에 닿습니다([docs/rules.md](docs/rules.md#population-rules)).
 - 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵
