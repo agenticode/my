@@ -143,3 +143,34 @@ func (w *Writer) SPDReadings(host string) ([]model.SPDReading, error) {
 	}
 	return scanSPD(rows)
 }
+
+// SetDIMMFromSPD writes what a tied SPD reading says into the row of a
+// DIMM: the manufacturing week and the device width replace what the row
+// holds (no inventory has the first, and the second comes to EDAC and a
+// BMC from the same EEPROM by way of firmware); the other fields of fill
+// are written only where the row is empty. An empty date or an unset
+// width leaves the column as it is.
+func (w *Writer) SetDIMMFromSPD(uid, mfgDate string, width model.Opt[int], fill model.DIMM) error {
+	if uid == "" {
+		return invalid("dimm: uid is empty")
+	}
+	var size any
+	if fill.SizeBytes > 0 {
+		size = fill.SizeBytes
+	}
+	_, err := w.exec(`UPDATE dimm SET
+  mfg_date        = CASE WHEN ? != '' THEN ? ELSE mfg_date END,
+  device_width    = COALESCE(?, device_width),
+  size_bytes      = COALESCE(size_bytes, ?),
+  memory_type     = CASE WHEN memory_type = '' THEN ? ELSE memory_type END,
+  module_type     = CASE WHEN module_type = '' THEN ? ELSE module_type END,
+  ranks           = COALESCE(ranks, ?),
+  speed_mts       = COALESCE(speed_mts, ?),
+  manufacturer_id = CASE WHEN manufacturer_id = '' THEN ? ELSE manufacturer_id END
+ WHERE dimm_uid = ?`,
+		mfgDate, mfgDate, optInt(width), size, fill.MemoryType, fill.ModuleType, optInt(fill.Ranks), optInt(fill.SpeedMTs), fill.ManufacturerID, uid)
+	if err != nil {
+		return fmt.Errorf("dimm %s: %w", uid, err)
+	}
+	return nil
+}

@@ -326,6 +326,37 @@ The board carries the check of its modules against the population the public doc
 
 The cards of `why` carry `population`, the line of the first population finding that names the slot of the DIMM, as a statement (`pop.why`); it changes no check and no confidence.
 
+### The view `spd`
+
+`my spd --json` holds what each memory module of a host says about itself in its SPD EEPROM. The fields of a module are decoded from the bytes of `spd_reading` each time the view is built; the reason comes from the probe of the latest scan that looked for the SPD.
+
+| Field | Content |
+| --- | --- |
+| `host`, `system` | the host, its maker and product |
+| `looked` | whether the latest scan of the host looked for the SPD |
+| `read`, `devices`, `dimms`, `tied` | readings in the states `ok`, `crc` and `short`; SPD devices looked at; DIMMs SMBIOS places on the host; readings tied to one of them |
+| `drivers` | the kernel drivers that gave the readings |
+| `head` | the line under the host, as a text (`code`, `args`, `text`) |
+| `reason` | when nothing was read: `code` (docs/compatibility.md lists the codes), `short`, `text`, `facts[]` (slots SMBIOS lists, a BMC), `step` (what the reader can do) |
+| `modules[]` | per reading: `slot`, `dimm_uid` and `tie` (`serial` or `serial-reversed`) of a tied reading; `origin`, `bus`, `address`, `driver`, `form`, `state`, `detail`, `bytes` (the number read); `spd`, the decode (below); `maker_name` and `maker_source` (`table`, `smbios` or `decode-dimms`); `state_text` for a reading that is not `ok`; `differences[]` to SMBIOS, EDAC and a BMC; `grade`, `grade_text` and `ue` of the tied DIMM |
+| `modules[].spd` | `length`, `state`, `key_byte`, `memory_type`, `fill`, `module_type`, `hybrid`, `spd_revision`, `spd_device_bytes`, `crcs[]` (`from`, `to`, `at`, `state`, `stored`, `computed`), `die_mbit`, `dies_per_package`, `package`, `row_bits`, `column_bits`, `device_width`, `package_ranks`, `logical_ranks`, `rank_mix`, `bus_width`, `extension_bits`, `sub_channels`, `size_bytes`, `organisation`, `tck_ps`, `speed_mts`, `module_maker` (the JEDEC code, `bank 1, 0x2C`), `module_maker_name`, `location`, `mfg_date`, `date_bytes`, `serial`, `part_number`, `module_revision`, `dram_maker`, `dram_maker_name`, `dram_stepping`, `missing[]` (`part`, `need`), `notes[]` |
+| `shared` | what every module has in common, printed once: `count`, `maker`, `maker_id`, `part_number`, `memory_type`, `module_type`, `size_bytes`, `organisation`, `die_mbit` |
+| `lots` | the table of date codes of the host (the view `lots` below) |
+| `notes[]` | the differences that concern the host: serial numbers tied in reverse order, readings tied to no slot, DIMMs without a reading, no SMBIOS serial numbers |
+
+### The view `lots`
+
+`my lots --json` counts the DIMMs of a host, or of every host of a ledger, by maker code, part number and manufacturing week, the DIMMs with a finding beside those without one. The week comes from `dimm.mfg_date`, whichever source gave it. A shared week is a lead for the supplier to check and no proof that a lot is at fault.
+
+| Field | Content |
+| --- | --- |
+| `hosts` | the hosts the table counts |
+| `findings` | false when the table has no finding columns: the readings are tied to no DIMM, or they are dump files without a host; `why` says which |
+| `rows[]` | per lot key: `maker_id`, `maker`, `part_number`, `mfg_date` (empty in the last row, the DIMMs without a date code), `date_source` (`spd`, `bmc` or `inventory`), `dimms`, `with_finding`, `with_ue`, `slots` (the slots with a finding, one host) or `hosts[]` (`host`, `dimms`, `with_finding`, several hosts) |
+| `by_organisation[]` | the same counts by ranks and device width: `organisation`, `dimms`, `with_finding`, `with_ue` |
+| `lines[]` | the line of each week that at least two DIMMs with a finding share, which names both sides, and the closing sentence |
+| `grade` | the worst finding of a DIMM the table counts; `my lots` exits with it |
+
 ### Firmware records in the views
 
 The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]`, and every row of `inventory` carries `firmware[]` and `firmware_marks`. A record of `firmware[]` holds:

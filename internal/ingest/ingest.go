@@ -313,6 +313,12 @@ func Run(ctx context.Context, s *store.Store, adapters []adapter.Adapter, opts O
 	if err != nil {
 		return nil, fmt.Errorf("ingest: slots: %w", err)
 	}
+	// The SPD of the modules is tied to the DIMMs by serial number once the
+	// slots are known, so that its device width stands over the one EDAC
+	// gave the slot.
+	if err := tieSPD(ctx, s, host); err != nil {
+		return nil, fmt.Errorf("ingest: spd: %w", err)
+	}
 	slots.notes = append(joined.notes(), slots.notes...)
 	if len(slots.notes) > 0 {
 		src := model.Source{ScanID: res.Scan.ID, Kind: SlotMapKind, Origin: host, Status: model.SourceOK,
