@@ -72,8 +72,8 @@ func (w *Writer) ReplacePlacement(p model.Placement, dimmUID, slot string) error
 
 // AdoptDIMM makes what a host recorded under one DIMM identity records of
 // another: the placements, and the DIMM named in events, actions, ECS
-// readings, faults and findings. The first identity is removed when no
-// record of any host refers to it any more.
+// readings, SPD readings, faults and findings. The first identity is
+// removed when no record of any host refers to it any more.
 func (w *Writer) AdoptDIMM(host, from, to string) error {
 	if host == "" || from == "" || to == "" || from == to {
 		return invalid("adopt dimm: host and two different identities are required")
@@ -87,7 +87,7 @@ func (w *Writer) AdoptDIMM(host, from, to string) error {
 			return fmt.Errorf("adopt dimm %s: %w", from, err)
 		}
 	}
-	for _, table := range []string{"event", "action", "ecs_sample", "fault", "verdict"} {
+	for _, table := range []string{"event", "action", "ecs_sample", "fault", "verdict", "spd_reading"} {
 		if _, err := w.exec(`UPDATE `+table+` SET dimm_uid = ? WHERE host = ? AND dimm_uid = ?`, to, host, from); err != nil {
 			return fmt.Errorf("adopt dimm %s: %s: %w", from, table, err)
 		}
@@ -103,7 +103,8 @@ func (w *Writer) dropUnusedDIMM(uid string) error {
  AND NOT EXISTS (SELECT 1 FROM action x WHERE x.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM ecs_sample c WHERE c.dimm_uid = dimm.dimm_uid)
  AND NOT EXISTS (SELECT 1 FROM fault f WHERE f.dimm_uid = dimm.dimm_uid)
- AND NOT EXISTS (SELECT 1 FROM verdict v WHERE v.dimm_uid = dimm.dimm_uid)`, uid)
+ AND NOT EXISTS (SELECT 1 FROM verdict v WHERE v.dimm_uid = dimm.dimm_uid)
+ AND NOT EXISTS (SELECT 1 FROM spd_reading r WHERE r.dimm_uid = dimm.dimm_uid)`, uid)
 	if err != nil {
 		return fmt.Errorf("drop dimm %s: %w", uid, err)
 	}
