@@ -1,0 +1,515 @@
+# dmidecode 3.0
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0.0 present.
+Table at 0x000EC9B0.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Supermicro
+	Product Name: SSG-6028R-OSD072P
+	Version: 123456789
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: SMC X10
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Supermicro
+	Product Name: X10DRH-iT
+	Version: 1.10
+	Serial Number: EX000004
+	Asset Tag: Default string
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Default string
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x003C, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x003E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMA1
+	Bank Locator: P0_Node0_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000007
+	Asset Tag: EXA000008
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0040, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0041, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMB1
+	Bank Locator: P0_Node0_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000011
+	Asset Tag: EXA000012
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0043, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0044, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMC1
+	Bank Locator: P0_Node0_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000015
+	Asset Tag: EXA000016
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0046, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0047, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMMD1
+	Bank Locator: P0_Node0_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000019
+	Asset Tag: EXA000020
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0049, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x003C
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004A, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 512 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 8
+
+Handle 0x004B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004D, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004F, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0050, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0051, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0052, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004A
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: NO DIMM
+	Bank Locator: NO DIMM
+	Type: Unknown
+	Type Detail: Unknown
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: NO DIMM
+	Asset Tag: NO DIMM
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x005A, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: SOCKET 0
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F1 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 79, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 3600 MHz
+	Current Speed: 2100 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0057
+	L2 Cache Handle: 0x0058
+	L3 Cache Handle: 0x0059
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 8
+	Core Enabled: 8
+	Thread Count: 16
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x005B, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: SOCKET 1
+	Type: <OUT OF SPEC>
+	Family: <OUT OF SPEC>
+	Manufacturer: Not Specified
+	ID: 00 00 00 00 00 00 00 00
+	Version: Not Specified
+	Voltage: Unknown
+	External Clock: Unknown
+	Max Speed: Unknown
+	Current Speed: Unknown
+	Status: Unpopulated
+	Upgrade: <OUT OF SPEC>
+	L1 Cache Handle: Not Provided
+	L2 Cache Handle: Not Provided
+	L3 Cache Handle: Not Provided
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Characteristics: None

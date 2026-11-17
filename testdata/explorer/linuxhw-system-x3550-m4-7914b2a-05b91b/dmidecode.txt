@@ -1,0 +1,526 @@
+# dmidecode 3.5
+Getting SMBIOS data from sysfs.
+SMBIOS 2.7 present.
+83 structures occupying 3671 bytes.
+Table at 0x7E7BA000.
+
+Handle 0x0001, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: Socket 1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: D7 06 02 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 45, Stepping 7
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2609 0 @ 2.40GHz
+	Voltage: 1.2 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011
+	L1 Cache Handle: 0x0003
+	L2 Cache Handle: 0x0004
+	L3 Cache Handle: 0x0005
+	Serial Number: EX000001
+	Asset Tag: EXA000002
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0002, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: Socket 2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: D7 06 02 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 45, Stepping 7
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2609 0 @ 2.40GHz
+	Voltage: 1.2 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011
+	L1 Cache Handle: 0x0006
+	L2 Cache Handle: 0x0007
+	L3 Cache Handle: 0x0008
+	Serial Number: EX000003
+	Asset Tag: EXA000004
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0009, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 1536 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 24
+
+Handle 0x000A, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GB
+	Form Factor: DIMM
+	Set: 1
+	Locator: DIMM 1
+	Bank Locator: Bank 1
+	Type: DDR3
+	Type Detail: Registered (Buffered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000006
+	Asset Tag: EXA000007
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 1066 MT/s
+
+Handle 0x000B, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 2
+	Locator: DIMM 2
+	Bank Locator: Bank 2
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x000C, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 3
+	Locator: DIMM 3
+	Bank Locator: Bank 3
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x000D, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GB
+	Form Factor: DIMM
+	Set: 4
+	Locator: DIMM 4
+	Bank Locator: Bank 4
+	Type: DDR3
+	Type Detail: Registered (Buffered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 1066 MT/s
+
+Handle 0x000E, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 5
+	Locator: DIMM 5
+	Bank Locator: Bank 5
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x000F, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 6
+	Locator: DIMM 6
+	Bank Locator: Bank 6
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0010, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 7
+	Locator: DIMM 7
+	Bank Locator: Bank 7
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0011, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 8
+	Locator: DIMM 8
+	Bank Locator: Bank 8
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0012, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 9
+	Locator: DIMM 9
+	Bank Locator: Bank 9
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0013, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 10
+	Locator: DIMM 10
+	Bank Locator: Bank 10
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0014, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 11
+	Locator: DIMM 11
+	Bank Locator: Bank 11
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0015, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 12
+	Locator: DIMM 12
+	Bank Locator: Bank 12
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0016, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GB
+	Form Factor: DIMM
+	Set: 13
+	Locator: DIMM 13
+	Bank Locator: Bank 13
+	Type: DDR3
+	Type Detail: Registered (Buffered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000014
+	Asset Tag: EXA000015
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 1066 MT/s
+
+Handle 0x0017, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 14
+	Locator: DIMM 14
+	Bank Locator: Bank 14
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0018, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 15
+	Locator: DIMM 15
+	Bank Locator: Bank 15
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0019, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GB
+	Form Factor: DIMM
+	Set: 16
+	Locator: DIMM 16
+	Bank Locator: Bank 16
+	Type: DDR3
+	Type Detail: Registered (Buffered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000018
+	Asset Tag: EXA000019
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 1066 MT/s
+
+Handle 0x001A, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 17
+	Locator: DIMM 17
+	Bank Locator: Bank 17
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x001B, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 18
+	Locator: DIMM 18
+	Bank Locator: Bank 18
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x001C, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 19
+	Locator: DIMM 19
+	Bank Locator: Bank 19
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x001D, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 20
+	Locator: DIMM 20
+	Bank Locator: Bank 20
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x001E, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 21
+	Locator: DIMM 21
+	Bank Locator: Bank 21
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x001F, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 22
+	Locator: DIMM 22
+	Bank Locator: Bank 22
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0020, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 23
+	Locator: DIMM 23
+	Bank Locator: Bank 23
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0021, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0009
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 24
+	Locator: DIMM 24
+	Bank Locator: Bank 24
+	Type: Unknown
+	Type Detail: None
+
+Handle 0x0024, DMI type 1, 27 bytes
+System Information
+	Manufacturer: IBM
+	Product Name: System x3550 M4 -[7914B2A]-
+	Version: 0C
+	Serial Number: EX000021
+	UUID: 00000000-0000-4000-8000-000000000022
+	Wake-up Type: Power Switch
+	SKU Number: Not Specified
+	Family: System X
+
+Handle 0x0025, DMI type 2, 16 bytes
+Base Board Information
+	Manufacturer: IBM
+	Product Name: 01GR489
+	Version: 0C
+	Serial Number: EX000023
+	Asset Tag: EXA000024
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Blade
+	Chassis Handle: 0x0026
+	Type: Motherboard
+	Contained Object Handles: 0

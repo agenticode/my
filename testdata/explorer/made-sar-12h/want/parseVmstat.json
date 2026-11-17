@@ -1,0 +1,12 @@
+{
+ "fn": "parseVmstat",
+ "in": {
+  "text": "@file:proc/vmstat"
+ },
+ "out": {
+  "pswpin": 2345,
+  "pswpout": 6789,
+  "pgfault": 9876543210,
+  "pgmajfault": 123456
+ }
+}

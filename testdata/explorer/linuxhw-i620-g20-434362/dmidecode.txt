@@ -1,0 +1,674 @@
+# dmidecode 2.12
+SMBIOS 2.8 present.
+98 structures occupying 5244 bytes.
+Table at 0x000EB000.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Sugon
+	Product Name: I620-G20
+	Version: Grantley-EP
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number:                                 
+	Family: Rack
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Sugon
+	Product Name: 60G24-US
+	Version: 1.1
+	Serial Number: EX000003
+	Asset Tag: EXA000004
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: To be filled by O.E.M.
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0036, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 768 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 12
+
+Handle 0x0038, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMA0
+	Bank Locator: A0_Node0_Channel0_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x003A, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMA1
+	Bank Locator: A1_Node0_Channel0_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000013
+	Asset Tag: EXA000014
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x003B, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMA2
+	Bank Locator: A2_Node0_Channel0_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000015
+	Asset Tag: EXA000016
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x003C, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMB0
+	Bank Locator: B0_Node0_Channel1_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000018
+	Asset Tag: EXA000019
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x003E, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMB1
+	Bank Locator: B1_Node0_Channel1_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000021
+	Asset Tag: EXA000022
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x003F, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMB2
+	Bank Locator: B2_Node0_Channel1_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000023
+	Asset Tag: EXA000024
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0040, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMC0
+	Bank Locator: C0_Node0_Channel2_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000026
+	Asset Tag: EXA000027
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x0042, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMC1
+	Bank Locator: C1_Node0_Channel2_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000029
+	Asset Tag: EXA000030
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0043, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMC2
+	Bank Locator: C2_Node0_Channel2_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000031
+	Asset Tag: EXA000032
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0044, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMD0
+	Bank Locator: D0_Node0_Channel3_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000033
+	Asset Tag: EXA000034
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0045, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMD1
+	Bank Locator: D1_Node0_Channel3_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000035
+	Asset Tag: EXA000036
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0046, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0036
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_DIMMD2
+	Bank Locator: D2_Node0_Channel3_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000037
+	Asset Tag: EXA000038
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0047, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 768 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 12
+
+Handle 0x0049, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMME0
+	Bank Locator: E0_Node1_Channel0_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000040
+	Asset Tag: EXA000041
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x004B, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMME1
+	Bank Locator: E1_Node1_Channel0_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000043
+	Asset Tag: EXA000044
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x004C, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMME2
+	Bank Locator: E2_Node1_Channel0_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000045
+	Asset Tag: EXA000046
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x004D, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMF0
+	Bank Locator: F0_Node1_Channel1_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000048
+	Asset Tag: EXA000049
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x004F, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMF1
+	Bank Locator: F1_Node1_Channel1_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000051
+	Asset Tag: EXA000052
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0050, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMF2
+	Bank Locator: F2_Node1_Channel1_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000053
+	Asset Tag: EXA000054
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0051, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMG0
+	Bank Locator: G0_Node1_Channel2_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000056
+	Asset Tag: EXA000057
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1866 MHz
+
+Handle 0x0053, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMG1
+	Bank Locator: G1_Node1_Channel2_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000059
+	Asset Tag: EXA000060
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0054, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMG2
+	Bank Locator: G2_Node1_Channel2_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000061
+	Asset Tag: EXA000062
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0055, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMH0
+	Bank Locator: H0_Node1_Channel3_Dimm0
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000063
+	Asset Tag: EXA000064
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0056, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMH1
+	Bank Locator: H1_Node1_Channel3_Dimm1
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000065
+	Asset Tag: EXA000066
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x0057, DMI type 17, 34 bytes
+Memory Device
+	Array Handle: 0x0047
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_DIMMH2
+	Bank Locator: H2_Node1_Channel3_Dimm2
+	Type: Other
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: NO DIMM
+	Serial Number: EX000067
+	Asset Tag: EXA000068
+	Part Number: NO DIMM
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+
+Handle 0x005B, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: SOCKET 0
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F2 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 63, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0058
+	L2 Cache Handle: 0x0059
+	L3 Cache Handle: 0x005A
+	Serial Number: EX000069
+	Asset Tag: EXA000070
+	Part Number: Not Specified
+	Core Count: 6
+	Core Enabled: 6
+	Thread Count: 12
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x005F, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: SOCKET 1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F2 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 63, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x005C
+	L2 Cache Handle: 0x005D
+	L3 Cache Handle: 0x005E
+	Serial Number: EX000071
+	Asset Tag: EXA000072
+	Part Number: Not Specified
+	Core Count: 6
+	Core Enabled: 6
+	Thread Count: 12
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control

@@ -1,0 +1,55 @@
+{
+ "fn": "collectMemoryMap",
+ "in": {
+  "dmidecode": "",
+  "numactl": "@file:numactl-hardware.txt",
+  "numastat": "@file:numastat.txt",
+  "edacCe": "",
+  "edacUe": "",
+  "lshw": "",
+  "sysfsCache": "@file:cpu-cache.txt"
+ },
+ "out": {
+  "dimms": [],
+  "numa": [
+   {
+    "nodeId": 0,
+    "totalBytes": 270150926336,
+    "freeBytes": 135075463168,
+    "usedBytes": 135075463168,
+    "numaHit": 1234567897,
+    "numaMiss": 1241,
+    "numaForeign": 5685,
+    "interleaveHit": 130,
+    "localNode": 1234500007,
+    "otherNode": 67897
+   },
+   {
+    "nodeId": 1,
+    "totalBytes": 270150926336,
+    "freeBytes": 135204438016,
+    "usedBytes": 134946488320,
+    "numaHit": 1234568897,
+    "numaMiss": 2241,
+    "numaForeign": 6685,
+    "interleaveHit": 1130,
+    "localNode": 1234501007,
+    "otherNode": 68897
+   }
+  ],
+  "cpuCaches": [
+   {
+    "socket": 0,
+    "l1Bytes": 81920,
+    "l2Bytes": 2097152,
+    "l3Bytes": 110100480
+   },
+   {
+    "socket": 1,
+    "l1Bytes": 81920,
+    "l2Bytes": 2097152,
+    "l3Bytes": 110100480
+   }
+  ]
+ }
+}

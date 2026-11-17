@@ -1,0 +1,658 @@
+# dmidecode 3.4
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0 present.
+85 structures occupying 5056 bytes.
+Table at 0x000E0F70.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Huawei
+	Product Name: 1288H V5
+	Version: Purley
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: Type1Family
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Huawei
+	Product Name: BC11SPSCC0
+	Version: V100R005
+	Serial Number: EX000004
+	Asset Tag: EXA000005
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Type2 - Board Chassis Location
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0004, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU01
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: 54 06 05 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 85, Stepping 4
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) Gold 6126 CPU @ 2.60GHz
+	Voltage: 1.6 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2600 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA3647-1
+	L1 Cache Handle: 0x0006
+	L2 Cache Handle: 0x0007
+	L3 Cache Handle: 0x0008
+	Serial Number: EX000008
+	Asset Tag: EXA000009
+	Part Number: Not Specified
+	Core Count: 12
+	Core Enabled: 12
+	Thread Count: 24
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0005, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU02
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: 54 06 05 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 85, Stepping 4
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) Gold 6126 CPU @ 2.60GHz
+	Voltage: 1.6 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2600 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA3647-1
+	L1 Cache Handle: 0x0009
+	L2 Cache Handle: 0x000A
+	L3 Cache Handle: 0x000B
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: Not Specified
+	Core Count: 12
+	Core Enabled: 12
+	Thread Count: 24
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0024, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 4608 GB
+	Error Information Handle: No Error
+	Number Of Devices: 24
+
+Handle 0x0025, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM000
+	Bank Locator: _Node0_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000013
+	Asset Tag: EXA000014
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0026, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM001
+	Bank Locator: _Node0_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000017
+	Asset Tag: EXA000018
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0027, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM010
+	Bank Locator: _Node0_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000021
+	Asset Tag: EXA000022
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0028, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM011
+	Bank Locator: _Node0_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000025
+	Asset Tag: EXA000026
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0029, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM020
+	Bank Locator: _Node0_Channel2_Dimm0
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x002A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM021
+	Bank Locator: _Node0_Channel2_Dimm1
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x002B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM030
+	Bank Locator: _Node0_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000029
+	Asset Tag: EXA000030
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x002C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM031
+	Bank Locator: _Node0_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000033
+	Asset Tag: EXA000034
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x002D, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM040
+	Bank Locator: _Node0_Channel4_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000037
+	Asset Tag: EXA000038
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x002E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM041
+	Bank Locator: _Node0_Channel4_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000041
+	Asset Tag: EXA000042
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x002F, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM050
+	Bank Locator: _Node0_Channel5_Dimm0
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x0030, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM051
+	Bank Locator: _Node0_Channel5_Dimm1
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x0031, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM100
+	Bank Locator: _Node1_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000045
+	Asset Tag: EXA000046
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0032, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM101
+	Bank Locator: _Node1_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000049
+	Asset Tag: EXA000050
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0033, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM110
+	Bank Locator: _Node1_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000053
+	Asset Tag: EXA000054
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0034, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM111
+	Bank Locator: _Node1_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000057
+	Asset Tag: EXA000058
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0035, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM120
+	Bank Locator: _Node1_Channel2_Dimm0
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x0036, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM121
+	Bank Locator: _Node1_Channel2_Dimm1
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x0037, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM130
+	Bank Locator: _Node1_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000061
+	Asset Tag: EXA000062
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0038, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM131
+	Bank Locator: _Node1_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000065
+	Asset Tag: EXA000066
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x0039, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM140
+	Bank Locator: _Node1_Channel4_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000069
+	Asset Tag: EXA000070
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x003A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 32 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM141
+	Bank Locator: _Node1_Channel4_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2666 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000073
+	Asset Tag: EXA000074
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 2666 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x003B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM150
+	Bank Locator: _Node1_Channel5_Dimm0
+	Type: Unknown
+	Type Detail: Unknown Synchronous
+
+Handle 0x003C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0024
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM151
+	Bank Locator: _Node1_Channel5_Dimm1
+	Type: Unknown
+	Type Detail: Unknown Synchronous

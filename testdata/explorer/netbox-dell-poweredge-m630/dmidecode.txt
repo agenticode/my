@@ -1,0 +1,752 @@
+# dmidecode 2.12
+SMBIOS 2.8 present.
+67 structures occupying 3473 bytes.
+Table at 0x7AB09000.
+
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Dell Inc.
+	Product Name: PowerEdge M630
+	Version: Not Specified
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: Not Specified
+
+Handle 0x0200, DMI type 2, 14 bytes
+Base Board Information
+	Manufacturer: Dell Inc.
+	Product Name: 0PHY8D
+	Version: A00
+	Serial Number: EX000004
+	Asset Tag: Not Specified
+	Features:
+		Board is a hosting board
+		Board is removable
+		Board is replaceable
+		Board is hot swappable
+	Location In Chassis: Slot 05
+	Chassis Handle: 0x0300
+	Type: Server Blade
+
+Handle 0x0202, DMI type 2, 14 bytes
+Base Board Information
+	Manufacturer: Dell Inc.
+	Product Name: Not Specified
+	Version: Not Specified
+	Serial Number: EX000005
+	Asset Tag: Not Specified
+	Features:
+		Board is removable
+		Board is replaceable
+	Location In Chassis: Slot 05
+	Chassis Handle: 0x0300
+	Type: Interconnect Board
+
+Handle 0x0400, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F2 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 63, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2683 v3 @ 2.00GHz
+	Voltage: 1.3 V
+	External Clock: 9600 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: <OUT OF SPEC>
+	L1 Cache Handle: 0x0700
+	L2 Cache Handle: 0x0701
+	L3 Cache Handle: 0x0702
+	Serial Number: EX000007
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 14
+	Core Enabled: 14
+	Thread Count: 28
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0401, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F2 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 63, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2683 v3 @ 2.00GHz
+	Voltage: 1.3 V
+	External Clock: 9600 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: <OUT OF SPEC>
+	L1 Cache Handle: 0x0703
+	L2 Cache Handle: 0x0704
+	L3 Cache Handle: 0x0705
+	Serial Number: EX000008
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 14
+	Core Enabled: 14
+	Thread Count: 28
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x1000, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 1536 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 24
+
+Handle 0x1100, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A1
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x1101, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A2
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000014
+	Asset Tag: EXA000015
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x1102, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A3
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000018
+	Asset Tag: EXA000019
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x1103, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: A4
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000022
+	Asset Tag: EXA000023
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x1104, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 2
+	Locator: A5
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000025
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1105, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 2
+	Locator: A6
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000026
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1106, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 2
+	Locator: A7
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000027
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1107, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 2
+	Locator: A8
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000028
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1108, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 3
+	Locator: A9
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000029
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1109, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 3
+	Locator: A10
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000030
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x110A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 3
+	Locator: A11
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000031
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x110B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 3
+	Locator: A12
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000032
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x110C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 4
+	Locator: B1
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000034
+	Asset Tag: EXA000035
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x110D, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 4
+	Locator: B2
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000038
+	Asset Tag: EXA000039
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x110E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 4
+	Locator: B3
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000042
+	Asset Tag: EXA000043
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x110F, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: 4
+	Locator: B4
+	Bank Locator: Not Specified
+	Type: <OUT OF SPEC>
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000046
+	Asset Tag: EXA000047
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum voltage:  1.200 V
+	Maximum voltage:  1.200 V
+	Configured voltage:  1.200 V
+
+Handle 0x1110, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 5
+	Locator: B5
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000049
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1111, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 5
+	Locator: B6
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000050
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1112, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 5
+	Locator: B7
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000051
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1113, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 5
+	Locator: B8
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000052
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1114, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 6
+	Locator: B9
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000053
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1115, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 6
+	Locator: B10
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000054
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1116, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 6
+	Locator: B11
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000055
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1117, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: 6
+	Locator: B12
+	Bank Locator: Not Specified
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: EX000056
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown

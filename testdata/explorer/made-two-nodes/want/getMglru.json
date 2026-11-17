@@ -1,0 +1,13 @@
+{
+ "fn": "getMglru",
+ "in": {
+  "enabled": "@file:lru-gen-enabled",
+  "lruGen": ""
+ },
+ "out": {
+  "enabled": true,
+  "enabledValue": "0x0007",
+  "cgroups": [],
+  "error": "debug-unreadable"
+ }
+}

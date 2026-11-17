@@ -1,0 +1,105 @@
+{
+ "fn": "parseNumaInfo",
+ "in": {
+  "hw": "@file:numactl-hardware.txt",
+  "stat": "@file:numastat.txt"
+ },
+ "out": [
+  {
+   "nodeId": 0,
+   "totalBytes": 67528294400,
+   "freeBytes": 33764147200,
+   "usedBytes": 33764147200,
+   "numaHit": 1234571897,
+   "numaMiss": 5241,
+   "numaForeign": 9685,
+   "interleaveHit": 4130,
+   "localNode": 1234504007,
+   "otherNode": 71897
+  },
+  {
+   "nodeId": 1,
+   "totalBytes": 67528294400,
+   "freeBytes": 33893122048,
+   "usedBytes": 33635172352,
+   "numaHit": 1234572897,
+   "numaMiss": 6241,
+   "numaForeign": 10685,
+   "interleaveHit": 5130,
+   "localNode": 1234505007,
+   "otherNode": 72897
+  },
+  {
+   "nodeId": 2,
+   "totalBytes": 67528294400,
+   "freeBytes": 34022096896,
+   "usedBytes": 33506197504,
+   "numaHit": 1234573897,
+   "numaMiss": 7241,
+   "numaForeign": 11685,
+   "interleaveHit": 6130,
+   "localNode": 1234506007,
+   "otherNode": 73897
+  },
+  {
+   "nodeId": 3,
+   "totalBytes": 67528294400,
+   "freeBytes": 34151071744,
+   "usedBytes": 33377222656,
+   "numaHit": 1234574897,
+   "numaMiss": 8241,
+   "numaForeign": 12685,
+   "interleaveHit": 7130,
+   "localNode": 1234507007,
+   "otherNode": 74897
+  },
+  {
+   "nodeId": 4,
+   "totalBytes": 67528294400,
+   "freeBytes": 34280046592,
+   "usedBytes": 33248247808,
+   "numaHit": 0,
+   "numaMiss": 0,
+   "numaForeign": 0,
+   "interleaveHit": 0,
+   "localNode": 0,
+   "otherNode": 0
+  },
+  {
+   "nodeId": 5,
+   "totalBytes": 67528294400,
+   "freeBytes": 34409021440,
+   "usedBytes": 33119272960,
+   "numaHit": 0,
+   "numaMiss": 0,
+   "numaForeign": 0,
+   "interleaveHit": 0,
+   "localNode": 0,
+   "otherNode": 0
+  },
+  {
+   "nodeId": 6,
+   "totalBytes": 67528294400,
+   "freeBytes": 34537996288,
+   "usedBytes": 32990298112,
+   "numaHit": 0,
+   "numaMiss": 0,
+   "numaForeign": 0,
+   "interleaveHit": 0,
+   "localNode": 0,
+   "otherNode": 0
+  },
+  {
+   "nodeId": 7,
+   "totalBytes": 67528294400,
+   "freeBytes": 34666971136,
+   "usedBytes": 32861323264,
+   "numaHit": 0,
+   "numaMiss": 0,
+   "numaForeign": 0,
+   "interleaveHit": 0,
+   "localNode": 0,
+   "otherNode": 0
+  }
+ ]
+}

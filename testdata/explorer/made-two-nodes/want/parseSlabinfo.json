@@ -1,0 +1,169 @@
+{
+ "fn": "parseSlabinfo",
+ "in": {
+  "text": "@file:proc/slabinfo"
+ },
+ "out": [
+  {
+   "name": "ext4_inode_cache",
+   "activeObjs": 1234567,
+   "totalObjs": 1250000,
+   "objSize": 1096,
+   "totalSize": 1370000000
+  },
+  {
+   "name": "dentry",
+   "activeObjs": 3456789,
+   "totalObjs": 3500000,
+   "objSize": 192,
+   "totalSize": 672000000
+  },
+  {
+   "name": "kmalloc-64",
+   "activeObjs": 2000000,
+   "totalObjs": 2000000,
+   "objSize": 64,
+   "totalSize": 128000000
+  },
+  {
+   "name": "kmalloc-8",
+   "activeObjs": 900000,
+   "totalObjs": 900000,
+   "objSize": 8,
+   "totalSize": 7200000
+  },
+  {
+   "name": "buffer_head",
+   "activeObjs": 1500000,
+   "totalObjs": 1500000,
+   "objSize": 104,
+   "totalSize": 156000000
+  },
+  {
+   "name": "radix_tree_node",
+   "activeObjs": 345678,
+   "totalObjs": 350000,
+   "objSize": 584,
+   "totalSize": 204400000
+  },
+  {
+   "name": "inode_cache",
+   "activeObjs": 45678,
+   "totalObjs": 46000,
+   "objSize": 600,
+   "totalSize": 27600000
+  },
+  {
+   "name": "task_struct",
+   "activeObjs": 2345,
+   "totalObjs": 2400,
+   "objSize": 9792,
+   "totalSize": 23500800
+  },
+  {
+   "name": "vm_area_struct",
+   "activeObjs": 123456,
+   "totalObjs": 125000,
+   "objSize": 208,
+   "totalSize": 26000000
+  },
+  {
+   "name": "kmalloc-1k",
+   "activeObjs": 23456,
+   "totalObjs": 24000,
+   "objSize": 1024,
+   "totalSize": 24576000
+  },
+  {
+   "name": "kmalloc-512",
+   "activeObjs": 34567,
+   "totalObjs": 35000,
+   "objSize": 512,
+   "totalSize": 17920000
+  },
+  {
+   "name": "kmalloc-256",
+   "activeObjs": 45678,
+   "totalObjs": 46000,
+   "objSize": 256,
+   "totalSize": 11776000
+  },
+  {
+   "name": "kmalloc-128",
+   "activeObjs": 56789,
+   "totalObjs": 57000,
+   "objSize": 128,
+   "totalSize": 7296000
+  },
+  {
+   "name": "kmalloc-32",
+   "activeObjs": 678901,
+   "totalObjs": 680000,
+   "objSize": 32,
+   "totalSize": 21760000
+  },
+  {
+   "name": "kmalloc-16",
+   "activeObjs": 789012,
+   "totalObjs": 790000,
+   "objSize": 16,
+   "totalSize": 12640000
+  },
+  {
+   "name": "filp",
+   "activeObjs": 98765,
+   "totalObjs": 99000,
+   "objSize": 256,
+   "totalSize": 25344000
+  },
+  {
+   "name": "sock_inode_cache",
+   "activeObjs": 4567,
+   "totalObjs": 4600,
+   "objSize": 832,
+   "totalSize": 3827200
+  },
+  {
+   "name": "anon_vma",
+   "activeObjs": 87654,
+   "totalObjs": 88000,
+   "objSize": 104,
+   "totalSize": 9152000
+  },
+  {
+   "name": "pid",
+   "activeObjs": 12345,
+   "totalObjs": 12500,
+   "objSize": 128,
+   "totalSize": 1600000
+  },
+  {
+   "name": "mm_struct",
+   "activeObjs": 1234,
+   "totalObjs": 1300,
+   "objSize": 1408,
+   "totalSize": 1830400
+  },
+  {
+   "name": "signal_cache",
+   "activeObjs": 2345,
+   "totalObjs": 2400,
+   "objSize": 1152,
+   "totalSize": 2764800
+  },
+  {
+   "name": "cred_jar",
+   "activeObjs": 34567,
+   "totalObjs": 35000,
+   "objSize": 192,
+   "totalSize": 6720000
+  },
+  {
+   "name": "skbuff_head_cache",
+   "activeObjs": 5678,
+   "totalObjs": 5700,
+   "objSize": 256,
+   "totalSize": 1459200
+  }
+ ]
+}

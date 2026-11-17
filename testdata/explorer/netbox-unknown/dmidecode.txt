@@ -1,0 +1,192 @@
+# dmidecode 3.1
+Getting SMBIOS data from sysfs.
+SMBIOS 2.8 present.
+44 structures occupying 2055 bytes.
+Table at 0x000E4E00.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Online Labs
+	Product Name: SR
+	Version: (^_^)
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: Avoton
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Online Labs
+	Product Name: SR
+	Version: 42
+	Serial Number: EX000004
+	Asset Tag: EXA000005
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: <BAD INDEX>
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0004, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU0
+	Type: Central Processor
+	Family: Atom
+	Manufacturer: Intel(R) Corporation
+	ID: D8 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 77, Stepping 8
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Atom(TM) CPU  C2750  @ 2.40GHz
+	Voltage: 1.6 V
+	External Clock: 100 MHz
+	Max Speed: 2400 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA775
+	L1 Cache Handle: 0x0005
+	L2 Cache Handle: 0x0006
+	L3 Cache Handle: Not Provided
+	Serial Number: Not Specified
+	Asset Tag: UNKNOWN
+	Part Number: Not Specified
+	Core Count: 8
+	Core Enabled: 8
+	Thread Count: 8
+	Characteristics:
+		64-bit capable
+
+Handle 0x0015, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: None
+	Maximum Capacity: 64 GB
+	Error Information Handle: No Error
+	Number Of Devices: 4
+
+Handle 0x0016, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0015
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM0
+	Bank Locator: BANK 0
+	Type: DDR3
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1600 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0017, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0015
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM0
+	Bank Locator: BANK 1
+	Type: DDR3
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000014
+	Asset Tag: EXA000015
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1600 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0018, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0015
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM1
+	Bank Locator: BANK 0
+	Type: DDR3
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000018
+	Asset Tag: EXA000019
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1600 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0019, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0015
+	Error Information Handle: No Error
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: 8192 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM1
+	Bank Locator: BANK 1
+	Type: DDR3
+	Type Detail: Synchronous Unbuffered (Unregistered)
+	Speed: 1600 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000022
+	Asset Tag: EXA000023
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1600 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown

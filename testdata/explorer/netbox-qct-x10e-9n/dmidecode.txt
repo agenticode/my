@@ -1,0 +1,197 @@
+# dmidecode 3.0
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0 present.
+37 structures occupying 2615 bytes.
+Table at 0x8F9C5000.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Quanta Cloud Technology Inc.
+	Product Name: QuantaMicro X10E-9N
+	Version: N/A
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: Default string
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Quanta Cloud Technology Inc.
+	Product Name: S3E-MB
+	Version: 31S3EMB0010
+	Serial Number: EX000004
+	Asset Tag: N/A
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: 4
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0037, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: E9 06 09 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 158, Stepping 9
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E3-1240 v6 @ 3.70GHz
+	Voltage: 1.0 V
+	External Clock: 100 MHz
+	Max Speed: 4100 MHz
+	Current Speed: 3700 MHz
+	Status: Populated, Enabled
+	Upgrade: Other
+	L1 Cache Handle: 0x0034
+	L2 Cache Handle: 0x0035
+	L3 Cache Handle: 0x0036
+	Serial Number: To Be Filled By O.E.M.
+	Asset Tag: To Be Filled By O.E.M.
+	Part Number: To Be Filled By O.E.M.
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 8
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0038, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 64 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 4
+
+Handle 0x0039, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0038
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: DIMM A1
+	Bank Locator: CHANNEL A
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x003A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0038
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM A0
+	Bank Locator: CHANNEL A
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000007
+	Asset Tag: EXA000008
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x003B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0038
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: Unknown
+	Set: None
+	Locator: DIMM B1
+	Bank Locator: CHANNEL B
+	Type: Unknown
+	Type Detail: None
+	Speed: Unknown
+	Manufacturer: Not Specified
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x003C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0038
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMM B0
+	Bank Locator: CHANNEL B
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2133 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000011
+	Asset Tag: EXA000012
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 2133 MHz
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V

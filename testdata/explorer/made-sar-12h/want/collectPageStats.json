@@ -1,0 +1,121 @@
+{
+ "fn": "collectPageStats",
+ "in": {
+  "vmstat": "@file:proc/vmstat",
+  "sarB": "@file:sar-B.txt"
+ },
+ "out": {
+  "vmstat": {
+   "pgfault": 9876543210,
+   "pgmajfault": 123456,
+   "pgsteal_kswapd": 45678,
+   "pgsteal_direct": 1234,
+   "pgdemote_kswapd": 0,
+   "pgscan_kswapd": 56789,
+   "pgscan_direct": 2345,
+   "workingset_refault_anon": 12,
+   "workingset_refault_file": 34567,
+   "workingset_activate_file": 2345
+  },
+  "sarB": [
+   {
+    "time": "12:10",
+    "values": {
+     "pgpgin/s": 0,
+     "pgpgout/s": 40,
+     "fault/s": 900,
+     "majflt/s": 0,
+     "pgfree/s": 1000,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "01:10",
+    "values": {
+     "pgpgin/s": 1.5,
+     "pgpgout/s": 41,
+     "fault/s": 901,
+     "majflt/s": 0,
+     "pgfree/s": 1001,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "11:10",
+    "values": {
+     "pgpgin/s": 3,
+     "pgpgout/s": 42,
+     "fault/s": 902,
+     "majflt/s": 0,
+     "pgfree/s": 1002,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "12:10",
+    "values": {
+     "pgpgin/s": 4.5,
+     "pgpgout/s": 43,
+     "fault/s": 903,
+     "majflt/s": 0,
+     "pgfree/s": 1003,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "01:10",
+    "values": {
+     "pgpgin/s": 6,
+     "pgpgout/s": 44,
+     "fault/s": 904,
+     "majflt/s": 0,
+     "pgfree/s": 1004,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "11:10",
+    "values": {
+     "pgpgin/s": 7.5,
+     "pgpgout/s": 45,
+     "fault/s": 905,
+     "majflt/s": 0,
+     "pgfree/s": 1005,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "12:20",
+    "values": {
+     "pgpgin/s": 2,
+     "pgpgout/s": 41,
+     "fault/s": 901,
+     "majflt/s": 0,
+     "pgfree/s": 1001,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   }
+  ]
+ }
+}

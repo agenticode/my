@@ -1,0 +1,7 @@
+{
+ "fn": "parseSlabinfo",
+ "in": {
+  "text": "@file:proc/slabinfo"
+ },
+ "out": []
+}
