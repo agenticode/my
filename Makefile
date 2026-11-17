@@ -83,7 +83,19 @@ FUZZ_TARGETS := \
 	./internal/adapter/redfish:FuzzRegistry \
 	./internal/preflight:FuzzHost \
 	./internal/eventstream:FuzzLine \
-	./internal/adapter/vendorlog:FuzzCollect
+	./internal/adapter/vendorlog:FuzzCollect \
+	./internal/explorer:FuzzDimms \
+	./internal/explorer:FuzzCaches \
+	./internal/explorer:FuzzNuma \
+	./internal/explorer:FuzzSystem \
+	./internal/explorer:FuzzPage \
+	./internal/explorer:FuzzProcesses \
+	./internal/explorer:FuzzJVM \
+	./internal/explorer:FuzzFileCache \
+	./internal/explorer:FuzzProcessNuma \
+	./internal/explorer:FuzzMglru \
+	./internal/explorer:FuzzLoad \
+	./internal/explorer:FuzzFormat
 
 .PHONY: all build test test-race golden examples examples-case fuzz lint fmt fmt-check vet cross dist dist-check clean
 

@@ -70,6 +70,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | groups the errors of a DIMM into faults, measures trend, spread and baselines, and applies the rules |
+| `internal/explorer` | the readers of the Memory Explorer: where a slot is drawn on the board, read from its locator strings, and the memory counters of the kernel; carried over from another program of the same author (see `NOTICE`) |
 | `internal/view` | the data behind every figure, built from a ledger and the engine result; also the JSON output |
 | `internal/term` | draws the figures as text |
 | `internal/report` | the HTML report: one file with inline SVG figures |
