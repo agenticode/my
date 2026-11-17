@@ -5,7 +5,7 @@
 # the release page. It fails when CHANGELOG.md has no entry for the version.
 #
 # usage: release-notes.sh <version> [repository URL]
-#   .github/scripts/release-notes.sh v1.0.0 > notes.md
+#   .github/scripts/release-notes.sh v1.1.0 > notes.md
 set -euo pipefail
 
 version=${1:?usage: release-notes.sh <version> [repository URL]}
