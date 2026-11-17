@@ -1669,7 +1669,7 @@ A decode whose base CRC is bad has the state `crc`: its fields are shown with th
 
 The codes of the module maker and of the DRAM maker are those of JEDEC JEP106, the list of manufacturer identification codes that JEDEC publishes. MemorY writes them as SMBIOS 3.2 does in `internal/adapter/smbios`: the bank (the continuation count plus one) and the code byte as stored, with its parity bit, `bank 1, 0xCE`. The two forms compare as text.
 
-`internal/decode/spd/makers.tsv` names the codes found on server memory modules, makers of DRAM, of modules, of SPD hubs, of registers and data buffers and of PMICs: 59 rows, each checked against the vendor tables of `decode-dimms` (i2c-tools commit `dcc0e69`, GPL-2.0-or-later) and of illumos libjedec (`libjedec.c`, illumos-gate `4a58223`, CDDL-1.0), which agree on every row. MemorY wrote the rows from those facts and copies neither table. A maker is shown with its code in brackets, `Samsung (JEDEC bank 1, 0xCE)`; a code without a row is shown alone. `decode-dimms` output gives names and no codes: MemorY shows the names it prints.
+`internal/decode/spd/makers.tsv` names the codes found on server memory modules, makers of DRAM, of modules, of SPD hubs, of registers and data buffers and of PMICs: 60 rows, each checked against the vendor tables of `decode-dimms` (i2c-tools commit `dcc0e69`, GPL-2.0-or-later) and of illumos libjedec (`libjedec.c`, illumos-gate `4a58223`, CDDL-1.0), which agree on every row. MemorY wrote the rows from those facts and copies neither table. A maker is shown with its code in brackets, `Samsung (JEDEC bank 1, 0xCE)`; a code without a row is shown alone. `decode-dimms` output gives names and no codes: MemorY shows the names it prints.
 
 ### What was checked
 
