@@ -59,3 +59,55 @@
     if (ev.key === 'Escape') { hide(); }
   });
 })();
+
+(function () {
+  /* The card of a stick or a CPU of the board: a copy of it beside the
+     pointer, inside the window, while the pointer or the focus is on it. */
+  var hover = document.getElementById('mx-hover');
+  if (!hover || !document.addEventListener || !hover.closest) { return; }
+  var current = null;
+  function hide() {
+    hover.hidden = true;
+    current = null;
+    while (hover.firstChild) { hover.removeChild(hover.firstChild); }
+  }
+  function place(x, y) {
+    var w = hover.offsetWidth, h = hover.offsetHeight;
+    var left = x + 14, top = y + 14;
+    if (left + w > window.innerWidth - 8) { left = Math.max(8, x - w - 14); }
+    if (top + h > window.innerHeight - 8) { top = Math.max(8, y - h - 14); }
+    hover.style.left = left + 'px';
+    hover.style.top = top + 'px';
+  }
+  function show(mark, x, y) {
+    var card = document.getElementById(mark.getAttribute('data-card'));
+    if (!card) { return; }
+    if (current !== mark) {
+      while (hover.firstChild) { hover.removeChild(hover.firstChild); }
+      var copy = card.cloneNode(true);
+      copy.removeAttribute('id');
+      hover.appendChild(copy);
+      current = mark;
+    }
+    hover.hidden = false;
+    place(x, y);
+  }
+  function markOf(t) {
+    if (!t) { return null; }
+    if (!t.closest) { return null; }
+    return t.closest('[data-card]');
+  }
+  document.addEventListener('mousemove', function (ev) {
+    var mark = markOf(ev.target);
+    if (mark) { show(mark, ev.clientX, ev.clientY); } else if (current) { hide(); }
+  });
+  document.addEventListener('focusin', function (ev) {
+    var mark = markOf(ev.target);
+    if (!mark) { hide(); return; }
+    var r = mark.getBoundingClientRect();
+    show(mark, r.right, r.top);
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { hide(); }
+  });
+}());

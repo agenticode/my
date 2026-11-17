@@ -117,3 +117,20 @@ svg.spark { vertical-align: -3px; margin-right: 8px; }
 .fig .figtitle { font-size: 13px; font-weight: 600; fill: var(--ink); }
 .fig .figlegend { font-size: 11px; fill: var(--ink2); }
 .fig .fignote { font-size: 11px; fill: var(--ink2); }
+
+/* The board: the CPUs with the banks of their channels. */
+.mb-die { fill: var(--surface); stroke: var(--ink3); stroke-width: 1.2; }
+.fig .mb-cpu-name { font-size: 12px; font-weight: 600; fill: var(--ink); }
+.fig .mb-cpu-sub, .fig .mb-cache-label, .fig .mb-ch-label, .fig .mb-stick-cap { font-size: 9.5px; }
+.fig .mb-cache-label, .fig .mb-stick-cap { font-family: var(--mono); }
+.mb-cache-bar { fill: var(--wash); stroke: var(--line); stroke-width: 1; }
+.mb-cache-bar.cache-l1 { fill: var(--h0); }
+.mb-cache-bar.cache-l2 { fill: #e6eefb; }
+.mb-cache-bar.cache-l3 { fill: #d2e2f8; }
+.mb-bus { fill: none; stroke: var(--axis); stroke-width: 2; }
+.mb-stick-notch { fill: var(--axis); }
+.mb-stick-notch.ue { fill: var(--replace); }
+.g-observe .mb-stick-cap, .g-replace .mb-stick-cap { fill: #fff; }
+.g-consider .mb-stick-cap, .g-hold .mb-stick-cap, .g-ok .mb-stick-cap { fill: var(--ink); }
+.mb-cpu-die:hover .mb-die { stroke: var(--ink); }
+svg.board .slot .cell { pointer-events: visible; }

@@ -1055,7 +1055,8 @@ func TestWords(t *testing.T) {
 	more, _ := os.ReadFile("figures.go")
 	build, _ := os.ReadFile("build.go")
 	boots, _ := os.ReadFile("boots.go")
-	src = append(append(append(src, more...), build...), boots...)
+	board, _ := os.ReadFile("board.go")
+	src = append(append(append(append(src, more...), build...), boots...), board...)
 	for _, m := range regexp.MustCompile(`doc\.say\("([a-z0-9_.]+)"`).FindAllSubmatch(src, -1) {
 		if code := string(m[1]); !Words.Has(code) && !strings.HasSuffix(code, ".") {
 			t.Errorf("the report asks for %q, which the catalog lacks", code)
@@ -1503,7 +1504,7 @@ func TestFigures(t *testing.T) {
 		t.Fatalf("figures: %v\nwant %s", names, want)
 	}
 	for name, wants := range map[string][]string{
-		"slotmap":          {"Slot map of host r12-n034", "replace now", "hold replacement", "empty slot", "32 slots, 16 DIMMs", "CPU0", "H2"},
+		"slotmap":          {"Board of host r12-n034", "replace now", "hold replacement", "empty slot", "32 slots, 16 DIMMs", "CPU 0", "CPU0_H2", "Ch7"},
 		"timeline":         {"Host r12-n034: every DIMM with errors, 2026-07-31 to 2026-11-12", "peak 73/day", "3 reboots", "CPU0_C1: 2026-11-12 UE (demand read)"},
 		"CPU0_C1-topology": {"CPU0_C1 S/N 3B9C56: where the errors sit (width = share of the errors of this DIMM)", "bg0 bank3", "98%"},
 		"CPU0_C1-map": {"CPU0_C1 S/N 3B9C56: rank0 dev7 bg0 bank3, row by column, one cell = 32 columns", "10-99", "100+", "uncorrected error", "0x1a2f", "row fault",

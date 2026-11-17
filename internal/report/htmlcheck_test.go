@@ -230,7 +230,7 @@ var (
 		"text":   set("x", "y", "text-anchor", "transform"),
 		"title":  set(),
 	}
-	globalAttrs = set("id", "class", "title", "hidden", "role", "aria-label", "aria-hidden", "data-rec", "data-label")
+	globalAttrs = set("id", "class", "title", "hidden", "role", "aria-label", "aria-hidden", "data-rec", "data-label", "data-card")
 )
 
 func set(names ...string) map[string]bool {
@@ -478,6 +478,13 @@ func checkHTML(root *elem, raw []byte) []string {
 		if h := e.attrs["href"]; strings.HasPrefix(h, "#") && ids[h[1:]] == nil {
 			fail("%s: link to %s, which is not in the report", where(e), h)
 		}
+		if card, ok := e.attrs["data-card"]; ok {
+			// A stick or a CPU of the board names its card, which is in
+			// the list of cards.
+			if c := ids[card]; c == nil || !inside(c, ids["mx-cards"]) {
+				fail("%s: data-card %q names no card in #mx-cards", where(e), card)
+			}
+		}
 		if keys, ok := e.attrs["data-rec"]; ok {
 			if e.attrs["href"] == "" || e.attrs["data-label"] == "" {
 				fail("%s: a mark with records needs a link and a label", where(e))
@@ -514,4 +521,18 @@ func (e *elem) content0() string {
 		}
 	}
 	return b.String()
+}
+
+// inside tells whether e is box or below it.
+func inside(e, box *elem) bool {
+	if box == nil {
+		return false
+	}
+	found := false
+	box.walk(func(x *elem) {
+		if x == e {
+			found = true
+		}
+	})
+	return found
 }
