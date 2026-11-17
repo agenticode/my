@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"math"
 	"strings"
@@ -13,7 +11,7 @@ type SarRow struct {
 	Values Record `json:"values"`
 }
 
-// PageStats is what collectPageStats returns.
+// PageStats are the page counters and the paging table.
 type PageStats struct {
 	Vmstat Record   `json:"vmstat"`
 	SarB   []SarRow `json:"sarB"`
@@ -25,7 +23,6 @@ const MaxSarRows = 20000
 var reSarTime = jsre(`(\d{2}:\d{2})`, "")
 
 // ParsePageVmstat reads lines of two fields: name and count.
-// The vmstat lines of collectPageStats, window.ts 685-693.
 func ParsePageVmstat(raw string) Record {
 	var r Record
 	for _, line := range Lines(raw) {
@@ -40,7 +37,6 @@ func ParsePageVmstat(raw string) Record {
 // columns (a column AM or PM of a 12-hour clock is left out), each later
 // line of numbers is a row; lines Linux and Average are skipped, and a
 // text that holds NOT_AVAILABLE has no rows.
-// The sar lines of collectPageStats, window.ts 696-735.
 func ParseSarB(raw string) []SarRow {
 	out := []SarRow{}
 	if raw == "" || strings.Contains(raw, "NOT_AVAILABLE") {
@@ -98,8 +94,8 @@ func ParseSarB(raw string) []SarRow {
 	return out
 }
 
-// PageStats reads /proc/vmstat (the lines egrep of the reference picks)
-// and the output of sar -B. collectPageStats, window.ts 662-742.
+// PageStatsOf reads /proc/vmstat (the lines of the page counters)
+// and the output of sar -B.
 func PageStatsOf(vmstat, sarB string) PageStats {
 	return PageStats{
 		Vmstat: ParsePageVmstat(GrepE(vmstat, "pgscan", "pgsteal", "pgfault", "pgmajfault", "workingset", "pgdemote")),

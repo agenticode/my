@@ -1,14 +1,12 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"math"
 	"sort"
 	"strconv"
 )
 
-// CPUCache holds the cache sizes of one CPU package (CpuCacheInfo).
+// CPUCache holds the cache sizes of one CPU package.
 type CPUCache struct {
 	Socket  Num `json:"socket"`
 	L1Bytes Num `json:"l1Bytes"`
@@ -71,7 +69,6 @@ func cutBeforeCPU(raw string) []string {
 // ParseLshwCacheHierarchy reads the cache sizes per CPU package of lshw
 // text: per *-cpu node when there are any, else by the order of the cache
 // nodes (a level 1 or 2 after a level 3 starts the next package).
-// parseLshwCacheHierarchy, window.ts 1200-1277.
 func ParseLshwCacheHierarchy(raw string) []CPUCache {
 	if Trim(raw) == "" {
 		return nil
@@ -146,8 +143,8 @@ func ParseLshwCacheHierarchy(raw string) []CPUCache {
 }
 
 // ParseSysfsCacheInfo reads the lines "SOCKET:n LEVEL:n TYPE:t SIZE:s"
-// the reference makes of sysfs: level 1 and 2 summed, level 3 the last
-// one. parseSysfsCacheInfo, window.ts 1281-1311.
+// the cache files of sysfs are written as: level 1 and 2 summed, level 3 the last
+// one.
 func ParseSysfsCacheInfo(raw string) []CPUCache {
 	if Trim(raw) == "" {
 		return nil

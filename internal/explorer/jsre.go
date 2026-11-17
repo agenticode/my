@@ -7,7 +7,7 @@ import (
 	"unicode/utf8"
 )
 
-// A regular expression of the reference is written here as JavaScript
+// A regular expression of the readers is written here as JavaScript
 // wrote it and turned into a Go expression that matches the same strings:
 //
 //   - \s and \S use the white space of JavaScript (isJSSpace);

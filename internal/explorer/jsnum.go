@@ -1,7 +1,7 @@
 package explorer
 
 // Numbers as JavaScript has them, so that every carried function computes
-// what its reference computes.
+// what JavaScript computes.
 
 import (
 	"math"
@@ -216,8 +216,7 @@ func Or(x, alt Num) Num {
 	return x
 }
 
-// Log is Math.log as node computes it on the machine the reference was run
-// on: the fdlibm algorithm of V8, built by clang, which fuses a product
+// Log is Math.log as node computes it on arm64: the fdlibm algorithm of V8, built by clang, which fuses a product
 // into the sum or difference it stands in (-ffp-contract=on). The fused
 // steps are written as math.FMA, which rounds once on every platform, and
 // every other product is rounded on its own, so that the Go compiler fuses

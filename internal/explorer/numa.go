@@ -1,10 +1,8 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import "sort"
 
-// NumaNode is one NUMA node as the reference describes it (NumaNodeInfo).
+// NumaNode is one NUMA node, its size and its numastat counters.
 type NumaNode struct {
 	NodeID        Num `json:"nodeId"`
 	TotalBytes    Num `json:"totalBytes"`
@@ -24,7 +22,7 @@ var (
 	reNumaHeader = jsre(`node(\d+)`, "i")
 )
 
-// numaFields are the rows of numastat the reference reads.
+// numaFields are the rows of numastat that are read.
 var numaFields = map[string]func(*NumaNode) *Num{
 	"numa_hit":       func(n *NumaNode) *Num { return &n.NumaHit },
 	"numa_miss":      func(n *NumaNode) *Num { return &n.NumaMiss },
@@ -37,8 +35,7 @@ var numaFields = map[string]func(*NumaNode) *Num{
 // ParseNumaInfo reads the node sizes of "numactl --hardware" and the
 // counters of numastat. Only the first line of the numastat text names the
 // nodes; a second block of nodes is read under the names of the first.
-// Without numactl text there are no nodes. parseNumaInfo, window.ts
-// 1099-1198.
+// Without numactl text there are no nodes.
 func ParseNumaInfo(numaHw, numaStat string) []NumaNode {
 	if Trim(numaHw) == "" {
 		return nil

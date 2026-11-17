@@ -1,12 +1,10 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"strings"
 )
 
-// JVM is one Java process as the reference describes it (JvmMemoryEntry).
+// JVM is one Java process and its memory.
 type JVM struct {
 	PID                Num      `json:"pid"`
 	ProcessName        string   `json:"processName"`
@@ -24,7 +22,7 @@ type JVM struct {
 	Warnings           []string `json:"warnings"`
 }
 
-// Warning codes of a JVM; the reference wrote them as English sentences.
+// Warning codes of a JVM.
 const (
 	WarnHeapCritical = "heap-critical" // heap in use above 85 % of -Xmx; the percentage follows after a colon
 	WarnOffHeap      = "off-heap"      // RSS above twice the heap in use
@@ -45,7 +43,7 @@ type JavaPID struct {
 	Cmdline string `json:"cmdline"`
 }
 
-// ParsePgrepJava reads "pgrep -a java". parsePgrepJava, window.ts 2020-2028.
+// ParsePgrepJava reads "pgrep -a java".
 func ParsePgrepJava(raw string) []JavaPID {
 	var out []JavaPID
 	for _, line := range Lines(raw) {
@@ -64,7 +62,6 @@ func numPtr(n Num) *Num { return &n }
 // ParseJstatGc reads the two lines of "jstat -gc": heap in use and
 // committed, metaspace, collections and their time; -Xmx of the command
 // line is the largest heap. nil when the text is not such a table.
-// parseJstatGc, window.ts 2079-2147.
 func ParseJstatGc(pid Num, name, cmdline string, rss Num, raw string, warnings []string) *JVM {
 	lines := strings.Split(Trim(raw), "\n")
 	if len(lines) < 2 {
@@ -136,7 +133,7 @@ func jvmFlag(re *jsRegexp, cmdline, unit string) *Num {
 }
 
 // ParseJvmProcFallback describes a JVM from its command line alone: -Xmx
-// and -XX:MaxDirectMemorySize. parseJvmProcFallback, window.ts 2152-2186.
+// and -XX:MaxDirectMemorySize.
 func ParseJvmProcFallback(pid Num, name, cmdline string, rss Num, warnings []string) JVM {
 	heapMax := jvmFlag(reFlagXmx, cmdline, "m")
 	direct := jvmFlag(reFlagDirect, cmdline, "m")
@@ -148,7 +145,6 @@ func ParseJvmProcFallback(pid Num, name, cmdline string, rss Num, warnings []str
 }
 
 // parseVmRSS reads VmRSS of a status text, in bytes.
-// The VmRSS of collectSingleJvmEntry, window.ts 2047-2053.
 func parseVmRSS(raw string) Num {
 	if m, ok := reVmRSS.Match(raw); ok {
 		return ParseInt(m.Group(1)) * 1024
@@ -156,7 +152,7 @@ func parseVmRSS(raw string) Num {
 	return 0
 }
 
-// JVMInput holds what the commands of collectJvmMemory printed: pgrep -a
+// JVMInput holds what the commands of the JVM readings printed: pgrep -a
 // java (whole: its first 20 lines are read), and per pid the VmRSS line
 // and jstat -gc.
 type JVMInput struct {
@@ -179,7 +175,6 @@ func jvmName(cmdline string) string {
 
 // JvmMemory describes the Java processes: from jstat when it answers, else
 // from the command line. Nothing under extreme load.
-// collectJvmMemory and collectSingleJvmEntry, window.ts 399-434, 2033-2070.
 func JvmMemory(in JVMInput) []JVM {
 	out := []JVM{}
 	if in.Load == "extreme_load" || Trim(in.Pgrep) == "" {

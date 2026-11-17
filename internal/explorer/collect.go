@@ -1,8 +1,6 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
-// MapInput holds what the commands of collectMemoryMap printed, with the
+// MapInput holds what the commands of the memory map printed, with the
 // account they ran under. An empty text is a command that printed nothing,
 // failed or was not run.
 type MapInput struct {
@@ -14,14 +12,14 @@ type MapInput struct {
 	Lshw       string // lshw -c memory -c processor
 	SysfsCache string // the lines "SOCKET:n LEVEL:n TYPE:t SIZE:s"
 
-	// User is the account; "" counts as root, as in the reference.
+	// User is the account; "" counts as root.
 	User string
-	// Profile is what the reference knew of the host's account profile:
+	// Profile is what is known of the account profile of the host:
 	// "" (nothing known), "operator", "developer" or "custom".
 	Profile string
 }
 
-// MapResult is what collectMemoryMap returns.
+// MapResult is the memory map: slots, NUMA nodes and caches.
 type MapResult struct {
 	Dimms       []Dimm        `json:"dimms"`
 	Numa        []NumaNode    `json:"numa"`
@@ -41,8 +39,7 @@ type Unsupported struct {
 	SudoTried bool `json:"sudoTried,omitempty"`
 }
 
-// supported tells the four memory rows of the capability matrix of the
-// reference: dmidecode needs the operator profile, lshw runs partly for
+// supported tells what each account profile may run: dmidecode needs the operator profile, lshw runs partly for
 // every profile. A host of which nothing is known may run all.
 func supported(feature, profile string) bool {
 	if profile == "" {
@@ -66,7 +63,7 @@ func unsupportedReason(profile string) string {
 
 func isRootUser(user string) bool { return user == "root" || user == "" }
 
-// MapCommands returns the commands collectMemoryMap runs for an account,
+// MapCommands returns the commands the memory map runs for an account,
 // in its order: dmidecode only when the profile allows it or the account
 // is not root (then through sudo -n, as lshw).
 func MapCommands(user, profile string) []string {
@@ -98,7 +95,6 @@ func headLines(text string, n int) string {
 // MemoryMap puts the slots, the NUMA nodes and the cache sizes together:
 // slots from dmidecode, from lshw when dmidecode gives none; cache sizes
 // from lshw, from sysfs when sysfs has more packages.
-// collectMemoryMap, window.ts 802-904.
 func MemoryMap(in MapInput) MapResult {
 	dmiOK := supported("memory.dmidecode", in.Profile)
 	lshwOK := supported("memory.lshw", in.Profile)
@@ -129,7 +125,7 @@ func MemoryMap(in MapInput) MapResult {
 	return MapResult{Dimms: orEmpty(dimms), Numa: orEmpty(numa), CPUCaches: orEmpty(caches), Unsupported: un}
 }
 
-// orEmpty gives an empty list for nil, as the reference returns [].
+// orEmpty gives an empty list for nil.
 func orEmpty[T any](s []T) []T {
 	if s == nil {
 		return []T{}

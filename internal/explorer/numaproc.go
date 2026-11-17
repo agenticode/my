@@ -1,7 +1,5 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"sort"
 	"strings"
@@ -17,7 +15,6 @@ var (
 
 // ParseCgroupPath reads the memory cgroup of /proc/<pid>/cgroup: the
 // cgroup v2 line, else the memory line of v1; "/" when neither.
-// The cgroup path of memory:getProcessNuma, window.ts 1591-1607.
 func ParseCgroupPath(raw string) string {
 	path := ""
 	if raw != "" {
@@ -40,7 +37,6 @@ func NumaStatPaths(cgroup string) []string {
 }
 
 // parseCommStatus reads the text "<comm>\n---\n<VmRSS and Threads lines>".
-// The comm and status of memory:getProcessNuma, window.ts 1624-1629.
 func parseCommStatus(raw string, pid Num) (name string, rssKB, threads Num) {
 	parts := strings.Split(raw, "---")
 	name = Trim(parts[0])
@@ -68,7 +64,6 @@ type NumaStatEntry struct {
 
 // ParseNumaStat reads memory.numa_stat ("anon N0=20090880 N1=12185600") and
 // the nodes it names, in the order of their numbers.
-// The numa_stat lines of memory:getProcessNuma, window.ts 1646-1673.
 func ParseNumaStat(raw string) ([]NumaStatEntry, []string) {
 	entries := []NumaStatEntry{}
 	seen := map[string]bool{}
@@ -103,7 +98,7 @@ func ParseNumaStat(raw string) ([]NumaStatEntry, []string) {
 	return entries, orEmpty(nodes)
 }
 
-// ProcessNumaResult is what memory:getProcessNuma returns.
+// ProcessNumaResult is the memory of one process over the NUMA nodes.
 type ProcessNumaResult struct {
 	PID         Num             `json:"pid"`
 	ProcessName string          `json:"processName"`
@@ -115,8 +110,7 @@ type ProcessNumaResult struct {
 	Nodes       []string        `json:"nodes"`
 }
 
-// ProcessNumaInput holds what the commands of memory:getProcessNuma
-// printed: /proc/<pid>/cgroup, memory.numa_stat (the text NOT_AVAILABLE
+// ProcessNumaInput holds what was read for one process: /proc/<pid>/cgroup, memory.numa_stat (the text NOT_AVAILABLE
 // when neither file could be read), and the comm and status text.
 type ProcessNumaInput struct {
 	PID        Num
@@ -126,7 +120,7 @@ type ProcessNumaInput struct {
 }
 
 // ProcessNuma describes how the memory of one process lies over the NUMA
-// nodes. memory:getProcessNuma, window.ts 1577-1689.
+// nodes.
 func ProcessNuma(in ProcessNumaInput) ProcessNumaResult {
 	cg := ParseCgroupPath(in.Cgroup)
 	name, rss, threads := parseCommStatus(in.CommStatus, in.PID)

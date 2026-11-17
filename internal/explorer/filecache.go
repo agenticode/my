@@ -1,13 +1,10 @@
 package explorer
 
-// Carried over from the Memory Explorer of aterm by its author. See NOTICE.
-
 import (
 	"strings"
 )
 
-// FileCache is one file in the page cache as the reference estimates it
-// (FileCacheEntry).
+// FileCache is one file in the page cache, as estimated.
 type FileCache struct {
 	Path           string `json:"path"`
 	SizeBytes      Num    `json:"sizeBytes"`
@@ -23,7 +20,6 @@ var (
 )
 
 // InferFileType names the kind of a file by its path.
-// inferFileType, window.ts 2202-2209.
 func InferFileType(path string) string {
 	switch {
 	case strings.Contains(path, ".log") || strings.Contains(path, "/log/"):
@@ -41,8 +37,7 @@ func InferFileType(path string) string {
 }
 
 // parseCacheFields reads the kB lines of meminfo the file cache estimate
-// uses. The meminfo fields of collectFileCacheEstimate, window.ts 468-473
-// and 519-527.
+// uses.
 func parseCacheFields(raw string) Record {
 	var r Record
 	for _, line := range Lines(raw) {
@@ -63,7 +58,7 @@ func ratio(a, b Num) Num {
 
 // ParseFincore reads "fincore --bytes --noheadings": four columns (pages,
 // resident, size, file) or three, of which only size and file are read;
-// files under 1 MiB are left out. The fincore lines, window.ts 552-585.
+// files under 1 MiB are left out. The fincore
 func ParseFincore(raw string) []FileCache {
 	var out []FileCache
 	for _, line := range Lines(raw) {
@@ -97,7 +92,6 @@ func ParseFincore(raw string) []FileCache {
 // ParseStatSizes reads "stat -c '%s %n'" and estimates the cached part of
 // each file of 1 MiB and more: at most its size, or 30 % of the page cache,
 // times the share of active file pages.
-// The stat lines of collectFileCacheEstimate, window.ts 594-615.
 func ParseStatSizes(raw string, totalCached, activeRatio Num) []FileCache {
 	var out []FileCache
 	for _, line := range Lines(raw) {
@@ -127,7 +121,6 @@ func ParseStatSizes(raw string, totalCached, activeRatio Num) []FileCache {
 
 // ParseFindLarge reads "find ... -printf '%s %p\n'" and estimates half the
 // share of active file pages of each file as cached.
-// The find lines of collectFileCacheEstimate, window.ts 630-647.
 func ParseFindLarge(raw string, activeRatio Num) []FileCache {
 	var out []FileCache
 	for _, line := range Lines(raw) {
@@ -150,7 +143,7 @@ func ParseFindLarge(raw string, activeRatio Num) []FileCache {
 	return out
 }
 
-// FileCacheInput holds what the commands of collectFileCacheEstimate
+// FileCacheInput holds what the commands of the file cache estimate
 // printed. Meminfo is /proc/meminfo whole: the estimate picks its lines.
 type FileCacheInput struct {
 	Load string
@@ -166,7 +159,6 @@ type FileCacheInput struct {
 
 // FileCacheEstimate estimates the page cache per file: fincore, then stat
 // with the active ratio, then find; under load, three sums of meminfo.
-// collectFileCacheEstimate, window.ts 442-655.
 func FileCacheEstimate(in FileCacheInput) []FileCache {
 	out := []FileCache{}
 	if in.Load != "normal" || in.FdWalkDangerous {
@@ -223,7 +215,7 @@ func FileCacheEstimate(in FileCacheInput) []FileCache {
 	return out
 }
 
-// OpenFilePaths are the files the reference hands to fincore and stat: the
+// OpenFilePaths are the files handed to fincore and stat: the
 // first 50 of the list of open files.
 func OpenFilePaths(openFiles string) []string {
 	var out []string
