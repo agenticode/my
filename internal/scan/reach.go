@@ -10,6 +10,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/crashlog"
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
+	"github.com/agenticode/my/internal/adapter/hostmem"
 	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
@@ -26,7 +27,7 @@ import (
 // shown an error.
 func Reads(src model.Source) bool {
 	switch src.Kind {
-	case hostinfo.Kind, smbios.Kind, ingest.SlotMapKind, ingest.TimeAlignKind:
+	case hostinfo.Kind, smbios.Kind, hostmem.Kind, ingest.SlotMapKind, ingest.TimeAlignKind:
 		return false
 	case edacsysfs.Kind, crashlog.KindPstore, crashlog.KindKdump, bert.Kind:
 		// An empty crash log place says that no boot crashed into it,

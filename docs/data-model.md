@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 9 in this release |
+| schema version | `PRAGMA user_version`, 10 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -46,7 +46,7 @@ Identities and places:
 
 | Table | A row is |
 | --- | --- |
-| `host` | a host: name, architecture, system vendor and product, and the hypervisor when it is a virtual machine |
+| `host` | a host: name, architecture, system vendor and product, the hypervisor when it is a virtual machine, and the number of processor records of its SMBIOS tables (the sockets of the board) with the name of the first processor |
 | `boot` | one boot: start time, kernel release, BIOS and BMC version, kernel command line, and how it ended when a record shows it |
 | `dimm` | a DIMM identity: manufacturer, part number, serial number, size, type, ranks, device width, speed |
 | `slot` | a physical slot of a board, with the names the sources use for it |
@@ -62,6 +62,7 @@ Collection runs:
 | `capture_check` | what a reset right after a fatal memory error would have lost on the host when a live scan ran: one row per check of `my preflight`, with its state, the statement and what was read ([crash-loop.md](crash-loop.md)) |
 | `unread_record` | a record a reader could not use and whose text names memory: the reference, the reason and the text, at most 50 per source and 4 KiB each |
 | `registry_seen` | a message registry a BMC published: prefix, version, owner, language, the number of its messages, of those about memory, and of those this version classes, with the keys of the ones it does not |
+| `host_reading` | the text of a file or of a read-only command about the memory of a host when a scan ran (meminfo, vmstat, slab caches, NUMA nodes, `sar -B`, CPU caches): kind, key, time, where it came from, the text and whether it was cut. The Memory Explorer shows them; no rule reads them |
 
 Derived by the engine:
 

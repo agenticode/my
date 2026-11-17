@@ -460,16 +460,20 @@ func (o *options) scan(ctx context.Context, env *cli.Env, s *session, now time.T
 	if o.bmc.bmc != "" {
 		bmc = func() (adapter.Adapter, error) { return o.readBMC(ctx, env, s.lang, tmp, now) }
 	}
-	return scanInto(ctx, s.lang, path, o.root, tmp, now, bmc)
+	return scanInto(ctx, s.lang, path, o.root, tmp, now, bmc, true)
 }
 
 // scanInto scans the host, or the copy of a host's files below root, into
 // the ledger at path, which is created when it is not there. It returns
 // the ledger and the name of the host. bmc, when it is not nil, asks the
 // BMC of the host; it is called once the host is known to be worth
-// scanning, and what it returns is read in the same run.
-func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time, bmc func() (adapter.Adapter, error)) (*store.Store, string, error) {
+// scanning, and what it returns is read in the same run. Without programs
+// the programs of the Memory Explorer are not run (my serve draws nothing).
+func scanInto(ctx context.Context, lang i18n.Lang, path, root, tmp string, now time.Time, bmc func() (adapter.Adapter, error), programs bool) (*store.Store, string, error) {
 	opts := scan.Options{Root: "/", Live: true, Privileged: os.Geteuid() == 0, Now: now, TempDir: tmp}
+	if !programs {
+		opts.Numactl, opts.Numastat, opts.Sar = "-", "-", "-"
+	}
 	if root != "" && filepath.Clean(root) != "/" {
 		// A copy of a host's files: only files are read.
 		if fi, err := os.Stat(root); err != nil || !fi.IsDir() {
@@ -565,7 +569,7 @@ func blindText(lang i18n.Lang, opts *scan.Options, sources []model.Source) strin
 	}
 	for _, src := range sources {
 		switch src.Kind {
-		case "hostinfo", "smbios", ingest.SlotMapKind, ingest.TimeAlignKind:
+		case "hostinfo", "smbios", "host-memory", ingest.SlotMapKind, ingest.TimeAlignKind:
 			continue // they describe the machine and hold no error
 		}
 		line := "\n  " + src.Kind + ": " + engine.Messages.Text(lang, "status."+string(src.Status), nil)

@@ -420,3 +420,15 @@ func (b *Builder) AddBaseboard(handle uint16, manufacturer, product string) {
 	}
 	b.Add(2, handle, d, strs...)
 }
+
+// AddProcessor appends a type 4 (processor information) structure with
+// its version string.
+func (b *Builder) AddProcessor(handle uint16, version string) {
+	d := make([]byte, 48-4)
+	var strs []string
+	if version != "" {
+		strs = append(strs, version)
+		d[0x10-4] = byte(len(strs))
+	}
+	b.Add(4, handle, d, strs...)
+}

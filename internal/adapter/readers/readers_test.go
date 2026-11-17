@@ -190,7 +190,9 @@ func TestGarbage(t *testing.T) {
 				// as a valid input.
 				// Host facts that cannot be read are left out: the facts
 				// are what a host says about itself, and none is needed.
-				if statuses["ok"] == len(garbageFor(fixture)) && r.Name != "hostinfo" {
+				// A reading of the Memory Explorer is any text the file
+				// holds.
+				if statuses["ok"] == len(garbageFor(fixture)) && r.Name != "hostinfo" && r.Name != "host-memory" {
 					t.Errorf("every garbage input was read as ok: %v", statuses)
 				}
 			}()

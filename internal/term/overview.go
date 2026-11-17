@@ -205,7 +205,7 @@ func Overview(w io.Writer, ov *view.Overview, st Style, hints []Hint) error {
 
 // machineSource are the kinds of source that describe the machine and the
 // work of the scan, and hold no error record.
-var machineSource = map[string]bool{"hostinfo": true, "smbios": true, "slot-map": true, "time-align": true}
+var machineSource = map[string]bool{"hostinfo": true, "smbios": true, "host-memory": true, "slot-map": true, "time-align": true}
 
 // looseCounts writes how much the host finding is about: the errors and
 // the pages taken offline that are tied to no DIMM.

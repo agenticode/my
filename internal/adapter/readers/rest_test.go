@@ -25,6 +25,7 @@ var notImported = map[string]string{
 	"dcbrain":       "the dataset is read by my eval only",
 	"edac-sysfs":    "read from a copy of a host's files only",
 	"hostinfo":      "read from a copy of a host's files only",
+	"host-memory":   "read from a copy of a host's files only",
 	"smbios/tables": "read from a copy of a host's files only",
 	"redfish/tree":  "the reader of redfish/file, given a directory",
 	"sel/binary":    "the reader of sel/text and sel/json; a file is only taken for one of 16-byte records when they are records",

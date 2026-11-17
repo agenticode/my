@@ -174,7 +174,19 @@ func (c *Case) Board(ctx context.Context, h *engine.HostResult) (*Board, error) 
 	var bh boardHost
 	for _, x := range hosts {
 		if x.Name == h.Host {
-			bh.vendor = x.SystemVendor
+			bh.vendor, bh.processor, bh.sockets = x.SystemVendor, x.CPU, x.Sockets
+		}
+	}
+	readings, err := c.store.Readings(ctx, h.Host)
+	if err != nil {
+		return nil, err
+	}
+	for _, r := range readings {
+		switch r.Kind {
+		case model.ReadingLshw:
+			bh.lshw = r.Text
+		case model.ReadingCPUCache:
+			bh.cpuCache = r.Text
 		}
 	}
 	return boardOf(c.Lang, h, slots, bh), nil
