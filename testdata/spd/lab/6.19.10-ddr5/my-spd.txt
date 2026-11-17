@@ -1,0 +1,6 @@
+host lab-spd  QEMU lab-spd  SPD not read: SPD driver did not bind
+ The driver spd5118 is loaded and did not bind 0-0050, 0-0051. On DDR5 the driver has to write the
+ page register of the hub, and a controller set to block writes to the SPD addresses refuses that. A
+ scan as root reads the setting.
+ SMBIOS lists 4 slots.
+ Search the kernel log for spd5118.

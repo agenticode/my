@@ -89,6 +89,22 @@ The guest names no DIMM for a machine check: the errors of the machine check loo
 | The journal filed every kernel message of the boot under `localhost` or the name of the prepared disk, `lab-prep`: cloud-init renamed the guest after the last one. An import of the journal alone names the host `lab-prep` | `journal-k.json` |
 | Three guests booted at once on the lab host were so slow that systemd stopped waiting for the disk of `/home`, and two of them stayed in emergency mode. `boards.sh` runs one guest at a time | the consoles of the first attempt |
 
+## SPD
+
+`tools/lab/spd.sh` boots an x86 guest of the q35 machine on the Fedora 44 cloud image, whose kernel `6.19.10-300.fc44` has `i2c_i801`, `ee1004` and `spd5118` as modules. QEMU gives the q35 machine an ICH9 SMBus controller (PCI ID `8086:2930`) with eight EEPROMs at 0x50 to 0x57 and fills them with zeros (`hw/i386/pc_q35.c` and `hw/i2c/smbus_eeprom.c`, read in the source of 11.1.3; the guests ran the Fedora package 10.2.2). `smbios17.py` describes two populated and two empty slots, DDR4 in one boot and DDR5 in the next, so that the kernel creates SPD clients on that bus. MemorY ran as root with `MY_DEBUG=spd-vm`, without which it stops at the virtual machine. It is the only run of the probe and of a read against a real kernel; nothing was written to the bus. The copies `my collect host` wrote are in `testdata/spd/lab`, and `TestLabGuests` reads them.
+
+| Copy | What the kernel did | What MemorY said |
+| --- | --- | --- |
+| `6.19.10-ddr4` | `i801_smbus` bound the controller and the kernel created `ee1004` clients at 0x50 and 0x51. `ee1004` bound both and logged `Failed to select page 0 (-6)`, since nothing answers at 0x36 and 0x37. Each read of the 512-byte `eeprom` file ended in ENXIO at offset 0 | two readings of state `io` with `ENXIO`, reason `read-failed` |
+| `6.19.10-ddr5` | the kernel created `spd5118` clients at 0x50 and 0x51. The driver was loaded and bound neither, with no line in the kernel log: where a hub has its type registers the EEPROMs read 0 | reason `spd-driver-refused`; the probe read SPD write disable clear (`spd-wd=0`) |
+
+What the guests changed and showed:
+
+- The text of `spd-driver-refused` said that a controller set to block writes refuses the driver of a DDR5 hub, also when a scan as root had read that the controller lets them through. With the bit read clear it now says so, and that `spd5118` refuses a device whose type registers do not name a hub without writing to the kernel log.
+- For `ee1004` and ENXIO, the text of `read-failed` now names the page select addresses and the line the kernel logs.
+- The EEPROMs gave no byte, so the decoder and the states `ok`, `crc`, `short`, `type` and `blank` were not reached in the lab. The design expected `type` here.
+- As the user `nobody` the guest showed no kernel log and no other source of error records, and `my spd` ended with exit 70 before the SPD: a scan that reads no such source says so and draws no screen. `my spd FILE` and a copy that `my collect host` wrote as root do not depend on it.
+
 ## What the captures changed
 
 Each of these was wrong or missing before the capture showed it.
@@ -137,6 +153,7 @@ Each of these was wrong or missing before the capture showed it.
 - Machine check banks of real hardware: corrected error interrupts, whether a board keeps a record in its bank across the reset after a fatal error (QEMU does), the decoding of AMD processors (their memory banks lie above the ten banks QEMU emulates).
 - The boot error region of real firmware, and an ERST or EFI variable store of real firmware under repeated panics; the entries a BMC makes about a crash.
 - ACPI error injection (EINJ), and firmware-first handling on x86: QEMU builds a firmware error source for aarch64 guests only.
+- An SPD with data in it, SPD write disable set, a bus a BMC shares, the I3C path, and the SMBus of AMD (`i2c-piix4`) and arm64 boards: the EEPROMs of QEMU hold zeros and answer on an ICH9 controller only.
 - A BMC, a GPU, repairs by the BIOS or a BMC. The CXL devices are emulated: their records and repairs are real to the kernel, their memory cells are not.
 - Time: every capture spans minutes. Trends over days, the 30 day baseline and a database that grew for months are not in them.
 - Other versions: two kernels (7.3.0 on x86, 6.19.10 on aarch64) and two versions of rasdaemon (0.8.0 as packaged, 1.0.0).
@@ -175,6 +192,8 @@ $LAB/tools/loop-arm.sh disk && $LAB/tools/loop-arm.sh boot && $LAB/tools/loop-ar
 $LAB/tools/loop-arm.sh run $LAB/tools/loop-arm-spread.plan && $LAB/tools/loop-arm.sh capture spread    # set kernel.panic=30 first: see 6.19.10-ghes-loop-spread
 $LAB/tools/boards.sh image && $LAB/tools/boards.sh prepare
 for g in two-sockets digits letters; do $LAB/tools/boards.sh boot $g && $LAB/tools/boards.sh collect $g && $LAB/tools/boards.sh stop $g; done
+$LAB/tools/spd.sh image
+for t in ddr4 ddr5; do $LAB/tools/spd.sh boot $t && $LAB/tools/spd.sh run $t && $LAB/tools/spd.sh stop; done
 python3 tools/lab/sanitize.py $LAB/cap/mce testdata/real/7.3.0-mce --replace <build host>=lab-vm
 ```
 

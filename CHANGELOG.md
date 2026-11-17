@@ -31,7 +31,7 @@ Ledger schema 12.
 
 ### Known limits
 
-- No SPD has been read on a real server. The decoder was checked against 8 public DDR4 and DDR5 dumps and the reader against made sysfs trees. On most server boards Linux has no path to the SPD; MemorY then names the reason and reads a dump.
+- No SPD has been read on a real server. The decoder was checked against 8 public DDR4 and DDR5 dumps, the reader against made sysfs trees and in two emulated guests whose EEPROMs hold no SPD ([docs/validation-lab.md](docs/validation-lab.md#spd)). On most server boards Linux has no path to the SPD; MemorY then names the reason and reads a dump.
 
 ## [1.0.0] - 2026-11-16
 

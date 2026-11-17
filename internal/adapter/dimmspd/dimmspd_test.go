@@ -354,3 +354,22 @@ func TestShortTextsInKorean(t *testing.T) {
 		}
 	}
 }
+
+// The setting of SPD write disable as a scan as root read it: set on one
+// controller, clear on every one, or not read.
+func TestWriteSetting(t *testing.T) {
+	for _, tt := range []struct {
+		pci               string
+		disabled, enabled bool
+	}{
+		{"pci 0000:00:1f.4 id=8086:a323 driver=i801_smbus spd-wd=1", true, false},
+		{"pci 0000:00:1f.3 id=8086:2930 driver=i801_smbus spd-wd=0", false, true},
+		{"pci 0000:00:1f.3 id=8086:2930 driver=i801_smbus spd-wd=0\npci 0000:80:1f.4 id=8086:a323 driver=i801_smbus spd-wd=1", true, false},
+		{"pci 0000:00:1f.4 id=8086:a323 driver=i801_smbus", false, false},
+	} {
+		p := ParseProbe("spd-probe 1\ni2c present\n" + tt.pci + "\n")
+		if p.WriteDisabled() != tt.disabled || p.WriteEnabled() != tt.enabled {
+			t.Errorf("%q: disabled %v enabled %v, want %v %v", tt.pci, p.WriteDisabled(), p.WriteEnabled(), tt.disabled, tt.enabled)
+		}
+	}
+}

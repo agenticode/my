@@ -1,0 +1,9 @@
+spd-probe 1
+i2c present
+adapter i2c-0 "SMBus I801 adapter at 0000:00:1f.3"
+pci 0000:00:1f.3 id=8086:2930 driver=i801_smbus spd-wd=0
+driver i801_smbus registered
+driver ee1004 registered
+driver spd5118 module
+client 0-0050 name=ee1004 driver=ee1004 eeprom=512 read=0 state=io errno=ENXIO at=0
+client 0-0051 name=ee1004 driver=ee1004 eeprom=512 read=0 state=io errno=ENXIO at=0

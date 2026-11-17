@@ -296,3 +296,50 @@ func TestDemoCase(t *testing.T) {
 		testutil.Golden(t, "spd/demo-"+lang+".txt", []byte(out))
 	}
 }
+
+// The copies my collect host wrote in the two guests of tools/lab/spd.sh,
+// the one run of the probe and of a read against a real kernel
+// (docs/validation-lab.md): the EEPROMs of QEMU hold no SPD and nothing
+// answers at the page select addresses.
+func TestLabGuests(t *testing.T) {
+	for _, tt := range []struct {
+		dir, reason, detail string
+		has, hasNot         []string
+	}{
+		// ee1004 bound both clients; every read ended in ENXIO.
+		{"6.19.10-ddr4", dimmspd.ReasonReadFailed, "errno=ENXIO at=0",
+			[]string{"ENXIO on /sys/bus/i2c/devices/0-0050/eeprom", "page select addresses 0x36 and 0x37"}, nil},
+		// spd5118 bound neither, and the controller lets writes through.
+		{"6.19.10-ddr5", dimmspd.ReasonSPDDriverRefused, "",
+			[]string{"did not bind 0-0050, 0-0051", "lets writes to the SPD addresses through"}, []string{"block writes"}},
+	} {
+		t.Run(tt.dir, func(t *testing.T) {
+			root := testutil.Testdata(t, "spd", "lab", tt.dir, "collect")
+			code, out := spdScreen(t, root, "spd", "--lang", "en", "--width", "100")
+			if code != 0 {
+				t.Errorf("exit %d", code)
+			}
+			for _, s := range tt.has {
+				if !strings.Contains(strings.ReplaceAll(out, "\n ", " "), s) {
+					t.Errorf("no %q in\n%s", s, out)
+				}
+			}
+			for _, s := range tt.hasNot {
+				if strings.Contains(strings.ReplaceAll(out, "\n ", " "), s) {
+					t.Errorf("%q in\n%s", s, out)
+				}
+			}
+			_, js := spdScreen(t, root, "spd", "--json")
+			if !strings.Contains(js, `"code": "`+tt.reason+`"`) {
+				t.Errorf("reason is not %s:\n%s", tt.reason, js)
+			}
+			if tt.detail != "" && strings.Count(js, `"detail": "`+tt.detail+`"`) != 2 {
+				t.Errorf("not 2 readings with %s:\n%s", tt.detail, js)
+			}
+			ko, _ := spdScreen(t, root, "spd", "--lang", "ko", "--width", "100")
+			if ko != code {
+				t.Errorf("exit %d in Korean, %d in English", ko, code)
+			}
+		})
+	}
+}

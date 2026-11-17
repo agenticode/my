@@ -560,9 +560,22 @@ func (c *Case) spdReason(p *dimmspd.Probe, code string, slots int, memType strin
 	}
 	r := &SPDReason{Code: code, Short: Text{Code: "spd.short." + code, Text: engine.DetailText(c.Lang, dimmspd.Short(p, code))}}
 	r.Text = c.spdText("spd.reason."+code, args...)
-	if code == dimmspd.ReasonSPDDriverRefused && p.SPDDriver() == "spd5118" && !p.WriteDisabled() {
-		extra := c.spdText("spd.reason.refused_ddr5")
-		r.Text.Text += " " + extra.Text
+	// What else the driver of the clients does: spd5118 writes the page
+	// register of the hub, which a controller can block, and refuses a
+	// device whose type registers do not name a hub without a line in the
+	// kernel log; ee1004 gives ENXIO also when nothing answers at the page
+	// select addresses (seen in the lab, docs/validation-lab.md).
+	var extra string
+	switch {
+	case code == dimmspd.ReasonSPDDriverRefused && p.SPDDriver() == "spd5118" && p.WriteEnabled():
+		extra = "spd.reason.refused_ddr5_open"
+	case code == dimmspd.ReasonSPDDriverRefused && p.SPDDriver() == "spd5118" && !p.WriteDisabled():
+		extra = "spd.reason.refused_ddr5"
+	case code == dimmspd.ReasonReadFailed && p.SPDDriver() == "ee1004" && firstErrno(p) == "ENXIO":
+		extra = "spd.reason.enxio_ee1004"
+	}
+	if extra != "" {
+		r.Text.Text += " " + c.spdText(extra).Text
 	}
 	if SPDMessages.Has("spd.step." + code) {
 		t := c.spdText("spd.step."+code, args...)
@@ -595,6 +608,16 @@ func typeOf(decoded []spd.Decoded) string {
 }
 
 // reasonArgs are the values the texts of a reason name.
+// firstErrno is the error of the first client whose read ended in one.
+func firstErrno(p *dimmspd.Probe) string {
+	for _, cl := range p.Clients {
+		if cl.Errno != "" {
+			return cl.Errno
+		}
+	}
+	return ""
+}
+
 func reasonArgs(p *dimmspd.Probe, code string) []any {
 	kv := []any{"what", p.Virtual}
 	if c, ok := p.SMBusController(); ok {

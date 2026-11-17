@@ -1,0 +1,3 @@
+i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+i2c i2c-0: Successfully instantiated SPD at 0x50
+i2c i2c-0: Successfully instantiated SPD at 0x51
