@@ -18,3 +18,4 @@ func (discard) BIOSSetting(*model.BIOSSetting) error { return nil }
 func (discard) BMCMemory(*model.BMCMemory) error     { return nil }
 func (discard) Firmware(*model.FirmwareRecord) error { return nil }
 func (discard) Registry(*model.RegistrySeen) error   { return nil }
+func (discard) Reading(*model.HostReading) error     { return nil }

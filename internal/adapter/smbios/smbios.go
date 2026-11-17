@@ -132,6 +132,12 @@ func (a *Adapter) emit(sink adapter.Sink, rep *adapter.Report, structs []Structu
 			if host.Board == "" {
 				host.Board = strings.TrimSpace(clean(s.str(0x04)) + " " + clean(s.str(0x05)))
 			}
+		case 4:
+			// Each processor record is a socket of the board.
+			host.Sockets++
+			if host.CPU == "" {
+				host.CPU = clean(s.str(0x10))
+			}
 		case 17:
 			rep.Records++
 			m := memoryDevice(s)
@@ -241,6 +247,13 @@ func (a *Adapter) dmidecode(r io.Reader, sink adapter.Sink, rep *adapter.Report)
 		case 2:
 			if host.Board == "" {
 				host.Board = strings.TrimSpace(clean(fields["Manufacturer"]) + " " + clean(fields["Product Name"]))
+			}
+		case 4:
+			// Each processor record is a socket of the board; text of
+			// dmidecode -t memory has none.
+			host.Sockets++
+			if host.CPU == "" {
+				host.CPU = clean(fields["Version"])
 			}
 		case 17:
 			rep.Records++

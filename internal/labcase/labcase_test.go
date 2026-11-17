@@ -123,7 +123,7 @@ type forms struct {
 var captures = []capture{
 	{
 		dir: "7.3.0-baseline", host: "lab-vm", virtual: "VMware", journal: true,
-		sources: []string{"hostinfo ok", "rasdaemon empty", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon empty", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictOK,
 		notes:   []string{"smbios: 128 memory slots, 3 populated"},
 	},
@@ -131,7 +131,7 @@ var captures = []capture{
 		dir: "7.3.0-hwpoison", host: "lab-vm", virtual: "VMware", journal: true, hard: 4,
 		reports: []string{"klog/offline", "rasdaemon/memory_failure_event"},
 		forms:   &forms{actions: 4, kernel: "7.3.0-ras", note: "klog: 4 page offlines were asked for by a program"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		// The pages name no DIMM: the host finding watches them, and its
 		// check says that a program asked for them.
 		finding: model.VerdictObserve, said: model.VerdictOK, loose: []string{"R-HOST-02"}, asked: true,
@@ -143,7 +143,7 @@ var captures = []capture{
 		dir: "7.3.0-soft-offline", host: "lab-vm", virtual: "VMware", journal: true, soft: 3, earlier: 4,
 		// The kernel traces no soft offline: rasdaemon has nothing of this boot.
 		reports: []string{"klog/offline"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		// The kernel log of this boot does not say that a program asked
 		// for a soft offline, and the four pages of the boot before are
 		// known from the database alone: nothing marks them as asked for.
@@ -157,7 +157,7 @@ var captures = []capture{
 		// The kernel log has no machine check record: a logged record is
 		// not printed by default.
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
 		notes: []string{"klog: the machine check injector (mce-inject) was set up in a boot of this log"},
 	},
@@ -166,7 +166,7 @@ var captures = []capture{
 		// error is in two sources and counts once.
 		dir: "7.3.0-mce-print-all", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
 	},
 	{
@@ -174,7 +174,7 @@ var captures = []capture{
 		// times are ahead of the kernel's for the whole run.
 		dir: "7.3.0-mce-clock-step", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/mce", "klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
 		notes: []string{"rasdaemon: 13 records are dated by the kernel's time"},
 	},
@@ -183,7 +183,7 @@ var captures = []capture{
 		// mce_record, and the signals the kernel sent in a table of their own.
 		dir: "7.3.0-mce-rasdaemon-1.0", host: "lab-guest", virtual: "QEMU", ce: 7, ue: 3, gradeB: 10, hard: 3, soft: 2, noDIMM: 10,
 		reports: []string{"klog/offline", "rasdaemon/mce_record", "rasdaemon/memory_failure_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictHoldReplacement, said: model.VerdictOK, loose: []string{"R-HOST-01", "R-HOST-02"},
 		notes: []string{"rasdaemon: table signal_event: 3 rows not read"},
 	},
@@ -192,7 +192,7 @@ var captures = []capture{
 		// device is the DIMM: its serial number is its identity.
 		dir: "7.3.0-cxl", host: "lab-guest", virtual: "QEMU", ce: 11, ue: 1, gradeA: 9, gradeB: 3,
 		reports: []string{"rasdaemon/cxl_dram_event", "rasdaemon/cxl_general_media_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		finding: model.VerdictReplaceNow,
 		dimms: []dimm{{slot: "cxl:mem0", serial: "0x4c41420001", ce: 11, ue: 1, grade: model.VerdictReplaceNow, mode: model.ModeRow,
 			rules: []string{"R-UE-01", "R-FW-01"}}},
@@ -204,7 +204,7 @@ var captures = []capture{
 		// answers the PPR with a memory sparing record that leaves 2 spares.
 		dir: "7.3.0-cxl-repair", host: "lab-guest", virtual: "QEMU", ce: 15, gradeA: 15,
 		reports: []string{"rasdaemon/cxl_dram_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs empty", "smbios ok", "host-memory ok"},
 		// The guest sees the files of the lab host. Its own scan read
 		// pstore, mcelog and the crash dumps of the lab host as well, and
 		// found a page taken offline in the kernel log of a crash of the
@@ -228,7 +228,7 @@ var captures = []capture{
 		// the kernel log only.
 		dir: "6.19.10-ghes", host: "lab-arm", virtual: "QEMU", journal: true, ce: 24, ue: 2, gradeA: 26, hard: 2,
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok", "host-memory ok"},
 		finding: model.VerdictReplaceNow,
 		dimms: []dimm{{slot: "DIMM 0", serial: "LAB00A64", ce: 24, ue: 2, grade: model.VerdictReplaceNow, mode: model.ModeMultiRow,
 			rules: []string{"R-UE-01", "R-SCRUB-01"}}},
@@ -244,7 +244,7 @@ var captures = []capture{
 		clock:   -10 * time.Second,
 		before:  state{ce: 24, ue: 2, gradeA: 26, hard: 2},
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok", "host-memory ok"},
 		finding: model.VerdictReplaceNow,
 		notes:   []string{"time-align: rasdaemon stamped 11 records of one boot"},
 		dimms:   []dimm{{slot: "DIMM 0", serial: "LAB00A64", ce: 10, ue: 1, grade: model.VerdictReplaceNow, mode: model.ModeRow, rules: []string{"R-UE-01"}}},
@@ -256,7 +256,7 @@ var captures = []capture{
 		// the first two are in the rasdaemon database alone.
 		dir: "6.19.10-ghes-multi", host: "lab-arm6", virtual: "QEMU", journal: true, boots: 3, ce: 35, ue: 1, gradeA: 36, hard: 1,
 		reports: []string{"klog/edac", "klog/ghes", "klog/offline", "rasdaemon/mc_event"},
-		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok"},
+		sources: []string{"hostinfo ok", "rasdaemon ok", "klog ok", "edac-sysfs ok", "smbios ok", "host-memory ok"},
 		live:    []string{"hostinfo ok", "rasdaemon ok", "klog ok", "klog ok", "edac-sysfs ok", "smbios ok"},
 		finding: model.VerdictConsiderReplacement,
 		dimms: []dimm{
@@ -920,6 +920,15 @@ func TestWhatMySaidOnTheHost(t *testing.T) {
 			if c.live != nil {
 				want = c.live
 			}
+			// The live runs were made before the readings of the Memory
+			// Explorer existed.
+			var older []string
+			for _, w := range want {
+				if !strings.HasPrefix(w, "host-memory ") {
+					older = append(older, w)
+				}
+			}
+			want = older
 			if strings.Join(got, ", ") != strings.Join(want, ", ") {
 				t.Errorf("live sources: %s\n        want: %s", strings.Join(got, ", "), strings.Join(want, ", "))
 			}

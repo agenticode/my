@@ -17,6 +17,7 @@ import (
 	"github.com/agenticode/my/internal/adapter/edacsysfs"
 	"github.com/agenticode/my/internal/adapter/fmfm"
 	"github.com/agenticode/my/internal/adapter/hostinfo"
+	"github.com/agenticode/my/internal/adapter/hostmem"
 	"github.com/agenticode/my/internal/adapter/klog"
 	"github.com/agenticode/my/internal/adapter/mcelog"
 	"github.com/agenticode/my/internal/adapter/nvidia"
@@ -94,6 +95,9 @@ func List() []Reader {
 		{Name: "fmfm", Package: "fmfm", Fixture: "testdata/fmfm/runtime.json",
 			Open: func(p string) adapter.Adapter { return fmfm.NewFile(p, fmfm.Options{Now: When}) },
 			Bad:  []byte(`{"ErrorDT": "2026-11-12T03:14:07Z", "Records": [` + garbageText)},
+		{Name: "host-memory", Package: "hostmem", Fixture: "testdata/explorer/made-two-nodes", Main: "proc/meminfo",
+			Open:     func(p string) adapter.Adapter { return hostmem.New(p, hostmem.Options{Now: When}) },
+			HostPath: "proc/meminfo"},
 		{Name: "hostinfo", Package: "hostinfo", Fixture: "testdata/real/6.19.10-bert-loop", Main: "proc/cpuinfo",
 			Open:     func(p string) adapter.Adapter { return hostinfo.New(os.DirFS(p), p, hostinfo.Options{Now: When}) },
 			HostPath: "proc/cpuinfo"},

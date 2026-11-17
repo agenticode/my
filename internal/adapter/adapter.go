@@ -49,6 +49,9 @@ type Sink interface {
 	// Registry takes a message registry a BMC published, with how much of
 	// it this version classes.
 	Registry(*model.RegistrySeen) error
+	// Reading takes the text of a file or command about the memory of the
+	// host (the Memory Explorer); it holds no error record.
+	Reading(*model.HostReading) error
 }
 
 // Report says how reading a source went. Every adapter returns one, also
@@ -176,6 +179,7 @@ type Collected struct {
 	Memory     []*model.BMCMemory
 	Firmwares  []*model.FirmwareRecord
 	Registries []*model.RegistrySeen
+	Readings   []*model.HostReading
 }
 
 func (c *Collected) Host(h *model.Host) error     { c.Hosts = append(c.Hosts, h); return nil }
@@ -204,6 +208,10 @@ func (c *Collected) Firmware(f *model.FirmwareRecord) error {
 }
 func (c *Collected) Registry(r *model.RegistrySeen) error {
 	c.Registries = append(c.Registries, r)
+	return nil
+}
+func (c *Collected) Reading(r *model.HostReading) error {
+	c.Readings = append(c.Readings, r)
 	return nil
 }
 

@@ -265,9 +265,11 @@ func (w *Writer) UpsertHost(h *model.Host) error {
 	if h.Name == "" {
 		return invalid("host: name is empty")
 	}
-	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, virtual, first_seen, last_seen)
- VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, virtual, sockets, cpu, first_seen, last_seen)
+ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
  ON CONFLICT(name) DO UPDATE SET
+  sockets        = CASE WHEN excluded.sockets        > 0  THEN excluded.sockets        ELSE sockets        END,
+  cpu            = CASE WHEN excluded.cpu            != '' THEN excluded.cpu            ELSE cpu            END,
   arch           = CASE WHEN excluded.arch           != '' THEN excluded.arch           ELSE arch           END,
   system_vendor  = CASE WHEN excluded.system_vendor  != '' THEN excluded.system_vendor  ELSE system_vendor  END,
   system_product = CASE
@@ -283,7 +285,7 @@ func (w *Writer) UpsertHost(h *model.Host) error {
     ELSE excluded.virtual END,
   first_seen = MIN(COALESCE(first_seen, excluded.first_seen), COALESCE(excluded.first_seen, first_seen)),
   last_seen  = MAX(COALESCE(last_seen, excluded.last_seen), COALESCE(excluded.last_seen, last_seen))`,
-		h.Name, h.Arch, h.SystemVendor, h.SystemProduct, h.Board, h.Virtual, ts(h.FirstSeen), ts(h.LastSeen))
+		h.Name, h.Arch, h.SystemVendor, h.SystemProduct, h.Board, h.Virtual, h.Sockets, h.CPU, ts(h.FirstSeen), ts(h.LastSeen))
 	return err
 }
 
@@ -994,7 +996,7 @@ func (w *Writer) PutCaptureChecks(scanID int64, host string, checks []model.Capt
 }
 
 // DropScan removes a scan that added nothing: its row, its source
-// inventory and capture checks, and the counter readings of the host taken
+// inventory, capture checks and readings, and the counter readings of the host taken
 // since the scan started, which repeat the readings before. A ledger that
 // is read at every boot would otherwise grow by those rows each time.
 func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
@@ -1003,6 +1005,7 @@ func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
 		args []any
 	}{
 		{`DELETE FROM capture_check WHERE scan_id = ?`, []any{scanID}},
+		{`DELETE FROM host_reading WHERE scan_id = ?`, []any{scanID}},
 		{`DELETE FROM source WHERE scan_id = ?`, []any{scanID}},
 		{`DELETE FROM counter_sample WHERE host = ? AND observed_at >= ?`, []any{host, ts(since)}},
 		{`DELETE FROM scan WHERE id = ?`, []any{scanID}},
@@ -1021,4 +1024,30 @@ func (w *Writer) DropScan(scanID int64, host string, since time.Time) error {
 		}
 	}
 	return nil
+}
+
+// MaxReadingBytes bounds the text of one reading in the ledger.
+const MaxReadingBytes = 4 << 20
+
+// PutReading keeps a reading. A reading of the same host, kind, key and
+// time replaces the one before.
+func (w *Writer) PutReading(r *model.HostReading) error {
+	switch {
+	case r.Host == "":
+		return invalid("reading: host is empty")
+	case r.Kind == "":
+		return invalid("reading: kind is empty")
+	case r.TakenAt.IsZero():
+		return invalid("reading %s: no time", r.Kind)
+	case len(r.Text) > MaxReadingBytes:
+		return invalid("reading %s: %d bytes, more than %d", r.Kind, len(r.Text), MaxReadingBytes)
+	}
+	var scan any
+	if r.ScanID > 0 {
+		scan = r.ScanID
+	}
+	_, err := w.exec(`INSERT INTO host_reading (host, scan_id, kind, key, taken_at, origin, text, cut) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ ON CONFLICT(host, kind, key, taken_at) DO UPDATE SET scan_id = excluded.scan_id, origin = excluded.origin, text = excluded.text, cut = excluded.cut`,
+		r.Host, scan, r.Kind, r.Key, ts(r.TakenAt), r.Origin, r.Text, r.Cut)
+	return err
 }

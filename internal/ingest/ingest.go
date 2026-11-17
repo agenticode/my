@@ -663,6 +663,17 @@ func (k *sink) Registry(r *model.RegistrySeen) error {
 	return k.refuse(r.Prefix, k.w.PutRegistrySeen(r))
 }
 
+// Reading keeps the text of a file or command about the memory of the
+// host. It is counted as a record of the source, in no total.
+func (k *sink) Reading(r *model.HostReading) error {
+	r.Host, r.ScanID = k.host, k.scanID
+	if err := k.w.PutReading(r); err != nil {
+		return k.refuse(r.Kind, err)
+	}
+	k.src.Samples++
+	return nil
+}
+
 // sample counts a reading that is neither an event nor an action: a GPU
 // memory record, an ECS reading, or what a BMC says about itself, the BIOS
 // settings and a memory module.

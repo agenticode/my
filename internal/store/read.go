@@ -289,7 +289,7 @@ func (s *Store) Daily(ctx context.Context, f EventFilter, offsetSeconds int) ([]
 
 // Hosts returns the hosts in the ledger.
 func (s *Store) Hosts(ctx context.Context) ([]model.Host, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT name, arch, system_vendor, system_product, board, virtual, first_seen, last_seen FROM host ORDER BY name`)
+	rows, err := s.db.QueryContext(ctx, `SELECT name, arch, system_vendor, system_product, board, virtual, sockets, cpu, first_seen, last_seen FROM host ORDER BY name`)
 	if err != nil {
 		return nil, err
 	}
@@ -298,7 +298,7 @@ func (s *Store) Hosts(ctx context.Context) ([]model.Host, error) {
 	for rows.Next() {
 		var h model.Host
 		var first, last sql.NullString
-		if err := rows.Scan(&h.Name, &h.Arch, &h.SystemVendor, &h.SystemProduct, &h.Board, &h.Virtual, &first, &last); err != nil {
+		if err := rows.Scan(&h.Name, &h.Arch, &h.SystemVendor, &h.SystemProduct, &h.Board, &h.Virtual, &h.Sockets, &h.CPU, &first, &last); err != nil {
 			return nil, err
 		}
 		h.FirstSeen, h.LastSeen = parseTS(first), parseTS(last)
@@ -1120,4 +1120,26 @@ func (s *Store) RecordCounts(ctx context.Context) (map[string]int64, error) {
 		out[t] = n
 	}
 	return out, nil
+}
+
+// Readings returns the latest reading of each kind and key of a host.
+func (s *Store) Readings(ctx context.Context, host string) ([]model.HostReading, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT r.host, COALESCE(r.scan_id, 0), r.kind, r.key, r.taken_at, r.origin, r.text, r.cut FROM host_reading r
+ WHERE r.host = ? AND r.taken_at = (SELECT MAX(x.taken_at) FROM host_reading x WHERE x.host = r.host AND x.kind = r.kind AND x.key = r.key)
+ ORDER BY r.kind, r.key`, host)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []model.HostReading
+	for rows.Next() {
+		var r model.HostReading
+		var at string
+		if err := rows.Scan(&r.Host, &r.ScanID, &r.Kind, &r.Key, &at, &r.Origin, &r.Text, &r.Cut); err != nil {
+			return nil, err
+		}
+		r.TakenAt = parseTS(sql.NullString{String: at, Valid: true})
+		out = append(out, r)
+	}
+	return out, rows.Err()
 }
