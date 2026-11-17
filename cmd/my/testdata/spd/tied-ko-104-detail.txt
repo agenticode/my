@@ -1,0 +1,140 @@
+호스트 r12-n034  Example Systems R760  DIMM 16개 중 16개의 SPD (spd5118), 시리얼로 연결
+16 x Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A  DDR5 RDIMM 64 GB 2Rx4  16 Gb 다이
+
+ 슬롯     주차      위치  시리얼    판정
+ CPU0_A1  2022-W43  0x06  5C331BCD  정상
+          SPD 리비전 1.0, ROOT/spd/0-0050.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x50, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_B1  2023-W08  0x06  7FF0C3B9  정상
+          SPD 리비전 1.0, ROOT/spd/0-0051.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x51, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_C1  2022-W43  0x06  56A80D01  즉시 교체
+          SPD 리비전 1.0, ROOT/spd/0-0052.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x52, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_D1  2023-W08  0x06  AE2CD51D  정상
+          SPD 리비전 1.0, ROOT/spd/0-0053.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x53, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_E1  2023-W08  0x06  B6332238  정상
+          SPD 리비전 1.0, ROOT/spd/0-0054.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x54, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_F1  2023-W08  0x06  A8A64B3B  정상
+          SPD 리비전 1.0, ROOT/spd/0-0055.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x55, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_G1  2023-W08  0x06  1D2C9305  정상
+          SPD 리비전 1.0, ROOT/spd/0-0056.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x56, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU0_H1  2023-W08  0x06  DBC9CEE9  정상
+          SPD 리비전 1.0, ROOT/spd/0-0057.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-0, 주소 0x57, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_A1  2023-W08  0x06  B7F782AE  정상
+          SPD 리비전 1.0, ROOT/spd/1-0050.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x50, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_B1  2023-W08  0x06  41102AC3  정상
+          SPD 리비전 1.0, ROOT/spd/1-0051.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x51, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_C1  2023-W08  0x06  D848BE33  정상
+          SPD 리비전 1.0, ROOT/spd/1-0052.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x52, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_D1  2022-W43  0x06  7A399A55  관찰
+          SPD 리비전 1.0, ROOT/spd/1-0053.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x53, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_E1  2023-W08  0x06  12AE3490  정상
+          SPD 리비전 1.0, ROOT/spd/1-0054.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x54, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_F1  2023-W08  0x06  8671F24B  정상
+          SPD 리비전 1.0, ROOT/spd/1-0055.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x55, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_G1  2023-W08  0x06  B88F2453  정상
+          SPD 리비전 1.0, ROOT/spd/1-0056.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x56, 드라이버 spd5118
+          연결 근거: 시리얼
+ CPU1_H1  2023-W08  0x06  D6A7388B  정상
+          SPD 리비전 1.0, ROOT/spd/1-0057.bin에서
+          1,024바이트 읽음
+          0-509바이트 CRC: 저장값 0x3353, 계산값 0x3353 (ok)
+          패키지당 다이 1개 (monolithic)
+          DRAM 제조사 Micron Technology (JEDEC bank 1, 0x2C), 스테핑 0x41, 모듈 리비전 0x31
+          버스 i2c-1, 주소 0x57, 드라이버 spd5118
+          연결 근거: 시리얼
+
+ 날짜 코드
+ Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+ 주차      DIMM  판정  UE  판정 있는 슬롯
+ 2022-W43     3     2   1  CPU0_C1 CPU1_D1
+ 2023-W08    13     0   0
+ 판정이 있는 DIMM 2개 중 2개가 2022-W43이고, 판정이 없는 DIMM 14개 중 1개도 2022-W43임.
+ 이 표는 SPD의 날짜 코드로 모듈을 센 것임. 생산 로트에 문제가 있는지는 제조사의 고장 분석이 판단함.

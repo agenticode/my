@@ -80,6 +80,18 @@ func app() *cli.App {
 				Run:       live(runInventory),
 			},
 			{
+				Name:      "spd",
+				Summary:   "what each module says in its SPD: week made, ranks and device width, maker, serial; or decode dump files",
+				SummaryKO: "모듈이 SPD에 적은 내용: 제조 주차, rank와 장치 폭, 제조사, 시리얼. 또는 덤프 파일 해석",
+				Run:       live(runSPD),
+			},
+			{
+				Name:      "lots",
+				Summary:   "DIMMs by maker, part number and week made, those with a finding beside those without one",
+				SummaryKO: "제조사, 부품 번호, 제조 주차별 DIMM 수. 판정이 있는 DIMM과 없는 DIMM을 나란히",
+				Run:       live(runLots),
+			},
+			{
 				Name:      "vendors",
 				Summary:   "the tables that read the memory messages of each BMC and BIOS vendor, and what a case's BMC published",
 				SummaryKO: "BMC와 BIOS 벤더별 메모리 메시지를 읽는 표, 그리고 케이스의 BMC가 내놓은 것",

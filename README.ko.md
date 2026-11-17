@@ -201,6 +201,8 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my collect host -o DIR` | 스캔이 이 호스트에서 읽는 파일과 메모리 측정값을 디렉터리에 복사해 다른 곳에서 가져오게 함 |
 | `my collect redfish --bmc ADDRESS -o OUT` | BMC에 Redfish로 메모리, BIOS 설정, 로그를 물어 저장 |
 | `my inventory` | DIMM을 한 줄에 하나씩: 제조사, 파트 넘버, 용량, 구성, 속도, 적용 중인 RAS 설정, 운영체제와 BMC가 각각 기록한 CE |
+| `my spd` | 모듈이 SPD EEPROM에 적은 내용: 제조 주차, 위치 코드, rank와 장치 폭, 다이 용량, 제조사, 부품 번호와 시리얼. 시리얼로 슬롯과 연결하고, 읽지 못하면 이유를 적음. `my spd FILE...`은 덤프 파일을 해석([docs/compatibility.md](docs/compatibility.md#module-spd)) |
+| `my lots` | 제조사, 부품 번호, 제조 주차별 DIMM 수. 판정이 있는 DIMM과 없는 DIMM을 나란히 셈. 호스트 하나 또는 원장의 모든 호스트 |
 | `my bios` | BIOS의 메모리 RAS 설정을 프로필과 대조([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my vendors` | BMC와 BIOS 벤더별 메모리 메시지를 읽는 표, 표마다 확인한 정도, 케이스에서 어느 표도 분류하지 못한 메시지([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | 소견을 OCP FMFM 프레임워크 형식의 분석 로그로 저장([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |

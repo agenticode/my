@@ -202,6 +202,8 @@ A file is recognised by its content, so `my import` takes them in any mix. Platf
 | `my collect host -o DIR` | copy what a scan reads of this host, and the memory readings, into a directory to import elsewhere |
 | `my collect redfish --bmc ADDRESS -o OUT` | ask a BMC over Redfish for memory, BIOS settings and logs |
 | `my inventory` | the DIMMs one per line: maker, part number, size, organisation, speed, the RAS settings in effect, and the corrected errors the operating system and the BMC each recorded |
+| `my spd` | what each module says in its SPD EEPROM: manufacturing week, location code, ranks and device width, die capacity, maker, part and serial number, tied to its slot by serial number, and why when it could not be read; `my spd FILE...` decodes dump files ([docs/compatibility.md](docs/compatibility.md#module-spd)) |
+| `my lots` | the DIMMs by maker, part number and manufacturing week, those with a finding beside those without one, over one host or every host of a ledger |
 | `my bios` | check the memory RAS settings of the BIOS against a profile ([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
 | `my vendors` | the tables that read the memory messages of each BMC and BIOS vendor, how far each was checked, and the messages of a case no table classes ([docs/vendors.md](docs/vendors.md)) |
 | `my export fmfm` | write the findings as an analysis log in the form of the OCP FMFM framework ([docs/fmfm-mapping.md](docs/fmfm-mapping.md)) |

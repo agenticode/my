@@ -37,8 +37,10 @@ type Case struct {
 	// Lang is the language sentences are written in.
 	Lang i18n.Lang
 
-	// fwByHost holds the firmware records of each host, once read.
-	fwByHost map[string][]model.FirmwareRecord
+	// fwByHost holds the firmware records of each host, once read, and
+	// spdByHost the SPD readings.
+	fwByHost  map[string][]model.FirmwareRecord
+	spdByHost map[string]*spdData
 }
 
 // Open runs the engine over the ledger and returns the Case the views are

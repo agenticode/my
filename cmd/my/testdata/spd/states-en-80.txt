@@ -1,0 +1,35 @@
+host r12-n034  Example Systems R760
+SPD of 10 of 16 DIMMs (spd5118), tied by serial number
+9 x Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+DDR5 RDIMM 64 GB 2Rx4  16 Gb dies
+
+ SLOT        DATE      LOC   SERIAL    ORG   FINDING
+ CPU0_A1     2022-W43  0x06  5C331BCD  1Rx4  ok
+             base CRC bad: stored 0x3353, computed 0x1C1B
+             CPU0_A1: SMBIOS reports 64 GB, the SPD describes a module of 32 GB.
+             CPU0_A1: SMBIOS reports 2 ranks, the SPD 1.
+ CPU0_E1     2022-W43  0x06  B6332238  2Rx4  ok
+ CPU0_F1     2022-W43  0x06  A8A64B3B  2Rx4  ok
+ CPU0_G1     2022-W43  0x06  1D2C9305  2Rx4  ok
+ CPU0_H1     2022-W43  0x06  DBC9CEE9  2Rx4  ok
+ CPU1_D1     2022-W43  0x06  7A399A55  2Rx4  observe
+ CPU1_E1     2022-W43  0x06  12AE3490  2Rx4  ok
+ CPU1_F1     2022-W43  0x06  8671F24B  2Rx4  ok
+ CPU1_G1     2022-W43  0x06  B88F2453  2Rx4  ok
+ CPU1_H1     2022-W43  0x06  D6A7388B  2Rx4  ok
+ i2c-0 0x51  128 bytes read: the pages after the first could not be selected
+ i2c-0 0x52  only 0x00 bytes
+ i2c-0 0x53  memory type DDR3, not decoded
+ i2c-1 0x50  read failed (EACCES)
+ i2c-1 0x51  read failed (EIO)
+ i2c-1 0x52  not read within the deadline
+
+ 6 of 16 DIMMs have no SPD reading.
+
+ date codes
+ EXM64G48R2X4-A
+ MAKER                    DATE          DIMMS  FINDING  UE  SLOTS WITH A FINDING
+ Micron Technology (JED…  2022-W43          9        1   0  CPU1_D1
+ Example Memory           no date code      7        1   1  CPU0_C1
+ The table counts modules by the date code in their SPD. Whether a lot is at
+ fault is for the maker's failure analysis to say.

@@ -1,0 +1,29 @@
+host r12-n034  Example Systems R760  SPD of 16 of 16 DIMMs (spd5118), tied by serial number
+16 x Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A  DDR5 RDIMM 64 GB 2Rx4  16 Gb dies
+
+ SLOT     DATE      LOC   SERIAL    FINDING
+ CPU0_A1  2022-W43  0x06  5C331BCD  ok
+ CPU0_B1  2023-W08  0x06  7FF0C3B9  ok
+ CPU0_C1  2022-W43  0x06  56A80D01  replace now
+ CPU0_D1  2023-W08  0x06  AE2CD51D  ok
+ CPU0_E1  2023-W08  0x06  B6332238  ok
+ CPU0_F1  2023-W08  0x06  A8A64B3B  ok
+ CPU0_G1  2023-W08  0x06  1D2C9305  ok
+ CPU0_H1  2023-W08  0x06  DBC9CEE9  ok
+ CPU1_A1  2023-W08  0x06  B7F782AE  ok
+ CPU1_B1  2023-W08  0x06  41102AC3  ok
+ CPU1_C1  2023-W08  0x06  D848BE33  ok
+ CPU1_D1  2022-W43  0x06  7A399A55  observe
+ CPU1_E1  2023-W08  0x06  12AE3490  ok
+ CPU1_F1  2023-W08  0x06  8671F24B  ok
+ CPU1_G1  2023-W08  0x06  B88F2453  ok
+ CPU1_H1  2023-W08  0x06  D6A7388B  ok
+
+ date codes
+ Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+ DATE      DIMMS  FINDING  UE  SLOTS WITH A FINDING
+ 2022-W43      3        2   1  CPU0_C1 CPU1_D1
+ 2023-W08     13        0   0
+ 2 of the 2 DIMMs with a finding carry 2022-W43; 1 of the 14 DIMMs without one carries it too.
+ The table counts modules by the date code in their SPD. Whether a lot is at fault is for the maker's
+ failure analysis to say.

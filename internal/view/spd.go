@@ -2,14 +2,17 @@ package view
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/agenticode/my/internal/adapter"
 	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/decode/spd"
 	"github.com/agenticode/my/internal/engine"
+	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
 )
@@ -136,7 +139,16 @@ type spdData struct {
 // origin. A reading of an eeprom file belongs to the scan that read it:
 // one that a later scan of the host no longer made is left out.
 func (c *Case) spdOf(ctx context.Context, host string) (*spdData, error) {
+	if d, ok := c.spdByHost[host]; ok {
+		return d, nil
+	}
 	out := &spdData{}
+	defer func() {
+		if c.spdByHost == nil {
+			c.spdByHost = map[string]*spdData{}
+		}
+		c.spdByHost[host] = out
+	}()
 	_, srcs, err := c.latestScan(ctx, host)
 	if err != nil {
 		return nil, err
@@ -283,7 +295,7 @@ func (c *Case) SPD(ctx context.Context, h *engine.HostResult) (*SPD, error) {
 			if spd.Read(r.State) {
 				m.Differences = c.spdDifferences(dr, d, widths[dr.Slot])
 			}
-		} else if spd.Read(r.State) {
+		} else if spd.Read(r.State) && d.HasSerial() {
 			untied++
 		}
 		if m.MakerName == "" {
@@ -327,7 +339,11 @@ func (c *Case) SPD(ctx context.Context, h *engine.HostResult) (*SPD, error) {
 					}
 				}
 				v.Reason = c.spdReason(data.probe, code, n, typeOf(data.decoded))
-				v.Head = c.spdText("spd.head.none", "short", v.Reason.Short.Text)
+				short := v.Reason.Short.Text
+				if code == dimmspd.ReasonVirtual && data.probe.Virtual != "" {
+					short += " (" + data.probe.Virtual + ")"
+				}
+				v.Head = c.spdText("spd.head.none", "short", short)
 			}
 		}
 		if v.Reason == nil {
@@ -421,12 +437,12 @@ func detailArgs(detail string) map[string]string {
 	return out
 }
 
-// sharedOf returns what every module has in common.
+// sharedOf returns what every module read in full has in common.
 func sharedOf(mods []SPDModule) SPDShared {
 	var s SPDShared
 	first := true
 	for _, m := range mods {
-		if !spd.Read(m.State) {
+		if m.State != spd.StateOK {
 			continue
 		}
 		d := m.SPD
@@ -624,4 +640,143 @@ func dash(s string) string {
 		return "-"
 	}
 	return s
+}
+
+// spdCard returns the lines of the SPD on the card of a DIMM: the missing
+// data of a DIMM without a tied reading on a host whose latest scan looked
+// for the SPD, and the line of --detail for a DIMM with one.
+func (c *Case) spdCard(ctx context.Context, h *engine.HostResult, d *engine.DIMMResult) (missing, line *Text, err error) {
+	data, err := c.spdOf(ctx, h.Host)
+	if err != nil || !d.Present {
+		return nil, nil, err
+	}
+	for i, r := range data.readings {
+		if r.DIMMUID != d.UID || !spd.Read(r.State) {
+			continue
+		}
+		x := data.decoded[i]
+		if x.State != spd.StateOK {
+			continue
+		}
+		date := x.Date
+		if date == "" {
+			date = x.DateBytes
+		}
+		die := "-"
+		if x.DieMbit.Valid {
+			die = dieText(x.DieMbit.V)
+		}
+		t := c.spdText("spd.card.detail", "date", dash(date), "loc", dash(x.Location), "die", die, "package", dash(x.Package))
+		return nil, &t, nil
+	}
+	if !data.looked {
+		return nil, nil, nil
+	}
+	short := ""
+	_, srcs, err := c.latestScan(ctx, h.Host)
+	if err != nil {
+		return nil, nil, err
+	}
+	for _, s := range srcs {
+		if s.Kind == dimmspd.Kind && s.Status != model.SourceOK {
+			short = engine.DetailText(c.Lang, s.Detail)
+		}
+	}
+	if short == "" {
+		short = SPDMessages.Text(c.Lang, "spd.card.untied", nil)
+	}
+	code := "spd.card.missing"
+	if d.DIMM == nil || !d.DIMM.DeviceWidth.Valid {
+		code = "spd.card.missing_width"
+	}
+	t := c.spdText(code, "short", short)
+	return &t, nil, nil
+}
+
+// dieText writes the capacity of a die: "16 Gb", "512 Mb".
+func dieText(mbit int) string {
+	if mbit >= 1024 && mbit%1024 == 0 {
+		return fmt.Sprintf("%d Gb", mbit/1024)
+	}
+	return fmt.Sprintf("%d Mb", mbit)
+}
+
+// DieText writes the capacity of a die as the SPD screens do.
+func DieText(mbit int) string { return dieText(mbit) }
+
+// SharedOf returns what every module of a list has in common.
+func SharedOf(mods []SPDModule) SPDShared { return sharedOf(mods) }
+
+// SPDFiles is the view of my spd FILE...: the decode of dump files that
+// came without a host.
+type SPDFiles struct {
+	Files []SPDFile `json:"files"`
+	// Read counts the modules decoded (states ok, crc, short).
+	Read int   `json:"read"`
+	Head Text  `json:"head"`
+	Lots *Lots `json:"lots,omitzero"`
+}
+
+// SPDFile is one file of my spd FILE....
+type SPDFile struct {
+	Path string `json:"path"`
+	// NotSPD says what a file that is no SPD looks like.
+	NotSPD  *Text       `json:"not_spd,omitzero"`
+	Modules []SPDModule `json:"modules,omitzero"`
+}
+
+// FileInput is a file given to my spd: its name and what reading it gave.
+type FileInput struct {
+	Path  string
+	Input *spd.Input
+	Err   error
+}
+
+// DecodeFiles builds the view of dump files in the language given.
+func DecodeFiles(lang i18n.Lang, files []FileInput) *SPDFiles {
+	c := &Case{Lang: lang}
+	v := &SPDFiles{Files: []SPDFile{}}
+	var decoded []spd.Decoded
+	for _, f := range files {
+		out := SPDFile{Path: f.Path}
+		var ns *spd.NotSPD
+		switch {
+		case errors.As(f.Err, &ns):
+			t := c.spdText("spd.state.notspd", "what", c.spdText("spd.notspd."+ns.What, "n", ns.N, "byte", fmt.Sprintf("0x%02X", max(ns.Byte, 0))).Text)
+			out.NotSPD = &t
+		case f.Err != nil:
+			t := c.spdText("spd.state.notspd", "what", f.Err.Error())
+			out.NotSPD = &t
+		default:
+			rs, err := dimmspd.InputReadings(f.Path, f.Input, time.Time{})
+			if err != nil {
+				t := c.spdText("spd.state.notspd", "what", err.Error())
+				out.NotSPD = &t
+				break
+			}
+			for _, r := range rs {
+				d := adapter.Guard(func() spd.Decoded { return ingest.SPDDecode(*r) })
+				m := SPDModule{Origin: r.Origin, Form: r.Form, State: d.State, Detail: r.Detail, Bytes: len(r.Raw), SPD: d,
+					MakerName: d.ModuleMakerName, MakerSource: "table"}
+				if r.Form == model.SPDFormDecodeDimms {
+					m.MakerSource = "decode-dimms"
+				}
+				if m.MakerName == "" {
+					m.MakerSource = ""
+				}
+				m.StateText = c.stateText(m, nil)
+				if spd.Read(d.State) {
+					v.Read++
+					decoded = append(decoded, d)
+				}
+				out.Modules = append(out.Modules, m)
+			}
+		}
+		v.Files = append(v.Files, out)
+	}
+	v.Head = c.spdText("spd.head.files", "n", len(files), "read", v.Read)
+	if len(decoded) > 0 {
+		v.Lots = c.LotsOfDecodes(decoded)
+	}
+	return v
 }
