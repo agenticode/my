@@ -1,0 +1,30 @@
+section#s7.sec
+  ## 7 모듈 SPD
+  p.lead: 모듈마다 SPD EEPROM에 스스로 적어 둔 내용을 스캔 때 읽은 그대로 보입니다. 이 절에는 판정이 없고 등급을 바꾸지 않습니다.
+  p: DIMM 16개 중 16개의 SPD (spd5118), 시리얼로 연결
+  p.spd-shared: 16 x Micron Technology (JEDEC bank 1, 0x2C), EXM64G48R2X4-A, DDR5 RDIMM 64 GB 2Rx4, 16 Gb 다이
+  table.spd
+    | 슬롯 | 주차 | 위치 | 시리얼 | 구성 | 부품 번호 | 제조사 | 판정
+    | CPU0_A1 | 2023-W08 | 0x06 | 5C331BCD | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_B1 | 2023-W08 | 0x06 | 7FF0C3B9 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_C1 | 2022-W43 | 0x06 | 56A80D01 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 즉시 교체
+    | CPU0_D1 | 2023-W08 | 0x06 | AE2CD51D | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_E1 | 2023-W08 | 0x06 | B6332238 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_F1 | 2023-W08 | 0x06 | A8A64B3B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_G1 | 2023-W08 | 0x06 | 1D2C9305 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU0_H1 | 2023-W08 | 0x06 | DBC9CEE9 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_A1 | 2023-W08 | 0x06 | B7F782AE | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_B1 | 2023-W08 | 0x06 | 41102AC3 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_C1 | 2023-W08 | 0x06 | D848BE33 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_D1 | 2022-W43 | 0x06 | 7A399A55 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 관찰
+    | CPU1_E1 | 2023-W08 | 0x06 | 12AE3490 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_F1 | 2023-W08 | 0x06 | 8671F24B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_G1 | 2023-W08 | 0x06 | B88F2453 | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+    | CPU1_H1 | 2023-W08 | 0x06 | D6A7388B | 2Rx4 | EXM64G48R2X4-A | Micron Technology (JEDEC bank 1, 0x2C) | 정상
+  ### 날짜 코드
+  table.lots
+    | 제조사 | 부품 번호 | 주차 | DIMM | 판정 | UE | 판정 있는 슬롯
+    | Micron Technology (JEDEC bank 1, 0x2C) | EXM64G48R2X4-A | 2022-W43 | 2 | 2 | 1 | CPU0_C1 CPU1_D1
+    | Micron Technology (JEDEC bank 1, 0x2C) | EXM64G48R2X4-A | 2023-W08 | 14 | 0 | 0 | 
+  p: 판정이 있는 DIMM 2개 중 2개가 2022-W43이고, 판정이 없는 DIMM 14개 중 0개도 2022-W43임.
+  p: 이 표는 SPD의 날짜 코드로 모듈을 센 것임. 생산 로트에 문제가 있는지는 제조사의 고장 분석이 판단함.
