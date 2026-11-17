@@ -294,7 +294,7 @@ The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above
 | `sockets` | the number of sockets of the board (its processor records), when the ledger knows it |
 | `rows[]` | per row of the board `parts[]`: a bank (`bank` `left` or `right`, `socket`, `no_channels`, `channels[]`) or a CPU (`cpu`: `socket`, `dimms`, `bytes`, `size`, `caches[]` with `level`, `bytes`, `size`; `controller` set when the part is the memory controller of the chipset and no CPU) |
 | `rows[].parts[].channels[]` | `channel` (the number of the channel on its processor, from 0; left out when the socket is drawn without channels), `name` (the vendor's name of the channel: `A`, `2`, `1.0`) and `sticks[]` in drawing order |
-| `sticks[]`, `unplaced[]` | per slot: `slot`, `state` (the grade of the finding of its DIMM, `empty` or `unknown`), `dimm_uid`, `ce`, `ue`, `size`, `bytes`, `module` (`maker`, `part_number`, `serial`, `type`, `speed_mts`, `configured_mts`, `ranks`), `locator`, `bank_locator`, `place` (`state` `placed`, `no-channel` or `unplaced`, `reason`, `socket`, `channel`, `position` in the channel from 0, `assumed`), `socket_by` (how the processor was found: `name` or `bank` for the processor word of the locator or of the bank locator, `node`, `mate`, `letters`, `one-socket`, `hub`, `family:<id>`) and `channel_by` (`name`, `bank` or `family:<id>`), `label` (the label of the board's manual of an empty slot the firmware gives no name) |
+| `sticks[]`, `unplaced[]` | per slot: `slot`, `state` (the grade of the finding of its DIMM, `empty` or `unknown`), `dimm_uid`, `ce`, `ue`, `size`, `bytes`, `module` (`maker`, `part_number`, `serial`, `type`, `speed_mts`, `configured_mts`, `ranks`), `locator`, `bank_locator`, `place` (`state` `placed`, `no-channel` or `unplaced`, `reason`, `socket`, `channel`, `position` in the channel from 0, `assumed`), `socket_by` (how the processor was found: `name` or `bank` for the processor word of the locator or of the bank locator, `node`, `mate`, `letters`, `one-socket`, `hub`, `family:<id>`) and `channel_by` (`name`, `bank` or `family:<id>`), `label` (the label of the board's manual of an empty slot the firmware gives no name), `mark` (the mark of the population check: `+` on an empty slot the vendor's table fills for the number of modules, `-` on a module in a slot the table leaves empty) |
 | `aside` | the slots set aside and those the ledger knows only by a name a source used, as the slot map draws them (the fields of the slot map of `overview`) |
 | `counts` | `placed`, `no_channel`, `unplaced` |
 | `reasons[]` | per reason a slot was drawn without channels or set aside: `state`, `reason`, `count`, an example `locator` and `bank_locator`, and the sentence in `text` |
@@ -303,6 +303,23 @@ The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above
 | `family`, `documents[]` | the board family whose table placed slots, and the documents it is written from (`title`, `number`, `date`, `url`, `pages`) |
 | `complete` | `full` when every slot is placed from its own names or the table of its family and every check holds; else `reason`, why the board is not (`unnamed-empty`, `duplicated-names`, `absent-processor`, `processor-unknown`, `processor-records-missing`, `module-in-a-slot-the-board-lacks`, the reason of a family row such as `no-channel-in-document`); `absent` counts modules on a socket whose processor record says it holds no processor; `unchecked` is set when no channel count was known to check the board against |
 | `lines[]` | the lines of data quality of the board, as statements |
+| `population` | the population check of the board (the view `population` below) |
+
+### The view `population`
+
+The board carries the check of its modules against the population the public documents of the board's maker give for it ([rules.md](rules.md#population-rules)). It is built with the board and stored nowhere. A population finding is no finding of a DIMM: it has no grade and changes no finding, ranking or exit code.
+
+| Field | Content |
+| --- | --- |
+| `set` | the rule set of the board, left out when none was used |
+| `no_rule` | why no rule set was used: `no-set` (no rule set speaks of the board) or `not-full` (the board is not placed in full), with the line in `text` |
+| `ordered`, `strength` | set when the rule set holds a fill order, and the strength of its wording: `required` or `recommended` |
+| `processors[]` | per processor with modules: `socket`, `modules`, `installed` (the slots that hold them), `recommended` (the slots the table fills for their number, left out when the table lists none), `table[]` (per number of modules `n` the `slots` the table fills) |
+| `findings[]` | per finding: `rule`, `strength` and `strength_text`, `socket` (-1 for the system), `channel` (the vendor's name of the channel), `fill` (empty slots the table fills), `leave` (modules in slots it leaves empty), `slots` (every slot the finding names), `first` (the slot of the channel the table fills first), `counts` (modules per processor), `types`, `ranks`, `bytes`, `speeds` (rated, in MT/s), `parts` (the number of part numbers in the channel), `source` and the sentence in `text` |
+| `notes[]` | lines that are no finding: `kind` (`agrees`, `holds` for a rule set without an order, `not-compared` when the table lists no population for the number, `other-mode`, `second-set`), `socket`, `modules`, `counts` (the numbers the table lists), `mode`, `source`, `text` |
+| `unchecked[]` | rules that were not checked: `rule`, `field` (`type`, `ranks`, `size`, `speed`, `part`, `status` of a processor record, `places` the board does not list, `mode` without a table), `n`, `mode`, `text` |
+| `source` | the page a line stands on: `id` of `internal/explorer/sources.tsv`, `title`, `number`, `date`, `url`, `pages`, and `cite`, the title, number and page in one line |
+| `text` | the line of `no_rule` |
 
 ### Firmware records in the views
 
