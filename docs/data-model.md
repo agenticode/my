@@ -292,13 +292,16 @@ The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above
 | `ce`, `ue` | the corrected and uncorrected errors of the modules on record |
 | `badge` | the memory type and speed every module shares, when they share one |
 | `sockets` | the number of sockets of the board (its processor records), when the ledger knows it |
-| `rows[]` | per row of the board `parts[]`: a bank (`bank` `left` or `right`, `socket`, `no_channels`, `channels[]`) or a CPU (`cpu`: `socket`, `dimms`, `bytes`, `size`, `caches[]` with `level`, `bytes`, `size`) |
-| `rows[].parts[].channels[]` | `channel` (left out when the socket is drawn without channels) and `sticks[]` in drawing order |
-| `sticks[]`, `unplaced[]` | per slot: `slot`, `state` (the grade of the finding of its DIMM, `empty` or `unknown`), `dimm_uid`, `ce`, `ue`, `size`, `bytes`, `module` (`maker`, `part_number`, `serial`, `type`, `speed_mts`, `configured_mts`, `ranks`), `locator`, `bank_locator`, `place` (`state` `placed`, `no-channel` or `unplaced`, `reason`, `socket`, `channel`, `assumed`), `socket_by` and `channel_by` (the names of the tests that read the socket and the channel from the names) |
+| `rows[]` | per row of the board `parts[]`: a bank (`bank` `left` or `right`, `socket`, `no_channels`, `channels[]`) or a CPU (`cpu`: `socket`, `dimms`, `bytes`, `size`, `caches[]` with `level`, `bytes`, `size`; `controller` set when the part is the memory controller of the chipset and no CPU) |
+| `rows[].parts[].channels[]` | `channel` (the number of the channel on its processor, from 0; left out when the socket is drawn without channels), `name` (the vendor's name of the channel: `A`, `2`, `1.0`) and `sticks[]` in drawing order |
+| `sticks[]`, `unplaced[]` | per slot: `slot`, `state` (the grade of the finding of its DIMM, `empty` or `unknown`), `dimm_uid`, `ce`, `ue`, `size`, `bytes`, `module` (`maker`, `part_number`, `serial`, `type`, `speed_mts`, `configured_mts`, `ranks`), `locator`, `bank_locator`, `place` (`state` `placed`, `no-channel` or `unplaced`, `reason`, `socket`, `channel`, `position` in the channel from 0, `assumed`), `socket_by` (how the processor was found: `name` or `bank` for the processor word of the locator or of the bank locator, `node`, `mate`, `letters`, `one-socket`, `hub`, `family:<id>`) and `channel_by` (`name`, `bank` or `family:<id>`), `label` (the label of the board's manual of an empty slot the firmware gives no name) |
 | `aside` | the slots set aside and those the ledger knows only by a name a source used, as the slot map draws them (the fields of the slot map of `overview`) |
 | `counts` | `placed`, `no_channel`, `unplaced` |
 | `reasons[]` | per reason a slot was drawn without channels or set aside: `state`, `reason`, `count`, an example `locator` and `bank_locator`, and the sentence in `text` |
 | `caches` | where the cache sizes were read: `lshw` or `sysfs` |
+| `hub` | set when the memory controller is in the chipset (front-side-bus platforms): no processor owns a slot |
+| `family`, `documents[]` | the board family whose table placed slots, and the documents it is written from (`title`, `number`, `date`, `url`, `pages`) |
+| `complete` | `full` when every slot is placed from its own names or the table of its family and every check holds; else `reason`, why the board is not (`unnamed-empty`, `duplicated-names`, `absent-processor`, `processor-unknown`, `processor-records-missing`, `module-in-a-slot-the-board-lacks`, the reason of a family row such as `no-channel-in-document`); `absent` counts modules on a socket whose processor record says it holds no processor; `unchecked` is set when no channel count was known to check the board against |
 | `lines[]` | the lines of data quality of the board, as statements |
 
 ### Firmware records in the views

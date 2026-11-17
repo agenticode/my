@@ -85,19 +85,21 @@ host r12-n034  Example Systems R760  16 of 32 slots, 1024 GB  DDR5 RDIMM 4800 MT
  ch       7      6      5      4      3      2      1      0
         ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ██  ·· ░░  ·· ░░  ══╡CPU 0╞══
  CPU0_  H2 H1  G2 G1  F2 F1  E2 E1  D2 D1  C2 C1  B2 B1  A2 A1
+ name     H      G      F      E      D      C      B      A
  err                                          cU
 
  ch                    0      1      2      3      4      5      6      7
         ══╡CPU 1╞══  ░░ ··  ░░ ··  ░░ ··  ▒▒ ··  ░░ ··  ░░ ··  ░░ ··  ░░ ··
  CPU1_               A1 A2  B1 B2  C1 C2  D1 D2  E1 E2  F1 F2  G1 G2  H1 H2
+ name                  A      B      C      D      E      F      G      H
  err                                      c
 
  ██ replace now   ▒▒ observe   ░░ ok   ·· empty slot   c corrected, U uncorrected errors
 ```
 
-`my board` draws the board as the Memory Explorer does: a bank of slots on each side of a CPU, one column per channel, the slots of a channel side by side. The channel numbers are above the bank, the slot names below it, with the part of the name all slots of the bank share at the start of the line. The `err` line marks the slots whose DIMM has corrected (`c`) or uncorrected (`U`) errors on record. The cells are those of the slot map. `--detail` adds a table with one line per slot: where it was drawn, the DIMM in it and its errors. `--ascii` draws with ASCII characters.
+`my board` draws the board as the Memory Explorer does: a bank of slots on each side of a CPU, one column per channel, the slots of a channel side by side. The channel numbers are above the bank, the slot names below it, with the part of the name all slots of the bank share at the start of the line. The `name` line gives the vendor's name of each channel where it says more than the number (`A` for channel 0 of a board that names its channels by letter). The `err` line marks the slots whose DIMM has corrected (`c`) or uncorrected (`U`) errors on record. The cells are those of the slot map. `--detail` adds a table with one line per slot: where it was drawn, the DIMM in it and its errors. `--ascii` draws with ASCII characters.
 
-The board places a slot from its two SMBIOS names, the locator and the bank locator. Slots whose names it cannot read are drawn below the board as the slot map draws them, and a line says why, with an example of the names. A socket whose names give no channels is drawn as one row of slots in the order of the SMBIOS table. [compatibility.md](compatibility.md#slot-names-of-server-vendors) lists the names it reads and what it makes of each. The exit code is that of `my`: the grade of the host.
+The board places a slot from its two SMBIOS names, the locator and the bank locator, and where the names give only a slot number, from the table of the board's family that the maker's documents give. Slots whose names it cannot read are drawn below the board as the slot map draws them, and a line says why, with an example of the names. A socket whose names give no channels is drawn as one row of slots in the order of the SMBIOS table. On a board whose memory controller is in the chipset (servers with front-side-bus processors), no processor owns a slot: the board draws one box `chipset` in the place of the CPUs. An empty slot the firmware gives no name is drawn with the label of the board's manual and a star, where the table of its family lists the labels; `--detail` lists the lines of data quality, which say which document a table comes from and what the board could not check. [compatibility.md](compatibility.md#slot-names-of-server-vendors) lists the names it reads and what it makes of each. The exit code is that of `my`: the grade of the host.
 
 In a report the board is the figure of section 2, the slot map. A slot shows its card when the pointer is on it or it has the focus: the slot, the DIMM, its errors and its finding; a slot with a finding leads to it.
 

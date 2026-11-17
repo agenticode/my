@@ -71,6 +71,9 @@ const (
 	// Node of the bank locator, one processor record, the processor of the
 	// slots of one channel letter, the channel letters split in order.
 	FixSocketRules
+	// FixChipsetMemory puts every slot of a front-side-bus platform on the
+	// memory controller of the board: no processor owns a slot.
+	FixChipsetMemory
 	// FixChannelRank numbers the channels of a processor and the slots of a
 	// channel from 0 in the vendor's order.
 	FixChannelRank
@@ -105,7 +108,7 @@ var fixNames = map[Fix]string{
 	FixSupermicroNode: "supermicro-node", FixSlabBySize: "slab-by-size", FixDellDimm: "dell-dimm",
 	FixChanWord: "chan-word", FixLettersFromA: "letters-from-a", FixRepeatedTable: "repeated-table",
 	FixNameForms: "name-forms", FixBoardFamilies: "board-families", FixLetterMeaning: "letter-meaning",
-	FixSocketRules: "socket-rules", FixChannelRank: "channel-rank",
+	FixSocketRules: "socket-rules", FixChipsetMemory: "chipset-memory", FixChannelRank: "channel-rank",
 }
 
 // Name is the name of a fix, as the tests list it.

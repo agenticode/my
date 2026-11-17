@@ -59,7 +59,7 @@ section#s2.sec
       mark: CPU1_G2: 빈 슬롯
       mark: CPU1_H1: 정상, 64 GB, S/N 55C12A
       mark: CPU1_H2: 빈 슬롯
-      text: CPU0_H2 | CPU0_H1 | Ch7 | CPU0_G2 | CPU0_G1 | Ch6 | CPU0_F2 | CPU0_F1 | Ch5 | CPU0_E2 | CPU0_E1 | Ch4 | CPU0_D2 | CPU0_D1 | Ch3 | CPU0_C2 | CPU0_C1 | Ch2 | CPU0_B2 | CPU0_B1 | Ch1 | CPU0_A2 | CPU0_A1 | Ch0 | CPU 0 | DIMM 8개 | 512 GB | CPU 1 | DIMM 8개 | 512 GB | CPU1_A1 | CPU1_A2 | Ch0 | CPU1_B1 | CPU1_B2 | Ch1 | CPU1_C1 | CPU1_C2 | Ch2 | CPU1_D1 | CPU1_D2 | Ch3 | CPU1_E1 | CPU1_E2 | Ch4 | CPU1_F1 | CPU1_F2 | Ch5 | CPU1_G1 | CPU1_G2 | Ch6 | CPU1_H1 | CPU1_H2 | Ch7
+      text: CPU0_H2 | CPU0_H1 | ChH | CPU0_G2 | CPU0_G1 | ChG | CPU0_F2 | CPU0_F1 | ChF | CPU0_E2 | CPU0_E1 | ChE | CPU0_D2 | CPU0_D1 | ChD | CPU0_C2 | CPU0_C1 | ChC | CPU0_B2 | CPU0_B1 | ChB | CPU0_A2 | CPU0_A1 | ChA | CPU 0 | DIMM 8개 | 512 GB | CPU 1 | DIMM 8개 | 512 GB | CPU1_A1 | CPU1_A2 | ChA | CPU1_B1 | CPU1_B2 | ChB | CPU1_C1 | CPU1_C2 | ChC | CPU1_D1 | CPU1_D2 | ChD | CPU1_E1 | CPU1_E2 | ChE | CPU1_F1 | CPU1_F2 | ChF | CPU1_G1 | CPU1_G2 | ChG | CPU1_H1 | CPU1_H2 | ChH
     li: 즉시 교체
     li: 관찰
     li: 정상
@@ -71,7 +71,7 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel7_Dimm1
-  보드 위치 = CPU 0, 채널 7
+  보드 위치 = CPU 0, 채널 7 (H)
   소견 = 빈 슬롯
   CPU0_H1 = 
   로케이터 = CPU0_H1
@@ -86,14 +86,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel7_Dimm0
-  보드 위치 = CPU 0, 채널 7
+  보드 위치 = CPU 0, 채널 7 (H)
   소견 = 정상
   CPU0_G2 = 
   로케이터 = CPU0_G2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel6_Dimm1
-  보드 위치 = CPU 0, 채널 6
+  보드 위치 = CPU 0, 채널 6 (G)
   소견 = 빈 슬롯
   CPU0_G1 = 
   로케이터 = CPU0_G1
@@ -108,14 +108,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel6_Dimm0
-  보드 위치 = CPU 0, 채널 6
+  보드 위치 = CPU 0, 채널 6 (G)
   소견 = 정상
   CPU0_F2 = 
   로케이터 = CPU0_F2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel5_Dimm1
-  보드 위치 = CPU 0, 채널 5
+  보드 위치 = CPU 0, 채널 5 (F)
   소견 = 빈 슬롯
   CPU0_F1 = 
   로케이터 = CPU0_F1
@@ -130,14 +130,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel5_Dimm0
-  보드 위치 = CPU 0, 채널 5
+  보드 위치 = CPU 0, 채널 5 (F)
   소견 = 정상
   CPU0_E2 = 
   로케이터 = CPU0_E2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel4_Dimm1
-  보드 위치 = CPU 0, 채널 4
+  보드 위치 = CPU 0, 채널 4 (E)
   소견 = 빈 슬롯
   CPU0_E1 = 
   로케이터 = CPU0_E1
@@ -152,14 +152,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel4_Dimm0
-  보드 위치 = CPU 0, 채널 4
+  보드 위치 = CPU 0, 채널 4 (E)
   소견 = 정상
   CPU0_D2 = 
   로케이터 = CPU0_D2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel3_Dimm1
-  보드 위치 = CPU 0, 채널 3
+  보드 위치 = CPU 0, 채널 3 (D)
   소견 = 빈 슬롯
   CPU0_D1 = 
   로케이터 = CPU0_D1
@@ -174,14 +174,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel3_Dimm0
-  보드 위치 = CPU 0, 채널 3
+  보드 위치 = CPU 0, 채널 3 (D)
   소견 = 정상
   CPU0_C2 = 
   로케이터 = CPU0_C2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel2_Dimm1
-  보드 위치 = CPU 0, 채널 2
+  보드 위치 = CPU 0, 채널 2 (C)
   소견 = 빈 슬롯
   CPU0_C1 = 
   로케이터 = CPU0_C1
@@ -196,14 +196,14 @@ section#s2.sec
   정정 오류 = 1231
   정정 불가 오류 = 1
   뱅크 로케이터 = P0_Node0_Channel2_Dimm0
-  보드 위치 = CPU 0, 채널 2
+  보드 위치 = CPU 0, 채널 2 (C)
   소견 = 즉시 교체
   CPU0_B2 = 
   로케이터 = CPU0_B2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel1_Dimm1
-  보드 위치 = CPU 0, 채널 1
+  보드 위치 = CPU 0, 채널 1 (B)
   소견 = 빈 슬롯
   CPU0_B1 = 
   로케이터 = CPU0_B1
@@ -218,14 +218,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel1_Dimm0
-  보드 위치 = CPU 0, 채널 1
+  보드 위치 = CPU 0, 채널 1 (B)
   소견 = 정상
   CPU0_A2 = 
   로케이터 = CPU0_A2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel0_Dimm1
-  보드 위치 = CPU 0, 채널 0
+  보드 위치 = CPU 0, 채널 0 (A)
   소견 = 빈 슬롯
   CPU0_A1 = 
   로케이터 = CPU0_A1
@@ -240,7 +240,7 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P0_Node0_Channel0_Dimm0
-  보드 위치 = CPU 0, 채널 0
+  보드 위치 = CPU 0, 채널 0 (A)
   소견 = 정상
   CPU 0 = 
   DIMM = 8
@@ -261,14 +261,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel0_Dimm0
-  보드 위치 = CPU 1, 채널 0
+  보드 위치 = CPU 1, 채널 0 (A)
   소견 = 정상
   CPU1_A2 = 
   로케이터 = CPU1_A2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel0_Dimm1
-  보드 위치 = CPU 1, 채널 0
+  보드 위치 = CPU 1, 채널 0 (A)
   소견 = 빈 슬롯
   CPU1_B1 = 
   로케이터 = CPU1_B1
@@ -283,14 +283,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel1_Dimm0
-  보드 위치 = CPU 1, 채널 1
+  보드 위치 = CPU 1, 채널 1 (B)
   소견 = 정상
   CPU1_B2 = 
   로케이터 = CPU1_B2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel1_Dimm1
-  보드 위치 = CPU 1, 채널 1
+  보드 위치 = CPU 1, 채널 1 (B)
   소견 = 빈 슬롯
   CPU1_C1 = 
   로케이터 = CPU1_C1
@@ -305,14 +305,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel2_Dimm0
-  보드 위치 = CPU 1, 채널 2
+  보드 위치 = CPU 1, 채널 2 (C)
   소견 = 정상
   CPU1_C2 = 
   로케이터 = CPU1_C2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel2_Dimm1
-  보드 위치 = CPU 1, 채널 2
+  보드 위치 = CPU 1, 채널 2 (C)
   소견 = 빈 슬롯
   CPU1_D1 = 
   로케이터 = CPU1_D1
@@ -327,14 +327,14 @@ section#s2.sec
   정정 오류 = 53
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel3_Dimm0
-  보드 위치 = CPU 1, 채널 3
+  보드 위치 = CPU 1, 채널 3 (D)
   소견 = 관찰
   CPU1_D2 = 
   로케이터 = CPU1_D2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel3_Dimm1
-  보드 위치 = CPU 1, 채널 3
+  보드 위치 = CPU 1, 채널 3 (D)
   소견 = 빈 슬롯
   CPU1_E1 = 
   로케이터 = CPU1_E1
@@ -349,14 +349,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel4_Dimm0
-  보드 위치 = CPU 1, 채널 4
+  보드 위치 = CPU 1, 채널 4 (E)
   소견 = 정상
   CPU1_E2 = 
   로케이터 = CPU1_E2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel4_Dimm1
-  보드 위치 = CPU 1, 채널 4
+  보드 위치 = CPU 1, 채널 4 (E)
   소견 = 빈 슬롯
   CPU1_F1 = 
   로케이터 = CPU1_F1
@@ -371,14 +371,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel5_Dimm0
-  보드 위치 = CPU 1, 채널 5
+  보드 위치 = CPU 1, 채널 5 (F)
   소견 = 정상
   CPU1_F2 = 
   로케이터 = CPU1_F2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel5_Dimm1
-  보드 위치 = CPU 1, 채널 5
+  보드 위치 = CPU 1, 채널 5 (F)
   소견 = 빈 슬롯
   CPU1_G1 = 
   로케이터 = CPU1_G1
@@ -393,14 +393,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel6_Dimm0
-  보드 위치 = CPU 1, 채널 6
+  보드 위치 = CPU 1, 채널 6 (G)
   소견 = 정상
   CPU1_G2 = 
   로케이터 = CPU1_G2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel6_Dimm1
-  보드 위치 = CPU 1, 채널 6
+  보드 위치 = CPU 1, 채널 6 (G)
   소견 = 빈 슬롯
   CPU1_H1 = 
   로케이터 = CPU1_H1
@@ -415,14 +415,14 @@ section#s2.sec
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel7_Dimm0
-  보드 위치 = CPU 1, 채널 7
+  보드 위치 = CPU 1, 채널 7 (H)
   소견 = 정상
   CPU1_H2 = 
   로케이터 = CPU1_H2
   정정 오류 = 0
   정정 불가 오류 = 0
   뱅크 로케이터 = P1_Node1_Channel7_Dimm1
-  보드 위치 = CPU 1, 채널 7
+  보드 위치 = CPU 1, 채널 7 (H)
   소견 = 빈 슬롯
   table.ranking
     | # | 슬롯 | 시리얼 | CE | UE | 고장 모드 | 최근 30일 | 소견 | 규칙
@@ -1101,6 +1101,7 @@ section#s7.sec
   p.how: 소견의 바탕입니다: 찾아본 모든 소스, 소스마다 얻은 것, 오류 위치를 어디까지 보고하는지. 소견은 기록의 관측 등급이 허락하는 만큼만 말합니다.
   ### 보드를 그린 방식
   li: 보드에 그린 슬롯 32개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+  li: 프로세서의 채널 수를 몰라 보드의 채널을 그 수와 맞춰 보지 못함
   ### 관측 등급별 오류
   figure
     svg.fig.obsbar: 호스트 r12-n034의 관측 등급별 오류

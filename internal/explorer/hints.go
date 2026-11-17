@@ -20,8 +20,12 @@ type textHints struct {
 	// is the maker and product of the board in one string, each without the
 	// placeholders firmware writes, as the ledger keeps them.
 	sysVendor, product, board string
-	// cpus are the processor records in table order.
-	cpus []cpuRecord
+	// cpus are the processor records in table order. A processor block
+	// without a Handle line before it (a text written from what a ledger
+	// keeps without the socket count) gives cpuName alone: the name of the
+	// processor, and no record.
+	cpus    []cpuRecord
+	cpuName string
 }
 
 // cpuRecord is one processor record.
@@ -69,6 +73,12 @@ func hintsOf(raw string) textHints {
 				h.board = strings.TrimSpace(get("Manufacturer") + " " + get("Product Name"))
 			}
 		case "Processor Information":
+			if r.handle == "" {
+				if h.cpuName == "" {
+					h.cpuName = get("Version")
+				}
+				continue
+			}
 			c := cpuRecord{name: get("Version"), status: -1}
 			if st, ok := r.fields["Status"]; ok {
 				c.status = 0

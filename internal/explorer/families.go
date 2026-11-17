@@ -748,7 +748,13 @@ func (p *pass) applyRow(f *family) (done, ok bool) {
 
 // hubFamily makes the board one of memory on the chipset, when the stage
 // that reads such boards is in force.
-func (p *pass) hubFamily() bool { return false }
+func (p *pass) hubFamily() bool {
+	if !stage(FixChipsetMemory) {
+		return false
+	}
+	p.proc.Hub = true
+	return true
+}
 
 // familiesOf lists the ids of the rows whose maker and match fit a board,
 // for tests.

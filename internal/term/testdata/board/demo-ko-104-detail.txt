@@ -4,11 +4,13 @@ CE 1,284건, UE 1건
  ch       7      6      5      4      3      2      1      0
         ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ██  ·· ░░  ·· ░░  ══╡CPU 0╞══
  CPU0_  H2 H1  G2 G1  F2 F1  E2 E1  D2 D1  C2 C1  B2 B1  A2 A1
+ 이름     H      G      F      E      D      C      B      A
  오류                                         cU
 
  ch                    0      1      2      3      4      5      6      7
         ══╡CPU 1╞══  ░░ ··  ░░ ··  ░░ ··  ▒▒ ··  ░░ ··  ░░ ··  ░░ ··  ░░ ··
  CPU1_               A1 A2  B1 B2  C1 C2  D1 D2  E1 E2  F1 F2  G1 G2  H1 H2
+ 이름                  A      B      C      D      E      F      G      H
  오류                                     c
 
  ██ 즉시 교체   ▒▒ 관찰   ░░ 정상   ·· 빈 슬롯   c 정정 오류, U 정정 불가 오류
@@ -16,38 +18,39 @@ CE 1,284건, UE 1건
  CPU 0  DIMM 8개, 512 GB
  CPU 1  DIMM 8개, 512 GB
 
- 슬롯     위치        크기   부품 번호       일련번호  CE    UE  소견
- CPU0_H2  CPU 0 ch 7                                   0     0   빈 슬롯
- CPU0_H1  CPU 0 ch 7  64 GB  EXM64G48R2X4-A  4B3B31    0     0   정상
- CPU0_G2  CPU 0 ch 6                                   0     0   빈 슬롯
- CPU0_G1  CPU 0 ch 6  64 GB  EXM64G48R2X4-A  382A8A    0     0   정상
- CPU0_F2  CPU 0 ch 5                                   0     0   빈 슬롯
- CPU0_F1  CPU 0 ch 5  64 GB  EXM64G48R2X4-A  2B6332    0     0   정상
- CPU0_E2  CPU 0 ch 4                                   0     0   빈 슬롯
- CPU0_E1  CPU 0 ch 4  64 GB  EXM64G48R2X4-A  E2CD51    0     0   정상
- CPU0_D2  CPU 0 ch 3                                   0     0   빈 슬롯
- CPU0_D1  CPU 0 ch 3  64 GB  EXM64G48R2X4-A  80D01E    0     0   정상
- CPU0_C2  CPU 0 ch 2                                   0     0   빈 슬롯
- CPU0_C1  CPU 0 ch 2  64 GB  EXM64G48R2X4-A  3B9C56    1231  1   즉시 교체
- CPU0_B2  CPU 0 ch 1                                   0     0   빈 슬롯
- CPU0_B1  CPU 0 ch 1  64 GB  EXM64G48R2X4-A  DE7FF0    0     0   정상
- CPU0_A2  CPU 0 ch 0                                   0     0   빈 슬롯
- CPU0_A1  CPU 0 ch 0  64 GB  EXM64G48R2X4-A  5C331B    0     0   정상
- CPU1_A1  CPU 1 ch 0  64 GB  EXM64G48R2X4-A  2C9305    0     0   정상
- CPU1_A2  CPU 1 ch 0                                   0     0   빈 슬롯
- CPU1_B1  CPU 1 ch 1  64 GB  EXM64G48R2X4-A  DBC9CE    0     0   정상
- CPU1_B2  CPU 1 ch 1                                   0     0   빈 슬롯
- CPU1_C1  CPU 1 ch 2  64 GB  EXM64G48R2X4-A  99B7F7    0     0   정상
- CPU1_C2  CPU 1 ch 2                                   0     0   빈 슬롯
- CPU1_D1  CPU 1 ch 3  64 GB  EXM64G48R2X4-A  2AEB41    53    0   관찰
- CPU1_D2  CPU 1 ch 3                                   0     0   빈 슬롯
- CPU1_E1  CPU 1 ch 4  64 GB  EXM64G48R2X4-A  02AC34    0     0   정상
- CPU1_E2  CPU 1 ch 4                                   0     0   빈 슬롯
- CPU1_F1  CPU 1 ch 5  64 GB  EXM64G48R2X4-A  848BE3    0     0   정상
- CPU1_F2  CPU 1 ch 5                                   0     0   빈 슬롯
- CPU1_G1  CPU 1 ch 6  64 GB  EXM64G48R2X4-A  D7A399    0     0   정상
- CPU1_G2  CPU 1 ch 6                                   0     0   빈 슬롯
- CPU1_H1  CPU 1 ch 7  64 GB  EXM64G48R2X4-A  55C12A    0     0   정상
- CPU1_H2  CPU 1 ch 7                                   0     0   빈 슬롯
+ 슬롯     위치          크기   부품 번호       일련번호  CE    UE  소견
+ CPU0_H2  CPU 0 ch 7 H                                   0     0   빈 슬롯
+ CPU0_H1  CPU 0 ch 7 H  64 GB  EXM64G48R2X4-A  4B3B31    0     0   정상
+ CPU0_G2  CPU 0 ch 6 G                                   0     0   빈 슬롯
+ CPU0_G1  CPU 0 ch 6 G  64 GB  EXM64G48R2X4-A  382A8A    0     0   정상
+ CPU0_F2  CPU 0 ch 5 F                                   0     0   빈 슬롯
+ CPU0_F1  CPU 0 ch 5 F  64 GB  EXM64G48R2X4-A  2B6332    0     0   정상
+ CPU0_E2  CPU 0 ch 4 E                                   0     0   빈 슬롯
+ CPU0_E1  CPU 0 ch 4 E  64 GB  EXM64G48R2X4-A  E2CD51    0     0   정상
+ CPU0_D2  CPU 0 ch 3 D                                   0     0   빈 슬롯
+ CPU0_D1  CPU 0 ch 3 D  64 GB  EXM64G48R2X4-A  80D01E    0     0   정상
+ CPU0_C2  CPU 0 ch 2 C                                   0     0   빈 슬롯
+ CPU0_C1  CPU 0 ch 2 C  64 GB  EXM64G48R2X4-A  3B9C56    1231  1   즉시 교체
+ CPU0_B2  CPU 0 ch 1 B                                   0     0   빈 슬롯
+ CPU0_B1  CPU 0 ch 1 B  64 GB  EXM64G48R2X4-A  DE7FF0    0     0   정상
+ CPU0_A2  CPU 0 ch 0 A                                   0     0   빈 슬롯
+ CPU0_A1  CPU 0 ch 0 A  64 GB  EXM64G48R2X4-A  5C331B    0     0   정상
+ CPU1_A1  CPU 1 ch 0 A  64 GB  EXM64G48R2X4-A  2C9305    0     0   정상
+ CPU1_A2  CPU 1 ch 0 A                                   0     0   빈 슬롯
+ CPU1_B1  CPU 1 ch 1 B  64 GB  EXM64G48R2X4-A  DBC9CE    0     0   정상
+ CPU1_B2  CPU 1 ch 1 B                                   0     0   빈 슬롯
+ CPU1_C1  CPU 1 ch 2 C  64 GB  EXM64G48R2X4-A  99B7F7    0     0   정상
+ CPU1_C2  CPU 1 ch 2 C                                   0     0   빈 슬롯
+ CPU1_D1  CPU 1 ch 3 D  64 GB  EXM64G48R2X4-A  2AEB41    53    0   관찰
+ CPU1_D2  CPU 1 ch 3 D                                   0     0   빈 슬롯
+ CPU1_E1  CPU 1 ch 4 E  64 GB  EXM64G48R2X4-A  02AC34    0     0   정상
+ CPU1_E2  CPU 1 ch 4 E                                   0     0   빈 슬롯
+ CPU1_F1  CPU 1 ch 5 F  64 GB  EXM64G48R2X4-A  848BE3    0     0   정상
+ CPU1_F2  CPU 1 ch 5 F                                   0     0   빈 슬롯
+ CPU1_G1  CPU 1 ch 6 G  64 GB  EXM64G48R2X4-A  D7A399    0     0   정상
+ CPU1_G2  CPU 1 ch 6 G                                   0     0   빈 슬롯
+ CPU1_H1  CPU 1 ch 7 H  64 GB  EXM64G48R2X4-A  55C12A    0     0   정상
+ CPU1_H2  CPU 1 ch 7 H                                   0     0   빈 슬롯
 
  - 보드에 그린 슬롯 32개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+ - 프로세서의 채널 수를 몰라 보드의 채널을 그 수와 맞춰 보지 못함

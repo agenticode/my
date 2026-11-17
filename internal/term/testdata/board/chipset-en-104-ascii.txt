@@ -1,0 +1,7 @@
+host board-host  Dell Inc. PowerEdge 2950  8 of 8 slots, 16 GB  DDR2 FB-DIMM 667 MT/s
+
+ ch       1            0                           2            3
+     ::    ::     ::    ::     ==[chipset]==  ::    ::     ::    ::
+     DIMM6 DIMM2  DIMM5 DIMM1                 DIMM3 DIMM7  DIMM4 DIMM8
+
+ :: ok

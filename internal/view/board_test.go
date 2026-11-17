@@ -184,13 +184,14 @@ func TestBoardWhenTheReaderFails(t *testing.T) {
 	h := &engine.HostResult{Host: "h"}
 	for _, c := range []struct {
 		name   string
-		parse  func(string, explorer.Counts, explorer.Counts) []explorer.Dimm
+		parse  func(string, explorer.Counts, explorer.Counts) ([]explorer.Dimm, explorer.Facts)
 		reason string
 	}{
-		{"count", func(s string, a, b explorer.Counts) []explorer.Dimm {
-			return explorer.ParseDmidecodeMemory(s, a, b)[1:]
+		{"count", func(s string, a, b explorer.Counts) ([]explorer.Dimm, explorer.Facts) {
+			d, f := explorer.ReadSlots(s, a, b)
+			return d[1:], f
 		}, "count"},
-		{"panic", func(string, explorer.Counts, explorer.Counts) []explorer.Dimm { panic("reader") }, "fault"},
+		{"panic", func(string, explorer.Counts, explorer.Counts) ([]explorer.Dimm, explorer.Facts) { panic("reader") }, "fault"},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			old := boardParse

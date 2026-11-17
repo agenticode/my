@@ -106,7 +106,7 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 			}
 			for _, ch := range p.Channels {
 				for _, st := range ch.Sticks {
-					nameW = max(nameW, monoWidth(st.Slot, bText))
+					nameW = max(nameW, monoWidth(stickName(st), bText))
 				}
 			}
 		}
@@ -157,8 +157,13 @@ func (doc *Document) boardFigure(b *view.Board, anchors map[string]string, subje
 					x += bStickW * s
 				}
 				if ch.Channel.Valid {
+					// The vendor's name of the channel where there is one.
+					label := strconv.Itoa(ch.Channel.V)
+					if ch.Name != "" {
+						label = ch.Name
+					}
 					group.add(el("text", A{"class", "mb-ch-label", "x", num((x0 + x) / 2), "y", num(y + stickH + 6 + nameW + 6 + bText), "text-anchor", "middle"},
-						doc.say("board.ch", "n", ch.Channel.V)))
+						doc.say("board.ch", "n", label)))
 				}
 				bank.add(group)
 			}
@@ -203,12 +208,25 @@ func (doc *Document) stick(st view.BoardStick, x, y, w, h, nameW float64, anchor
 		g.add(el("text", A{"class", "mb-stick-cap", "x", num(tx), "y", num(ty), "transform", "rotate(-90 " + num(tx) + " " + num(ty) + ")"}, st.Size))
 	}
 	tx, ty := x+w/2+bText*0.35, y+h+6
-	g.add(el("text", A{"class", "celllabel", "x", num(tx), "y", num(ty), "text-anchor", "end", "transform", "rotate(-90 " + num(tx) + " " + num(ty) + ")"}, st.Slot))
+	label := "celllabel"
+	if st.Label != "" {
+		label += " mb-label-manual"
+	}
+	g.add(el("text", A{"class", label, "x", num(tx), "y", num(ty), "text-anchor", "end", "transform", "rotate(-90 " + num(tx) + " " + num(ty) + ")"}, stickName(st)))
 	if subject {
 		cx := x + w/2
 		g.add(el("path", A{"class", "pointer", "d", "M" + num(cx-4) + " " + num(y-12) + "h8l-4 6z"}))
 	}
 	return g
+}
+
+// stickName is the name a stick is drawn by: the slot, or for an empty slot
+// the firmware gives no name, the label of the board's manual with a star.
+func stickName(st view.BoardStick) string {
+	if st.Label != "" {
+		return st.Label + "*"
+	}
+	return st.Slot
 }
 
 // stickTitle is what a stick says in one line.
@@ -222,6 +240,9 @@ func (doc *Document) stickTitle(st view.BoardStick) string {
 		state = engine.GradeText(doc.Lang, model.VerdictGrade(st.State))
 	}
 	t := doc.say("slot.title", "slot", st.Slot, "state", state)
+	if st.Label != "" {
+		t = doc.say("slot.title", "slot", st.Label, "state", state) + ", " + doc.say("board.label_manual")
+	}
 	if st.Size != "" {
 		t += ", " + st.Size
 	}
@@ -238,6 +259,9 @@ func (doc *Document) stickTitle(st view.BoardStick) string {
 // bar per cache level.
 func (doc *Document) cpuDie(cpu *view.BoardCPU, x, y, w, h float64, card, source string) *node {
 	title := doc.say("board.cpu", "n", cpu.Socket)
+	if cpu.Controller {
+		title = doc.say("board.controller")
+	}
 	g := el("g", A{"class", "mb-cpu-die", "data-card", card, "aria-label", title, "role", "img"},
 		el("title", title),
 		el("rect", A{"class", "mb-die", "x", num(x), "y", num(y), "width", num(w), "height", num(h), "rx", "4"}),
@@ -277,7 +301,11 @@ func (doc *Document) boardCards(b *view.Board) (*node, map[string]string) {
 		for _, p := range ln {
 			if p.CPU != nil {
 				dl := el("dl", A{"id", cardID("cpu", cpuN), "class", "mx-card"})
-				dl.add(el("div", A{"class", "mx-card-title"}, el("dt", doc.say("board.cpu", "n", p.CPU.Socket)), el("dd", "")))
+				title := doc.say("board.cpu", "n", p.CPU.Socket)
+				if p.CPU.Controller {
+					title = doc.say("board.controller")
+				}
+				dl.add(el("div", A{"class", "mx-card-title"}, el("dt", title), el("dd", "")))
 				row(dl, "card.dimms", strconv.Itoa(p.CPU.DIMMs))
 				row(dl, "card.memory", p.CPU.Size)
 				for _, c := range p.CPU.Caches {
@@ -297,6 +325,7 @@ func (doc *Document) boardCards(b *view.Board) (*node, map[string]string) {
 					ids[st.Slot] = id
 					dl := el("dl", A{"id", id, "class", "mx-card"})
 					dl.add(el("div", A{"class", "mx-card-title"}, el("dt", st.Slot), el("dd", "")))
+					row(dl, "card.label", st.Label)
 					row(dl, "card.locator", st.Locator)
 					row(dl, "card.size", st.Size)
 					if m := st.Module; m != nil {
@@ -311,7 +340,7 @@ func (doc *Document) boardCards(b *view.Board) (*node, map[string]string) {
 					row(dl, "card.ce", strconv.FormatInt(st.CE, 10))
 					row(dl, "card.ue", strconv.FormatInt(st.UE, 10))
 					row(dl, "card.bank", st.BankLocator)
-					row(dl, "card.place", doc.placeText(st.Place))
+					row(dl, "card.place", doc.placeText(st.Place, ch.Name, b.Hub))
 					row(dl, "card.finding", doc.stateText(st.State))
 					box.add(dl)
 				}
@@ -331,11 +360,21 @@ func (doc *Document) stateText(state string) string {
 	return engine.GradeText(doc.Lang, model.VerdictGrade(state))
 }
 
-func (doc *Document) placeText(p explorer.Placement) string {
-	switch p.State {
-	case explorer.Placed:
-		return doc.say("board.place", "cpu", p.Socket, "ch", p.Channel)
-	case explorer.NoChannel:
+// placeText says where the board put a slot: its CPU, or the memory
+// controller of the chipset, and its channel with the vendor's name.
+func (doc *Document) placeText(p explorer.Placement, name string, hub bool) string {
+	ch := strconv.Itoa(p.Channel)
+	if name != "" && name != ch {
+		ch += " (" + name + ")"
+	}
+	switch {
+	case p.State == explorer.Placed && hub:
+		return doc.say("board.place_hub", "ch", ch)
+	case p.State == explorer.Placed:
+		return doc.say("board.place", "cpu", p.Socket, "ch", ch)
+	case p.State == explorer.NoChannel && hub:
+		return doc.say("board.controller")
+	case p.State == explorer.NoChannel:
 		return doc.say("board.place_nochannel", "cpu", p.Socket)
 	}
 	return doc.say("board.place_aside")

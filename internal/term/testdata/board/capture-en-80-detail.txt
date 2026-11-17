@@ -4,6 +4,7 @@ CE 35, UE 1
  ch      2   1   0                3   4   5
         ░░  ▓▓  ▒▒  ══╡CPU 0╞══  ▓▓  ▓▓  ░░
  CPU0_  C1  B1  A1               D1  E1  F1
+ name    C   B   A                D   E   F
  err        c   c                cU  c
 
  ▓▓ consider replacement   ▒▒ observe   ░░ ok
@@ -11,12 +12,14 @@ CE 35, UE 1
 
  CPU 0  6 DIMMs, 96 GB
 
- slot     place       size   part number  serial    CE  UE  finding
- CPU0_C1  CPU 0 ch 2  16 GB  LABDDR4-16G  LABM0003  0   0   ok
- CPU0_B1  CPU 0 ch 1  16 GB  LABDDR4-16G  LABM0002  10  0   consider replacement
- CPU0_A1  CPU 0 ch 0  16 GB  LABDDR4-16G  LABM0001  3   0   observe
- CPU0_D1  CPU 0 ch 3  16 GB  LABDDR4-16G  LABM0004  10  1   consider replacement
- CPU0_E1  CPU 0 ch 4  16 GB  LABDDR4-16G  LABM0005  12  0   consider replacement
- CPU0_F1  CPU 0 ch 5  16 GB  LABDDR4-16G  LABM0006  0   0   ok
+ slot     place         size   part number  serial    CE  UE  finding
+ CPU0_C1  CPU 0 ch 2 C  16 GB  LABDDR4-16G  LABM0003  0   0   ok
+ CPU0_B1  CPU 0 ch 1 B  16 GB  LABDDR4-16G  LABM0002  10  0   consider replaceme
+ CPU0_A1  CPU 0 ch 0 A  16 GB  LABDDR4-16G  LABM0001  3   0   observe
+ CPU0_D1  CPU 0 ch 3 D  16 GB  LABDDR4-16G  LABM0004  10  1   consider replaceme
+ CPU0_E1  CPU 0 ch 4 E  16 GB  LABDDR4-16G  LABM0005  12  0   consider replaceme
+ CPU0_F1  CPU 0 ch 5 F  16 GB  LABDDR4-16G  LABM0006  0   0   ok
 
  - 6 slots on the board, 0 drawn without channels, 0 set aside
+ - the channel count of the processor is not known: the channels of the board
+   could not be checked against it

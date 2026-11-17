@@ -51,6 +51,7 @@ func Board(w io.Writer, b *view.Board, st Style) error {
 			for _, ch := range part.Channels {
 				for _, s := range ch.Sticks {
 					shown[s.State] = true
+					shown["named"] = shown["named"] || s.Label != ""
 					marks = marks || s.CE+s.UE > 0
 				}
 			}
@@ -81,6 +82,7 @@ func Board(w io.Writer, b *view.Board, st Style) error {
 type stripPart struct {
 	cpu     *view.BoardCPU
 	channel model.Opt[int]
+	name    string // the vendor's name of the channel
 	sticks  []view.BoardStick
 	// bankEnd is set on the last channel of a bank.
 	bankEnd bool
@@ -98,13 +100,13 @@ func (st Style) boardSegments(parts []view.BoardPart) [][]stripPart {
 				continue
 			}
 			for i, ch := range p.Channels {
-				out = append(out, stripPart{channel: ch.Channel, sticks: ch.Sticks, bankEnd: i == len(p.Channels)-1})
+				out = append(out, stripPart{channel: ch.Channel, name: ch.Name, sticks: ch.Sticks, bankEnd: i == len(p.Channels)-1})
 			}
 		}
 		return out
 	}
 	all := flat(parts)
-	if st.stripWidth(all, 1, 2) <= st.width() || st.stripWidth(all, 0, 1) <= st.width() {
+	if st.stripWidth(all, 1, 2) <= st.width() || st.stripWidth(all, minGap(all), 1) <= st.width() {
 		return [][]stripPart{all}
 	}
 	var halves [][]stripPart
@@ -115,14 +117,15 @@ func (st Style) boardSegments(parts []view.BoardPart) [][]stripPart {
 	}
 	var out [][]stripPart
 	for _, h := range halves {
-		if st.stripWidth(h, 0, 1) <= st.width() {
+		if st.stripWidth(h, minGap(h), 1) <= st.width() {
 			out = append(out, h)
 			continue
 		}
 		// Cut at a channel into as few lines as hold it.
 		var cur []stripPart
 		for _, sp := range h {
-			if len(cur) > 0 && st.stripWidth(append(append([]stripPart{}, cur...), sp), 0, 1) > st.width() {
+			next := append(append([]stripPart{}, cur...), sp)
+			if len(cur) > 0 && st.stripWidth(next, minGap(next), 1) > st.width() {
 				out = append(out, cur)
 				cur = nil
 			}
@@ -135,13 +138,38 @@ func (st Style) boardSegments(parts []view.BoardPart) [][]stripPart {
 	return out
 }
 
+// minGap is the least gap between the cells of a channel: none when every
+// name is narrower than a cell, else one, so that names do not run into
+// each other.
+func minGap(seg []stripPart) int {
+	prefix, cell := stripLabels(seg)
+	for _, sp := range seg {
+		for _, s := range sp.sticks {
+			if Width(strings.TrimPrefix(stickName(s), prefix)) >= cell {
+				return 1
+			}
+		}
+	}
+	return 0
+}
+
+// stickName is the name a stick is drawn by: the slot, or for an empty
+// slot the firmware gives no name, the label of the board's manual with a
+// star.
+func stickName(s view.BoardStick) string {
+	if s.Label != "" {
+		return s.Label + "*"
+	}
+	return s.Slot
+}
+
 // stripLabels are the shared start of the slot names of a strip and the
 // width of a cell.
 func stripLabels(seg []stripPart) (prefix string, cell int) {
 	var names []string
 	for _, sp := range seg {
 		for _, s := range sp.sticks {
-			names = append(names, s.Slot)
+			names = append(names, stickName(s))
 		}
 	}
 	prefix = commonStart(names)
@@ -171,10 +199,14 @@ func commonStart(names []string) string {
 }
 
 func (st Style) cpuBox(cpu *view.BoardCPU) string {
-	if st.ASCII {
-		return "==[CPU " + strconv.Itoa(cpu.Socket) + "]=="
+	name := "CPU " + strconv.Itoa(cpu.Socket)
+	if cpu.Controller {
+		name = st.say("board.chipset")
 	}
-	return "══╡CPU " + strconv.Itoa(cpu.Socket) + "╞══"
+	if st.ASCII {
+		return "==[" + name + "]=="
+	}
+	return "══╡" + name + "╞══"
 }
 
 func (st Style) labelWidth(prefix string, errors bool) int {
@@ -207,20 +239,25 @@ func (st Style) stripWidth(seg []stripPart, gapIn, gapCh int) int {
 func (st Style) strip(seg []stripPart, errors bool) []string {
 	gapIn, gapCh := 1, 2
 	if st.stripWidth(seg, gapIn, gapCh) > st.width() {
-		gapIn, gapCh = 0, 1
+		gapIn, gapCh = minGap(seg), 1
 	}
 	prefix, cell := stripLabels(seg)
 	lw := st.labelWidth(prefix, errors)
-	var ch, mid, names, errs strings.Builder
+	var ch, mid, names, errs, chnames strings.Builder
 	pad := func(b *strings.Builder, s string, w int) { b.WriteString(padRight(s, w)) }
 	pad(&ch, " "+st.say("board.ch"), lw)
 	pad(&mid, "", lw)
 	pad(&names, " "+prefix, lw)
 	pad(&errs, " "+st.say("board.err"), lw)
-	anyChannel := false
+	pad(&chnames, " "+st.say("board.chname"), lw)
+	anyChannel, anyName := false, false
+	centre := func(b *strings.Builder, label string, span int) {
+		left := (span - Width(label) + 1) / 2
+		b.WriteString(strings.Repeat(" ", max(left, 0)) + padRight(label, span-max(left, 0)))
+	}
 	for i, sp := range seg {
 		if i > 0 {
-			for _, b := range []*strings.Builder{&ch, &mid, &names, &errs} {
+			for _, b := range []*strings.Builder{&ch, &mid, &names, &errs, &chnames} {
 				b.WriteString(strings.Repeat(" ", gapCh))
 			}
 		}
@@ -231,6 +268,7 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 			mid.WriteString(st.bold(box))
 			names.WriteString(strings.Repeat(" ", bw))
 			errs.WriteString(strings.Repeat(" ", bw))
+			chnames.WriteString(strings.Repeat(" ", bw))
 			continue
 		}
 		span := len(sp.sticks)*cell + max(len(sp.sticks)-1, 0)*gapIn
@@ -238,9 +276,18 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 		if sp.channel.Valid {
 			label = strconv.Itoa(sp.channel.V)
 			anyChannel = true
+			// The vendor's name of the channel, where it says more than
+			// the number.
+			if sp.name != "" && sp.name != label {
+				anyName = true
+			}
 		}
-		left := (span - Width(label) + 1) / 2
-		ch.WriteString(strings.Repeat(" ", max(left, 0)) + padRight(label, span-max(left, 0)))
+		centre(&ch, label, span)
+		name := ""
+		if sp.channel.Valid {
+			name = sp.name
+		}
+		centre(&chnames, truncate(name, span, ""), span)
 		for j, s := range sp.sticks {
 			if j > 0 {
 				for _, b := range []*strings.Builder{&mid, &names, &errs} {
@@ -249,7 +296,7 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 			}
 			glyph := st.paint(gradeColor(s.State), st.gradeGlyph(s.State))
 			mid.WriteString(glyph + strings.Repeat(" ", cell-2))
-			name := strings.TrimPrefix(s.Slot, prefix)
+			name := strings.TrimPrefix(stickName(s), prefix)
 			if s.State != view.SlotEmpty && s.State != view.SlotUnknown && s.State != string(model.VerdictOK) {
 				name = st.paint(gradeColor(s.State), st.bold(name))
 			}
@@ -269,6 +316,9 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 		out = append(out, ch.String())
 	}
 	out = append(out, mid.String(), names.String())
+	if anyName {
+		out = append(out, strings.TrimRight(chnames.String(), " "))
+	}
 	if errors && strings.TrimSpace(errs.String()) != strings.TrimSpace(st.say("board.err")) {
 		out = append(out, errs.String())
 	}
@@ -293,6 +343,9 @@ func (st Style) boardLegend(p *page, shown map[string]bool, marks bool) {
 	if marks {
 		legend = append(legend, st.say("board.marks"))
 	}
+	if shown["named"] {
+		legend = append(legend, st.say("board.named"))
+	}
 	for _, l := range flow(legend, "   ", st.width()-1) {
 		p.add(" " + l)
 	}
@@ -306,6 +359,9 @@ func (st Style) boardDetail(p *page, b *view.Board) {
 		for _, part := range r.Parts {
 			if c := part.CPU; c != nil {
 				line := fmt.Sprintf(" CPU %d  %s", c.Socket, st.say("board.dimms", "n", c.DIMMs))
+				if c.Controller {
+					line = " " + st.say("board.chipset") + "  " + st.say("board.dimms", "n", c.DIMMs)
+				}
 				if c.Size != "" {
 					line += ", " + c.Size
 				}
@@ -318,13 +374,27 @@ func (st Style) boardDetail(p *page, b *view.Board) {
 	}
 	rows := [][]string{{st.say("board.col.slot"), st.say("board.col.place"), st.say("board.col.size"), st.say("board.col.part"),
 		st.say("board.col.serial"), "CE", "UE", st.say("board.col.finding")}}
-	add := func(s view.BoardStick) {
+	add := func(s view.BoardStick, chName string) {
 		place := st.say("board.place_aside")
 		switch s.Place.State {
 		case explorer.Placed:
-			place = st.say("board.place", "cpu", s.Place.Socket, "ch", s.Place.Channel)
+			ch := strconv.Itoa(s.Place.Channel)
+			if chName != "" && chName != ch {
+				ch += " " + chName
+			}
+			place = st.say("board.place", "cpu", s.Place.Socket, "ch", ch)
+			if b.Hub {
+				place = st.say("board.place_hub", "ch", ch)
+			}
 		case explorer.NoChannel:
 			place = st.say("board.place_nochannel", "cpu", s.Place.Socket)
+			if b.Hub {
+				place = st.say("board.chipset")
+			}
+		}
+		slot := s.Slot
+		if s.Label != "" {
+			slot = s.Label + "*"
 		}
 		part, serial := "", ""
 		if s.Module != nil {
@@ -338,19 +408,19 @@ func (st Style) boardDetail(p *page, b *view.Board) {
 		default:
 			state = engine.GradeText(st.lang(), model.VerdictGrade(s.State))
 		}
-		rows = append(rows, []string{s.Slot, place, s.Size, part, serial, strconv.FormatInt(s.CE, 10), strconv.FormatInt(s.UE, 10), state})
+		rows = append(rows, []string{slot, place, s.Size, part, serial, strconv.FormatInt(s.CE, 10), strconv.FormatInt(s.UE, 10), state})
 	}
 	for _, r := range b.Rows {
 		for _, part := range r.Parts {
 			for _, ch := range part.Channels {
 				for _, s := range ch.Sticks {
-					add(s)
+					add(s, ch.Name)
 				}
 			}
 		}
 	}
 	for _, s := range b.Unplaced {
-		add(s)
+		add(s, "")
 	}
 	p.blank()
 	for _, line := range table(rows, st.width()) {

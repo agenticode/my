@@ -1,0 +1,15 @@
+호스트 board-host  Supermicro SSG-6028R-OSD072P  슬롯 16개 중 4개, 64 GB  DDR4 2133 MT/s
+
+ ch            3                      2                      1                      0
+     ··         ░░          ··         ░░          ··         ░░          ··         ░░
+     P1-DIMMD2* P1_DIMMD1   P1-DIMMC2* P1_DIMMC1   P1-DIMMB2* P1_DIMMB1   P1-DIMMA2* P1_DIMMA1
+ 이름          D                      C                      B                      A
+
+     ══╡CPU 0╞══
+
+ ch                       0                1                2                3
+      ══╡CPU 1╞══  ··      ··       ··      ··       ··      ··       ··      ··
+ P2-               DIMME1* DIMME2*  DIMMF1* DIMMF2*  DIMMG1* DIMMG2*  DIMMH1* DIMMH2*
+ 이름                     E                F                G                H
+
+ ░░ 정상   ·· 빈 슬롯   * 보드 설명서의 라벨 (펌웨어가 이름을 주지 않음)

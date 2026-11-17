@@ -1,0 +1,7 @@
+호스트 board-host  Dell Inc. PowerEdge 2950  슬롯 8개 중 8개, 16 GB  DDR2 FB-DIMM 667 MT/s
+
+ ch       1            0                        2            3
+     ::    ::     ::    ::     ==[칩셋]==  ::    ::     ::    ::
+     DIMM6 DIMM2  DIMM5 DIMM1              DIMM3 DIMM7  DIMM4 DIMM8
+
+ :: 정상
