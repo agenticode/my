@@ -40,6 +40,14 @@ done
 OUT=$LAB/cap/$NAME
 rm -rf "$OUT"
 mkdir -p "$OUT"
+# What "my collect host" writes comes first, into the empty directory: host
+# facts, dmesg, the EDAC tree, the rasdaemon database, SMBIOS, the memory
+# readings (numactl, numastat, sar -B, lshw) and collect.json. The steps
+# below add what it leaves out.
+if [ "$MY" != "-" ] && [ -x "$MY" ]; then
+	"$MY" collect host -o "$OUT" >"$LAB/cap/$NAME.collect.txt" 2>&1
+	mv "$LAB/cap/$NAME.collect.txt" "$OUT/collect.txt"
+fi
 cd "$OUT" || exit 1
 
 have() { command -v "$1" >/dev/null 2>&1; }

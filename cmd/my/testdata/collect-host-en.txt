@@ -1,0 +1,7 @@
+host facts: 13 files
+error records: dmesg, sys/devices/system/edac/mc, var/lib/rasdaemon/ras-mc_event.db
+SMBIOS: the text of dmidecode -t memory
+memory readings: 4 of 10
+  not there: proc/vmstat, proc/pressure/memory, proc/slabinfo, sys/kernel/mm/lru_gen/enabled, sys/devices/system/cpu, mcelog-client.txt
+  failed: sar-B.txt
+written to OUT, with collect.json; my --root OUT reads it

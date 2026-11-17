@@ -1,0 +1,7 @@
+호스트 정보: 파일 13개
+오류 기록: dmesg, sys/devices/system/edac/mc, var/lib/rasdaemon/ras-mc_event.db
+SMBIOS: sudo -n dmidecode -t memory의 출력
+메모리 측정값: 10개 중 4개
+  없음: proc/vmstat, proc/pressure/memory, proc/slabinfo, sys/kernel/mm/lru_gen/enabled, sys/devices/system/cpu, mcelog-client.txt
+  실패: sar-B.txt
+OUT에 collect.json과 함께 저장함. my --root OUT로 읽음
