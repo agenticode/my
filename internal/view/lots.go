@@ -21,7 +21,7 @@ type Lots struct {
 	// Findings is false when the table has no finding columns: the
 	// readings are tied to no DIMM (Why says so), or they come from dump
 	// files that have no host.
-	Findings bool `json:"findings"`
+	Findings bool     `json:"findings"`
 	Rows     []LotRow `json:"rows"`
 	// ByOrganisation counts the same numbers by ranks and device width.
 	ByOrganisation []OrgRow `json:"by_organisation"`
