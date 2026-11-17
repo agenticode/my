@@ -466,6 +466,7 @@ func TestHelp(t *testing.T) {
 		{[]string{"diff", "--help"}, "diff", []string{"Usage: my diff BEFORE AFTER [--at TIME] [--all] [flags]", "--at TIME", "--all", "no file is changed and this host is not scanned", "The exit code is the grade of the host in the later case", "Comparison. Two cases of one host", "Grades and exit codes."}},
 		{[]string{"import", "--help"}, "import", []string{"Usage: my import <file|directory>... [-o FILE]", "--captured-at TIME", "An input that is not recognised is listed in the summary as such and the import goes on", "--strict"}},
 		{[]string{"help", "bundle"}, "bundle", []string{"Usage: my bundle [slot|serial] -o FILE", "--anonymize", "never the contents of memory", "The exit code is 0"}},
+		{[]string{"board", "--help"}, "board", []string{"Usage: my board [flags]", "--detail", "The board ties no record to a slot", "The exit code is the grade of the host"}},
 		{[]string{"report", "--help"}, "report", []string{"Usage: my report [FILE] -o OUT.html [--audience customer|fa] [--figures DIR]", "--audience WHO", "--figures DIR", "nothing is loaded from elsewhere", "Printing it from a browser gives a PDF", "The exit code is 0"}},
 	} {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
@@ -555,7 +556,7 @@ func registerFlags(o *options, topic string) {
 		o.withDetail()
 		o.fs.Bool("oneline", false, "")
 		o.fs.Bool("all", false, "")
-	case "dimm":
+	case "dimm", "board":
 		o.withDetail()
 	case "map":
 		o.fs.String("bank", "", "")

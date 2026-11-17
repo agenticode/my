@@ -39,7 +39,7 @@ case bundle of 2026-11-13 09:30 UTC, written by my dev; subject CPU0_C1 S/N 3B9C
 | `manifest.json` | what the bundle is and what it holds |
 | `sources.json` | the source inventory: every source a run looked for, with what it yielded or why it could not be read |
 | `README.txt` | the same in words, for a person who receives the file and has not seen the tool |
-| `ledger.db` | the ledger: error records with their original text, DIMM identities, slots, placements, boots, actions, counter and GPU readings, and the findings of the sender ([data-model.md](data-model.md)) |
+| `ledger.db` | the ledger: error records with their original text, DIMM identities, slots, placements, boots, actions, counter, GPU and memory readings, and the findings of the sender ([data-model.md](data-model.md)) |
 | `inputs/` | only with `--with-inputs`: the files the records were read from, whole, each under the name the manifest gives it |
 
 `my import FILES... -o case.mycase --with-inputs` and `my collect redfish --bmc ADDRESS -o case.mycase --with-inputs` put the files that were read into the bundle, compressed: the files given to the import (for a directory, the files below it, as the directory reader takes them), or the answers of the BMC with the manifest of the collection. It is off by default. A log of a BMC or of a vendor tool holds logins, user names, network addresses and configuration, which a bundle otherwise never holds, and nothing in those files is replaced. `--with-inputs` and `--anonymize` together are refused: the anonymizer replaces names in the ledger and cannot vouch for a whole vendor file. The README of such a bundle says so, and `not_collected` shrinks to what is still left out.
@@ -93,6 +93,7 @@ The findings are computed again from the records when a case is opened. When the
 | boots: time, kernel release, BIOS and BMC version, kernel command line | kernel log lines that are not about memory errors, page offlining, machine checks or the boot banner |
 | repairs and isolation steps the host recorded | |
 | GPU memory records, counter readings, ECS readings, what a BMC reported | |
+| the memory readings of the Memory Explorer: `/proc/meminfo`, `/proc/vmstat`, memory pressure, the head of `/proc/slabinfo`, CPU caches, `numactl --hardware`, `numastat`, `sar -B`, the state of MGLRU, `lshw` | |
 | the host name, the system vendor and product | |
 | the paths of the files that were read | |
 

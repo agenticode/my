@@ -2,6 +2,18 @@
 
 Releases of MemorY, the latest first. Version numbers follow [Semantic Versioning](https://semver.org/). `my version --json` prints the versions of what a binary reads and writes: the analysis engine, the ledger schema, the case bundle format and the `--json` output.
 
+## [Unreleased]
+
+Ledger schema 10.
+
+### Added
+
+- `my board`: the board of a host, its slots by CPU and channel as the SMBIOS slot names give them, with the grade and the errors of each DIMM. The report draws the same board in section 2, with a card per slot. [docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors) lists the slot names that are read.
+- The Memory Explorer: the memory readings of a host (meminfo, vmstat, memory pressure, slab caches, CPU caches, `numactl --hardware`, `numastat`, `sar -B`, the state of MGLRU, `lshw`) are kept in the ledger and drawn in a new section 7 of the report, in five tabs. A report of a case without readings has eight sections as before. Its thresholds mark values and change no grade; `--audience fa` adds its hints in words.
+- `my collect host -o DIR`: what a scan reads of this host, with the memory readings, copied into a directory that `my import` and `--root` read elsewhere. `--sudo` runs `dmidecode` and `lshw` through `sudo -n`.
+- A scan runs `numactl`, `numastat` and `sar` when they are installed, each with a time limit; `my serve` and `my harvest` do not.
+- Ledger schema 10: the table `host_reading`, and the number of sockets and the processor name of a host. Bundles carry the readings.
+
 ## [1.0.0] - 2026-11-16
 
 The first release: engine 8, ledger schema 9, bundle format 1, JSON output 1. Archives for linux/amd64, linux/arm64 and darwin/arm64, built with Go 1.26.11, `CGO_ENABLED=0`, statically linked. Two builds of the tag give the same bytes ([docs/release.md](docs/release.md)).

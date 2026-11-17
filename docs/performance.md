@@ -52,7 +52,7 @@ On the fleet, where no host has more than 146,787 errors, time grows in step wit
 
 ## Memory readings of a scan
 
-A scan of a running host makes the readings of the Memory Explorer and runs `numactl --hardware`, `numastat` and `sar -B` where they are installed. `TestTimeOfTheReadings` in `internal/adapter/hostmem` measures the adapter on the host it runs on, 21 times with the programs and 21 times without:
+A scan of a running host makes the readings of the Memory Explorer ([compatibility.md](compatibility.md#memory-explorer-readings)) and runs `numactl --hardware`, `numastat` and `sar -B` where they are installed. `TestTimeOfTheReadings` in `internal/adapter/hostmem` measures the adapter on the host it runs on, 21 times with the programs and 21 times without:
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o hostmem.test ./internal/adapter/hostmem

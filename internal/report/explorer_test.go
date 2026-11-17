@@ -139,3 +139,26 @@ func TestExplorerPrintsEveryPanel(t *testing.T) {
 		t.Error("the print style does not show every panel of the explorer")
 	}
 }
+
+// Without the pressure reading the card of the overview says so; with it
+// the card holds the two averages.
+func TestPressureCardWithoutTheReading(t *testing.T) {
+	without := map[string]string{model.ReadingMeminfo: everyReading[model.ReadingMeminfo]}
+	for _, c := range []struct {
+		kinds map[string]string
+		want  string
+	}{{without, "not read"}, {everyReading, " / "}} {
+		doc := buildFrom(t, withReadings(t, c.kinds), options(i18n.EN, Customer))
+		b, _ := render(t, doc)
+		raw := string(b)
+		i := strings.Index(raw, "Pressure some / full, avg10")
+		if i < 0 {
+			t.Fatalf("no pressure card")
+		}
+		card := raw[i:]
+		card = card[:strings.Index(card, "</dd>")]
+		if !strings.Contains(card[strings.Index(card, "<dd"):], c.want) {
+			t.Errorf("pressure card %q, want %q in it", card, c.want)
+		}
+	}
+}

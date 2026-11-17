@@ -100,6 +100,8 @@ CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev
 
 주소 맵에서 가로줄은 row 고장, 세로줄은 column 고장, 반복되는 한 칸은 single bit 고장, bank에 퍼진 구름은 bank 고장입니다. 터미널에서 `my help reading`을 실행하면 그림마다 읽는 법이 한국어로 나옵니다. 같은 내용을 자세히 쓴 문서가 [docs/reading-guide.md](docs/reading-guide.md)입니다. `docs/` 아래 문서는 영어입니다.
 
+`my board`는 SMBIOS 슬롯 이름을 읽어 슬롯을 CPU와 채널별로 그리고, DIMM마다 등급과 오류를 표시합니다.
+
 `my report`는 케이스를 HTML 파일 하나로 저장합니다. 그림은 SVG로 들어가고 DIMM별 소견, 오진 점검표, 원본 기록이 함께 담깁니다. 밖에서 불러오는 것이 없어서 네트워크 없이 열리고, 브라우저에서 인쇄하면 PDF가 됩니다. 예제의 리포트는 [examples/ko/demo-report.html](examples/ko/demo-report.html)이고, 아래는 그 안에 든 `CPU0_C1`의 타임라인입니다.
 
 ![CPU0_C1의 타임라인: 9월 말부터 하루 CE가 늘고, 아래에 재부팅, hPPR, page offline, UE가 표시됨](examples/ko/figures/CPU0_C1-timeline.svg)
@@ -162,6 +164,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | EDAC 카운터 | `/sys/devices/system/edac/mc` | 부팅 이후 DIMM별 건수 |
 | mcelog 데몬 | `mcelog --client` | DIMM별 건수 |
 | SMBIOS | `/sys/firmware/dmi/tables` 또는 `dmidecode` 출력 | 슬롯, DIMM 시리얼과 부품번호 |
+| 메모리 측정값 | `/proc/meminfo`, `/proc/vmstat`, `/proc/slabinfo`, 메모리 압력, sysfs의 CPU 캐시, `numactl --hardware`, `numastat`, `sar -B`, MGLRU 상태, `my collect host`가 실행한 `lshw` | 리포트의 메모리 익스플로러 절과 보드의 캐시 크기. 오류 기록은 없음 |
 | BMC | `ipmitool sel` 출력, Redfish 덤프, Redfish 서비스, 저장한 `racadm getsel`과 `racadm lclog view` 출력 | 메모리 이벤트, 펌웨어가 비활성화한 모듈, sparing, 리페어 |
 | GPU 메모리 | `nvidia-smi -q`와 쿼리 출력 | GPU별 row remapping 상태와 ECC 카운터 |
 | FMFM 로그 | JSON 파일 | 런타임, 부팅, 크래시 기록과 ECS 값 |
@@ -183,6 +186,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | 명령 | 하는 일 |
 | --- | --- |
 | `my` 또는 `my scan` | 이 호스트를 스캔: 슬롯 맵과 위험 순위 |
+| `my board` | 보드: 슬롯을 CPU와 채널별로 그리고 DIMM마다 등급과 오류를 표시. `--detail`은 슬롯마다 한 줄을 더함([docs/reading-guide.md](docs/reading-guide.md#board)) |
 | `my dimm <슬롯\|시리얼>` | DIMM 하나를 진찰: 소견, 토폴로지 막대, 주소 맵, 타임라인 |
 | `my why [슬롯\|시리얼]` | 결정과 그것을 받치는 문장 최대 3줄. `--detail`은 근거 기록, 반례 점검, 신뢰도 단계를 더하고 `--oneline`은 티켓용 한 줄 |
 | `my map <슬롯\|시리얼>` | bank 하나의 주소 맵. `--bank`, `--rank`, `--device`로 고르고 `--rows A-B`로 확대 |
@@ -194,6 +198,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | `my report [FILE] -o report.html` | 케이스나 이 호스트를 HTML 파일 하나로 저장. `--audience fa`는 불량 분석에 필요한 내용을 추가 |
 | `my diff BEFORE AFTER` | 한 호스트의 두 케이스를 비교. reseat, 슬롯 교차, 교체, 펌웨어 업데이트 전후에 오류가 DIMM을 따라갔는지 슬롯에 남았는지 확인 |
 | `my import <파일\|디렉터리>...` | 호스트 없이 파일만으로 케이스를 만듦 |
+| `my collect host -o DIR` | 스캔이 이 호스트에서 읽는 파일과 메모리 측정값을 디렉터리에 복사해 다른 곳에서 가져오게 함 |
 | `my collect redfish --bmc ADDRESS -o OUT` | BMC에 Redfish로 메모리, BIOS 설정, 로그를 물어 저장 |
 | `my inventory` | DIMM을 한 줄에 하나씩: 제조사, 파트 넘버, 용량, 구성, 속도, 적용 중인 RAS 설정, 운영체제와 BMC가 각각 기록한 CE |
 | `my bios` | BIOS의 메모리 RAS 설정을 프로필과 대조([docs/redfish.md](docs/redfish.md#bios-memory-ras-settings)) |
@@ -265,6 +270,7 @@ MemorY에는 텔레메트리가 없고, 프로젝트가 운영하는 서버에 �
 | `my preflight`가 본, 이 호스트에서 reset 때 잃는 것과 읽은 파일 | |
 | 호스트 이름, 아키텍처, 시스템 제품명 | |
 | DIMM별 오류 카운터 값, GPU 메모리 기록, ECS 값, BMC가 보고한 내용 | |
+| 스캔 시점에 커널이 센 호스트 메모리 값(메모리 사용량, slab 캐시 크기, 페이지 카운터, NUMA 노드 크기)과 CPU 캐시 크기 | |
 | 찾아본 소스 전부와 읽은 경로, 소스별 결과 | |
 | 보낸 사람의 실행에서 나온 소견 | |
 
@@ -296,6 +302,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 소견을 공개 플릿 데이터셋의 장애 티켓과 대조했습니다. 결과는 [docs/evaluation.md](docs/evaluation.md)에 있습니다.
 - 실제 메모리 컨트롤러의 EDAC 드라이버가 올라간 호스트에서는 아직 검증하지 못했습니다. 그런 호스트의 기록 디코딩은 커널과 rasdaemon 소스를 따라 만든 픽스처로만 시험했습니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
+- 보드는 공개 모음의 SMBIOS 덤프와 랩 게스트로만 대조했고, 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵

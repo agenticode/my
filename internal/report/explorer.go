@@ -2,12 +2,14 @@ package report
 
 import (
 	"math"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/agenticode/my/internal/explorer"
 	"github.com/agenticode/my/internal/i18n"
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/view"
 )
 
@@ -110,7 +112,11 @@ func (doc *Document) mxOverview(e *view.Explorer) []any {
 		swap = mib(sys.SwapUsedBytes)
 	}
 	card("swap", swap, view.KPILevel("swap", sys))
-	card("psi", explorer.ToFixed(float64(sys.PsiSomeAvg10), 1)+" / "+explorer.ToFixed(float64(sys.PsiFullAvg10), 1), view.KPILevel("pressure", sys))
+	if slices.Contains(e.Missing, model.ReadingPressure) {
+		card("psi", doc.say("mx.kpi.not_read"), "")
+	} else {
+		card("psi", explorer.ToFixed(float64(sys.PsiSomeAvg10), 1)+" / "+explorer.ToFixed(float64(sys.PsiFullAvg10), 1), view.KPILevel("pressure", sys))
+	}
 	card("dirty", mib(sys.DirtyBytes)+" / "+mib(sys.WritebackBytes), "")
 	out := []any{cards, doc.memoryBar(sys)}
 	if doc.Audience == FA {
