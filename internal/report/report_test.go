@@ -679,6 +679,9 @@ func TestHostileText(t *testing.T) {
 		`UPDATE action SET raw = raw || ?, detail = ?, method = ?`,
 		`UPDATE dimm SET manufacturer = ?, part_number = ?`,
 		`UPDATE host SET system_vendor = ?, system_product = ?`,
+		// The board writes the SMBIOS names of a slot into its figure,
+		// its card and their attributes.
+		`UPDATE slot SET locator = locator || ?, bank_locator = ?`,
 		`UPDATE source SET origin = ?, detail = ?`,
 	} {
 		n := strings.Count(stmt, "?")
@@ -719,6 +722,16 @@ func TestHostileText(t *testing.T) {
 	}
 	if n := len(root.find("script")); n != 1 {
 		t.Errorf("%d script elements", n)
+	}
+	// The SMBIOS names of the slots reach the cards of the board as text.
+	named := 0
+	for _, card := range root.find("dl.mx-card") {
+		if strings.Contains(card.content(), "<script>alert(1)</script>") {
+			named++
+		}
+	}
+	if named == 0 {
+		t.Error("no card of the board shows the hostile slot names")
 	}
 	if bytes.Contains(raw, []byte("<img")) || bytes.Contains(raw, []byte("<script>alert")) || bytes.Contains(raw, []byte("onerror=alert(2)>\"")) {
 		t.Error("hostile markup is in the report unescaped")
