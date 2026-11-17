@@ -302,7 +302,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 소견을 공개 플릿 데이터셋의 장애 티켓과 대조했습니다. 결과는 [docs/evaluation.md](docs/evaluation.md)에 있습니다.
 - 실제 메모리 컨트롤러의 EDAC 드라이버가 올라간 호스트에서는 아직 검증하지 못했습니다. 그런 호스트의 기록 디코딩은 커널과 rasdaemon 소스를 따라 만든 픽스처로만 시험했습니다.
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
-- 보드는 공개 모음의 SMBIOS 덤프와 랩 게스트로만 대조했고, 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
+- 공개 SMBIOS 모음의 서버 덤프 2,044개 중 1,934개는 모든 슬롯을 프로세서, 채널, 채널 안 위치에 놓습니다. 슬롯 이름이나, 제조사 공개 문서 385개로 만든 보드 계열 표 361개를 씁니다. 나머지 110개는 자기 기록만으로 위치를 알 수 없는 까닭과 함께 따로 적어 둡니다. 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵

@@ -453,7 +453,878 @@ SMBIOS gives no error records and no grade. The board of `my board` and of the r
 
 ## Slot names of server vendors
 
-The board places a slot by its locator and bank locator, the two names SMBIOS gives it. Each name is read whole, by the first of a table of name forms that matches all of it: a processor word and its number (`P1`, `CPU0`, `PROC 1`), a channel letter or number, the number of the slot in its channel, or a running slot number that says nothing of the channel. The board then decides the processor of each slot (the processor word of the locator, then of the bank locator; a `Node` of the bank locator; the only processor of a board with one; the processor of the other slots of the same channel letter; channel letters split evenly over the processors in order), numbers the channels of a processor from 0 in the order of their names, and the slots of a channel from 0. The rows below are what the board draws of the first slot of each fixture under `testdata/explorer`; a test holds the table to the fixtures.
+The board places a slot by the two names SMBIOS gives it, the locator and the bank locator, and where a name gives only a slot number, by the table of the board's family. Every slot gets a processor, a channel and a position in the channel, counted from 0, or it is drawn without channels on its processor, or set aside by its name with the reason. A memory device of type Flash, ROM or EEPROM is a chip of the board and no slot.
+
+### Name forms
+
+Each name is read whole, by the first form of the tables below that matches all of it; letters of any case match except where a form says capitals. A name that no form reads sets its slot aside. `NO DIMM`, `Not Specified`, `N/A`, `None`, `Unknown`, `<BAD INDEX>`, `<OUT OF SPEC>` and an empty string name nothing.
+
+<!-- forms -->
+| Locator form | Examples | Parts |
+| --- | --- | --- |
+| `p-dimm-letter` | `P1-DIMMA1`, `P1_DIMM_A1` | processor word `P`, channel letter, slot |
+| `dimm-p-letter` | `DIMM_P0_A1` | processor word `P`, channel letter, slot |
+| `p-umc-ch` | `P0_UMC0_CH_A0`, `P0_MC0_DIM_CH_A0` | processor word `P`, memory controller, channel letter, slot |
+| `p-ch-dimm` | `P0-ChA-DIMM0` | processor word `P`, channel letter, slot |
+| `cpu-dimm-letter` | `CPU0_DIMM_A1`, `CPU1 DIMM A1` | processor word `CPU`, channel letter, slot |
+| `cpu-dimm-letter-only` | `CPU0_DIMM_A` | processor word `CPU`, channel letter |
+| `cpu-u-dimm-u-letter` | `CPU_0_DIMM_A_0` | processor word `CPU`, channel letter, slot |
+| `cpu-letter` | `CPU0_A1` | processor word `CPU`, channel letter, slot |
+| `cpu-c-d` | `CPU0_C0D1` | processor word `CPU`, channel number, slot |
+| `cpu-ch-dimm` | `CPU0_CH0_DIMM0` | processor word `CPU`, channel number, slot |
+| `socket-channel-dimm` | `SOCKET 0 CHANNEL 1 DIMM 0` | processor word `SOCKET`, channel number, slot |
+| `node-channel-dimm` | `NODE 0 CHANNEL 0 DIMM 0 (C0A0)` | processor word `NODE`, channel number, slot |
+| `dimm-digits` | `DIMM010`, `DIMM000 J11` | processor, channel and slot as three digits (capitals only) |
+| `p-digit-letter` | `P1_DIMM1A`, `P1-1A` | processor word `P`, a digit and a letter: what they are the board decides |
+| `node-digit-letter` | `NODE0-1A` | processor word `NODE`, a digit and a letter |
+| `proc-dimm` | `PROC 1 DIMM 9`, `PROC  1 DIMM  1` | processor word `PROC` (from 1), a slot number that says no channel |
+| `proc-dimm-letter` | `PROC 1 DIMM 3A` | processor word `PROC`, slot number, population letter |
+| `cpu-dimm-number` | `CPU1-DIMM5`, `CPU1_DIMM_5` | processor word `CPU`, a slot number that says no channel |
+| `dimm-cpu` | `DIMM5_CPU0` | a slot number, processor word `CPU` |
+| `socket-dimm` | `Socket 0 DIMM 1` | processor word `Socket`, a slot number |
+| `node-dimm` | `Node0_Dimm1` | processor word `Node`, a slot number |
+| `c-dimm` | `C0_DIMM1`, `H0_DIMM1` | processor word `C` or `H` (capitals only), a slot number |
+| `cpu-only` | `CPU1` | processor word `CPU`; the bank locator gives the slot number |
+| `board-dimm` | `Board 1, DIMM 1A` | memory card, slot number, population letter |
+| `path` | `1/0/0/1A` | a path of the partition, slot number, population letter |
+| `controller-channel-dimm` | `Controller0-ChannelA-DIMM0` | memory controller, channel letter, slot |
+| `controller-channel` | `Controller1-ChannelB` | memory controller, channel letter |
+| `channel-dimm` | `ChannelA-DIMM0`, `ChannelA_Dimm1` | channel letter, slot |
+| `onboard-dimm` | `ONBOARD DIMM_A1` | channel letter, slot |
+| `dimm-ch-letter` | `DIMM CHA1`, `DIMM-CHB2` | channel letter, slot |
+| `ch-letter` | `CHA_1` | channel letter, slot |
+| `ddr-letter` | `DDR4_A1` | channel letter, slot |
+| `memory-letter` | `MEMORY A1` | channel letter, slot |
+| `cpu-u-letter` | `CPU_A1` | channel letter, slot |
+| `dimm-letter` | `DIMMA1` | channel letter, slot |
+| `dimm-u-letter` | `DIMM_A1`, `DIMM A1` | a letter and a number: what they are the board decides |
+| `letter-number` | `A1`, `B12` | a letter and a number: what they are the board decides |
+| `dimm-number-u-letter` | `DIMM1_A` | a digit and a letter |
+| `dimm-digit-letter` | `DIMM-1A`, `DIMM 1A`, `DIMM1A` | a digit and a letter |
+| `mem-card` | `MEM A, J1` | memory card letter, slot number |
+| `a-dimm` | `A1_DIMM0` | a slot number |
+| `dimm-number` | `DIMM 1`, `DIMM1`, `Dimm 1` | a slot number that says no channel |
+
+| Bank locator form | Examples | Parts |
+| --- | --- | --- |
+| `p-node-channel-dimm` | `P0_Node0_Channel0_Dimm0` | processor (from 0), node, channel number, slot |
+| `p-channel-dimm` | `P0_Channel0_Dimm0` | processor (from 0), channel number, slot |
+| `node-channel-dimm` | `_Node0_Channel0_Dimm0`, `A1_Node0_Channel0_Dimm0` | node, channel number, slot |
+| `node-channel-dimm-words` | `NODE 0 CHANNEL 0 DIMM 0` | node, channel number, slot |
+| `socket-channel-dimm` | `SOCKET 0 CHANNEL 0 DIMM 0` | processor, channel number, slot |
+| `node` | `NODE 1` | node: a processor or a memory controller, the board decides |
+| `p-channel-letter` | `P0 CHANNEL A` | processor (from 0), channel letter |
+| `cpu-ch-letter` | `CPU0ChA` | processor, channel letter |
+| `p-ch-letter` | `P0-CH-A` | processor, channel letter |
+| `board-cpu` | `Primary Main Board/CPU 1` | processor |
+| `cpu` | `CPU 1`, `CPU1` | processor |
+| `sys-mb-p` | `/SYS/MB/P0` | processor (from 0) |
+| `cpu-bank` | `CPU0_Bank1` | processor, bank |
+| `p-bank` | `P1_BANK0` | processor, bank: the slots of a bank share their channel |
+| `node-bank` | `Node0_Bank1` | node, bank |
+| `node-bank-card` | `Node 0 Bank 1 MemCard 2` | chassis node, bank, memory card |
+| `channel-letter` | `CHANNEL A`, `ChannelA` | channel letter |
+| `chan-dimm` | `CHAN A DIMM 1` | channel letter, slot |
+| `channel-number` | `Channel 1` | channel number |
+| `letter` | `A` | channel letter (one capital) |
+| `path` | `1/0/0/1` | a path of the partition |
+| `dimm-number` | `DIMM1`, `DIMM 1` | the slot number of a locator `CPU1` |
+| `same-as-locator` | `DIMM_A1`, `BANK_A2`, `A1` | the locator again: nothing |
+| `bank-number` | `BANK 1`, `Bank 1`, `Slot 1` | a bank: nothing of the place |
+| `number` | `7` | a bank number: nothing of the place |
+| `bank-word` | `BANK` | nothing |
+<!-- /forms -->
+
+### Which processor, channel and slot
+
+- A letter and a number (`A1`, `DIMM_A1`) or a digit and a letter (`1A`): where the bank locator spells channel and slot (`NODE 0 CHANNEL 0 DIMM 0`, `P0_Node0_Channel0_Dimm0`), the pairing decides. The letter is the channel when letters and bank channels pair one to one; for `1A` the digit is the channel when digits and bank channels pair one to one; otherwise the name is a label and the bank locator places the slot. A bank locator `P1_BANK0` groups the slots of one channel. Without such a bank locator the letter is the channel and the number the slot, except on Supermicro boards, whose `1A` has the channel in the digit and the slot in the letter. On Dell PowerEdge boards the letter is the processor: their families say so.
+- The processor of a slot: the processor word of the locator, then that of the bank locator. A word counts from 0 when some slot of the board carries it with 0, else from 1; `PROC` counts from 1. Then a `Node` of the bank locator: with no more nodes than processor records a node is a processor, with a multiple of them it is one of several memory controllers of a processor (Intel Whitley boards write `NODE 1` to `NODE 4` on two processors). Then the only processor of a board with one record. Then the processor of the other slots of the same channel letter. Last, channel letters without a processor word split evenly over the processors in order, when their number divides by the processor records and no processor gets more letters than it has channels (`ChannelA` to `ChannelD` on the first of two Xeon E5, `ChannelE` to `ChannelH` on the second). A slot without a processor after that is set aside.
+- A locator that names the channel letter stands when its bank locator names another channel; a line says so.
+- The channels of a processor are numbered from 0 in the order of their names (letters, numbers, the memory controller first where several stand behind one processor), and the slots of a channel from 0 in the order of their numbers. The board draws the vendor's name of the channel under it.
+
+### Board families
+
+A family is a row of `internal/explorer/families.tsv` (361 rows), written from a public document of the board's maker. A row ties products to the document by the system product and the board name, and says what the document gives: which slot number sits on which processor, channel and position, which word of the names is which processor, how many channels a processor of the board has and how many slots a channel holds, which empty slots the manual labels where the firmware gives them no name, and which records the firmware writes for slots the board does not have. A board named only by its part number takes the row of the family whose named boards carry the same part number. A row whose document does not settle the place sets the slots of the board aside with the reason. Rows are tried in order; the first that fits a board decides. A board that fits no row is read by the rules above. The tables keep the facts of the documents in MemorY's own form; no text, table or drawing of a document is copied.
+
+<!-- families -->
+| Family | Maker | Boards | What the table gives | Documents |
+| --- | --- | --- | --- | --- |
+| `dell-cs24-sc` | dell | CS24-SC | set aside: no-document | none found |
+| `board-strings-broken` | * | no product and no board | set aside: board-unknown | none found |
+| `dell-board-unknown` | dell | `^(?:\|CounterACT\|OmniCube CN-3400-1\|AWS Elemental Appliance)\\|(?:.* )?(?:04N3DF\|0XWDCF\|04F3CJ\|0024FG)$` | set aside: board-unknown | none found |
+| `dell-pn-0pxxhp` | dell | board 0PXXHP | a board known by its part number: the rule of `dell-12g-24slot` | `dell-e14s` |
+| `dell-pn-0jp31p` | dell | board 0JP31P | a board known by its part number: the rule of `dell-12g-24slot` | `dell-e14s` |
+| `dell-pn-0vrcy5` | dell | board 0VRCY5 | a board known by its part number: the rule of `dell-12g-24slot` | `dell-e14s` |
+| `dell-pn-04jn2k` | dell | board 04JN2K | a board known by its part number: the rule of `dell-14g-16slot` | `dell-e45s` |
+| `fujitsu-d2709-phantoms` | fujitsu | PRIMERGY TX200 S5 | records without a slot on the board: DIMM-3A, DIMM-3B, DIMM-3C, DIMM-3D, DIMM-3E, DIMM-3F | `fujitsu-d2709-tx200-s5` |
+| `sm-x10dr-16-labels` | supermicro | X10DRi, X10DRH, X10DRW | labels of the manual for 16 slots, given to empty slots without a name; with 2 processor records, 16 memory devices | `sm-mnl-1491`, `sm-mnl-1628` |
+| `sm-x10drg-24-labels` | supermicro | X10DRG | labels of the manual for 24 slots, given to empty slots without a name; with 2 processor records, 24 memory devices | `sm-mnl-1780` |
+| `sm-x10sra-8-labels` | supermicro | X10SRA | labels of the manual for 8 slots, given to empty slots without a name; with 1 processor records, 8 memory devices | `sm-mnl-1643` |
+| `gigabyte-mu71-su0-phantoms` | gigabyte | MU71-SU0-00 | records without a slot on the board: DIMM_P1_G0, DIMM_P1_G1, DIMM_P1_H0, DIMM_P1_I0, DIMM_P1_J0, DIMM_P1_J1, DIMM_P1_K0, DIMM_P1_L0 | `gigabyte-mu71-su0-user-manual` |
+| `gigabyte-c621-su8-phantoms` | gigabyte | C621-SU8 | records without a slot on the board: CPU1_DIMM_B2, CPU1_DIMM_C2, CPU1_DIMM_E2, CPU1_DIMM_F2, CPU2_DIMM_A1, CPU2_DIMM_A2, CPU2_DIMM_B1, CPU2_DIMM_B2, CPU2_DIMM_C1, CPU2_DIMM_C2, CPU2_DIMM_D1, CPU2_DIMM_D2, CPU2_DIMM_E1, CPU2_DIMM_E2, CPU2_DIMM_F1, CPU2_DIMM_F2 | `gigabyte-c621-su8-user-manual` |
+| `gigabyte-c621-sd8-phantoms` | gigabyte | C621-SD8 | records without a slot on the board: CPU1_DIMM_A2, CPU1_DIMM_B2, CPU1_DIMM_C1, CPU1_DIMM_C2, CPU1_DIMM_D2, CPU1_DIMM_E2, CPU1_DIMM_F1, CPU1_DIMM_F2, CPU2_DIMM_A2, CPU2_DIMM_B2, CPU2_DIMM_C1, CPU2_DIMM_C2, CPU2_DIMM_D2, CPU2_DIMM_E2, CPU2_DIMM_F1, CPU2_DIMM_F2 | `gigabyte-c621-sd8-user-manual` |
+| `tyan-s4985-ck8` | tyan | CK8 (board S4985) | set aside: names-not-in-document | `tyan-s4985-user-manual`, `tyan-m4985-user-manual` |
+| `msi-ms9661-mcp55` | msi | MCP55 (board MS-9661) | set aside: no-channel-in-document | `msi-ms9661-manual` |
+| `msi-ms9280` | msi | MS-9280 (board MS-9280) | set aside: no-document | none found |
+| `aopw-plus` | * | AOPW-PLUS (board AOPW-PLUS) | set aside: no-document | none found |
+| `gmktec-nucbox8` | * | NucBox8 (board GMKtec) | set aside: no-document | none found |
+| `dell-13g-24slot` | dell | PowerEdge R630, board PowerEdge R630, PowerEdge R730xd, board PowerEdge R730xd, PowerEdge R730, board PowerEdge R730, PowerEdge T630, board PowerEdge T630, PowerEdge R730XD, board PowerEdge R730XD, OmniCube CN-3400-1, board OmniCube CN-3400-1 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3 | `dell-e26s` |
+| `dell-12g-24slot` | dell | PowerEdge R720, board PowerEdge R720, PowerEdge R620, board PowerEdge R620, PowerEdge R720xd, board PowerEdge R720xd, PowerEdge T620, board PowerEdge T620, OEM-R 720xd, board OEM-R 720xd | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3 | `dell-e14s` |
+| `dell-12g-e5-2400-2s-12slot` | dell | PowerEdge R520, board PowerEdge R520, PowerEdge R420, board PowerEdge R420, PowerEdge T420, board PowerEdge T420 | slot number to channel and position on the letter (A the first processor); channels 1, 2, 3 | `dell-e18s` |
+| `dell-12g-e5-2400-1s-6slot` | dell | PowerEdge T320, board PowerEdge T320, PowerEdge R320, board PowerEdge R320 | slot number to channel and position on the letter (A the first processor); channels 1, 2, 3 | `dell-e20s` |
+| `dell-13g-12slot` | dell | PowerEdge R430, board PowerEdge R430, PowerEdge R530, board PowerEdge R530, PowerEdge T430, board PowerEdge T430 | slot number to channel and position on the letter (A the first processor), another table for the second processor; channels 0, 1, 2, 3 | `dell-e28s` |
+| `dell-11g-18slot` | dell | PowerEdge R710, board PowerEdge R710, PowerEdge T710, board PowerEdge T710 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed, unnamed | `dell-r710-owner-manual` |
+| `dell-11g-12slot` | dell | PowerEdge R610, board PowerEdge R610, PowerEdge T610, board PowerEdge T610 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed, unnamed | `dell-r610-owner-manual` |
+| `dell-11g-8slot` | dell | PowerEdge R510, board PowerEdge R510, PowerEdge R410, board PowerEdge R410, PowerEdge T410, board PowerEdge T410 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2 | `dell-r410-owner-manual` |
+| `dell-11g-x3400-6slot` | dell | PowerEdge T310, board PowerEdge T310, PowerEdge R310, board PowerEdge R310 | slot number to channel and position on the letter (A the first processor); channels A, B | `dell-t310-owner-manual` |
+| `dell-11g-x3400-4slot` | dell | PowerEdge R210, board PowerEdge R210, PowerEdge T110, board PowerEdge T110 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed | `dell-r210-owner-manual` |
+| `dell-e3-4slot-lettered` | dell | PowerEdge R210 II, board PowerEdge R210 II, PowerEdge T110 II, board PowerEdge T110 II | the names place the slots | `dell-e10s` |
+| `dell-12g-r220` | dell | PowerEdge R220, board PowerEdge R220 | slot number to channel and position on the one processor; channels 1, 2 | `dell-e10s-2` |
+| `dell-13g-1s-4slot` | dell | PowerEdge R230, board PowerEdge R230, PowerEdge T330, board PowerEdge T330, PowerEdge T130, board PowerEdge T130, PowerEdge R330, board PowerEdge R330 | slot number to channel and position on the letter (A the first processor); channels 0, 1 | `dell-e33s` |
+| `dell-14g-1s-4slot` | dell | PowerEdge R340, board PowerEdge R340, PowerEdge R240, board PowerEdge R240, PowerEdge T340, board PowerEdge T340, PowerEdge T140, board PowerEdge T140 | slot number to channel and position on the letter (A the first processor); channels 0, 1 | `dell-e57s` |
+| `dell-15g-1s-4slot` | dell | PowerEdge T150, board PowerEdge T150, PowerEdge R350, board PowerEdge R350 | slot number to channel and position on the letter (A the first processor); channels 0, 1 | `dell-e80s` |
+| `dell-14g-24slot` | dell | PowerEdge R740, board PowerEdge R740, PowerEdge R640, board PowerEdge R640, PowerEdge R740xd, board PowerEdge R740xd, PowerEdge T640, board PowerEdge T640, XC640-10 CORE, board XC640-10 CORE, XC740xd-12 CORE, board XC740xd-12 CORE | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3, 4, 5 | `dell-e38s` |
+| `dell-14g-16slot` | dell | PowerEdge R440, board PowerEdge R440, PowerEdge T440, board PowerEdge T440, PowerEdge R540, board PowerEdge R540, PowerEdge R740xd2, board PowerEdge R740xd2 | slot number to channel and position on the letter (A the first processor), another table for the second processor; channels 0, 1, 2, 3, 4, 5 | `dell-e45s` |
+| `dell-14g-epyc7001-32slot` | dell | PowerEdge R7425, board PowerEdge R7425 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3, 4, 5, 6, 7 | `dell-e38s-2` |
+| `dell-15g-epyc-1s-16slot` | dell | PowerEdge R6515, board PowerEdge R6515, PowerEdge R7515, board PowerEdge R7515 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e45s-2` |
+| `dell-15g-epyc-2s-32slot` | dell | PowerEdge R7525, board PowerEdge R7525 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e68s` |
+| `dell-15g-icx-32slot` | dell | PowerEdge R750, board PowerEdge R750, PowerEdge R650, board PowerEdge R650 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e70s` |
+| `dell-15g-icx-16slot` | dell | PowerEdge R450, board PowerEdge R450, PowerEdge T550, board PowerEdge T550 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e74s` |
+| `dell-16g-epyc9004-2s-24slot` | dell | PowerEdge R7625, board PowerEdge R7625 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H, I, J, K, L | `dell-e94s` |
+| `dell-16g-epyc9004-1s-12slot` | dell | PowerEdge R6615, board PowerEdge R6615 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H, I, J, K, L | `dell-e97s` |
+| `dell-16g-spr-16slot` | dell | PowerEdge R660xs, board PowerEdge R660xs | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e87s` |
+| `dell-xr4510c` | dell | PowerEdge XR4510c, board PowerEdge XR4510c | slot number to channel and position on the letter (A the first processor); channels A1, A2, A3, A4 | `dell-xr4510c-installation-service-manual` |
+| `dell-precision-7920-tower` | dell | Precision 7920 Tower, board Precision 7920 Tower | slot number to channel and position on the processor word of the names; channels Ch0, Ch1, Ch2, Ch3, Ch4, Ch5 | `dell-d04x` |
+| `dell-precision-7820-tower` | dell | Precision 7820 Tower, board Precision 7820 Tower | slot number to channel and position on the processor word of the names; channels Ch0, Ch1, Ch2, Ch3, Ch4, Ch5 | `dell-d02t` |
+| `dell-precision-rack-7910` | dell | Precision Rack 7910, board Precision Rack 7910 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3 | `dell-e31s` |
+| `dell-precision-7920-rack` | dell | Precision 7920 Rack, board Precision 7920 Rack | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3, 4, 5 | `dell-e38s-3` |
+| `dell-precision-7960-rack` | dell | Precision 7960 Rack, board Precision 7960 Rack | slot number to channel and position on the letter (A the first processor); channels CH_A, CH_B, CH_C, CH_D, CH_E, CH_F, CH_G, CH_H | `dell-e82s` |
+| `dell-c4140` | dell | PowerEdge C4140, board PowerEdge C4140 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3, 4, 5 | `dell-e53s` |
+| `dell-c6520` | dell | PowerEdge C6520, board PowerEdge C6520 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e64s` |
+| `dell-c6525` | dell | PowerEdge C6525, board PowerEdge C6525 | slot number to channel and position on the letter (A the first processor); channels A, B, C, D, E, F, G, H | `dell-e63s` |
+| `dell-c6220ii-c8220` | dell | PowerEdge C6220 II, board PowerEdge C6220 II, PowerEdge C8220, board PowerEdge C8220 | slot number to channel and position on the letter (A the first processor); channels CHA, CHB, CHC, CHD | `dell-c6220-owner-manual` |
+| `dell-c6320` | dell | PowerEdge C6320, board PowerEdge C6320 | slot number to channel and position on the letter (A the first processor); channels CHA, CHB, CHC, CHD | `dell-b08s` |
+| `dell-c5220` | dell | PowerEdge C5220, board PowerEdge C5220 | set aside: no-channel-in-document | `dell-b04s` |
+| `dell-c6100-numbered` | dell | C6100, board C6100, XS23-TY35, board XS23-TY35 | set aside: names-not-in-document | `dell-c6100-owner-manual` |
+| `dell-xs23-ty3-spelled` | dell | XS23-TY3, board XS23-TY3 | the names place the slots | `dell-c6100-owner-manual` |
+| `dell-c1100-cs24-ty` | dell | CS24-TY, board CS24-TY | the names place the slots | `dell-c1100-owner-manual` |
+| `dell-pe-1950-2950` | dell | PowerEdge 1950, board PowerEdge 1950, PowerEdge 2950, board PowerEdge 2950 | slot number to channel and position on the memory controller of the chipset; channels 0, 1, 2, 3 | `dell-1950-owner-manual` |
+| `dell-pe-2900` | dell | PowerEdge 2900, board PowerEdge 2900 | slot number to channel and position on the memory controller of the chipset; channels 0, 1, 2, 3 | `dell-2900-owner-manual` |
+| `dell-pe-sc1430` | dell | PowerEdge SC1430, board PowerEdge SC1430 | slot number to channel and position on the memory controller of the chipset; channels 0, 1 | `dell-sc1430-owner-manual` |
+| `dell-precision-r5400` | dell | Precision WorkStation R5400, board Precision WorkStation R5400 | set aside: no-channel-in-document | `dell-r5400-service-manual` |
+| `dell-pe-t300` | dell | PowerEdge T300, board PowerEdge T300 | slot number to channel and position on the memory controller of the chipset; channels A, B | `dell-t300-owner-manual` |
+| `dell-pe-840-860-r200` | dell | PowerEdge 840, board PowerEdge 840, PowerEdge 860, board PowerEdge 860, PowerEdge R200, board PowerEdge R200 | memory on the chipset, the names place the slots; 2 channels of 2 slots | `dell-860-owner-manual` |
+| `dell-pe-2850-sc1425` | dell | PowerEdge 2850, board PowerEdge 2850, PowerEdge SC1425, board PowerEdge SC1425 | memory on the chipset, the names place the slots; 2 channels of 3 slots | `dell-2850-installation-guide` |
+| `dell-pe-2970` | dell | PowerEdge 2970, board PowerEdge 2970 | set aside: no-channel-in-document | `dell-2970-owner-manual` |
+| `dell-pe-r805` | dell | PowerEdge R805, board PowerEdge R805 | set aside: no-channel-in-document | `dell-r805-owner-manual` |
+| `dell-pe-r900` | dell | PowerEdge R900, board PowerEdge R900 | memory on the chipset, the names place the slots; 4 channels of 8 slots | `dell-r900-owner-manual` |
+| `dell-pe-r910` | dell | PowerEdge R910, board PowerEdge R910 | set aside: no-processor-in-document | `dell-e06s` |
+| `dell-pe-r810` | dell | PowerEdge R810, board PowerEdge R810 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed, unnamed, unnamed | `dell-e05s` |
+| `dell-pe-r815-r715` | dell | PowerEdge R815, board PowerEdge R815, PowerEdge R715, board PowerEdge R715 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed, unnamed, unnamed | `dell-e05s-2` |
+| `dell-pe-r515` | dell | PowerEdge R515, board PowerEdge R515 | slot number to channel and position on the letter (A the first processor); channels unnamed, unnamed | `dell-r515-owner-manual` |
+| `dell-pe-r820` | dell | PowerEdge R820, board PowerEdge R820 | slot number to channel and position on the letter (A the first processor); channels 0, 1, 2, 3 | `dell-e21s` |
+| `hp-gen9-24slot` | hp | ProLiant DL360 Gen9, board ProLiant DL360 Gen9, ProLiant DL380 Gen9, board ProLiant DL380 Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-767927-009`, `hpe-768830-401a` |
+| `hp-gen8-24slot` | hp | ProLiant DL380p Gen8, board ProLiant DL380p Gen8, ProLiant DL360p Gen8, board ProLiant DL360p Gen8 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-dl380p-gen8-user-guide`, `hpe-664724-006`, `hpe-ddr3-gen8` |
+| `hp-gen8-e5-2400-12slot` | hp | ProLiant DL360e Gen8, board ProLiant DL360e Gen8, ProLiant DL380e Gen8, board ProLiant DL380e Gen8 | slot number to channel and position on the processor word of the names; channels 1, 2, 3 | `hpe-675786-006`, `hpe-676151-006`, `hpe-ddr3-gen8` |
+| `hp-gen10-24slot` | hp | ProLiant DL360 Gen10, board ProLiant DL360 Gen10, ProLiant DL380 Gen10, board ProLiant DL380 Gen10 | slot number to channel and position on the processor word of the names; channels CH1, CH2, CH3, CH4, CH5, CH6 | `hpe-population-gen10-technical`, `hpe-dl380-gen10-user-guide`, `hpe-dl360-gen10-maintenance-service-guide` |
+| `hp-ml350-gen10` | hp | ProLiant ML350 Gen10, board ProLiant ML350 Gen10 | slot number to channel and position on the processor word of the names; channels CH1, CH2, CH3, CH4, CH5, CH6 | `hpe-population-gen10-technical`, `hpe-ml350-gen10-user-guide`, `hpe-870691-007` |
+| `hp-bl460c-gen8` | hp | ProLiant BL460c Gen8, board ProLiant BL460c Gen8 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-656396-004`, `hpe-656396-002`, `hpe-ddr3-gen8` |
+| `hp-bl460c-gen9` | hp | ProLiant BL460c Gen9, board ProLiant BL460c Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-768826-007` |
+| `hp-bl460c-gen10` | hp | ProLiant BL460c Gen10, board ProLiant BL460c Gen10 | slot number to channel and position on the processor word of the names; channels CH1, CH2, CH3, CH4, CH5, CH6 | `hpe-876833-006`, `hpe-population-gen10-technical` |
+| `hp-microserver-gen10` | hp | ProLiant MicroServer Gen10, board ProLiant MicroServer Gen10 | slot number to channel and position on the one processor; channels A, B | `hpe-872677-004`, `hpe-gen10-maintenance-service-guide`, `hpe-gen10` |
+| `hp-ml10-gen9` | hp | ML10Gen9, board ML10Gen9 | the names place the slots | `hpe-833836-073`, `hpe-833835-004`, `hpe-ml10-generation9-gen9` |
+| `hp-dl60-gen9` | hp | ProLiant DL60 Gen9, board ProLiant DL60 Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-786245-003` |
+| `hp-dl20-gen9` | hp | ProLiant DL20 Gen9, board ProLiant DL20 Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2 | `hpe-826318-003a` |
+| `hp-dl160-gen8` | hp | ProLiant DL160 Gen8, board ProLiant DL160 Gen8 | slot number to channel and position on the processor word of the names, another table for the second processor; channels 1, 2, 3, 4 | `hpe-670519-006`, `hpe-670554-007` |
+| `hp-dl385p-gen8` | hp | ProLiant DL385p Gen8, board ProLiant DL385p Gen8 | slot number to channel and position on the processor word of the names; channels Ch1, Ch2, Ch3, Ch4 | `hpe-dl385p-gen8-user-guide` |
+| `hp-gen9-16slot` | hp | ProLiant DL160 Gen9, board ProLiant DL160 Gen9, ProLiant DL180 Gen9, board ProLiant DL180 Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-775786-004`, `hpe-775439-004` |
+| `hp-dl120-gen9` | hp | ProLiant DL120 Gen9, board ProLiant DL120 Gen9 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-781878-003` |
+| `hp-g6g7-18slot-lettered` | hp | ProLiant DL360 G7, board ProLiant DL360 G7, ProLiant DL380 G7, board ProLiant DL380 G7, ProLiant DL380 G6, board ProLiant DL380 G6 | slot number to channel and position on the processor word of the names; channels 1, 2, 3 | `hpe-495624-003` |
+| `hp-dl360-g6-18slot-unlettered` | hp | ProLiant DL360 G6, board ProLiant DL360 G6 | slot number to channel and position on the processor word of the names; channels 1, 2, 3 | `hpe-517689-005` |
+| `hp-g5-fbdimm-8slot` | hp | ProLiant DL360 G5, board ProLiant DL360 G5, ProLiant DL380 G5, board ProLiant DL380 G5 | set aside: no-channel-in-document | `hpe-406316-002` |
+| `hp-z6-g4` | hp | HP Z6 G4 Workstation, board HP Z6 G4 Workstation | slot number to channel and position on the processor word of the names, another table for the second processor; channels 0.0, 0.1, 0.2, 1.0, 1.1, 1.2 | `hpe-setup-z6-g4-z8-g4`, `hp-z6-g4-tech-wp`, `hp-z6-g4-quickspecs`, `hp-z6-g4-msg` |
+| `hp-z8-g4` | hp | HP Z8 G4 Workstation, board HP Z8 G4 Workstation | slot number to channel and position on the processor word of the names, another table for the second processor; channels 0.0, 0.1, 0.2, 1.0, 1.1, 1.2 | `hpe-setup-z6-g4-z8-g4` |
+| `hp-dl320-g6-9slot` | hp | ProLiant DL320 G6, board ProLiant DL320 G6 | slot number to channel and position on the processor word of the names; channels 1, 2, 3 | `hpe-530514-002` |
+| `hp-dl160-g6-18slot` | hp | ProLiant DL160 G6, board ProLiant DL160 G6 | slot number to channel and position on the processor word of the names; channels Chnl1, Chnl2, Chnl3 | `hpe-dl160-6-g6` |
+| `hp-dl180-g6-12slot` | hp | ProLiant DL180 G6, board ProLiant DL180 G6 | slot number to channel and position on the processor word of the names; channels Chnl1, Chnl2, Chnl3 | `hpe-dl180-6-g6` |
+| `hp-bl460c-g6g7-12slot` | hp | ProLiant BL460c G6, board ProLiant BL460c G6, ProLiant BL460c G7, board ProLiant BL460c G7 | slot number to channel and position on the processor word of the names; channels 1, 2, 3 | `hpe-501274-002` |
+| `hp-dl120-g6-6slot` | hp | ProLiant DL120 G6, board ProLiant DL120 G6 | slot number to channel and position on the one processor; channels 1, 2 | `hpe-579574-004` |
+| `hp-dl120-g7-4slot` | hp | ProLiant DL120 G7, board ProLiant DL120 G7 | slot number to channel and position on the one processor; channels A, B | `hpe-638025-003a` |
+| `hp-dl385-g7-24slot` | hp | ProLiant DL385 G7, board ProLiant DL385 G7 | slot number to channel and position on the processor word of the names; channels A, B, C, D | `hpe-588708-001` |
+| `hp-dl585-g7-48slot` | hp | ProLiant DL585 G7, board ProLiant DL585 G7 | slot number to channel and position on the processor word of the names; channels A, B, C, D | `hpe-617692-004` |
+| `hp-bl685c-g7-32slot` | hp | ProLiant BL685c G7, board ProLiant BL685c G7 | slot number to channel and position on the processor word of the names; channels 1, 2, 3, 4 | `hpe-593961-001` |
+| `hp-dl165-g7-24slot` | hp | ProLiant DL165 G7, board ProLiant DL165 G7 | slot number to channel and position on the processor word of the names; channels A, B, C, D | `hpe-601465-003` |
+| `hp-dl145-g3-8slot` | hp | ProLiant DL145 G3, board ProLiant DL145 G3 | set aside: no-channel-in-document | `hpe-430047-004` |
+| `hp-dl580-g7-cartridges` | hp | ProLiant DL580 G7, board ProLiant DL580 G7 | memory cards, 2 to a processor; slot number on the card to channel and position | `hpe-595656-005` |
+| `hp-dl140-g2-8slot` | hp | ProLiant DL140 G2, board ProLiant DL140 G2 | set aside: no-channel-in-document | `hpe-381737-004` |
+| `hp-g4-ddr2-6slot` | hp | ProLiant DL360 G4p, board ProLiant DL360 G4p, ProLiant DL380 G4, board ProLiant DL380 G4 | set aside: no-channel-in-document | `hpe-359226-008` |
+| `hp-compaq-dl380-g1-4slot` | hp | ProLiant DL380, board ProLiant DL380 | set aside: no-channel-in-document | `hpe-136363-004` |
+| `hp-superdome-x-bl920s-gen8` | hp | Superdome2 16s x86, board Superdome2 16s x86 | set aside: no-channel-in-document | `hpe-hpe-integrity-superdome` |
+| `hp-netserver-lh4-memory-boards` | hp | HP NetServer, board HP NetServer | set aside: no-channel-in-document | `hpe-4-4r-user-guide` |
+| `ibm-x3550m3-x3650m3-18slot` | ibm | `^System x3550 M3 -\[2145CG8\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[2145CG8\]-$\|^System x3550 M3 -\[7944AC1\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[7944AC1\]-$\|^System x3550 M3 -\[7042CR6\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[7042CR6\]-$\|^System x3550 M3 -\[7944KFG\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[7944KFG\]-$\|^System x3550 M3 -\[7944SCP\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[7944SCP\]-$\|^System x3550 M3 -\[7944KAG\]-\\|\|^\\|(?:.* )?System x3550 M3 -\[7944KAG\]-$\|^System x3650 M3 -\[7945AC1\]-\\|\|^\\|(?:.* )?System x3650 M3 -\[7945AC1\]-$\|^System x3650 M3 -\[7945YBU\]-\\|\|^\\|(?:.* )?System x3650 M3 -\[7945YBU\]-$\|^System x3650 M3 -\[794562M\]-\\|\|^\\|(?:.* )?System x3650 M3 -\[794562M\]-$\|^System x3650 M3 -\[794522U\]-\\|\|^\\|(?:.* )?System x3650 M3 -\[794522U\]-$` | slot numbers that run over the processors, to processor, channel and position; channels CH0, CH1, CH2 | `ibm-x3550-m3-4254-7944-installation` |
+| `ibm-x3550m2-x3650m2-16slot` | ibm | `^IBM System x -\[79463AM\]-\\|\|^\\|(?:.* )?IBM System x -\[79463AM\]-$\|^System x3550 M2 -\[794644M\]-\\|\|^\\|(?:.* )?System x3550 M2 -\[794644M\]-$\|^System x3550 M2 -\[794622V\]-\\|\|^\\|(?:.* )?System x3550 M2 -\[794622V\]-$\|^System x3650 M2 -\[7947AC1\]-\\|\|^\\|(?:.* )?System x3650 M2 -\[7947AC1\]-$` | slot numbers that run over the processors, to processor, channel and position; channels CH0, CH1, CH2 | `ibm-x3550-m2-4198-7946-installation` |
+| `ibm-x3400m3-16slot` | ibm | `^IBM System x3400 M3 Server -\[737958G\]-\\|\|^\\|(?:.* )?IBM System x3400 M3 Server -\[737958G\]-$` | slot numbers that run over the processors, to processor, channel and position; channels CH0, CH1, CH2 | `ibm-x3400-m3-7378-7379-installation` |
+| `ibm-x3550m4-x3650m4-24slot` | ibm | `^IBM System x3650 M4: -\[2145DH8\]-\\|\|^\\|(?:.* )?IBM System x3650 M4: -\[2145DH8\]-$\|^IBM System x3550 M4 Server -\[7914AC1\]-\\|\|^\\|(?:.* )?IBM System x3550 M4 Server -\[7914AC1\]-$\|^System x3550 M4 -\[7914B2A\]-\\|\|^\\|(?:.* )?System x3550 M4 -\[7914B2A\]-$\|^System x3650 M4 -\[7915E1G\]-\\|\|^\\|(?:.* )?System x3650 M4 -\[7915E1G\]-$\|^IBM System x3550 M4 Server -\[7914Z5Q\]-\\|\|^\\|(?:.* )?IBM System x3550 M4 Server -\[7914Z5Q\]-$` | slot numbers that run over the processors, to processor, channel and position; channels Ch0, Ch1, Ch2, Ch3 | `ibm-x3550-m4-7914-installation-x3550` |
+| `ibm-x3300m4-12slot` | ibm | `^System x3300 M4 -\[7382E4G\]-\\|\|^\\|(?:.* )?System x3300 M4 -\[7382E4G\]-$\|^System x3300 M4 -\[7382E3G\]-\\|\|^\\|(?:.* )?System x3300 M4 -\[7382E3G\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0, 1, 2 | `ibm-x3300-m4-7382` |
+| `ibm-flex-x220-12slot` | ibm | `^Flex System x220 Compute Node -\[7906D2G\]-\\|\|^\\|(?:.* )?Flex System x220 Compute Node -\[7906D2G\]-$` | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D, E, F | `ibm-x220-installation-service-guide-7906` |
+| `ibm-flex-x240-24slot` | ibm | `^Flex System x240 Compute Node -\[8737AC1\]-\\|\|^\\|(?:.* )?Flex System x240 Compute Node -\[8737AC1\]-$` | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D | `ibm-x240-7863-8737-8738-8956` |
+| `ibm-bladecenter-hs23-16slot` | ibm | `^BladeCenter HS23 -\[7875MFM\]-\\|\|^\\|(?:.* )?BladeCenter HS23 -\[7875MFM\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0, 1, 2, 3 | `ibm-hs23-installation-user-guide-7875` |
+| `ibm-idataplex-dx360m4-16slot` | ibm | `^IBM System X iDataPlex dx360 M4 Server -\[7912AC1\]-\\|\|^\\|(?:.* )?IBM System X iDataPlex dx360 M4 Server -\[7912AC1\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0, 1, 2, 3 | `ibm-dx360-m4-7912-7913-user` |
+| `ibm-x3250m3-6slot` | ibm | `^System x3250 M3 -\[4252K4G\]-\\|\|^\\|(?:.* )?System x3250 M3 -\[4252K4G\]-$\|^System x3250 M3 -\[4252PAW\]-\\|\|^\\|(?:.* )?System x3250 M3 -\[4252PAW\]-$` | slot number to channel and position on the one processor; channels X, Y | `ibm-x3250-m3-4251-4252-4261` |
+| `ibm-x3250m4-4slot` | ibm | `^IBM System X3250 M4 -\[2583AC1\]-\\|\|^\\|(?:.* )?IBM System X3250 M4 -\[2583AC1\]-$` | slot number to channel and position on the one processor; channels X, Y | `ibm-x3250-m4-installation-service-guide` |
+| `ibm-x3200m2-4slot` | ibm | `^IBM System x3200 M2 -\[4368IGS\]-\\|\|^\\|(?:.* )?IBM System x3200 M2 -\[4368IGS\]-$` | slot number to channel and position on the memory controller of the chipset; channels 0, 1 | `ibm-x3200-m2-4367-4368-installation` |
+| `ibm-x3650-7979-12slot` | ibm | `^IBM System x3650 -\[7979AC1\]-\\|\|^\\|(?:.* )?IBM System x3650 -\[7979AC1\]-$\|^IBM System x3650 -\[7979B9U\]-\\|\|^\\|(?:.* )?IBM System x3650 -\[7979B9U\]-$` | slot number to channel and position on the memory controller of the chipset; channels 0, 1, 2, 3 | `ibm-x3650-7979-user-guide` |
+| `ibm-xseries235-6slot` | ibm | `^eserver xSeries 235 -\[86712AX\]-\\|\|^\\|(?:.* )?eserver xSeries 235 -\[86712AX\]-$` | set aside: no-channel-in-document | `ibm-235-8671-installation-guide` |
+| `ibm-x3850x5-64slot` | ibm | `^System x3850 X5 -\[7143Y61\]-\\|\|^\\|(?:.* )?System x3850 X5 -\[7143Y61\]-$` | set aside: no-channel-in-document | `ibm-x3850-x5-x3950-x5-7145` |
+| `intel-s5000-fbd-8slot` | * | S5000PSL, board S5000PSL, S5000PAL, board S5000PAL, S5000XVN, board S5000XVN | memory on the chipset, the names place the slots; 4 channels of 2 slots | `intel-s5000psl-s5000xsl-technical` |
+| `intel-s5000vsa` | * | S5000VSA, board S5000VSA, PR1710N, board PR1710N | memory on the chipset, the names place the slots; 2 channels of 4 slots | `intel-s5000vsa-technical` |
+| `intel-s5000vcl` | * | S5000VCL, board S5000VCL | memory on the chipset, the names place the slots; 2 channels of 3 slots | `intel-s5000vcl-technical` |
+| `intel-s3210sh` | * | S3210SH, board S3210SH | memory on the chipset, the names place the slots; 2 channels of 2 slots | `intel-e14960-009` |
+| `intel-se7501wv2` | * | SE7501WV2S, board SE7501WV2S | memory on the chipset, the names place the slots; 2 channels of 3 slots | `intel-se7501wv2-technical` |
+| `intel-s5520-12slot` | intel | S5520HC, board S5520HC, S5520SC, board S5520SC | the names place the slots | `intel-e39529-013` |
+| `intel-s5500hcv` | intel | S5500HCV, board S5500HCV | the names place the slots | `intel-e39529-013` |
+| `intel-s5520ur` | intel | S5520UR, board S5520UR | the names place the slots | `intel-e44031-012` |
+| `intel-s5500bc` | intel | S5500BC, board S5500BC | the names place the slots | `intel-e42249-009` |
+| `intel-s3420gp` | intel | S3420GP, board S3420GP, ......., board ......., S3420GPV, board S3420GPV | the names place the slots | `intel-e65697-010` |
+| `intel-s1200bt` | intel | S1200BTL, board S1200BTL | the names place the slots | `intel-s1200bt-technical` |
+| `intel-s1200v3rp` | intel | S1200RP, board S1200RP, S1200RP_SE, board S1200RP_SE | the names place the slots | `intel-s1200v3rp-technical` |
+| `intel-s1200sp` | intel | S1200SP, board S1200SP, ParX T404i G6 Server, board ParX T404i G6 Server, ParX T100c G6 Server, board ParX T100c G6 Server | the names place the slots | `intel-s1200sp-technical` |
+| `intel-s2600gz` | intel | S2600GZ, board S2600GZ | the names place the slots | `intel-s2600gz-technical` |
+| `intel-s2600cp-w2600cr` | intel | S2600CP, board S2600CP, CYPRESS11, board CYPRESS11, S2600CP .........., board S2600CP .........., W2600CR, board W2600CR, W2600CR .........., board W2600CR .......... | the names place the slots | `intel-s2600cp-p4000cp-technical` |
+| `intel-s4600lh2` | intel | S4600LH, board S4600LH, LH Pass, board LH Pass | the names place the slots | `intel-s4600lh2-t2-technical` |
+| `intel-s2600wt` | intel | S2600WTTR, board S2600WTTR | the names place the slots | `intel-s2600wt-technical-tps` |
+| `intel-s2600cw` | intel | S2600CW, board S2600CW | the names place the slots | `intel-s2600cw-technical` |
+| `intel-s2600wf` | intel | S2600WFT, board S2600WFT | the names place the slots | `intel-s2600wf-technical` |
+| `intel-s2600st` | intel | S2600STB, board S2600STB | the names place the slots | `intel-s2600st-technical` |
+| `intel-m50cyp` | intel | M50CYP2SBSTD, board M50CYP2SBSTD | the names place the slots | `intel-m50cyp2sb-technical` |
+| `intel-whitley-ref` | intel | WHITLEY, board WHITLEY | the names place the slots | `intel-m50cyp2sb-technical` |
+| `intel-m70klp` | intel | M70KLP2SB M90598-001, board M70KLP2SB M90598-001 | the names place the slots | `intel-m70klp-technical` |
+| `intel-eaglestream-ref` | intel | ArcherCity, board ArcherCity, EAGLESTREAM, board EAGLESTREAM, AST2600EVB, board AST2600EVB | the names place the slots | `intel-m50fcp2sbstd-technical` |
+| `intel-birchstream-ref` | intel | BIRCHSTREAM, board BIRCHSTREAM | the names place the slots | `intel-no-document-of` |
+| `amd-ethanol-x` | * | ETHANOL_DEBUG_X, board ETHANOL_DEBUG_X | the names place the slots | `amd-population-7003` |
+| `amd-volcano` | * | Volcano, board Volcano | the names place the slots | `amd-9004-population` |
+| `asus-p8b-m` | asus | board P8B-M Series, TERRA_PC, board TERRA_PC, Flagman TP100.3, board Flagman TP100.3 | the names place the slots | `asus-rs100-e7-pi2-user-guide` |
+| `asus-p8b-x-e` | asus | TS100-E7-PI4, board TS100-E7-PI4, TS300-E7-PS4, board TS300-E7-PS4, board P8B-E Series | the names place the slots | `asus-ts300-e7-ps4-user-guide` |
+| `asus-p9d-4slot` | asus | TS110-E8-PI4, board TS110-E8-PI4, TERRA_SERVER, board TERRA_SERVER, P9D-X Series, board P9D-X Series, P9D-V Series, board P9D-V Series, P9D-M Series, board P9D-M Series | the names place the slots | `asus-p9d-user-guide` |
+| `asus-p12r` | asus | RS300-E11-PS4, board RS300-E11-PS4, RS100-E11-PI2, board RS100-E11-PI2, board P12R-E Series | the names place the slots | `asus-e28203` |
+| `asus-e3-2slot` | asus | P9D-I Series, board P9D-I Series, P10S-I Series, board P10S-I Series | the names place the slots | `asus-p9d-user-guide-2` |
+| `asus-z9-8slot` | asus | Z9PA-D8 Series, board Z9PA-D8 Series, Z9PE-D8 WS, board Z9PE-D8 WS | the names place the slots | `asus-z9pa-d8-user-guide` |
+| `asus-z10-8slot` | asus | Z10PA-D8 Series, board Z10PA-D8 Series, Z10PE-D8 WS, board Z10PE-D8 WS | the names place the slots | `asus-e13692` |
+| `asus-z9-16slot` | asus | ESC4000 G2 Series, board ESC4000 G2 Series, Z9PE-D16 Series, board Z9PE-D16 Series, GEG, board GEG | the names place the slots | `asus-z9pe-d16-10g-user-guide` |
+| `asus-z10-16slot` | asus | Z10PE-D16 WS, board Z10PE-D16 WS, Silverback WS, board Silverback WS, GX4, board GX4, RS400-E8-PS2-F, board RS400-E8-PS2-F | the names place the slots | `asus-e13683` |
+| `asus-z9pr-d12` | asus | RS700-X7-PS4, board RS700-X7-PS4 | the names place the slots | `asus-rs700-x7-ps4-user-guide` |
+| `asus-z9na-d6` | asus | Z9NA-D6, board Z9NA-D6 | the names place the slots | `asus-z9na-d6-user-manual` |
+| `asus-wsc621e-sage` | asus | WS-C621E-SAGE Series, board WS-C621E-SAGE Series | the names place the slots | `asus-e16279` |
+| `asus-z11ph-d12` | asus | RS720Q-E9-RS24-S, board RS720Q-E9-RS24-S | the names place the slots | `asus-e16292` |
+| `asus-z11pg-d16` | asus | Z11PG-D16 Series, board Z11PG-D16 Series, ESC4000 G4, board ESC4000 G4 | the names place the slots | `asus-e16560` |
+| `asus-z11pg-d24` | asus | ESC8000 G4, board ESC8000 G4, ESC8000 G4-10G, board ESC8000 G4-10G | the names place the slots | `asus-e21686` |
+| `asus-prows-c621-64l` | asus | Pro WS C621-64L SAGE-10G Series, board Pro WS C621-64L SAGE-10G Series | the names place the slots | `asus-e16276` |
+| `asus-krpg-u8` | asus | ESC4000A-E10, board ESC4000A-E10 | the names place the slots | `asus-e21771` |
+| `asus-k14pp-d24` | asus | RS720A-E12-RS12, board RS720A-E12-RS12 | the names place the slots | `asus-e28170` |
+| `lenovo-thinkstation-p920` | lenovo | 30BDS0RA00, board 30BDS0RA00, 30BDS0RB00, board 30BDS0RB00, 30BDS2H804, board 30BDS2H804, 30BC001DGE, board 30BC001DGE, 30BC0048US, board 30BC0048US, 30BC000QGE, board 30BC000QGE, 30BC003KUS, board 30BC003KUS, 30BDS0N700, board 30BDS0N700 | slot number to channel and position on the processor word of the names; channels unnamed, unnamed, unnamed, unnamed, unnamed, unnamed | `lenovo-p920-p720` |
+| `lenovo-thinkstation-p720` | lenovo | 30BBS1PF00, board 30BBS1PF00, 30BACTO1WW, board 30BACTO1WW, 30BBS6NG00, board 30BBS6NG00, 30BBS21C01, board 30BBS21C01 | slot number to channel and position on the processor word of the names; channels unnamed, unnamed, unnamed, unnamed, unnamed, unnamed | `lenovo-p920-p720` |
+| `lenovo-thinksystem-sr590-sr570-16slot` | lenovo | `^ThinkSystem SR590 -\[7X99CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR590 -\[7X99CTO1WW\]-$\|^ThinkSystem SR570 -\[7Y03CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR570 -\[7Y03CTO1WW\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0.0, 0.1, 0.2, 1.0, 1.1, 1.2 | `lenovo-sr590-7x98-7x99-installation-installation` |
+| `lenovo-thinksystem-sr650-sr630-24slot` | lenovo | `^ThinkSystem SR650 -\[7X06CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR650 -\[7X06CTO1WW\]-$\|^ThinkSystem SR630 -\[7X02CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR630 -\[7X02CTO1WW\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0.0, 0.1, 0.2, 1.0, 1.1, 1.2 | `lenovo-sr650-7x05-7x06-installation` |
+| `lenovo-thinksystem-sr530-12slot` | lenovo | `^ThinkSystem SR530 -\[7X08CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR530 -\[7X08CTO1WW\]-$` | slot numbers that run over the processors, to processor, channel and position; channels unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed, unnamed | `lenovo-sr530-7x07-7x08-installation` |
+| `lenovo-thinksystem-sr650v2-sr630v2-32slot` | lenovo | ThinkSystem SR650 V2, board ThinkSystem SR650 V2, ThinkSystem SR630 V2, board ThinkSystem SR630 V2 | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D, E, F, G, H | `lenovo-sr650-v2-installation` |
+| `lenovo-thinksystem-st650v2-32slot` | lenovo | ThinkSystem ST650 V2, board ThinkSystem ST650 V2 | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D, E, F, G, H | `lenovo-st650-v2-technical` |
+| `lenovo-thinksystem-sr645-32slot` | lenovo | ThinkSystem SR645, board ThinkSystem SR645 | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D, E, F, G, H | `lenovo-sr645-installation` |
+| `lenovo-thinksystem-sr950v3-128slot` | lenovo | ThinkSystem SR950 V3, board ThinkSystem SR950 V3 | the names place the slots | `lenovo-sr950-v3-installation-installation` |
+| `lenovo-thinksystem-sn550-24slot` | lenovo | `^ThinkSystem SN550 -\[7X16CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SN550 -\[7X16CTO1WW\]-$` | slot numbers that run over the processors, to processor, channel and position; channels 0.0, 0.1, 0.2, 1.0, 1.1, 1.2 | `lenovo-sn550` |
+| `lenovo-systemx-m5-24slot` | lenovo | `^System x3650 M5: -\[8871AC1\]-\\|\|^\\|(?:.* )?System x3650 M5: -\[8871AC1\]-$\|^System x3650 M5: -\[5462IC1\]-\\|\|^\\|(?:.* )?System x3650 M5: -\[5462IC1\]-$\|^System x3550 M5: -\[8869AC1\]-\\|\|^\\|(?:.* )?System x3550 M5: -\[8869AC1\]-$\|^System x3550 M5: -\[5463AC1\]-\\|\|^\\|(?:.* )?System x3550 M5: -\[5463AC1\]-$` | slot numbers that run over the processors, to processor, channel and position; channels Ch0, Ch1, Ch2, Ch3 | `lenovo-x3650-m5-5462-installation-service` |
+| `lenovo-flex-x240m5-24slot` | lenovo | `^Lenovo Flex System x240 M5 Compute Node -\[9532AC1\]-\\|\|^\\|(?:.* )?Lenovo Flex System x240 M5 Compute Node -\[9532AC1\]-$` | slot numbers that run over the processors, to processor, channel and position; channels A, B, C, D | `lenovo-x240-m5-9532-2951-installation` |
+| `lenovo-systemx-x3250m6-4slot` | lenovo | `^LENOVO System x3250 M6 -\[3943AC1\]-\\|\|^\\|(?:.* )?LENOVO System x3250 M6 -\[3943AC1\]-$` | set aside: no-channel-in-document | `lenovo-x3250-m6-installation-service-guide` |
+| `lenovo-thinksystem-sr250-4slot` | lenovo | `^ThinkSystem SR250 -\[7Y51CTO1WW\]-\\|\|^\\|(?:.* )?ThinkSystem SR250 -\[7Y51CTO1WW\]-$` | set aside: no-channel-in-document | `lenovo-sr250-installation` |
+| `lenovo-thinksystem-sr250v2-4slot` | lenovo | ThinkSystem SR250 V2, board ThinkSystem SR250 V2 | set aside: no-channel-in-document | `lenovo-sr250-v2-technical` |
+| `sun-x4170-x4270-gen1` | sun | SUN FIRE X4270 SERVER, board SUN FIRE X4270 SERVER | set aside: duplicated-names | `oracle-820-5830-13` |
+| `sun-x4170-x4270-m2` | sun | SUN FIRE X4170 M2 SERVER, board SUN FIRE X4170 M2 SERVER, SUN FIRE X4270 M2 SERVER, board SUN FIRE X4270 M2 SERVER | slot number to channel and position on the bank locator; channels 0, 1, 2 | `oracle-e22369-02`, `oracle-e21671-04` |
+| `sun-x4170-x4270-m3` | sun | SUN FIRE X4170 M3, board SUN FIRE X4170 M3, SUN FIRE X4270 M3, board SUN FIRE X4270 M3 | slot number to channel and position on the bank locator; channels A, B, C, D | `oracle-e22313-13`, `oracle-e23396-15` |
+| `sun-x4-2` | sun | SUN SERVER X4-2, board SUN SERVER X4-2 | slot number to channel and position on the bank locator; channels A, B, C, D | `oracle-e38041-07` |
+| `sun-x5-2` | sun | ORACLE SERVER X5-2, board ORACLE SERVER X5-2 | slot number to channel and position on the bank locator; channels A, B, C, D | `oracle-e48320-10` |
+| `sun-x2270` | sun | SUN FIRE X2270, board SUN FIRE X2270 | set aside: no-channel-in-document | `oracle-820-5607-11`, `oracle-821-1345` |
+| `sun-x2200-m2` | sun | Sun Fire X2200 M2, board Sun Fire X2200 M2, Sun Fire X2200 M2 with Quad Core Processor, board Sun Fire X2200 M2 with Quad Core Processor | set aside: no-channel-in-document | `oracle-819-6597-12`, `oracle-819-6601-22` |
+| `sun-ultra40-m2` | sun | Sun Ultra 40 M2 Workstation, board Sun Ultra 40 M2 Workstation | set aside: no-channel-in-document | `oracle-820-0123-13` |
+| `sun-ultra20-m2` | sun | Ultra20 M2, board Ultra20 M2 | set aside: no-channel-in-document | `oracle-819-6584-11` |
+| `fujitsu-d2619-18slot` | fujitsu | PRIMERGY RX300 S5, board PRIMERGY RX300 S5, PRIMERGY TX300 S5, board PRIMERGY TX300 S5, PRIMERGY TX300 S6, board PRIMERGY TX300 S6 | the names place the slots | `fujitsu-d2619-tx300-s5-technical-manual`, `fujitsu-d2619-tx300-s6-technical-manual`, `fujitsu-rx300-s5-guide` |
+| `fujitsu-d2709-12slot` | fujitsu | PRIMERGY TX200 S5, board PRIMERGY TX200 S5 | the names place the slots | `fujitsu-d2709-tx200-s5` |
+| `fujitsu-d3031-12slot` | fujitsu | PRIMERGY RX200 S6, board PRIMERGY RX200 S6 | the names place the slots | `fujitsu-rx200-s6-guide`, `fujitsu-5600` |
+| `fujitsu-d2759-6slot` | fujitsu | PRIMERGY TX150 S7, board PRIMERGY TX150 S7 | the names place the slots | `fujitsu-d2759-tx150-s7-technical-manual` |
+| `fujitsu-d2863-4slot` | fujitsu | PRIMERGY RX100 S6, board PRIMERGY RX100 S6 | the names place the slots | `fujitsu-d2863-rx100-s6-technical-manual` |
+| `fujitsu-d3049-4slot` | fujitsu | PRIMERGY TX140 S1p, board PRIMERGY TX140 S1p | the names place the slots | `fujitsu-d3049-tx140-s1-tx120-s3`, `fujitsu-tx140-s1-maintenance-manual` |
+| `fujitsu-d3239-4slot` | fujitsu | PRIMERGY TX1320 M1, board PRIMERGY TX1320 M1, PRIMERGY TX1330 M1, board PRIMERGY TX1330 M1 | the names place the slots | `fujitsu-tx1320-m1-maintenance-manual`, `fujitsu-tx1330-m1-maintenance-manual` |
+| `fujitsu-e5-2600-24slot-labelled` | fujitsu | PRIMERGY RX200 S7, board PRIMERGY RX200 S7, PRIMERGY RX200 S8, board PRIMERGY RX200 S8, PRIMERGY RX2530 M1, board PRIMERGY RX2530 M1 | the names place the slots | `fujitsu-rx200-s8-maintenance-manual`, `fujitsu-rx200-s7-maintenance-manual`, `fujitsu-rx2530-m1-maintenance-manual` |
+| `fujitsu-d2939-24slot-node-names` | fujitsu | PRIMERGY RX300 S7, board PRIMERGY RX300 S7, PRIMERGY RX300 S8, board PRIMERGY RX300 S8 | slot number to channel and position on the processor word of the names, another table for the second processor; channels A, B, C, D, E, F, G, H | `fujitsu-rx300-s8-maintenance-manual` |
+| `fujitsu-d3099-12slot-node-names` | fujitsu | PRIMERGY TX2540 M1, board PRIMERGY TX2540 M1 | slot number to channel and position on the processor word of the names, another table for the second processor; channels A, B, C, D, E, F | `fujitsu-tx2540-m1-maintenance-manual` |
+| `fujitsu-d2119-fbdimm-8slot` | fujitsu | PRIMERGY RX300 S3, board PRIMERGY RX300 S3 | memory on the chipset, the names place the slots; 4 channels of 2 slots | `fujitsu-d2119-rx300-s3-technical-manual`, `fujitsu-rx300-s3-guide` |
+| `fujitsu-d3384-24slot` | fujitsu | PRIMERGY RX2540 M4, board PRIMERGY RX2540 M4 | the names place the slots | `fujitsu-rx2540-m4-guide` |
+| `fujitsu-d4129-24slot` | fujitsu | PRIMERGY RX2450 M2, board PRIMERGY RX2450 M2 | the names place the slots | `fujitsu-rx2450-m2-guide` |
+| `nec-r120b-1` | nec | `^Express5800/R120b-1 \[N8100-1660F\]\\|\|^\\|(?:.* )?Express5800/R120b-1 \[N8100-1660F\]$` | slot number to channel and position on the processor word of the names; channels CH0, CH1, CH2 | `nec-express5800-r120b-1-user-guide` |
+| `cisco-ucs-c220-c240-m4` | cisco | UCSC-C220-M4S, board UCSC-C220-M4S, UCSC-C240-M4L, board UCSC-C240-M4L | the names place the slots | `cisco-c220-m4-installation-service-guide`, `cisco-c220-m4`, `cisco-c240-m4-installation-service-guide`, `cisco-c240-m4` |
+| `supermicro-x8dtu-12slot` | supermicro | X8DTU, board X8DTU | the names place the slots; P0 is processor 1, P1 is processor 0; with 2 processor records | `sm-mnl-1081` |
+| `supermicro-x8-dp-12slot` | supermicro | X8DT6, board X8DT6, X8DT3, board X8DT3, X8DTH-i/6/iF/6F (board X8DTH), X8DTT, board X8DTT, X8DTT-H, board X8DTT-H, X8DTG-D, board X8DTG-D | the names place the slots | `sm-mnl-1062` |
+| `supermicro-x8da3-12slot` | supermicro | X8DA3, board X8DA3 | the names place the slots | `sm-mnl-1031` |
+| `supermicro-x8dtl-6slot` | supermicro | X8DTL, board X8DTL | the names place the slots | `sm-mnl-1076` |
+| `supermicro-x8-dp-18slot` | supermicro | X8DTN+-F, board X8DTN+-F, X8DTN, board X8DTN, X8DTU-6+, board X8DTU-6+, X8DTU-LN4+, board X8DTU-LN4+ | the names place the slots | `sm-mnl-1199` |
+| `supermicro-x8dah-18slot-before-pcb2` | supermicro | X8DAH, board X8DAH | the names place the slots | `sm-mnl-1060` |
+| `supermicro-x8dah-18slot-pcb2` | supermicro | iX4224-846E16 (board X8DAH) | the names place the slots | `sm-mnl-1060` |
+| `supermicro-h8-g34-dp-16slot` | supermicro | H8DG6/H8DGi, board H8DG6/H8DGi, H8DGU, board H8DGU, H8DGT, board H8DGT | the names place the slots | `sm-mnl-h8dg` |
+| `supermicro-h8qg6-32slot` | supermicro | H8QG6, board H8QG6 | the names place the slots | `sm-mnl-h8qg-6` |
+| `supermicro-h8qgl-16slot` | supermicro | H8QGL (board H8QGL-6F) | the names place the slots | `sm-mnl-h8qgl-6` |
+| `supermicro-h8sgl-8slot` | supermicro | H8SGL, board H8SGL | the names place the slots | `sm-mnl-h8sgl-f` |
+| `supermicro-h8scm-4slot` | supermicro | H8SCM, board H8SCM | the names place the slots | `sm-mnl-h8scm-f` |
+| `supermicro-h8dcl-8slot` | supermicro | H8DCL, board H8DCL | the names place the slots | `sm-mnl-h8dcl` |
+| `supermicro-x9dbl-6slot` | supermicro | X9DBL-3F/X9DBL-iF, board X9DBL-3F/X9DBL-iF | the names place the slots | `sm-mnl-1307` |
+| `supermicro-x9-dp-16slot` | supermicro | `^X9DRW\\|\|^\\|(?:.* )?X9DRW$\|^X9DRD-7LN4F\\|(?:.* )?X9DRD-7LN4F$\|^X9DRD-7LN4F\(-JBOD\)/X9DRD-EF\\|(?:.* )?X9DRD-7LN4F$\|^X9DRFR\\|\|^\\|(?:.* )?X9DRFR$\|^X9DRW-7/iTPF\\|\|^\\|(?:.* )?X9DRW-7/iTPF$` | the names place the slots | `sm-mnl-1278` |
+| `supermicro-x9-dp-24slot` | supermicro | X9DRi-LN4+/X9DR3-LN4+, board X9DRi-LN4+/X9DR3-LN4+, X9DRW-7TPF+, board X9DRW-7TPF+, X9DRE-TF+/X9DR7-TF+, board X9DRE-TF+/X9DR7-TF+ | the names place the slots | `sm-mnl-1258` |
+| `supermicro-x9-dp-8slot` | supermicro | X9DRT, board X9DRT, HYVE-ZEUS (board X9DRD-iF), X9DRD-iF/LF (board X9DRD-iF) | the names place the slots | `sm-mnl-1488` |
+| `supermicro-x9-up-8slot` | supermicro | X9SRE/X9SRE-3F/X9SRi/X9SRi-3F, board X9SRE/X9SRE-3F/X9SRi/X9SRi-3F, X9SRL-F, board X9SRL-F, X9SRH-7F/7TF, board X9SRH-7F/7TF | the names place the slots | `sm-mnl-1284` |
+| `supermicro-x9sra-8slot` | supermicro | X9SRA/X9SRA-3, board X9SRA/X9SRA-3 | the names place the slots | `sm-mnl-1281` |
+| `supermicro-x10-dp-16slot` | supermicro | Super Server (board X10DRW-i), SYS-6018R-WTR (board X10DRW-i), CALLEO (board X10DRW-i), SYS-6028R-WTR (board X10DRW-i), SYS-6028R-WTRT (board X10DRW-iT), SYS-1028TP-DC1R (board X10DRT-P), SYS-6028TP-DNCR (board X10DRT-P), Rackform_R4422.v6 (board X10DRT-P), Super Server (board X10DRX-CS045) | the names place the slots | `sm-mnl-1557` |
+| `supermicro-x10dri-x10drh-16slot` | supermicro | X10DRi, board X10DRi, X10DRi (board X10DRI-T), X10DRH (board X10DRH-i), X10DRH (board X10DRH-iT), SSG-2028R-E1CR24L (board X10DRH-iT), SSG-6048R-E1CR24H (board X10DRH-iT) | the names place the slots | `sm-mnl-1491` |
+| `supermicro-x10-dp-24slot` | supermicro | Super Server (board X10DRU-i+), transtec CALLEO (board X10DRC-LN4+), Super Server (board X10DRC-LN4+), CALLEO (board X10DRi-LN4+) | the names place the slots | `sm-mnl-1560` |
+| `supermicro-x10drg-24slot` | supermicro | SYS-4028GR-TR (board X10DRG-O+-CPU), SYS-4028GR-TR2 (board X10DRG-O+-CPU) | the names place the slots | `sm-mnl-1780` |
+| `supermicro-x10-dp-8slot` | supermicro | Super Server (board X10DRL-i), Rackform R309.v5 (board X10DRL-i), Super Server (board X10DRL-CT), Super Server (board X10DAL-i) | the names place the slots | `sm-mnl-1566` |
+| `supermicro-x10-up-8slot` | supermicro | Super Server (board X10SRi-F), Super Server (board X10SRL-F), Super Server (board X10SRH-CF) | the names place the slots | `sm-mnl-1586` |
+| `supermicro-x10sra-8slot` | supermicro | X10SRA, board X10SRA, X10SRA-F, board X10SRA-F | the names place the slots | `sm-mnl-1643` |
+| `supermicro-x10srm-4slot` | supermicro | Super Server (board X10SRM-TF), Super Server (board X10SRM-F) | the names place the slots | `sm-mnl-1845` |
+| `supermicro-x10sll-x10slm-4slot` | supermicro | X10SLL-F, board X10SLL-F, X10SLM-F, board X10SLM-F, X10SLL-HF-CKD, board X10SLL-HF-CKD | the names place the slots | `sm-mnl-1428` |
+| `supermicro-x10sl7-4slot` | supermicro | X10SL7-F, board X10SL7-F | the names place the slots | `sm-mnl-1463` |
+| `supermicro-x10slh-x10slmplus-4slot` | supermicro | X10SLH-F/X10SLM+-F, board X10SLH-F/X10SLM+-F, X10SLM+-LN4F, board X10SLM+-LN4F | the names place the slots | `sm-mnl-1464` |
+| `supermicro-x10sae-4slot` | supermicro | X10SAE, board X10SAE | the names place the slots | `sm-mnl-1479` |
+| `supermicro-x10sdv-4slot` | supermicro | Super Server (board X10SDV-4C-TLN2F), Super Server (board X10SDV-2C-TLN2F), Super Server (board X10SDV-TLN4F), Super Server (board X10SDV-8C-TLN4F), Super Server (board X10SDV-8C-TLN4F+), Super Server (board X10SDV-8C+-LN2F), SYS-5018D-FN8T (board X10SDV-TP8F), Super Server (board X10SDV-TP8F), Super Server (board X10SDV-2C-TP4F), Super Server (board X10SDV-2C-7TP4F) | the names place the slots | `sm-mnl-1726` |
+| `supermicro-x11-lga1151-4slot-b2-first` | supermicro | Super Server (board X11SSL-F), 410041 (board X11SSL-F), Super Server (board X11SSL-CF), Super Server (board X11SSM-F), Super Server (board X11SSH-F), Super Server (board X11SSH-LN4F), Super Server (board X11SSH-CTF), Super Server (board X11SCL-F), SYS-5039MC-H12TRF (board X11SCE-F), Super Server (board X11SCH-F), Super Server (board X11SSA-F), Super Server (board X11SSZ-TLN4F), Super Server (board X11SAE-M) | the names place the slots | `sm-mnl-1778` |
+| `supermicro-x11-lga1151-4slot-a2-first` | supermicro | PCplus T600-C246 (board X11SCA), Super Server (board X11SCA-F), Super Server (board X11SCA-W), Super Server (board X11SAE), Super Server (board X11SAE-F), Super Server (board X11SCZ-Q) | the names place the slots | `sm-mnl-2087` |
+| `supermicro-x11scl-if-2slot` | supermicro | Super Server (board X11SCL-IF) | the names place the slots | `sm-mnl-2088` |
+| `supermicro-x11ssv-q-2slot` | supermicro | X11SSV-Q, board X11SSV-Q | the names place the slots | `sm-mnl-1795` |
+| `supermicro-x11-dp-16slot` | supermicro | `^X11DPi-N\\|(?:.* )?X11DPi-NT$\|^X11DPi-N\(T\)\\|(?:.* )?X11DPi-NT$\|^X11DPi-N\\|(?:.* )?X11DPi-N$\|^X11DPi-N\(T\)\\|(?:.* )?X11DPi-N$\|^SYS-6029P-TR\\|(?:.* )?X11DPi-N$\|^SYS-7049P-TR\\|(?:.* )?X11DPi-N$\|^SYS-7049GP-TRT\\|(?:.* )?X11DPG-QT$\|^Super Server\\|(?:.* )?X11DPG-QT$\|^Super Server\\|(?:.* )?X11DPH-T$\|^Joyent-S10G5\\|(?:.* )?X11DPH-T$\|^SSG-6049P-E1CR36L\\|(?:.* )?X11DPH-T$\|^Super Server\\|(?:.* )?X11DPH-i$\|^SYS-7039A-I\\|(?:.* )?X11DAi-N$\|^X11DAi-N\\|\|^\\|(?:.* )?X11DAi-N$` | the names place the slots | `sm-mnl-1773` |
+| `supermicro-x11-dp-24slot` | supermicro | Super Server (board X11DPU), SYS-1029U-TR25M (board X11DPU), SYS-2029U-TN24R4T (board X11DPU), SYS-6019U-TN4R4T (board X11DPU), SYS-1029U-TRT (board X11DPU), SYS-1029U-TR25M-BK-LC019 (board X11DPU-LC019), SYS-2029BT-HNR-NS2-WW001 (board X11DPT-B), X11DPG-OT (board X11DPG-OT-CPU), SYS-4029GP-TRT2 (board X11DPG-OT-CPU), SYS-4029GP-TRT (board X11DPG-OT-CPU) | the names place the slots | `sm-x11-user-guide` |
+| `supermicro-x11ddw-12slot` | supermicro | SYS-1029P-WTR (board X11DDW-L), SYS-6029P-WTR (board X11DDW-L), SYS-6019P-WTR (board X11DDW-L), SYS-6019P-WT (board X11DDW-L), SYS-6029P-WTRT (board X11DDW-NT), iPC-12-210 (board X11DDW-NT), Super Server (board X11DDW-NT) | the names place the slots | `sm-mnl-1907` |
+| `supermicro-x11dpl-8slot` | supermicro | Super Server (board X11DPL-i) | the names place the slots | `sm-mnl-1946` |
+| `supermicro-x11qph-48slot` | supermicro | SYS-2049U-TR4 (board X11QPH+) | the names place the slots | `sm-mnl-1983` |
+| `supermicro-x11-up-8slot` | supermicro | Super Server (board X11SPi-TF), Super Server (board X11SPL-F), SSG-5029P-E1CTR12L (board X11SPH-nCTF) | the names place the slots | `sm-mnl-1900` |
+| `supermicro-x11-up-6slot` | supermicro | Super Server (board X11SPM-F), X11-SPM-TF (board X11SPM-TF), egino BTO Konfig Server (board X11SPM-TF), SYS-5019P-WTR (board X11SPW-TF), SYS-5029P-WTR (board X11SPW-TF), SYS-1019P-WTR (board X11SPW-TF) | the names place the slots | `sm-mnl-1939` |
+| `supermicro-b11spe-12slot` | supermicro | SBI-6119P-T3N (board B11SPE-CPU-TF) | the names place the slots | `sm-mnl-2135` |
+| `supermicro-x11sra-8slot` | supermicro | Super Server (board X11SRA-RF) | the names place the slots | `sm-mnl-2005` |
+| `supermicro-x11sdv-4slot` | supermicro | Super Server (board X11SDV-8C-TLN2F), Super Server (board X11SDV-4C-TP8F), SYS-E300-9D-8CN8TP (board X11SDV-8C-TP8F), Prime Server Pro (board X11SDV-8C-TP8F) | the names place the slots | `sm-mnl-2019` |
+| `supermicro-a2sd-4slot` | supermicro | Super Server (board A2SDi-4C-HLN4F), Super Server (board A2SDi-8C-HLN4F), Super Server (board A2SDV-4C-LN8F) | the names place the slots | `sm-mnl-1951` |
+| `supermicro-a1sa2-4slot` | supermicro | A1SA2-2750F, board A1SA2-2750F | the names place the slots | `sm-mnl-1600` |
+| `supermicro-a1sam-a1srm-4slot` | supermicro | A1SAM-2550F, board A1SAM-2550F, A1SRM-2558F, board A1SRM-2558F | the names place the slots | `sm-mnl-1561` |
+| `supermicro-x12dpi-18slot` | supermicro | Super Server (board X12DPi-N6) | the names place the slots | `sm-mnl-2233` |
+| `supermicro-x12-dp-16slot` | supermicro | X12DAi-N6, board X12DAi-N6, SYS-620C-TN12R (board X12DDW-A6) | the names place the slots | `sm-mnl-2239` |
+| `supermicro-x12dpu-32slot` | supermicro | SYS-620U-TNR (board X12DPU-6) | the names place the slots | `sm-mnl-2234` |
+| `supermicro-x12-up-8slot` | supermicro | Super Server (board X12SPL-F), SYS-510P-MR (board X12SPO-F) | the names place the slots | `sm-mnl-2270` |
+| `supermicro-x12sae-4slot` | supermicro | Super Server (board X12SAE-5) | the names place the slots | `sm-mnl-2358` |
+| `supermicro-x12sdv-sp6f-4slot` | supermicro | Super Server (board X12SDV-8C-SP6F) | the names place the slots | `sm-mnl-2362` |
+| `supermicro-x12sdv-spt8f-4slot` | supermicro | Super Server (board X12SDV-16C-SPT8F) | the names place the slots | `sm-mnl-2440` |
+| `supermicro-x13-dp-16slot` | supermicro | Flagman KvX229.7 (board X13DEI), Super Server (board X13DEI), SYS-751A-I (board X13DAI-T) | the names place the slots | `sm-mnl-2509` |
+| `supermicro-x13sew-8slot` | supermicro | SYS-511E-WR (board X13SEW-F) | the names place the slots | `sm-mnl-2413` |
+| `supermicro-x13sae-4slot` | supermicro | Super Server (board X13SAE-F) | the names place the slots | `sm-mnl-2425` |
+| `supermicro-x13san-2slot` | supermicro | Super Server (board X13SAN-L) | the names place the slots | `sm-mnl-2517` |
+| `supermicro-h11dsi-16slot` | supermicro | Super Server (board H11DSi), Super Server (board H11DSi-NT) | the names place the slots | `sm-mnl-2027` |
+| `supermicro-h12dsi-16slot` | supermicro | Super Server (board H12DSi-N6), Super Server (board H12DSi-NT6) | the names place the slots | `sm-mnl-2363` |
+| `supermicro-h11ssl-8slot` | supermicro | Super Server (board H11SSL-i), Super Server (board H11SSL-C), GN#16917 (board H11SSL-NC), Super Server (board H11SSL-NC) | the names place the slots | `sm-mnl-2085` |
+| `supermicro-h12-up-8slot` | supermicro | Super Server (board H12SSL-i), Supermicro motherboard-H12 Series (board H12SSL-i), Super Server (board H12SSL-NT), Super Server (board H12SSL-CT), AS -1014S-WTRT (board H12SSW-NT), 520012 (board H12SSW-NT), Super Server (board H12SSW-NT) | the names place the slots | `sm-mnl-2314` |
+| `supermicro-h12dsg-32slot` | supermicro | AS -4124GS-TNR (board H12DSG-O-CPU) | the names place the slots | `sm-mnl-2299` |
+| `supermicro-h13sae-mf-4slot` | supermicro | Super Server (board H13SAE-MF) | the names place the slots | `sm-mnl-2627` |
+| `supermicro-m11sdv-4slot` | supermicro | Super Server (board M11SDV-8C-LN4F), Super Server (board M11SDV-8CT-LN4F) | the names place the slots | `sm-mnl-2172` |
+| `supermicro-m12swa-8slot` | supermicro | AS -5014A-TT (board M12SWA-TF), M12SWA-TF, board M12SWA-TF, Super Server (board M12SWA-TF) | the names place the slots | `sm-mnl-2336` |
+| `supermicro-c7x99-oce-8slot` | supermicro | C7X99-OCE, board C7X99-OCE | the names place the slots | `sm-mnl-1646` |
+| `supermicro-c9x299-pg300f-8slot` | supermicro | C9X299-PG300F, board C9X299-PG300F | the names place the slots | `sm-mnl-2117` |
+| `supermicro-c7-c9-lga1151-4slot` | supermicro | C7Z170-M, board C7Z170-M, C7Z270-CG-L, board C7Z270-CG-L, C7Z270-CG-M, board C7Z270-CG-M, C7Z270-PG, board C7Z270-PG, C9Z390-PGW, board C9Z390-PGW | the names place the slots | `sm-mnl-1813` |
+| `supermicro-c7-c9-lga1151-2slot` | supermicro | C7Z370-CG-IW, board C7Z370-CG-IW, C9Z390-CG-IW, board C9Z390-CG-IW | the names place the slots | `sm-mnl-2018` |
+| `gigabyte-epyc-sp3-2s-16ch-2dpc` | gigabyte | R182-Z90-00 (board MZ92-FS0-00), R182-Z91-00 (board MZ92-FS0-00), G482-Z54-00 (board MZ52-G41-00) | the names place the slots | `gigabyte-r182-z90-r182-z91-r182` |
+| `gigabyte-epyc-sp3-1s-8ch-2dpc` | gigabyte | MZ31-AR0-00, board MZ31-AR0-00, MZ32-AR0-00, board MZ32-AR0-00, R162-ZA0-00 (board MZA2-CE0-00), R262-ZA2-00 (board MZA2-CE0-00) | the names place the slots | `gigabyte-mz32-ar0-user-manual`, `gigabyte-mz31-ar0-user-manual`, `gigabyte-r162-za0-user-manual`, `gigabyte-r262-za1-za2-user-manual` |
+| `gigabyte-ampere-mp32-8ch-2dpc` | gigabyte | MP32-AR1-SW-HZ-001 (board MP32-AR1-00), E252-P30-00 (board MP32-AR1-00), MP32-AR1-00, board MP32-AR1-00, MP32-AR0, board MP32-AR0 | the names place the slots | `gigabyte-e252-p30-user-manual` |
+| `gigabyte-mx33-xeon-e2300-4slot` | gigabyte | MX33-BS0-00, board MX33-BS0-00, MX33-BS1-V1, board MX33-BS1-V1 | the names place the slots | `gigabyte-mx33-bs0-user-manual` |
+| `gigabyte-epyc-sp3-2s-16ch-1dpc` | gigabyte | MZ71-CE0-00, board MZ71-CE0-00, MZ71-CE1-00, board MZ71-CE1-00, MZ72-HB0-00, board MZ72-HB0-00 | the names place the slots | `gigabyte-mz71-ce0-mz71-ce1-user`, `gigabyte-mz72-hb0-user-manual` |
+| `gigabyte-epyc3000-mj11-4slot` | gigabyte | G431-MM0-OT (board MJ11-EC1-OT) | the names place the slots | `gigabyte-g431-mm0-user-manual` |
+| `gigabyte-am4-am5-mc1x-4slot` | gigabyte | MC13-LE0-000, board MC13-LE0-000, MC13-LE1-000, board MC13-LE1-000, MC12-LE0-00, board MC12-LE0-00 | the names place the slots | `gigabyte-mc13-le0-mc13-le1-user` |
+| `gigabyte-mu71-su0-xeon-w3200-8slot` | gigabyte | MU71-SU0-00, board MU71-SU0-00 | the names place the slots | `gigabyte-mu71-su0-user-manual` |
+| `gigabyte-c621-su8-8slot` | gigabyte | C621-SU8 M18818, board C621-SU8 M18818 | the names place the slots | `gigabyte-c621-su8-user-manual` |
+| `gigabyte-c621-sd8-8slot` | gigabyte | C621-SD8 M18802, board C621-SD8 M18802 | the names place the slots | `gigabyte-c621-sd8-user-manual` |
+| `gigabyte-mw50-sv0-e5-1s-8slot` | gigabyte | MW50-SV0, board MW50-SV0, OEM-F7342-00 (board MW50-SV0) | the names place the slots | `gigabyte-mw50-sv0-user-manual` |
+| `gigabyte-mg51-g21-xeon-sp-2s-24slot` | gigabyte | G291-280-00 (board MG51-G21-00), G291-281-00 (board MG51-G21-00) | the names place the slots | `gigabyte-g291-280-g291-281-user` |
+| `gigabyte-e5-2s-4ch-3dpc-24slot` | gigabyte | R280-G2O-XX (board MD90-FS0-XX), G250-G52-Sample-Dalco-002-XX (board MG50-G21-XX) | the names place the slots | `gigabyte-r280-f2o-r280-g2o-user` |
+| `gigabyte-mu70-su0-e5-1s-12slot` | gigabyte | MU70-SU0-NV-XX, board MU70-SU0-NV-XX | the names place the slots | `gigabyte-mu70-su0-user-manual` |
+| `gigabyte-xeon-sp-2s-6ch-uneven-16slot` | gigabyte | Relion XE2142 (board MH61-HD3-ZB) | the names place the slots | `gigabyte-h261-h60-user-manual` |
+| `gigabyte-md72-hb0-xeon-sp3-2s-16slot` | gigabyte | SS4000HD (board MD72-HB0-00) | the names place the slots | `gigabyte-md72-hb0-md72-hb1-user` |
+| `gigabyte-mu72-su0-xeon-w3300-8slot` | gigabyte | MU72-SU0-00, board MU72-SU0-00 | the names place the slots | `gigabyte-mu72-su0-user-manual` |
+| `gigabyte-6pxsv-e5-1s-8slot` | gigabyte | GA-6PXSV1, board GA-6PXSV1 | the names place the slots | `gigabyte-6pxsvl-user-manual` |
+| `gigabyte-mz12-hd3-epyc-1s-8slot` | gigabyte | G242-Z11-00 (board MZ12-HD3-00) | the names place the slots | `gigabyte-g242-z10-g242-z11-user` |
+| `gigabyte-mc62-g40-trpro-8slot` | gigabyte | MC62-G40-00, board MC62-G40-00 | the names place the slots | `gigabyte-mc62-g40-user-manual` |
+| `asrock-am5-b650d4u-4slot` | asrock | B650D4U-2L2T/BCM, board B650D4U-2L2T/BCM, board B650D4U, B650D4U | the names place the slots | `asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t` |
+| `asrock-am4-x570-4slot` | asrock | X570D4U, board X570D4U, X570D4U-2L2T, board X570D4U-2L2T, X570D4U-2L2T/BCM (board X570D4U-2L2T), X570D4I-2T, board X570D4I-2T | the names place the slots | `asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t` |
+| `asrock-romed8-2t-8slot` | asrock | ROMED8-2T, board ROMED8-2T, board ROMED8-2T/OVH | the names place the slots | `asrock-romed8-2t-romed8-romed8-2t` |
+| `asrock-rome2d16-2t-16slot` | asrock | ROME2D16-2T, board ROME2D16-2T | the names place the slots | `asrock-rome2d16-2t-rome2d16-rome2d16-2l` |
+| `asrock-genoad12m3-12slot` | asrock | GENOAD12M3-2Q/H, board GENOAD12M3-2Q/H | the names place the slots | `asrock-genoad12m3-2q-user-manual-genoad12m3` |
+| `asrock-intel-ddr5-controller-4slot` | asrock | board W680D4U-1L, Z690D4U-2L2T/G5, board Z690D4U-2L2T/G5, EC266D4-4L, board EC266D4-4L | the names place the slots | `asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u` |
+| `asrock-sp2c621d32lm3-32slot` | asrock | R1G3D32 (board SP2C621D32LM3) | the names place the slots | `asrock-sp2c621d32lm3-user-manual` |
+| `asrock-altrad8ud-8slot` | asrock | ALTRAD8UD-1L2T, board ALTRAD8UD-1L2T | the names place the slots | `asrock-altrad8ud-1l2t-user-manual` |
+| `msi-am5-d3051-d3052` | msi | MSIS336 MS-S336, board MSIS336 MS-S336, MSIS366, board MSIS366 | the names place the slots | `msi-d3052-s3661-user-guide` |
+| `tyan-s7012` | tyan | board S7012 | the names place the slots | `tyan-s7012-user-manual` |
+| `tyan-s7010` | tyan | board S7010 | the names place the slots | `tyan-s7010-user-manual` |
+| `tyan-s8026` | tyan | board S8026GM2NRE, board S8026GM2NRE-HOV-B | the names place the slots | `tyan-s8026-user-manual` |
+| `tyan-s8036` | tyan | B8036T65AV4E24HR-HOV-1 (board B8036GM2NE) | the names place the slots | `tyan-s8036-user-manual` |
+| `tyan-s7109` | tyan | B7109F77DV14HR-2T-N (board S7109GM2NR-2T) | the names place the slots | `tyan-s7106-user-manual` |
+| `tyan-s8812` | tyan | board S8812 | set aside: names-not-in-document | `tyan-s8812-user-manual` |
+| `tyan-s4882` | tyan | S4882 (board S4882) | slot number to channel and position on the processor word of the names; channels high64, low64 | `tyan-k8qs-s4882-user-manual` |
+| `huawei-rh-v3-16slot` | huawei | RH1288 V3, board RH1288 V3, RH2288 V3, board RH2288 V3 | the names place the slots | `huawei-rh1288-v3-user-guide`, `huawei-rh2288-v3-user-guide` |
+| `huawei-rh2288hv3-24slot` | huawei | RH2288H V3, board RH2288H V3 | the names place the slots | `huawei-rh2288h-v3-user-guide` |
+| `huawei-v5-24slot` | huawei | 1288H V5 (board BC11SPSC0), 1288H V5 (board BC11SPSCC0), 2288H V5, board 2288H V5 | the names place the slots | `huawei-1288h-v5-user-guide`, `huawei-2288h-v5-user-guide` |
+| `lenovo-thinkserver-rd330` | lenovo | Lenovo ThinkServer RD330, board Lenovo ThinkServer RD330 | the names place the slots | `lenovo-rd330-maintenance-manual` |
+| `lenovo-thinkserver-rd450` | lenovo | ThinkServer RD450, board ThinkServer RD450 | the names place the slots | `lenovo-rd450-user-guide-maintenance-manual` |
+| `lenovo-thinkstation-px` | lenovo | 30EUA0EG00, board 30EUA0EG00 | slot number to channel and position on the processor word of the names, another table for the second processor; channels 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 | `lenovo-memory-configurator-lenovo`, `lenovo-thinkstation-px-user-guide` |
+| `fujitsu-d3521-tx1310m3` | fujitsu | PRIMERGY TX1310 M3, board PRIMERGY TX1310 M3 | the names place the slots | `fujitsu-tx1310-m3-guide` |
+| `fujitsu-mx130s2-sample` | fujitsu | PRIMERGY MX130 S2, board PRIMERGY MX130 S2 | the names place the slots | `fujitsu-mx130-s2-maintenance-manual` |
+| `inspur-nf5280m6-32slot` | inspur | NF5280M6 | the names place the slots | `inspur-nf5280m-lm6-user-manual` |
+| `inspur-sa5212m4-16slot` | inspur | SA5212M4 (board Inspur Shuyu) | the names place the slots | `inspur-sa5212m4-sa5212m4-user-manual` |
+| `quanta-t22hf-s5hf-16slot` | quanta | QuantaPlex T22HF-1U, board QuantaPlex T22HF-1U | the names place the slots | `quanta-t22hf-1u-service-guide` |
+| `huawei-taishan200-2280-kunpeng920` | huawei | `^TaiShan 200\\|\|^\\|(?:.* )?TaiShan 200$\|^TaiShan 200 \(Model 2280\)\\|\|^\\|(?:.* )?TaiShan 200 \(Model 2280\)$\|^TaiShan 2280 V2\\|\|^\\|(?:.* )?TaiShan 2280 V2$` | the names place the slots | `huawei-200-maintenance-service-guide-2280` |
+| `huawei-atlas500pro-3000` | huawei | `^Atlas 500 Pro\\|\|^\\|(?:.* )?Atlas 500 Pro$\|^Atlas 500 Pro \(Model 3000\)\\|\|^\\|(?:.* )?Atlas 500 Pro \(Model 3000\)$` | the names place the slots | `huawei-500-maintenance-service-guide-3000` |
+| `quanta-ocp-leopard-16slot` | quanta | Leopard ORv2-DDR4, board Leopard ORv2-DDR4 | the names place the slots | `quanta-v3-1` |
+| `quanta-ocp-windmill-winterfell-16slot` | quanta | Freedom (board Quanta Winterfell) | slot number to channel and position on the bank locator, another table for the second processor; channels 0, 1, 2, 3 | `quanta-v2-0` |
+| `lenovo-thinkserver-rd450x` | lenovo | RD450X, board RD450X | the names place the slots | `lenovo-rd450-user-guide-maintenance-manual` |
+| `hp-dl360-gen10plus-32slot` | hp | ProLiant DL360 Gen10 Plus, board ProLiant DL360 Gen10 Plus | slot number to channel and position on the processor word of the names; channels CH0, CH1, CH2, CH3, CH4, CH5, CH6, CH7 | `hpe-population-gen10-3rd-technical`, `hpe-dl360-gen10-maintenance-service-guide-2` |
+| `hp-dl385-gen10plus-32slot` | hp | ProLiant DL385 Gen10 Plus, board ProLiant DL385 Gen10 Plus, ProLiant DL385 Gen10 Plus v2, board ProLiant DL385 Gen10 Plus v2 | slot number to channel and position on the processor word of the names; channels A, B, C, D, E, F, G, H | `hpe-population-gen10-gen10-7002-7003`, `hpe-dl385-gen10-maintenance-service-guide`, `hpe-dl385-gen10-v2-maintenance-service` |
+| `hp-dl380-gen11-32slot` | hp | ProLiant DL380 Gen11, board ProLiant DL380 Gen11 | slot number to channel and position on the processor word of the names; channels pair1_2, pair3_4, pair5_6, pair7_8, pair9_10, pair11_12, pair13_14, pair15_16 | `hpe-population-gen11-5th-technical`, `hpe-population-gen11-4th`, `hpe-dl380-gen11`, `hpe-dl380-gen11-maintenance-service-guide` |
+| `hp-dl160-gen10-16slot` | hp | ProLiant DL160 Gen10, board ProLiant DL160 Gen10 | slot number to channel and position on the processor word of the names; channels CH1, CH2, CH3, CH4, CH5, CH6 | `hpe-dl160-gen10`, `hpe-876833-006-2` |
+| `hp-dl20-gen10plus-4slot` | hp | ProLiant DL20 Gen10 Plus, board ProLiant DL20 Gen10 Plus | slot number to channel and position on the processor word of the names; channels CH1, CH2 | `hpe-population-gen10-2300-technical` |
+| `hp-cray-xd665-24slot` | hp | HPE Cray SC XD665 (board HPE Cray XD665 MB PCA) | the names place the slots | `hpe-xd665-maintenance-service-guide`, `hpe-xd665` |
+| `gigabyte-mr92-fs1-32slot` | * | `^R182-N20-UNI\\|(?:NULL )?MR92-FS1-UNI$` | the names place the slots | `gigabyte-r182-n20-r182-na0-3rd` |
+| `huawei-2288hv5-bc11spscb-unbranded` | * | 2288H V5 (board -- BC11SPSCB0), FPD-8-SP-H2K288G5-CTO (board -- BC11SPSCB10) | the names place the slots | `huawei-2288h-v5-user-guide` |
+| `huawei-rh2288hv3-bc11hgsa-hve` | * | 3DGFX (board HVE BC11HGSA0) | the names place the slots | `huawei-rh2288h-v3-user-guide-2` |
+| `asrock-sp2c621d32tm3-32slot-inferit` | * | RS224 R1G3D32RU (board INF SP2C621D32TM3) | the names place the slots | `asrock-sp2c621d32tm3-user-manual` |
+| `aic-libra-16slot` | * | SB302-LB (board AIC LIBRA) | set aside: names-not-in-document | `other-user-manual` |
+| `geekom-intel-h-2sodimm` | * | `^(?:GT13 Pro\|IT12\|IT13\|XT12 Pro\|XT13 Pro)\\|(?:GT13 Pro\|IT12\|IT13\|XT12 Pro\|XT13 Pro)$` | the names place the slots | `other-12th-1` |
+| `neousys-nuvo-9000-10000-2sodimm` | * | Nuvo-9000 Series (board NVS-9000), Nuvo-10000 Series (board NVS-10000) | the names place the slots | `other-9000-user-manual` |
+| `geekom-miniair11-jsl-2sodimm` | * | MiniAir 11 (board GEEKOM MiniAir 11) | the names place the slots | `other-11` |
+| `neousys-nuvo-2600-1sodimm` | * | Nuvo-2600 Series | the names place the slots | `other-2600-user-manual` |
+| `geekom-miniair12-n100` | * | Mini Air12 | the names place the slots | `other-1` |
+| `ekf-sc9-toccata-tgl` | * | CompactPCI Serial (board EKF Elektronik GmbH SC9-TOCCATA) | the names place the slots | `other-631121-012` |
+| `adlink-aadp-com-hpc-alt-6slot` | * | Ampere Altra Developer Platform (board ADLINK Ampere Altra Developer Platform) | slot number to channel and position on the processor word of the names; channels MCU0, MCU1, MCU2, MCU4, MCU5, MCU6 | `other-user-guide` |
+| `besstar-atb15-2sodimm` | * | `^(?:X300\|X400\|X500)\\|BESSTAR TECH ATB15$` | the names place the slots | `other-x300-x400-x500-user-manual` |
+| `gigabyte-rmb-mr91-openyard` | * | RS201I (board OpenYard RMB-MR91) | the names place the slots | `gigabyte-r182-n20-r182-na0-user` |
+| `powerleader-psc621di-16f` | * | PR2710P-24 (board OEM PSC621DI-16F) | the names place the slots | `other-rs5230-user-manual-pr2710p-manual` |
+| `quanta-d52b-1u-nokia-airframe` | * | AR-S5008A-5A/AF1294.05 | the names place the slots | `quanta-d52b` |
+| `graviton-onega-16slot` | * | Server Graviton (board Graviton ONEGA) | the names place the slots | `other-2041-2122` |
+| `yadro-vegman-rx20g2-32slot` | * | ; 9k (board w 9k w 9k) | the names place the slots | `other-rx20-g2` |
+| `etegro-rs125g4-quanta-s2ms-16slot` | * | Hyperion RS125 G4 (board ETegro Technologies ETRS125G4) | the names place the slots | `other-rs125-g4` |
+| `etegro-rs130g4-quanta-s2rq-24slot` | * | Hyperion RS130 G4 (board ETegro Technologies ETRS130G4) | the names place the slots | `other-rs130-g4` |
+<!-- /families -->
+
+The documents the rows cite (385 documents, `internal/explorer/sources.tsv`), with the pages read. Some were read from a public copy on web.archive.org or manualslib where the maker no longer serves them; ten were read from copies whose address was not recorded and are cited by title, number and date.
+
+<!-- documents -->
+| Document | Maker | Title | Number or revision | Date | Pages | Address |
+| --- | --- | --- | --- | --- | --- | --- |
+| `dell-e26s` | dell | Dell PowerEdge R630 Owner's Manual | Regulatory Model E26S Series, Rev. A08 | June 2022 | pp. 159-164 | <https://dl.dell.com/topicspdf/poweredge-r630_owners-manual_en-us.pdf> |
+| `dell-e14s` | dell | Dell PowerEdge R720 and R720xd Owner's Manual | Regulatory Model E14S Series, Rev. A07 | 2018-10 | pp. 40-46 | <https://dl.dell.com/topicspdf/poweredge-r720_owners-manual_en-us.pdf> |
+| `dell-e18s` | dell | Dell PowerEdge R420 Systems Owner's Manual | Regulatory Model E18S Series, Rev. A04 | 2013-11 | pp. 43-47 | <https://dl.dell.com/topicspdf/poweredge-r420_owners-manual_en-us.pdf> |
+| `dell-e20s` | dell | Dell PowerEdge T320 Systems Owner's Manual | Regulatory Model E20S Series, Rev. A05 | 2017-08 | pp. 67-70 | <https://dl.dell.com/topicspdf/poweredge-t320_owners-manual_en-us.pdf> |
+| `dell-e28s` | dell | Dell PowerEdge R430 Owner's Manual | Regulatory Model E28S Series, Rev. A07 | November 2020 | pp. 80-87 | <https://dl.dell.com/topicspdf/poweredge-r430_owners-manual_en-us.pdf> |
+| `dell-r710-owner-manual` | dell | Dell PowerEdge R710 Systems Hardware Owner's Manual | Rev. A03 | September 2009 | pp. 129-133, 181-182 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r710_owner's%20manual_en-us.pdf> |
+| `dell-r610-owner-manual` | dell | Dell PowerEdge R610 Systems Hardware Owner's Manual | Rev. A04 | 2013-03 | pp. 116-119, 166 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r610_owner's%20manual2_en-us.pdf> |
+| `dell-r410-owner-manual` | dell | Dell PowerEdge R410 Systems Hardware Owner's Manual | Rev. A00 | April 2009 | pp. 119-123, 171 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r410_owner's%20manual_en-us.pdf> |
+| `dell-t310-owner-manual` | dell | Dell PowerEdge T310 Systems Hardware Owner's Manual | Rev. A00 | July 2009 | pp. 108-110, 172 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-t310_owner's%20manual_en-us.pdf> |
+| `dell-r210-owner-manual` | dell | Dell PowerEdge R210 Systems Hardware Owner's Manual | Rev. A00 | August 2009 | pdf pp. 27, 41 (the file has no printed page numbers); pp. 27, 41 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r210_owner's%20manual_en-us.pdf> |
+| `dell-e10s` | dell | Dell PowerEdge R210 II Systems Owner's Manual | Regulatory Model E10S Series, Rev. A01 | 2013-09 | pp. 69-70, 117 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r210-2_owner's%20manual_en-us.pdf> |
+| `dell-e10s-2` | dell | Dell PowerEdge R220 Owner's Manual | Regulatory Model E10S, Rev. A02 | 2015-05 | pp. 47-49 | <https://dl.dell.com/topicspdf/poweredge-r220_owners-manual_en-us.pdf> |
+| `dell-e33s` | dell | Dell PowerEdge R230 Owner's Manual | Regulatory Model E33S Series, Rev. A05 | 2019-10 | pp. 56-58 | <https://dl.dell.com/topicspdf/poweredge-r230_owners-manual_en-us.pdf> |
+| `dell-e57s` | dell | Dell EMC PowerEdge R240 Installation and Service Manual | Regulatory Model E57S Series, Rev. A09 | August 2025 | pp. 40-42 | <https://dl.dell.com/topicspdf/poweredge-r240_owners-manual_en-us.pdf> |
+| `dell-e80s` | dell | Dell EMC PowerEdge T150 Installation and Service Manual | Regulatory Model E80S series, Rev. A03 | June 2025 | pp. 39-41 | <https://dl.dell.com/topicspdf/poweredge-t150_owners-manual_en-us.pdf> |
+| `dell-e38s` | dell | Dell EMC PowerEdge R740 Installation and Service Manual | Regulatory Model E38S Series, Rev. A20 | Sept. 2021 | pp. 61-71 | <https://dl.dell.com/topicspdf/poweredge-r740_owners-manual_en-us.pdf> |
+| `dell-e45s` | dell | Dell EMC PowerEdge R440 Installation and Service Manual | Regulatory Model E45S Series, Rev. A17 | December 2021 | pp. 46-51 | <https://dl.dell.com/topicspdf/poweredge-r440_owners-manual9_en-us.pdf> |
+| `dell-e38s-2` | dell | Dell EMC PowerEdge R7425 Installation and Service Manual | Regulatory Model E38S Series, Rev. A20 | March 2021 | pp. 101-105 | <https://dl.dell.com/topicspdf/poweredge-r7425_owners-manual_en-us.pdf> |
+| `dell-e45s-2` | dell | Dell PowerEdge R6515 Installation and Service Manual | Regulatory Model E45S Series, Rev. A14 | July 2023 | pp. 47-52 | <https://dl.dell.com/topicspdf/poweredge-r6515_owners-manual_en-us.pdf> |
+| `dell-e68s` | dell | Dell PowerEdge R7525 Installation and Service Manual | Regulatory Model E68S, Rev. A20 | July 2024 | pp. 72-77 | <https://dl.dell.com/topicspdf/poweredge-r7525_owners-manual_en-us.pdf> |
+| `dell-e70s` | dell | Dell PowerEdge R750 Installation and Service Manual | Regulatory Model E70S, Rev. A11 | December 2024 | pp. 98-102 | <https://dl.dell.com/topicspdf/poweredge-r750_owners-manual_en-us.pdf> |
+| `dell-e74s` | dell | Dell PowerEdge R450 Installation and Service Manual | Part Number E74S, Rev. A03 | July 2026 | pp. 51-52 | <https://dl.dell.com/topicspdf/poweredge-r450_owners-manual_en-us.pdf> |
+| `dell-e94s` | dell | Dell PowerEdge R7625 Installation and Service Manual | Regulatory Model E94S, Rev. A09 | July 2026 | pp. 34-35, 173-176 | <https://dl.dell.com/content/manual25024882-dell-poweredge-r7625-installation-and-service-manual.pdf?language=en-us> |
+| `dell-e97s` | dell | Dell PowerEdge R6615 Installation and Service Manual | Regulatory Model E97S, Rev. A09 | July 2026 | pp. 125-128 | <https://dl.dell.com/content/manual24843968-dell-poweredge-r6615-installation-and-service-manual.pdf?language=en-us> |
+| `dell-e87s` | dell | Dell PowerEdge R660xs Installation and Service Manual | Part Number E87S, Rev. A07 | September 2026 | pp. 103-105 | <https://dl.dell.com/content/manual42812694-dell-poweredge-r660xs-installation-and-service-manual.pdf?language=en-us> |
+| `dell-xr4510c-installation-service-manual` | dell | Dell PowerEdge XR4510c Installation and Service Manual | Rev. A02 | October 2024 | pp. 59-60 | <https://dl.dell.com/content/manual20158191-dell-poweredge-xr4510c-installation-and-service-manual.pdf?language=en-us> |
+| `dell-d04x` | dell | Dell Precision 7920 Tower Owner's Manual | Regulatory Model D04X, Rev. A14 | October 2026 | pp. 89-90, 99-100, 102-104 | <https://dl.dell.com/topicspdf/precision-7920-workstation_Owners-Manual_en-us.pdf> |
+| `dell-d02t` | dell | Dell Precision 7820 Tower Owner's Manual | Regulatory Model D02T, Rev. A09 | August 2023 | pp. 91-93, 101-102, 104-105 | <https://dl.dell.com/content/manual26341430-dell-precision-7820-tower-owner-s-manual.pdf?language=en-us> |
+| `dell-e31s` | dell | Dell Precision Rack 7910 Owner's Manual | Regulatory Model E31S, Rev. A06 | September 2023 | pp. 19-22 | <https://dl.dell.com/topicspdf/precision-r7910-workstation_Owners-Manual_en-us.pdf> |
+| `dell-e38s-3` | dell | Dell Precision 7920 Rack Owner's Manual | Regulatory Model E38S, Rev. A02 | November 2020 | pp. 26-27, 102-104 | <https://web.archive.org/web/20210715152400/https://dl.dell.com/topicspdf/precision-7920r-workstation_owners-manual_en-us.pdf> |
+| `dell-e82s` | dell | Precision 7960 Rack Setup and Specifications | Regulatory Model E82S, Rev. A07 | August 2026 | pp. 12-15 | <https://dl.dell.com/content/manual42601925-precision-7960-rack-setup-and-specifications.pdf?language=en-us> |
+| `dell-e53s` | dell | Dell EMC PowerEdge C4140 Installation and Service Manual | Regulatory Model E53S Series, Rev. A14 | August 2022 | pp. 41-44 | <https://dl.dell.com/topicspdf/poweredge-c4140_owners-manual_en-us.pdf> |
+| `dell-e64s` | dell | Dell EMC PowerEdge C6520 Installation and Service Manual | Regulatory Model E64S Series, Rev. A03 | August 2022 | pp. 56-58 | <https://dl.dell.com/topicspdf/poweredge-c6520_owners-manual_en-us.pdf> |
+| `dell-e63s` | dell | Dell PowerEdge C6525 Installation and Service Manual | Regulatory Model E63S Series, Rev. A15 | May 2024 | pp. 24-29 | <https://dl.dell.com/topicspdf/poweredge-c6525_owners-manual_en-us.pdf> |
+| `dell-c6220-owner-manual` | dell | Dell PowerEdge C6220 II Systems Hardware Owner's Manual | Rev. A01 | October 2013 | pp. 230-232 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_cloud_products/poweredge-c6220-2_Owner's%20Manual_en-us.pdf> |
+| `dell-b08s` | dell | Dell PowerEdge C6320 Owner's Manual | Regulatory Model B08S, Rev. A04 | 2017-08 | pp. 104-105, board connector table (txt lines 6148-6173) | <https://dl.dell.com/topicspdf/poweredge-c6320_owners-manual_en-us.pdf> |
+| `dell-b04s` | dell | Dell PowerEdge C5220 Systems Hardware Owner's Manual | Regulatory Model B04S, Rev. A02 | 2012-06 | pp. 64-66 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_cloud_products/poweredge-c5220_owner's%20manual_en-us.pdf> |
+| `dell-c6100-owner-manual` | dell | Dell PowerEdge C6100 Systems Hardware Owner's Manual | Regulatory Model XS23-TY3, Rev. A01 | January 2010 | pp. 77-79, 129; pp. 77-79 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_cloud_products/poweredge-c6100_owner's%20manual_en-us.pdf> |
+| `dell-c1100-owner-manual` | dell | Dell PowerEdge C1100 Systems Hardware Owner's Manual | Regulatory Model CS24-TY, Rev. A01 | 2013-02 | pp. 63-66 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_cloud_products/poweredge-c1100_owner's%20manual_en-us.pdf> |
+| `dell-1950-owner-manual` | dell | Dell PowerEdge 1950 Systems Hardware Owner's Manual | P/N HH176, Rev. A02 | September 2009 | pp. 26, 63-65 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-1950_owner's%20manual_en-us.pdf> |
+| `dell-2900-owner-manual` | dell | Dell PowerEdge 2900 Systems Hardware Owner's Manual | December 2005, no revision printed | December 2005 | pp. 27, 82-85 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-2900_owner's%20manual_en-us.pdf> |
+| `dell-sc1430-owner-manual` | dell | Dell PowerEdge SC1430 Systems Hardware Owner's Manual | P/N WH819, Rev. A00 | June 2006 | pp. 19, 76-77, 120-121 | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-1430sc_owner's%20manual_en-us.pdf> |
+| `dell-r5400-service-manual` | dell | Dell Precision R5400 Service Manual | Model WMTE01, Rev. A00 | June 2008 | pdf p. 25 ("System Memory") | <https://dl.dell.com/manuals/all-products/esuprt_desktop/esuprtl_precision_workstation/precision-r5400_service%20manual_en-us.pdf> |
+| `dell-t300-owner-manual` | dell | Dell PowerEdge T300 Systems Hardware Owner's Manual | P/N HR675, Rev. A01 | June 2009 | pp. 111-112, 169 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-t300_owner's%20manual_en-us.pdf> |
+| `dell-860-owner-manual` | dell | Dell PowerEdge 860 Systems Hardware Owner's Manual | P/N GJ055, Rev. A00 | June 2006 | pp. 67-68 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-860_owner's%20manual_en-us.pdf> |
+| `dell-2850-installation-guide` | dell | Dell PowerEdge 2850 Systems Installation and Troubleshooting Guide | June 2004, no revision printed | June 2004 | section "System Memory" (txt lines 3595-3700) | <https://dl.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-2850_user's%20guide11_en-us.pdf> |
+| `dell-2970-owner-manual` | dell | Dell PowerEdge 2970 Systems Hardware Owner's Manual | February 2007, no revision printed | February 2007 | pp. 91-93, 142 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-2970_owner's%20manual_en-us.pdf> |
+| `dell-r805-owner-manual` | dell | Dell PowerEdge R805 Systems Hardware Owner's Manual | P/N TT864, Rev. A01 | June 2009 | "System Memory" (txt lines 3090-3206), Table 6-2 (txt lines 4056-4122) | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r805_owner's%20manual_en-us.pdf> |
+| `dell-r900-owner-manual` | dell | Dell PowerEdge R900 Systems Hardware Owner's Manual | P/N XK946, Rev. A00 | September 2007 | pp. 92-95, 98-99; pp. 92-95, 98 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r900_owner's%20manual_en-us.pdf> |
+| `dell-e06s` | dell | Dell PowerEdge R910 Hardware Owner's Manual | Regulatory Model E06S Series, Rev. A02 | October 2012 | pp. 46-51, 91-98, 200 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r910_owner's%20manual_en-us.pdf> |
+| `dell-e05s` | dell | Dell PowerEdge R810 Hardware Owner's Manual | Regulatory Model E05S, Rev. A00 | February 2010 | pp. 100-104, 187-188 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r810_owner's%20manual_en-us.pdf> |
+| `dell-e05s-2` | dell | Dell PowerEdge R815 Hardware Owner's Manual | Regulatory Model E05S, Rev. A01 | December 2013 | pp. 92-96, 177-178 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r815_owner's%20manual_en-us.pdf> |
+| `dell-r515-owner-manual` | dell | Dell PowerEdge R515 Systems Hardware Owner's Manual | Rev. A00 | August 2010 | pp. 104-107, 183 | <https://dl.dell.com/Manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r515_owner's%20manual_en-us.pdf> |
+| `dell-e21s` | dell | Dell PowerEdge R820 Owner's Manual | Regulatory Model E21S Series, Rev. A05 | 2014-03 | pp. 43-51 | <https://dl.dell.com/topicspdf/poweredge-r820_owners-manual_en-us.pdf> |
+| `hpe-767927-009` | hp | HPE ProLiant DL360 Gen9 Server User Guide | 767927-009, edition 9, February 2018 | 7927-00 | 15, 41-48 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04441974> |
+| `hpe-768830-401a` | hp | HPE ProLiant DL380 Gen9 Server User Guide | 768830-401a, edition 10, April 2018 | 8830-40 | 22, 68-79 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04436966> |
+| `hpe-dl380p-gen8-user-guide` | hp | HPE ProLiant DL380p Gen8 Server User Guide | 661848-006R, edition 7, December 2015 | 1848-00 | 16, 45-51 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03231416> |
+| `hpe-664724-006` | hp | HP ProLiant DL360p Gen8 Server User Guide | 664724-006, edition 6, February 2014 | 4724-00 | 13, 42-49 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03231393> |
+| `hpe-ddr3-gen8` | hp | Configuring and using DDR3 memory with HP ProLiant Gen8 Servers (engineering white paper) | 2nd edition | 2012 | 11-14; 11-13 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03293145> |
+| `hpe-675786-006` | hp | HPE ProLiant DL360e Gen8 Server User Guide | 675786-006, edition 8, October 2019 | 5786-00 | 10, 45-51 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03401317> |
+| `hpe-676151-006` | hp | HPE ProLiant DL380e Gen8 Server User Guide | 676151-006, edition 7, October 2019 | 6151-00 | 14, 59-64 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03413110> |
+| `hpe-population-gen10-technical` | hp | Server Memory and Persistent Memory population rules for HPE Gen10 servers with Intel Xeon Scalable processors (technical white paper) | a00017079ENW, Rev. 16, copyright 2025 | 2025 | 4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26 | <https://www.hpe.com/psnow/doc/a00017079enw> |
+| `hpe-dl380-gen10-user-guide` | hp | HPE ProLiant DL380 Gen10 Server User Guide | 30-EFA1AAC3-401h, edition 20 | October 2024 | 30, 141-142 | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00019109en_us> |
+| `hpe-dl360-gen10-maintenance-service-guide` | hp | HPE ProLiant DL360 Gen10 Server Maintenance and Service Guide | docId a00115362en_us |  | topics "DIMM slot locations", "DIMM-processor compatibility" | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00115362en_us> |
+| `hpe-ml350-gen10-user-guide` | hp | HPE ProLiant ML350 Gen10 Server User Guide | 30-3266984C-008a, edition 8a | January 2024 | topics "System board components", "Memory options" (no DIMM slot topic) | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00016366en_us> |
+| `hpe-870691-007` | hp | HPE ProLiant ML350 Gen10 Server User Guide | 870691-007, edition 7, October 2020 | 0691-00 | 15-17, 120-121 (no DIMM slot drawing either) | <https://itpfdoc.hitachi.co.jp/manuals/ha8000v/hard/Gen10/Server/ML350/870691-007_en.pdf> |
+| `hpe-656396-004` | hp | HP ProLiant BL460c Gen8 Server Blade User Guide | 656396-004, edition 4, December 2012 | 6396-00 | 9, 23, 27-33 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03428245> |
+| `hpe-656396-002` | hp | HP ProLiant BL460c Gen8 Server Blade User Guide | 656396-002, edition 2, August 2012 | 6396-00 | 9, 27-33 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03231200> |
+| `hpe-768826-007` | hp | HPE ProLiant BL460c Gen9 Server Blade User Guide | 768826-007, edition 7, September 2018 | 8826-00 | 12-13, 43-48 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04410344> |
+| `hpe-876833-006` | hp | HPE ProLiant BL460c Gen10 Server Blade User Guide | 876833-006, edition 6, May 2019 | 6833-00 | 15, 60 | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00018554en_us> |
+| `hpe-872677-004` | hp | HPE ProLiant MicroServer Gen10 User Guide | 872677-004, edition 4, November 2018 | 2677-00 | 9-11, 48 | <https://www.laptopsdirect.co.uk/PDFs/P07203-421_UserManual1.PDF> |
+| `hpe-gen10-maintenance-service-guide` | hp | HPE ProLiant MicroServer Gen10 Maintenance and Service Guide | 30-9F0C0938-005, edition 5, January 2025 | 0938-00 | topic "DIMM slot locations" | <https://support.hpe.com/hpesc/public/docDisplay?docId=sd00005613en_us> |
+| `hpe-gen10` | hp | HPE ProLiant MicroServer Gen10 QuickSpecs | a00008701enw, version 10, 09-November-2020 (retired) | 2020 | 3, 10 | <https://support.hpe.com/hpesc/public/api/document/a00008701enw> |
+| `hpe-833836-073` | hp | HPE ProLiant ML10 Gen9 Server User Guide, Spanish edition (Guía de usuario del servidor HPE ProLiant ML10 Gen9) | 833836-073, February 2017 | 3836-07 | 35-38 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04960478> |
+| `hpe-833835-004` | hp | HPE ProLiant ML10 Gen9 Server Maintenance and Service Guide | 833835-004, edition 4, August 2018 | 3835-00 | 67 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04960486> |
+| `hpe-ml10-generation9-gen9` | hp | HPE ProLiant ML10 Generation9 (Gen9) QuickSpecs | c04922941, version 8, 11-July-2017 (retired) | 2017 | 6, 17-18 | <https://support.hpe.com/hpesc/public/api/document/c04922941> |
+| `hpe-786245-003` | hp | HPE ProLiant DL60 Gen9 Server User Guide | 786245-003, edition 3, April 2016 | 6245-00 | 11, 49-54 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04504816> |
+| `hpe-826318-003a` | hp | HPE ProLiant DL20 Gen9 Server User Guide | 826318-003a, edition 4, June 2017 | 6318-00 | 14, 65-69 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04898522> |
+| `hpe-670519-006` | hp | HP ProLiant DL160 Gen8 Server User Guide | 670519-006, edition 6, March 2013 | 0519-00 | 10, 46-51 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03242768> |
+| `hpe-670554-007` | hp | HP ProLiant DL160 Gen8 Server Maintenance and Service Guide | 670554-007, edition 7, March 2013 | 0554-00 | 74-75 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03257139> |
+| `hpe-dl385p-gen8-user-guide` | hp | HPE ProLiant DL385p Gen8 Server User Guide | 661850-002R, edition 3, December 2015 | 1850-00 | 16, 51-57 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c03351259> |
+| `hpe-775786-004` | hp | HPE ProLiant DL160 Gen9 Server User Guide | 775786-004, edition 4, March 2016 | 5786-00 | 12, 52-58 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04430543> |
+| `hpe-775439-004` | hp | HPE ProLiant DL180 Gen9 Server User Guide | 775439-004, edition 5, March 2016 | 5439-00 | 16, 82-87 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04422844> |
+| `hpe-781878-003` | hp | HPE ProLiant DL120 Gen9 Server User Guide | 781878-003, edition 3, April 2016 | 1878-00 | 12, 57-62 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04504822> |
+| `hpe-495624-003` | hp | HP ProLiant DL380 G6 Server User Guide | part number 495624-003, edition 3, February 2011 | 5624-00 | pp. 16, 41-47 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01705681> |
+| `hpe-517689-005` | hp | HPE ProLiant DL360 G6 Server User Guide | part number 517689-005, edition 5, October 2018 | 7689-00 | pp. 12, 38-44 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01705733> |
+| `hpe-406316-002` | hp | HP ProLiant DL360 Generation 5 Server User Guide | part number 406316-002, second edition, May 2006 | 6316-00 | pp. 11, 37-40 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c00710435> |
+| `hpe-setup-z6-g4-z8-g4` | hp | Intel Optane DC Persistent Memory: Configuration and Setup on HP Z6 G4 and Z8 G4 Workstations, technical white paper | 4AA7-6622ENW | November 2019 | pp. 6-7, 21-23 | <https://web.archive.org/web/20210724215723/https://h20195.www2.hp.com/v2/getpdf.aspx/4AA7-6622ENW.pdf> |
+| `hpe-530514-002` | hp | HP ProLiant DL320 G6 Server User Guide | part number 530514-002, second edition, March 2010 | 0514-00 | pp. 10-11, 26-31 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01736500> |
+| `hpe-dl160-6-g6` | hp | QuickSpecs HP ProLiant DL160 Generation 6 (G6) | DA-13247, version 59 | September 24, 2012 | pp. 36-38 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04284374> |
+| `hpe-dl180-6-g6` | hp | QuickSpecs HP ProLiant DL180 Generation 6 (G6) | DA-13248, version 53 | September 24, 2012 | pp. 38-40 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04284378> |
+| `hpe-501274-002` | hp | HP ProLiant BL460c G6 Server Blade User Guide | part number 501274-002, edition 2, March 2011 | 1274-00 | pp. 10, 27-33 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01708947> |
+| `hpe-579574-004` | hp | HP ProLiant DL120 G6 Server User Guide | part number 579574-004, edition 4, April 2012 | 9574-00 | pp. 9, 23-25 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01934840> |
+| `hpe-638025-003a` | hp | HP ProLiant DL120 G7 Server User Guide | part number 638025-003a, edition 3, April 2014 | 8025-00 | pp. 12-13, 28-30 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02790682> |
+| `hpe-588708-001` | hp | HP ProLiant DL385 G7 Server User Guide | part number 588708-001, first edition, March 2010 | 8708-00 | pp. 12-13, 15, 47-50 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02118792> |
+| `hpe-617692-004` | hp | HP ProLiant DL585 G7 Server User Guide | part number 617692-004, edition 4, October 2012 | 7692-00 | pp. 17-18, 43-46 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02244320> |
+| `hpe-593961-001` | hp | HP ProLiant BL685c G7 Server Blade User Guide | part number 593961-001, first edition, June 2010 | 3961-00 | pp. 10, 28-31 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02252425> |
+| `hpe-601465-003` | hp | HP ProLiant DL165 G7 Server Maintenance and Service Guide | part number 601465-003, third edition, March 2013 | 1465-00 | pp. 63-64, 95 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02074307> |
+| `hpe-430047-004` | hp | HP ProLiant DL145 Generation 3 Server Maintenance and Service Guide | part number 430047-004, fourth edition, April 2007 | 0047-00 | pp. 33, 38-39, 63-64, 70 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c00856243> |
+| `hpe-595656-005` | hp | HP ProLiant DL580 G7 Server User Guide | part number 595656-005, edition 5, July 2012 | 5656-00 | pp. 17-18, 43-51; pp. 44-47 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c02267159> |
+| `hpe-381737-004` | hp | HP ProLiant DL140 Generation 2 Server Maintenance and Service Guide | part number 381737-004, fourth edition, September 2006 | 1737-00 | pp. 31, 58, 65 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c00368751> |
+| `hpe-359226-008` | hp | HP ProLiant DL380 Generation 4 Server Maintenance and Service Guide | part number 359226-008, eighth edition, May 2006 | 9226-00 | pp. 38, 80-81, 95 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c00687567> |
+| `hpe-136363-004` | hp | ProLiant DL380 Maintenance and Service Guide (Compaq) | part number 136363-004, fourth edition, June 2000 | 6363-00 | pp. 45-46, 142 (printed 2-29, 2-30, 5-4) | <https://support.hpe.com/hpesc/public/docDisplay?docId=c01129673> |
+| `hpe-hpe-integrity-superdome` | hp | HPE Integrity Superdome X QuickSpecs | c04383189, version 20, 17 June 2019 (marked retired) | 17 June 2019 | pp. 8, 15-16, 23 | <https://support.hpe.com/hpesc/public/docDisplay?docId=c04383189> |
+| `hpe-4-4r-user-guide` | hp | HP NetServer LH 4/LH 4r User Guide | no part number on the title pages; copyright 1998, PDF created December 1999 | 1998 | pp. 29, 31-32 (printed 23, 25-26) | <https://www.manualslib.com/manual/439638/Hp-D7171a-Netserver-Lpr.html> |
+| `ibm-x3550-m3-4254-7944-installation` | ibm | Lenovo System x3550 M3 (Types 4254, 7944) documentation pages "Installing a memory module", "DIMM installation sequence", "Memory mirroring", "Online-spare memory"; the same text in "System x3550 M3 Installation and User's Guide" | web pages carry no document number, fetched 2026-11-17; the guide is Part Number 00KC032, Thirteenth Edition (September 2023) | 2026-11-17 | guide pdf p61-67 (printed 51-57) | <https://pubs.lenovo.com/x3550-m3/c_dimm_rules> |
+| `ibm-x3550-m2-4198-7946-installation` | ibm | IBM System x3550 M2 Types 4198 and 7946: Installation and User's Guide | Part Number 00D9279, Thirteenth Edition ( | July 2012 | pdf p68-72 (printed 52-56) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/00d9279.pdf> |
+| `ibm-x3400-m3-7378-7379-installation` | ibm | IBM System x3400 M3 Types 7378 and 7379: Installation and User's Guide | Part Number 00D3189, Ninth Edition ( | February 2012 | pdf p95-104 (printed 79-88) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/00d3189.pdf> |
+| `ibm-x3550-m4-7914-installation-x3550` | ibm | Lenovo System x3550 M4 (Type 7914) documentation pages "Installing a memory module", "DIMM installation sequence", "Memory mirrored channel", "Memory rank sparing"; the same text in "System x3550 M4 Installation and Service Guide" | web pages carry no document number, fetched 2026-11-17; the guide is the Twentieth Edition (November 2015), no part number printed | 2026-11-17 | guide pdf p59-64 (printed 45-50) | <https://pubs.lenovo.com/x3550-m4/c_dimm_rules> |
+| `ibm-x3300-m4-7382` | ibm | Lenovo System x3300 M4 (Type 7382) documentation page "Installing a memory module" | web page carries no document number, fetched 2026-11-17; the Installation and Service Guide PDF is 62 MB at public.dhe.ibm.com and 73 MB at pubs.lenovo.com, over the 60 MB limit, not fetched | 2026-11-17 | whole page | <https://pubs.lenovo.com/x3300-m4/installing_memory> |
+| `ibm-x220-installation-service-guide-7906` | ibm | Flex System x220 Compute Node Installation and Service Guide (Machine Types 7906, 2585) and the web pages "Installing a DIMM", "Independent-channel mode", "Rank-sparing mode", "Mirrored-channel mode" with the same text | Part Number 00YJ297, Tenth Edition ( | August 2016 | guide pdf p590-595 (printed 582-587) | <https://pubs.lenovo.com/x220/dw1kr_book.pdf> |
+| `ibm-x240-7863-8737-8738-8956` | ibm | IBM Flex System x240 Compute Node Types 7863, 8737, 8738, and 8956: Installation and Service Guide | Part Number 00FH226, Seventh Edition | March 2017 | pdf p603-607 (printed 591-595) | <https://pubs.lenovo.com/x240/dw1ko_book_ibm.pdf> |
+| `ibm-hs23-installation-user-guide-7875` | ibm | BladeCenter HS23 Blade Server Installation and User's Guide (Types 7875 and 1929) and the web page "Installing a memory module" with the same text | Part Number 00AK736, Fifth Edition ( | June 2017 | pdf p24 and p32-34 (printed 14 and 22-24) | <https://pubs.lenovo.com/bladecenter-hs23/cy1ec_hs23_iug.pdf> |
+| `ibm-dx360-m4-7912-7913-user` | ibm | System x iDataPlex dx360 M4 Types 7912 and 7913: User's Guide | Part Number 00V9812, Second Edition ( | July 2012 | pdf p55-59 (printed 39-43) | <https://pubs.lenovo.com/idataplex/ch1inmst.pdf> |
+| `ibm-x3250-m3-4251-4252-4261` | ibm | IBM System x3250 M3 Types 4251, 4252, and 4261: Installation and User's Guide | Part Number 81Y6118, Sixth Edition ( | August 2011 | pdf p46-50 (printed 30-34) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/81y6118.pdf> |
+| `ibm-x3250-m4-installation-service-guide` | ibm | System x3250 M4 Installation and Service Guide (Machine Type 2583) and the web pages "Memory module installation", "Unbuffered DIMMs (UDIMMs)", "Installing a DIMM" with the same text | Fourteenth Edition (November 2015), no part number printed | November 2015 | guide pdf p59-61 (printed 45-47) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/x3250_m4_2583_isg_en.pdf> |
+| `ibm-x3200-m2-4367-4368-installation` | ibm | System x3200 M2 Types 4367 and 4368: Installation Guide | Part Number 46M2038, Third Edition (September 2009) | 2038 | pdf p29-31 (printed 15-17) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/46m2038.pdf> |
+| `ibm-x3650-7979-user-guide` | ibm | System x3650 Type 7979: User's Guide | Part Number 44R5189, Fifth Edition ( | December 2007 | pdf p83-87 (printed 67-71) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/44r5189.pdf> |
+| `ibm-235-8671-installation-guide` | ibm | IBM xSeries 235 Type 8671: Option Installation Guide | Part Number 59P6537 (SC59-P653-70), Third Edition ( | January 2003 | pdf p15 and p54-55 (printed 3 and 42-43) | <https://public.dhe.ibm.com/systems/support/system_x_pdf/59p6537.pdf> |
+| `ibm-x3850-x5-x3950-x5-7145` | ibm | IBM System x3850 X5 and x3950 X5 Types 7145, 7146, 7143, and 7191: Installation and User's Guide | Part Number 00FH255, Fourteenth Edition ( | October 2013 | pdf p48 and p88-93 (printed 34 and 74-79) | <https://pubs.lenovo.com/x3850-x6-6241/7145_iug_pdf.pdf> |
+| `intel-s5000psl-s5000xsl-technical` | intel | Intel Server Boards S5000PSL and S5000XSL Technical Product Specification | D41763-008, Revision 1.7, August 2010 | 1763-00 | p29-35; pp. 29-35 | <https://web.archive.org/web/20161130150538/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5000psl/sb/417435_d41763_008_s5000psl_tps_rev_17.pdf> |
+| `intel-s5000vsa-technical` | intel | Intel Server Board S5000VSA Technical Product Specification | D36978-010, Revision 1.8, June 2010 | 6978-01 | p20-22, p61 | <https://web.archive.org/web/20200120041744/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5000vsa/sb/d36978010_s5000vsa_tps_r1_9.pdf> |
+| `intel-s5000vcl-technical` | intel | Intel Server Board S5000VCL Technical Product Specification | D64569-007, Revision 2.3, cover date May 2007 | 4569-00 | p19-21 | <https://web.archive.org/web/20230201073947/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5000vcl/sb/s5000vcl_tps_r2_3.pdf> |
+| `intel-e14960-009` | intel | Intel Server Boards S3200SH/S3210SH Technical Product Specification | E14960-009, Revision 1.8, May 2010 | 4960-00 | p30-31, p38-40, p65 | <https://web.archive.org/web/20220316225735/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s3200sh/sb/e14960009_s3210sh_tps_r1_8.pdf> |
+| `intel-se7501wv2-technical` | intel | Intel Server Board SE7501WV2 Technical Product Specification | C25653-001, Revision 1.0, December 2002 | 5653-00 | p24-26, p72-73, p90 | <https://web.archive.org/web/20081203072305/http://download.intel.com/support/motherboards/server/se7501wv2/tps.pdf> |
+| `intel-e39529-013` | intel | Intel Server Boards S5520HC, S5500HCV, and S5520HCT Technical Product Specification | E39529-013, Revision 1.9, June 2011 | 9529-01 | p41-43, p48-51; p41, p43, p49-51 | <https://web.archive.org/web/20160705103142/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5520hc/sb/e39529013_s5520hc_s5500hcv_s5520hct_tps_r19.pdf> |
+| `intel-e44031-012` | intel | Intel Server Board S5520UR and S5520URT Technical Product Specification | E44031-012, Revision 1.9, May 2011 | 4031-01 | p39-44 | <https://web.archive.org/web/20201112042143/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5520ur/sb/e44031012_s5520ur_s5520urt_tps_r1_9.pdf> |
+| `intel-e42249-009` | intel | Intel Server Board S5500BC Technical Product Specification | E42249-009, Revision 1.8, June 2011 | 2249-00 | p40-43 | <https://web.archive.org/web/20160910011329/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s5500bc/sb/e42249009_s5500bc_tps_1_9.pdf> |
+| `intel-e65697-010` | intel | Intel Server Board S3420GP Technical Product Specification | E65697-010, Revision 2.4, January 2011 | 5697-01 | p33-36 | <https://web.archive.org/web/20220414191407/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s3420gp/sb/s3420gp_tps_r2_4.pdf> |
+| `intel-s1200bt-technical` | intel | Intel Server Board S1200BT Technical Product Specification | G13326-007, Revision 2.4, May 2013 | 3326-00 | p30-34 | <https://web.archive.org/web/20220317015358/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/sb/g13326007_s1200bt_tps_r2_4.pdf> |
+| `intel-s1200v3rp-technical` | intel | Intel Server Board S1200V3RP Technical Product Specification | G84364-004, Revision 2.0, June 2015 | 4364-00 | p29-33 | <https://web.archive.org/web/20220126191535/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/sb/g84364004_s1200v3rp_tps_r2_0.pdf> |
+| `intel-s1200sp-technical` | intel | Intel Server Board S1200SP Family Technical Product Specification | Revision 1.4, March 2017 (no order number printed) | March 2017 | p32-36 | <https://web.archive.org/web/20240807064334/https://www.intel.com/content/dam/support/us/en/documents/server-products/S1200SP_TPS_R1_4_AllSKU.pdf> |
+| `intel-s2600gz-technical` | intel | Intel Server Board S2600GZ/GL Technical Product Specification | Revision 2.4, October 2014 (no order number on the cover) | October 2014 | p35-39 | <https://web.archive.org/web/20230127062822/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/sb/s2600gzgl_tps_r2_4.pdf> |
+| `intel-s2600cp-p4000cp-technical` | intel | Intel Server Board S2600CP Family, Intel Server System P4000CP Family Technical Product Specification | G26942-005, Revision 1.9, March 2015 | 6942-00 | p49-53 | <https://web.archive.org/web/20160327150014/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/s2600cp/sb/g26942005_s2600cp_p4000cp_tps_rev19.pdf> |
+| `intel-s4600lh2-t2-technical` | intel | Intel Server Boards S4600LH2/T2 Technical Product Specification | Revision 2.0, March 2014 (no order number on the cover) | March 2014 | p37-40 | <https://web.archive.org/web/20240118024553/https://www.intel.com/content/dam/support/us/en/documents/motherboards/server/sb/s4600lh2_t2_tps_rev_2_02.pdf> |
+| `intel-s2600wt-technical-tps` | intel | Intel Server Board S2600WT Technical Product Specification (TPS) | Revision 1.9 | February 2020 | p38-41, p44 | <https://web.archive.org/web/20220317050938/https://www.intel.com/content/dam/support/us/en/documents/server-products/server-boards/Intel_Server_Board_S2600WT_TPS.pdf> |
+| `intel-s2600cw-technical` | intel | Intel Server Board S2600CW Family Technical Product Specification | Revision 2.61 | March 2020 | p38-40, p43 | <https://web.archive.org/web/20220205233726/https://www.intel.com/content/dam/support/us/en/documents/server-products/server-boards/S2600CW_TPS.pdf> |
+| `intel-s2600wf-technical` | intel | Intel Server Board S2600WF Product Family Technical Product Specification | Rev 2.6 | October 2021 | p54-57, p137 | <https://web.archive.org/web/20250118081233/https://www.intel.com/content/dam/support/us/en/documents/server-products/server-boards/S2600WF_TPS.pdf> |
+| `intel-s2600st-technical` | intel | Intel Server Board S2600ST Product Family Technical Product Specification | Rev 2.4 | March 2020 | p47-50 | <https://web.archive.org/web/20210921180702/https://www.intel.com/content/dam/support/us/en/documents/server-products/Intel_S2600ST_TPS.pdf> |
+| `intel-m50cyp2sb-technical` | intel | Intel Server Board M50CYP2SB Technical Product Specification | Rev. 1.41 | August 2022 | p40, p45-48, p122; p46, p48 | <https://web.archive.org/web/20221024041852/https://www.intel.com/content/dam/support/us/en/documents/server-products/single-node-servers/m50cyp2sb-server-board-tps.pdf> |
+| `intel-m70klp-technical` | intel | Intel Server System M70KLP Family Technical Product Specification | Rev. 1.0 | April 2021 | p34, p38-40 | <https://web.archive.org/web/20220326215456/https://www.intel.com/content/dam/support/us/en/documents/server-products/M70KLP_TPS.pdf> |
+| `intel-m50fcp2sbstd-technical` | intel | Intel Server Board M50FCP2SBSTD Technical Product Specification | Rev. 1.5 | June 2024 | p38, p40-41 | <https://web.archive.org/web/20240711223041/https://www.intel.com/content/dam/support/us/en/documents/server-products/intel-server-board-m50fcp2sbstd-tps.pdf> |
+| `intel-no-document-of` | intel | no document of the board itself; coreboot src/mainboard/intel/avenuecity_crb/dimm_slot.c | commit 9f21b10ec29fe946fc1abc75a76c74105eae7611 |  | line 11 | <https://github.com/coreboot/coreboot/tree/main/src/mainboard/intel/avenuecity_crb> |
+| `amd-population-7003` | amd | Memory Population Guidelines for AMD EPYC 7003 Series Processors | Publication 56873, Revision 1.00 | April 2023 | p6-20 | <https://docs.amd.com/api/khub/documents/0bglRXRnwmLeDr6L0vSZVA/content> |
+| `amd-9004-population` | amd | AMD EPYC 9004 Series Memory Population Recommendations | Publication 58269, Revision 1.1 | June 2023 | p5-12 | <https://docs.amd.com/api/khub/documents/zynTogiENLgLxWEd4075vQ/content> |
+| `asus-rs100-e7-pi2-user-guide` | asus | RS100-E7/PI2 user guide (motherboard ASUS P8B-M) | E6489, First Edition | March 2011 | p28, p79 | <https://dlcdnets.asus.com/pub/ASUS/server/RS100-E7(PI2)/Manual/E6489_RS100_E7_PI2_web.pdf> |
+| `asus-ts300-e7-ps4-user-guide` | asus | TS300-E7/PS4 user guide (motherboard ASUS P8B-E/4L) | E6468, First Edition | March 2011 | p29 | <https://dlcdnets.asus.com/pub/ASUS/server/TS300-E7_PS4/Manual/e6468_TS300-E7_PS4.pdf> |
+| `asus-p9d-user-guide` | asus | P9D-X user guide | E7959, First Edition | April 2013 | p34 | <https://dlcdnets.asus.com/pub/ASUS/mb/socket1150/P9D-X/Manual&AVL/E7959_P9D-X_for_web.pdf> |
+| `asus-e28203` | asus | P12R-M Series user guide | E28203, Revised Edition V7 | May 2026 | p31 | <https://dlcdnets.asus.com/pub/ASUS/server/P12R-M/Manual/E28203_P12R-M_Series_UM_V7_WEB.pdf> |
+| `asus-p9d-user-guide-2` | asus | P9D-I user guide | E8351, First Edition | July 2013 | p33 | <https://dlcdnets.asus.com/pub/ASUS/mb/socket1150/P9D-I/Manual/E8351_P9D-I.pdf> |
+| `asus-z9pa-d8-user-guide` | asus | Z9PA-D8 Series user guide | E7572, First Edition | August 2012 | p12, p33-34 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket2011/Z9PA-D8/Manual&QVL/E7572_Z9PA-D8_for_web.pdf> |
+| `asus-e13692` | asus | Z10PA-D8 Series user guide | E13692, Revised Edition V3 | December 2017 | p13, p31-32 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket2011-R3/Z10PA-D8/Manual/E13692_Z10PA-D8_Series_UM_V3_WEB.pdf> |
+| `asus-z9pe-d16-10g-user-guide` | asus | Z9PE-D16-10G Series user guide | E8158, First Edition | May 2013 | p34-35 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket2011/Z9PE-D16-10G/Manual/E8158_Z9PE-D16-10G_Series.pdf> |
+| `asus-e13683` | asus | Z10PE-D16 WS user guide | E13683, Revised Edition V5 | December 2017 | p11, p32-33 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket2011-R3/Z10PE-D16_WS/Manual/E13683_Z10PE-D16_WS_UM_V5_WEB.pdf> |
+| `asus-rs700-x7-ps4-user-guide` | asus | RS700-X7/PS4 user guide (motherboard ASUS Z9PR-D12/4L) | E7372, First Edition | April 2012 | p13, p27-28 | <https://dlcdnets.asus.com/pub/ASUS/server/RS700-X7_PS4/Manual/e7372_rs700-x7_ps4_for_web.pdf> |
+| `asus-z9na-d6-user-manual` | asus | Z9NA-D6 series user manual (Chinese edition) | C7280, first edition | April 2012 | p12, p33-34, p79 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket1356/Z9NA-D6/Manual/C7280_Z9NA-D6.pdf> |
+| `asus-e16279` | asus | WS C621E SAGE user guide | E16279, Revised Edition V7 | February 2020 | p10, p21-22 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket3647/WS_C621E_SAGE/Manual/E16279_WS_C621E_SAGE_UM_V7_WEB.pdf> |
+| `asus-e16292` | asus | RS720Q-E9-RS24-S Series user guide (motherboard ASUS Z11PH-D12) | E16292, Revised Edition V5 | February 2020 | p16, p31 | <https://dlcdnets.asus.com/pub/ASUS/server/RS720Q-E9-RS24-S/Manual/E16292_RS720Q-E9-RS24-S_UM_V5_WEB.pdf> |
+| `asus-e16560` | asus | ESC4000 G4 Series user guide (motherboard ASUS Z11PG-D16) | E16560, Revised Edition V9 | August 2022 | p14, p37-38 | <https://dlcdnets.asus.com/pub/ASUS/server/ESC4000_G4/Manual/E16560_ESC4000_G4_Series_UM_V9_WEB.pdf> |
+| `asus-e21686` | asus | ESC8000 G4 Series user guide (motherboard ASUS Z11PG-D24) | E21686, Revised Edition V12 | February 2023 | p14, p31-33 | <https://dlcdnets.asus.com/pub/ASUS/server/ESC8000_G4/Manual/E21686_ESC8000_G4_UM_V12_WEB.pdf> |
+| `asus-e16276` | asus | Pro WS C621-64L SAGE Series user guide | E16276, Revised Edition V3 | February 2020 | p19-20 | <https://dlcdnets.asus.com/pub/ASUS/mb/Socket3647/Pro_WS_C621-64L_SAGE_10G/MANUAL/E16276_Pro_WS_C621-64L_SAGE_Series_UM_V3_WEB.pdf> |
+| `asus-e21771` | asus | ESC4000A-E10 user guide (motherboard ASUS KRPG-U8) | E21771, Revised Edition V9 | March 2023 | p13, p31 | <https://dlcdnets.asus.com/pub/ASUS/server/ESC4000A-E10/Manual/E21771_ESC4000A-E10_UM_V9_WEB.pdf> |
+| `asus-e28170` | asus | RS720A-E12-RS12 user guide (motherboard ASUS K14PP-D24) | E28170, Revised Edition V5 | May 2026 | p14, p46-48 | <https://dlcdnets.asus.com/pub/ASUS/server/RS720A-E12-RS12/Manual/E28170_RS720A-E12-RS12_UM_V5_WEB.pdf> |
+| `lenovo-p920-p720` | lenovo | Lenovo ThinkStation P920 and P720 Memory Configurator | version 1.0, 11/8/ | 2017 | pp.3-6; pp.7-8 | <https://download.lenovo.com/pccbbs/thinkcentre_pdf/thinkstation_p920_p720_memory_configurations_v1.0.pdf> |
+| `lenovo-sr590-7x98-7x99-installation-installation` | lenovo | ThinkSystem SR590 (7X98, 7X99) online documentation, topics "Memory module installation rules", "DRAM DIMM installation rules", "Independent mode" | no document number; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/sr590/dimm_installation_rules> |
+| `lenovo-sr650-7x05-7x06-installation` | lenovo | ThinkSystem SR650 (7X05, 7X06) online documentation, topics "Memory configuration", "DRAM DIMM installation rules", "Independent mode" | no document number; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/sr650/memory_configuration> |
+| `lenovo-sr530-7x07-7x08-installation` | lenovo | ThinkSystem SR530 (7X07, 7X08) online documentation, topic "Memory module installation rules" | no document number; fetched | 2026-11-17 | whole topic | <https://pubs.lenovo.com/sr530/memory_module_installation_order> |
+| `lenovo-sr650-v2-installation` | lenovo | ThinkSystem SR650 V2 online documentation, topics "Memory module installation rules and order", "Independent mode" | no document number; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/sr650-v2/dimm_installation_rules> |
+| `lenovo-st650-v2-technical` | lenovo | ThinkSystem ST650 V2 online documentation, topics "Technical rules for memory modules", "Independent memory mode" | no document number; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/st650-v2/technical_rules_dimms> |
+| `lenovo-sr645-installation` | lenovo | ThinkSystem SR645 online documentation, topics "Memory module installation rules and order", "Memory" | no document number; fetched | 2026-11-17 | whole topics and three figures | <https://pubs.lenovo.com/sr645/memory_module_install_rules> |
+| `lenovo-sr950-v3-installation-installation` | lenovo | ThinkSystem SR950 V3 online documentation, topics "Memory module installation rules and order", "Independent memory mode installation order" | no document number; fetched | 2026-11-17 | whole topics and two figures | <https://pubs.lenovo.com/sr950-v3/memory_module_installation_order> |
+| `lenovo-sn550` | lenovo | ThinkSystem SN550 online documentation, topics "Memory configuration", "Independent memory mode" | no document number; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/sn550/memory_configuration> |
+| `lenovo-x3650-m5-5462-installation-service` | lenovo | Lenovo System x3650 M5 Type 5462 Installation and Service Guide, online edition, topics "Installing a memory module", "DIMM installation sequence" | no document number online; fetched | 2026-11-17 | whole topics, figure xinyi044b.jpg | <https://pubs.lenovo.com/x3650-m5-5462/c_dimm_rules> |
+| `lenovo-x240-m5-9532-2951-installation` | lenovo | Lenovo Flex System x240 M5 Compute Node Types 9532 and 2951 Installation and Service Guide, online edition, topic "Installing a DIMM" | no document number online; fetched | 2026-11-17 | whole topic | <https://pubs.lenovo.com/x240-m5/installing_the_dimm> |
+| `lenovo-x3250-m6-installation-service-guide` | lenovo | Lenovo System x3250 M6 Installation and Service Guide, online edition, topics "DIMM installation guidelines", "Unbuffered DIMMs (UDIMMs)", "System-board connectors" | no document number online; fetched | 2026-11-17 | whole topics | <https://pubs.lenovo.com/x3250-m6/r_memory_module_installation> |
+| `lenovo-sr250-installation` | lenovo | ThinkSystem SR250 online documentation, topic "Memory module installation rules and order" | no document number; fetched | 2026-11-17 | whole topic | <https://pubs.lenovo.com/sr250/memory_module_installation_order> |
+| `lenovo-sr250-v2-technical` | lenovo | ThinkSystem SR250 V2 online documentation, topic "Technical rules for memory modules" | no document number; fetched | 2026-11-17 | whole topic | <https://pubs.lenovo.com/sr250-v2/technical_rules_memory> |
+| `oracle-820-5830-13` | sun | Sun Fire X4170, X4270, and X4275 Servers Service Manual | Part No. 820-5830-13, Revision A, December 2010 | 5830-13 | section 4.1, pp. 4-2 to 4-11 | <https://docs.oracle.com/cd/E19477-01/820-5830-13/820-5830-13.pdf> |
+| `oracle-e22369-02` | sun | Sun Fire X4170 M2 Server Service Manual | Part No. E22369-02, Revision A, May 2011 | 2369-02 | section 4.2, pp. 4-3 to 4-13 | <https://docs.oracle.com/cd/E19762-01/E22369-02/E22369-02.pdf> |
+| `oracle-e21671-04` | sun | Sun Fire X4270 M2 Server Service Manual | Part No. E21671-04, January 2012 (page footers: May 2011) | 1671-04 | section 4.2, pp. 4-3 to 4-13 | <https://docs.oracle.com/cd/E19245-01/E21671/E21671.pdf> |
+| `oracle-e22313-13` | sun | Sun Server X3-2 (formerly Sun Fire X4170 M3) Service Manual | Part No. E22313-13, April 2014 | 2313-13 | "Servicing the DIMMs (CRU)", pp. 58 to 70 | <https://docs.oracle.com/cd/E22368_01/pdf/E22313.pdf> |
+| `oracle-e23396-15` | sun | Sun Server X3-2L (formerly Sun Fire X4270 M3) Service Manual | Part No. E23396-15, April 2014 | 3396-15 | "Servicing the DIMMs (CRU)", pp. 63 to 76 | <https://docs.oracle.com/cd/E23393_01/pdf/E23396.pdf> |
+| `oracle-e38041-07` | sun | Sun Server X4-2 Service Manual | Part No. E38041-07, May 2014 | 8041-07 | "Servicing the DIMMs (CRU)", pp. 63 to 75 | <https://docs.oracle.com/cd/E36975_01/pdf/E38041.pdf> |
+| `oracle-e48320-10` | sun | Oracle Server X5-2 Service Manual | Part No. E48320-10, January 2021 | 8320-10 | "Servicing the DIMMs (CRU)", pp. 91 to 104 | <https://docs.oracle.com/cd/E41059_01/pdf/E48320.pdf> |
+| `oracle-820-5607-11` | sun | Sun Fire X2270 Server Service Manual | Part No. 820-5607-11, Rev. A, June 2009 | 5607-11 | section 3.5.10, pp. 3-29 to 3-33 | <https://docs.oracle.com/cd/E19432-01/820-5607-11/820-5607-11.pdf> |
+| `oracle-821-1345` | sun | Sun Fire X2270 M2 Server Service Manual (sibling) | 821-1345, HTML edition, copyright 2010, 2012 | 2010 | "DIMM Population Rules", "DIMM Slot Designations" | <https://docs.oracle.com/cd/E19902-01/html/821-1345/ajdef.html> |
+| `oracle-819-6597-12` | sun | Sun Fire X2200 M2 Server Service Manual | Part No. 819-6597-12, July 2008 (page footer) | 6597-12 | section 1.3.2 p. 1-7, sections 4.4.10 and 4.4.11 pp. 4-31 to 4-36 | <https://docs.oracle.com/cd/E19121-01/sf.x2200m2/819-6597-12/819-6597-12.pdf> |
+| `oracle-819-6601-22` | sun | Sun Fire X2200 M2 Server Product Notes | Part No. 819-6601-22, July 2009 (page footer) | 6601-22 | pp. 21, 24, 49 | <https://docs.oracle.com/cd/E19121-01/sf.x2200m2/819-6601-22/819-6601-22.pdf> |
+| `oracle-820-0123-13` | sun | Sun Ultra 40 Workstation Service Manual (Ultra 40 and Ultra 40 M2) | Part No. 820-0123-13, Revision A, June 2008 | 0123-13 | section 5.2, pp. 5-5 to 5-16 | <https://docs.oracle.com/cd/E19127-01/ultra40m2.ws/820-0123-13/820-0123-13.pdf> |
+| `oracle-819-6584-11` | sun | Sun Ultra 20 M2 Workstation Service Manual | Part No. 819-6584-11, Revision A, January 2007 | 6584-11 | section 5.8 pp. 5-22 to 5-24, appendix A.2 p. A-3 | <https://docs.oracle.com/cd/E19127-01/ultra20m2.ws/819-6584-11/819-6584-11.pdf> |
+| `fujitsu-d2619-tx300-s5-technical-manual` | fujitsu | System Board D2619 for RX/TX300 S5, Technical Manual | Edition | April 2009 | section 3.2, pp. 18-23 | <https://web.archive.org/web/20111027141223/http://manuals.ts.fujitsu.com/file/8419/d2619-thb-en.pdf> |
+| `fujitsu-d2619-tx300-s6-technical-manual` | fujitsu | System Board D2619-N for PRIMERGY RX/TX300 S6, Technical Manual | Edition | March 2011 | section 3.2, pp. 22-25 | <http://manuals.ts.fujitsu.com/file/9222/d2619-n-thb-en.pdf> |
+| `fujitsu-rx300-s5-guide` | fujitsu | PRIMERGY RX300 S5 Options Guide | Edition | September 2009 | chapter 5, pp. 29-31 | <http://manuals.ts.fujitsu.com/file/8488/rx300s5-og-en.pdf> |
+| `fujitsu-d2709-tx200-s5` | fujitsu | System Board D2709 für TX200 S5, Technisches Handbuch (German edition) | Ausgabe Mai | 2009 | section 3.2, pp. 17-19 | <https://web.archive.org/web/20110409144153/http://manuals.ts.fujitsu.com/file/8748/d2709-thb-de.pdf> |
+| `fujitsu-rx200-s6-guide` | fujitsu | PRIMERGY RX200 S6 Server Options Guide | Edition | November 2011 | pp. 12, 32, 33, 35 | <https://web.archive.org/web/20180329025545/http://manuals.ts.fujitsu.com/file/9274/rx200s6-og-en.pdf> |
+| `fujitsu-5600` | fujitsu | White Paper "Memory performance of Xeon 5600 (Westmere-EP) based systems" | Version 2.0 | 2011-06-06 | pp. 2, 5-7 | <https://sp.ts.fujitsu.com/dmsp/Publications/public/wp-westmere-ep-memory-performance-ww-en.pdf> |
+| `fujitsu-d2759-tx150-s7-technical-manual` | fujitsu | System Board D2759 for PRIMERGY TX150 S7, Technical Manual | Edition | December 2009 | pp. 20-23, 29 | <https://web.archive.org/web/20160508195258/http://manuals.ts.fujitsu.com/file/9110/d2759-thb-en.pdf> |
+| `fujitsu-d2863-rx100-s6-technical-manual` | fujitsu | System Board D2863 for PRIMERGY RX100 S6, Technical Manual | Edition | February 2011 | pp. 17, 20-23 | <https://web.archive.org/web/20180404025537/http://manuals.ts.fujitsu.com/file/9112/rx100s6-d2863-tm-en.pdf> |
+| `fujitsu-d3049-tx140-s1-tx120-s3` | fujitsu | System board D3049 for PRIMERGY TX140 S1 / TX120 S3, Technical Manual (Japanese edition) |  | May 2012 | pp. 17, 18, 20, 24, 25 | <https://web.archive.org/web/20160804213347/http://manuals.ts.fujitsu.com/file/10153/tx140s1-tx120s3-d3049-tm-jp.pdf> |
+| `fujitsu-tx140-s1-maintenance-manual` | fujitsu | PRIMERGY TX140 S1 Upgrade and Maintenance Manual (Japanese edition) |  | January 2013 | chapter 10, pp. 295-298 | <https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/tx140s1-umm-jp.pdf> |
+| `fujitsu-tx1320-m1-maintenance-manual` | fujitsu | FUJITSU Server PRIMERGY TX1320 M1 Upgrade and Maintenance Manual | Edition | November 2014 | chapter 10, pp. 215-218 | <https://web.archive.org/web/20150321081306/http://manuals.ts.fujitsu.com/file/11779/tx1320m1-umm-en.pdf> |
+| `fujitsu-tx1330-m1-maintenance-manual` | fujitsu | FUJITSU Server PRIMERGY TX1330 M1 Upgrade and Maintenance Manual (Japanese edition) |  | August 2014 | chapter 10, pp. 225-228 | <https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/tx1330m1-umm-jp.pdf> |
+| `fujitsu-mx130-s2-maintenance-manual` | fujitsu | PRIMERGY MX130 S2 Server Upgrade and Maintenance Manual | Edition | November 2011 | pp. 179-181 | <https://web.archive.org/web/20140213173318/http://manuals.ts.fujitsu.com/file/10334/mx130s2-umm-en.pdf> |
+| `fujitsu-rx200-s8-maintenance-manual` | fujitsu | PRIMERGY RX200 S8 Server Upgrade and Maintenance Manual |  | June 2015 | chapter 10, pp. 197-207 | <https://web.archive.org/web/20190711143807/http://manuals.ts.fujitsu.com/file/11453/rx200s8-umm-en.pdf> |
+| `fujitsu-rx200-s7-maintenance-manual` | fujitsu | PRIMERGY RX200 S7 Upgrade and Maintenance Manual (Japanese edition) |  | October 2015 | chapter 10, pp. 236-245 | <https://web.archive.org/web/20220121104812/https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/rx200s7-umm-jp.pdf> |
+| `fujitsu-rx2530-m1-maintenance-manual` | fujitsu | FUJITSU Server PRIMERGY RX2530 M1 Upgrade and Maintenance Manual (Japanese edition) |  | August 2015 | chapter 10, pp. 226-234 | <https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/rx2530m1-umm-jp.pdf> |
+| `fujitsu-rx300-s8-maintenance-manual` | fujitsu | PRIMERGY RX300 S8 Upgrade and Maintenance Manual (Japanese edition) |  | October 2014 | chapter 10, pp. 253-263 | <https://web.archive.org/web/20150513075329/https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/rx300s8-umm-jp.pdf> |
+| `fujitsu-tx2540-m1-maintenance-manual` | fujitsu | FUJITSU Server PRIMERGY TX2540 M1 Upgrade and Maintenance Manual (Japanese edition) |  | December 2014 | chapter 10, pp. 264-266 | <https://web.archive.org/web/20220121105533/https://jp.fujitsu.com/platform/server/primergy/products/note/svsdvd/dvd/pdf/tx2540m1-umm-jp.pdf> |
+| `fujitsu-d2119-rx300-s3-technical-manual` | fujitsu | System Board D2119 for RX300 S3, Technical Manual | Edition | May 2006 | section 3.2, pp. 16-17 | <https://web.archive.org/web/20170517071252/http://manuals.ts.fujitsu.com/file/3375/d2119-thb-en.pdf> |
+| `fujitsu-rx300-s3-guide` | fujitsu | PRIMERGY RX300 S3 Server Options Guide | Edition | June 2007 | chapter 5, pp. 25-27 | <http://manuals.ts.fujitsu.com/file/4003/rx300s3-og-en.pdf> |
+| `fujitsu-rx2540-m4-guide` | fujitsu | PRIMERGY RX2540 M4 System configurator and order information guide | date not on the saved pages |  | pp. 16-19 (chapter RAM) | <https://sp.ts.fujitsu.com/dmsp/Publications/public/cnfgRX2540M4.pdf> |
+| `fujitsu-rx2450-m2-guide` | fujitsu | PRIMERGY RX2450 M2 System configurator and order information guide |  | 2026/10/26 | pp. 15-17 (chapter 4, DDR5 system memory) | <https://sp.ts.fujitsu.com/dmsp/Publications/public/cnfgRX2450M2.pdf> |
+| `nec-express5800-r120b-1-user-guide` | nec | NEC Express5800/R120b-1 User's Guide | 3rd Edition, 10-2011, ONL-510_017_06_R120b1-100-99-1110 | 2011 | chapter 9, pp. 9-26 to 9-40; p. 4-13 | <https://www.58support.nec.co.jp/global/download/pdf/UGe_R120b1.pdf> |
+| `cisco-c220-m4-installation-service-guide` | cisco | Cisco UCS C220 M4 Server Installation and Service Guide | OL-32473-01, September 04, 2015 | 2473-01 | chapter 3, "Replacing DIMMs", pp. 3-17 to 3-21 | <https://web.archive.org/web/20150925065807/http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/hw/C220M4/install/C220M4.pdf> |
+| `cisco-c220-m4` | cisco | Cisco UCS C220 M4 High-Density Rack Server (Small Form Factor Disk Drive Model) Spec Sheet | REV E.12 | May 13, 2019 | pp. 18-23, 71-76 | <https://www.cisco.com/c/dam/en/us/products/collateral/servers-unified-computing/ucs-c-series-rack-servers/c220m4-sff-spec-sheet.pdf> |
+| `cisco-c240-m4-installation-service-guide` | cisco | Cisco UCS C240 M4 Server Installation and Service Guide | OL-32474-01, August 12, 2015 | 2474-01 | "Replacing DIMMs" (same slot figure and rules, txt:164-173) | <http://www.cisco.com/c/en/us/td/docs/unified_computing/ucs/c/hw/C240M4/install/C240M4.pdf> |
+| `cisco-c240-m4` | cisco | Cisco UCS C240 M4 High-Density Rack Server (Large Form Factor Disk Drive Model) Spec Sheet | REV F.19 | February 17, 2019 | not re-read beyond the title page | <https://www.cisco.com/c/dam/en/us/products/collateral/servers-unified-computing/ucs-c-series-rack-servers/c240m4-lff-spec-sheet.pdf> |
+| `sm-mnl-1081` | supermicro | X8DTU / X8DTU-F User's Manual | MNL-1081, Revision 1.20 | Oct. 24, 2012 | pr. 1-3, 2-10 to 2-12 (p11, p30-32) | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1081.pdf> |
+| `sm-mnl-1062` | supermicro | X8DT3/X8DTi(-F, -LN4F) User's Manual | MNL-1062, Revision 1.2c | March 9, 2012 | pr. 2-7, 2-8 (p29-30) | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1062.pdf> |
+| `sm-mnl-1031` | supermicro | X8DA3/X8DAi User's Manual | MNL-1031 (revision page not read) |  | pr. 1-4 (layout), 2-7, 2-8 | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1031.pdf> |
+| `sm-mnl-1076` | supermicro | X8DTL-3/-i/-3F/-iF User's Manual | MNL-1076, Revision 1.2b | Oct. 25, 2013 | pr. 2-7, 2-8 (p29-30) | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1076.pdf> |
+| `sm-mnl-1199` | supermicro | X8DTN+-F / X8DTN+-F-LR User's Manual | MNL-1199, Revision 1.1 | Oct. 11, 2011 | pr. 3-3 to 3-5 (p34-36) | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1199.pdf> |
+| `sm-mnl-1060` | supermicro | X8DAH+ / X8DAH+-F / X8DAH+(-F)-LR User's Manual | MNL-1060, Revision 1.2b | May 31, 2012 | pr. 1-3, 2-7 to 2-10 (p11, p31-34) | <https://www.supermicro.com/manuals/motherboard/5500/MNL-1060.pdf> |
+| `sm-mnl-h8dg` | supermicro | H8DG6/i(-F) Serverboard User's Manual | MNL-H8DGi(6)(-F), Revision 1.2a | March 06, 2014 | pr. 2-8, 2-9 (p28-29) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8DGi(6)(-F).pdf> |
+| `sm-mnl-h8qg-6` | supermicro | H8QG6/i-F Serverboard User's Manual | MNL-H8QG(6)(i)-F, Revision 1.2a | March 07, 2014 | pr. 2-8 to 2-10 (p28-30) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8QG(6)(i)-F.pdf> |
+| `sm-mnl-h8qgl-6` | supermicro | H8QGL-6/iF Serverboard User's Manual | MNL-H8QGL-(6)(i)F, Revision 1.1a | March 11, 2014 | pr. 2-8, 2-9 (p28-29) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8QGL-(6)(i)F.pdf> |
+| `sm-mnl-h8sgl-f` | supermicro | H8SGL(-F) Serverboard User's Manual | MNL-H8SGL(-F), Revision 1.2c | March 11, 2014 | pr. 2-8, 2-9 (p28-29) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8SGL(-F).pdf> |
+| `sm-mnl-h8scm-f` | supermicro | H8SCM(-F) Serverboard User's Manual | MNL-H8SCM(-F), Revision 1.2c | March 11, 2014 | pr. 2-8, 2-9 (p28-29) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8SCM(-F).pdf> |
+| `sm-mnl-h8dcl` | supermicro | H8DCL-6/i(F) Serverboard User's Manual | MNL-H8DCL-(i)(6)(F), Revision 1.2 | March 04, 2014 | pr. 2-8, 2-9 (p30-31) | <https://www.supermicro.com/manuals/motherboard/SR56x0/MNL-H8DCL-(i)(6)(F).pdf> |
+| `sm-mnl-1307` | supermicro | X9DBL-i/3/iF/3F User's Manual | MNL-1307, Revision 1.0c | May 23, 2013 | pr. 2-9 to 2-12 (p33-36) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1307.pdf> |
+| `sm-mnl-1278` | supermicro | X9DRW-3F / X9DRW-iF User's Manual | MNL-1278, Revision 1.1c | June 28, 2021 | pr. 1-10, 2-11 to 2-16 (p17, p34-39) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1278.pdf> |
+| `sm-mnl-1258` | supermicro | X9DR3-LN4F+ / X9DRi-LN4F+ User's Manual | MNL-1258, Revision 1.1c | April 1, 2014 | pr. 2-11, 2-12 (p35-36) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1258.pdf> |
+| `sm-mnl-1488` | supermicro | X9DRD-iF / X9DRD-LF User's Manual | MNL-1488, Revision 1.0a | March 21, 2014 | pr. 2-12 (p40) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1488.pdf> |
+| `sm-mnl-1284` | supermicro | X9SRi / X9SRE (-F, -3F) User's Manual | MNL-1284, Revision 1.0c | February 22, 2013 | pr. 2-8 to 2-10 (p36-38) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1284.pdf> |
+| `sm-mnl-1281` | supermicro | X9SRA User's Manual | MNL-1281, Revision 1.1 | March 5, 2014 | pr. 2-8 to 2-10 (p28-30) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1281.pdf> |
+| `sm-mnl-1557` | supermicro | X10DRW-i / X10DRW-iT User's Manual | MNL-1557, Revision 1.2b | January 22, 2020 | pr. 2-11 to 2-13 (p35-37) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1557.pdf> |
+| `sm-mnl-1491` | supermicro | X10DRi / X10DRi-T User's Manual | MNL-1491, Revision 1.2a | October 22, 2020 | pr. 2-13 to 2-15 (p35-37) | <https://www.supermicro.com/manuals/motherboard/C606_602/MNL-1491.pdf> |
+| `sm-mnl-1560` | supermicro | X10DRC-T4+ / X10DRC-LN4+ / X10DRi-T4+ / X10DRi-LN4+ User's Manual | MNL-1560, Revision 1.2a | January 31, 2020 | pr. 2-13, 2-14 (p36-37) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1560.pdf> |
+| `sm-mnl-1780` | supermicro | X10DRG-O+-CPU / X10DRG-OT+-CPU / X10DRG-O-PCIE User's Manual | MNL-1780, Revision 1.1a | February 03, 2020 | pr. 2-13 to 2-15 (p38-40) | <https://www.supermicro.com/manuals/motherboard/C612/MNL-1780.pdf> |
+| `sm-mnl-1566` | supermicro | X10DRL-i User's Manual | MNL-1566, Revision 1.1b | February 24, 2020 | pr. 2-11, 2-13 (p33, p35) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1566.pdf> |
+| `sm-mnl-1586` | supermicro | X10SRi-F User's Manual | MNL-1586, Revision 1.2 (date not on the pages read) |  | pr. 2-13 to 2-15 (p33-35) | <https://www.supermicro.com/manuals/motherboard/C612/MNL-1586.pdf> |
+| `sm-mnl-1643` | supermicro | X10SRA / X10SRA-F User's Manual | MNL-1643, Revision 1.1b | August 17, 2016 | pr. 2-9 to 2-12 (p39-42) | <https://www.supermicro.com/manuals/motherboard/C612/MNL-1643.pdf> |
+| `sm-mnl-1845` | supermicro | X10SRM-F / X10SRM-TF User Manual | MNL-1845, Revision 1.1 | April 25, 2019 | pr. 31 to 33 (p31-33) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1845.pdf> |
+| `sm-mnl-1428` | supermicro | X10SLM-F / X10SLL-F / X10SLL-SF / X10SLL-S User's Manual | MNL-1428, Revision 1.1b | June 21, 2016 | pr. 2-11, 2-12 (p35-36) | <https://www.supermicro.com/manuals/motherboard/C222/MNL-1428.pdf> |
+| `sm-mnl-1463` | supermicro | X10SL7-F User's Manual | MNL-1463, Revision 1.1a | August 19, 2014 | pr. 2-10, 2-11 (p30-31) | <https://www.supermicro.com/manuals/motherboard/C222/MNL-1463.pdf> |
+| `sm-mnl-1464` | supermicro | X10SLH-F User's Manual | MNL-1464, Revision 1.1 | December 22, 2016 | pr. 2-11, 2-12 (p33-34) | <https://www.supermicro.com/manuals/motherboard/C222/MNL-1464.pdf> |
+| `sm-mnl-1479` | supermicro | X10SAE User's Manual | MNL-1479, Revision 1.1c | January 8, 2015 | pr. 2-10, 2-11 (p30-31) | <https://www.supermicro.com/manuals/motherboard/C226/MNL-1479.pdf> |
+| `sm-mnl-1726` | supermicro | X10SDV Mini-ITX Series User's Manual | MNL-1726, 1.0c | February 12, 2020 | pr. 2-7, 2-8 (p34-35) | <https://www.supermicro.com/manuals/motherboard/D/MNL-1726.pdf> |
+| `sm-mnl-1778` | supermicro | X11SSH-F / X11SSH-LN4F User Manual | MNL-1778, Revision 1.1 | July 30, 2018 | pr. 33 to 35 (p33-35) | <https://www.supermicro.com/manuals/motherboard/C236/MNL-1778.pdf> |
+| `sm-mnl-2087` | supermicro | X11SCA / X11SCA-W / X11SCA-F User Manual | MNL-2087, Revision 1.2, January 13, 2022 | 2087 | pr. 34 (p34) | <https://www.supermicro.com/manuals/motherboard/X11/MNL-2087.pdf> |
+| `sm-mnl-2088` | supermicro | X11SCL-IF User's Manual | MNL-2088, Revision 1.1, May 06, 2020 | 2088 | pr. 29, 30 (p29-30) | <https://www.supermicro.com/manuals/motherboard/X11/MNL-2088.pdf> |
+| `sm-mnl-1795` | supermicro | X11SSV-Q User's Manual | MNL-1795, Revision 1.0a | July 6, 2018 | pr. 27 (p27) | <https://www.supermicro.com/manuals/motherboard/Q170/MNL-1795.pdf> |
+| `sm-mnl-1773` | supermicro | X11DPi-N / X11DPi-NT User's Manual | MNL-1773, Revision 1.3 | July 30, 2021 | pr. 33 to 38 (p33-38) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1773.pdf> |
+| `sm-x11-user-guide` | supermicro | Memory Configuration for X11 UP/DP/MP Motherboards, User's Guide | Revision 1.1a | February 7, 2020 | pp. 6-7, 19 | <https://www.supermicro.com/support/resources/memory/X11_memory_config_guide.pdf> |
+| `sm-mnl-1907` | supermicro | X11DDW-L / X11DDW-NT User's Manual | MNL-1907, Revision 2.0, September 30, 2020 | 1907 | pr. 33, 37 (p33, p37) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1907.pdf> |
+| `sm-mnl-1946` | supermicro | X11DPL-i User's Manual | MNL-1946, Revision 1.1b, April 10, 2020 | 1946 | pr. 30, 33 (p30, p33) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1946.pdf> |
+| `sm-mnl-1983` | supermicro | X11QPH+ User's Manual | MNL-1983, Revision 1.1c, September 28, 2020 | 1983 | pr. 33, 35 (p33, p35) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1983.pdf> |
+| `sm-mnl-1900` | supermicro | X11SPi-TF User's Manual | MNL-1900, Revision 1.1b, October 11, 2022 | 1900 | pr. 32 to 34 (p32-34) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1900.pdf> |
+| `sm-mnl-1939` | supermicro | X11SPM-F / X11SPM-TF / X11SPM-TPF User's Manual | MNL-1939, Revision 1.1c, March 10, 2020 | 1939 | pr. 34 to 36 (p34-36) | <https://www.supermicro.com/manuals/motherboard/C620/MNL-1939.pdf> |
+| `sm-mnl-2135` | supermicro | SBI-6119P-T3N SuperBlade Module User's Manual | MNL-2135, Revision 1.0b | April 19, 2023 | pr. 3-13 to 3-16 (p47-50) | <https://www.supermicro.com/manuals/superblade/MNL-2135.pdf> |
+| `sm-mnl-2005` | supermicro | X11SRA / X11SRA-F / X11SRA-RF User Manual | MNL-2005, Revision 1.1b, January 29, 2021 | 2005 | pr. 30 to 32 (p30-32) | <https://www.supermicro.com/manuals/motherboard/C420/MNL-2005.pdf> |
+| `sm-mnl-2019` | supermicro | X11SDV-TLN2F series User's Manual | MNL-2019, Revision 1.0a, April 02, 2021 | 2019 | pr. 23, 24 (p23-24) | <https://www.supermicro.com/manuals/motherboard/D/MNL-2019.pdf> |
+| `sm-mnl-1951` | supermicro | A2SDi-HLN4F Series User's Manual | MNL-1951, Revision 1.0a, February 24, 2020 | 1951 | pr. 28, 29 (p28-29) | <https://www.supermicro.com/manuals/motherboard/Atom_on-chip/MNL-1951.pdf> |
+| `sm-mnl-1600` | supermicro | A1SA2-2750F / A1SA2-2550F User's Manual | MNL-1600, Revision 1.0 | April 23, 2014 | pr. 2-5 (p25) | <https://www.supermicro.com/manuals/motherboard/Atom_on-chip/MNL-1600.pdf> |
+| `sm-mnl-1561` | supermicro | A1SAM-2750F / A1SAM-2550F / A1SRM-2758F / A1SRM-2558F User's Manual | MNL-1561, Revision 1.0 (date not on the pages read) |  | pr. 2-5, 2-6 (p25-26) | <https://www.supermicro.com/manuals/motherboard/Atom_on-chip/MNL-1561.pdf> |
+| `sm-mnl-2233` | supermicro | X12DPi-N6 / X12DPi-NT6 User's Manual | MNL-2233, Revision 2.0b | May 18, 2023 | pr. 39 to 41 (p39-41) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2233.pdf> |
+| `sm-mnl-2239` | supermicro | X12DAi-N6 User's Manual | MNL-2239, Revision 1.1a | April 22, 2022 | pr. 42, 43 (p42-43) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2239.pdf> |
+| `sm-mnl-2234` | supermicro | X12DPU-6 User's Manual | MNL-2234, Revision 1.0b | March 11, 2022 | pr. 41, 42 (p41-42) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2234.pdf> |
+| `sm-mnl-2270` | supermicro | X12SPL-LN4F / X12SPL-F User's Manual | MNL-2270, Revision 1.1c | November 20, 2023 | pr. 33, 34 (p33-34) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2270.pdf> |
+| `sm-mnl-2358` | supermicro | X12SAE-5 / X12SCA-5F User's Manual | MNL-2358, Revision 1.1c | September 30, 2026 | pr. 32, 33 (p32-33) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2358.pdf> |
+| `sm-mnl-2362` | supermicro | X12SDV-4C/8C/10C-SP6F, X12SDV-8CE-SP4F, X12SDV-10CR-SP6F User's Manual | MNL-2362, Revision 1.0a | June 04, 2024 | pr. 13, 25 to 27 (p13, p25-27) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2362.pdf> |
+| `sm-mnl-2440` | supermicro | X12SDV-4C/8C/14C/16C/20C-SPT8F User's Manual | MNL-2440, Revision 1.0c | May 02, 2025 | pr. 12, 24 to 26 (p12, p24-26) | <https://www.supermicro.com/manuals/motherboard/X12/MNL-2440.pdf> |
+| `sm-mnl-2509` | supermicro | X13DEI / X13DEI-T User's Manual | MNL-2509, Revision 1.0c | August 25, 2025 | pr. 59 to 62 (p59-62) | <https://www.supermicro.com/manuals/motherboard/X13/MNL-2509.pdf> |
+| `sm-mnl-2413` | supermicro | X13SEW-TF / X13SEW-F User's Manual | MNL-2413, Revision 1.1c | May 06, 2025 | pr. 33 to 35 (p33-35) | <https://www.supermicro.com/manuals/motherboard/X13/MNL-2413.pdf> |
+| `sm-mnl-2425` | supermicro | X13SAE / X13SAE-F User's Manual | MNL-2425, Revision 1.2c | September 30, 2026 | pr. 34, 35 (p34-35) | <https://www.supermicro.com/manuals/motherboard/X13/MNL-2425.pdf> |
+| `sm-mnl-2517` | supermicro | X13SAN-H/-E/-L/-C User's Manual | MNL-2517, Revision 1.0a | June 09, 2025 | pr. 29 (p29) | <https://www.supermicro.com/manuals/motherboard/X13/MNL-2517.pdf> |
+| `sm-mnl-2027` | supermicro | H11DSi / H11DSi-NT User's Manual | MNL-2027, Revision 1.1a, August 06, 2020 | 2027 | pr. 31 to 33 (p31-33) | <https://www.supermicro.com/manuals/motherboard/EPYC7000/MNL-2027.pdf> |
+| `sm-mnl-2363` | supermicro | H12DSi-N6 / H12DSi-NT6 User's Manual | MNL-2363, Revision 1.0c | June 04, 2025 | pr. 31 to 33 (p31-33) | <https://www.supermicro.com/manuals/motherboard/EPYC7000/MNL-2363.pdf> |
+| `sm-mnl-2085` | supermicro | H11SSL-i / H11SSL-C / H11SSL-NC User's Manual | MNL-2085, Revision 1.1a, December 18, 2019 | 2085 | pr. 33, 34 (p33-34) | <https://www.supermicro.com/manuals/motherboard/EPYC7000/MNL-2085.pdf> |
+| `sm-mnl-2314` | supermicro | H12SSL-i/C/CT/NT User's Manual | MNL-2314, Revision 1.0a | April 22, 2021 | pr. 31, 32 (p31-32) | <https://www.supermicro.com/manuals/motherboard/EPYC7000/MNL-2314.pdf> |
+| `sm-mnl-2299` | supermicro | H12DSG-O-CPU User's Manual | MNL-2299, Revision 1.0a | April 14, 2021 | pr. 32, 33 (p32-33) | <https://www.supermicro.com/manuals/motherboard/EPYC7000/MNL-2299.pdf> |
+| `sm-mnl-2627` | supermicro | H13SAE-MF User's Manual | MNL-2627, Revision 1.1b | November 03, 2026 | pr. 32 to 34 (p32-34) | <https://www.supermicro.com/manuals/motherboard/H13/MNL-2627.pdf> |
+| `sm-mnl-2172` | supermicro | M11SDV-4C/4CT/8C/8CT/8C+-LN4F User Manual | MNL-2172, Revision 1.1a | December 30, 2021 | pr. 25 to 27 (p25-27) | <https://www.supermicro.com/manuals/motherboard/EPYC3000/MNL-2172.pdf> |
+| `sm-mnl-2336` | supermicro | M12SWA-TF User's Manual | MNL-2336, Revision 1.1c | September 08, 2025 | pr. 32 to 34 (p32-34) | <https://www.supermicro.com/manuals/motherboard/M12/MNL-2336.pdf> |
+| `sm-mnl-1646` | supermicro | C7X99-OCE / C7X99-OCE-F User's Manual | MNL-1646, Revision 1.1 | September 21, 2016 | pr. 2-9 to 2-11 (p39-41) | <https://www.supermicro.com/manuals/motherboard/X99/MNL-1646.pdf> |
+| `sm-mnl-2117` | supermicro | C9X299-PG300F User's Manual | MNL-2117, Revision 1.0c | November 12, 2020 | pr. 30, 31 (p30-31) | <https://www.supermicro.com/manuals/motherboard/X299/MNL-2117.pdf> |
+| `sm-mnl-1813` | supermicro | C7Z170-M / C7H170-M User's Manual | MNL-1813, Revision 1.0c | May 26, 2017 | pr. 2-9 to 2-11 (p39-41) | <https://www.supermicro.com/manuals/motherboard/Z170/MNL-1813.pdf> |
+| `sm-mnl-2018` | supermicro | C9Z390-CG-IW User's Manual | MNL-2018, Revision 1.0a, May 14, 2019 | 2018 | pr. 2-8, 2-9 (p32-33) | <https://www.supermicro.com/manuals/motherboard/Z390/MNL-2018.pdf> |
+| `gigabyte-r182-z90-r182-z91-r182` | gigabyte | R182-Z90 / R182-Z91 / R182-Z92 AMD EPYC 7003 DP Server System User Manual | Rev. 1.0 | 2021 | p. 32-35 | <https://download.gigabyte.com/FileList/Manual/server_manual_R182-Z90_Z91_Z92_e_A00.pdf> |
+| `gigabyte-mz32-ar0-user-manual` | gigabyte | MZ32-AR0 User Manual | Rev. 1.0 and Rev. 3.0 | 2021 | p. 13-15 | <https://download.gigabyte.com/FileList/Manual/server_manual_MZ32-AR0_e_v10.pdf> |
+| `gigabyte-e252-p30-user-manual` | gigabyte | E252-P30 Edge Server User Manual | Rev. 1.0 | 2021 | p. 25-28 | <https://download.gigabyte.com/FileList/Manual/server_manual_e_E252-P30_v10.pdf> |
+| `gigabyte-mx33-bs0-user-manual` | gigabyte | MX33-BS0 Server Board User Manual | Rev. 1.0 | 2021 | p. 12-13 | <https://download.gigabyte.com/FileList/Manual/sever_manual_MX33-BS0_e_10.pdf> |
+| `gigabyte-mz71-ce0-mz71-ce1-user` | gigabyte | MZ71-CE0 / MZ71-CE1 User Manual | Rev. 1.0 (2020) and Rev. 3.0 | 2020 | p. 13-15 | <https://download.gigabyte.com/FileList/Manual/server_manual_MZ71-CEx_e_v10.pdf> |
+| `gigabyte-g431-mm0-user-manual` | gigabyte | G431-MM0 GPU Server User Manual | Rev. 1.0 | 2020 | p. 25-26 | <https://download.gigabyte.com/FileList/Manual/server_manual_e_G431-MM0_v1.0.pdf> |
+| `gigabyte-mc13-le0-mc13-le1-user` | gigabyte | MC13-LE0 / MC13-LE1 Server Board User Manual | Rev. 1.0 | 2022 | p. 13-14 | <https://download.gigabyte.com/FileList/Manual/sever_manual_MC13-LE0_1_e_v1.0.pdf> |
+| `gigabyte-mu71-su0-user-manual` | gigabyte | MU71-SU0 Server Board User Manual | Rev. 1.0 | 2019 | p. 9, 12-13 | <https://download.gigabyte.com/FileList/Manual/server_manual_MU71-SU0_e_v10.pdf> |
+| `gigabyte-c621-su8-user-manual` | gigabyte | C621-SU8 User's Manual | Rev. 1001 | 2018 | p. 8, 12 | <https://download.gigabyte.com/FileList/Manual/server_manual_c621-su8_1001_e_v1.pdf> |
+| `gigabyte-c621-sd8-user-manual` | gigabyte | C621-SD8 User's Manual | Rev. 1001 | 2018 | p. 8, 11 | <https://download.gigabyte.com/FileList/Manual/server_manual_c621-sd8_1001_e_v2.pdf> |
+| `gigabyte-mw50-sv0-user-manual` | gigabyte | MW50-SV0 User's Manual | Rev. 1002 | 2019 | p. 8, 18 | <https://download.gigabyte.com/FileList/Manual/server_manual_mw50-sv0_e_v1002.pdf> |
+| `gigabyte-g291-280-g291-281-user` | gigabyte | G291-280 / G291-281 GPU Server User Manual | Rev. 1.1 | 2019 | p. 27-29 | <https://download.gigabyte.com/FileList/Manual/server_system_manual_g291-28x_e_1.0.pdf> |
+| `gigabyte-r280-f2o-r280-g2o-user` | gigabyte | R280-F2O / R280-G2O Server User Manual | Rev. 1.1 | 2016 | p. 12, 19-21, 36 | <https://download.gigabyte.com/FileList/Manual/server_manual_r280-f2o_g2o_a3c_f3c_e_11.pdf> |
+| `gigabyte-mu70-su0-user-manual` | gigabyte | MU70-SU0 User's Manual | Rev. 1002 | 2016 | p. 7, 11, 17-18 | <https://download.gigabyte.com/FileList/Manual/server_manual_mu70-su0_en_1002.pdf> |
+| `gigabyte-h261-h60-user-manual` | gigabyte | H261-H60 High Density Server User Manual | Rev. 1.0 | 2019 | p. 28-30 | <https://download.gigabyte.com/FileList/Manual/server_manual_h261-h60_e_1.0.pdf> |
+| `gigabyte-md72-hb0-md72-hb1-user` | gigabyte | MD72-HB0 / MD72-HB1 Server Board User Manual | Rev. 1.0 | 2021 | p. 9, 13-17 | <https://download.gigabyte.com/FileList/Manual/server_mb_manual__md72hb0_1_e_1.0.pdf> |
+| `gigabyte-mu72-su0-user-manual` | gigabyte | MU72-SU0 Server Board User Manual | Rev. 1.0 | 2021 | p. 9, 12-16 | <https://download.gigabyte.com/FileList/Manual/server_mb_manual_MU72-SU0_e_v1.0.pdf> |
+| `gigabyte-6pxsvl-user-manual` | gigabyte | GA-6PXSVL User's Manual | Rev. 1001 | 2014 | p. 7, 11, 15 | <https://download.gigabyte.com/FileList/Manual/server_manual_6pxsvl_e_v1001.pdf> |
+| `gigabyte-g242-z10-g242-z11-user` | gigabyte | G242-Z10 / G242-Z11 HPC Server User Manual | Rev. 1.0 | 2021 | p. 32-34 | <https://download.gigabyte.com/FileList/Manual/server_manual_e_G242-Z10_Z11_A00.pdf> |
+| `gigabyte-mc62-g40-user-manual` | gigabyte | MC62-G40 Workstation Board User Manual | Rev. 1.0 | 2021 | p. 10, 13-14 | <https://download.gigabyte.com/FileList/Manual/server_manual__MC62-G40_e_1001.pdf> |
+| `asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t` | asrock | B650D4U / B650D4U-2L2T / B650D4U-2L2T/BCM User Manual | Version 1.30, Jun. 2026 (first published August 2022) | Jun. 2026 | p9, p14-17, p23-25, p32 | <https://download.asrock.com/Manual/B650D4U.pdf> |
+| `asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t` | asrock | X570D4U / X570D4U-2L2T / X570D4U-2L2T/BCM User Manual | Version 1.0 | September 2022 | p8, p13, p14, p29 | <https://download.asrock.com/Manual/X570D4U.pdf> |
+| `asrock-romed8-2t-romed8-romed8-2t` | asrock | ROMED8-2T / ROMED8-NL / ROMED8-2T/BCM User Manual | Version 1.30, Apr. 2026 (first published February 2022) | Apr. 2026 | p9, p14, p30 | <https://download.asrock.com/Manual/ROMED8-2T.pdf> |
+| `asrock-rome2d16-2t-rome2d16-rome2d16-2l` | asrock | ROME2D16-2T / ROME2D16-NL / ROME2D16-2L+ / ROME2D16-2T/BCM User Manual | Version 1.10 | Dec. 2024 | p8, p21, p31 | <https://download.asrock.com/Manual/ROME2D16-2T.pdf> |
+| `asrock-genoad12m3-2q-user-manual-genoad12m3` | asrock | GENOAD12M3-2Q User Manual (covers GENOAD12M3-2Q, GENOAD12M3-2Q/H, GENOAD12M3/T) | Version 1.22, Oct. 2025 (first published April 2023) | Oct. 2025 | p8, p9, p13, p27 | <https://download.asrock.com/Manual/GENOAD12M3-2Q.pdf> |
+| `asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u` | asrock | Z690D4U-2L2T / W680D4U-2L2T / W680D4U-1L / Z690D4U / W680D4U User Manual | Version 1.30 | Mar. 2026 | p11, p19, p23, p29, p36, p41 | <https://download.asrock.com/Manual/W680D4U-1L.pdf> |
+| `asrock-sp2c621d32lm3-user-manual` | asrock | SP2C621D32LM3 User Manual | Version 1.0 | June 2023 | p8, p13, p20, p28-31 | <https://download.asrock.com/Manual/SP2C621D32LM3.pdf> |
+| `asrock-altrad8ud-1l2t-user-manual` | asrock | ALTRAD8UD-1L2T User Manual | Version 1.20, Jul. 2025 (first published July 2023) | Jul. 2025 | p8, p12, p30 | <https://download.asrock.com/Manual/ALTRAD8UD-1L2T.pdf> |
+| `msi-d3052-s3661-user-guide` | msi | D3052 (MS-S3661) Server Motherboard User Guide | Revision V2.0 | 2025/06 | p18 | <https://download-2.msi.com/archive/mnu_exe/server/S3661-D3052-v2.0-UG.pdf> |
+| `tyan-s7012-user-manual` | tyan | S7012 user's manual | Version 1.1 (file S7012_UG_v1.1_06212012.pdf), (c) 2009 MiTAC | 2012 | p10, p26 | <https://web.archive.org/web/20121119035656id_/http://www.tyan.com:80/manuals/S7012_UG_v1.1_06212012.pdf> |
+| `tyan-s7010-user-manual` | tyan | S7010 user's manual | Version 1.0, (c) 2009 MiTAC | 2009 | p12, p27-28 | <https://web.archive.org/web/20090419093950id_/http://www.tyan.com:80/manuals/S7010_UG_v1.0.pdf> |
+| `tyan-s8026-user-manual` | tyan | S8026 user's manual | Version 1.0h, (c) 2017 MiTAC | 2017 | p15, p36-38 | <https://web.archive.org/web/20260611010444id_/https://ftp1.tyan.com/pub/doc/S8026_UG_v1.0h.pdf> |
+| `tyan-s8036-user-manual` | tyan | S8036 user's manual (text copy on manualslib; the version is not shown) |  |  | p39 | <https://www.manualslib.com/manual/2447880/Tyan-S8036.html?page=39> |
+| `tyan-s7106-user-manual` | tyan | S7106 user's manual (text copy on manualslib; the version is not shown) |  |  | p31 | <https://www.manualslib.com/manual/1307092/Tyan-S7106.html?page=31> |
+| `tyan-s8812-user-manual` | tyan | S8812 user's manual | Version 1.2b, (c) 2013 MiTAC | 2013 | p10, p28-30 | <https://web.archive.org/web/20130810231136id_/http://www.tyan.com:80/manuals/S8812_UG_v1.2b.pdf> |
+| `tyan-k8qs-s4882-user-manual` | tyan | Thunder K8QS Pro S4882 user's manual | Revision 1.01, (c) TYAN 2003-2004 | 2003-20 | p9, p27-28 | <https://web.archive.org/web/20081207091103id_/http://www.tyan.com/manuals/m_s4882_101.pdf> |
+| `huawei-rh1288-v3-user-guide` | huawei | FusionServer RH1288 V3 Server User Guide | Issue 04, 2023-02-28, xFusion | 2023-02-28 | pdf p. 57, 201-202 | not recorded |
+| `huawei-rh2288h-v3-user-guide` | huawei | FusionServer RH2288H V3 Server User Guide | Issue 04, 2023-02-28, xFusion | 2023-02-28 | pdf p. 80, 233-234 | not recorded |
+| `huawei-1288h-v5-user-guide` | huawei | FusionServer 1288H V5 Server User Guide | Issue 17, 2024-05-11, xFusion | 2024-05-11 | pdf p. 28-33 (p. 18-23) | not recorded |
+| `lenovo-rd330-maintenance-manual` | lenovo | ThinkServer RD330 Hardware Maintenance Manual | Sixth Edition ( | March 2015 | p. 77-80 (pdf p. 91-94) | <https://download.lenovo.com/pccbbs/thinkservers/rd330hmm_en.pdf> |
+| `lenovo-rd450-user-guide-maintenance-manual` | lenovo | ThinkServer RD450 User Guide and Hardware Maintenance Manual | Ninth Edition ( | November 2017 | p. 69-74 (pdf p. 81-88); p. 69-74 | <https://download.lenovo.com/pccbbs/thinkservers/rd450_ug_en.pdf> |
+| `lenovo-memory-configurator-lenovo` | lenovo | Memory Configurator Lenovo ThinkStation PX | Version 1.3 | March 2025 | pp. 4-9 | not recorded |
+| `fujitsu-tx1310-m3-guide` | fujitsu | PRIMERGY TX1310 M3 System configurator and order-information guide | March 2021 (status 2021-02-25) | March 2021 | configuration diagram and section III | not recorded |
+| `inspur-nf5280m-lm6-user-manual` | inspur | NF5280M/LM6 User Manual (meta brain Server, IEIT SYSTEMS) | V1.6 | 2025-12-17 | p. 50-53 (pdf p. 59-64) | not recorded |
+| `inspur-sa5212m4-sa5212m4-user-manual` | inspur | 浪潮英信服务器 SA5212M4 用户手册 (Inspur SA5212M4 user manual, Chinese) | V1.0 | December 2014 | p. 69-70 (pdf p. 75-76) | not recorded |
+| `quanta-t22hf-1u-service-guide` | quanta | QuantaPlex Series T22HF-1U Service Guide | Version 1.0 | May 5, 2019 | pdf p. 49-50, 110 | not recorded |
+| `huawei-200-maintenance-service-guide-2280` | huawei | TaiShan 200 Server Maintenance and Service Guide (Model 2280) | Issue 23, 2025-07-27, Huawei, EDOC1100093458 | 2025-07-27 | p. 37-41 (pdf p. 49-52) | <https://support.huawei.com/enterprise/en/doc/EDOC1100093458> |
+| `huawei-500-maintenance-service-guide-3000` | huawei | Atlas 500 Pro AI Edge Server Maintenance and Service Guide (Model 3000) | Issue 18, 2023-12-06, EDOC1100141191 | 2023-12-06 | p. 19-20 | <https://support.huawei.com/enterprise/en/doc/EDOC1100141191> |
+| `quanta-v3-1` | quanta | Facebook Server Intel Motherboard V3.1 (Leopard), Open Compute Project | Rev 1.00 | 2016-01-06 | p. 13, 45, 49-50, 68 | <https://opencompute.org/documents/facebook-xeon-motherboard-v31> |
+| `quanta-v2-0` | quanta | Open Compute Project Intel Motherboard Hardware v2.0 (Windmill) |  | April 11, 2012 | p. 7-8, 30-31, 34 | <http://www.opencompute.org/wp/wp-content/uploads/2012/05/Open_Compute_Project_Intel_Motherboard_v2.0.pdf> |
+| `hpe-population-gen10-3rd-technical` | hp | Server Memory and Persistent Memory population rules for HPE Gen10 Plus servers with 3rd Gen Intel Xeon Scalable processors (technical white paper) | a50003886ENW Rev. 6, PDF dated 3 September 2025 | 3 September 2025 | pp. 3-5, 9, 12 | <https://www.hpe.com/psnow/doc/a50003886enw> |
+| `hpe-dl360-gen10-maintenance-service-guide-2` | hp | HPE ProLiant DL360 Gen10 Plus Server Maintenance and Service Guide | docId a00114988en_us (part number 30-C15B03A6-005, edition 5, February 2025 as the notes give it; not in the saved topics) | February 2025 | topics "DIMM slot locations", "DIMM-processor compatibility" | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00114988en_us> |
+| `hpe-population-gen10-gen10-7002-7003` | hp | Server memory population rules for HPE ProLiant Gen10 and Gen10 Plus servers with AMD EPYC 7002 and 7003-series processors (technical white paper) | a00038346ENW Rev. 7, PDF dated 4 August 2025 | 4 August 2025 | pp. 3-4, 6, 8, 11-12 | <https://www.hpe.com/psnow/doc/a00038346enw> |
+| `hpe-dl385-gen10-maintenance-service-guide` | hp | HPE ProLiant DL385 Gen10 Plus Server Maintenance and Service Guide | docId a00094064en_us |  | topics "DIMM slot locations", "DIMM-processor compatibility" | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00094064en_us> |
+| `hpe-dl385-gen10-v2-maintenance-service` | hp | HPE ProLiant DL385 Gen10 Plus v2 Server Maintenance and Service Guide | docId a00112969en_us |  | same two topics | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00112969en_us> |
+| `hpe-population-gen11-5th-technical` | hp | Server memory population rules for HPE Gen11 servers with 5th Gen Intel Xeon Scalable processors (technical white paper) | a50010242ENW, no revision printed, PDF dated 10 March 2026 | 10 March 2026 | pp. 4, 6, 10-12, 15 | <https://www.hpe.com/psnow/doc/a50010242enw> |
+| `hpe-population-gen11-4th` | hp | Server memory population rules for HPE Gen11 servers with 4th Gen Intel Xeon Scalable processors | a50007437ENW Rev. 1, PDF dated 12 March 2026 | 12 March 2026 | p. 14 | <https://www.hpe.com/psnow/doc/a50007437enw> |
+| `hpe-dl380-gen11` | hp | HPE ProLiant DL380 Gen11 QuickSpecs | a50004307enw, version 48 | 5 October 2026 | pp. 41, 77 | <https://www.hpe.com/psnow/doc/a50004307enw> |
+| `hpe-dl380-gen11-maintenance-service-guide` | hp | HPE ProLiant DL380 Gen11 Server Maintenance and Service Guide | docId sd00002447en_us |  | topic "DIMM slot locations" | <https://support.hpe.com/hpesc/public/docDisplay?docId=sd00002447en_us> |
+| `hpe-dl160-gen10` | hp | HPE ProLiant DL160 Gen10 Server QuickSpecs | a00021860enw, version 32, 18 August 2025 (marked retired in the notes) | 18 August 2025 | pp. 8, 31 | <https://www.hpe.com/psnow/doc/a00021860enw> |
+| `hpe-876833-006-2` | hp | HPE ProLiant BL460c Gen10 Server Blade User Guide (channel names only) | 876833-006, edition 6, May 2019 | 6833-00 | p. 15 | <https://support.hpe.com/hpesc/public/docDisplay?docId=a00018554en_us> |
+| `hpe-population-gen10-2300-technical` | hp | Server memory population rules for HPE ProLiant Gen10 Plus servers with Intel Xeon E-2300 processors (technical white paper) | a50005926ENW Rev. 2, PDF dated 6 August 2025 | 6 August 2025 | pp. 3-5 | <https://www.hpe.com/psnow/doc/a50005926enw> |
+| `hpe-xd665-maintenance-service-guide` | hp | HPE Cray Supercomputing XD665 CTO Chassis Maintenance and Service Guide | part number 10-150126-Q425, edition 5 | August 2025 | topics "DIMM slot locations", "DIMM population rule", "Memory information" | <https://support.hpe.com/hpesc/public/docDisplay?docId=sd00003514en_us> |
+| `hpe-xd665` | hp | HPE Cray XD665 QuickSpecs | a50007004enw, version 11 | 2 December 2024 | pp. 6-7 | <https://www.hpe.com/psnow/doc/a50007004enw> |
+| `gigabyte-r182-n20-r182-na0-3rd` | gigabyte | R182-N20 / R182-NA0 3rd Gen. Intel Xeon Scalable DP Server System, User Manual | Rev. 1.0 | 2021 | PDF pp. 31-33 | <https://download.gigabyte.com/FileList/Manual/server_manual_R182-N20_NA0_e_10.pdf> |
+| `huawei-2288h-v5-user-guide` | huawei | FusionServer 2288H V5 Server User Guide | Issue 21, 2024-05-11, XFUSION INTERNATIONAL PTE. LTD. | 2024-05-11 | PDF pp. 32-37 | not recorded |
+| `huawei-rh2288h-v3-user-guide-2` | huawei | FusionServer RH2288H V3 Server User Guide | Issue 04, 2023-02-28, xFusion Digital Technologies | 2023-02-28 | PDF pp. 80, 233-234 | not recorded |
+| `asrock-sp2c621d32tm3-user-manual` | asrock | SP2C621D32TM3 User Manual | Version 1.20 | 2024 | PDF pp. 18, 31-35 | <https://download.asrock.com/Manual/SP2C621D32TM3.pdf> |
+| `other-user-manual` | other | Libra Server MotherBoard User's Manual | UM_Libra_v3.1_122216 (excerpt pp. 1-2, 8, 16-19) |  | manual pp. 16-18 | not recorded |
+| `other-12th-1` | other | 12th Generation Intel Core Processors Datasheet, Volume 1 | 655258, rev. 011 | May 2025 | PDF pp. 108, 115-117 | <https://cdrdv2.intel.com/v1/dl/getContent/655258> |
+| `other-9000-user-manual` | other | Nuvo-9000 Series User Manual | Rev. 1.4, July 2024 (distributor copy; neousys-tech.com answered 403) | July 2024 | PDF pp. 7, 58 | <https://elmark-automation.com/amfile/file/download/file/138702/product/72487> |
+| `other-11` | other | GEEKOM MiniAir 11 product page | retrieved | 2026-11-17 | memory line | <https://www.geekompc.com/> |
+| `other-2600-user-manual` | other | Nuvo-2600 Series User Manual | Rev. 1.0 | October 2022 | PDF pp. 11, 36, 47 | <https://nnz-ipc.ru/files/documentation/neousys/nuvo-2600-user-manual.pdf> |
+| `other-1` | other | Intel Processor N-series (Alder Lake-N) Datasheet, Volume 1 | 759603, rev. 002 | January 2025 | PDF p. 159 | <https://cdrdv2.intel.com/v1/dl/getContent/759603> |
+| `other-631121-012` | other | 11th Generation Intel Core Processor Datasheet, Volume 1 | 631121-012, May 2023 | 1121-01 | PDF pp. 86-88 | <https://cdrdv2.intel.com/v1/dl/getContent/631121> |
+| `other-user-guide` | other | COM-HPC-ALT User's Guide | P/N 50M-00115-1010, Rev. 1.1, 2025-07-30 | 0115-10 | PDF pp. 11, 13, 28, 69 | <https://www.adlinktech.com/Products/DownloadMDownload.aspx?lang=en&pdNo=1954&MainCategory=computer_on_modules&kind=M&isManual=yes> |
+| `other-x300-x400-x500-user-manual` | other | Minisforum X300 / X400 / X500 user manual | PDF title "说明书 X500 2022.6.16", 24 pages, no text layer | 2022 | PDF p. 13 | <https://pc-file.s3.us-west-1.amazonaws.com/X300_X400_X500/user+manual/%E8%AF%B4%E6%98%8E%E4%B9%A6+X3-4-500+2022.6.16.pdf> |
+| `gigabyte-r182-n20-r182-na0-user` | gigabyte | R182-N20 / R182-NA0 User Manual | Rev. 1.0 | 2021 | PDF pp. 31-33 | <https://download.gigabyte.com/FileList/Manual/server_manual_R182-N20_NA0_e_10.pdf> |
+| `other-rs5230-user-manual-pr2710p-manual` | other | RS5230 User Manual (FS-branded edition of the Powerleader PR2710P manual; the text says "All Powerleader rack servers" and shows the "PR2710P-24-disk server") | PDF dated 2023-11-23, 59 pages | 2023-11-23 | PDF pp. 20-25 | <https://resource.fs.com/mall/doc/202311231103177tqpxp.pdf> |
+| `quanta-d52b` | quanta | QuantaGrid Series D52B-1U User's Guide (copy on manualslib) | Version 1.0 | 2017 | PDF pp. 15, 22 | <https://www.manualslib.com/manual/3444966/Quanta-Computer-D52b-1u.html> |
+| `other-2041-2122` | other | Graviton S2041IO and S2122IO server datasheets | undated |  | p. 1 | not recorded |
+| `other-rx20-g2` | other | YADRO VEGMAN Rx20 G2 datasheet | v2.0 | 2026-05-14 | p. 2 | <https://st.yadro.com/docs/VEGMAN/YADRO_VEGMAN_Rx20-G2_DS_RUS.pdf> |
+| `other-rs125-g4` | other | ETegro Hyperion RS125 G4 specification page | captured | 2013-02-17 | memory line | <https://web.archive.org/web/20130217123912/http://www.etegro.ru/configurator/servers/rackmount/base/rs125g4/spec> |
+| `other-rs130-g4` | other | ETegro Hyperion RS130 G4 specification page | captured | 2012-11-28 | memory line | <https://web.archive.org/web/20121128030206/http://www.etegro.ru/configurator/servers/rackmount/performance/rs130g4/spec> |
+| `sm-mnl-1628` | supermicro | X10DRH-C / X10DRH-CT / X10DRH-i / X10DRH-iT User's Manual | MNL-1628, Revision 2.0b | April 15, 2020 | pr. 2-13 to 2-15 (p35-37) | <https://www.supermicro.com/manuals/motherboard/C600/MNL-1628.pdf> |
+| `tyan-s4985-user-manual` | tyan | Thunder K8QSD Pro S4985 user's manual (copy of tyan.com on web.archive.org) | Version 1.00 |  | p23-24 | <https://web.archive.org/web/20081010072845id_/http://www.tyan.com:80/manuals/m_s4985_100.pdf> |
+| `tyan-m4985-user-manual` | tyan | M4985 processor and memory card manual (copy of tyan.com on web.archive.org) | Revision 1.00 |  | p16 | <https://web.archive.org/web/20100331082302id_/http://www.tyan.com:80/manuals/m_m4985_100.pdf> |
+| `msi-ms9661-manual` | msi | MS-9661 server board user's guide (text copy on manualslib) |  |  | p20 | <https://www.manualslib.com/manual/3885410/Msi-Ms-9661.html?page=20> |
+| `gigabyte-mz31-ar0-user-manual` | gigabyte | MZ31-AR0 User Manual | Rev. 2.0 (2019) and Rev. 3.0, 2021 | 2019 | p. 13-15 | <https://download.gigabyte.com/FileList/Manual/server_manual_mz31-ar0_e_v20.pdf> |
+| `gigabyte-r162-za0-user-manual` | gigabyte | R162-ZA0 User Manual | Rev. 1.0 | 2021 | p. 29-31 | <https://download.gigabyte.com/FileList/Manual/server_manual_R162-ZA0_e_A00.pdf> |
+| `gigabyte-r262-za1-za2-user-manual` | gigabyte | R262-ZA1 / R262-ZA2 User Manual | Rev. 1.0 | 2021 | p. 36-38 | <https://download.gigabyte.com/FileList/Manual/server_manual_R262-ZA1_ZA2_e_A00.pdf> |
+| `gigabyte-mz72-hb0-user-manual` | gigabyte | MZ72-HB0 User Manual | Rev. 1.0 (2020) and Rev. 3.0, 2021 | 2020 | p. 13-15 | <https://download.gigabyte.com/FileList/Manual/server_manual_MZ72-HB0_e_v10.pdf> |
+| `huawei-rh2288-v3-user-guide` | huawei | FusionServer RH2288 V3 Server User Guide | Issue 04 | 2023-02-28 | pdf p. 67, 215-216 | not recorded |
+| `lenovo-thinkstation-px-user-guide` | lenovo | ThinkStation PX User Guide | Seventh Edition | June 2025 | p. 8, 87-88 | not recorded |
+| `hp-z6-g4-tech-wp` | hp | HP Z6 G4 Workstation Technical White Paper | 4AA7-1335ENW | January 2021 | pp. 20-21 | <https://web.archive.org/web/20220216015225/https://h20195.www2.hp.com/v2/getpdf.aspx/4AA7-1335ENW.pdf> |
+| `hp-z6-g4-quickspecs` | hp | HP Z6 G4 Workstation QuickSpecs | c05527761, DA-15955, version 59 | April 1, 2024 | pp. 14, 21-23 | <https://web.archive.org/web/20251122031240id_/https://www8.hp.com/h20195/v2/getpdf.aspx/c05527761.pdf> |
+| `hp-z6-g4-msg` | hp | Maintenance and Service Guide HP Z6 G4 Workstation (syndication copy of the PDF) | part number 932089-002, second edition, November 2017 | 2089-00 | pp. 69-72, 79 | <https://web.archive.org/web/20240730122704id_/http://content.etilize.com/User-Manual/1045331998.pdf> |
+<!-- /documents -->
+
+### Memory on the chipset
+
+Servers with front-side-bus processors (Xeon 5000 to 5400, 3000 to 3300 and 7200 to 7400, the NetBurst Xeon, Core 2) keep the memory controller in the chipset: no processor owns a slot. The board draws one controller, `chipset`, in the place of the CPUs, and the channels and slots per channel come from the family of the board (four channels of two slots on a Dell PowerEdge 2950, for example). A front-side-bus board without a family row has no channel count, and a line says that the channels could not be checked.
+
+### The checks
+
+What the names and the tables gave is checked before the board is drawn:
+
+- The sockets run from 0 without a gap, are no more than the processor records of the board and no more than 8. Otherwise every slot is set aside.
+- No two slots stand in one place. Otherwise every slot is set aside: the names cannot tell the two apart.
+- No socket has more channels than its processor (46 processor families, by name or, for a blank or generic name, by the CPUID signature) or its family row gives. Otherwise that socket is drawn without channels.
+- No channel holds more slots than its platform: 2 or 1 where the processor table says so, 3 on the other DDR3, DDR4 and DDR5 platforms, and the number a document gives for an older platform that holds more (4 on Opteron of Socket F and 940; 4 on the FB-DIMM channels of the Intel S5000 boards and 8 per riser channel of the Dell PowerEdge R900, through their family rows). Otherwise that socket is drawn without channels.
+- A slot number without a channel on a board without a family table: its socket is drawn without channels.
+- A processor of no row of the processor table: the board is drawn as the names say, and a line says that the channels could not be checked.
+- A module on a socket whose processor record says that no processor is installed: drawn as named, and a line says so.
+
+A slot set aside is drawn below the board, as the slot map draws it, with the reason and an example of its names in the lines of data quality.
+
+### Fixtures
+
+The rows below are what the board draws of the first slot of each fixture under `testdata/explorer`; a test holds the table to the fixtures.
 
 | Names | Locator | Bank locator | Board | Fixture |
 | --- | --- | --- | --- | --- |
@@ -485,31 +1356,80 @@ The board places a slot by its locator and bank locator, the two names SMBIOS gi
 | empty slots the firmware gives no name, on a board without the labels of its manual | `NO DIMM` | `NO DIMM` | set aside | `linuxhw-sa5212m4-4250b0` |
 | a name of no form beside a channel and slot in the bank locator, on one socket | `J1MY` | `CHAN A DIMM 0` | set aside | `ironic-dmi-data` |
 
-Before the board is drawn, what the names gave is checked:
+### The public collection
 
-- A slot is set aside when its names give no socket and no channel, when a name follows no form of the table, when a number is too large for a socket or a channel, and when its names give no socket on a board of more than one socket.
-- A socket whose slots have a number and no channel is drawn without channels.
-- When the sockets of the slots left do not run from 0 or from 1 without a gap, are more than 8, or are more than the processor records of the board, every slot is set aside.
-- A socket whose channels would hold more than 3 slots each, or which has a slot with a channel below 0, is drawn without channels: its slots in the order of the SMBIOS table.
+The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https://github.com/linuxhw/DMI), commit `57b21bc`, CC BY 4.0) are 2,044 dumps, of which 2,043 dumps with memory devices, in 1,711 distinct slot lists (`testdata/explorer/population/slots.tsv`, each list as the ledger keeps the dump). A dump is placed in full when every slot has a processor, a channel and a position from its own names or from the table of its family, every check holds, the channel count of the processor is known and no module stands on an absent processor. A test holds every slot to its expected place, and every dump to being placed in full or listed with its reason in `testdata/explorer/population/unplaceable.tsv`. The first two columns count the boards whose every slot the readers of the first version and of the first round of fixes put on a CPU and a channel, by their own checks.
 
-The number of sockets is the number of processor records (SMBIOS type 4). `dmidecode -t memory` text and ledgers written before this release lack it; there the CPU packages of the cache reading stand in for the check of a socket no test read. Slots set aside are drawn below the board, as the slot map draws them, with the reason and an example of their names in the data quality lines.
+<!-- population -->
+| Maker | Dumps | Every slot placed, first version | Every slot placed, first round of fixes | Placed in full | Separate list |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Supermicro | 550 | 412 | 413 | 525 | 25 |
+| Dell | 476 | 187 | 390 | 465 | 11 |
+| other | 338 | 124 | 213 | 297 | 41 |
+| HP | 270 | 235 | 235 | 251 | 19 |
+| Intel | 103 | 16 | 94 | 103 | 0 |
+| Lenovo | 52 | 8 | 8 | 49 | 3 |
+| ASUS | 44 | 11 | 24 | 44 | 0 |
+| IBM | 43 | 0 | 1 | 40 | 3 |
+| Gigabyte | 40 | 11 | 40 | 40 | 0 |
+| HPE | 36 | 32 | 33 | 36 | 0 |
+| Fujitsu | 33 | 5 | 7 | 33 | 0 |
+| Huawei | 27 | 27 | 27 | 26 | 1 |
+| Quanta | 11 | 4 | 7 | 10 | 1 |
+| Tyan | 7 | 0 | 0 | 2 | 5 |
+| Inspur | 5 | 4 | 4 | 4 | 1 |
+| ASRock | 4 | 0 | 4 | 4 | 0 |
+| Cisco | 4 | 0 | 1 | 4 | 0 |
+| Sugon | 1 | 1 | 1 | 1 | 0 |
+| all | 2,044 | 1,077 | 1,502 | 1,934 | 110 |
 
-The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https://github.com/linuxhw/DMI), commit `57b21bc`, CC BY 4.0) are 2,043 dumps with memory devices, in 1,711 distinct slot lists (`testdata/explorer/population/slots.tsv`, each list as the ledger keeps the dump: system, board, processor records and every memory device once). With the processor records of each dump, the boards are drawn so:
+| Reason | Dumps |
+| --- | ---: |
+| `no-channel-in-document` | 38 |
+| `unnamed-empty` | 27 |
+| `duplicated-names` | 12 |
+| `board-unknown` | 10 |
+| `names-not-in-document` | 6 |
+| `no-document` | 5 |
+| `absent-processor` | 4 |
+| `no-processor-in-document` | 4 |
+| `processor-unknown` | 2 |
+| `no-memory-device` | 1 |
+| `processor-records-missing` | 1 |
 
-| Tests | Every slot placed | Some placed | Without channels | All set aside |
-| --- | --- | --- | --- | --- |
-| first version | 1,077 | 48 | 226 | 692 |
-| first round of fixes | 1,502 | 51 | 239 | 251 |
-| this release | 1,959 | 2 | 9 | 73 |
+| Socket count unknown | Every slot placed | Some placed | Without channels | All set aside | A CPU the dump lacks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| first version | 1,135 | 50 | 229 | 629 | 5 |
+| first round | 1,567 | 48 | 239 | 189 | 8 |
+| this release | 1,665 | 25 | 6 | 347 | 1 |
+<!-- /population -->
 
-The first version is how the names were read when the board was first written; the first round of fixes read more parts of a name and took the channel of a numbered slot from the slot number. This release reads every name by the table of forms and takes the place of a numbered slot from the table of its board family; a numbered slot of a board without such a table is drawn without channels. Memory devices that are chips of the board (flash) and records the manual has no slot for count in none of the columns. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
+The reasons of the separate list:
 
-What the checks cannot see:
+| Reason | What the dump shows |
+| --- | --- |
+| `no-channel-in-document` | the maker's document gives banks, pairs or slot numbers and no channel for each slot (HP ProLiant G4 and G5, Sun Fire X2200 M2, IBM xSeries 235, Lenovo ThinkSystem SR250) |
+| `unnamed-empty` | empty slots the firmware names `NO DIMM` or not at all (Supermicro X10 boards, Inspur SA5212M4); where the family lists the labels of the manual they are drawn with them, marked |
+| `duplicated-names` | the firmware writes one name for two slots |
+| `board-unknown` | the records name no model, and a part number of the board ties to no document |
+| `names-not-in-document` | the firmware's slot names and the labels of the document do not meet |
+| `no-document` | no public document of the board was found |
+| `no-processor-in-document` | no document says which memory riser serves which processor (Dell PowerEdge R910) |
+| `absent-processor` | modules on a socket whose processor record says not installed |
+| `processor-unknown` | the processor is in no row of the processor table (AppliedMicro X-Gene 1, HiSilicon Hi1612) |
+| `processor-records-missing` | one processor record, and the family table puts slots on a second processor |
+| `no-memory-device` | the dump has no SMBIOS memory device |
 
-- Names with a slot number and no channel (Dell `A7`, HPE `PROC 1 DIMM 9`, Lenovo `DIMM 7`): the channel stands only in the vendor's slot table. The board takes it from the table of the board's family; a board whose family table is not known is drawn without channels.
+`internal/explorer/testdata/population-boards.txt` holds the same counts. `testdata/explorer/population/sample.tsv` holds slots of one dump of every family placed by hand from the document, with its page; a test holds the board to them.
 
-The tables of the board families are in `internal/explorer/families.tsv`: 361 rows, each written from a public document of the board's maker that `internal/explorer/sources.tsv` names with title, number or revision, date, address and the pages read (385 documents). A row says which slot number sits on which processor and channel, which word of the names is which processor, how many channels a processor of the board has and how many slots a channel holds, which empty slots the manual labels where the firmware gives them no name, and which records the firmware writes for slots the board does not have. A row ties products to their document by the system product and the board name; a board named only by its part number takes the row of the family whose named dumps carry the same part number. Rows whose document does not settle the place set the slots of the board aside with the reason. The tables keep the facts of the documents in MemorY's own form; no text, table or drawing of a document is copied.
-- A processor word the firmware counts in another way than the board's labels: the board takes the word as the names give it.
+### What the board cannot know
+
+- A family whose document was not found: its numbered slots are drawn without channels, or the board is set aside.
+- Firmware that names no empty slot: such slots stand below the board, or with the labels of the manual where the family lists them.
+- A ledger written before the processor records were kept, or text of `dmidecode -t memory`: no processor name, signature or populated flag. The channel count cannot be checked and the absent check is skipped; the CPU packages of the cache reading stand in for the socket count. One public board (an IBM System x3650 M2 whose firmware writes one processor record) is then drawn with a CPU its records lack.
+- The documents are the revisions cited; a later revision with another table is not known.
+- No board was compared with a real server. A wrong row of a family table draws a module in the wrong channel of the right processor, and no check sees that.
+- Three readings rest on the dumps alone: the letters of the ETegro Hyperion RS125 G4 split over two processors as the guide of its Quanta sibling board draws them; `Board <c>` of the HP DL580 G7 read as memory cartridge c; `P0_` of the Supermicro X8DTU read as the second processor, as the order of the records and one dump with one processor show.
 
 ## Memory Explorer readings
 

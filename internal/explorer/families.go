@@ -22,6 +22,7 @@ var sourcesTSV string
 // family is one row of families.tsv.
 type family struct {
 	id, maker string
+	match     string // the pattern as the table writes it
 	re        *regexp.Regexp
 	forms     map[string]bool
 	when      map[string][]string
@@ -116,7 +117,7 @@ func parseFamilies(text string) ([]family, error) {
 		if err != nil {
 			return nil, fmt.Errorf("families.tsv %s: %v", p[0], err)
 		}
-		f := family{id: p[0], maker: p[1], re: re, forms: map[string]bool{}, when: map[string][]string{}, socket: p[5], kind: p[6], arg: p[7], rawMap: p[9]}
+		f := family{id: p[0], maker: p[1], match: p[2], re: re, forms: map[string]bool{}, when: map[string][]string{}, socket: p[5], kind: p[6], arg: p[7], rawMap: p[9]}
 		for _, x := range strings.Split(p[3], ",") {
 			if x != "" {
 				f.forms[x] = true

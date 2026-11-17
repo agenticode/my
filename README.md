@@ -303,7 +303,7 @@ Version 1.0.0, released on 2026-11-16. [CHANGELOG.md](CHANGELOG.md) lists what i
 - Findings compared with the failure tickets of a public fleet dataset: [docs/evaluation.md](docs/evaluation.md).
 - Not validated yet: hosts with the EDAC driver of a real memory controller. The decoding of their records rests on fixtures written from kernel and rasdaemon sources.
 - No analyzer of a memory vendor has been run against the plugin contract.
-- The board was compared with the SMBIOS dumps of a public collection and with lab guests; no board was compared with a real server ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
+- The board places every slot of 1,934 of the 2,044 server dumps of a public SMBIOS collection on a processor, a channel and a position, from the slot names or from the tables of 361 board families written from 385 public documents of the makers; the other 110 dumps are listed with the reason their own records do not tell the place. No board was compared with a real server ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - No BMC of a real server has been read. The Redfish client has run against the stand-in BMCs of the tests and against the DMTF mockup server ([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## Roadmap
