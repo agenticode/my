@@ -122,9 +122,16 @@ func NewRoot(root string, opts Options) *Adapter {
 func (a *Adapter) emit(sink adapter.Sink, rep *adapter.Report, structs []Structure) {
 	now := a.now()
 	var host model.Host
+	var procs []processor
 	populated := 0
+	seen := map[string]bool{}
 	for i := range structs {
 		s := &structs[i]
+		if k := fmt.Sprintf("%d\x00%q\x00%q", s.Handle, s.Data, s.Strings); seen[k] {
+			continue // the same record again: read once
+		} else {
+			seen[k] = true
+		}
 		switch s.Type {
 		case 1:
 			host.SystemVendor, host.SystemProduct = clean(s.str(0x04)), clean(s.str(0x05))
@@ -135,10 +142,12 @@ func (a *Adapter) emit(sink adapter.Sink, rep *adapter.Report, structs []Structu
 		case 4:
 			// Each processor record is a socket of the board.
 			host.Sockets++
-			if host.CPU == "" {
-				host.CPU = clean(s.str(0x10))
-			}
+			procs = append(procs, processorOf(s))
 		case 17:
+			if v, ok := s.u8(0x12); ok && isFlash(memoryTypes[v]) {
+				rep.Notes = append(rep.Notes, flashNote(int(s.Handle), memoryTypes[v]))
+				continue
+			}
 			rep.Records++
 			m := memoryDevice(s)
 			if len(s.Data) < 0x15 {
@@ -157,6 +166,7 @@ func (a *Adapter) emit(sink adapter.Sink, rep *adapter.Report, structs []Structu
 			}
 		}
 	}
+	host.CPU, host.CPUSignature, host.CPUPresent = hostCPU(procs)
 	if host != (model.Host{}) {
 		if err := sink.Host(&host); err != nil {
 			rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err
@@ -164,6 +174,11 @@ func (a *Adapter) emit(sink adapter.Sink, rep *adapter.Report, structs []Structu
 		}
 	}
 	finish(rep, populated)
+}
+
+// flashNote says that a memory device was a chip of the board and no slot.
+func flashNote(handle int, typ string) string {
+	return fmt.Sprintf("skipped handle 0x%04X: a memory device of type %s is a chip of the board, no memory slot", handle, typ)
 }
 
 func finish(rep *adapter.Report, populated int) {
@@ -231,16 +246,28 @@ var (
 func (a *Adapter) dmidecode(r io.Reader, sink adapter.Sink, rep *adapter.Report) {
 	now := a.now()
 	var host model.Host
+	var procs []processor
 	populated := 0
 	var (
 		typ    = -1
 		handle int
 		fields map[string]string
+		body   strings.Builder
 		sawAny bool
 		denied bool
 	)
+	seen := map[string]bool{}
 	flush := func() error {
-		defer func() { typ, fields = -1, nil }()
+		defer func() { typ, fields = -1, nil; body.Reset() }()
+		if typ >= 0 {
+			// A text that holds its table twice: a record that stands again
+			// with the same handle and the same fields is read once.
+			if k := body.String(); seen[k] {
+				return nil
+			} else {
+				seen[k] = true
+			}
+		}
 		switch typ {
 		case 1:
 			host.SystemVendor, host.SystemProduct = clean(fields["Manufacturer"]), clean(fields["Product Name"])
@@ -252,10 +279,12 @@ func (a *Adapter) dmidecode(r io.Reader, sink adapter.Sink, rep *adapter.Report)
 			// Each processor record is a socket of the board; text of
 			// dmidecode -t memory has none.
 			host.Sockets++
-			if host.CPU == "" {
-				host.CPU = clean(fields["Version"])
-			}
+			procs = append(procs, processorOfText(fields))
 		case 17:
+			if isFlash(fields["Type"]) {
+				rep.Notes = append(rep.Notes, flashNote(handle, strings.TrimSpace(fields["Type"])))
+				return nil
+			}
 			rep.Records++
 			m, why := moduleFromText(fields)
 			if why != "" {
@@ -289,7 +318,11 @@ func (a *Adapter) dmidecode(r io.Reader, sink adapter.Sink, rep *adapter.Report)
 			h, _ := strconv.ParseInt(m[1], 16, 32)
 			t, _ := strconv.Atoi(m[2])
 			handle, typ, fields, sawAny = int(h), t, map[string]string{}, true
+			body.WriteString(line + "\n")
 			continue
+		}
+		if fields != nil && strings.HasPrefix(line, "\t") {
+			body.WriteString(line + "\n")
 		}
 		if fields == nil || !strings.HasPrefix(line, "\t") || strings.HasPrefix(line, "\t\t") {
 			continue
@@ -310,6 +343,7 @@ func (a *Adapter) dmidecode(r io.Reader, sink adapter.Sink, rep *adapter.Report)
 		rep.Status, rep.Detail = model.SourceError, err.Error()
 		return
 	}
+	host.CPU, host.CPUSignature, host.CPUPresent = hostCPU(procs)
 	if host != (model.Host{}) {
 		if err := sink.Host(&host); err != nil {
 			rep.Status, rep.Detail, rep.SinkErr = model.SourceError, "ledger rejected a record: "+err.Error(), err

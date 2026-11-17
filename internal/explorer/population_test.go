@@ -14,11 +14,13 @@ import (
 
 // popSlot is one line of testdata/explorer/population/slots.tsv.
 type popSlot struct {
-	list, dumps, sockets int
-	vendor, processor    string
-	populated            bool
-	locator, bank        string
-	socket, channel      float64
+	list, dumps, sockets                                  int
+	vendor, product, board, processor, signature, present string
+	populated                                             bool
+	typ, locator, bank                                    string
+	refSocket, refChannel                                 float64
+	// The place the board gives the slot.
+	state, reason, socket, channel, chname, position, index, by string
 }
 
 func unescapeTSV(s string) string {
@@ -45,13 +47,18 @@ func readPopulation(t testing.TB) [][]popSlot {
 			continue
 		}
 		p := strings.Split(line, "\t")
-		if len(p) != 10 {
+		if len(p) != 23 {
 			t.Fatalf("slots.tsv: %q has %d fields", line, len(p))
+		}
+		for i := range p {
+			p[i] = unescapeTSV(p[i])
 		}
 		n := func(s string) int { v, _ := strconv.Atoi(s); return v }
 		fl := func(s string) float64 { v, _ := strconv.ParseFloat(s, 64); return v }
-		s := popSlot{list: n(p[0]), dumps: n(p[1]), sockets: n(p[2]), vendor: unescapeTSV(p[3]), processor: unescapeTSV(p[4]),
-			populated: p[5] == "1", locator: unescapeTSV(p[6]), bank: unescapeTSV(p[7]), socket: fl(p[8]), channel: fl(p[9])}
+		s := popSlot{list: n(p[0]), dumps: n(p[1]), sockets: n(p[2]), vendor: p[3], product: p[4], board: p[5], processor: p[6],
+			signature: p[7], present: p[8], populated: p[9] == "1", typ: p[10], locator: p[11], bank: p[12],
+			refSocket: fl(p[13]), refChannel: fl(p[14]), state: p[15], reason: p[16], socket: p[17], channel: p[18],
+			chname: p[19], position: p[20], index: p[21], by: p[22]}
 		if len(lists) < s.list {
 			lists = append(lists, nil)
 		}
@@ -63,6 +70,22 @@ func readPopulation(t testing.TB) [][]popSlot {
 	return lists
 }
 
+// slotTexts are the slots of a list as the board hands them to the reader.
+func slotTexts(list []popSlot) []SlotText {
+	in := make([]SlotText, len(list))
+	for i, s := range list {
+		in[i] = SlotText{Locator: s.locator, BankLocator: s.bank, Populated: s.populated, SizeMB: 16384, Type: s.typ}
+	}
+	return in
+}
+
+// The counts of the public collection that the population tests hold.
+const (
+	popLists = 1711
+	popSlots = 25605
+	popDumps = 2043
+)
+
 // TestPopulationPlacement writes every slot list of the public collection
 // as the board writes ledger slots (Size, Locator, Bank Locator) and reads
 // it back: each slot gets the socket and channel the reference gave it in
@@ -70,48 +93,34 @@ func readPopulation(t testing.TB) [][]popSlot {
 func TestPopulationPlacement(t *testing.T) {
 	carried(t)
 	lists := readPopulation(t)
-	if len(lists) != 1625 {
-		t.Fatalf("%d slot lists, want 1625", len(lists))
+	if len(lists) != popLists {
+		t.Fatalf("%d slot lists, want %d", len(lists), popLists)
 	}
 	slots, dumps := 0, 0
 	for _, list := range lists {
-		in := make([]SlotText, len(list))
-		for i, s := range list {
-			in[i] = SlotText{Locator: s.locator, BankLocator: s.bank, Populated: s.populated, SizeMB: 16384}
-			if s.locator == "Not Specified" {
-				in[i].Locator = ""
-			}
-		}
-		got := ParseDmidecodeMemory(WriteSlots(in), nil, nil)
+		got := ParseDmidecodeMemory(WriteSlots(slotTexts(list)), nil, nil)
 		if len(got) != len(list) {
 			t.Errorf("list %d: %d slots read back, want %d", list[0].list, len(got), len(list))
 			continue
 		}
 		for i, s := range list {
-			if float64(got[i].Socket) != s.socket || float64(got[i].Channel) != s.channel || got[i].Populated != s.populated {
+			if float64(got[i].Socket) != s.refSocket || float64(got[i].Channel) != s.refChannel || got[i].Populated != s.populated {
 				t.Errorf("list %d slot %q|%q: socket %v channel %v populated %v, the reference gave %v %v %v", s.list, s.locator, s.bank,
-					got[i].Socket, got[i].Channel, got[i].Populated, s.socket, s.channel, s.populated)
+					got[i].Socket, got[i].Channel, got[i].Populated, s.refSocket, s.refChannel, s.populated)
 			}
 		}
 		slots += len(list)
 		dumps += list[0].dumps
 	}
-	if slots != 24541 || dumps != 2043 {
-		t.Errorf("%d slots over %d dumps, want 24541 over 2043", slots, dumps)
+	if slots != popSlots || dumps != popDumps {
+		t.Errorf("%d slots over %d dumps, want %d over %d", slots, dumps, popSlots, popDumps)
 	}
 }
 
 // popText writes a slot list as the board writes the slots of a ledger,
 // with the system maker and the processor the ledger knows.
 func popText(list []popSlot) string {
-	in := make([]SlotText, len(list))
-	for i, s := range list {
-		in[i] = SlotText{Locator: s.locator, BankLocator: s.bank, Populated: s.populated, SizeMB: 16384}
-		if s.locator == "Not Specified" {
-			in[i].Locator = ""
-		}
-	}
-	return WriteSlotsOf(SlotHost{Vendor: list[0].vendor, Processor: list[0].processor}, in)
+	return WriteSlotsOf(SlotHost{Vendor: list[0].vendor, Processor: list[0].processor}, slotTexts(list))
 }
 
 // boardTally counts the dumps of the collection by how their boards are
@@ -181,10 +190,10 @@ func TestPopulationBoards(t *testing.T) {
 		known bool
 		want  boardTally
 	}{
-		{0, true, boardTally{all: 1076, some: 48, noChannel: 226, none: 693}},
-		{0, false, boardTally{all: 1134, some: 50, noChannel: 229, none: 630, wrongCPU: 5}},
-		{AllFixes, true, boardTally{all: 1502, some: 51, noChannel: 238, none: 252}},
-		{AllFixes, false, boardTally{all: 1567, some: 48, noChannel: 238, none: 190, wrongCPU: 8}},
+		{0, true, boardTally{all: 1077, some: 48, noChannel: 226, none: 692}},
+		{0, false, boardTally{all: 1135, some: 50, noChannel: 229, none: 629, wrongCPU: 5}},
+		{AllFixes, true, boardTally{all: 1503, some: 51, noChannel: 238, none: 251}},
+		{AllFixes, false, boardTally{all: 1568, some: 48, noChannel: 238, none: 189, wrongCPU: 8}},
 	} {
 		old := SetFixes(c.fixes)
 		got := tallyPopulation(lists, c.known)

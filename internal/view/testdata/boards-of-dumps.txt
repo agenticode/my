@@ -134,6 +134,10 @@ linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced none 24]
   fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel crowd 24]
   fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 2 [no-channel crowd 24]
+linuxhw-ts100-e7-pi4-e88885 (4 slots, 1 processor records)
+  first                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
 linuxhw-volcano-59c634 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced negative 24]
   fixed                  placed 24, no channel 0, aside 0, CPUs 2 []

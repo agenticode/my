@@ -185,12 +185,22 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 	hints := hintsOf(raw)
 	var dimms []Dimm
 	dimmIndex := 0
-	for _, section := range strings.Split(raw, "Memory Device\n") {
+	seen := map[string]bool{}
+	sections := strings.Split(raw, "Memory Device\n")
+	for si, section := range sections {
 		if !strings.Contains(section, "Locator:") {
 			continue
 		}
 		if len(dimms) > MaxSlots {
 			break
+		}
+		if on(FixRepeatedTable) && si > 0 {
+			if k, ok := deviceKey(sections[si-1], section); ok {
+				if seen[k] {
+					continue
+				}
+				seen[k] = true
+			}
 		}
 		get := func(k string) string { return dmiFields.get(section, k) }
 		sizeStr := get("Size")
@@ -227,6 +237,21 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 	}
 	secondPasses(dimms, hints)
 	return dimms
+}
+
+// deviceKey is the handle line and the fields of a memory device, the text
+// a repeated record repeats; ok is false when no handle line stands before
+// it.
+func deviceKey(before, section string) (string, bool) {
+	before = strings.TrimSuffix(before, "\n")
+	line := before[strings.LastIndexByte(before, '\n')+1:]
+	if !reHandleLine.MatchString(line) || !strings.Contains(line, "DMI type 17,") {
+		return "", false
+	}
+	if i := strings.Index(section, "\nHandle "); i >= 0 {
+		section = section[:i]
+	}
+	return line + "\n" + section, true
 }
 
 // sizeOf is a size with its unit in bytes; 0 for a unit it does not know.

@@ -318,3 +318,14 @@ func Fingerprint(parts ...string) string {
 func NormalizeLabel(s string) string {
 	return strings.ToUpper(strings.Join(strings.Fields(s), " "))
 }
+
+// Placeholder tells a string firmware writes where it has no value for a
+// field of the SMBIOS tables ("Not Specified", "To Be Filled By O.E.M.").
+func Placeholder(s string) bool {
+	switch strings.ToUpper(strings.TrimSpace(s)) {
+	case "", "NOT SPECIFIED", "NOT PROVIDED", "UNKNOWN", "NO DIMM", "NODIMM", "[EMPTY]", "EMPTY", "N/A", "NONE",
+		"TO BE FILLED BY O.E.M.", "DEFAULT STRING", "<BAD INDEX>", "<OUT OF SPEC>":
+		return true
+	}
+	return false
+}

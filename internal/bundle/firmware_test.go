@@ -138,4 +138,7 @@ func TestOlderBundleOpens(t *testing.T) {
 	if recs, err := l.FirmwareRecords(ctx, store.FirmwareFilter{}); err != nil || len(recs) != 0 {
 		t.Errorf("firmware records of an older bundle: %+v, %v", recs, err)
 	}
+	if hosts, err := l.Hosts(ctx); err != nil || len(hosts) == 0 || hosts[0].CPUSignature != "" || hosts[0].CPUPresent != "" {
+		t.Errorf("hosts of an older bundle: %+v, %v", hosts, err)
+	}
 }
