@@ -1,0 +1,1452 @@
+# Slots of one public dump of every board family, placed by hand from the vendor's document: the processor and
+# channel the document gives the slot (its own numbers and names; - where the document names no channel) and the
+# position in the channel, the document (an id of internal/explorer/sources.tsv) and the page. Empty slots without a
+# name and records the board has no slot for are left out: their place is not the document's slot table.
+family	dump	locator	bank	processor	channel	position	source	page
+dell-13g-24slot	0354475C3BDD	A1	Not Specified	0	0	0	dell-e26s	p. 159-160
+dell-13g-24slot	0354475C3BDD	A4	Not Specified	0	3	0	dell-e26s	p. 159-160
+dell-13g-24slot	0354475C3BDD	A5	Not Specified	0	0	1	dell-e26s	p. 159-160
+dell-13g-24slot	0354475C3BDD	A12	Not Specified	0	3	2	dell-e26s	p. 159-160
+dell-13g-24slot	0354475C3BDD	B2	Not Specified	1	1	0	dell-e26s	p. 159-160
+dell-13g-24slot	0354475C3BDD	B9	Not Specified	1	0	2	dell-e26s	p. 159-160
+dell-12g-24slot	13A7060552FC	DIMM_A1	Not Specified	0	0	0	dell-e14s	p. 41-42
+dell-12g-24slot	13A7060552FC	DIMM_A3	Not Specified	0	2	0	dell-e14s	p. 41-42
+dell-12g-24slot	13A7060552FC	DIMM_A6	Not Specified	0	1	1	dell-e14s	p. 41-42
+dell-12g-24slot	13A7060552FC	DIMM_A11	Not Specified	0	2	2	dell-e14s	p. 41-42
+dell-12g-24slot	13A7060552FC	DIMM_B4	Not Specified	1	3	0	dell-e14s	p. 41-42
+dell-12g-e5-2400-2s-12slot	3D22EB0424B9	DIMM_A1	Not Specified	0	1	0	dell-e18s	p. 44
+dell-12g-e5-2400-2s-12slot	3D22EB0424B9	DIMM_A4	Not Specified	0	1	1	dell-e18s	p. 44
+dell-12g-e5-2400-2s-12slot	3D22EB0424B9	DIMM_A5	Not Specified	0	2	1	dell-e18s	p. 44
+dell-12g-e5-2400-2s-12slot	3D22EB0424B9	DIMM_B3	Not Specified	1	3	0	dell-e18s	p. 44
+dell-12g-e5-2400-2s-12slot	3D22EB0424B9	DIMM_B6	Not Specified	1	3	1	dell-e18s	p. 44
+dell-12g-e5-2400-1s-6slot	048513E87D65	DIMM_A1	Not Specified	0	1	0	dell-e20s	p. 68
+dell-12g-e5-2400-1s-6slot	048513E87D65	DIMM_A2	Not Specified	0	2	0	dell-e20s	p. 68
+dell-12g-e5-2400-1s-6slot	048513E87D65	DIMM_A4	Not Specified	0	1	1	dell-e20s	p. 68
+dell-12g-e5-2400-1s-6slot	048513E87D65	DIMM_A6	Not Specified	0	3	1	dell-e20s	p. 68
+dell-13g-12slot	1C773B9E0801	A1	Not Specified	0	0	0	dell-e28s	p. 73
+dell-13g-12slot	1C773B9E0801	A5	Not Specified	0	0	1	dell-e28s	p. 73
+dell-13g-12slot	1C773B9E0801	A8	Not Specified	0	3	1	dell-e28s	p. 73
+dell-13g-12slot	1C773B9E0801	B1	Not Specified	1	0	0	dell-e28s	p. 73
+dell-13g-12slot	1C773B9E0801	B4	Not Specified	1	3	0	dell-e28s	p. 73
+dell-11g-18slot	13132B93A918	DIMM_A1	Not Specified	0		0	dell-r710-owner-manual	p. 32
+dell-11g-18slot	13132B93A918	DIMM_A4	Not Specified	0		1	dell-r710-owner-manual	p. 32
+dell-11g-18slot	13132B93A918	DIMM_A7	Not Specified	0		2	dell-r710-owner-manual	p. 32
+dell-11g-18slot	13132B93A918	DIMM_A2	Not Specified	0		0	dell-r710-owner-manual	p. 32
+dell-11g-18slot	13132B93A918	DIMM_A9	Not Specified	0		2	dell-r710-owner-manual	p. 32
+dell-11g-18slot	13132B93A918	DIMM_B5	Not Specified	1		1	dell-r710-owner-manual	p. 32
+dell-11g-12slot	14D2A48FEC25	DIMM_A1	Not Specified	0		0	dell-r610-owner-manual	p. 116
+dell-11g-12slot	14D2A48FEC25	DIMM_A4	Not Specified	0		1	dell-r610-owner-manual	p. 116
+dell-11g-12slot	14D2A48FEC25	DIMM_A2	Not Specified	0		0	dell-r610-owner-manual	p. 116
+dell-11g-12slot	14D2A48FEC25	DIMM_A6	Not Specified	0		1	dell-r610-owner-manual	p. 116
+dell-11g-12slot	14D2A48FEC25	DIMM_B3	Not Specified	1		0	dell-r610-owner-manual	p. 116
+dell-11g-8slot	004BE79FD7FC	DIMM_A1	Not Specified	0	0	0	dell-r410-owner-manual	printed p. 25
+dell-11g-8slot	004BE79FD7FC	DIMM_A2	Not Specified	0	1	0	dell-r410-owner-manual	printed p. 25
+dell-11g-8slot	004BE79FD7FC	DIMM_A3	Not Specified	0	2	0	dell-r410-owner-manual	printed p. 25
+dell-11g-8slot	004BE79FD7FC	DIMM_A4	Not Specified	0	0	1	dell-r410-owner-manual	printed p. 25
+dell-11g-8slot	004BE79FD7FC	DIMM_B1	Not Specified	1	0	0	dell-r410-owner-manual	printed p. 25
+dell-11g-8slot	004BE79FD7FC	DIMM_B2	Not Specified	1	1	0	dell-r410-owner-manual	printed p. 25
+dell-11g-x3400-6slot	0EAF01173A25	DIMM_A1	Not Specified	0	A	0	dell-t310-owner-manual	p. 172
+dell-11g-x3400-6slot	0EAF01173A25	DIMM_A2	Not Specified	0	B	0	dell-t310-owner-manual	p. 172
+dell-11g-x3400-6slot	0EAF01173A25	DIMM_A3	Not Specified	0	A	1	dell-t310-owner-manual	p. 172
+dell-11g-x3400-6slot	0EAF01173A25	DIMM_A6	Not Specified	0	B	2	dell-t310-owner-manual	p. 172
+dell-11g-x3400-4slot	67C8A996085B	DIMM_A1	Not Specified	0		0	dell-r210-owner-manual	pdf p. 41
+dell-11g-x3400-4slot	67C8A996085B	DIMM_A2	Not Specified	0		0	dell-r210-owner-manual	pdf p. 41
+dell-11g-x3400-4slot	67C8A996085B	DIMM_A3	Not Specified	0		1	dell-r210-owner-manual	pdf p. 41
+dell-11g-x3400-4slot	67C8A996085B	DIMM_A4	Not Specified	0		1	dell-r210-owner-manual	pdf p. 41
+dell-e3-4slot-lettered	2F2AD1E404DF	DIMM A1	BANK 1	0	A	0	dell-e10s	p. 133
+dell-e3-4slot-lettered	2F2AD1E404DF	DIMM A2	BANK 0	0	A	1	dell-e10s	p. 133
+dell-e3-4slot-lettered	2F2AD1E404DF	DIMM B1	BANK 3	0	B	0	dell-e10s	p. 133
+dell-e3-4slot-lettered	2F2AD1E404DF	DIMM B2	BANK 2	0	B	1	dell-e10s	p. 133
+dell-12g-r220	08A61FF1F631	DIMM_1	BANK 1	0	1	0	dell-e10s-2	p. 48
+dell-12g-r220	08A61FF1F631	DIMM_3	BANK 0	0	1	1	dell-e10s-2	p. 48
+dell-12g-r220	08A61FF1F631	DIMM_2	BANK 3	0	2	0	dell-e10s-2	p. 48
+dell-12g-r220	08A61FF1F631	DIMM_4	BANK 2	0	2	1	dell-e10s-2	p. 48
+dell-13g-1s-4slot	546173AB2B8E	A1	Not Specified	0	0	0	dell-e33s	p. 57
+dell-13g-1s-4slot	546173AB2B8E	A2	Not Specified	0	1	0	dell-e33s	p. 57
+dell-13g-1s-4slot	546173AB2B8E	A3	Not Specified	0	0	1	dell-e33s	p. 57
+dell-13g-1s-4slot	546173AB2B8E	A4	Not Specified	0	1	1	dell-e33s	p. 57
+dell-14g-1s-4slot	0013715F7C60	A1	Not Specified	0	0	0	dell-e57s	p. 41
+dell-14g-1s-4slot	0013715F7C60	A2	Not Specified	0	1	0	dell-e57s	p. 41
+dell-14g-1s-4slot	0013715F7C60	A3	Not Specified	0	0	1	dell-e57s	p. 41
+dell-14g-1s-4slot	0013715F7C60	A4	Not Specified	0	1	1	dell-e57s	p. 41
+dell-15g-1s-4slot	2451437DE532	A1	Not Specified	0	0	0	dell-e80s	p. 40
+dell-15g-1s-4slot	2451437DE532	A2	Not Specified	0	1	0	dell-e80s	p. 40
+dell-15g-1s-4slot	2451437DE532	A3	Not Specified	0	0	1	dell-e80s	p. 40
+dell-15g-1s-4slot	2451437DE532	A4	Not Specified	0	1	1	dell-e80s	p. 40
+dell-14g-24slot	102E11A0DB9A	A1	Not Specified	0	0	0	dell-e38s	p. 62
+dell-14g-24slot	102E11A0DB9A	A6	Not Specified	0	5	0	dell-e38s	p. 62
+dell-14g-24slot	102E11A0DB9A	A7	Not Specified	0	0	1	dell-e38s	p. 62
+dell-14g-24slot	102E11A0DB9A	A8	Not Specified	0	1	1	dell-e38s	p. 62
+dell-14g-24slot	102E11A0DB9A	B4	Not Specified	1	3	0	dell-e38s	p. 62
+dell-14g-24slot	102E11A0DB9A	B12	Not Specified	1	5	1	dell-e38s	p. 62
+dell-14g-16slot	4A122AB18262	A1	Not Specified	0	0	0	dell-e45s	p. 47
+dell-14g-16slot	4A122AB18262	A2	Not Specified	0	1	0	dell-e45s	p. 47
+dell-14g-16slot	4A122AB18262	A7	Not Specified	0	0	1	dell-e45s	p. 47
+dell-14g-16slot	4A122AB18262	A9	Not Specified	0	3	1	dell-e45s	p. 47
+dell-14g-16slot	4A122AB18262	A10	Not Specified	0	4	1	dell-e45s	p. 47
+dell-14g-16slot	4A122AB18262	B3	Not Specified	1	2	0	dell-e45s	p. 47
+dell-14g-epyc7001-32slot	1C2794FDE243	A1	Not Specified	0	0	0	dell-e38s-2	p. 103
+dell-14g-epyc7001-32slot	1C2794FDE243	A5	Not Specified	0	4	0	dell-e38s-2	p. 103
+dell-14g-epyc7001-32slot	1C2794FDE243	A9	Not Specified	0	0	1	dell-e38s-2	p. 103
+dell-14g-epyc7001-32slot	1C2794FDE243	A13	Not Specified	0	4	1	dell-e38s-2	p. 103
+dell-14g-epyc7001-32slot	1C2794FDE243	B5	Not Specified	1	4	0	dell-e38s-2	p. 103
+dell-15g-epyc-1s-16slot	0474663F511F	A1	Not Specified	0	D	0	dell-e45s-2	p. 48
+dell-15g-epyc-1s-16slot	0474663F511F	A2	Not Specified	0	C	0	dell-e45s-2	p. 48
+dell-15g-epyc-1s-16slot	0474663F511F	A3	Not Specified	0	H	0	dell-e45s-2	p. 48
+dell-15g-epyc-1s-16slot	0474663F511F	A6	Not Specified	0	A	0	dell-e45s-2	p. 48
+dell-15g-epyc-1s-16slot	0474663F511F	A8	Not Specified	0	E	0	dell-e45s-2	p. 48
+dell-15g-epyc-1s-16slot	0474663F511F	A12	Not Specified	0	A	1	dell-e45s-2	p. 48
+dell-15g-epyc-2s-32slot	23F136DC785E	A1	Not Specified	0	D	0	dell-e68s	p. 73
+dell-15g-epyc-2s-32slot	23F136DC785E	A2	Not Specified	0	C	0	dell-e68s	p. 73
+dell-15g-epyc-2s-32slot	23F136DC785E	A3	Not Specified	0	H	0	dell-e68s	p. 73
+dell-15g-epyc-2s-32slot	23F136DC785E	A4	Not Specified	0	G	0	dell-e68s	p. 73
+dell-15g-epyc-2s-32slot	23F136DC785E	B1	Not Specified	1	D	0	dell-e68s	p. 73
+dell-15g-epyc-2s-32slot	23F136DC785E	B9	Not Specified	1	D	1	dell-e68s	p. 73
+dell-15g-icx-32slot	2DFFE1B75A53	A1	Not Specified	0	A	0	dell-e70s	p. 99
+dell-15g-icx-32slot	2DFFE1B75A53	A2	Not Specified	0	E	0	dell-e70s	p. 99
+dell-15g-icx-32slot	2DFFE1B75A53	A3	Not Specified	0	C	0	dell-e70s	p. 99
+dell-15g-icx-32slot	2DFFE1B75A53	A4	Not Specified	0	G	0	dell-e70s	p. 99
+dell-15g-icx-32slot	2DFFE1B75A53	A9	Not Specified	0	A	1	dell-e70s	p. 99
+dell-15g-icx-32slot	2DFFE1B75A53	B5	Not Specified	1	B	0	dell-e70s	p. 99
+dell-15g-icx-16slot	3684EA8CEBA1	A1	Not Specified	0	A	0	dell-e74s	p. 51
+dell-15g-icx-16slot	3684EA8CEBA1	A2	Not Specified	0	E	0	dell-e74s	p. 51
+dell-15g-icx-16slot	3684EA8CEBA1	A5	Not Specified	0	B	0	dell-e74s	p. 51
+dell-15g-icx-16slot	3684EA8CEBA1	A8	Not Specified	0	H	0	dell-e74s	p. 51
+dell-15g-icx-16slot	3684EA8CEBA1	B3	Not Specified	1	C	0	dell-e74s	p. 51
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	A1	Not Specified	0	A	0	dell-e94s	p. 174
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	A2	Not Specified	0	G	0	dell-e94s	p. 174
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	A3	Not Specified	0	C	0	dell-e94s	p. 174
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	A4	Not Specified	0	I	0	dell-e94s	p. 174
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	B1	Not Specified	1	A	0	dell-e94s	p. 174
+dell-16g-epyc9004-2s-24slot	292F80B4F0BE	B4	Not Specified	1	I	0	dell-e94s	p. 174
+dell-16g-epyc9004-1s-12slot	71A1F0F8BB87	A1	Not Specified	0	A	0	dell-e97s	p. 127
+dell-16g-epyc9004-1s-12slot	71A1F0F8BB87	A2	Not Specified	0	G	0	dell-e97s	p. 127
+dell-16g-epyc9004-1s-12slot	71A1F0F8BB87	A5	Not Specified	0	B	0	dell-e97s	p. 127
+dell-16g-epyc9004-1s-12slot	71A1F0F8BB87	A9	Not Specified	0	D	0	dell-e97s	p. 127
+dell-16g-epyc9004-1s-12slot	71A1F0F8BB87	A12	Not Specified	0	L	0	dell-e97s	p. 127
+dell-16g-spr-16slot	46E84777EA42	A1	Not Specified	0	A	0	dell-e87s	p. 103
+dell-16g-spr-16slot	46E84777EA42	A2	Not Specified	0	G	0	dell-e87s	p. 103
+dell-16g-spr-16slot	46E84777EA42	A7	Not Specified	0	B	0	dell-e87s	p. 103
+dell-16g-spr-16slot	46E84777EA42	B1	Not Specified	1	A	0	dell-e87s	p. 103
+dell-16g-spr-16slot	46E84777EA42	B5	Not Specified	1	D	0	dell-e87s	p. 103
+dell-xr4510c	35E133588594	A1	Not Specified	0	A1	0	dell-xr4510c-installation-service-manual	p. 59
+dell-xr4510c	35E133588594	A2	Not Specified	0	A2	0	dell-xr4510c-installation-service-manual	p. 59
+dell-xr4510c	35E133588594	A3	Not Specified	0	A3	0	dell-xr4510c-installation-service-manual	p. 59
+dell-xr4510c	35E133588594	A4	Not Specified	0	A4	0	dell-xr4510c-installation-service-manual	p. 59
+dell-precision-7920-tower	11F2F8B0AD2A	DIMM1_CPU0	Not Specified	0	Ch2	0	dell-d04x	p. 90
+dell-precision-7920-tower	11F2F8B0AD2A	DIMM2_CPU0	Not Specified	0	Ch5	0	dell-d04x	p. 90
+dell-precision-7920-tower	11F2F8B0AD2A	DIMM7_CPU0	Not Specified	0	Ch2	1	dell-d04x	p. 90
+dell-precision-7920-tower	11F2F8B0AD2A	DIMM5_CPU1	Not Specified	1	Ch0	0	dell-d04x	p. 90
+dell-precision-7920-tower	11F2F8B0AD2A	DIMM12_CPU1	Not Specified	1	Ch3	1	dell-d04x	p. 90
+dell-precision-7820-tower	3792A2743A38	DIMM1_CPU0	Not Specified	0	Ch2	0	dell-d02t	pp. 92-93
+dell-precision-7820-tower	3792A2743A38	DIMM3_CPU0	Not Specified	0	Ch1	0	dell-d02t	pp. 92-93
+dell-precision-7820-tower	3792A2743A38	DIMM2_CPU0	Not Specified	0	Ch5	0	dell-d02t	pp. 92-93
+dell-precision-7820-tower	3792A2743A38	DIMM4_CPU1	Not Specified	1	Ch4	0	dell-d02t	pp. 92-93
+dell-precision-7820-tower	3792A2743A38	DIMM5_CPU1	Not Specified	1	Ch0	0	dell-d02t	pp. 92-93
+dell-precision-rack-7910	4E572CAA6B4C	A1	Not Specified	0	0	0	dell-e31s	pp. 19-20
+dell-precision-rack-7910	4E572CAA6B4C	A2	Not Specified	0	1	0	dell-e31s	pp. 19-20
+dell-precision-rack-7910	4E572CAA6B4C	A5	Not Specified	0	0	1	dell-e31s	pp. 19-20
+dell-precision-rack-7910	4E572CAA6B4C	A6	Not Specified	0	1	1	dell-e31s	pp. 19-20
+dell-precision-rack-7910	4E572CAA6B4C	B1	Not Specified	1	0	0	dell-e31s	pp. 19-20
+dell-precision-7920-rack	1D56B1A533A9	A1	Not Specified	0	0	0	dell-e38s-3	pp. 102-103
+dell-precision-7920-rack	1D56B1A533A9	A2	Not Specified	0	1	0	dell-e38s-3	pp. 102-103
+dell-precision-7920-rack	1D56B1A533A9	A4	Not Specified	0	3	0	dell-e38s-3	pp. 102-103
+dell-precision-7920-rack	1D56B1A533A9	A5	Not Specified	0	4	0	dell-e38s-3	pp. 102-103
+dell-precision-7920-rack	1D56B1A533A9	A7	Not Specified	0	0	1	dell-e38s-3	pp. 102-103
+dell-precision-7960-rack	A4F90226C97E	A1	Not Specified	0	CH_A	0	dell-e82s	p. 14
+dell-precision-7960-rack	A4F90226C97E	A2	Not Specified	0	CH_G	0	dell-e82s	p. 14
+dell-precision-7960-rack	A4F90226C97E	A3	Not Specified	0	CH_C	0	dell-e82s	p. 14
+dell-precision-7960-rack	A4F90226C97E	A8	Not Specified	0	CH_H	0	dell-e82s	p. 14
+dell-precision-7960-rack	A4F90226C97E	A9	Not Specified	0	CH_A	1	dell-e82s	p. 14
+dell-c4140	944FAD941A1D	A1	Not Specified	0	0	0	dell-e53s	p. 42
+dell-c4140	944FAD941A1D	A2	Not Specified	0	1	0	dell-e53s	p. 42
+dell-c4140	944FAD941A1D	A5	Not Specified	0	4	0	dell-e53s	p. 42
+dell-c4140	944FAD941A1D	A7	Not Specified	0	0	1	dell-e53s	p. 42
+dell-c4140	944FAD941A1D	B3	Not Specified	1	2	0	dell-e53s	p. 42
+dell-c6520	E99F6500F47C	A1	Not Specified	0	A	0	dell-e64s	p. 56
+dell-c6520	E99F6500F47C	A2	Not Specified	0	E	0	dell-e64s	p. 56
+dell-c6520	E99F6500F47C	A5	Not Specified	0	B	0	dell-e64s	p. 56
+dell-c6520	E99F6500F47C	A8	Not Specified	0	H	0	dell-e64s	p. 56
+dell-c6520	E99F6500F47C	B3	Not Specified	1	C	0	dell-e64s	p. 56
+dell-c6525	B11FEC7694D8	A1	Not Specified	0	D	0	dell-e63s	p. 28
+dell-c6525	B11FEC7694D8	A2	Not Specified	0	C	0	dell-e63s	p. 28
+dell-c6525	B11FEC7694D8	A3	Not Specified	0	H	0	dell-e63s	p. 28
+dell-c6525	B11FEC7694D8	A4	Not Specified	0	G	0	dell-e63s	p. 28
+dell-c6525	B11FEC7694D8	A6	Not Specified	0	A	0	dell-e63s	p. 28
+dell-c6220ii-c8220	F5E056823CF5	DIMM_A1	CPU1	0	CHA	0	dell-c6220-owner-manual	pp. 231-232
+dell-c6220ii-c8220	F5E056823CF5	DIMM_A5	CPU1	0	CHA	1	dell-c6220-owner-manual	pp. 231-232
+dell-c6220ii-c8220	F5E056823CF5	DIMM_A2	CPU1	0	CHB	0	dell-c6220-owner-manual	pp. 231-232
+dell-c6220ii-c8220	F5E056823CF5	DIMM_A4	CPU1	0	CHD	0	dell-c6220-owner-manual	pp. 231-232
+dell-c6220ii-c8220	F5E056823CF5	DIMM_B3	CPU2	1	CHC	0	dell-c6220-owner-manual	pp. 231-232
+dell-c6320	B982D68E5247	A1	Not Specified	0	CHA	0	dell-b08s	p. 105
+dell-c6320	B982D68E5247	A2	Not Specified	0	CHB	0	dell-b08s	p. 105
+dell-c6320	B982D68E5247	B3	Not Specified	1	CHC	0	dell-b08s	p. 105
+dell-c6320	B982D68E5247	B4	Not Specified	1	CHD	0	dell-b08s	p. 105
+dell-xs23-ty3-spelled	23AD9484C6C6	DIMM0	CPU0ChA	0	A	0	dell-c6100-owner-manual	pp. 78-79
+dell-xs23-ty3-spelled	23AD9484C6C6	DIMM1	CPU0ChA	0	A	1	dell-c6100-owner-manual	pp. 78-79
+dell-xs23-ty3-spelled	23AD9484C6C6	DIMM0	CPU0ChC	0	C	0	dell-c6100-owner-manual	pp. 78-79
+dell-xs23-ty3-spelled	23AD9484C6C6	DIMM0	CPU1ChB	1	B	0	dell-c6100-owner-manual	pp. 78-79
+dell-c1100-cs24-ty	77C94ADE7569	DIMM A0	CHANNEL A	0	A	0	dell-c1100-owner-manual	p. 65
+dell-c1100-cs24-ty	77C94ADE7569	DIMM A1	CHANNEL A	0	A	1	dell-c1100-owner-manual	p. 65
+dell-c1100-cs24-ty	77C94ADE7569	DIMM C0	CHANNEL C	0	C	0	dell-c1100-owner-manual	p. 65
+dell-c1100-cs24-ty	77C94ADE7569	DIMM D0	CHANNEL D	1	D	0	dell-c1100-owner-manual	p. 65
+dell-c1100-cs24-ty	77C94ADE7569	DIMM F2	CHANNEL F	1	F	2	dell-c1100-owner-manual	p. 65
+dell-pe-1950-2950	12946989497B	DIMM1	Not Specified	-1	0	0	dell-1950-owner-manual	pp. 63-64
+dell-pe-1950-2950	12946989497B	DIMM5	Not Specified	-1	0	1	dell-1950-owner-manual	pp. 63-64
+dell-pe-1950-2950	12946989497B	DIMM2	Not Specified	-1	1	0	dell-1950-owner-manual	pp. 63-64
+dell-pe-1950-2950	12946989497B	DIMM4	Not Specified	-1	3	0	dell-1950-owner-manual	pp. 63-64
+dell-pe-1950-2950	12946989497B	DIMM8	Not Specified	-1	3	1	dell-1950-owner-manual	pp. 63-64
+dell-pe-2900	2D778EC201D6	DIMM1	Not Specified	-1	0	0	dell-2900-owner-manual	pp. 82-83
+dell-pe-2900	2D778EC201D6	DIMM5	Not Specified	-1	0	1	dell-2900-owner-manual	pp. 82-83
+dell-pe-2900	2D778EC201D6	DIMM9	Not Specified	-1	0	2	dell-2900-owner-manual	pp. 82-83
+dell-pe-2900	2D778EC201D6	DIMM2	Not Specified	-1	1	0	dell-2900-owner-manual	pp. 82-83
+dell-pe-2900	2D778EC201D6	DIMM8	Not Specified	-1	3	1	dell-2900-owner-manual	pp. 82-83
+dell-pe-sc1430	2088C31572DB	DIMM1	Not Specified	-1	0	0	dell-sc1430-owner-manual	p. 121
+dell-pe-sc1430	2088C31572DB	DIMM2	Not Specified	-1	1	0	dell-sc1430-owner-manual	p. 121
+dell-pe-sc1430	2088C31572DB	DIMM5	Not Specified	-1	0	1	dell-sc1430-owner-manual	p. 121
+dell-pe-sc1430	2088C31572DB	DIMM6	Not Specified	-1	1	1	dell-sc1430-owner-manual	p. 121
+dell-pe-t300	1ABEF56EEB5A	DIMM1	Not Specified	-1	A	0	dell-t300-owner-manual	p. 111
+dell-pe-t300	1ABEF56EEB5A	DIMM2	Not Specified	-1	B	0	dell-t300-owner-manual	p. 111
+dell-pe-t300	1ABEF56EEB5A	DIMM3	Not Specified	-1	A	1	dell-t300-owner-manual	p. 111
+dell-pe-t300	1ABEF56EEB5A	DIMM4	Not Specified	-1	B	1	dell-t300-owner-manual	p. 111
+dell-pe-t300	1ABEF56EEB5A	DIMM6	Not Specified	-1	B	2	dell-t300-owner-manual	p. 111
+dell-pe-840-860-r200	2AD24BD8D5F6	DIMM1_A	Not Specified	-1	A	0	dell-860-owner-manual	p. 68
+dell-pe-840-860-r200	2AD24BD8D5F6	DIMM2_A	Not Specified	-1	A	1	dell-860-owner-manual	p. 68
+dell-pe-840-860-r200	2AD24BD8D5F6	DIMM1_B	Not Specified	-1	B	0	dell-860-owner-manual	p. 68
+dell-pe-840-860-r200	2AD24BD8D5F6	DIMM2_B	Not Specified	-1	B	1	dell-860-owner-manual	p. 68
+dell-pe-2850-sc1425	1A0BFC21B7EB	DIMM1_A	Not Specified	-1	A	0	dell-2850-installation-guide	section "System Memory" (txt lines 3595-3700)
+dell-pe-2850-sc1425	1A0BFC21B7EB	DIMM1_B	Not Specified	-1	B	0	dell-2850-installation-guide	section "System Memory" (txt lines 3595-3700)
+dell-pe-2850-sc1425	1A0BFC21B7EB	DIMM2_A	Not Specified	-1	A	1	dell-2850-installation-guide	section "System Memory" (txt lines 3595-3700)
+dell-pe-2850-sc1425	1A0BFC21B7EB	DIMM2_B	Not Specified	-1	B	1	dell-2850-installation-guide	section "System Memory" (txt lines 3595-3700)
+dell-pe-2850-sc1425	1A0BFC21B7EB	DIMM3_A	Not Specified	-1	A	2	dell-2850-installation-guide	section "System Memory" (txt lines 3595-3700)
+dell-pe-r900	7C692A98BD7B	DIMM A1	Not Specified	-1	A	0	dell-r900-owner-manual	pp. 94-95
+dell-pe-r900	7C692A98BD7B	DIMM B1	Not Specified	-1	B	0	dell-r900-owner-manual	pp. 94-95
+dell-pe-r900	7C692A98BD7B	DIMM C1	Not Specified	-1	C	0	dell-r900-owner-manual	pp. 94-95
+dell-pe-r900	7C692A98BD7B	DIMM D1	Not Specified	-1	D	0	dell-r900-owner-manual	pp. 94-95
+dell-pe-r900	7C692A98BD7B	DIMM A2	Not Specified	-1	A	1	dell-r900-owner-manual	pp. 94-95
+dell-pe-r810	376A04F0DBD5	DIMM A1	Not Specified	0		0	dell-e05s	pp. 187-188
+dell-pe-r810	376A04F0DBD5	DIMM A5	Not Specified	0		1	dell-e05s	pp. 187-188
+dell-pe-r810	376A04F0DBD5	DIMM A2	Not Specified	0		0	dell-e05s	pp. 187-188
+dell-pe-r810	376A04F0DBD5	DIMM B3	Not Specified	1		0	dell-e05s	pp. 187-188
+dell-pe-r810	376A04F0DBD5	DIMM D8	Not Specified	3		1	dell-e05s	pp. 187-188
+dell-pe-r815-r715	5F8534514111	DIMM_A1	Not Specified	0		0	dell-e05s-2	p. 175
+dell-pe-r815-r715	5F8534514111	DIMM_A5	Not Specified	0		1	dell-e05s-2	p. 175
+dell-pe-r815-r715	5F8534514111	DIMM_A2	Not Specified	0		0	dell-e05s-2	p. 175
+dell-pe-r815-r715	5F8534514111	DIMM_C4	Not Specified	2		0	dell-e05s-2	p. 175
+dell-pe-r815-r715	5F8534514111	DIMM_D8	Not Specified	3		1	dell-e05s-2	p. 175
+dell-pe-r515	07472D3395B3	DIMM_A1	Not Specified	0		0	dell-r515-owner-manual	p. 183
+dell-pe-r515	07472D3395B3	DIMM_A2	Not Specified	0		0	dell-r515-owner-manual	p. 183
+dell-pe-r515	07472D3395B3	DIMM_A3	Not Specified	0		1	dell-r515-owner-manual	p. 183
+dell-pe-r515	07472D3395B3	DIMM_A4	Not Specified	0		1	dell-r515-owner-manual	p. 183
+dell-pe-r515	07472D3395B3	DIMM_B1	Not Specified	1		0	dell-r515-owner-manual	p. 183
+dell-pe-r820	200620453502	DIMM_A1	Not Specified	0	0	0	dell-e21s	pp. 45-46
+dell-pe-r820	200620453502	DIMM_A5	Not Specified	0	0	1	dell-e21s	pp. 45-46
+dell-pe-r820	200620453502	DIMM_A9	Not Specified	0	0	2	dell-e21s	pp. 45-46
+dell-pe-r820	200620453502	DIMM_B2	Not Specified	1	1	0	dell-e21s	pp. 45-46
+dell-pe-r820	200620453502	DIMM_D8	Not Specified	3	3	1	dell-e21s	pp. 45-46
+hp-gen9-24slot	062C3461F315	PROC 1 DIMM 12	Not Specified	0	1	0	hpe-767927-009	15, 41-48
+hp-gen9-24slot	062C3461F315	PROC 1 DIMM 9	Not Specified	0	2	0	hpe-767927-009	15, 41-48
+hp-gen9-24slot	062C3461F315	PROC 1 DIMM 1	Not Specified	0	3	0	hpe-767927-009	15, 41-48
+hp-gen9-24slot	062C3461F315	PROC 1 DIMM 6	Not Specified	0	4	2	hpe-767927-009	15, 41-48
+hp-gen9-24slot	062C3461F315	PROC 2 DIMM 12	Not Specified	1	1	0	hpe-767927-009	15, 41-48
+hp-gen8-24slot	04C0E4BFF77E	PROC  1 DIMM 12	Not Specified	0	1	0	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-24slot	04C0E4BFF77E	PROC  1 DIMM 11	Not Specified	0	1	1	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-24slot	04C0E4BFF77E	PROC  1 DIMM  9	Not Specified	0	2	0	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-24slot	04C0E4BFF77E	PROC  1 DIMM  1	Not Specified	0	3	0	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-24slot	04C0E4BFF77E	PROC  1 DIMM  4	Not Specified	0	4	0	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-24slot	04C0E4BFF77E	PROC  2 DIMM  8	Not Specified	1	2	1	hpe-dl380p-gen8-user-guide	16, 45-51
+hp-gen8-e5-2400-12slot	0F9365A4AA99	PROC  1 DIMM  1	Not Specified	0	1	0	hpe-675786-006	10, 45-51
+hp-gen8-e5-2400-12slot	0F9365A4AA99	PROC  1 DIMM  3	Not Specified	0	2	0	hpe-675786-006	10, 45-51
+hp-gen8-e5-2400-12slot	0F9365A4AA99	PROC  1 DIMM  5	Not Specified	0	3	0	hpe-675786-006	10, 45-51
+hp-gen8-e5-2400-12slot	0F9365A4AA99	PROC  1 DIMM  2	Not Specified	0	1	1	hpe-675786-006	10, 45-51
+hp-gen8-e5-2400-12slot	0F9365A4AA99	PROC  2 DIMM  3	Not Specified	1	2	0	hpe-675786-006	10, 45-51
+hp-gen10-24slot	0438CFCFB022	PROC 1 DIMM 8	Not Specified	0	CH1	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-gen10-24slot	0438CFCFB022	PROC 1 DIMM 10	Not Specified	0	CH2	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-gen10-24slot	0438CFCFB022	PROC 1 DIMM 7	Not Specified	0	CH1	1	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-gen10-24slot	0438CFCFB022	PROC 1 DIMM 1	Not Specified	0	CH6	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-gen10-24slot	0438CFCFB022	PROC 2 DIMM 12	Not Specified	1	CH3	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-ml350-gen10	76214BC43043	PROC 1 DIMM 3	Not Specified	0	CH5	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-ml350-gen10	76214BC43043	PROC 1 DIMM 5	Not Specified	0	CH4	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-ml350-gen10	76214BC43043	PROC 2 DIMM 8	Not Specified	1	CH1	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-ml350-gen10	76214BC43043	PROC 2 DIMM 10	Not Specified	1	CH2	0	hpe-population-gen10-technical	4-13, 19, 23; 4-7, 14, 19; 4-8, 17, 21, 26
+hp-bl460c-gen8	1DB9D4472AA8	PROC  1 DIMM  1	Not Specified	0	1	0	hpe-656396-004	9, 23, 27-33
+hp-bl460c-gen8	1DB9D4472AA8	PROC  1 DIMM  3	Not Specified	0	2	0	hpe-656396-004	9, 23, 27-33
+hp-bl460c-gen8	1DB9D4472AA8	PROC  1 DIMM  8	Not Specified	0	3	0	hpe-656396-004	9, 23, 27-33
+hp-bl460c-gen8	1DB9D4472AA8	PROC  1 DIMM  5	Not Specified	0	4	1	hpe-656396-004	9, 23, 27-33
+hp-bl460c-gen8	1DB9D4472AA8	PROC  2 DIMM  1	Not Specified	1	1	0	hpe-656396-004	9, 23, 27-33
+hp-bl460c-gen9	10A191CF5774	PROC 1 DIMM 1	Not Specified	0	1	0	hpe-768826-007	12-13, 43-48
+hp-bl460c-gen9	10A191CF5774	PROC 1 DIMM 3	Not Specified	0	2	0	hpe-768826-007	12-13, 43-48
+hp-bl460c-gen9	10A191CF5774	PROC 1 DIMM 8	Not Specified	0	3	0	hpe-768826-007	12-13, 43-48
+hp-bl460c-gen9	10A191CF5774	PROC 1 DIMM 6	Not Specified	0	4	0	hpe-768826-007	12-13, 43-48
+hp-bl460c-gen9	10A191CF5774	PROC 2 DIMM 6	Not Specified	1	4	0	hpe-768826-007	12-13, 43-48
+hp-bl460c-gen10	0D501A0F9103	PROC 1 DIMM 3	Not Specified	0	CH1	0	hpe-876833-006	15, 60
+hp-bl460c-gen10	0D501A0F9103	PROC 1 DIMM 4	Not Specified	0	CH1	1	hpe-876833-006	15, 60
+hp-bl460c-gen10	0D501A0F9103	PROC 1 DIMM 1	Not Specified	0	CH3	0	hpe-876833-006	15, 60
+hp-bl460c-gen10	0D501A0F9103	PROC 1 DIMM 6	Not Specified	0	CH4	0	hpe-876833-006	15, 60
+hp-bl460c-gen10	0D501A0F9103	PROC 2 DIMM 3	Not Specified	1	CH1	0	hpe-876833-006	15, 60
+hp-microserver-gen10	00C05E8C85AC	DIMM 1	CHANNEL A	0	A	0	hpe-872677-004	9-11, 48
+hp-microserver-gen10	00C05E8C85AC	DIMM 2	CHANNEL B	0	B	0	hpe-872677-004	9-11, 48
+hp-ml10-gen9	34D8389128BE	ChannelA-DIMM0	BANK 0	0	A	0	hpe-833836-073	35-38
+hp-ml10-gen9	34D8389128BE	ChannelA-DIMM1	BANK 1	0	A	1	hpe-833836-073	35-38
+hp-ml10-gen9	34D8389128BE	ChannelB-DIMM0	BANK 2	0	B	0	hpe-833836-073	35-38
+hp-ml10-gen9	34D8389128BE	ChannelB-DIMM1	BANK 3	0	B	1	hpe-833836-073	35-38
+hp-dl60-gen9	8CE8B7C853FD	PROC 1 DIMM 1	Not Specified	0	1	0	hpe-786245-003	11, 49-54
+hp-dl60-gen9	8CE8B7C853FD	PROC 1 DIMM 2	Not Specified	0	2	0	hpe-786245-003	11, 49-54
+hp-dl60-gen9	8CE8B7C853FD	PROC 1 DIMM 3	Not Specified	0	4	0	hpe-786245-003	11, 49-54
+hp-dl60-gen9	8CE8B7C853FD	PROC 1 DIMM 4	Not Specified	0	3	0	hpe-786245-003	11, 49-54
+hp-dl60-gen9	8CE8B7C853FD	PROC 2 DIMM 4	Not Specified	1	3	0	hpe-786245-003	11, 49-54
+hp-dl20-gen9	A3520AD155FA	PROC 1 DIMM 3	Not Specified	0	1	0	hpe-826318-003a	14, 65-69
+hp-dl20-gen9	A3520AD155FA	PROC 1 DIMM 4	Not Specified	0	1	1	hpe-826318-003a	14, 65-69
+hp-dl20-gen9	A3520AD155FA	PROC 1 DIMM 1	Not Specified	0	2	0	hpe-826318-003a	14, 65-69
+hp-dl20-gen9	A3520AD155FA	PROC 1 DIMM 2	Not Specified	0	2	1	hpe-826318-003a	14, 65-69
+hp-dl160-gen8	229473840979	PROC  1 DIMM  1	Not Specified	0	1	0	hpe-670519-006	10, 46-51
+hp-dl160-gen8	229473840979	PROC  1 DIMM 12	Not Specified	0	3	0	hpe-670519-006	10, 46-51
+hp-dl160-gen8	229473840979	PROC  1 DIMM  9	Not Specified	0	4	0	hpe-670519-006	10, 46-51
+hp-dl160-gen8	229473840979	PROC  1 DIMM  7	Not Specified	0	4	2	hpe-670519-006	10, 46-51
+hp-dl160-gen8	229473840979	PROC  2 DIMM  1	Not Specified	1	3	0	hpe-670519-006	10, 46-51
+hp-dl160-gen8	229473840979	PROC  2 DIMM 12	Not Specified	1	1	0	hpe-670519-006	10, 46-51
+hp-dl385p-gen8	2A0018D2AAFA	Proc 1 DIMM 1A	Not Specified	0	Ch1	0	hpe-dl385p-gen8-user-guide	16, 51-57
+hp-dl385p-gen8	2A0018D2AAFA	Proc 1 DIMM 4C	Not Specified	0	Ch2	0	hpe-dl385p-gen8-user-guide	16, 51-57
+hp-dl385p-gen8	2A0018D2AAFA	Proc 1 DIMM 7B	Not Specified	0	Ch3	0	hpe-dl385p-gen8-user-guide	16, 51-57
+hp-dl385p-gen8	2A0018D2AAFA	Proc 1 DIMM 10D	Not Specified	0	Ch4	0	hpe-dl385p-gen8-user-guide	16, 51-57
+hp-dl385p-gen8	2A0018D2AAFA	Proc 1 DIMM 2I	Not Specified	0	Ch1	2	hpe-dl385p-gen8-user-guide	16, 51-57
+hp-gen9-16slot	9D553E2446C6	PROC 1 DIMM 8	Not Specified	0	1	0	hpe-775786-004	12, 52-58
+hp-gen9-16slot	9D553E2446C6	PROC 1 DIMM 7	Not Specified	0	1	1	hpe-775786-004	12, 52-58
+hp-gen9-16slot	9D553E2446C6	PROC 1 DIMM 6	Not Specified	0	2	0	hpe-775786-004	12, 52-58
+hp-gen9-16slot	9D553E2446C6	PROC 1 DIMM 1	Not Specified	0	3	0	hpe-775786-004	12, 52-58
+hp-gen9-16slot	9D553E2446C6	PROC 2 DIMM 6	Not Specified	1	2	0	hpe-775786-004	12, 52-58
+hp-dl120-gen9	765EB8D56A39	PROC 1 DIMM 1	Not Specified	0	1	0	hpe-781878-003	12, 57-62
+hp-dl120-gen9	765EB8D56A39	PROC 1 DIMM 2	Not Specified	0	1	1	hpe-781878-003	12, 57-62
+hp-dl120-gen9	765EB8D56A39	PROC 1 DIMM 8	Not Specified	0	3	0	hpe-781878-003	12, 57-62
+hp-dl120-gen9	765EB8D56A39	PROC 1 DIMM 5	Not Specified	0	4	1	hpe-781878-003	12, 57-62
+hp-g6g7-18slot-lettered	0AFFCE1D15FC	PROC 1 DIMM 3A	Not Specified	0	1	0	hpe-495624-003	p. 42
+hp-g6g7-18slot-lettered	0AFFCE1D15FC	PROC 1 DIMM 2D	Not Specified	0	1	1	hpe-495624-003	p. 42
+hp-g6g7-18slot-lettered	0AFFCE1D15FC	PROC 1 DIMM 6B	Not Specified	0	2	0	hpe-495624-003	p. 42
+hp-g6g7-18slot-lettered	0AFFCE1D15FC	PROC 1 DIMM 5E	Not Specified	0	2	1	hpe-495624-003	p. 42
+hp-g6g7-18slot-lettered	0AFFCE1D15FC	PROC 2 DIMM 3A	Not Specified	1	1	0	hpe-495624-003	p. 42
+hp-dl360-g6-18slot-unlettered	97C666008E4E	PROC 1 DIMM 3	Not Specified	0	1	0	hpe-517689-005	p. 39
+hp-dl360-g6-18slot-unlettered	97C666008E4E	PROC 1 DIMM 2	Not Specified	0	1	1	hpe-517689-005	p. 39
+hp-dl360-g6-18slot-unlettered	97C666008E4E	PROC 1 DIMM 6	Not Specified	0	2	0	hpe-517689-005	p. 39
+hp-dl360-g6-18slot-unlettered	97C666008E4E	PROC 1 DIMM 9	Not Specified	0	3	0	hpe-517689-005	p. 39
+hp-dl360-g6-18slot-unlettered	97C666008E4E	PROC 2 DIMM 3	Not Specified	1	1	0	hpe-517689-005	p. 39
+hp-z6-g4	2EFC95DF5773	CPU0-DIMM1	CPU0	0	0.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z6-g4	2EFC95DF5773	CPU0-DIMM3	CPU0	0	0.0	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z6-g4	2EFC95DF5773	CPU0-DIMM4	CPU0	0	1.0	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z6-g4	2EFC95DF5773	CPU0-DIMM6	CPU0	0	1.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z6-g4	2EFC95DF5773	CPU1-DIMM1	CPU1	1	1.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z6-g4	2EFC95DF5773	CPU1-DIMM6	CPU1	1	0.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM1	CPU0	0	0.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM3	CPU0	0	0.1	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM5	CPU0	0	0.0	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM8	CPU0	0	1.0	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM10	CPU0	0	1.1	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU0-DIMM12	CPU0	0	1.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-z8-g4	4858D0104BE9	CPU1-DIMM1	CPU1	1	1.2	0	hpe-setup-z6-g4-z8-g4	pp. 6-7, 21-23
+hp-dl320-g6-9slot	04CBD3898548	PROC 1 DIMM 3A	Not Specified	0	1	0	hpe-530514-002	pp. 26-27
+hp-dl320-g6-9slot	04CBD3898548	PROC 1 DIMM 2D	Not Specified	0	1	1	hpe-530514-002	pp. 26-27
+hp-dl320-g6-9slot	04CBD3898548	PROC 1 DIMM 6B	Not Specified	0	2	0	hpe-530514-002	pp. 26-27
+hp-dl320-g6-9slot	04CBD3898548	PROC 1 DIMM 9C	Not Specified	0	3	0	hpe-530514-002	pp. 26-27
+hp-dl160-g6-18slot	E32F627377A6	PROC 1 DIMM 3A	BANK0	0	Chnl1	0	hpe-dl160-6-g6	p. 38
+hp-dl160-g6-18slot	E32F627377A6	PROC 1 DIMM 2D	BANK1	0	Chnl1	1	hpe-dl160-6-g6	p. 38
+hp-dl160-g6-18slot	E32F627377A6	PROC 1 DIMM 6B	BANK3	0	Chnl2	0	hpe-dl160-6-g6	p. 38
+hp-dl160-g6-18slot	E32F627377A6	PROC 1 DIMM 9C	BANK6	0	Chnl3	0	hpe-dl160-6-g6	p. 38
+hp-dl160-g6-18slot	E32F627377A6	PROC 2 DIMM 3A	BANK9	1	Chnl1	0	hpe-dl160-6-g6	p. 38
+hp-dl180-g6-12slot	D1FDB54452D3	PROC 1 DIMM 2A	BANK0	0	Chnl1	0	hpe-dl180-6-g6	p. 40
+hp-dl180-g6-12slot	D1FDB54452D3	PROC 1 DIMM 1D	BANK1	0	Chnl1	1	hpe-dl180-6-g6	p. 40
+hp-dl180-g6-12slot	D1FDB54452D3	PROC 1 DIMM 4B	BANK2	0	Chnl2	0	hpe-dl180-6-g6	p. 40
+hp-dl180-g6-12slot	D1FDB54452D3	PROC 2 DIMM 6C	BANK10	1	Chnl3	0	hpe-dl180-6-g6	p. 40
+hp-bl460c-g6g7-12slot	FA97A758D2C6	PROC 1 DIMM 2A	Not Specified	0	1	0	hpe-501274-002	p. 28
+hp-bl460c-g6g7-12slot	FA97A758D2C6	PROC 1 DIMM 4B	Not Specified	0	2	0	hpe-501274-002	p. 28
+hp-bl460c-g6g7-12slot	FA97A758D2C6	PROC 1 DIMM 6C	Not Specified	0	3	0	hpe-501274-002	p. 28
+hp-bl460c-g6g7-12slot	FA97A758D2C6	PROC 2 DIMM 2A	Not Specified	1	1	0	hpe-501274-002	p. 28
+hp-dl120-g6-6slot	9505BCDC413E	DIMM3A	Not Specified	0	1	0	hpe-579574-004	p. 23
+hp-dl120-g6-6slot	9505BCDC413E	DIMM6B	Not Specified	0	2	0	hpe-579574-004	p. 23
+hp-dl120-g6-6slot	9505BCDC413E	DIMM2C	Not Specified	0	1	1	hpe-579574-004	p. 23
+hp-dl120-g6-6slot	9505BCDC413E	DIMM1E	Not Specified	0	1	2	hpe-579574-004	p. 23
+hp-dl120-g7-4slot	E5BFE9955A8A	DIMM  1	Not Specified	0	A	1	hpe-638025-003a	p. 28
+hp-dl120-g7-4slot	E5BFE9955A8A	DIMM  3	Not Specified	0	B	1	hpe-638025-003a	p. 28
+hp-dl120-g7-4slot	E5BFE9955A8A	DIMM  2	Not Specified	0	A	0	hpe-638025-003a	p. 28
+hp-dl120-g7-4slot	E5BFE9955A8A	DIMM  4	Not Specified	0	B	0	hpe-638025-003a	p. 28
+hp-dl385-g7-24slot	D005510674A2	Proc 1 DIMM 1A	Not Specified	0	A	0	hpe-588708-001	p. 48
+hp-dl385-g7-24slot	D005510674A2	Proc 1 DIMM 4C	Not Specified	0	B	0	hpe-588708-001	p. 48
+hp-dl385-g7-24slot	D005510674A2	Proc 1 DIMM 7B	Not Specified	0	C	0	hpe-588708-001	p. 48
+hp-dl385-g7-24slot	D005510674A2	Proc 1 DIMM 10D	Not Specified	0	D	0	hpe-588708-001	p. 48
+hp-dl585-g7-48slot	0239B15EF9C8	Proc 1 DIMM 1A	Not Specified	0	A	0	hpe-617692-004	pp. 43-44
+hp-dl585-g7-48slot	0239B15EF9C8	Proc 1 DIMM 7B	Not Specified	0	C	0	hpe-617692-004	pp. 43-44
+hp-dl585-g7-48slot	0239B15EF9C8	Proc 1 DIMM 4C	Not Specified	0	B	0	hpe-617692-004	pp. 43-44
+hp-dl585-g7-48slot	0239B15EF9C8	Proc 3 DIMM 10D	Not Specified	2	D	0	hpe-617692-004	pp. 43-44
+hp-bl685c-g7-32slot	3F69ABE6ED6B	Proc 1 DIMM 1A	Not Specified	0	1	0	hpe-593961-001	p. 29
+hp-bl685c-g7-32slot	3F69ABE6ED6B	Proc 1 DIMM 2E	Not Specified	0	1	1	hpe-593961-001	p. 29
+hp-bl685c-g7-32slot	3F69ABE6ED6B	Proc 1 DIMM 5B	Not Specified	0	3	0	hpe-593961-001	p. 29
+hp-bl685c-g7-32slot	3F69ABE6ED6B	Proc 4 DIMM 8H	Not Specified	3	4	1	hpe-593961-001	p. 29
+hp-dl165-g7-24slot	BA87B618D9BC	PROC 1 DIMM 1	A	0	A	0	hpe-601465-003	p. 64
+hp-dl165-g7-24slot	BA87B618D9BC	PROC 1 DIMM 7	C	0	C	0	hpe-601465-003	p. 64
+hp-dl165-g7-24slot	BA87B618D9BC	PROC 2 DIMM 1	A	1	A	0	hpe-601465-003	p. 64
+hp-dl165-g7-24slot	BA87B618D9BC	PROC 2 DIMM 7	C	1	C	0	hpe-601465-003	p. 64
+hp-dl580-g7-cartridges	25E46C90AE6D	Board 1, DIMM 1A	Not Specified	0	1.0	0	hpe-595656-005	p. 45
+hp-dl580-g7-cartridges	25E46C90AE6D	Board 1, DIMM 3B	Not Specified	0	1.1	0	hpe-595656-005	p. 45
+hp-dl580-g7-cartridges	25E46C90AE6D	Board 1, DIMM 6B	Not Specified	0	1.3	0	hpe-595656-005	p. 45
+hp-dl580-g7-cartridges	25E46C90AE6D	Board 1, DIMM 8A	Not Specified	0	1.2	0	hpe-595656-005	p. 45
+hp-dl580-g7-cartridges	25E46C90AE6D	Board 3, DIMM 1A	Not Specified	1	3.0	0	hpe-595656-005	p. 45
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM02	BANK02	0	CH0	1	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM03	BANK03	0	CH0	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM06	BANK06	0	CH1	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM09	BANK09	0	CH2	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM11	BANK11	1	CH0	1	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM12	BANK12	1	CH0	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM15	BANK15	1	CH1	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m3-x3650m3-18slot	2557A5FB1E15	DIMM18	BANK18	1	CH2	0	ibm-x3550-m3-4254-7944-installation	guide pdf p61-67 (printed 51-57)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM03	BANK03	0	CH0	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM06	BANK06	0	CH1	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM08	BANK08	0	CH2	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM11	BANK11	1	CH0	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM14	BANK14	1	CH1	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3550m2-x3650m2-16slot	5C605064E293	DIMM16	BANK16	1	CH2	0	ibm-x3550-m2-4198-7946-installation	pdf p68-72 (printed 52-56)
+ibm-x3400m3-16slot	625A63555E86	DIMM02	BANK02	0	CH0	1	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM03	BANK03	0	CH0	0	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM06	BANK06	0	CH1	0	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM08	BANK08	0	CH2	0	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM11	BANK11	1	CH0	0	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM13	BANK13	1	CH1	1	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3400m3-16slot	625A63555E86	DIMM16	BANK16	1	CH2	0	ibm-x3400-m3-7378-7379-installation	pdf p95-104 (printed 79-88)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 1	Bank 1	0	Ch0	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 2	Bank 2	0	Ch0	1	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 4	Bank 4	0	Ch1	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 9	Bank 9	0	Ch3	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 12	Bank 12	0	Ch2	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 13	Bank 13	1	Ch0	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 21	Bank 21	1	Ch3	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3550m4-x3650m4-24slot	3280540D917C	DIMM 24	Bank 24	1	Ch2	0	ibm-x3550-m4-7914-installation-x3550	guide pdf p59-64 (printed 45-50)
+ibm-x3300m4-12slot	22505A944239	DIMM 1	Bank 1	0	0	0	ibm-x3300-m4-7382	whole page
+ibm-x3300m4-12slot	22505A944239	DIMM 2	Bank 2	0	0	1	ibm-x3300-m4-7382	whole page
+ibm-x3300m4-12slot	22505A944239	DIMM 3	Bank 3	0	1	0	ibm-x3300-m4-7382	whole page
+ibm-x3300m4-12slot	22505A944239	DIMM 4	Bank 4	0	1	1	ibm-x3300-m4-7382	whole page
+ibm-x3300m4-12slot	22505A944239	DIMM 7	Bank 7	1	0	0	ibm-x3300-m4-7382	whole page
+ibm-x3300m4-12slot	22505A944239	DIMM 10	Bank 10	1	1	1	ibm-x3300-m4-7382	whole page
+ibm-flex-x220-12slot	D09505DE40B4	DIMM 1	Node 1 Bank 1	0	A	0	ibm-x220-installation-service-guide-7906	guide pdf p590-595 (printed 582-587)
+ibm-flex-x220-12slot	D09505DE40B4	DIMM 3	Node 1 Bank 3	0	B	0	ibm-x220-installation-service-guide-7906	guide pdf p590-595 (printed 582-587)
+ibm-flex-x220-12slot	D09505DE40B4	DIMM 5	Node 1 Bank 5	0	C	0	ibm-x220-installation-service-guide-7906	guide pdf p590-595 (printed 582-587)
+ibm-flex-x220-12slot	D09505DE40B4	DIMM 6	Node 1 Bank 6	0	C	1	ibm-x220-installation-service-guide-7906	guide pdf p590-595 (printed 582-587)
+ibm-flex-x220-12slot	D09505DE40B4	DIMM 8	Node 1 Bank 8	1	F	0	ibm-x220-installation-service-guide-7906	guide pdf p590-595 (printed 582-587)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 1	Node 1 Bank 1	0	B	0	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 2	Node 1 Bank 2	0	B	1	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 4	Node 1 Bank 4	0	A	0	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 13	Node 1 Bank 13	1	C	0	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 14	Node 1 Bank 14	1	C	1	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-flex-x240-24slot	6F6DEF6E7D5A	DIMM 16	Node 1 Bank 16	1	D	0	ibm-x240-7863-8737-8738-8956	pdf p603-607 (printed 591-595)
+ibm-bladecenter-hs23-16slot	D5DD0E377016	DIMM 1	Bank 1	0	1	0	ibm-hs23-installation-user-guide-7875	pdf p24 and p32-34 (printed 14 and 22-24)
+ibm-bladecenter-hs23-16slot	D5DD0E377016	DIMM 2	Bank 16	0	1	1	ibm-hs23-installation-user-guide-7875	pdf p24 and p32-34 (printed 14 and 22-24)
+ibm-bladecenter-hs23-16slot	D5DD0E377016	DIMM 7	Bank 5	0	0	0	ibm-hs23-installation-user-guide-7875	pdf p24 and p32-34 (printed 14 and 22-24)
+ibm-bladecenter-hs23-16slot	D5DD0E377016	DIMM 9	Bank 2	1	2	0	ibm-hs23-installation-user-guide-7875	pdf p24 and p32-34 (printed 14 and 22-24)
+ibm-bladecenter-hs23-16slot	D5DD0E377016	DIMM 16	Bank 12	1	0	0	ibm-hs23-installation-user-guide-7875	pdf p24 and p32-34 (printed 14 and 22-24)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 1	Bank 1	0	2	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 3	Bank 3	0	3	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 6	Bank 6	0	1	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 8	Bank 8	0	0	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 9	Bank 9	1	2	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-idataplex-dx360m4-16slot	E15173785994	DIMM 16	Bank 16	1	0	0	ibm-dx360-m4-7912-7913-user	pdf p55-59 (printed 39-43)
+ibm-x3250m3-6slot	5E8C353CBDA1	DIMM01	BANK01	0	X	0	ibm-x3250-m3-4251-4252-4261	pdf p46-50 (printed 30-34)
+ibm-x3250m3-6slot	5E8C353CBDA1	DIMM02	BANK02	0	X	1	ibm-x3250-m3-4251-4252-4261	pdf p46-50 (printed 30-34)
+ibm-x3250m3-6slot	5E8C353CBDA1	DIMM04	BANK04	0	Y	0	ibm-x3250-m3-4251-4252-4261	pdf p46-50 (printed 30-34)
+ibm-x3250m3-6slot	5E8C353CBDA1	DIMM05	BANK05	0	Y	1	ibm-x3250-m3-4251-4252-4261	pdf p46-50 (printed 30-34)
+ibm-x3250m4-4slot	B87E2E266E18	DIMM01	BANK01	0	X	0	ibm-x3250-m4-installation-service-guide	guide pdf p59-61 (printed 45-47)
+ibm-x3250m4-4slot	B87E2E266E18	DIMM02	BANK02	0	X	1	ibm-x3250-m4-installation-service-guide	guide pdf p59-61 (printed 45-47)
+ibm-x3250m4-4slot	B87E2E266E18	DIMM03	BANK03	0	Y	0	ibm-x3250-m4-installation-service-guide	guide pdf p59-61 (printed 45-47)
+ibm-x3250m4-4slot	B87E2E266E18	DIMM04	BANK04	0	Y	1	ibm-x3250-m4-installation-service-guide	guide pdf p59-61 (printed 45-47)
+ibm-x3200m2-4slot	09068F07526E	DIMM 1	DIMM 1	-1	0	0	ibm-x3200-m2-4367-4368-installation	pdf p29-31 (printed 15-17)
+ibm-x3200m2-4slot	09068F07526E	DIMM 2	DIMM 2	-1	0	1	ibm-x3200-m2-4367-4368-installation	pdf p29-31 (printed 15-17)
+ibm-x3200m2-4slot	09068F07526E	DIMM 3	DIMM 3	-1	1	0	ibm-x3200-m2-4367-4368-installation	pdf p29-31 (printed 15-17)
+ibm-x3200m2-4slot	09068F07526E	DIMM 4	DIMM 4	-1	1	1	ibm-x3200-m2-4367-4368-installation	pdf p29-31 (printed 15-17)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 1	Bank 1	-1	0	0	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 4	Bank 1	-1	1	0	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 7	Bank 2	-1	2	0	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 10	Bank 2	-1	3	0	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 2	Bank 3	-1	0	1	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+ibm-x3650-7979-12slot	BC2D6FA78D8E	DIMM 3	Bank 5	-1	0	2	ibm-x3650-7979-user-guide	pdf p83-87 (printed 67-71)
+intel-s5000-fbd-8slot	1608517DFD01	ONBOARD DIMM_A1	Channel A	-1	A	0	intel-s5000psl-s5000xsl-technical	p29-35; pp. 29-35
+intel-s5000-fbd-8slot	1608517DFD01	ONBOARD DIMM_A2	Channel A	-1	A	1	intel-s5000psl-s5000xsl-technical	p29-35; pp. 29-35
+intel-s5000-fbd-8slot	1608517DFD01	ONBOARD DIMM_B1	Channel B	-1	B	0	intel-s5000psl-s5000xsl-technical	p29-35; pp. 29-35
+intel-s5000-fbd-8slot	1608517DFD01	ONBOARD DIMM_C2	Channel C	-1	C	1	intel-s5000psl-s5000xsl-technical	p29-35; pp. 29-35
+intel-s5000-fbd-8slot	1608517DFD01	ONBOARD DIMM_D1	Channel D	-1	D	0	intel-s5000psl-s5000xsl-technical	p29-35; pp. 29-35
+intel-s5000vsa	15AF20021F99	ONBOARD DIMM_A1	Channel A	-1	A	0	intel-s5000vsa-technical	p20-22, p61
+intel-s5000vsa	15AF20021F99	ONBOARD DIMM_A2	Channel A	-1	A	1	intel-s5000vsa-technical	p20-22, p61
+intel-s5000vsa	15AF20021F99	ONBOARD DIMM_A3	Channel A	-1	A	2	intel-s5000vsa-technical	p20-22, p61
+intel-s5000vsa	15AF20021F99	ONBOARD DIMM_B1	Channel B	-1	B	0	intel-s5000vsa-technical	p20-22, p61
+intel-s5000vsa	15AF20021F99	ONBOARD DIMM_B4	Channel B	-1	B	3	intel-s5000vsa-technical	p20-22, p61
+intel-s5000vcl	36C172C932E3	ONBOARD DIMM_A1	Channel A	-1	A	0	intel-s5000vcl-technical	p19-21
+intel-s5000vcl	36C172C932E3	ONBOARD DIMM_A2	Channel A	-1	A	1	intel-s5000vcl-technical	p19-21
+intel-s5000vcl	36C172C932E3	ONBOARD DIMM_A3	Channel A	-1	A	2	intel-s5000vcl-technical	p19-21
+intel-s5000vcl	36C172C932E3	ONBOARD DIMM_B1	Channel B	-1	B	0	intel-s5000vcl-technical	p19-21
+intel-s3210sh	2194B1F62AC7	DIMM_A1	CHAN A DIMM 1	-1	A	0	intel-e14960-009	p30-31, p38-40, p65
+intel-s3210sh	2194B1F62AC7	DIMM_A2	CHAN A DIMM 2	-1	A	1	intel-e14960-009	p30-31, p38-40, p65
+intel-s3210sh	2194B1F62AC7	DIMM_B1	CHAN B DIMM 1	-1	B	0	intel-e14960-009	p30-31, p38-40, p65
+intel-s3210sh	2194B1F62AC7	DIMM_B2	CHAN B DIMM 2	-1	B	1	intel-e14960-009	p30-31, p38-40, p65
+intel-se7501wv2	784B87202334	DIMM3A	BANK3	-1	A	2	intel-se7501wv2-technical	p24-26, p72-73, p90
+intel-se7501wv2	784B87202334	DIMM3B	BANK3	-1	B	2	intel-se7501wv2-technical	p24-26, p72-73, p90
+intel-se7501wv2	784B87202334	DIMM2A	BANK2	-1	A	1	intel-se7501wv2-technical	p24-26, p72-73, p90
+intel-se7501wv2	784B87202334	DIMM1A	BANK1	-1	A	0	intel-se7501wv2-technical	p24-26, p72-73, p90
+intel-se7501wv2	784B87202334	DIMM1B	BANK1	-1	B	0	intel-se7501wv2-technical	p24-26, p72-73, p90
+intel-s5520-12slot	256D70541E78	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5520-12slot	256D70541E78	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5520-12slot	256D70541E78	DIMM_C1	NODE 0 CHANNEL 2 DIMM 0	0	C	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5520-12slot	256D70541E78	DIMM_D1	NODE 1 CHANNEL 0 DIMM 0	1	D	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5520-12slot	256D70541E78	DIMM_F2	NODE 1 CHANNEL 2 DIMM 1	1	F	1	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5500hcv	33B5ABCD2500	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5500hcv	33B5ABCD2500	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5500hcv	33B5ABCD2500	DIMM_C2	NODE 0 CHANNEL 2 DIMM 1	0	C	1	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5500hcv	33B5ABCD2500	DIMM_D1	NODE 1 CHANNEL 0 DIMM 0	1	D	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5500hcv	33B5ABCD2500	DIMM_F1	NODE 1 CHANNEL 2 DIMM 0	1	F	0	intel-e39529-013	p41-43, p48-51; p41, p43, p49-51
+intel-s5520ur	4F14B8DE6876	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-e44031-012	p39-44
+intel-s5520ur	4F14B8DE6876	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-e44031-012	p39-44
+intel-s5520ur	4F14B8DE6876	DIMM_B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	intel-e44031-012	p39-44
+intel-s5520ur	4F14B8DE6876	DIMM_D1	NODE 1 CHANNEL 0 DIMM 0	1	D	0	intel-e44031-012	p39-44
+intel-s5520ur	4F14B8DE6876	DIMM_F2	NODE 1 CHANNEL 2 DIMM 1	1	F	1	intel-e44031-012	p39-44
+intel-s5500bc	8ED748930FC9	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-e42249-009	p40-43
+intel-s5500bc	8ED748930FC9	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-e42249-009	p40-43
+intel-s5500bc	8ED748930FC9	DIMM_B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	intel-e42249-009	p40-43
+intel-s5500bc	8ED748930FC9	DIMM_D1	NODE 1 CHANNEL 0 DIMM 0	1	D	0	intel-e42249-009	p40-43
+intel-s5500bc	8ED748930FC9	DIMM_E2	NODE 1 CHANNEL 1 DIMM 1	1	E	1	intel-e42249-009	p40-43
+intel-s3420gp	7679BBF010DB	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-e65697-010	p33-36
+intel-s3420gp	7679BBF010DB	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-e65697-010	p33-36
+intel-s3420gp	7679BBF010DB	DIMM_A3	NODE 0 CHANNEL 0 DIMM 2	0	A	2	intel-e65697-010	p33-36
+intel-s3420gp	7679BBF010DB	DIMM_B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	intel-e65697-010	p33-36
+intel-s3420gp	7679BBF010DB	DIMM_B3	NODE 0 CHANNEL 1 DIMM 2	0	B	2	intel-e65697-010	p33-36
+intel-s1200bt	39D9E6E6CB17	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-s1200bt-technical	p30-34
+intel-s1200bt	39D9E6E6CB17	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-s1200bt-technical	p30-34
+intel-s1200bt	39D9E6E6CB17	DIMM_B2	NODE 0 CHANNEL 1 DIMM 1	0	B	1	intel-s1200bt-technical	p30-34
+intel-s1200bt	39D9E6E6CB17	DIMM_B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	intel-s1200bt-technical	p30-34
+intel-s1200v3rp	0E10C25CF396	ChannelA-DIMM1	BANK 1	0	A	0	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	0E10C25CF396	ChannelA-DIMM2	BANK 0	0	A	1	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	0E10C25CF396	ChannelB-DIMM1	BANK 3	0	B	0	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	0E10C25CF396	ChannelB-DIMM2	BANK 2	0	B	1	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	832EB05B058D	DIMM A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	832EB05B058D	DIMM A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	832EB05B058D	DIMM B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	intel-s1200v3rp-technical	p29-33
+intel-s1200v3rp	832EB05B058D	DIMM B2	NODE 0 CHANNEL 1 DIMM 1	0	B	1	intel-s1200v3rp-technical	p29-33
+intel-s1200sp	330813FC534A	DIMM_A1	NODE 0 CHANNEL 0 DIMM 1	0	A	0	intel-s1200sp-technical	p32-36
+intel-s1200sp	330813FC534A	DIMM_A2	NODE 0 CHANNEL 0 DIMM 2	0	A	1	intel-s1200sp-technical	p32-36
+intel-s1200sp	330813FC534A	DIMM_B1	NODE 0 CHANNEL 1 DIMM 1	0	B	0	intel-s1200sp-technical	p32-36
+intel-s1200sp	330813FC534A	DIMM_B2	NODE 0 CHANNEL 1 DIMM 2	0	B	1	intel-s1200sp-technical	p32-36
+intel-s2600gz	4B0292812B94	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-s2600gz-technical	p35-39
+intel-s2600gz	4B0292812B94	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-s2600gz-technical	p35-39
+intel-s2600gz	4B0292812B94	DIMM_A3	NODE 0 CHANNEL 0 DIMM 2	0	A	2	intel-s2600gz-technical	p35-39
+intel-s2600gz	4B0292812B94	DIMM_D1	NODE 0 CHANNEL 3 DIMM 0	0	D	0	intel-s2600gz-technical	p35-39
+intel-s2600gz	4B0292812B94	DIMM_E1	NODE 1 CHANNEL 0 DIMM 0	1	E	0	intel-s2600gz-technical	p35-39
+intel-s2600cp-w2600cr	5F463C4DAE95	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-s2600cp-p4000cp-technical	p49-53
+intel-s2600cp-w2600cr	5F463C4DAE95	DIMM_A2	NODE 0 CHANNEL 0 DIMM 1	0	A	1	intel-s2600cp-p4000cp-technical	p49-53
+intel-s2600cp-w2600cr	5F463C4DAE95	DIMM_D1	NODE 0 CHANNEL 3 DIMM 0	0	D	0	intel-s2600cp-p4000cp-technical	p49-53
+intel-s2600cp-w2600cr	5F463C4DAE95	DIMM_E1	NODE 1 CHANNEL 0 DIMM 0	1	E	0	intel-s2600cp-p4000cp-technical	p49-53
+intel-s2600cp-w2600cr	5F463C4DAE95	DIMM_H2	NODE 1 CHANNEL 3 DIMM 1	1	H	1	intel-s2600cp-p4000cp-technical	p49-53
+intel-s4600lh2	500D53D4644B	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	intel-s4600lh2-t2-technical	p37-40
+intel-s4600lh2	500D53D4644B	DIMM_E2	NODE 1 CHANNEL 0 DIMM 1	1	E	1	intel-s4600lh2-t2-technical	p37-40
+intel-s4600lh2	500D53D4644B	DIMM_J1	NODE 2 CHANNEL 0 DIMM 0	2	J	0	intel-s4600lh2-t2-technical	p37-40
+intel-s4600lh2	500D53D4644B	DIMM_P1	NODE 3 CHANNEL 1 DIMM 0	3	P	0	intel-s4600lh2-t2-technical	p37-40
+intel-s4600lh2	500D53D4644B	DIMM_T3	NODE 3 CHANNEL 3 DIMM 2	3	T	2	intel-s4600lh2-t2-technical	p37-40
+intel-s2600wt	1FC1FCA28BFB	DIMM_A1	NODE 1	0	A	0	intel-s2600wt-technical-tps	p38-41, p44
+intel-s2600wt	1FC1FCA28BFB	DIMM_A2	NODE 1	0	A	1	intel-s2600wt-technical-tps	p38-41, p44
+intel-s2600wt	1FC1FCA28BFB	DIMM_D3	NODE 1	0	D	2	intel-s2600wt-technical-tps	p38-41, p44
+intel-s2600wt	1FC1FCA28BFB	DIMM_E1	NODE 2	1	E	0	intel-s2600wt-technical-tps	p38-41, p44
+intel-s2600wt	1FC1FCA28BFB	DIMM_H3	NODE 2	1	H	2	intel-s2600wt-technical-tps	p38-41, p44
+intel-s2600cw	B1EBBADF8ACF	DIMM_A1	NODE 1	0	A	0	intel-s2600cw-technical	p38-40, p43
+intel-s2600cw	B1EBBADF8ACF	DIMM_A2	NODE 1	0	A	1	intel-s2600cw-technical	p38-40, p43
+intel-s2600cw	B1EBBADF8ACF	DIMM_D1	NODE 1	0	D	0	intel-s2600cw-technical	p38-40, p43
+intel-s2600cw	B1EBBADF8ACF	DIMM_E1	NODE 2	1	E	0	intel-s2600cw-technical	p38-40, p43
+intel-s2600cw	B1EBBADF8ACF	DIMM_H2	NODE 2	1	H	1	intel-s2600cw-technical	p38-40, p43
+intel-s2600wf	1A8F025340D8	CPU1_DIMM_A1	NODE 1	0	A	0	intel-s2600wf-technical	p54-57, p137
+intel-s2600wf	1A8F025340D8	CPU1_DIMM_A2	NODE 1	0	A	1	intel-s2600wf-technical	p54-57, p137
+intel-s2600wf	1A8F025340D8	CPU1_DIMM_D1	NODE 1	0	D	0	intel-s2600wf-technical	p54-57, p137
+intel-s2600wf	1A8F025340D8	CPU2_DIMM_A1	NODE 2	1	A	0	intel-s2600wf-technical	p54-57, p137
+intel-s2600wf	1A8F025340D8	CPU2_DIMM_F2	NODE 2	1	F	1	intel-s2600wf-technical	p54-57, p137
+intel-s2600st	46A6757EC740	CPU1_DIMM_A1	NODE 1	0	A	0	intel-s2600st-technical	p47-50
+intel-s2600st	46A6757EC740	CPU1_DIMM_A2	NODE 1	0	A	1	intel-s2600st-technical	p47-50
+intel-s2600st	46A6757EC740	CPU1_DIMM_B1	NODE 1	0	B	0	intel-s2600st-technical	p47-50
+intel-s2600st	46A6757EC740	CPU1_DIMM_D2	NODE 1	0	D	1	intel-s2600st-technical	p47-50
+intel-s2600st	46A6757EC740	CPU2_DIMM_F1	NODE 2	1	F	0	intel-s2600st-technical	p47-50
+intel-m50cyp	D50FC48A745B	CPU0_DIMM_A1	NODE 0	0	A	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-m50cyp	D50FC48A745B	CPU0_DIMM_A2	NODE 0	0	A	1	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-m50cyp	D50FC48A745B	CPU0_DIMM_C1	NODE 1	0	C	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-m50cyp	D50FC48A745B	CPU0_DIMM_H2	NODE 3	0	H	1	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-m50cyp	D50FC48A745B	CPU1_DIMM_E1	NODE 6	1	E	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	0C134C2C2098	CPU0_DIMM_A0	NODE 0	0	A	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	0C134C2C2098	CPU0_DIMM_A1	NODE 0	0	A	1	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	0C134C2C2098	CPU0_DIMM_C0	NODE 1	0	C	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	0C134C2C2098	CPU1_DIMM_H1	NODE 7	1	H	1	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	4290A93BC0B0	CPU0_DIMM_A1	NODE 0	0	A	0	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-whitley-ref	4290A93BC0B0	CPU0_DIMM_A2	NODE 0	0	A	1	intel-m50cyp2sb-technical	p40, p45-48, p122; p46, p48
+intel-m70klp	3735307E5C03	CPU0_C0D0	NODE 0	0	0.0	0	intel-m70klp-technical	p34, p38-40
+intel-m70klp	3735307E5C03	CPU0_C0D1	NODE 0	0	0.0	1	intel-m70klp-technical	p34, p38-40
+intel-m70klp	3735307E5C03	CPU0_C3D0	NODE 1	0	1.3	0	intel-m70klp-technical	p34, p38-40
+intel-m70klp	3735307E5C03	CPU1_C5D1	NODE 5	1	1.5	1	intel-m70klp-technical	p34, p38-40
+intel-m70klp	3735307E5C03	CPU3_C2D0	NODE 12	3	0.2	0	intel-m70klp-technical	p34, p38-40
+intel-eaglestream-ref	356135E81941	CPU0_DIMM_A1	NODE 0	0	A	0	intel-m50fcp2sbstd-technical	p38, p40-41
+intel-eaglestream-ref	356135E81941	CPU0_DIMM_A2	NODE 0	0	A	1	intel-m50fcp2sbstd-technical	p38, p40-41
+intel-eaglestream-ref	356135E81941	CPU0_DIMM_C1	NODE 1	0	C	0	intel-m50fcp2sbstd-technical	p38, p40-41
+intel-eaglestream-ref	356135E81941	CPU1_DIMM_A1	NODE 4	1	A	0	intel-m50fcp2sbstd-technical	p38, p40-41
+intel-eaglestream-ref	356135E81941	CPU1_DIMM_H2	NODE 7	1	H	1	intel-m50fcp2sbstd-technical	p38, p40-41
+intel-birchstream-ref	1F03C9158405	CPU0_DIMM_A	BANK 0	0	A	0	intel-no-document-of	line 11
+intel-birchstream-ref	1F03C9158405	CPU0_DIMM_L	BANK 11	0	L	0	intel-no-document-of	line 11
+intel-birchstream-ref	1F03C9158405	CPU1_DIMM_A	BANK 12	1	A	0	intel-no-document-of	line 11
+intel-birchstream-ref	1F03C9158405	CPU1_DIMM_F	BANK 17	1	F	0	intel-no-document-of	line 11
+amd-ethanol-x	475A2B0CCAB4	DIMM 0	P0 CHANNEL A	0	A	0	amd-population-7003	p6-20
+amd-ethanol-x	475A2B0CCAB4	DIMM 1	P0 CHANNEL A	0	A	1	amd-population-7003	p6-20
+amd-ethanol-x	475A2B0CCAB4	DIMM 1	P0 CHANNEL C	0	C	1	amd-population-7003	p6-20
+amd-ethanol-x	475A2B0CCAB4	DIMM 0	P1 CHANNEL H	1	H	0	amd-population-7003	p6-20
+amd-volcano	59C634EF9C63	DIMM 0	P0 CHANNEL A	0	A	0	amd-9004-population	p5-12
+amd-volcano	59C634EF9C63	DIMM 0	P0 CHANNEL G	0	G	0	amd-9004-population	p5-12
+amd-volcano	59C634EF9C63	DIMM 0	P0 CHANNEL L	0	L	0	amd-9004-population	p5-12
+amd-volcano	59C634EF9C63	DIMM 0	P1 CHANNEL C	1	C	0	amd-9004-population	p5-12
+asus-p8b-m	8340D78F7FD7	DIMM_A2	BANK 0	0	A	1	asus-rs100-e7-pi2-user-guide	p28, p79
+asus-p8b-m	8340D78F7FD7	DIMM_A1	BANK 1	0	A	0	asus-rs100-e7-pi2-user-guide	p28, p79
+asus-p8b-m	8340D78F7FD7	DIMM_B2	BANK 2	0	B	1	asus-rs100-e7-pi2-user-guide	p28, p79
+asus-p8b-m	8340D78F7FD7	DIMM_B1	BANK 3	0	B	0	asus-rs100-e7-pi2-user-guide	p28, p79
+asus-p8b-x-e	F39A0766047F	DIMM_A1	BANK 0	0	A	0	asus-ts300-e7-ps4-user-guide	p29
+asus-p8b-x-e	F39A0766047F	DIMM_A2	BANK 1	0	A	1	asus-ts300-e7-ps4-user-guide	p29
+asus-p8b-x-e	F39A0766047F	DIMM_B1	BANK 2	0	B	0	asus-ts300-e7-ps4-user-guide	p29
+asus-p8b-x-e	F39A0766047F	DIMM_B2	BANK 3	0	B	1	asus-ts300-e7-ps4-user-guide	p29
+asus-p9d-4slot	56716627F689	DIMM_A1	BANK 0	0	A	0	asus-p9d-user-guide	p34
+asus-p9d-4slot	56716627F689	DIMM_A2	BANK 1	0	A	1	asus-p9d-user-guide	p34
+asus-p9d-4slot	56716627F689	DIMM_B1	BANK 2	0	B	0	asus-p9d-user-guide	p34
+asus-p9d-4slot	56716627F689	DIMM_B2	BANK 3	0	B	1	asus-p9d-user-guide	p34
+asus-p12r	85644FBAE9C3	DIMM_A1	BANK 0	0	A	0	asus-e28203	p31
+asus-p12r	85644FBAE9C3	DIMM_A2	BANK 1	0	A	1	asus-e28203	p31
+asus-p12r	85644FBAE9C3	DIMM_B1	BANK 2	0	B	0	asus-e28203	p31
+asus-p12r	85644FBAE9C3	DIMM_B2	BANK 3	0	B	1	asus-e28203	p31
+asus-e3-2slot	5316A66710E3	DIMM_A1	BANK 0	0	A	0	asus-p9d-user-guide-2	p33
+asus-e3-2slot	5316A66710E3	DIMM_B1	BANK 2	0	B	0	asus-p9d-user-guide-2	p33
+asus-z9-8slot	38D0E7604F44	DIMM_A1	DIMM_A1	0	A	0	asus-z9pa-d8-user-guide	p12, p33-34
+asus-z9-8slot	38D0E7604F44	DIMM_B1	DIMM_B1	0	B	0	asus-z9pa-d8-user-guide	p12, p33-34
+asus-z9-8slot	38D0E7604F44	DIMM_D1	DIMM_D1	0	D	0	asus-z9pa-d8-user-guide	p12, p33-34
+asus-z9-8slot	38D0E7604F44	DIMM_E1	DIMM_E1	1	E	0	asus-z9pa-d8-user-guide	p12, p33-34
+asus-z9-8slot	38D0E7604F44	DIMM_H1	DIMM_H1	1	H	0	asus-z9pa-d8-user-guide	p12, p33-34
+asus-z10-8slot	11881C8190C9	DIMM_A1	NODE 1	0	A	0	asus-e13692	p13, p31-32
+asus-z10-8slot	11881C8190C9	DIMM_B1	NODE 1	0	B	0	asus-e13692	p13, p31-32
+asus-z10-8slot	11881C8190C9	DIMM_E1	NODE 2	1	E	0	asus-e13692	p13, p31-32
+asus-z10-8slot	11881C8190C9	DIMM_F1	NODE 2	1	F	0	asus-e13692	p13, p31-32
+asus-z9-16slot	7B1CCCBFE2D9	DIMM_A1	DIMM_A1	0	A	0	asus-z9pe-d16-10g-user-guide	p34-35
+asus-z9-16slot	7B1CCCBFE2D9	DIMM_A2	DIMM_A2	0	A	1	asus-z9pe-d16-10g-user-guide	p34-35
+asus-z9-16slot	7B1CCCBFE2D9	DIMM_D1	DIMM_D1	0	D	0	asus-z9pe-d16-10g-user-guide	p34-35
+asus-z9-16slot	7B1CCCBFE2D9	DIMM_E1	DIMM_E1	1	E	0	asus-z9pe-d16-10g-user-guide	p34-35
+asus-z9-16slot	7B1CCCBFE2D9	DIMM_H2	DIMM_H2	1	H	1	asus-z9pe-d16-10g-user-guide	p34-35
+asus-z10-16slot	9FCE74D7C651	DIMM_A1	NODE 1	0	A	0	asus-e13683	p11, p32-33
+asus-z10-16slot	9FCE74D7C651	DIMM_A2	NODE 1	0	A	1	asus-e13683	p11, p32-33
+asus-z10-16slot	9FCE74D7C651	DIMM_C1	NODE 2	0	C	0	asus-e13683	p11, p32-33
+asus-z10-16slot	9FCE74D7C651	DIMM_E1	NODE 3	1	E	0	asus-e13683	p11, p32-33
+asus-z10-16slot	9FCE74D7C651	DIMM_G2	NODE 4	1	G	1	asus-e13683	p11, p32-33
+asus-z9pr-d12	FFF77E8C316C	DIMM_A1	DIMM_A1	0	A	0	asus-rs700-x7-ps4-user-guide	p13, p27-28
+asus-z9pr-d12	FFF77E8C316C	DIMM_A2	DIMM_A2	0	A	1	asus-rs700-x7-ps4-user-guide	p13, p27-28
+asus-z9pr-d12	FFF77E8C316C	DIMM_D2	DIMM_D2	0	D	1	asus-rs700-x7-ps4-user-guide	p13, p27-28
+asus-z9pr-d12	FFF77E8C316C	DIMM_E1	DIMM_E1	1	E	0	asus-rs700-x7-ps4-user-guide	p13, p27-28
+asus-z9pr-d12	FFF77E8C316C	DIMM_H1	DIMM_H1	1	H	0	asus-rs700-x7-ps4-user-guide	p13, p27-28
+asus-z9na-d6	3F980E2FFD61	DIMM_A1	DIMM_A1	0	A	0	asus-z9na-d6-user-manual	p12, p33-34, p79
+asus-z9na-d6	3F980E2FFD61	DIMM_B1	DIMM_B1	0	B	0	asus-z9na-d6-user-manual	p12, p33-34, p79
+asus-z9na-d6	3F980E2FFD61	DIMM_C1	DIMM_C1	0	C	0	asus-z9na-d6-user-manual	p12, p33-34, p79
+asus-z9na-d6	3F980E2FFD61	DIMM_D1	DIMM_D1	1	D	0	asus-z9na-d6-user-manual	p12, p33-34, p79
+asus-wsc621e-sage	501AB4AFC716	DIMM_A1	NODE 1	0	A	0	asus-e16279	p10, p21-22
+asus-wsc621e-sage	501AB4AFC716	DIMM_D1	NODE 1	0	D	0	asus-e16279	p10, p21-22
+asus-wsc621e-sage	501AB4AFC716	DIMM_F1	NODE 1	0	F	0	asus-e16279	p10, p21-22
+asus-wsc621e-sage	501AB4AFC716	DIMM_G1	NODE 2	1	G	0	asus-e16279	p10, p21-22
+asus-wsc621e-sage	501AB4AFC716	DIMM_M1	NODE 2	1	M	0	asus-e16279	p10, p21-22
+asus-z11ph-d12	5DCDC5F18084	DIMM_A1	NODE 1	0	A	0	asus-e16292	p16, p31
+asus-z11ph-d12	5DCDC5F18084	DIMM_B1	NODE 1	0	B	0	asus-e16292	p16, p31
+asus-z11ph-d12	5DCDC5F18084	DIMM_D1	NODE 2	0	D	0	asus-e16292	p16, p31
+asus-z11ph-d12	5DCDC5F18084	DIMM_G1	NODE 3	1	G	0	asus-e16292	p16, p31
+asus-z11ph-d12	5DCDC5F18084	DIMM_K1	NODE 4	1	K	0	asus-e16292	p16, p31
+asus-z11pg-d16	E6BBA8966F48	DIMM_A1	NODE 1	0	A	0	asus-e16560	p14, p37-38
+asus-z11pg-d16	E6BBA8966F48	DIMM_A2	NODE 1	0	A	1	asus-e16560	p14, p37-38
+asus-z11pg-d16	E6BBA8966F48	DIMM_B1	NODE 1	0	B	0	asus-e16560	p14, p37-38
+asus-z11pg-d16	E6BBA8966F48	DIMM_D2	NODE 2	0	D	1	asus-e16560	p14, p37-38
+asus-z11pg-d16	E6BBA8966F48	DIMM_G1	NODE 3	1	G	0	asus-e16560	p14, p37-38
+asus-z11pg-d16	E6BBA8966F48	DIMM_K2	NODE 4	1	K	1	asus-e16560	p14, p37-38
+asus-z11pg-d24	05733798C837	DIMM_A1	NODE 1	0	A	0	asus-e21686	p14, p31-33
+asus-z11pg-d24	05733798C837	DIMM_A2	NODE 1	0	A	1	asus-e21686	p14, p31-33
+asus-z11pg-d24	05733798C837	DIMM_D1	NODE 2	0	D	0	asus-e21686	p14, p31-33
+asus-z11pg-d24	05733798C837	DIMM_G1	NODE 3	1	G	0	asus-e21686	p14, p31-33
+asus-z11pg-d24	05733798C837	DIMM_K2	NODE 4	1	K	1	asus-e21686	p14, p31-33
+asus-prows-c621-64l	A1C444FAB774	DIMM_A1	NODE 1	0	A	0	asus-e16276	p19-20
+asus-prows-c621-64l	A1C444FAB774	DIMM_A2	NODE 1	0	A	1	asus-e16276	p19-20
+asus-prows-c621-64l	A1C444FAB774	DIMM_D1	NODE 1	0	D	0	asus-e16276	p19-20
+asus-prows-c621-64l	A1C444FAB774	DIMM_F2	NODE 1	0	F	1	asus-e16276	p19-20
+asus-krpg-u8	AA0745354901	DIMM_A1	NODE 1	0	A	0	asus-e21771	p13, p31
+asus-krpg-u8	AA0745354901	DIMM_C1	NODE 1	0	C	0	asus-e21771	p13, p31
+asus-krpg-u8	AA0745354901	DIMM_D1	NODE 1	0	D	0	asus-e21771	p13, p31
+asus-krpg-u8	AA0745354901	DIMM_H1	NODE 1	0	H	0	asus-e21771	p13, p31
+asus-k14pp-d24	6002D3D7ADE4	CPU1_DIMM_A1	P0 CHANNEL A	0	A	0	asus-e28170	p14, p46-48
+asus-k14pp-d24	6002D3D7ADE4	CPU1_DIMM_G1	P0 CHANNEL G	0	G	0	asus-e28170	p14, p46-48
+asus-k14pp-d24	6002D3D7ADE4	CPU1_DIMM_L1	P0 CHANNEL L	0	L	0	asus-e28170	p14, p46-48
+asus-k14pp-d24	6002D3D7ADE4	CPU2_DIMM_A1	P1 CHANNEL A	1	A	0	asus-e28170	p14, p46-48
+asus-k14pp-d24	6002D3D7ADE4	CPU2_DIMM_I1	P1 CHANNEL I	1	I	0	asus-e28170	p14, p46-48
+lenovo-thinkstation-p920	48C5B5FA7A49	CPU1_DIMM_3	NODE 1	0		0	lenovo-p920-p720	p.118
+lenovo-thinkstation-p920	48C5B5FA7A49	CPU1_DIMM_7	NODE 1	0		1	lenovo-p920-p720	p.118
+lenovo-thinkstation-p920	48C5B5FA7A49	CPU1_DIMM_5	NODE 1	0		0	lenovo-p920-p720	p.118
+lenovo-thinkstation-p920	48C5B5FA7A49	CPU1_DIMM_4	NODE 1	0		0	lenovo-p920-p720	p.118
+lenovo-thinkstation-p920	48C5B5FA7A49	CPU2_DIMM_3	NODE 2	1		0	lenovo-p920-p720	p.118
+lenovo-thinkstation-p720	41BFB52F3B1A	CPU1_DIMM_3	NODE 1	0		0	lenovo-p920-p720	pp.3-6; pp.7-8
+lenovo-thinkstation-p720	41BFB52F3B1A	CPU1_DIMM_5	NODE 1	0		0	lenovo-p920-p720	pp.3-6; pp.7-8
+lenovo-thinkstation-p720	41BFB52F3B1A	CPU2_DIMM_3	NODE 2	1		0	lenovo-p920-p720	pp.3-6; pp.7-8
+lenovo-thinkstation-p720	41BFB52F3B1A	CPU2_DIMM_5	NODE 2	1		0	lenovo-p920-p720	pp.3-6; pp.7-8
+lenovo-thinksystem-sr590-sr570-16slot	0610B26F3970	DIMM 3	CPU 1	0	0.0	0	lenovo-sr590-7x98-7x99-installation-installation	whole topics
+lenovo-thinksystem-sr590-sr570-16slot	0610B26F3970	DIMM 4	CPU 1	0	0.0	1	lenovo-sr590-7x98-7x99-installation-installation	whole topics
+lenovo-thinksystem-sr590-sr570-16slot	0610B26F3970	DIMM 6	CPU 1	0	1.0	0	lenovo-sr590-7x98-7x99-installation-installation	whole topics
+lenovo-thinksystem-sr590-sr570-16slot	0610B26F3970	DIMM 5	CPU 1	0	1.0	1	lenovo-sr590-7x98-7x99-installation-installation	whole topics
+lenovo-thinksystem-sr590-sr570-16slot	0610B26F3970	DIMM 11	CPU 2	1	0.0	0	lenovo-sr590-7x98-7x99-installation-installation	whole topics
+lenovo-thinksystem-sr650-sr630-24slot	447F1CAA9701	DIMM 5	CPU 1	0	0.0	0	lenovo-sr650-7x05-7x06-installation	whole topics
+lenovo-thinksystem-sr650-sr630-24slot	447F1CAA9701	DIMM 6	CPU 1	0	0.0	1	lenovo-sr650-7x05-7x06-installation	whole topics
+lenovo-thinksystem-sr650-sr630-24slot	447F1CAA9701	DIMM 8	CPU 1	0	1.0	0	lenovo-sr650-7x05-7x06-installation	whole topics
+lenovo-thinksystem-sr650-sr630-24slot	447F1CAA9701	DIMM 7	CPU 1	0	1.0	1	lenovo-sr650-7x05-7x06-installation	whole topics
+lenovo-thinksystem-sr650-sr630-24slot	447F1CAA9701	DIMM 17	CPU 2	1	0.0	0	lenovo-sr650-7x05-7x06-installation	whole topics
+lenovo-thinksystem-sr530-12slot	16717DADAA79	DIMM 3	CPU 1	0		0	lenovo-sr530-7x07-7x08-installation	whole topic
+lenovo-thinksystem-sr530-12slot	16717DADAA79	DIMM 2	CPU 1	0		0	lenovo-sr530-7x07-7x08-installation	whole topic
+lenovo-thinksystem-sr530-12slot	16717DADAA79	DIMM 4	CPU 1	0		0	lenovo-sr530-7x07-7x08-installation	whole topic
+lenovo-thinksystem-sr530-12slot	16717DADAA79	DIMM 5	CPU 1	0		0	lenovo-sr530-7x07-7x08-installation	whole topic
+lenovo-thinksystem-sr530-12slot	16717DADAA79	DIMM 9	CPU 2	1		0	lenovo-sr530-7x07-7x08-installation	whole topic
+lenovo-thinksystem-sr650v2-sr630v2-32slot	7AC016764E14	DIMM 3	CPU 1	0	A	0	lenovo-sr650-v2-installation	whole topics
+lenovo-thinksystem-sr650v2-sr630v2-32slot	7AC016764E14	DIMM 4	CPU 1	0	A	1	lenovo-sr650-v2-installation	whole topics
+lenovo-thinksystem-sr650v2-sr630v2-32slot	7AC016764E14	DIMM 1	CPU 1	0	B	0	lenovo-sr650-v2-installation	whole topics
+lenovo-thinksystem-sr650v2-sr630v2-32slot	7AC016764E14	DIMM 14	CPU 1	0	E	0	lenovo-sr650-v2-installation	whole topics
+lenovo-thinksystem-sr650v2-sr630v2-32slot	7AC016764E14	DIMM 19	CPU 2	1	A	0	lenovo-sr650-v2-installation	whole topics
+lenovo-thinksystem-st650v2-32slot	038AE9A4AA3B	DIMM 14	CPU 1	0	A	0	lenovo-st650-v2-technical	whole topics
+lenovo-thinksystem-st650v2-32slot	038AE9A4AA3B	DIMM 13	CPU 1	0	A	1	lenovo-st650-v2-technical	whole topics
+lenovo-thinksystem-st650v2-32slot	038AE9A4AA3B	DIMM 16	CPU 1	0	B	0	lenovo-st650-v2-technical	whole topics
+lenovo-thinksystem-st650v2-32slot	038AE9A4AA3B	DIMM 3	CPU 1	0	E	0	lenovo-st650-v2-technical	whole topics
+lenovo-thinksystem-st650v2-32slot	038AE9A4AA3B	DIMM 19	CPU 2	1	A	0	lenovo-st650-v2-technical	whole topics
+lenovo-thinksystem-sr645-32slot	D770320101E1	DIMM 10	CPU 1	0	A	0	lenovo-sr645-installation	whole topics and three figures
+lenovo-thinksystem-sr645-32slot	D770320101E1	DIMM 9	CPU 1	0	A	1	lenovo-sr645-installation	whole topics and three figures
+lenovo-thinksystem-sr645-32slot	D770320101E1	DIMM 14	CPU 1	0	C	0	lenovo-sr645-installation	whole topics and three figures
+lenovo-thinksystem-sr645-32slot	D770320101E1	DIMM 1	CPU 1	0	H	0	lenovo-sr645-installation	whole topics and three figures
+lenovo-thinksystem-sr645-32slot	D770320101E1	DIMM 26	CPU 2	1	A	0	lenovo-sr645-installation	whole topics and three figures
+lenovo-thinksystem-sr950v3-128slot	80C0A7FFD0E3	DIMM A1	Primary Main Board/CPU 0	0	A	0	lenovo-sr950-v3-installation-installation	whole topics and two figures
+lenovo-thinksystem-sr950v3-128slot	80C0A7FFD0E3	DIMM A2	Primary Main Board/CPU 0	0	A	1	lenovo-sr950-v3-installation-installation	whole topics and two figures
+lenovo-thinksystem-sr950v3-128slot	80C0A7FFD0E3	DIMM J1	Primary Main Board/CPU 2	2	J	0	lenovo-sr950-v3-installation-installation	whole topics and two figures
+lenovo-thinksystem-sr950v3-128slot	80C0A7FFD0E3	DIMM A1	Secondary CPU Board/CPU 4	4	A	0	lenovo-sr950-v3-installation-installation	whole topics and two figures
+lenovo-thinksystem-sr950v3-128slot	80C0A7FFD0E3	DIMM T2	Primary CPU Board/CPU 7	7	T	1	lenovo-sr950-v3-installation-installation	whole topics and two figures
+lenovo-thinksystem-sn550-24slot	8F8D27788C8D	DIMM 5	CPU 1	0	0.0	0	lenovo-sn550	whole topics
+lenovo-thinksystem-sn550-24slot	8F8D27788C8D	DIMM 8	CPU 1	0	1.0	0	lenovo-sn550	whole topics
+lenovo-thinksystem-sn550-24slot	8F8D27788C8D	DIMM 20	CPU 2	1	0.0	0	lenovo-sn550	whole topics
+lenovo-thinksystem-sn550-24slot	8F8D27788C8D	DIMM 19	CPU 2	1	0.0	1	lenovo-sn550	whole topics
+lenovo-thinksystem-sn550-24slot	8F8D27788C8D	DIMM 13	CPU 2	1	1.2	0	lenovo-sn550	whole topics
+lenovo-systemx-m5-24slot	A1A7BFF4B5C7	Dimm 1	CPU 1	0	Ch0	0	lenovo-x3650-m5-5462-installation-service	whole topics, figure xinyi044b.jpg
+lenovo-systemx-m5-24slot	A1A7BFF4B5C7	Dimm 4	CPU 1	0	Ch1	0	lenovo-x3650-m5-5462-installation-service	whole topics, figure xinyi044b.jpg
+lenovo-systemx-m5-24slot	A1A7BFF4B5C7	Dimm 9	CPU 1	0	Ch3	0	lenovo-x3650-m5-5462-installation-service	whole topics, figure xinyi044b.jpg
+lenovo-systemx-m5-24slot	A1A7BFF4B5C7	Dimm 12	CPU 1	0	Ch2	0	lenovo-x3650-m5-5462-installation-service	whole topics, figure xinyi044b.jpg
+lenovo-systemx-m5-24slot	A1A7BFF4B5C7	Dimm 13	CPU 2	1	Ch0	0	lenovo-x3650-m5-5462-installation-service	whole topics, figure xinyi044b.jpg
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 4	CPU 1	0	A	0	lenovo-x240-m5-9532-2951-installation	whole topic
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 9	CPU 1	0	C	0	lenovo-x240-m5-9532-2951-installation	whole topic
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 1	CPU 1	0	B	0	lenovo-x240-m5-9532-2951-installation	whole topic
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 12	CPU 1	0	D	0	lenovo-x240-m5-9532-2951-installation	whole topic
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 16	CPU 2	1	C	0	lenovo-x240-m5-9532-2951-installation	whole topic
+lenovo-flex-x240m5-24slot	CC76B4AA67C4	Dimm 21	CPU 2	1	A	0	lenovo-x240-m5-9532-2951-installation	whole topic
+sun-x4170-x4270-m2	82C4B5F145E4	D2	/SYS/MB/P0	0	0	0	oracle-e22369-02	p. 4-7
+sun-x4170-x4270-m2	82C4B5F145E4	D1	/SYS/MB/P0	0	0	1	oracle-e22369-02	p. 4-7
+sun-x4170-x4270-m2	82C4B5F145E4	D5	/SYS/MB/P0	0	1	0	oracle-e22369-02	p. 4-7
+sun-x4170-x4270-m2	82C4B5F145E4	D8	/SYS/MB/P1	1	2	0	oracle-e22369-02	p. 4-7
+sun-x4170-x4270-m2	82C4B5F145E4	D6	/SYS/MB/P1	1	2	2	oracle-e22369-02	p. 4-7
+sun-x4170-x4270-m3	3AEA7677F53C	D7	/SYS/MB/P0	0	A	0	oracle-e22313-13	printed p. 60
+sun-x4170-x4270-m3	3AEA7677F53C	D6	/SYS/MB/P0	0	A	1	oracle-e22313-13	printed p. 60
+sun-x4170-x4270-m3	3AEA7677F53C	D5	/SYS/MB/P0	0	B	0	oracle-e22313-13	printed p. 60
+sun-x4170-x4270-m3	3AEA7677F53C	D0	/SYS/MB/P0	0	C	0	oracle-e22313-13	printed p. 60
+sun-x4170-x4270-m3	3AEA7677F53C	D2	/SYS/MB/P1	1	D	0	oracle-e22313-13	printed p. 60
+sun-x4-2	6CCAD470BB47	D7	/SYS/MB/P0	0	A	0	oracle-e38041-07	printed p. 64
+sun-x4-2	6CCAD470BB47	D4	/SYS/MB/P0	0	B	1	oracle-e38041-07	printed p. 64
+sun-x4-2	6CCAD470BB47	D0	/SYS/MB/P0	0	C	0	oracle-e38041-07	printed p. 64
+sun-x4-2	6CCAD470BB47	D3	/SYS/MB/P0	0	D	1	oracle-e38041-07	printed p. 64
+sun-x4-2	6CCAD470BB47	D0	/SYS/MB/P1	1	C	0	oracle-e38041-07	printed p. 64
+sun-x5-2	B6860ED621C9	D11	/SYS/MB/P0	0	A	0	oracle-e48320-10	pp. 96
+sun-x5-2	B6860ED621C9	D8	/SYS/MB/P0	0	B	0	oracle-e48320-10	pp. 96
+sun-x5-2	B6860ED621C9	D6	/SYS/MB/P0	0	B	2	oracle-e48320-10	pp. 96
+sun-x5-2	B6860ED621C9	D0	/SYS/MB/P0	0	C	0	oracle-e48320-10	pp. 96
+sun-x5-2	B6860ED621C9	D3	/SYS/MB/P1	1	D	0	oracle-e48320-10	pp. 96
+fujitsu-d2619-18slot	C75C8D396A0B	DIMM-1A	n/a	0	A	0	fujitsu-d2619-tx300-s5-technical-manual	p. 18
+fujitsu-d2619-18slot	C75C8D396A0B	DIMM-2A	n/a	0	A	1	fujitsu-d2619-tx300-s5-technical-manual	p. 18
+fujitsu-d2619-18slot	C75C8D396A0B	DIMM-3A	n/a	0	A	2	fujitsu-d2619-tx300-s5-technical-manual	p. 18
+fujitsu-d2619-18slot	C75C8D396A0B	DIMM-1C	n/a	0	C	0	fujitsu-d2619-tx300-s5-technical-manual	p. 18
+fujitsu-d2619-18slot	C75C8D396A0B	DIMM-1D	n/a	1	D	0	fujitsu-d2619-tx300-s5-technical-manual	p. 18
+fujitsu-d2709-12slot	ABDDA74B1AC2	DIMM-1A	n/a	0	A	0	fujitsu-d2709-tx200-s5	p. 17
+fujitsu-d2709-12slot	ABDDA74B1AC2	DIMM-2A	n/a	0	A	1	fujitsu-d2709-tx200-s5	p. 17
+fujitsu-d2709-12slot	ABDDA74B1AC2	DIMM-1D	n/a	1	D	0	fujitsu-d2709-tx200-s5	p. 17
+fujitsu-d2709-12slot	ABDDA74B1AC2	DIMM-1F	n/a	1	F	0	fujitsu-d2709-tx200-s5	p. 17
+fujitsu-d3031-12slot	A598FCA268BC	DIMM-1A	n/a	0	A	0	fujitsu-rx200-s6-guide	p. 5
+fujitsu-d3031-12slot	A598FCA268BC	DIMM-2A	n/a	0	A	1	fujitsu-rx200-s6-guide	p. 5
+fujitsu-d3031-12slot	A598FCA268BC	DIMM-1B	n/a	0	B	0	fujitsu-rx200-s6-guide	p. 5
+fujitsu-d3031-12slot	A598FCA268BC	DIMM-1D	n/a	1	D	0	fujitsu-rx200-s6-guide	p. 5
+fujitsu-d2759-6slot	4BE064DA92A3	DIMM-1A	Not Specified	0	A	0	fujitsu-d2759-tx150-s7-technical-manual	pp. 21
+fujitsu-d2759-6slot	4BE064DA92A3	DIMM-2A	Not Specified	0	A	1	fujitsu-d2759-tx150-s7-technical-manual	pp. 21
+fujitsu-d2759-6slot	4BE064DA92A3	DIMM-3A	Not Specified	0	A	2	fujitsu-d2759-tx150-s7-technical-manual	pp. 21
+fujitsu-d2759-6slot	4BE064DA92A3	DIMM-1B	Not Specified	0	B	0	fujitsu-d2759-tx150-s7-technical-manual	pp. 21
+fujitsu-d2863-4slot	1C2E0E5B16EC	DIMM-1A	Not Specified	0	A	0	fujitsu-d2863-rx100-s6-technical-manual	p. 20
+fujitsu-d2863-4slot	1C2E0E5B16EC	DIMM-2A	Not Specified	0	A	1	fujitsu-d2863-rx100-s6-technical-manual	p. 20
+fujitsu-d2863-4slot	1C2E0E5B16EC	DIMM-1B	Not Specified	0	B	0	fujitsu-d2863-rx100-s6-technical-manual	p. 20
+fujitsu-d2863-4slot	1C2E0E5B16EC	DIMM-2B	Not Specified	0	B	1	fujitsu-d2863-rx100-s6-technical-manual	p. 20
+fujitsu-d3049-4slot	364362BE62F9	ChannelA-DIMM0	BANK 0	0	A	0	fujitsu-d3049-tx140-s1-tx120-s3	p. 24
+fujitsu-d3049-4slot	364362BE62F9	ChannelA-DIMM1	BANK 1	0	A	1	fujitsu-d3049-tx140-s1-tx120-s3	p. 24
+fujitsu-d3049-4slot	364362BE62F9	ChannelB-DIMM0	BANK 2	0	B	0	fujitsu-d3049-tx140-s1-tx120-s3	p. 24
+fujitsu-d3049-4slot	364362BE62F9	ChannelB-DIMM1	BANK 3	0	B	1	fujitsu-d3049-tx140-s1-tx120-s3	p. 24
+fujitsu-d3239-4slot	58271E12478B	DIMM-2A	BANK 0	0	A	1	fujitsu-tx1320-m1-maintenance-manual	p. 217
+fujitsu-d3239-4slot	58271E12478B	DIMM-1A	BANK 1	0	A	0	fujitsu-tx1320-m1-maintenance-manual	p. 217
+fujitsu-d3239-4slot	58271E12478B	DIMM-2B	BANK 2	0	B	1	fujitsu-tx1320-m1-maintenance-manual	p. 217
+fujitsu-d3239-4slot	58271E12478B	DIMM-1B	BANK 3	0	B	0	fujitsu-tx1320-m1-maintenance-manual	p. 217
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-1A	Not Specified	0	A	0	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-2A	Not Specified	0	A	1	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-1C	Not Specified	0	C	0	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-3D	Not Specified	0	D	2	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-1E	Not Specified	1	E	0	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-e5-2600-24slot-labelled	08710053605C	DIMM-2G	Not Specified	1	G	1	fujitsu-rx200-s8-maintenance-manual	p. 201
+fujitsu-d2939-24slot-node-names	6E07B32FDA2C	Node0_Dimm0	Node0_Bank0	0	A	0	fujitsu-rx300-s8-maintenance-manual	p. 257
+fujitsu-d2939-24slot-node-names	6E07B32FDA2C	Node0_Dimm6	Node0_Bank0	0	C	0	fujitsu-rx300-s8-maintenance-manual	p. 257
+fujitsu-d2939-24slot-node-names	6E07B32FDA2C	Node0_Dimm3	Node0_Bank0	0	B	0	fujitsu-rx300-s8-maintenance-manual	p. 257
+fujitsu-d2939-24slot-node-names	6E07B32FDA2C	Node1_Dimm0	Node1_Bank0	1	E	0	fujitsu-rx300-s8-maintenance-manual	p. 257
+fujitsu-d2939-24slot-node-names	6E07B32FDA2C	Node1_Dimm6	Node1_Bank0	1	G	0	fujitsu-rx300-s8-maintenance-manual	p. 257
+fujitsu-d3099-12slot-node-names	25DC1F84A0CF	Node0_Dimm0	Node0_Bank0	0	A	0	fujitsu-tx2540-m1-maintenance-manual	chapter 10, pp. 264-266
+fujitsu-d3099-12slot-node-names	25DC1F84A0CF	Node0_Dimm1	Node0_Bank0	0	A	1	fujitsu-tx2540-m1-maintenance-manual	chapter 10, pp. 264-266
+fujitsu-d3099-12slot-node-names	25DC1F84A0CF	Node0_Dimm2	Node0_Bank0	0	B	0	fujitsu-tx2540-m1-maintenance-manual	chapter 10, pp. 264-266
+fujitsu-d3099-12slot-node-names	25DC1F84A0CF	Node0_Dimm4	Node0_Bank0	0	C	0	fujitsu-tx2540-m1-maintenance-manual	chapter 10, pp. 264-266
+fujitsu-d3099-12slot-node-names	25DC1F84A0CF	Node1_Dimm0	Node1_Bank0	1	D	0	fujitsu-tx2540-m1-maintenance-manual	chapter 10, pp. 264-266
+fujitsu-d2119-fbdimm-8slot	2366E6CCAF09	DIMM-1A	Bank 1	-1	A	0	fujitsu-d2119-rx300-s3-technical-manual	printed p. 27
+fujitsu-d2119-fbdimm-8slot	2366E6CCAF09	DIMM-2A	Bank 2	-1	A	1	fujitsu-d2119-rx300-s3-technical-manual	printed p. 27
+fujitsu-d2119-fbdimm-8slot	2366E6CCAF09	DIMM-1B	Bank 1	-1	B	0	fujitsu-d2119-rx300-s3-technical-manual	printed p. 27
+fujitsu-d2119-fbdimm-8slot	2366E6CCAF09	DIMM-1D	Bank 1	-1	D	0	fujitsu-d2119-rx300-s3-technical-manual	printed p. 27
+fujitsu-d3384-24slot	4D63FF3C8C3D	CPU1_DIMM_A1	NODE 1	0	A	0	fujitsu-rx2540-m4-guide	pp. 16
+fujitsu-d3384-24slot	4D63FF3C8C3D	CPU1_DIMM_A2	NODE 1	0	A	1	fujitsu-rx2540-m4-guide	pp. 16
+fujitsu-d3384-24slot	4D63FF3C8C3D	CPU1_DIMM_D1	NODE 2	0	D	0	fujitsu-rx2540-m4-guide	pp. 16
+fujitsu-d3384-24slot	4D63FF3C8C3D	CPU2_DIMM_A1	NODE 3	1	A	0	fujitsu-rx2540-m4-guide	pp. 16
+fujitsu-d3384-24slot	4D63FF3C8C3D	CPU2_DIMM_F2	NODE 4	1	F	1	fujitsu-rx2540-m4-guide	pp. 16
+fujitsu-d4129-24slot	6F7BBA6E51B5	DIMM-1A	NODE 1	0	A	0	fujitsu-rx2450-m2-guide	pp. 15-17 (chapter 4, DDR5 system memory)
+fujitsu-d4129-24slot	6F7BBA6E51B5	DIMM-1C	NODE 3	0	C	0	fujitsu-rx2450-m2-guide	pp. 15-17 (chapter 4, DDR5 system memory)
+fujitsu-d4129-24slot	6F7BBA6E51B5	DIMM-1G	NODE 7	0	G	0	fujitsu-rx2450-m2-guide	pp. 15-17 (chapter 4, DDR5 system memory)
+fujitsu-d4129-24slot	6F7BBA6E51B5	DIMM-1M	NODE 13	1	M	0	fujitsu-rx2450-m2-guide	pp. 15-17 (chapter 4, DDR5 system memory)
+fujitsu-d4129-24slot	6F7BBA6E51B5	DIMM-1X	NODE 24	1	X	0	fujitsu-rx2450-m2-guide	pp. 15-17 (chapter 4, DDR5 system memory)
+nec-r120b-1	11FB59FB2CC9	CPU1_DIMM1	BANK 1	0	CH0	0	nec-express5800-r120b-1-user-guide	p. 9-35
+nec-r120b-1	11FB59FB2CC9	CPU1_DIMM2	BANK 2	0	CH1	0	nec-express5800-r120b-1-user-guide	p. 9-35
+nec-r120b-1	11FB59FB2CC9	CPU1_DIMM4	BANK 4	0	CH0	1	nec-express5800-r120b-1-user-guide	p. 9-35
+nec-r120b-1	11FB59FB2CC9	CPU2_DIMM2	BANK 8	1	CH1	0	nec-express5800-r120b-1-user-guide	p. 9-35
+nec-r120b-1	11FB59FB2CC9	CPU2_DIMM6	BANK 12	1	CH2	1	nec-express5800-r120b-1-user-guide	p. 9-35
+cisco-ucs-c220-c240-m4	07077149A7D0	DIMM_A1	NODE 0 CHANNEL 0 DIMM 0	0	A	0	cisco-c220-m4-installation-service-guide	p. 3-19
+cisco-ucs-c220-c240-m4	07077149A7D0	DIMM_A2	NO DIMM	0	A	1	cisco-c220-m4-installation-service-guide	p. 3-19
+cisco-ucs-c220-c240-m4	07077149A7D0	DIMM_B1	NODE 0 CHANNEL 1 DIMM 0	0	B	0	cisco-c220-m4-installation-service-guide	p. 3-19
+cisco-ucs-c220-c240-m4	07077149A7D0	DIMM_E1	NO DIMM	1	E	0	cisco-c220-m4-installation-service-guide	p. 3-19
+cisco-ucs-c220-c240-m4	07077149A7D0	DIMM_H3	NO DIMM	1	H	2	cisco-c220-m4-installation-service-guide	p. 3-19
+supermicro-x8dtu-12slot	0967B26CCBBA	P1_DIMM1A	BANK0	0	1	0	sm-mnl-1081	pr. 1-3, 2-10 to 2-12 (p11, p30-32)
+supermicro-x8dtu-12slot	0967B26CCBBA	P1_DIMM1B	BANK1	0	1	1	sm-mnl-1081	pr. 1-3, 2-10 to 2-12 (p11, p30-32)
+supermicro-x8dtu-12slot	0967B26CCBBA	P1_DIMM3A	BANK4	0	3	0	sm-mnl-1081	pr. 1-3, 2-10 to 2-12 (p11, p30-32)
+supermicro-x8dtu-12slot	0967B26CCBBA	P0_DIMM2B	BANK9	1	2	1	sm-mnl-1081	pr. 1-3, 2-10 to 2-12 (p11, p30-32)
+supermicro-x8-dp-12slot	4BEAEFFE22A4	P1-1A	BANK0	0	1	0	sm-mnl-1062	pr. 2-7, 2-8 (p29-30)
+supermicro-x8-dp-12slot	4BEAEFFE22A4	P1-1B	BANK1	0	1	1	sm-mnl-1062	pr. 2-7, 2-8 (p29-30)
+supermicro-x8-dp-12slot	4BEAEFFE22A4	P1-3A	BANK4	0	3	0	sm-mnl-1062	pr. 2-7, 2-8 (p29-30)
+supermicro-x8-dp-12slot	4BEAEFFE22A4	P2-2B	BANK9	1	2	1	sm-mnl-1062	pr. 2-7, 2-8 (p29-30)
+supermicro-x8da3-12slot	CC00F7DE0E2E	NODE0-1A	BANK0	0	1	0	sm-mnl-1031	pr. 1-4 (layout), 2-7, 2-8
+supermicro-x8da3-12slot	CC00F7DE0E2E	NODE0-1B	BANK1	0	1	1	sm-mnl-1031	pr. 1-4 (layout), 2-7, 2-8
+supermicro-x8da3-12slot	CC00F7DE0E2E	NODE0-2A	BANK2	0	2	0	sm-mnl-1031	pr. 1-4 (layout), 2-7, 2-8
+supermicro-x8da3-12slot	CC00F7DE0E2E	NODE1-3B	BANK11	1	3	1	sm-mnl-1031	pr. 1-4 (layout), 2-7, 2-8
+supermicro-x8dtl-6slot	0C862FB30BE8	P2_DIMM1A	BANK	1	1	0	sm-mnl-1076	pr. 2-7, 2-8 (p29-30)
+supermicro-x8dtl-6slot	0C862FB30BE8	P2_DIMM3A	BANK	1	3	0	sm-mnl-1076	pr. 2-7, 2-8 (p29-30)
+supermicro-x8dtl-6slot	0C862FB30BE8	P1_DIMM1A	BANK	0	1	0	sm-mnl-1076	pr. 2-7, 2-8 (p29-30)
+supermicro-x8dtl-6slot	0C862FB30BE8	P1_DIMM2A	BANK	0	2	0	sm-mnl-1076	pr. 2-7, 2-8 (p29-30)
+supermicro-x8-dp-18slot	2E7039855B22	P1-DIMM1A	BANK0	0	1	0	sm-mnl-1199	pr. 3-3 to 3-5 (p34-36)
+supermicro-x8-dp-18slot	2E7039855B22	P1-DIMM1B	BANK1	0	1	1	sm-mnl-1199	pr. 3-3 to 3-5 (p34-36)
+supermicro-x8-dp-18slot	2E7039855B22	P1-DIMM1C	BANK2	0	1	2	sm-mnl-1199	pr. 3-3 to 3-5 (p34-36)
+supermicro-x8-dp-18slot	2E7039855B22	P2-DIMM3A	BANK15	1	3	0	sm-mnl-1199	pr. 3-3 to 3-5 (p34-36)
+supermicro-x8dah-18slot-before-pcb2	4A92FB7AB3EE	P1_DIMM1A	P1_BANK1	0	A	0	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-before-pcb2	4A92FB7AB3EE	P1_DIMM2A	P1_BANK1	0	A	1	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-before-pcb2	4A92FB7AB3EE	P1_DIMM1B	P1_BANK2	0	B	0	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-before-pcb2	4A92FB7AB3EE	P2_DIMM3C	P2_BANK3	1	C	2	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-pcb2	A2E8DD42EE6F	P2_DIMM1A	P2_BANK1	1	1	0	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-pcb2	A2E8DD42EE6F	P2_DIMM1B	P2_BANK1	1	1	1	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-pcb2	A2E8DD42EE6F	P2_DIMM1C	P2_BANK1	1	1	2	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-x8dah-18slot-pcb2	A2E8DD42EE6F	P2_DIMM3A	P2_BANK3	1	3	0	sm-mnl-1060	pr. 1-3, 2-7 to 2-10 (p11, p31-34)
+supermicro-h8-g34-dp-16slot	49F6AA867D33	P1_DIMM1B	BANK0	0	1	1	sm-mnl-h8dg	pr. 2-8, 2-9 (p28-29)
+supermicro-h8-g34-dp-16slot	49F6AA867D33	P1_DIMM1A	BANK1	0	1	0	sm-mnl-h8dg	pr. 2-8, 2-9 (p28-29)
+supermicro-h8-g34-dp-16slot	49F6AA867D33	P1_DIMM4A	BANK7	0	4	0	sm-mnl-h8dg	pr. 2-8, 2-9 (p28-29)
+supermicro-h8-g34-dp-16slot	49F6AA867D33	P2_DIMM2B	BANK10	1	2	1	sm-mnl-h8dg	pr. 2-8, 2-9 (p28-29)
+supermicro-h8qg6-32slot	28567EC2EFB1	P1_1A	0	0	1	0	sm-mnl-h8qg-6	pr. 2-8 to 2-10 (p28-30)
+supermicro-h8qg6-32slot	28567EC2EFB1	P1_1B	1	0	1	1	sm-mnl-h8qg-6	pr. 2-8 to 2-10 (p28-30)
+supermicro-h8qg6-32slot	28567EC2EFB1	P1_3B	5	0	3	1	sm-mnl-h8qg-6	pr. 2-8 to 2-10 (p28-30)
+supermicro-h8qg6-32slot	28567EC2EFB1	P4_4A	30	3	4	0	sm-mnl-h8qg-6	pr. 2-8 to 2-10 (p28-30)
+supermicro-h8qgl-16slot	E3929CBFE2DD	P1_1A	0	0	1	0	sm-mnl-h8qgl-6	pr. 2-8, 2-9 (p28-29)
+supermicro-h8qgl-16slot	E3929CBFE2DD	P1_2A	1	0	2	0	sm-mnl-h8qgl-6	pr. 2-8, 2-9 (p28-29)
+supermicro-h8qgl-16slot	E3929CBFE2DD	P1_4A	3	0	4	0	sm-mnl-h8qgl-6	pr. 2-8, 2-9 (p28-29)
+supermicro-h8qgl-16slot	E3929CBFE2DD	P3_3A	10	2	3	0	sm-mnl-h8qgl-6	pr. 2-8, 2-9 (p28-29)
+supermicro-h8sgl-8slot	4B37E516C354	DIMM1B	BANK0	0	1	1	sm-mnl-h8sgl-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8sgl-8slot	4B37E516C354	DIMM1A	BANK1	0	1	0	sm-mnl-h8sgl-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8sgl-8slot	4B37E516C354	DIMM2B	BANK2	0	2	1	sm-mnl-h8sgl-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8sgl-8slot	4B37E516C354	DIMM4A	BANK7	0	4	0	sm-mnl-h8sgl-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8scm-4slot	4FE36F650E5D	DIMM1B	BANK0	0	1	1	sm-mnl-h8scm-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8scm-4slot	4FE36F650E5D	DIMM1A	BANK1	0	1	0	sm-mnl-h8scm-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8scm-4slot	4FE36F650E5D	DIMM2B	BANK2	0	2	1	sm-mnl-h8scm-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8scm-4slot	4FE36F650E5D	DIMM2A	BANK3	0	2	0	sm-mnl-h8scm-f	pr. 2-8, 2-9 (p28-29)
+supermicro-h8dcl-8slot	15FCD7D8671C	P1_DIMM1B	BANK0	0	1	1	sm-mnl-h8dcl	pr. 2-8, 2-9 (p30-31)
+supermicro-h8dcl-8slot	15FCD7D8671C	P1_DIMM1A	BANK1	0	1	0	sm-mnl-h8dcl	pr. 2-8, 2-9 (p30-31)
+supermicro-h8dcl-8slot	15FCD7D8671C	P1_DIMM2A	BANK3	0	2	0	sm-mnl-h8dcl	pr. 2-8, 2-9 (p30-31)
+supermicro-h8dcl-8slot	15FCD7D8671C	P2_DIMM1A	BANK5	1	1	0	sm-mnl-h8dcl	pr. 2-8, 2-9 (p30-31)
+supermicro-x9dbl-6slot	12D029235C8C	P1-DIMM1A	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1307	pr. 2-9 to 2-12 (p33-36)
+supermicro-x9dbl-6slot	12D029235C8C	P1-DIMM1B	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1307	pr. 2-9 to 2-12 (p33-36)
+supermicro-x9dbl-6slot	12D029235C8C	P1-DIMM1C	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-1307	pr. 2-9 to 2-12 (p33-36)
+supermicro-x9dbl-6slot	12D029235C8C	P2-DIMM1D	P1_Node1_Channel0_Dimm0	1	D	0	sm-mnl-1307	pr. 2-9 to 2-12 (p33-36)
+supermicro-x9-dp-16slot	00A4700B35D6	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1278	pr. 1-10, 2-11 to 2-16 (p17, p34-39)
+supermicro-x9-dp-16slot	00A4700B35D6	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1278	pr. 1-10, 2-11 to 2-16 (p17, p34-39)
+supermicro-x9-dp-16slot	00A4700B35D6	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1278	pr. 1-10, 2-11 to 2-16 (p17, p34-39)
+supermicro-x9-dp-16slot	00A4700B35D6	P2-DIMME1	P1_Node1_Channel0_Dimm0	1	E	0	sm-mnl-1278	pr. 1-10, 2-11 to 2-16 (p17, p34-39)
+supermicro-x9-dp-24slot	050383036EDE	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1258	pr. 2-11, 2-12 (p35-36)
+supermicro-x9-dp-24slot	050383036EDE	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1258	pr. 2-11, 2-12 (p35-36)
+supermicro-x9-dp-24slot	050383036EDE	P1-DIMMA3	P0_Node0_Channel0_Dimm2	0	A	2	sm-mnl-1258	pr. 2-11, 2-12 (p35-36)
+supermicro-x9-dp-24slot	050383036EDE	P2-DIMMH1	P1_Node1_Channel3_Dimm0	1	H	0	sm-mnl-1258	pr. 2-11, 2-12 (p35-36)
+supermicro-x9-dp-8slot	0233FFAB75C3	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1488	pr. 2-12 (p40)
+supermicro-x9-dp-8slot	0233FFAB75C3	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1488	pr. 2-12 (p40)
+supermicro-x9-dp-8slot	0233FFAB75C3	P1-DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-1488	pr. 2-12 (p40)
+supermicro-x9-dp-8slot	0233FFAB75C3	P2-DIMME1	P1_Node1_Channel0_Dimm0	1	E	0	sm-mnl-1488	pr. 2-12 (p40)
+supermicro-x9-up-8slot	06C728F89F55	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1284	pr. 2-8 to 2-10 (p36-38)
+supermicro-x9-up-8slot	06C728F89F55	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1284	pr. 2-8 to 2-10 (p36-38)
+supermicro-x9-up-8slot	06C728F89F55	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1284	pr. 2-8 to 2-10 (p36-38)
+supermicro-x9-up-8slot	06C728F89F55	P1-DIMMD2	P0_Node0_Channel3_Dimm1	0	D	1	sm-mnl-1284	pr. 2-8 to 2-10 (p36-38)
+supermicro-x9sra-8slot	37F2E680D954	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1281	pr. 2-8 to 2-10 (p28-30)
+supermicro-x9sra-8slot	37F2E680D954	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1281	pr. 2-8 to 2-10 (p28-30)
+supermicro-x9sra-8slot	37F2E680D954	P1-DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-1281	pr. 2-8 to 2-10 (p28-30)
+supermicro-x9sra-8slot	37F2E680D954	P1-DIMMD2	P0_Node0_Channel3_Dimm1	0	D	1	sm-mnl-1281	pr. 2-8 to 2-10 (p28-30)
+supermicro-x10-dp-16slot	022F96D5DAA8	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1557	pr. 2-11 to 2-13 (p35-37)
+supermicro-x10-dp-16slot	022F96D5DAA8	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1557	pr. 2-11 to 2-13 (p35-37)
+supermicro-x10-dp-16slot	022F96D5DAA8	P1-DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-1557	pr. 2-11 to 2-13 (p35-37)
+supermicro-x10-dp-16slot	022F96D5DAA8	P2-DIMME1	P1_Node1_Channel0_Dimm0	1	E	0	sm-mnl-1557	pr. 2-11 to 2-13 (p35-37)
+supermicro-x10dri-x10drh-16slot	38BECEA381EC	P1_DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1491	pr. 2-13 to 2-15 (p35-37)
+supermicro-x10dri-x10drh-16slot	38BECEA381EC	P1_DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1491	pr. 2-13 to 2-15 (p35-37)
+supermicro-x10dri-x10drh-16slot	38BECEA381EC	P2_DIMMG1	P1_Node1_Channel2_Dimm0	1	G	0	sm-mnl-1491	pr. 2-13 to 2-15 (p35-37)
+supermicro-x10dri-x10drh-16slot	38BECEA381EC	P2_DIMMH1	P1_Node1_Channel3_Dimm0	1	H	0	sm-mnl-1491	pr. 2-13 to 2-15 (p35-37)
+supermicro-x10-dp-24slot	2D97098D4DB6	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1560	pr. 2-13, 2-14 (p36-37)
+supermicro-x10-dp-24slot	2D97098D4DB6	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1560	pr. 2-13, 2-14 (p36-37)
+supermicro-x10-dp-24slot	2D97098D4DB6	P1-DIMMA3	P0_Node0_Channel0_Dimm2	0	A	2	sm-mnl-1560	pr. 2-13, 2-14 (p36-37)
+supermicro-x10-dp-24slot	2D97098D4DB6	P2-DIMMH1	P1_Node1_Channel3_Dimm0	1	H	0	sm-mnl-1560	pr. 2-13, 2-14 (p36-37)
+supermicro-x10drg-24slot	8D94A1EFB69C	P1_DIMMA1	P1_Node0_Channel0_Dimm1	0	A	0	sm-mnl-1780	pr. 2-13 to 2-15 (p38-40)
+supermicro-x10drg-24slot	8D94A1EFB69C	P1_DIMMA2	P1_Node0_Channel0_Dimm2	0	A	1	sm-mnl-1780	pr. 2-13 to 2-15 (p38-40)
+supermicro-x10drg-24slot	8D94A1EFB69C	P2_DIMME1	P2_Node1_Channel0_Dimm1	1	E	0	sm-mnl-1780	pr. 2-13 to 2-15 (p38-40)
+supermicro-x10-dp-8slot	0E77CAFC776B	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1566	pr. 2-11, 2-13 (p33, p35)
+supermicro-x10-dp-8slot	0E77CAFC776B	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1566	pr. 2-11, 2-13 (p33, p35)
+supermicro-x10-dp-8slot	0E77CAFC776B	P1-DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-1566	pr. 2-11, 2-13 (p33, p35)
+supermicro-x10-dp-8slot	0E77CAFC776B	P2-DIMME1	P1_Node1_Channel0_Dimm0	1	E	0	sm-mnl-1566	pr. 2-11, 2-13 (p33, p35)
+supermicro-x10-up-8slot	0B35DF721C1D	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1586	pr. 2-13 to 2-15 (p33-35)
+supermicro-x10-up-8slot	0B35DF721C1D	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1586	pr. 2-13 to 2-15 (p33-35)
+supermicro-x10-up-8slot	0B35DF721C1D	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1586	pr. 2-13 to 2-15 (p33-35)
+supermicro-x10-up-8slot	0B35DF721C1D	DIMMD2	P0_Node0_Channel3_Dimm1	0	D	1	sm-mnl-1586	pr. 2-13 to 2-15 (p33-35)
+supermicro-x10sra-8slot	605408244187	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1643	pr. 2-9 to 2-12 (p39-42)
+supermicro-x10sra-8slot	605408244187	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1643	pr. 2-9 to 2-12 (p39-42)
+supermicro-x10sra-8slot	605408244187	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-1643	pr. 2-9 to 2-12 (p39-42)
+supermicro-x10sra-8slot	605408244187	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-1643	pr. 2-9 to 2-12 (p39-42)
+supermicro-x10srm-4slot	0A44B1BC5FE5	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1845	pr. 31 to 33 (p31-33)
+supermicro-x10srm-4slot	0A44B1BC5FE5	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1845	pr. 31 to 33 (p31-33)
+supermicro-x10srm-4slot	0A44B1BC5FE5	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-1845	pr. 31 to 33 (p31-33)
+supermicro-x10srm-4slot	0A44B1BC5FE5	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-1845	pr. 31 to 33 (p31-33)
+supermicro-x10sll-x10slm-4slot	02155FC205AE	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1428	pr. 2-11, 2-12 (p35-36)
+supermicro-x10sll-x10slm-4slot	02155FC205AE	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1428	pr. 2-11, 2-12 (p35-36)
+supermicro-x10sll-x10slm-4slot	02155FC205AE	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1428	pr. 2-11, 2-12 (p35-36)
+supermicro-x10sll-x10slm-4slot	02155FC205AE	P1-DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1428	pr. 2-11, 2-12 (p35-36)
+supermicro-x10sl7-4slot	0C0D28C1A770	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1463	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sl7-4slot	0C0D28C1A770	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1463	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sl7-4slot	0C0D28C1A770	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1463	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sl7-4slot	0C0D28C1A770	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1463	pr. 2-10, 2-11 (p30-31)
+supermicro-x10slh-x10slmplus-4slot	7859C5969A35	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1464	pr. 2-11, 2-12 (p33-34)
+supermicro-x10slh-x10slmplus-4slot	7859C5969A35	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1464	pr. 2-11, 2-12 (p33-34)
+supermicro-x10slh-x10slmplus-4slot	7859C5969A35	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1464	pr. 2-11, 2-12 (p33-34)
+supermicro-x10slh-x10slmplus-4slot	7859C5969A35	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1464	pr. 2-11, 2-12 (p33-34)
+supermicro-x10sae-4slot	6D8BBA911035	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1479	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sae-4slot	6D8BBA911035	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1479	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sae-4slot	6D8BBA911035	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1479	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sae-4slot	6D8BBA911035	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1479	pr. 2-10, 2-11 (p30-31)
+supermicro-x10sdv-4slot	5FF5FCA7FE2A	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1726	pr. 2-7, 2-8 (p34-35)
+supermicro-x10sdv-4slot	5FF5FCA7FE2A	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1726	pr. 2-7, 2-8 (p34-35)
+supermicro-x10sdv-4slot	5FF5FCA7FE2A	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1726	pr. 2-7, 2-8 (p34-35)
+supermicro-x10sdv-4slot	5FF5FCA7FE2A	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1726	pr. 2-7, 2-8 (p34-35)
+supermicro-x11-lga1151-4slot-b2-first	0EC007042E2B	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1778	pr. 33 to 35 (p33-35)
+supermicro-x11-lga1151-4slot-b2-first	0EC007042E2B	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1778	pr. 33 to 35 (p33-35)
+supermicro-x11-lga1151-4slot-b2-first	0EC007042E2B	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1778	pr. 33 to 35 (p33-35)
+supermicro-x11-lga1151-4slot-b2-first	0EC007042E2B	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1778	pr. 33 to 35 (p33-35)
+supermicro-x11-lga1151-4slot-a2-first	CC2E95E1BC69	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2087	pr. 34 (p34)
+supermicro-x11-lga1151-4slot-a2-first	CC2E95E1BC69	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2087	pr. 34 (p34)
+supermicro-x11-lga1151-4slot-a2-first	CC2E95E1BC69	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2087	pr. 34 (p34)
+supermicro-x11-lga1151-4slot-a2-first	CC2E95E1BC69	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2087	pr. 34 (p34)
+supermicro-x11scl-if-2slot	2059670B2B70	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2088	pr. 29, 30 (p29-30)
+supermicro-x11scl-if-2slot	2059670B2B70	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2088	pr. 29, 30 (p29-30)
+supermicro-x11ssv-q-2slot	10133D1BC396	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1795	pr. 27 (p27)
+supermicro-x11ssv-q-2slot	10133D1BC396	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1795	pr. 27 (p27)
+supermicro-x11-dp-16slot	2198ED099BB9	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1773	pr. 33 to 38 (p33-38)
+supermicro-x11-dp-16slot	2198ED099BB9	P1-DIMMA2	NO DIMM	0	A	1	sm-mnl-1773	pr. 33 to 38 (p33-38)
+supermicro-x11-dp-16slot	2198ED099BB9	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1773	pr. 33 to 38 (p33-38)
+supermicro-x11-dp-16slot	2198ED099BB9	P2-DIMMF1	P1_Node1_Channel2_Dimm0	1	F	0	sm-mnl-1773	pr. 33 to 38 (p33-38)
+supermicro-x11-dp-24slot	2313D2BE80A7	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-x11-user-guide	pp. 6-7, 19
+supermicro-x11-dp-24slot	2313D2BE80A7	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-x11-user-guide	pp. 6-7, 19
+supermicro-x11-dp-24slot	2313D2BE80A7	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-x11-user-guide	pp. 6-7, 19
+supermicro-x11-dp-24slot	2313D2BE80A7	P2-DIMMF2	P1_Node1_Channel2_Dimm1	1	F	1	sm-x11-user-guide	pp. 6-7, 19
+supermicro-x11ddw-12slot	5A5D94EDF18E	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1907	pr. 33, 37 (p33, p37)
+supermicro-x11ddw-12slot	5A5D94EDF18E	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1907	pr. 33, 37 (p33, p37)
+supermicro-x11ddw-12slot	5A5D94EDF18E	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1907	pr. 33, 37 (p33, p37)
+supermicro-x11ddw-12slot	5A5D94EDF18E	P2-DIMMA1	P1_Node0_Channel0_Dimm0	1	A	0	sm-mnl-1907	pr. 33, 37 (p33, p37)
+supermicro-x11dpl-8slot	007236A7EB64	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1946	pr. 30, 33 (p30, p33)
+supermicro-x11dpl-8slot	007236A7EB64	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1946	pr. 30, 33 (p30, p33)
+supermicro-x11dpl-8slot	007236A7EB64	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1946	pr. 30, 33 (p30, p33)
+supermicro-x11dpl-8slot	007236A7EB64	P1-DIMME1	P0_Node1_Channel1_Dimm0	0	E	0	sm-mnl-1946	pr. 30, 33 (p30, p33)
+supermicro-x11qph-48slot	13107E8A13EF	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1983	pr. 33, 35 (p33, p35)
+supermicro-x11qph-48slot	13107E8A13EF	P1-DIMMA2	NO DIMM	0	A	1	sm-mnl-1983	pr. 33, 35 (p33, p35)
+supermicro-x11qph-48slot	13107E8A13EF	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1983	pr. 33, 35 (p33, p35)
+supermicro-x11qph-48slot	13107E8A13EF	P4-DIMMF1	P3_Node1_Channel2_Dimm0	3	F	0	sm-mnl-1983	pr. 33, 35 (p33, p35)
+supermicro-x11-up-8slot	222E54EDDE75	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1900	pr. 32 to 34 (p32-34)
+supermicro-x11-up-8slot	222E54EDDE75	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1900	pr. 32 to 34 (p32-34)
+supermicro-x11-up-8slot	222E54EDDE75	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1900	pr. 32 to 34 (p32-34)
+supermicro-x11-up-8slot	222E54EDDE75	DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1900	pr. 32 to 34 (p32-34)
+supermicro-x11-up-8slot	222E54EDDE75	DIMMF1	P0_Node1_Channel2_Dimm0	0	F	0	sm-mnl-1900	pr. 32 to 34 (p32-34)
+supermicro-x11-up-6slot	751AC2BC6C6F	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1939	pr. 34 to 36 (p34-36)
+supermicro-x11-up-6slot	751AC2BC6C6F	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1939	pr. 34 to 36 (p34-36)
+supermicro-x11-up-6slot	751AC2BC6C6F	DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-1939	pr. 34 to 36 (p34-36)
+supermicro-x11-up-6slot	751AC2BC6C6F	DIMME1	P0_Node1_Channel1_Dimm0	0	E	0	sm-mnl-1939	pr. 34 to 36 (p34-36)
+supermicro-b11spe-12slot	0BAF8B926179	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2135	pr. 3-13 to 3-16 (p47-50)
+supermicro-b11spe-12slot	0BAF8B926179	P1-DIMMA2	NO DIMM	0	A	1	sm-mnl-2135	pr. 3-13 to 3-16 (p47-50)
+supermicro-b11spe-12slot	0BAF8B926179	P1-DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-2135	pr. 3-13 to 3-16 (p47-50)
+supermicro-b11spe-12slot	0BAF8B926179	P1-DIMME1	P0_Node1_Channel1_Dimm0	0	E	0	sm-mnl-2135	pr. 3-13 to 3-16 (p47-50)
+supermicro-x11sra-8slot	0D337C48907E	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2005	pr. 30 to 32 (p30-32)
+supermicro-x11sra-8slot	0D337C48907E	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2005	pr. 30 to 32 (p30-32)
+supermicro-x11sra-8slot	0D337C48907E	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2005	pr. 30 to 32 (p30-32)
+supermicro-x11sra-8slot	0D337C48907E	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-2005	pr. 30 to 32 (p30-32)
+supermicro-x11sdv-4slot	131078870A66	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2019	pr. 23, 24 (p23-24)
+supermicro-x11sdv-4slot	131078870A66	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2019	pr. 23, 24 (p23-24)
+supermicro-x11sdv-4slot	131078870A66	DIMMD1	P0_Node1_Channel0_Dimm0	0	D	0	sm-mnl-2019	pr. 23, 24 (p23-24)
+supermicro-x11sdv-4slot	131078870A66	DIMME1	P0_Node1_Channel1_Dimm0	0	E	0	sm-mnl-2019	pr. 23, 24 (p23-24)
+supermicro-a2sd-4slot	67F50154C8D4	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1951	pr. 28, 29 (p28-29)
+supermicro-a2sd-4slot	67F50154C8D4	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1951	pr. 28, 29 (p28-29)
+supermicro-a2sd-4slot	67F50154C8D4	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1951	pr. 28, 29 (p28-29)
+supermicro-a2sd-4slot	67F50154C8D4	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1951	pr. 28, 29 (p28-29)
+supermicro-a1sa2-4slot	64B5066C8E62	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1600	pr. 2-5 (p25)
+supermicro-a1sa2-4slot	64B5066C8E62	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1600	pr. 2-5 (p25)
+supermicro-a1sa2-4slot	64B5066C8E62	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1600	pr. 2-5 (p25)
+supermicro-a1sa2-4slot	64B5066C8E62	P1-DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1600	pr. 2-5 (p25)
+supermicro-a1sam-a1srm-4slot	B9FD41A2E4E7	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1561	pr. 2-5, 2-6 (p25-26)
+supermicro-a1sam-a1srm-4slot	B9FD41A2E4E7	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1561	pr. 2-5, 2-6 (p25-26)
+supermicro-a1sam-a1srm-4slot	B9FD41A2E4E7	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1561	pr. 2-5, 2-6 (p25-26)
+supermicro-a1sam-a1srm-4slot	B9FD41A2E4E7	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1561	pr. 2-5, 2-6 (p25-26)
+supermicro-x12dpi-18slot	7B1062DBE031	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2233	pr. 39 to 41 (p39-41)
+supermicro-x12dpi-18slot	7B1062DBE031	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2233	pr. 39 to 41 (p39-41)
+supermicro-x12dpi-18slot	7B1062DBE031	P1-DIMMB2	NO DIMM	0	B	1	sm-mnl-2233	pr. 39 to 41 (p39-41)
+supermicro-x12dpi-18slot	7B1062DBE031	P1-DIMME1	P0_Node2_Channel0_Dimm0	0	E	0	sm-mnl-2233	pr. 39 to 41 (p39-41)
+supermicro-x12-dp-16slot	47A47A94D498	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2239	pr. 42, 43 (p42-43)
+supermicro-x12-dp-16slot	47A47A94D498	P1-DIMMB1	NO DIMM	0	B	0	sm-mnl-2239	pr. 42, 43 (p42-43)
+supermicro-x12-dp-16slot	47A47A94D498	P1-DIMMC1	P0_Node1_Channel0_Dimm0	0	C	0	sm-mnl-2239	pr. 42, 43 (p42-43)
+supermicro-x12-dp-16slot	47A47A94D498	P2-DIMMG1	P1_Node3_Channel0_Dimm0	1	G	0	sm-mnl-2239	pr. 42, 43 (p42-43)
+supermicro-x12dpu-32slot	8EFBD85B63DE	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2234	pr. 41, 42 (p41-42)
+supermicro-x12dpu-32slot	8EFBD85B63DE	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2234	pr. 41, 42 (p41-42)
+supermicro-x12dpu-32slot	8EFBD85B63DE	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2234	pr. 41, 42 (p41-42)
+supermicro-x12dpu-32slot	8EFBD85B63DE	P2-DIMMH2	P1_Node1_Channel3_Dimm1	1	H	1	sm-mnl-2234	pr. 41, 42 (p41-42)
+supermicro-x12-up-8slot	BC9F8E43AF76	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2270	pr. 33, 34 (p33-34)
+supermicro-x12-up-8slot	BC9F8E43AF76	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2270	pr. 33, 34 (p33-34)
+supermicro-x12-up-8slot	BC9F8E43AF76	DIMME1	P0_Node1_Channel0_Dimm0	0	E	0	sm-mnl-2270	pr. 33, 34 (p33-34)
+supermicro-x12-up-8slot	BC9F8E43AF76	DIMMH1	P0_Node1_Channel3_Dimm0	0	H	0	sm-mnl-2270	pr. 33, 34 (p33-34)
+supermicro-x12sae-4slot	0E8D90837AAF	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2358	pr. 32, 33 (p32-33)
+supermicro-x12sae-4slot	0E8D90837AAF	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2358	pr. 32, 33 (p32-33)
+supermicro-x12sae-4slot	0E8D90837AAF	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2358	pr. 32, 33 (p32-33)
+supermicro-x12sae-4slot	0E8D90837AAF	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2358	pr. 32, 33 (p32-33)
+supermicro-x12sdv-sp6f-4slot	ACFD57B232A4	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2362	pr. 13, 25 to 27 (p13, p25-27)
+supermicro-x12sdv-sp6f-4slot	ACFD57B232A4	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2362	pr. 13, 25 to 27 (p13, p25-27)
+supermicro-x12sdv-sp6f-4slot	ACFD57B232A4	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2362	pr. 13, 25 to 27 (p13, p25-27)
+supermicro-x12sdv-sp6f-4slot	ACFD57B232A4	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2362	pr. 13, 25 to 27 (p13, p25-27)
+supermicro-x12sdv-spt8f-4slot	E299F91C21A0	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2440	pr. 12, 24 to 26 (p12, p24-26)
+supermicro-x12sdv-spt8f-4slot	E299F91C21A0	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2440	pr. 12, 24 to 26 (p12, p24-26)
+supermicro-x12sdv-spt8f-4slot	E299F91C21A0	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2440	pr. 12, 24 to 26 (p12, p24-26)
+supermicro-x12sdv-spt8f-4slot	E299F91C21A0	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-2440	pr. 12, 24 to 26 (p12, p24-26)
+supermicro-x13-dp-16slot	A5DA019EA0BE	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2509	pr. 59 to 62 (p59-62)
+supermicro-x13-dp-16slot	A5DA019EA0BE	P1-DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2509	pr. 59 to 62 (p59-62)
+supermicro-x13-dp-16slot	A5DA019EA0BE	P1-DIMME1	P0_Node1_Channel0_Dimm0	0	E	0	sm-mnl-2509	pr. 59 to 62 (p59-62)
+supermicro-x13-dp-16slot	A5DA019EA0BE	P2-DIMMG1	P1_Node1_Channel2_Dimm0	1	G	0	sm-mnl-2509	pr. 59 to 62 (p59-62)
+supermicro-x13sew-8slot	757BDADF0B5C	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2413	pr. 33 to 35 (p33-35)
+supermicro-x13sew-8slot	757BDADF0B5C	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2413	pr. 33 to 35 (p33-35)
+supermicro-x13sew-8slot	757BDADF0B5C	DIMME1	P0_Node1_Channel0_Dimm0	0	E	0	sm-mnl-2413	pr. 33 to 35 (p33-35)
+supermicro-x13sew-8slot	757BDADF0B5C	DIMMG1	P0_Node1_Channel2_Dimm0	0	G	0	sm-mnl-2413	pr. 33 to 35 (p33-35)
+supermicro-x13sae-4slot	34D88052FFB9	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2425	pr. 34, 35 (p34-35)
+supermicro-x13sae-4slot	34D88052FFB9	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2425	pr. 34, 35 (p34-35)
+supermicro-x13sae-4slot	34D88052FFB9	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2425	pr. 34, 35 (p34-35)
+supermicro-x13sae-4slot	34D88052FFB9	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2425	pr. 34, 35 (p34-35)
+supermicro-x13san-2slot	6403FDE36610	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2517	pr. 29 (p29)
+supermicro-x13san-2slot	6403FDE36610	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2517	pr. 29 (p29)
+supermicro-h11dsi-16slot	45717F18B5CF	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2027	pr. 31 to 33 (p31-33)
+supermicro-h11dsi-16slot	45717F18B5CF	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2027	pr. 31 to 33 (p31-33)
+supermicro-h11dsi-16slot	45717F18B5CF	P1-DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2027	pr. 31 to 33 (p31-33)
+supermicro-h11dsi-16slot	45717F18B5CF	P1-DIMMH1	P0_Node0_Channel7_Dimm0	0	H	0	sm-mnl-2027	pr. 31 to 33 (p31-33)
+supermicro-h12dsi-16slot	CFECD866923B	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2363	pr. 31 to 33 (p31-33)
+supermicro-h12dsi-16slot	CFECD866923B	P1-DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2363	pr. 31 to 33 (p31-33)
+supermicro-h12dsi-16slot	CFECD866923B	P1-DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-2363	pr. 31 to 33 (p31-33)
+supermicro-h12dsi-16slot	CFECD866923B	P1-DIMMH1	P0_Node0_Channel7_Dimm0	0	H	0	sm-mnl-2363	pr. 31 to 33 (p31-33)
+supermicro-h11ssl-8slot	6D89A72C2222	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2085	pr. 33, 34 (p33-34)
+supermicro-h11ssl-8slot	6D89A72C2222	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2085	pr. 33, 34 (p33-34)
+supermicro-h11ssl-8slot	6D89A72C2222	DIMMG1	P0_Node0_Channel6_Dimm0	0	G	0	sm-mnl-2085	pr. 33, 34 (p33-34)
+supermicro-h11ssl-8slot	6D89A72C2222	DIMMH1	P0_Node0_Channel7_Dimm0	0	H	0	sm-mnl-2085	pr. 33, 34 (p33-34)
+supermicro-h12-up-8slot	04875F94AAC5	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2314	pr. 31, 32 (p31-32)
+supermicro-h12-up-8slot	04875F94AAC5	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-2314	pr. 31, 32 (p31-32)
+supermicro-h12-up-8slot	04875F94AAC5	DIMMG1	P0_Node0_Channel6_Dimm0	0	G	0	sm-mnl-2314	pr. 31, 32 (p31-32)
+supermicro-h12-up-8slot	04875F94AAC5	DIMMH1	P0_Node0_Channel7_Dimm0	0	H	0	sm-mnl-2314	pr. 31, 32 (p31-32)
+supermicro-h12dsg-32slot	54803F617EBD	P1-DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2299	pr. 32, 33 (p32-33)
+supermicro-h12dsg-32slot	54803F617EBD	P1-DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2299	pr. 32, 33 (p32-33)
+supermicro-h12dsg-32slot	54803F617EBD	P1-DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2299	pr. 32, 33 (p32-33)
+supermicro-h12dsg-32slot	54803F617EBD	P2-DIMMH2	P1_Node0_Channel7_Dimm1	1	H	1	sm-mnl-2299	pr. 32, 33 (p32-33)
+supermicro-h13sae-mf-4slot	9ABB78B85737	DIMMA2	P0_Node0_Channel0_Dimm0	0	A	1	sm-mnl-2627	pr. 32 to 34 (p32-34)
+supermicro-h13sae-mf-4slot	9ABB78B85737	DIMMA1	P0_Node0_Channel0_Dimm1	0	A	0	sm-mnl-2627	pr. 32 to 34 (p32-34)
+supermicro-h13sae-mf-4slot	9ABB78B85737	DIMMB2	P0_Node0_Channel1_Dimm0	0	B	1	sm-mnl-2627	pr. 32 to 34 (p32-34)
+supermicro-h13sae-mf-4slot	9ABB78B85737	DIMMB1	P0_Node0_Channel1_Dimm1	0	B	0	sm-mnl-2627	pr. 32 to 34 (p32-34)
+supermicro-m11sdv-4slot	1D75228DC8FD	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2172	pr. 25 to 27 (p25-27)
+supermicro-m11sdv-4slot	1D75228DC8FD	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2172	pr. 25 to 27 (p25-27)
+supermicro-m11sdv-4slot	1D75228DC8FD	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2172	pr. 25 to 27 (p25-27)
+supermicro-m11sdv-4slot	1D75228DC8FD	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-2172	pr. 25 to 27 (p25-27)
+supermicro-m12swa-8slot	447EC4983940	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2336	pr. 32 to 34 (p32-34)
+supermicro-m12swa-8slot	447EC4983940	DIMMC1	P0_Node0_Channel2_Dimm0	0	C	0	sm-mnl-2336	pr. 32 to 34 (p32-34)
+supermicro-m12swa-8slot	447EC4983940	DIMMD1	P0_Node0_Channel3_Dimm0	0	D	0	sm-mnl-2336	pr. 32 to 34 (p32-34)
+supermicro-m12swa-8slot	447EC4983940	DIMMH1	P0_Node0_Channel7_Dimm0	0	H	0	sm-mnl-2336	pr. 32 to 34 (p32-34)
+supermicro-c7x99-oce-8slot	5605E28BCF07	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1646	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7x99-oce-8slot	5605E28BCF07	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1646	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7x99-oce-8slot	5605E28BCF07	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1646	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7x99-oce-8slot	5605E28BCF07	DIMMD2	P0_Node0_Channel3_Dimm1	0	D	1	sm-mnl-1646	pr. 2-9 to 2-11 (p39-41)
+supermicro-c9x299-pg300f-8slot	3AA8F2C8D522	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2117	pr. 30, 31 (p30-31)
+supermicro-c9x299-pg300f-8slot	3AA8F2C8D522	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-2117	pr. 30, 31 (p30-31)
+supermicro-c9x299-pg300f-8slot	3AA8F2C8D522	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2117	pr. 30, 31 (p30-31)
+supermicro-c9x299-pg300f-8slot	3AA8F2C8D522	DIMMD2	P0_Node0_Channel3_Dimm1	0	D	1	sm-mnl-2117	pr. 30, 31 (p30-31)
+supermicro-c7-c9-lga1151-4slot	5D50FA33A353	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-1813	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7-c9-lga1151-4slot	5D50FA33A353	DIMMA2	P0_Node0_Channel0_Dimm1	0	A	1	sm-mnl-1813	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7-c9-lga1151-4slot	5D50FA33A353	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-1813	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7-c9-lga1151-4slot	5D50FA33A353	DIMMB2	P0_Node0_Channel1_Dimm1	0	B	1	sm-mnl-1813	pr. 2-9 to 2-11 (p39-41)
+supermicro-c7-c9-lga1151-2slot	66BE2E39DAA0	DIMMA1	P0_Node0_Channel0_Dimm0	0	A	0	sm-mnl-2018	pr. 2-8, 2-9 (p32-33)
+supermicro-c7-c9-lga1151-2slot	66BE2E39DAA0	DIMMB1	P0_Node0_Channel1_Dimm0	0	B	0	sm-mnl-2018	pr. 2-8, 2-9 (p32-33)
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P0_A1	BANK 1	0	A	1	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P0_E1	BANK 1	0	E	1	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P0_E0	BANK 0	0	E	0	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P1_I1	BANK 1	1	I	1	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-2s-16ch-2dpc	C0D8E0800C76	DIMM_P1_P0	BANK 0	1	P	0	gigabyte-r182-z90-r182-z91-r182	p. 33
+gigabyte-epyc-sp3-1s-8ch-2dpc	20445DA51E24	DIMM_P0_A1	BANK 1	0	A	1	gigabyte-mz32-ar0-user-manual	p. 29
+gigabyte-epyc-sp3-1s-8ch-2dpc	20445DA51E24	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-mz32-ar0-user-manual	p. 29
+gigabyte-epyc-sp3-1s-8ch-2dpc	20445DA51E24	DIMM_P0_C1	BANK 1	0	C	1	gigabyte-mz32-ar0-user-manual	p. 29
+gigabyte-epyc-sp3-1s-8ch-2dpc	20445DA51E24	DIMM_P0_E1	BANK 1	0	E	1	gigabyte-mz32-ar0-user-manual	p. 29
+gigabyte-epyc-sp3-1s-8ch-2dpc	20445DA51E24	DIMM_P0_H0	BANK 0	0	H	0	gigabyte-mz32-ar0-user-manual	p. 29
+gigabyte-ampere-mp32-8ch-2dpc	513B50B63035	DIMM_P0_A0	Bank 1	0	A	0	gigabyte-e252-p30-user-manual	p. 26
+gigabyte-ampere-mp32-8ch-2dpc	513B50B63035	DIMM_P0_A1	Bank 2	0	A	1	gigabyte-e252-p30-user-manual	p. 26
+gigabyte-ampere-mp32-8ch-2dpc	513B50B63035	DIMM_P0_E0	Bank 9	0	E	0	gigabyte-e252-p30-user-manual	p. 26
+gigabyte-ampere-mp32-8ch-2dpc	513B50B63035	DIMM_P0_E1	Bank 10	0	E	1	gigabyte-e252-p30-user-manual	p. 26
+gigabyte-ampere-mp32-8ch-2dpc	513B50B63035	DIMM_P0_H1	Bank 16	0	H	1	gigabyte-e252-p30-user-manual	p. 26
+gigabyte-mx33-xeon-e2300-4slot	2E0D4C1B34E3	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-mx33-bs0-user-manual	p. 12-13
+gigabyte-mx33-xeon-e2300-4slot	2E0D4C1B34E3	DIMM_P0_A1	BANK 1	0	A	1	gigabyte-mx33-bs0-user-manual	p. 12-13
+gigabyte-mx33-xeon-e2300-4slot	2E0D4C1B34E3	DIMM_P0_B0	BANK 2	0	B	0	gigabyte-mx33-bs0-user-manual	p. 12-13
+gigabyte-mx33-xeon-e2300-4slot	2E0D4C1B34E3	DIMM_P0_B1	BANK 3	0	B	1	gigabyte-mx33-bs0-user-manual	p. 12-13
+gigabyte-epyc-sp3-2s-16ch-1dpc	74E7E16574F5	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-mz71-ce0-mz71-ce1-user	p. 13
+gigabyte-epyc-sp3-2s-16ch-1dpc	74E7E16574F5	DIMM_P0_D0	BANK 0	0	D	0	gigabyte-mz71-ce0-mz71-ce1-user	p. 13
+gigabyte-epyc-sp3-2s-16ch-1dpc	74E7E16574F5	DIMM_P0_H0	BANK 0	0	H	0	gigabyte-mz71-ce0-mz71-ce1-user	p. 13
+gigabyte-epyc-sp3-2s-16ch-1dpc	74E7E16574F5	DIMM_P1_I0	BANK 0	1	I	0	gigabyte-mz71-ce0-mz71-ce1-user	p. 13
+gigabyte-epyc-sp3-2s-16ch-1dpc	74E7E16574F5	DIMM_P1_P0	BANK 0	1	P	0	gigabyte-mz71-ce0-mz71-ce1-user	p. 13
+gigabyte-epyc3000-mj11-4slot	04B3B45439D3	DIMM_P0_A1	BANK 1	0	A	1	gigabyte-g431-mm0-user-manual	p. 25
+gigabyte-epyc3000-mj11-4slot	04B3B45439D3	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-g431-mm0-user-manual	p. 25
+gigabyte-epyc3000-mj11-4slot	04B3B45439D3	DIMM_P0_B1	BANK 1	0	B	1	gigabyte-g431-mm0-user-manual	p. 25
+gigabyte-epyc3000-mj11-4slot	04B3B45439D3	DIMM_P0_B0	BANK 0	0	B	0	gigabyte-g431-mm0-user-manual	p. 25
+gigabyte-am4-am5-mc1x-4slot	1D7046547004	DIMM_P0_A1	P0 CHANNEL A	0	A	1	gigabyte-mc13-le0-mc13-le1-user	p. 13
+gigabyte-am4-am5-mc1x-4slot	1D7046547004	DIMM_P0_A0	P0 CHANNEL A	0	A	0	gigabyte-mc13-le0-mc13-le1-user	p. 13
+gigabyte-am4-am5-mc1x-4slot	1D7046547004	DIMM_P0_B1	P0 CHANNEL B	0	B	1	gigabyte-mc13-le0-mc13-le1-user	p. 13
+gigabyte-am4-am5-mc1x-4slot	1D7046547004	DIMM_P0_B0	P0 CHANNEL B	0	B	0	gigabyte-mc13-le0-mc13-le1-user	p. 13
+gigabyte-mu71-su0-xeon-w3200-8slot	01FB0C3391D1	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-mu71-su0-user-manual	p. 9, 12-13
+gigabyte-mu71-su0-xeon-w3200-8slot	01FB0C3391D1	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-mu71-su0-user-manual	p. 9, 12-13
+gigabyte-mu71-su0-xeon-w3200-8slot	01FB0C3391D1	DIMM_P0_B0	P0_Node0_Channel1_Dimm0	0	B	0	gigabyte-mu71-su0-user-manual	p. 9, 12-13
+gigabyte-mu71-su0-xeon-w3200-8slot	01FB0C3391D1	DIMM_P0_D0	P0_Node0_Channel3_Dimm0	0	D	0	gigabyte-mu71-su0-user-manual	p. 9, 12-13
+gigabyte-mu71-su0-xeon-w3200-8slot	01FB0C3391D1	DIMM_P0_D1	P0_Node0_Channel3_Dimm1	0	D	1	gigabyte-mu71-su0-user-manual	p. 9, 12-13
+gigabyte-c621-su8-8slot	E50340EDE30D	CPU1_DIMM_A1	NODE 1	0	A	0	gigabyte-c621-su8-user-manual	p. 12
+gigabyte-c621-su8-8slot	E50340EDE30D	CPU1_DIMM_A2	NODE 1	0	A	1	gigabyte-c621-su8-user-manual	p. 12
+gigabyte-c621-su8-8slot	E50340EDE30D	CPU1_DIMM_B1	NODE 1	0	B	0	gigabyte-c621-su8-user-manual	p. 12
+gigabyte-c621-su8-8slot	E50340EDE30D	CPU1_DIMM_D1	NODE 2	0	D	0	gigabyte-c621-su8-user-manual	p. 12
+gigabyte-c621-su8-8slot	E50340EDE30D	CPU1_DIMM_D2	NODE 2	0	D	1	gigabyte-c621-su8-user-manual	p. 12
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU1_DIMM_A1	NODE 1	0	A	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU1_DIMM_B1	NODE 1	0	B	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU1_DIMM_D1	NODE 2	0	D	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU1_DIMM_E1	NODE 2	0	E	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU2_DIMM_A1	NODE 3	1	A	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-c621-sd8-8slot	AAAFBC4D907C	CPU2_DIMM_E1	NODE 4	1	E	0	gigabyte-c621-sd8-user-manual	p. 11
+gigabyte-mw50-sv0-e5-1s-8slot	BC0FEEA18689	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-mw50-sv0-user-manual	p. 8
+gigabyte-mw50-sv0-e5-1s-8slot	BC0FEEA18689	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-mw50-sv0-user-manual	p. 8
+gigabyte-mw50-sv0-e5-1s-8slot	BC0FEEA18689	DIMM_P0_B0	P0_Node0_Channel1_Dimm0	0	B	0	gigabyte-mw50-sv0-user-manual	p. 8
+gigabyte-mw50-sv0-e5-1s-8slot	BC0FEEA18689	DIMM_P0_C0	P0_Node0_Channel2_Dimm0	0	C	0	gigabyte-mw50-sv0-user-manual	p. 8
+gigabyte-mw50-sv0-e5-1s-8slot	BC0FEEA18689	DIMM_P0_D1	P0_Node0_Channel3_Dimm1	0	D	1	gigabyte-mw50-sv0-user-manual	p. 8
+gigabyte-mg51-g21-xeon-sp-2s-24slot	4775FC566851	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-g291-280-g291-281-user	p. 27-29
+gigabyte-mg51-g21-xeon-sp-2s-24slot	4775FC566851	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-g291-280-g291-281-user	p. 27-29
+gigabyte-mg51-g21-xeon-sp-2s-24slot	4775FC566851	DIMM_P0_D0	P0_Node0_Channel3_Dimm0	0	D	0	gigabyte-g291-280-g291-281-user	p. 27-29
+gigabyte-mg51-g21-xeon-sp-2s-24slot	4775FC566851	DIMM_P1_G0	P1_Node1_Channel0_Dimm0	1	G	0	gigabyte-g291-280-g291-281-user	p. 27-29
+gigabyte-mg51-g21-xeon-sp-2s-24slot	4775FC566851	DIMM_P1_L1	P1_Node1_Channel5_Dimm1	1	L	1	gigabyte-g291-280-g291-281-user	p. 27-29
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P0_A2	P0_Node0_Channel0_Dimm2	0	A	2	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P0_D0	P0_Node0_Channel3_Dimm0	0	D	0	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P1_E0	P1_Node1_Channel0_Dimm0	1	E	0	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-e5-2s-4ch-3dpc-24slot	CC7479B4DE61	DIMM_P1_H2	P1_Node1_Channel3_Dimm2	1	H	2	gigabyte-r280-f2o-r280-g2o-user	p. 19
+gigabyte-mu70-su0-e5-1s-12slot	34029535BAED	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-mu70-su0-user-manual	p. 7
+gigabyte-mu70-su0-e5-1s-12slot	34029535BAED	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-mu70-su0-user-manual	p. 7
+gigabyte-mu70-su0-e5-1s-12slot	34029535BAED	DIMM_P0_A2	P0_Node0_Channel0_Dimm2	0	A	2	gigabyte-mu70-su0-user-manual	p. 7
+gigabyte-mu70-su0-e5-1s-12slot	34029535BAED	DIMM_P0_B0	P0_Node0_Channel1_Dimm0	0	B	0	gigabyte-mu70-su0-user-manual	p. 7
+gigabyte-mu70-su0-e5-1s-12slot	34029535BAED	DIMM_P0_D1	P0_Node0_Channel3_Dimm1	0	D	1	gigabyte-mu70-su0-user-manual	p. 7
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P0_B0	P0_Node0_Channel1_Dimm0	0	B	0	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P0_D1	P0_Node0_Channel3_Dimm1	0	D	1	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P1_G0	P1_Node1_Channel0_Dimm0	1	G	0	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	129C0AE90794	DIMM_P1_L0	P1_Node1_Channel5_Dimm0	1	L	0	gigabyte-h261-h60-user-manual	p. 28
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	13084E646FAA	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-md72-hb0-md72-hb1-user	p. 9, 13-17
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	13084E646FAA	DIMM_P0_E0	P0_Node0_Channel4_Dimm0	0	E	0	gigabyte-md72-hb0-md72-hb1-user	p. 9, 13-17
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	13084E646FAA	DIMM_P0_H0	P0_Node0_Channel7_Dimm0	0	H	0	gigabyte-md72-hb0-md72-hb1-user	p. 9, 13-17
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	13084E646FAA	DIMM_P1_I0	P1_Node1_Channel0_Dimm0	1	I	0	gigabyte-md72-hb0-md72-hb1-user	p. 9, 13-17
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	13084E646FAA	DIMM_P1_P0	P1_Node1_Channel7_Dimm0	1	P	0	gigabyte-md72-hb0-md72-hb1-user	p. 9, 13-17
+gigabyte-mu72-su0-xeon-w3300-8slot	972D51B2901F	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-mu72-su0-user-manual	p. 12
+gigabyte-mu72-su0-xeon-w3300-8slot	972D51B2901F	DIMM_P0_B0	P0_Node0_Channel1_Dimm0	0	B	0	gigabyte-mu72-su0-user-manual	p. 12
+gigabyte-mu72-su0-xeon-w3300-8slot	972D51B2901F	DIMM_P0_E0	P0_Node0_Channel4_Dimm0	0	E	0	gigabyte-mu72-su0-user-manual	p. 12
+gigabyte-mu72-su0-xeon-w3300-8slot	972D51B2901F	DIMM_P0_H0	P0_Node0_Channel7_Dimm0	0	H	0	gigabyte-mu72-su0-user-manual	p. 12
+gigabyte-6pxsv-e5-1s-8slot	54F5641A961B	MEMORY A0	Channel 0	0	A	0	gigabyte-6pxsvl-user-manual	p. 7
+gigabyte-6pxsv-e5-1s-8slot	54F5641A961B	MEMORY A1	Channel 0	0	A	1	gigabyte-6pxsvl-user-manual	p. 7
+gigabyte-6pxsv-e5-1s-8slot	54F5641A961B	MEMORY B0	Channel 1	0	B	0	gigabyte-6pxsvl-user-manual	p. 7
+gigabyte-6pxsv-e5-1s-8slot	54F5641A961B	MEMORY D1	Channel 3	0	D	1	gigabyte-6pxsvl-user-manual	p. 7
+gigabyte-mz12-hd3-epyc-1s-8slot	B5251D581093	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-g242-z10-g242-z11-user	p. 32
+gigabyte-mz12-hd3-epyc-1s-8slot	B5251D581093	DIMM_P0_C0	BANK 0	0	C	0	gigabyte-g242-z10-g242-z11-user	p. 32
+gigabyte-mz12-hd3-epyc-1s-8slot	B5251D581093	DIMM_P0_D0	BANK 0	0	D	0	gigabyte-g242-z10-g242-z11-user	p. 32
+gigabyte-mz12-hd3-epyc-1s-8slot	B5251D581093	DIMM_P0_H0	BANK 0	0	H	0	gigabyte-g242-z10-g242-z11-user	p. 32
+gigabyte-mc62-g40-trpro-8slot	FF6922E2D8CA	DIMM_P0_A0	BANK 0	0	A	0	gigabyte-mc62-g40-user-manual	p. 13
+gigabyte-mc62-g40-trpro-8slot	FF6922E2D8CA	DIMM_P0_B0	BANK 0	0	B	0	gigabyte-mc62-g40-user-manual	p. 13
+gigabyte-mc62-g40-trpro-8slot	FF6922E2D8CA	DIMM_P0_E0	BANK 0	0	E	0	gigabyte-mc62-g40-user-manual	p. 13
+gigabyte-mc62-g40-trpro-8slot	FF6922E2D8CA	DIMM_P0_H0	BANK 0	0	H	0	gigabyte-mc62-g40-user-manual	p. 13
+asrock-am5-b650d4u-4slot	451CBD9D58AD	DIMM 1	P0 CHANNEL A	0	A	1	asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t	p9, p14-17, p23-25, p32
+asrock-am5-b650d4u-4slot	451CBD9D58AD	DIMM 0	P0 CHANNEL A	0	A	0	asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t	p9, p14-17, p23-25, p32
+asrock-am5-b650d4u-4slot	451CBD9D58AD	DIMM 1	P0 CHANNEL B	0	B	1	asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t	p9, p14-17, p23-25, p32
+asrock-am5-b650d4u-4slot	451CBD9D58AD	DIMM 0	P0 CHANNEL B	0	B	0	asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t	p9, p14-17, p23-25, p32
+asrock-am4-x570-4slot	6ADE942D8CE3	DIMM 1	P0 CHANNEL A	0	A	1	asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t	p8, p13, p14, p29
+asrock-am4-x570-4slot	6ADE942D8CE3	DIMM 0	P0 CHANNEL A	0	A	0	asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t	p8, p13, p14, p29
+asrock-am4-x570-4slot	6ADE942D8CE3	DIMM 1	P0 CHANNEL B	0	B	1	asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t	p8, p13, p14, p29
+asrock-am4-x570-4slot	6ADE942D8CE3	DIMM 0	P0 CHANNEL B	0	B	0	asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t	p8, p13, p14, p29
+asrock-romed8-2t-8slot	B6726EAB97FE	DIMM 0	P0 CHANNEL A	0	A	0	asrock-romed8-2t-romed8-romed8-2t	p9, p14, p30
+asrock-romed8-2t-8slot	B6726EAB97FE	DIMM 0	P0 CHANNEL C	0	C	0	asrock-romed8-2t-romed8-romed8-2t	p9, p14, p30
+asrock-romed8-2t-8slot	B6726EAB97FE	DIMM 0	P0 CHANNEL D	0	D	0	asrock-romed8-2t-romed8-romed8-2t	p9, p14, p30
+asrock-romed8-2t-8slot	B6726EAB97FE	DIMM 0	P0 CHANNEL G	0	G	0	asrock-romed8-2t-romed8-romed8-2t	p9, p14, p30
+asrock-romed8-2t-8slot	B6726EAB97FE	DIMM 0	P0 CHANNEL H	0	H	0	asrock-romed8-2t-romed8-romed8-2t	p9, p14, p30
+asrock-rome2d16-2t-16slot	F0F1A3C06093	DIMM 0	P0 CHANNEL A	0	A	0	asrock-rome2d16-2t-rome2d16-rome2d16-2l	p8, p21, p31
+asrock-rome2d16-2t-16slot	F0F1A3C06093	DIMM 0	P0 CHANNEL H	0	H	0	asrock-rome2d16-2t-rome2d16-rome2d16-2l	p8, p21, p31
+asrock-rome2d16-2t-16slot	F0F1A3C06093	DIMM 0	P1 CHANNEL A	1	A	0	asrock-rome2d16-2t-rome2d16-rome2d16-2l	p8, p21, p31
+asrock-rome2d16-2t-16slot	F0F1A3C06093	DIMM 0	P1 CHANNEL C	1	C	0	asrock-rome2d16-2t-rome2d16-rome2d16-2l	p8, p21, p31
+asrock-rome2d16-2t-16slot	F0F1A3C06093	DIMM 0	P1 CHANNEL H	1	H	0	asrock-rome2d16-2t-rome2d16-rome2d16-2l	p8, p21, p31
+asrock-genoad12m3-12slot	AF39B86BBAAF	DIMM 0	P0 CHANNEL A	0	A	0	asrock-genoad12m3-2q-user-manual-genoad12m3	p8, p9, p13, p27
+asrock-genoad12m3-12slot	AF39B86BBAAF	DIMM 0	P0 CHANNEL F	0	F	0	asrock-genoad12m3-2q-user-manual-genoad12m3	p8, p9, p13, p27
+asrock-genoad12m3-12slot	AF39B86BBAAF	DIMM 0	P0 CHANNEL I	0	I	0	asrock-genoad12m3-2q-user-manual-genoad12m3	p8, p9, p13, p27
+asrock-genoad12m3-12slot	AF39B86BBAAF	DIMM 0	P0 CHANNEL L	0	L	0	asrock-genoad12m3-2q-user-manual-genoad12m3	p8, p9, p13, p27
+asrock-intel-ddr5-controller-4slot	20C7D1E4BD07	Controller0-ChannelA-DIMM1	BANK 0	0	0A	1	asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u	p11, p19, p23, p29, p36, p41
+asrock-intel-ddr5-controller-4slot	20C7D1E4BD07	Controller0-ChannelA-DIMM0	BANK 0	0	0A	0	asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u	p11, p19, p23, p29, p36, p41
+asrock-intel-ddr5-controller-4slot	20C7D1E4BD07	Controller1-ChannelA-DIMM1	BANK 0	0	1A	1	asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u	p11, p19, p23, p29, p36, p41
+asrock-intel-ddr5-controller-4slot	20C7D1E4BD07	Controller1-ChannelA-DIMM0	BANK 0	0	1A	0	asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u	p11, p19, p23, p29, p36, p41
+asrock-sp2c621d32lm3-32slot	EC54AC1F686F	ChannelA-DIMM0	NODE 0	0	A	0	asrock-sp2c621d32lm3-user-manual	p8, p13, p20, p28-31
+asrock-sp2c621d32lm3-32slot	EC54AC1F686F	ChannelA-DIMM1	NODE 0	0	A	1	asrock-sp2c621d32lm3-user-manual	p8, p13, p20, p28-31
+asrock-sp2c621d32lm3-32slot	EC54AC1F686F	ChannelC-DIMM0	NODE 1	0	C	0	asrock-sp2c621d32lm3-user-manual	p8, p13, p20, p28-31
+asrock-sp2c621d32lm3-32slot	EC54AC1F686F	ChannelI-DIMM0	NODE 4	1	I	0	asrock-sp2c621d32lm3-user-manual	p8, p13, p20, p28-31
+asrock-sp2c621d32lm3-32slot	EC54AC1F686F	ChannelP-DIMM1	NODE 7	1	P	1	asrock-sp2c621d32lm3-user-manual	p8, p13, p20, p28-31
+asrock-altrad8ud-8slot	33DCD26EDA10	DDR4_A1	Bank 1	0	A	0	asrock-altrad8ud-1l2t-user-manual	p8, p12, p30
+asrock-altrad8ud-8slot	33DCD26EDA10	DDR4_B1	Bank 2	0	B	0	asrock-altrad8ud-1l2t-user-manual	p8, p12, p30
+asrock-altrad8ud-8slot	33DCD26EDA10	DDR4_E1	Bank 5	0	E	0	asrock-altrad8ud-1l2t-user-manual	p8, p12, p30
+asrock-altrad8ud-8slot	33DCD26EDA10	DDR4_H1	Bank 8	0	H	0	asrock-altrad8ud-1l2t-user-manual	p8, p12, p30
+msi-am5-d3051-d3052	5C85906FD05B	DIMM 1	P0 CHANNEL A	0	A	1	msi-d3052-s3661-user-guide	p18
+msi-am5-d3051-d3052	5C85906FD05B	DIMM 0	P0 CHANNEL A	0	A	0	msi-d3052-s3661-user-guide	p18
+msi-am5-d3051-d3052	5C85906FD05B	DIMM 1	P0 CHANNEL B	0	B	1	msi-d3052-s3661-user-guide	p18
+msi-am5-d3051-d3052	5C85906FD05B	DIMM 0	P0 CHANNEL B	0	B	0	msi-d3052-s3661-user-guide	p18
+tyan-s7012	4A43E21507D4	P0-ChD-DIMM0	BANK15	0	D	0	tyan-s7012-user-manual	p10, p26
+tyan-s7012	4A43E21507D4	P0-ChD-DIMM2	BANK17	0	D	2	tyan-s7012-user-manual	p10, p26
+tyan-s7012	4A43E21507D4	P0-ChF-DIMM1	BANK10	0	F	1	tyan-s7012-user-manual	p10, p26
+tyan-s7012	4A43E21507D4	P1-ChA-DIMM0	BANK06	1	A	0	tyan-s7012-user-manual	p10, p26
+tyan-s7012	4A43E21507D4	P1-ChC-DIMM2	BANK02	1	C	2	tyan-s7012-user-manual	p10, p26
+tyan-s7010	0C071F7B6B6A	P0-ChD-DIMM0	BANK10	0	D	0	tyan-s7010-user-manual	p12, p27-28
+tyan-s7010	0C071F7B6B6A	P0-ChD-DIMM1	BANK11	0	D	1	tyan-s7010-user-manual	p12, p27-28
+tyan-s7010	0C071F7B6B6A	P0-ChE-DIMM0	BANK08	0	E	0	tyan-s7010-user-manual	p12, p27-28
+tyan-s7010	0C071F7B6B6A	P1-ChA-DIMM1	BANK05	1	A	1	tyan-s7010-user-manual	p12, p27-28
+tyan-s8026	850F0AA78715	P0_D1_UMC0_CH_A1	P0 CHANNEL A	0	A	1	tyan-s8026-user-manual	p15, p36-38
+tyan-s8026	850F0AA78715	P0_D1_UMC0_CH_A0	P0 CHANNEL A	0	A	0	tyan-s8026-user-manual	p15, p36-38
+tyan-s8026	850F0AA78715	P0_D0_UMC0_CH_D1	P0 CHANNEL D	0	D	1	tyan-s8026-user-manual	p15, p36-38
+tyan-s8026	850F0AA78715	P0_D3_UMC0_CH_E0	P0 CHANNEL E	0	E	0	tyan-s8026-user-manual	p15, p36-38
+tyan-s8026	850F0AA78715	P0_D2_UMC0_CH_H1	P0 CHANNEL H	0	H	1	tyan-s8026-user-manual	p15, p36-38
+tyan-s8036	7293A7D59821	P0_UMC0_CH_A1	P0 CHANNEL A	0	A	1	tyan-s8036-user-manual	p39
+tyan-s8036	7293A7D59821	P0_UMC0_CH_A0	P0 CHANNEL A	0	A	0	tyan-s8036-user-manual	p39
+tyan-s8036	7293A7D59821	P0_UMC2_CH_D1	P0 CHANNEL D	0	D	1	tyan-s8036-user-manual	p39
+tyan-s8036	7293A7D59821	P0_UMC3_CH_C0	P0 CHANNEL C	0	C	0	tyan-s8036-user-manual	p39
+tyan-s8036	7293A7D59821	P0_UMC4_CH_H1	P0 CHANNEL H	0	H	1	tyan-s8036-user-manual	p39
+tyan-s7109	91971D0E7746	P0_MC0_DIM_CH_A0	NODE 1	0	A	0	tyan-s7106-user-manual	p31
+tyan-s7109	91971D0E7746	P0_MC0_DIM_CH_A1	NODE 1	0	A	1	tyan-s7106-user-manual	p31
+tyan-s7109	91971D0E7746	P0_MC1_DIM_CH_D0	NODE 1	0	D	0	tyan-s7106-user-manual	p31
+tyan-s7109	91971D0E7746	P1_MC0_DIM_CH_C1	NODE 2	1	C	1	tyan-s7106-user-manual	p31
+tyan-s7109	91971D0E7746	P1_MC1_DIM_CH_F0	NODE 2	1	F	0	tyan-s7106-user-manual	p31
+tyan-s4882	84BBA0EA52AC	H0_DIMM0	Bank 1	0	low64	0	tyan-k8qs-s4882-user-manual	p9, p27-28
+tyan-s4882	84BBA0EA52AC	H0_DIMM1	Bank 2	0	high64	0	tyan-k8qs-s4882-user-manual	p9, p27-28
+tyan-s4882	84BBA0EA52AC	H0_DIMM2	Bank 3	0	low64	1	tyan-k8qs-s4882-user-manual	p9, p27-28
+tyan-s4882	84BBA0EA52AC	H0_DIMM3	Bank 4	0	high64	1	tyan-k8qs-s4882-user-manual	p9, p27-28
+tyan-s4882	84BBA0EA52AC	H1_DIMM2	Bank 7	1	low64	1	tyan-k8qs-s4882-user-manual	p9, p27-28
+huawei-rh-v3-16slot	36A7C15772FE	DIMM000	_Node0_Channel0_Dimm0	0	0	0	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	36A7C15772FE	DIMM001	_Node0_Channel0_Dimm1	0	0	1	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	36A7C15772FE	DIMM020	_Node0_Channel2_Dimm0	0	2	0	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	36A7C15772FE	DIMM120	_Node1_Channel2_Dimm0	1	2	0	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	36A7C15772FE	DIMM131	_Node1_Channel3_Dimm1	1	3	1	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	C95D9CCBAF34	DIMM010	_Node0_Channel1_Dimm0	0	1	0	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh-v3-16slot	C95D9CCBAF34	DIMM031	_Node0_Channel3_Dimm1	0	3	1	huawei-rh1288-v3-user-guide	pdf p. 57, 201-202
+huawei-rh2288hv3-24slot	9A84058B41F9	DIMM000	_Node0_Channel0_Dimm0	0	0	0	huawei-rh2288h-v3-user-guide	pdf p. 80, 233-234
+huawei-rh2288hv3-24slot	9A84058B41F9	DIMM012	_Node0_Channel1_Dimm2	0	1	2	huawei-rh2288h-v3-user-guide	pdf p. 80, 233-234
+huawei-rh2288hv3-24slot	9A84058B41F9	DIMM100	_Node1_Channel0_Dimm0	1	0	0	huawei-rh2288h-v3-user-guide	pdf p. 80, 233-234
+huawei-rh2288hv3-24slot	9A84058B41F9	DIMM110	_Node1_Channel1_Dimm0	1	1	0	huawei-rh2288h-v3-user-guide	pdf p. 80, 233-234
+huawei-rh2288hv3-24slot	9A84058B41F9	DIMM132	_Node1_Channel3_Dimm2	1	3	2	huawei-rh2288h-v3-user-guide	pdf p. 80, 233-234
+huawei-v5-24slot	96AA82145898	DIMM000 J22	_Node0_Channel0_Dimm0	0	0	0	huawei-1288h-v5-user-guide	pdf p. 28
+huawei-v5-24slot	96AA82145898	DIMM001 J23	_Node0_Channel0_Dimm1	0	0	1	huawei-1288h-v5-user-guide	pdf p. 28
+huawei-v5-24slot	96AA82145898	DIMM051 J33	_Node0_Channel5_Dimm1	0	5	1	huawei-1288h-v5-user-guide	pdf p. 28
+huawei-v5-24slot	96AA82145898	DIMM120 J72	_Node1_Channel2_Dimm0	1	2	0	huawei-1288h-v5-user-guide	pdf p. 28
+huawei-v5-24slot	96AA82145898	DIMM151 J45	_Node1_Channel5_Dimm1	1	5	1	huawei-1288h-v5-user-guide	pdf p. 28
+lenovo-thinkserver-rd330	6F8A9549CD08	CPU1_DimmA1	CPU1_Bank0	0	A	0	lenovo-rd330-maintenance-manual	p. 77-80 (pdf p. 91-94)
+lenovo-thinkserver-rd330	6F8A9549CD08	CPU1_DimmA2	CPU1_Bank0	0	A	1	lenovo-rd330-maintenance-manual	p. 77-80 (pdf p. 91-94)
+lenovo-thinkserver-rd330	6F8A9549CD08	CPU1_DimmC2	CPU1_Bank0	0	C	1	lenovo-rd330-maintenance-manual	p. 77-80 (pdf p. 91-94)
+lenovo-thinkserver-rd330	6F8A9549CD08	CPU2_DimmA1	CPU2_Bank0	1	A	0	lenovo-rd330-maintenance-manual	p. 77-80 (pdf p. 91-94)
+lenovo-thinkserver-rd330	6F8A9549CD08	CPU2_DimmB1	CPU2_Bank0	1	B	0	lenovo-rd330-maintenance-manual	p. 77-80 (pdf p. 91-94)
+lenovo-thinkserver-rd450	CED136D9B722	CPU1 DIMM A1	A1_Node0_Channel0_Dimm1	0	A	0	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450	CED136D9B722	CPU1 DIMM A2	A1_Node0_Channel0_Dimm2	0	A	1	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450	CED136D9B722	CPU1 DIMM B2	A1_Node0_Channel1_Dimm2	0	B	1	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450	CED136D9B722	CPU2 DIMM D1	A1_Node1_Channel3_Dimm1	1	D	0	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkstation-px	8A299C9A2065	CPU0_DIMM_4	NODE 0	0	4	0	lenovo-memory-configurator-lenovo	pp. 4-9
+lenovo-thinkstation-px	8A299C9A2065	CPU0_DIMM_1	NODE 1	0	1	0	lenovo-memory-configurator-lenovo	pp. 4-9
+lenovo-thinkstation-px	8A299C9A2065	CPU1_DIMM_12	NODE 4	1	12	0	lenovo-memory-configurator-lenovo	pp. 4-9
+lenovo-thinkstation-px	8A299C9A2065	CPU1_DIMM_16	NODE 7	1	16	0	lenovo-memory-configurator-lenovo	pp. 4-9
+fujitsu-d3521-tx1310m3	35A0293EF01F	DIMM CHA3	BANK 0	0	A	1	fujitsu-tx1310-m3-guide	configuration diagram and section III
+fujitsu-d3521-tx1310m3	35A0293EF01F	DIMM CHA1	BANK 1	0	A	0	fujitsu-tx1310-m3-guide	configuration diagram and section III
+fujitsu-d3521-tx1310m3	35A0293EF01F	DIMM CHB4	BANK 2	0	B	1	fujitsu-tx1310-m3-guide	configuration diagram and section III
+fujitsu-d3521-tx1310m3	35A0293EF01F	DIMM CHB2	BANK 3	0	B	0	fujitsu-tx1310-m3-guide	configuration diagram and section III
+fujitsu-mx130s2-sample	99502D498856	DIMM-CHA3	Channel A	0	A	1	fujitsu-mx130-s2-maintenance-manual	pp. 179-181
+fujitsu-mx130s2-sample	99502D498856	DIMM-CHA1	Channel A	0	A	0	fujitsu-mx130-s2-maintenance-manual	pp. 179-181
+fujitsu-mx130s2-sample	99502D498856	DIMM-CHB4	Channel B	0	B	1	fujitsu-mx130-s2-maintenance-manual	pp. 179-181
+fujitsu-mx130s2-sample	99502D498856	DIMM-CHB2	Channel B	0	B	0	fujitsu-mx130-s2-maintenance-manual	pp. 179-181
+inspur-nf5280m6-32slot	48E15DC00C22	CPU0_C0D0	NODE 0	0	0.0	0	inspur-nf5280m-lm6-user-manual	p. 50
+inspur-nf5280m6-32slot	48E15DC00C22	CPU0_C0D1	NODE 0	0	0.0	1	inspur-nf5280m-lm6-user-manual	p. 50
+inspur-nf5280m6-32slot	48E15DC00C22	CPU0_C7D0	NODE 3	0	3.7	0	inspur-nf5280m-lm6-user-manual	p. 50
+inspur-nf5280m6-32slot	48E15DC00C22	CPU1_C3D1	NODE 5	1	1.3	1	inspur-nf5280m-lm6-user-manual	p. 50
+inspur-sa5212m4-16slot	4250B01550A6	CHA_0	A1_Node0_Channel0_Dimm0	0	A	0	inspur-sa5212m4-sa5212m4-user-manual	p. 69-70 (pdf p. 75-76)
+inspur-sa5212m4-16slot	4250B01550A6	CHD_0	A1_Node0_Channel3_Dimm0	0	D	0	inspur-sa5212m4-sa5212m4-user-manual	p. 69-70 (pdf p. 75-76)
+inspur-sa5212m4-16slot	4250B01550A6	CHE_0	A1_Node1_Channel0_Dimm0	1	E	0	inspur-sa5212m4-sa5212m4-user-manual	p. 69-70 (pdf p. 75-76)
+inspur-sa5212m4-16slot	4250B01550A6	CHH_0	A1_Node1_Channel3_Dimm0	1	H	0	inspur-sa5212m4-sa5212m4-user-manual	p. 69-70 (pdf p. 75-76)
+quanta-t22hf-s5hf-16slot	B1850FC9EF80	DIMM_A0	P0 CHANNEL A	0	A	0	quanta-t22hf-1u-service-guide	pdf p. 49
+quanta-t22hf-s5hf-16slot	B1850FC9EF80	DIMM_A1	P0 CHANNEL A	0	A	1	quanta-t22hf-1u-service-guide	pdf p. 49
+quanta-t22hf-s5hf-16slot	B1850FC9EF80	DIMM_E1	P0 CHANNEL E	0	E	1	quanta-t22hf-1u-service-guide	pdf p. 49
+quanta-t22hf-s5hf-16slot	B1850FC9EF80	DIMM_H0	P0 CHANNEL H	0	H	0	quanta-t22hf-1u-service-guide	pdf p. 49
+huawei-taishan200-2280-kunpeng920	50ED10C1AEE2	DIMM000 J27	SOCKET 0 CHANNEL 0 DIMM 0	0	0	0	huawei-200-maintenance-service-guide-2280	p. 38-39
+huawei-taishan200-2280-kunpeng920	50ED10C1AEE2	DIMM001 J28	SOCKET 0 CHANNEL 0 DIMM 1	0	0	1	huawei-200-maintenance-service-guide-2280	p. 38-39
+huawei-taishan200-2280-kunpeng920	50ED10C1AEE2	DIMM030 J13	SOCKET 0 CHANNEL 3 DIMM 0	0	3	0	huawei-200-maintenance-service-guide-2280	p. 38-39
+huawei-taishan200-2280-kunpeng920	50ED10C1AEE2	DIMM070 J15	SOCKET 0 CHANNEL 7 DIMM 0	0	7	0	huawei-200-maintenance-service-guide-2280	p. 38-39
+huawei-taishan200-2280-kunpeng920	50ED10C1AEE2	DIMM161 J34	SOCKET 1 CHANNEL 6 DIMM 1	1	6	1	huawei-200-maintenance-service-guide-2280	p. 38-39
+huawei-atlas500pro-3000	819BF2A3EA9F	DIMM000 J17	SOCKET 0 CHANNEL 0 DIMM 0	0	0	0	huawei-500-maintenance-service-guide-3000	p. 19-20
+huawei-atlas500pro-3000	819BF2A3EA9F	DIMM010 J19	SOCKET 0 CHANNEL 1 DIMM 0	0	1	0	huawei-500-maintenance-service-guide-3000	p. 19-20
+huawei-atlas500pro-3000	819BF2A3EA9F	DIMM020 J25	SOCKET 0 CHANNEL 2 DIMM 0	0	2	0	huawei-500-maintenance-service-guide-3000	p. 19-20
+huawei-atlas500pro-3000	819BF2A3EA9F	DIMM030 J27	SOCKET 0 CHANNEL 3 DIMM 0	0	3	0	huawei-500-maintenance-service-guide-3000	p. 19-20
+quanta-ocp-leopard-16slot	58B8D5234EEB	A0	_Node0_Channel0_Dimm0	0	0	0	quanta-v3-1	p. 49
+quanta-ocp-leopard-16slot	58B8D5234EEB	A1	_Node0_Channel0_Dimm1	0	0	1	quanta-v3-1	p. 49
+quanta-ocp-leopard-16slot	58B8D5234EEB	A6	_Node0_Channel3_Dimm0	0	3	0	quanta-v3-1	p. 49
+quanta-ocp-leopard-16slot	58B8D5234EEB	B3	_Node1_Channel1_Dimm1	1	1	1	quanta-v3-1	p. 49
+quanta-ocp-leopard-16slot	58B8D5234EEB	B7	_Node1_Channel3_Dimm1	1	3	1	quanta-v3-1	p. 49
+quanta-ocp-windmill-winterfell-16slot	53CBFD82B356	A2	Node0_Bank0	0	1	0	quanta-v2-0	p. 7-8, 30-31, 34
+quanta-ocp-windmill-winterfell-16slot	53CBFD82B356	A4	Node0_Bank0	0	2	0	quanta-v2-0	p. 7-8, 30-31, 34
+quanta-ocp-windmill-winterfell-16slot	53CBFD82B356	B1	Node1_Bank0	1	0	1	quanta-v2-0	p. 7-8, 30-31, 34
+quanta-ocp-windmill-winterfell-16slot	53CBFD82B356	B5	Node1_Bank0	1	2	1	quanta-v2-0	p. 7-8, 30-31, 34
+lenovo-thinkserver-rd450x	0343E094053B	CPU1 DIMM A0	_Node0_Channel0_Dimm0	0	A	0	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450x	0343E094053B	CPU1 DIMM A1	_Node0_Channel0_Dimm1	0	A	1	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450x	0343E094053B	CPU1 DIMM D0	_Node0_Channel3_Dimm0	0	D	0	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+lenovo-thinkserver-rd450x	0343E094053B	CPU2 DIMM B1	_Node1_Channel1_Dimm1	1	B	1	lenovo-rd450-user-guide-maintenance-manual	p. 69-74 (pdf p. 81-88); p. 69-74
+hp-dl360-gen10plus-32slot	6004A3CDB655	PROC 1 DIMM 3	Not Specified	0	CH4	0	hpe-population-gen10-3rd-technical	pp. 3-5, 9, 12
+hp-dl360-gen10plus-32slot	6004A3CDB655	PROC 1 DIMM 14	Not Specified	0	CH0	0	hpe-population-gen10-3rd-technical	pp. 3-5, 9, 12
+hp-dl360-gen10plus-32slot	6004A3CDB655	PROC 1 DIMM 1	Not Specified	0	CH5	0	hpe-population-gen10-3rd-technical	pp. 3-5, 9, 12
+hp-dl360-gen10plus-32slot	6004A3CDB655	PROC 1 DIMM 9	Not Specified	0	CH2	1	hpe-population-gen10-3rd-technical	pp. 3-5, 9, 12
+hp-dl360-gen10plus-32slot	6004A3CDB655	PROC 2 DIMM 14	Not Specified	1	CH0	0	hpe-population-gen10-3rd-technical	pp. 3-5, 9, 12
+hp-dl385-gen10plus-32slot	62355E56BA26	PROC 1 DIMM 16	Not Specified	0	D	0	hpe-population-gen10-gen10-7002-7003	pp. 3-4, 6, 8, 11-12
+hp-dl385-gen10plus-32slot	62355E56BA26	PROC 1 DIMM 14	Not Specified	0	C	0	hpe-population-gen10-gen10-7002-7003	pp. 3-4, 6, 8, 11-12
+hp-dl385-gen10plus-32slot	62355E56BA26	PROC 1 DIMM 3	Not Specified	0	G	0	hpe-population-gen10-gen10-7002-7003	pp. 3-4, 6, 8, 11-12
+hp-dl385-gen10plus-32slot	62355E56BA26	PROC 1 DIMM 1	Not Specified	0	H	0	hpe-population-gen10-gen10-7002-7003	pp. 3-4, 6, 8, 11-12
+hp-dl385-gen10plus-32slot	62355E56BA26	PROC 1 DIMM 15	Not Specified	0	D	1	hpe-population-gen10-gen10-7002-7003	pp. 3-4, 6, 8, 11-12
+hp-dl380-gen11-32slot	89BBBA931D2E	PROC 1 DIMM 3	Not Specified	0	pair3_4	0	hpe-population-gen11-5th-technical	pp. 4, 6, 10-12, 15
+hp-dl380-gen11-32slot	89BBBA931D2E	PROC 1 DIMM 7	Not Specified	0	pair7_8	0	hpe-population-gen11-5th-technical	pp. 4, 6, 10-12, 15
+hp-dl380-gen11-32slot	89BBBA931D2E	PROC 1 DIMM 10	Not Specified	0	pair9_10	0	hpe-population-gen11-5th-technical	pp. 4, 6, 10-12, 15
+hp-dl380-gen11-32slot	89BBBA931D2E	PROC 1 DIMM 14	Not Specified	0	pair13_14	0	hpe-population-gen11-5th-technical	pp. 4, 6, 10-12, 15
+hp-dl380-gen11-32slot	89BBBA931D2E	PROC 2 DIMM 9	Not Specified	1	pair9_10	1	hpe-population-gen11-5th-technical	pp. 4, 6, 10-12, 15
+hp-dl160-gen10-16slot	8736F5E703F9	PROC 1 DIMM 1	Not Specified	0	CH3	0	hpe-dl160-gen10	pp. 8, 31
+hp-dl160-gen10-16slot	8736F5E703F9	PROC 1 DIMM 2	Not Specified	0	CH2	0	hpe-dl160-gen10	pp. 8, 31
+hp-dl160-gen10-16slot	8736F5E703F9	PROC 1 DIMM 3	Not Specified	0	CH1	0	hpe-dl160-gen10	pp. 8, 31
+hp-dl160-gen10-16slot	8736F5E703F9	PROC 1 DIMM 4	Not Specified	0	CH1	1	hpe-dl160-gen10	pp. 8, 31
+hp-dl160-gen10-16slot	8736F5E703F9	PROC 2 DIMM 3	Not Specified	1	CH1	0	hpe-dl160-gen10	pp. 8, 31
+hp-dl20-gen10plus-4slot	55339DFCC592	PROC 1 DIMM 3	Not Specified	0	CH1	0	hpe-population-gen10-2300-technical	pp. 3-5
+hp-dl20-gen10plus-4slot	55339DFCC592	PROC 1 DIMM 1	Not Specified	0	CH2	0	hpe-population-gen10-2300-technical	pp. 3-5
+hp-dl20-gen10plus-4slot	55339DFCC592	PROC 1 DIMM 4	Not Specified	0	CH1	1	hpe-population-gen10-2300-technical	pp. 3-5
+hp-dl20-gen10plus-4slot	55339DFCC592	PROC 1 DIMM 2	Not Specified	0	CH2	1	hpe-population-gen10-2300-technical	pp. 3-5
+hp-cray-xd665-24slot	64BB2DE4318F	CPU1_DIMM_A1	P1 CHANNEL A	0	A	0	hpe-xd665-maintenance-service-guide	topics "DIMM slot locations", "DIMM population rule", "Memory information"
+hp-cray-xd665-24slot	64BB2DE4318F	CPU1_DIMM_G1	P1 CHANNEL G	0	G	0	hpe-xd665-maintenance-service-guide	topics "DIMM slot locations", "DIMM population rule", "Memory information"
+hp-cray-xd665-24slot	64BB2DE4318F	CPU1_DIMM_L1	P1 CHANNEL L	0	L	0	hpe-xd665-maintenance-service-guide	topics "DIMM slot locations", "DIMM population rule", "Memory information"
+hp-cray-xd665-24slot	64BB2DE4318F	CPU2_DIMM_A1	P2 CHANNEL A	1	A	0	hpe-xd665-maintenance-service-guide	topics "DIMM slot locations", "DIMM population rule", "Memory information"
+hp-cray-xd665-24slot	64BB2DE4318F	CPU2_DIMM_F1	P2 CHANNEL F	1	F	0	hpe-xd665-maintenance-service-guide	topics "DIMM slot locations", "DIMM population rule", "Memory information"
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P0_A1	P0_Node0_Channel0_Dimm1	0	A	1	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P0_E0	P0_Node0_Channel4_Dimm0	0	E	0	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P0_H1	P0_Node0_Channel7_Dimm1	0	H	1	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P1_I0	P1_Node1_Channel0_Dimm0	1	I	0	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+gigabyte-mr92-fs1-32slot	228EB1A33AE6	DIMM_P1_P1	P1_Node1_Channel7_Dimm1	1	P	1	gigabyte-r182-n20-r182-na0-3rd	PDF p. 31
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM000 J22	_Node0_Channel0_Dimm0	0	0	0	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM001 J23	_Node0_Channel0_Dimm1	0	0	1	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM020 J26	_Node0_Channel2_Dimm0	0	2	0	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM120 J72	_Node1_Channel2_Dimm0	1	2	0	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM150 J44	_Node1_Channel5_Dimm0	1	5	0	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-2288hv5-bc11spscb-unbranded	FA6579B3F123	DIMM151 J45	_Node1_Channel5_Dimm1	1	5	1	huawei-2288h-v5-user-guide	PDF pp. 32-33
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM000	_Node0_Channel0_Dimm0	0	0	0	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM001	_Node0_Channel0_Dimm1	0	0	1	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM002	_Node0_Channel0_Dimm2	0	0	2	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM031	_Node0_Channel3_Dimm1	0	3	1	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM100	_Node1_Channel0_Dimm0	1	0	0	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+huawei-rh2288hv3-bc11hgsa-hve	9D4F1078D105	DIMM132	_Node1_Channel3_Dimm2	1	3	2	huawei-rh2288h-v3-user-guide-2	PDF p. 233
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelA-DIMM0	NODE 0	0	A	0	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelA-DIMM1	NODE 0	0	A	1	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelE-DIMM0	NODE 2	0	E	0	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelI-DIMM0	NODE 4	1	I	0	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelM-DIMM0	NODE 6	1	M	0	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+asrock-sp2c621d32tm3-32slot-inferit	68DD4BB73C8C	ChannelP-DIMM1	NODE 7	1	P	1	asrock-sp2c621d32tm3-user-manual	PDF pp. 18, 31-35
+geekom-intel-h-2sodimm	16CDCA664323	Controller0-ChannelA-DIMM0	BANK 0	0	0A	0	other-12th-1	PDF p. 115
+geekom-intel-h-2sodimm	16CDCA664323	Controller1-ChannelA-DIMM0	BANK 0	0	1A	0	other-12th-1	PDF p. 115
+neousys-nuvo-9000-10000-2sodimm	C2BB9BA56628	Controller0-ChannelA-DIMM0	BANK 0	0	0A	0	other-9000-user-manual	PDF p. 58
+neousys-nuvo-9000-10000-2sodimm	C2BB9BA56628	Controller1-ChannelA-DIMM0	BANK 0	0	1A	0	other-9000-user-manual	PDF p. 58
+geekom-miniair11-jsl-2sodimm	20FBB72937DC	Controller0-ChannelA	BANK 0	0	A	0	other-11	memory line
+geekom-miniair11-jsl-2sodimm	20FBB72937DC	Controller0-ChannelB-DIMM0	BANK 1	0	B	0	other-11	memory line
+neousys-nuvo-2600-1sodimm	EE829A6D39DA	Controller0-ChannelA	BANK 0	0	A	0	other-2600-user-manual	PDF p. 36
+neousys-nuvo-2600-1sodimm	EE829A6D39DA	Controller0-ChannelB-DIMM0	BANK 1	0	B	0	other-2600-user-manual	PDF p. 36
+geekom-miniair12-n100	23C3F9D25C2A	Controller0-ChannelA-DIMM0	BANK 0	0	A	0	other-1	PDF p. 159
+ekf-sc9-toccata-tgl	89AAC1C97050	Controller0-ChannelA-DIMM0	BANK 0	0	0A	0	other-631121-012	PDF pp. 86-88
+ekf-sc9-toccata-tgl	89AAC1C97050	Controller0-ChannelA-DIMM1	BANK 0	0	0A	1	other-631121-012	PDF pp. 86-88
+ekf-sc9-toccata-tgl	89AAC1C97050	Controller1-ChannelA-DIMM0	BANK 0	0	1A	0	other-631121-012	PDF pp. 86-88
+ekf-sc9-toccata-tgl	89AAC1C97050	Controller1-ChannelA-DIMM1	BANK 0	0	1A	1	other-631121-012	PDF pp. 86-88
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 0	Bank 0	0	MCU0	0	other-user-guide	PDF pp. 11
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 1	Bank 1	0	MCU1	0	other-user-guide	PDF pp. 11
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 2	Bank 2	0	MCU2	0	other-user-guide	PDF pp. 11
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 3	Bank 3	0	MCU4	0	other-user-guide	PDF pp. 11
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 4	Bank 4	0	MCU5	0	other-user-guide	PDF pp. 11
+adlink-aadp-com-hpc-alt-6slot	FB5A6C19741A	Socket 0 DIMM 5	Bank 5	0	MCU6	0	other-user-guide	PDF pp. 11
+besstar-atb15-2sodimm	81B31475FFFF	DIMM 0	P0 CHANNEL A	0	A	0	other-x300-x400-x500-user-manual	PDF p. 13
+besstar-atb15-2sodimm	81B31475FFFF	DIMM 0	P0 CHANNEL B	0	B	0	other-x300-x400-x500-user-manual	PDF p. 13
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P0_A0	P0_Node0_Channel0_Dimm0	0	A	0	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P0_C0	P0_Node0_Channel2_Dimm0	0	C	0	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P0_G1	P0_Node0_Channel6_Dimm1	0	G	1	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P1_I0	P1_Node1_Channel0_Dimm0	1	I	0	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P1_O0	P1_Node1_Channel6_Dimm0	1	O	0	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+gigabyte-rmb-mr91-openyard	143EE93F1249	DIMM_P1_P1	P1_Node1_Channel7_Dimm1	1	P	1	gigabyte-r182-n20-r182-na0-user	PDF p. 31
+powerleader-psc621di-16f	18C972C8633E	CPU0_DIMM_1	P0_Channel0_Dimm0	0	0	0	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+powerleader-psc621di-16f	18C972C8633E	CPU0_DIMM_2	P0_Channel0_Dimm1	0	0	1	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+powerleader-psc621di-16f	18C972C8633E	CPU0_DIMM_3	P0_Channel1_Dimm0	0	1	0	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+powerleader-psc621di-16f	18C972C8633E	CPU0_DIMM_5	P0_Channel3_Dimm0	0	3	0	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+powerleader-psc621di-16f	18C972C8633E	CPU0_DIMM_6	P0_Channel3_Dimm1	0	3	1	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+powerleader-psc621di-16f	18C972C8633E	CPU1_DIMM_8	P1_Channel5_Dimm0	1	5	0	other-rs5230-user-manual-pr2710p-manual	PDF p. 21
+quanta-d52b-1u-nokia-airframe	207E2D41F422	CPU0_A0	NODE 1	0	A	0	quanta-d52b	PDF pp. 15, 22
+quanta-d52b-1u-nokia-airframe	207E2D41F422	CPU0_A1	NODE 1	0	A	1	quanta-d52b	PDF pp. 15, 22
+quanta-d52b-1u-nokia-airframe	207E2D41F422	CPU0_D0	NODE 2	0	D	0	quanta-d52b	PDF pp. 15, 22
+quanta-d52b-1u-nokia-airframe	207E2D41F422	CPU1_F1	NODE 4	1	F	1	quanta-d52b	PDF pp. 15, 22
+graviton-onega-16slot	4241B2B9D92D	ChannelA-DIMM0	NODE 0	0	A	0	other-2041-2122	p. 1
+graviton-onega-16slot	4241B2B9D92D	ChannelE-DIMM0	NODE 2	0	E	0	other-2041-2122	p. 1
+graviton-onega-16slot	4241B2B9D92D	ChannelI-DIMM0	NODE 4	1	I	0	other-2041-2122	p. 1
+graviton-onega-16slot	4241B2B9D92D	ChannelM-DIMM0	NODE 6	1	M	0	other-2041-2122	p. 1
+graviton-onega-16slot	4241B2B9D92D	ChannelP-DIMM0	NODE 7	1	P	0	other-2041-2122	p. 1
+yadro-vegman-rx20g2-32slot	23BA3B5E78E1	NODE 0 CHANNEL 0 DIMM 0 (C0A0)	NODE 0	0	0.0	0	other-rx20-g2	p. 2
+yadro-vegman-rx20g2-32slot	23BA3B5E78E1	NODE 0 CHANNEL 0 DIMM 1 (C0A1)	NODE 0	0	0.0	1	other-rx20-g2	p. 2
+yadro-vegman-rx20g2-32slot	23BA3B5E78E1	NODE 0 CHANNEL 6 DIMM 0 (C0G0)	NODE 3	0	3.6	0	other-rx20-g2	p. 2
+yadro-vegman-rx20g2-32slot	23BA3B5E78E1	NODE 1 CHANNEL 7 DIMM 1 (C1H1)	NODE 7	1	3.7	1	other-rx20-g2	p. 2
+etegro-rs125g4-quanta-s2ms-16slot	0A660F070A3A	ChannelA_Dimm1	ChannelA	0	A	0	other-rs125-g4	memory line
+etegro-rs125g4-quanta-s2ms-16slot	0A660F070A3A	ChannelA_Dimm2	ChannelA	0	A	1	other-rs125-g4	memory line
+etegro-rs125g4-quanta-s2ms-16slot	0A660F070A3A	ChannelB_Dimm1	ChannelB	0	B	0	other-rs125-g4	memory line
+etegro-rs125g4-quanta-s2ms-16slot	0A660F070A3A	ChannelE_Dimm1	ChannelE	1	E	0	other-rs125-g4	memory line
+etegro-rs125g4-quanta-s2ms-16slot	0A660F070A3A	ChannelF_Dimm1	ChannelF	1	F	0	other-rs125-g4	memory line
+etegro-rs130g4-quanta-s2rq-24slot	E911C8087891	ChannelA_Dimm0	ChannelA	0	A	0	other-rs130-g4	memory line
+etegro-rs130g4-quanta-s2rq-24slot	E911C8087891	ChannelA_Dimm1	ChannelA	0	A	1	other-rs130-g4	memory line
+etegro-rs130g4-quanta-s2rq-24slot	E911C8087891	ChannelA_Dimm2	ChannelA	0	A	2	other-rs130-g4	memory line
+etegro-rs130g4-quanta-s2rq-24slot	E911C8087891	ChannelG_Dimm0	ChannelG	1	G	0	other-rs130-g4	memory line
+etegro-rs130g4-quanta-s2rq-24slot	E911C8087891	ChannelH_Dimm0	ChannelH	1	H	0	other-rs130-g4	memory line

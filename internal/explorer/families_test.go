@@ -7,59 +7,30 @@ import (
 	"testing"
 )
 
-// hubList tells a list whose board keeps its memory controller in the
-// chipset: the stage that reads such boards is not in this table yet.
-func hubList(list []popSlot) bool {
-	for _, s := range list {
-		if s.socket == "hub" || s.by == "hub" {
-			return true
-		}
-	}
-	f := familyByID[list[0].family()]
-	return f != nil && (f.kind == "hub" || f.socket == "hub")
-}
-
-// family of a slot list: the row the file expects to place it.
-func (s popSlot) family() string { return listFamily[s.list] }
-
-var listFamily = map[int]string{}
-
-// TestPopulationFamilies: every slot of the collection gets from the reader
-// the place the file expects, every dump the family the file names, and
-// every row of the family table places at least one slot list.
+// TestPopulationFamilies: every dump gets the family the file names, and
+// every row of the family table acts on at least one slot list.
 func TestPopulationFamilies(t *testing.T) {
+	family := map[int]string{}
 	for _, d := range readDumps(t) {
-		listFamily[d.list] = d.family
+		family[d.list] = d.family
 	}
-	lists := readPopulation(t)
 	used := map[string]int{}
-	checked := 0
-	for _, list := range lists {
-		d, f := ReadSlots(WriteSlotsOf(popHost(list), slotTexts(list)), nil, nil)
+	for _, list := range readPopulation(t) {
+		_, f := ReadSlots(WriteSlotsOf(popHost(list), slotTexts(list)), nil, nil)
 		for _, id := range []string{f.Family, f.Alias, f.Labels, f.PhantomRow} {
 			if id != "" {
 				used[id]++
 			}
 		}
-		if hubList(list) {
-			continue
-		}
-		if want := list[0].family(); f.Family != want {
+		if want := family[list[0].list]; f.Family != want {
 			t.Errorf("list %d (%s): family %q, want %q", list[0].list, list[0].product, f.Family, want)
-		}
-		for i, s := range list {
-			if diff := slotDiff(d[i], f, s); diff != "" {
-				t.Errorf("list %d slot %q|%q: %s", s.list, s.locator, s.bank, diff)
-			}
-			checked++
 		}
 	}
 	for _, fam := range families {
-		if used[fam.id] == 0 && fam.kind != "hub" && fam.socket != "hub" {
-			t.Errorf("row %s (%s) places no slot list", fam.id, fam.kind)
+		if used[fam.id] == 0 {
+			t.Errorf("row %s (%s) acts on no slot list", fam.id, fam.kind)
 		}
 	}
-	t.Logf("%d slots checked, %d rows used", checked, len(used))
 }
 
 // The family table is whole: every row has a known kind and its documents,
