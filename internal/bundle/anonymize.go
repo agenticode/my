@@ -136,6 +136,10 @@ var columns = map[string]treatment{
 	"host_reading.host": hostName, "host_reading.kind": keep, "host_reading.key": keep, "host_reading.taken_at": keep,
 	"host_reading.origin": freeText, "host_reading.text": freeText, "host.cpu": keep,
 	"host.cpu_signature": keep, "host.cpu_present": keep,
+	"spd_reading.host": hostName, "spd_reading.origin": freeText, "spd_reading.bus": keep, "spd_reading.driver": keep,
+	"spd_reading.form": keep, "spd_reading.state": keep, "spd_reading.detail": keep, "spd_reading.fields": freeText,
+	"spd_reading.sha256": keep, "spd_reading.first_seen": keep, "spd_reading.last_seen": keep, "spd_reading.dimm_uid": dimmUID,
+	"spd_reading.tie":    keep,
 	"registry_seen.host": hostName, "registry_seen.seen_at": keep, "registry_seen.prefix": keep, "registry_seen.version": keep,
 	"registry_seen.owner": keep, "registry_seen.language": keep, "registry_seen.unmapped": keep, "registry_seen.source": freeText,
 

@@ -140,5 +140,7 @@ func TestOlderBundleOpens(t *testing.T) {
 	}
 	if hosts, err := l.Hosts(ctx); err != nil || len(hosts) == 0 || hosts[0].CPUSignature != "" || hosts[0].CPUPresent != "" {
 		t.Errorf("hosts of an older bundle: %+v, %v", hosts, err)
+	} else if spds, err := l.SPDReadings(ctx, hosts[0].Name); err != nil || len(spds) != 0 {
+		t.Errorf("SPD readings of an older bundle: %+v, %v", spds, err)
 	}
 }

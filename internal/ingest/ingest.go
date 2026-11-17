@@ -674,6 +674,17 @@ func (k *sink) Reading(r *model.HostReading) error {
 	return nil
 }
 
+// SPD keeps the SPD of a memory module as it was read. It is counted as a
+// record of the source, in no total.
+func (k *sink) SPD(r *model.SPDReading) error {
+	r.Host, r.ScanID = k.host, k.scanID
+	if _, err := k.w.PutSPD(r); err != nil {
+		return k.refuse(r.Origin, err)
+	}
+	k.src.Samples++
+	return nil
+}
+
 // sample counts a reading that is neither an event nor an action: a GPU
 // memory record, an ECS reading, or what a BMC says about itself, the BIOS
 // settings and a memory module.

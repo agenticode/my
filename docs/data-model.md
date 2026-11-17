@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 11 in this release |
+| schema version | `PRAGMA user_version`, 12 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -62,7 +62,8 @@ Collection runs:
 | `capture_check` | what a reset right after a fatal memory error would have lost on the host when a live scan ran: one row per check of `my preflight`, with its state, the statement and what was read ([crash-loop.md](crash-loop.md)) |
 | `unread_record` | a record a reader could not use and whose text names memory: the reference, the reason and the text, at most 50 per source and 4 KiB each |
 | `registry_seen` | a message registry a BMC published: prefix, version, owner, language, the number of its messages, of those about memory, and of those this version classes, with the keys of the ones it does not |
-| `host_reading` | the text of a file or of a read-only command about the memory of a host when a scan ran (meminfo, vmstat, slab caches, NUMA nodes, `sar -B`, CPU caches): kind, key, time, where it came from, the text and whether it was cut. The Memory Explorer shows them; no rule reads them |
+| `host_reading` | the text of a file or of a read-only command about the memory of a host when a scan ran (meminfo, vmstat, slab caches, NUMA nodes, `sar -B`, CPU caches, what the scan saw of the path to the SPD): kind, key, time, where it came from, the text and whether it was cut. The Memory Explorer shows them; no rule reads them |
+| `spd_reading` | the SPD EEPROM of one memory module as a scan or an import got it: what was read (the `eeprom` file of a kernel driver or a dump file), the I2C bus, address and driver, the form (`eeprom`, `binary`, `hex`, `decode-dimms`), the state of the read, its detail, the bytes (at most 2,048) or the fields of `decode-dimms` text as JSON, their SHA-256, first and last seen, and the DIMM it is tied to with the evidence. Added in schema 12 |
 
 Derived by the engine:
 
@@ -202,6 +203,8 @@ These passes run after every read, in a fixed order (slots, counter events, the 
 `counter_sample`, `gpu_mem`, `ecs_sample`, `bmc`, `bios_setting` and `bmc_memory` hold readings. No total of the ledger includes them. Counter readings become counter events as described above. The GPU records are what the finding of a GPU rests on. ECS readings and BIOS settings are read for what they say about the records of a DIMM: a finding notes a DDR5 DIMM without ECS readings, a patrol scrubber that the BIOS has switched off, and a firmware that logs no corrected errors to the BMC. `my bios` checks the settings against a profile. The error counts a BMC keeps per module are stored as the BMC gives them.
 
 `host_reading` holds what the Memory Explorer draws: the text of `/proc/meminfo`, `/proc/vmstat`, `/proc/pressure/memory`, the head of `/proc/slabinfo`, the CPU caches of sysfs, `numactl --hardware`, `numastat`, `sar -B`, the state of MGLRU and, from `my collect host`, `lshw`. One row per kind and time of reading. The tabs of the report and `my board` parse the text each time they are built; no rule, finding or grade reads it, and a reading the parsers cannot read changes nothing else in the ledger. A bundle carries the rows; `--anonymize` replaces the host name in their text, where `sar` prints it in its first line.
+
+`spd_reading` holds the SPD of the memory modules as it was read, one row per SPD. The fields (dates, ranks, device width, maker codes) are decoded from the bytes each time a view is built and stored nowhere else, so that a later version decodes an older case again. A reading whose bytes, state and detail equal those of the latest row of its origin moves that row's `last_seen` and scan and adds no row. What the scan saw of the path to the SPD (buses, controllers, drivers, SPD devices and how each read went) is a `host_reading` of kind `spd-probe`, the text `my collect host` writes as `spd-probe.txt`; the reason why nothing was read is computed from it when a view is built. `--anonymize` keeps the bytes: a bundle holds the serial numbers of the DIMMs anyway, and a return is about them.
 
 ## Actions
 

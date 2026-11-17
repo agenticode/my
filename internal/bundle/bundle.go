@@ -228,7 +228,8 @@ var tables = map[string]string{
 	"fw_record":      "what the BIOS or a BMC said about memory, in the vendor's words: the common event it was read as, message ID, registry, severity, place, arguments, text",
 	"unread_record":  "records a reader could not use and whose text names memory, with the reason, at most 50 per source",
 	"registry_seen":  "message registries a BMC published, with the number of memory messages this version classes",
-	"host_reading":   "counters of the kernel about the memory of the host when a scan ran: memory use, slab cache sizes, page counters, NUMA node sizes, cache sizes of the CPUs",
+	"host_reading":   "counters of the kernel about the memory of the host when a scan ran: memory use, slab cache sizes, page counters, NUMA node sizes, cache sizes of the CPUs; what the scan saw of the path to the SPD",
+	"spd_reading":    "the SPD of the memory modules as read, 512 or 1,024 bytes per module, with the manufacturing week, serial and part number",
 	"meta":           "ledger identity, schema history and what the findings were computed with",
 }
 
