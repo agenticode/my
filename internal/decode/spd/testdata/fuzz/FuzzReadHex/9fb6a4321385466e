@@ -1,0 +1,2 @@
+go test fuzz v1
+string("0000 102c \n*\n0101\n*\n1000")

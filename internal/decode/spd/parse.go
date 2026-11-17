@@ -363,7 +363,7 @@ func ReadHex(text string) (*Input, error) {
 					if fillRepeat(&buf, last, next, end, form) {
 						return nil, &NotSPD{What: LooksHexBig}
 					}
-					next = end
+					next = size(buf, form)
 				}
 				repeat = false
 				continue
@@ -395,7 +395,7 @@ func ReadHex(text string) (*Input, error) {
 			if fillRepeat(&buf, last, next, r.off, form) {
 				return nil, &NotSPD{What: LooksHexBig}
 			}
-			next = r.off
+			next = size(buf, form)
 		}
 		repeat = false
 		switch {
@@ -432,7 +432,18 @@ func ReadHex(text string) (*Input, error) {
 		return in, nil
 	}
 	in.Bytes, in.Layout = pickOrder(buf)
+	if len(in.Bytes) > MaxBinary {
+		return nil, &NotSPD{What: LooksHexBig}
+	}
 	return in, nil
+}
+
+// size is the number of bytes of the values read so far.
+func size(buf []string, form string) int {
+	if form == LayoutWords {
+		return 2 * len(buf)
+	}
+	return len(buf)
 }
 
 // pickRow reads a line as a row. A line that starts with "0000 " is read
@@ -476,11 +487,10 @@ func fillRepeat(buf *[]string, last *row, from, to int, form string) bool {
 	}
 	vals := last.vals
 	if form == LayoutWords {
-		// Repeat in bytes of the groups, kept as groups: a repeated row is
-		// whole groups.
-		for a := from; a < to; a += 2 * len(vals) {
+		// Repeat whole groups of two bytes, as many as fit below to.
+		for a := from; a+2 <= to; a += 2 * len(vals) {
 			for i, v := range vals {
-				if a+2*i >= to {
+				if a+2*i+2 > to {
 					break
 				}
 				*buf = append(*buf, v)
