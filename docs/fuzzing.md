@@ -34,6 +34,9 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | event log record of 16 bytes, event data, event description | `internal/decode/ipmi` | `FuzzParseRecord` |
 | sensor names and messages of a BMC | `internal/decode/ipmi` | `FuzzLabels` |
 | DMI strings, kernel log line and CPU flags that name a hypervisor | `internal/decode/virt` | `FuzzNames` |
+| SPD dump in any form: binary, hex text, decode-dimms output, plain or gzip-compressed; and the decode of any bytes | `internal/decode/spd` | `FuzzParse` |
+| hex text of hexdump, od, xxd, i2cdump and plain hex | `internal/decode/spd` | `FuzzReadHex` |
+| `decode-dimms` output | `internal/decode/spd` | `FuzzDecodeDimms` |
 | raw SMBIOS table | `internal/adapter/smbios` | `FuzzTables` |
 | SMBIOS entry point | `internal/adapter/smbios` | `FuzzEntryPoint` |
 | `dmidecode` output | `internal/adapter/smbios` | `FuzzDmidecode` |

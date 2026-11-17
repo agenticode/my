@@ -42,6 +42,9 @@ FUZZ_TARGETS := \
 	./internal/decode/ipmi:FuzzParseRecord \
 	./internal/decode/ipmi:FuzzLabels \
 	./internal/decode/virt:FuzzNames \
+	./internal/decode/spd:FuzzParse \
+	./internal/decode/spd:FuzzReadHex \
+	./internal/decode/spd:FuzzDecodeDimms \
 	./internal/adapter/smbios:FuzzTables \
 	./internal/adapter/smbios:FuzzEntryPoint \
 	./internal/adapter/smbios:FuzzDmidecode \

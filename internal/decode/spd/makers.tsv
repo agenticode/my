@@ -1,0 +1,68 @@
+# Names of JEDEC JEP106 manufacturer codes found on server memory modules: makers of
+# DRAM devices, of modules, of SPD hubs, of registers and data buffers, of PMICs.
+# Facts only, written for MemorY. The code byte is written as stored, with its parity
+# bit, in the form internal/adapter/smbios uses. Each row was checked against the
+# public tables named in its last column:
+#   dd  i2c-tools, eeprom/decode-dimms, commit dcc0e69 (GPL-2.0-or-later)
+#   il  illumos-gate, usr/src/lib/libjedec/common/libjedec.c, commit 4a58223 (CDDL-1.0)
+# A code this table does not hold is shown as the code alone.
+bank	code	name	source
+1	0xCE	Samsung	dd il
+1	0x2C	Micron Technology	dd il
+4	0x0B	Nanya Technology	dd il
+1	0xDA	Winbond Electronics	dd il
+11	0x91	CXMT	dd il
+3	0xFE	Elpida	dd il
+6	0x51	Qimonda	dd il
+1	0xC1	Infineon	dd il
+5	0xC8	Powerchip Semiconductor	dd il
+2	0x9D	ISSI	dd il
+9	0xD5	Etron Technology	dd il
+8	0xEF	Zentel Electronics	dd il
+13	0x83	JHICC	dd il
+2	0x98	Kingston	dd il
+2	0x94	Smart Modular	dd il
+4	0x16	Netlist	dd il
+10	0x83	Hewlett Packard Enterprise	dd il
+1	0x54	Hewlett-Packard	dd il
+1	0xA4	IBM	dd il
+3	0x8A	Cisco Systems	dd il
+9	0xC8	Lenovo	dd il
+1	0x3E	Oracle	dd il
+5	0x43	Ramaxel Technology	dd il
+2	0xCE	Unigen	dd il
+7	0xF1	InnoDisk	dd il
+6	0xBA	Virtium Technology	dd il
+2	0x40	Viking Components	dd il
+2	0x4F	Transcend Information	dd il
+2	0x7A	Apacer Technology	dd il
+11	0xC8	Advantech	dd il
+5	0xCB	A-DATA Technology	dd il
+5	0xEF	Team Group	dd il
+3	0x9E	Corsair	dd il
+5	0xCD	G Skill	dd il
+6	0x9B	Crucial Technology	dd il
+4	0x25	Kingmax Semiconductor	dd il
+2	0xBA	PNY Technologies	dd il
+6	0x02	Patriot Memory	dd il
+7	0x34	Super Talent	dd il
+7	0xE3	ATP Electronics	dd il
+4	0xDA	Swissbit	dd il
+6	0xF7	Avant Technology	dd il
+5	0xCE	Quanta Computer	dd il
+10	0xCD	Longsys Electronics	dd il
+11	0xD6	Longsys Electronics	dd il
+11	0x31	Biwin Semiconductor	dd il
+2	0x91	Dataram	dd il
+8	0x5D	Wilk Elektronik	dd il
+1	0xB3	IDT	dd il
+5	0x23	Renesas Electronics	dd il
+7	0x32	Montage Technology	dd il
+7	0x9D	Rambus	dd il
+5	0xB3	Inphi	dd il
+1	0x97	Texas Instruments	dd il
+1	0x29	Microchip Technology	dd il
+11	0x8C	Richtek Power	dd il
+12	0x2A	Monolithic Power Systems	dd il
+12	0x10	Anpec Electronics	dd il
+1	0x89	Intel	dd il

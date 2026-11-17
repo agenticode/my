@@ -70,7 +70,7 @@ Documentation and help texts state what the tool does, with the command, the num
 | `internal/fwevent` | the common events a firmware record of any vendor is read as, and what each becomes in the ledger |
 | `internal/fwmap` | the tables that map the messages of each BMC and BIOS vendor to common events, the wording rules, and the classifier that asks them |
 | `internal/yamlite` | the small part of YAML the settings profile and the mapping tables are written in |
-| `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, the signs of a virtual machine |
+| `internal/decode` | EDAC driver detail strings, CPER memory error records, machine check status, IPMI memory sensor events, the signs of a virtual machine, the SPD of a module (bytes, hex text, decode-dimms output) |
 | `internal/scan` | finds the sources of a host, or of a copy of its files, and recognises loose files by their content |
 | `internal/ingest` | runs adapters against a ledger and records what each source yielded |
 | `internal/engine` | groups the errors of a DIMM into faults, measures trend, spread and baselines, and applies the rules |
@@ -100,5 +100,6 @@ Documentation and help texts state what the tool does, with the command, the num
 | `tools/lab` | scripts that inject errors on a lab host and capture what it recorded |
 | `tools/perf` | makes large synthetic inputs and measures time and peak memory of the commands on them ([docs/performance.md](docs/performance.md)) |
 | `tools/screenlen` | counts the lines and characters of the default screens on the lab captures, in English and Korean |
+| `tools/spd-fetch.sh` | downloads public SPD dumps that may not be copied into the repository, for `TestFetchedDumps` |
 | `tools/validate` | runs the binary against the host it is on ([docs/validation.md](docs/validation.md)) |
 | `docs` | the pages listed in the README |

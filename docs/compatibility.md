@@ -1466,6 +1466,122 @@ What a missing reading costs:
 
 The data quality part of the report names every reading the ledger lacks.
 
+## Module SPD
+
+Source `spd`, packages `internal/decode/spd` (the decoder) and `internal/adapter/dimmspd` (the reader of a host). The SPD EEPROM of a memory module holds what the module maker wrote about it: memory and module type, die capacity and package, ranks and device width, the codes of the module and DRAM makers, the manufacturing location and week, serial and part number. SMBIOS gives most of these and neither the week nor the device width. The SPD gives no error record and no grade.
+
+### Input forms
+
+`my spd FILE` and `my import` read an SPD in these forms. A file compressed with gzip is read through.
+
+| Form | Recognised by | Example line |
+| --- | --- | --- |
+| binary | 128 to 4,096 bytes, byte 2 a memory type of the key byte table | the `eeprom` file of the kernel, the file of a programmer or of a vendor tool |
+| `hexdump -C` | rows of an offset and 16 bytes, an ASCII column after `\|` | `` 00000000  23 12 0c 01 86 31 00 08  00 60 00 03 08 0b 80 00  \|#....1...`......\| `` |
+| `od -A x -t x1` | rows of an offset and 16 bytes | `000000 23 12 0c 01 86 31 00 08 00 60 00 03 08 0b 80 00` |
+| `i2cdump` | rows of a two-digit offset with a colon and 16 bytes, an ASCII column | `` 00: 23 12 0c 01 86 31 00 08 00 60 00 03 08 0b 80 00    #?????.?.`.????? `` |
+| the dumps of the illumos tests | rows of a four-digit offset with a colon, `#` comment lines | `0000: 23 12 0C 04 85 29 B2 08 00 60 00 03 08 0B 80 00` |
+| `xxd` | rows of an offset with a colon and 8 groups of four digits, in file order | `` 00000000: 2312 0c01 8631 0008 0060 0003 080b 8000  #....1...`...... `` |
+| `hexdump` | rows of an offset and 8 groups, the two bytes of each swapped on a little-endian machine | `0000000 1223 010c 3186 0800 6000 0300 0b08 0080` |
+| plain hex | two-digit bytes or runs of hex digits without offsets | `23 12 0C 01 86 31 00 08 00 60 00 03 08 0B 80 00` |
+| table with an offset column | 17 two-digit columns whose first counts 00, 10, 20 and so on, as some Windows tools print the SPD | `10 00 00 05 0D F8 FF 02 00 6E 6E 6E 11 00 6E F0 0A` |
+| `decode-dimms` output | a line `Decoding EEPROM:` and the line `---=== SPD EEPROM Information ===---` per module | `Decoding EEPROM: /sys/bus/i2c/drivers/ee1004/0-0050` |
+
+An offset is 2 to 8 hex digits with a colon, or 4 to 8 without one, so a line of two-digit bytes is plain hex. A row holds at most 16 bytes or 8 groups; what follows them, or a `|`, is the ASCII column. `*` repeats the row before it up to the offset of the next row, or up to a closing line that holds an offset alone, as `hexdump` and `od` end. Lines that start with `#`, lines before the first row and CRLF line ends are read past. A row may start with `0000 `, which decode-dimms allows for `eeprog`; no `eeprog` text was seen. Groups of four digits are read in both byte orders, and the order whose byte 2 is DDR4 or DDR5 with a good base CRC is taken; the reading says which.
+
+The bytes of hex text end at the first offset its rows leave out, or at a row that goes back to an earlier offset (a second dump in the same text); the decode of such bytes is `short`. A text over 64 KiB, or with more than 4,096 bytes, is no SPD. Of `decode-dimms` output the default form is read, not the HTML of `-f` and not `--side-by-side`; the fields it prints are taken as printed, and it holds no bytes.
+
+`my import` guesses the kind of every file, and takes a binary file for an SPD only when its base CRC is good. `my spd FILE` is told what the file is and also decodes one with a bad CRC.
+
+### Bytes that are decoded
+
+The offsets and codings are those of JEDEC Standard 21-C, Annex L (SPD for DDR4 SDRAM modules) and of JESD400-5 (DDR5 SPD contents). The standards were not read: they need a JEDEC account. The tables come from two public decoders that cite their sections and agree, `spd_ddr4.h` and `spd_ddr5.h` of illumos libjedec (illumos-gate `4a58223`, CDDL-1.0) and `decode_ddr4_sdram` of `decode-dimms` (i2c-tools, GPL-2.0-or-later), and were checked against the dumps below. MemorY writes them in tables of its own and copies no code of either.
+
+DDR4:
+
+<!-- spd-ddr4 -->
+| Byte | Bits | Field | Coding |
+| --- | --- | --- | --- |
+| 1 | 7-4, 3-0 | SPD revision | major, minor |
+| 2 |  | memory type | 0x0C DDR4, 0x12 DDR5; other key bytes are named and not decoded |
+| 3 | 3-0, 7 | module type, hybrid | 1 RDIMM, 2 UDIMM, 3 SODIMM, 4 LRDIMM, 5 Mini-RDIMM, 6 Mini-UDIMM, 8 72b-SO-RDIMM, 9 72b-SO-UDIMM, 12 16b-SO-DIMM, 13 32b-SO-DIMM |
+| 4 | 3-0 | capacity of a die | 0 256 Mb, doubling up to 7 32 Gb; 8 12 Gb, 9 24 Gb |
+| 5 | 5-3, 2-0 | row and column address bits | 12 + n, 9 + n |
+| 6 | 7, 6-4, 1-0 | package | monolithic or not; 1 + n dies; signal loading 1 multi-load stack, 2 single-load stack (3DS) |
+| 12 | 6, 5-3, 2-0 | rank mix, package ranks, device width | symmetric or asymmetric; 1 + n; 0 x4, 1 x8, 2 x16, 3 x32 |
+| 13 | 4-3, 2-0 | bus width extension, primary bus width | 0 none, 1 8 bits; 0 8, 1 16, 2 32, 3 64 bits |
+| 18, 125 |  | minimum cycle time (tCKAVGmin) | byte 18 in units of 125 ps plus byte 125 as a signed number of ps |
+| 126-127 |  | CRC of bytes 0-125 | low byte first |
+| 254-255 |  | CRC of bytes 128-253 | low byte first |
+| 320-321 |  | module maker | continuation count with parity, then the code |
+| 322 |  | manufacturing location | the maker's own coding |
+| 323, 324 |  | manufacturing year, week | BCD |
+| 325-328 |  | serial number | 4 bytes, shown as 8 hex digits in stored order |
+| 329-348 |  | part number | 20 ASCII characters, padded with spaces |
+| 349 |  | module revision |  |
+| 350-351 |  | DRAM maker | as bytes 320-321 |
+| 352 |  | DRAM stepping |  |
+<!-- /spd-ddr4 -->
+
+Logical ranks are package ranks times dies for a 3DS package and package ranks otherwise. Module size in bytes is die capacity / 8 x primary bus width / device width x logical ranks. The organisation is package ranks and device width, as `2Rx4`. The rated speed is 2,000,000 / tCKAVGmin in ps, set to the nearest step of 400/3 MT/s: 625 ps gives 3200, 750 ps 2666.
+
+DDR5:
+
+<!-- spd-ddr5 -->
+| Byte | Bits | Field | Coding |
+| --- | --- | --- | --- |
+| 0 | 6-4 | size of the SPD device | 1 256, 2 512, 3 1,024, 4 2,048 bytes |
+| 1 | 7-4, 3-0 | SPD revision | major, minor |
+| 2 |  | memory type | 0x12 |
+| 3 | 3-0, 7 | module type, hybrid | 1 RDIMM, 2 UDIMM, 3 SODIMM, 4 LRDIMM, 5 CUDIMM, 6 CSODIMM, 7 MRDIMM, 8 CAMM2, 9 SOCAMM2, 10 DDIMM, 11 solder down |
+| 4 | 7-5, 4-0 | dies per package, capacity of a die | 0 one die, 1 two (DDP), 2 two, 3 four, 4 eight, 5 sixteen (3DS); 1 4 Gb, 2 8, 3 12, 4 16, 5 24, 6 32, 7 48, 8 64 Gb |
+| 5 | 7-5, 4-0 | column and row address bits | 10 + n, 16 + n |
+| 6 | 7-5 | device width | 0 x4, 1 x8, 2 x16, 3 x32 |
+| 20-21 |  | minimum cycle time (tCKAVGmin) | ps, low byte first |
+| 234 | 6, 5-3 | rank mix, package ranks per sub-channel | symmetric or asymmetric; 1 + n |
+| 235 | 7-5, 4-3, 2-0 | sub-channels, bus width extension, primary bus width per sub-channel | 1 + n; 0 none, 1 4, 2 8 bits; 0 8, 1 16, 2 32, 3 64 bits |
+| 510-511 |  | CRC of bytes 0-509 | low byte first |
+| 512-513 |  | module maker | as DDR4 |
+| 514 |  | manufacturing location |  |
+| 515, 516 |  | manufacturing year, week | BCD |
+| 517-520 |  | serial number | 4 bytes |
+| 521-550 |  | part number | 30 ASCII characters |
+| 551 |  | module revision |  |
+| 552-553 |  | DRAM maker | as bytes 512-513 |
+| 554 |  | DRAM stepping |  |
+<!-- /spd-ddr5 -->
+
+Module size in bytes is sub-channels x primary bus width / device width x dies per package x die capacity / 8 x package ranks. The rated speed is 2,000,000 / tCKAVGmin, set to the nearest 400 MT/s: 416 ps gives 4800. Logical ranks count the dies of a 3DS package. A module with rank mix set is marked asymmetric, and its organisation and size are those of its first kind of rank. Of a DDR5 SPD whose first 128 bytes alone were read, the fields of bytes 0 to 21 are decoded: device width and die are known, ranks, CRC, date and identity are not.
+
+Every other memory type is named by its key byte (byte 2) and not decoded: `FPM DRAM`, `EDO`, `SDRAM`, `DDR`, `DDR2`, `DDR3`, `DDR4E`, the LPDDR types and the others of the table in `internal/decode/spd/spd.go`.
+
+The date is two BCD digits of year (2000 to 2099) and week (1 to 53). Bytes that are no such digits make no date; the two bytes are shown as stored (`0xDAAD`). decode-dimms then tries the bytes as binary numbers, and MemorY does not, so that the table of date codes holds no guessed week. The part number ends at the first NUL; one that holds a byte outside printable ASCII is not shown.
+
+### CRC
+
+CRC-16 with the polynomial 0x1021, start value 0, no reflection, stored low byte first: of DDR4 bytes 0-125 in 126-127 and bytes 128-253 in 254-255, of DDR5 bytes 0-509 in 510-511. The manufacturing block (DDR4 bytes 320 to 383, DDR5 512 to 554) is under no CRC.
+
+A decode whose base CRC is bad has the state `crc`: its fields are shown with the stored and the computed value, and nothing of it enters the DIMM row of the ledger. A bad CRC of DDR4 bytes 128-253 is a note; MemorY reads no byte of that block.
+
+### Maker codes
+
+The codes of the module maker and of the DRAM maker are those of JEDEC JEP106, the list of manufacturer identification codes that JEDEC publishes. MemorY writes them as SMBIOS 3.2 does in `internal/adapter/smbios`: the bank (the continuation count plus one) and the code byte as stored, with its parity bit, `bank 1, 0xCE`. The two forms compare as text.
+
+`internal/decode/spd/makers.tsv` names the codes found on server memory modules, makers of DRAM, of modules, of SPD hubs, of registers and data buffers and of PMICs: 59 rows, each checked against the vendor tables of `decode-dimms` (i2c-tools commit `dcc0e69`, GPL-2.0-or-later) and of illumos libjedec (`libjedec.c`, illumos-gate `4a58223`, CDDL-1.0), which agree on every row. MemorY wrote the rows from those facts and copies neither table. A maker is shown with its code in brackets, `Samsung (JEDEC bank 1, 0xCE)`; a code without a row is shown alone. `decode-dimms` output gives names and no codes: MemorY shows the names it prints.
+
+### What was checked
+
+| Dumps | Source, licence | Checked against |
+| --- | --- | --- |
+| 4 DDR4 (RDIMM 2Rx4, LRDIMM 3DS, UDIMM, SODIMM) and 2 DDR5 RDIMM (2Rx4, 1Rx8) | illumos-gate `4a58223`, CDDL-1.0 | the expected values of the illumos libjedec tests (`libjedec_hex2spd_ddr4.c`, `libjedec_hex2spd_ddr5.c`): type, module type, revision, rows and columns, die, package, width, ranks, bus widths, tCKAVGmin, serial, part number, revision, stepping, maker codes, year and week where the tests hold them |
+| 2 DDR5 UDIMM 1Rx8, the modules of one kit | ubihazard/ddr5-spd-recovery `47baa29`, MIT | the decoded snapshots of the spdr project (Pactolus-Microelectronics/spdr `991c514`) for the first; the second differs from the first in its serial number and in byte 996, which no field holds |
+| 1 DDR3 SODIMM | rigred/SPD `be3646f`, MIT | named DDR3 and not decoded |
+| the 4 DDR4 dumps | as above | `decode-dimms -x` of i2c-tools 4.4 (the Fedora 44 package) over their `hexdump -C` text: size, ranks, device width, date, serial, part number and both CRCs agree. On the two dumps whose date bytes are no BCD, decode-dimms prints `0xDAAD` for one and reads the other as binary numbers (`2041-W29`); MemorY gives no date for either. decode-dimms 4.4 decodes no DDR5 dump: it checks a DDR5 SPD with the DDR4 CRC and drops it |
+
+The 8 DDR4 and DDR5 dumps decode with good CRCs: 12 of 12 stored values equal the computed ones. `TestPublicDumps` holds every field of each to the values above, and `testdata/spd/README.md` names the files, their sources and every byte that was changed in the copies. `TestSynthetic` builds 14 dumps from the copies by changing named bytes (1Rx8, asymmetric ranks, a DDR4 multi-load stack, DDR5 3DS and DDP packages, bad CRCs, the first 128, 256 and 512 bytes, blank dumps); they hold the formulas, and no second decoder saw them. `tools/spd-fetch.sh` downloads 9 DDR5 UDIMM dumps of a repository that states no licence, and `TestFetchedDumps` decodes them where `MY_SPD_DIR` names their directory; all 9 have good CRCs and a date.
+
+Not checked: DDR5 modules with 3DS or two-die packages, modules with asymmetric ranks, MRDIMM and CUDIMM, SPD revisions above 1.0 for DDR5 and above 1.2 for DDR4 (no public dump was found); `decode-dimms` text of other versions than 4.4.
+
 ## Host facts
 
 Adapter `hostinfo`, package `internal/adapter/hostinfo`. It reads what a running Linux host says about itself from files any user may read: the host name, the kernel release, the architecture, the boot ID and boot time, the kernel command line, and the system, board and BIOS names under `/sys/class/dmi/id`.
