@@ -33,6 +33,31 @@ var collectWords = i18n.Catalog{
 	"err.bmc_nothing":          {EN: "the BMC at {bmc} gave nothing about the system: see the lines above. The host was not scanned; without --bmc it is scanned alone", KO: "{bmc}의 BMC에서 시스템 정보를 받지 못함(위 줄 참고). 호스트는 스캔하지 않았으며, --bmc 없이 실행하면 호스트만 스캔"},
 	"err.bmc_refused":          {EN: "the answers of the BMC at {bmc} were not added: {why}", KO: "{bmc}의 BMC 응답을 추가하지 않음: {why}"},
 
+	"err.collect_host_out":  {EN: "name where the collection goes with -o: a new directory", KO: "수집 결과를 저장할 곳을 -o로 지정해야 함: 새 디렉터리"},
+	"err.collect_host_file": {EN: "it is a file; a collection of the host is a directory", KO: "파일임. 호스트 수집 결과는 디렉터리임"},
+	"err.collect_sudo":      {EN: "--sudo goes with my collect host: it runs dmidecode and lshw through sudo -n", KO: "--sudo는 my collect host와 함께 써야 함: dmidecode와 lshw를 sudo -n으로 실행함"},
+
+	"collect.host.group.host":     {EN: "host facts", KO: "호스트 정보"},
+	"collect.host.group.errors":   {EN: "error records", KO: "오류 기록"},
+	"collect.host.group.smbios":   {EN: "SMBIOS", KO: "SMBIOS"},
+	"collect.host.group.readings": {EN: "memory readings", KO: "메모리 측정값"},
+	"collect.host.group.mcelog":   {EN: "mcelog", KO: "mcelog"},
+	"collect.host.files":          {EN: "{n} {n|file|files}", KO: "파일 {n}개"},
+	"collect.host.written":        {EN: "{what}", KO: "{what}"},
+	"collect.host.none":           {EN: "none could be read", KO: "읽은 것이 없음"},
+	"collect.host.tables":         {EN: "the raw tables", KO: "원본 테이블"},
+	"collect.host.dmidecode":      {EN: "the text of {how}", KO: "{how}의 출력"},
+	"collect.host.smbios_denied": {EN: "not readable; the tables are readable as root, or run with --sudo where the account may run dmidecode and lshw without a password",
+		KO: "읽지 못함. 테이블은 root로 읽을 수 있고, 계정이 암호 없이 dmidecode와 lshw를 실행할 수 있으면 --sudo로 실행"},
+	"collect.host.smbios_denied_sudo": {EN: "not readable, also through sudo -n: the account needs a sudoers rule for dmidecode without a password",
+		KO: "sudo -n으로도 읽지 못함: 계정에 암호 없이 dmidecode를 실행하는 sudoers 규칙이 필요함"},
+	"collect.host.readings":      {EN: "{n} of {of}", KO: "{of}개 중 {n}개"},
+	"collect.host.state.absent":  {EN: "not there: {what}", KO: "없음: {what}"},
+	"collect.host.state.denied":  {EN: "denied: {what}", KO: "거부됨: {what}"},
+	"collect.host.state.timeout": {EN: "no answer in time: {what}", KO: "시간 안에 응답 없음: {what}"},
+	"collect.host.state.failed":  {EN: "failed: {what}", KO: "실패: {what}"},
+	"collect.host.out":           {EN: "written to {dir}, with collect.json; my --root {dir} reads it", KO: "{dir}에 collect.json과 함께 저장함. my --root {dir}로 읽음"},
+
 	"collect.prompt":       {EN: "Password for {user} on the BMC: ", KO: "BMC 사용자 {user}의 암호: "},
 	"collect.loose_file":   {EN: "warning: other users of this machine can read the password file {file}", KO: "경고: 이 기기의 다른 사용자가 암호 파일 {file}을 읽을 수 있음"},
 	"collect.insecure":     {EN: "warning: --insecure: the certificate of the BMC is not checked, so the answers and the password can be read or changed on the way", KO: "경고: --insecure: BMC 인증서를 확인하지 않으므로 응답과 암호가 전송 중에 노출되거나 바뀔 수 있음"},
@@ -79,7 +104,7 @@ var collectWords = i18n.Catalog{
 	"collect.state.not offered": {EN: "not offered", KO: "제공 안 함"},
 	"collect.state.not reached": {EN: "not reached", KO: "도달 못 함"},
 
-	"help.collect.usage": {EN: "my collect redfish --bmc ADDRESS -o OUT [flags]", KO: "my collect redfish --bmc ADDRESS -o OUT [옵션]"},
+	"help.collect.usage": {EN: "my collect redfish --bmc ADDRESS -o OUT [flags]\nmy collect host -o DIR [--sudo] [--deadline TIME]", KO: "my collect redfish --bmc ADDRESS -o OUT [옵션]\nmy collect host -o DIR [--sudo] [--deadline TIME]"},
 	"help.collect.text": {
 		EN: "Asks the BMC of a server over Redfish for what MemorY reads about its memory, and writes the answers to OUT: the memory modules and their error counts, the BIOS settings with the registry that explains them, the event logs, the firmware versions and the chassis. " +
 			"It only reads. Every request is a GET, and nothing on the BMC is changed: no setting, no log, no action. With --session the command logs in to the session service and deletes its session at the end; these are the only two requests that are no GET. " +
@@ -89,6 +114,7 @@ var collectWords = i18n.Catalog{
 			"The certificate of the BMC is checked. Most BMCs ship with a certificate they signed themselves: --fingerprint accepts exactly that certificate, --ca-file a private authority. " +
 			"--targets collects from several BMCs, a few at a time, each into a directory of its own below OUT. " +
 			"\"my collect support DIR...\" prints which BMC gave which class of resources, from the manifests of collections. " +
+			"\"my collect host -o DIR\" copies what a scan reads of this host into DIR, so that \"my import DIR\", or a scan with the root option of my, reads it elsewhere: the host facts, the kernel ring buffer as dmesg text, the EDAC tree, the rasdaemon database, the SMBIOS tables (or the memory devices as dmidecode prints them), the memory counters of /proc and sysfs, and the output of numactl, numastat, sar (the paging table), lshw (memory and processors) and the client of mcelog where they are installed. It writes collect.json with every step, its state, time and size. It copies no journal and no file of /var/log. With --sudo, dmidecode and lshw run as sudo -n COMMAND, for an account that may run both without a password; nothing else runs through sudo. " +
 			"The exit code is 0 when everything that was asked for came back, 1 when a collection was written and lacks something that was denied, timed out or failed, and 70 when no BMC answered.",
 		KO: "서버의 BMC에 Redfish로 MemorY가 메모리에 관해 읽는 항목을 요청하고 응답을 OUT에 저장합니다. 메모리 모듈과 오류 카운트, BIOS 설정과 그 설정을 설명하는 레지스트리, 이벤트 로그, 펌웨어 버전, 섀시입니다. " +
 			"이 명령은 읽기만 합니다. 모든 요청이 GET이며 BMC의 설정, 로그, 액션 어느 것도 바꾸지 않습니다. --session을 주면 세션 서비스에 로그인하고 끝날 때 자기 세션을 삭제합니다. 이 두 요청에만 다른 메서드(POST와 DELETE)를 씁니다. " +
@@ -98,6 +124,7 @@ var collectWords = i18n.Catalog{
 			"BMC 인증서는 검증합니다. BMC 대부분은 자체 서명 인증서로 출하됩니다. --fingerprint는 그 인증서 하나만 받아들이고, --ca-file은 사설 인증 기관을 지정합니다. " +
 			"--targets는 여러 BMC에서 몇 대씩 동시에 수집해 OUT 아래에 BMC마다 디렉터리 하나씩 저장합니다. " +
 			"\"my collect support DIR...\"은 수집 결과의 매니페스트를 읽어 어느 BMC가 어떤 종류의 리소스를 주었는지 출력합니다. " +
+			"\"my collect host -o DIR\"은 스캔이 이 호스트에서 읽는 파일을 DIR에 복사하고, 다른 곳에서 \"my import DIR\"이나 my의 root 옵션으로 스캔해 읽게 합니다. 호스트 정보, dmesg 형식의 커널 링 버퍼, EDAC 트리, rasdaemon 데이터베이스, SMBIOS 테이블(없으면 dmidecode가 출력한 메모리 장치), /proc과 sysfs의 메모리 카운터, 그리고 설치되어 있으면 numactl, numastat, sar(페이징 표), lshw(메모리와 프로세서), mcelog 클라이언트의 출력입니다. 단계마다 상태, 시간, 크기를 적은 collect.json을 함께 씁니다. 저널과 /var/log의 파일은 복사하지 않습니다. --sudo를 주면 dmidecode와 lshw를 sudo -n COMMAND로 실행합니다. 두 명령을 암호 없이 실행할 수 있는 계정을 위한 옵션이며 다른 명령은 sudo로 실행하지 않습니다. " +
 			"요청한 것을 모두 받으면 종료 코드는 0, 수집 결과는 저장했으나 거부나 시간 초과나 실패로 빠진 것이 있으면 1, 응답한 BMC가 없으면 70입니다.",
 	},
 	"help.collect.flags": {
@@ -113,7 +140,7 @@ var collectWords = i18n.Catalog{
 			"--fingerprint SHA256  accept exactly the certificate with this SHA-256 fingerprint\n" +
 			"--insecure            accept any certificate, and allow plain http\n" +
 			"--timeout TIME        time for one request (default 30s)\n" +
-			"--deadline TIME       time for one BMC (default 20m)\n" +
+			"--deadline TIME       time for one BMC (default 20m), or for the host (default 2m)\n" +
 			"--retries N           how often a request is sent again after a timeout or an\n" +
 			"                      overload answer (default 3)\n" +
 			"--max-log-entries N   entries to read of one log (default 5000)\n" +
@@ -125,6 +152,7 @@ var collectWords = i18n.Catalog{
 			"--with-inputs         with -o NAME.mycase: put every answer of the BMC into the bundle;\n" +
 			"                      the answers can hold account names and addresses\n" +
 			"--quiet               print no progress\n" +
+			"--sudo                with host: run dmidecode and lshw as sudo -n COMMAND\n" +
 			"--event-map FILE      with -o NAME.mycase: a table of firmware messages of one's own,\n" +
 			"                      asked before the shipped tables; may be repeated\n" +
 			"--lang en|ko          language of the output (default: from the locale, English otherwise)\n" +
@@ -142,7 +170,7 @@ var collectWords = i18n.Catalog{
 			"--fingerprint SHA256  이 SHA-256 지문의 인증서 하나만 받아들임\n" +
 			"--insecure            어떤 인증서든 받아들이고 http도 허용\n" +
 			"--timeout TIME        요청 하나의 제한 시간 (기본 30s)\n" +
-			"--deadline TIME       BMC 한 대의 제한 시간 (기본 20m)\n" +
+			"--deadline TIME       BMC 한 대의 제한 시간 (기본 20m), 호스트는 기본 2m\n" +
 			"--retries N           시간 초과나 과부하 응답 뒤에 다시 보내는 횟수 (기본 3)\n" +
 			"--max-log-entries N   로그 하나에서 읽을 항목 수 (기본 5000)\n" +
 			"--log NAME            기본으로 건너뛰는 로그(Journal, AuditLog)도 읽음. 로그 서비스의\n" +
@@ -153,6 +181,7 @@ var collectWords = i18n.Catalog{
 			"--with-inputs         -o NAME.mycase와 함께: BMC의 응답 전부를 번들에 넣음. 응답에는\n" +
 			"                      계정 이름과 주소가 들어 있을 수 있음\n" +
 			"--quiet               진행 상황을 출력하지 않음\n" +
+			"--sudo                host와 함께: dmidecode와 lshw를 sudo -n COMMAND로 실행\n" +
 			"--event-map FILE      -o NAME.mycase와 함께: 내장 표보다 먼저 볼, 직접 만든\n" +
 			"                      펌웨어 메시지 표. 여러 번 줄 수 있음\n" +
 			"--lang en|ko          출력 언어 (기본: 로캘, 한국어가 아니면 영어)\n" +
