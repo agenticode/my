@@ -893,6 +893,8 @@ The pages are those of the PDF file; a web page is cited whole.
 | `tyan-s7012-user-manual` | tyan | S7012 user's manual | Version 1.1 (file S7012_UG_v1.1_06212012.pdf), (c) 2009 MiTAC | 2009 | 26 | <https://web.archive.org/web/20121119035656id_/http://www.tyan.com:80/manuals/S7012_UG_v1.1_06212012.pdf> |
 <!-- /population-documents -->
 
+Over the 2,044 server dumps of the public SMBIOS collection of [compatibility.md](compatibility.md#slot-names-of-server-vendors), with the modules each dump lists, 1,434 dumps reach a rule set with a table, 248 one of general rules only, 252 have no rule set and 109 are not placed in full. 201 dumps have a finding: P-ORDER-01 168, P-BAL-01 32, P-FIRST-01 21, P-MIX-02 5, P-MIX-03 3, P-MIX-05 2, P-MIX-01 1. These are counts over public uploads (`internal/view/testdata/population-coverage.txt`); they describe how the rules behave and say nothing of a fleet. No rule was checked on a real server.
+
 ## Boots
 
 A fatal memory error ends its boot. A host that resets after it and fails again shows the same place in boot after boot, and the records of each stop are read by the next boot ([crash-loop.md](crash-loop.md)). The engine looks at the latest `loop.window_boots` boots of every host, oldest first. Boots whose start is known only relative to another boot are left out.

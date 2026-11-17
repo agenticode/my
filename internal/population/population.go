@@ -140,7 +140,8 @@ type Finding struct {
 	Fill  []string `json:"fill,omitzero"`
 	Leave []string `json:"leave,omitzero"`
 	// Slots are the slots the finding names; First the slot of the
-	// channel the table fills first.
+	// channel the table fills first, or of two modules (P-MIX-02,
+	// P-MIX-03) the one the table fills before the other.
 	Slots []string `json:"slots,omitzero"`
 	First string   `json:"first,omitzero"`
 	// What differs: the modules per processor (P-BAL-01), the module types
@@ -657,7 +658,7 @@ func (c *checker) channels() {
 				if v, ok := c.rising(mods, func(m Module) int64 { return int64(m.Ranks) }); ok {
 					if v >= 0 {
 						a, b := c.b.Slots[mods[v-1]], c.b.Slots[mods[v]]
-						c.finding(MixRank, Finding{Socket: sock, Channel: name, Slots: []string{a.Name, b.Name}, First: head,
+						c.finding(MixRank, Finding{Socket: sock, Channel: name, Slots: []string{a.Name, b.Name}, First: a.Name,
 							Ranks: []int{a.Module.Ranks, b.Module.Ranks}})
 					}
 				} else {
@@ -668,7 +669,7 @@ func (c *checker) channels() {
 				if v, ok := c.rising(mods, func(m Module) int64 { return m.Bytes }); ok {
 					if v >= 0 {
 						a, b := c.b.Slots[mods[v-1]], c.b.Slots[mods[v]]
-						c.finding(MixSize, Finding{Socket: sock, Channel: name, Slots: []string{a.Name, b.Name}, First: head,
+						c.finding(MixSize, Finding{Socket: sock, Channel: name, Slots: []string{a.Name, b.Name}, First: a.Name,
 							Bytes: []int64{a.Module.Bytes, b.Module.Bytes}})
 					}
 				} else {

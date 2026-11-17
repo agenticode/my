@@ -455,6 +455,8 @@ SMBIOS gives no error records and no grade. The board of `my board` and of the r
 
 The board places a slot by the two names SMBIOS gives it, the locator and the bank locator, and where a name gives only a slot number, by the table of the board's family. Every slot gets a processor, a channel and a position in the channel, counted from 0, or it is drawn without channels on its processor, or set aside by its name with the reason. A memory device of type Flash, ROM or EEPROM is a chip of the board and no slot.
 
+A board placed in full whose family has a rule set is also held to the population its maker's documents give: which slots carry the modules for their number, which slot of a channel comes first, what may stand together. [rules.md](rules.md#population-rules) lists the rules, the rule sets and their documents; a board not placed in full gets no population check.
+
 ### Name forms
 
 Each name is read whole, by the first form of the tables below that matches all of it; letters of any case match except where a form says capitals. A name that no form reads sets its slot aside. `NO DIMM`, `Not Specified`, `N/A`, `None`, `Unknown`, `<BAD INDEX>`, `<OUT OF SPEC>` and an empty string name nothing.
