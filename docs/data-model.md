@@ -83,6 +83,8 @@ Faults and findings are computed on every run and can always be computed again f
 
 `dimm_uid` is "d" and 19 hexadecimal digits of a hash over manufacturer, part number and serial number, each in upper case with white space folded. The host and the slot are not part of it, so the history of a DIMM follows it to another slot and to another host. A serial number that is empty, a firmware placeholder ("NO DIMM", "Not Specified", "SerNum00") or all zeros or all F identifies nothing. Such a DIMM gets a placeholder, "s" and 19 digits of a hash over host and slot, with `identity = 'slot'`. Its history stays with the slot, and its finding says that no serial number is on record.
 
+SMBIOS fills the row: maker, part number, serial number, size, memory and module type, ranks and speed. An SPD reading tied to the DIMM fills the rest. It is tied on evidence only: its serial number equals the serial of one DIMM SMBIOS places on the host, after the same folding, or equals it with the four bytes in reverse order (`spd_reading.tie` says `serial` or `serial-reversed`). A serial that fits two DIMMs, one that two readings of a scan carry, a placeholder, or a host without SMBIOS serial numbers ties nothing; no reading is tied by bus address or slot order. A tied reading in the state `ok` writes `mfg_date` (SMBIOS has no date; a date a BMC gave stays where no reading is tied) and `device_width` (it replaces the width of EDAC or a BMC, which come from the same EEPROM by way of firmware; `my spd` lists where they differ), and fills the fields SMBIOS left empty, `manufacturer_id` among them. A reading of the state `crc`, and one without its serial bytes, writes nothing. The date of `decode-dimms` text is taken only when it lies no later than the reading, since decode-dimms reads date bytes that are no BCD as binary numbers.
+
 ### Slot
 
 A slot is named by the SMBIOS device locator when SMBIOS was read, with the bank locator added where two slots share a locator. Without SMBIOS it is named by the EDAC label or position, or by what the source of a record calls the place. `slot_alias` holds every other name: the SMBIOS handle, the EDAC memory controller and layer position, the label, and the numbers of socket, controller, channel and position. An error record is tied to a slot through the alias of the name its source used. An EDAC position is tied to an SMBIOS slot on evidence only: the EDAC label equals the locator, or the numbers of both sides agree for every populated slot. Without that the EDAC position stays a slot of its own, and the `slot-map` entry of the source inventory says so.
@@ -325,6 +327,37 @@ The board carries the check of its modules against the population the public doc
 | `text` | the line of `no_rule` |
 
 The cards of `why` carry `population`, the line of the first population finding that names the slot of the DIMM, as a statement (`pop.why`); it changes no check and no confidence.
+
+### The view `spd`
+
+`my spd --json` holds what each memory module of a host says about itself in its SPD EEPROM. The fields of a module are decoded from the bytes of `spd_reading` each time the view is built; the reason comes from the probe of the latest scan that looked for the SPD.
+
+| Field | Content |
+| --- | --- |
+| `host`, `system` | the host, its maker and product |
+| `looked` | whether the latest scan of the host looked for the SPD |
+| `read`, `devices`, `dimms`, `tied` | readings in the states `ok`, `crc` and `short`; SPD devices looked at; DIMMs SMBIOS places on the host; readings tied to one of them |
+| `drivers` | the kernel drivers that gave the readings |
+| `head` | the line under the host, as a text (`code`, `args`, `text`) |
+| `reason` | when nothing was read: `code` (docs/compatibility.md lists the codes), `short`, `text`, `facts[]` (slots SMBIOS lists, a BMC), `step` (what the reader can do) |
+| `modules[]` | per reading: `slot`, `dimm_uid` and `tie` (`serial` or `serial-reversed`) of a tied reading; `origin`, `bus`, `address`, `driver`, `form`, `state`, `detail`, `bytes` (the number read); `spd`, the decode (below); `maker_name` and `maker_source` (`table`, `smbios` or `decode-dimms`); `state_text` for a reading that is not `ok`; `differences[]` to SMBIOS, EDAC and a BMC; `grade`, `grade_text` and `ue` of the tied DIMM |
+| `modules[].spd` | `length`, `state`, `key_byte`, `memory_type`, `fill`, `module_type`, `hybrid`, `spd_revision`, `spd_device_bytes`, `crcs[]` (`from`, `to`, `at`, `state`, `stored`, `computed`), `die_mbit`, `dies_per_package`, `package`, `row_bits`, `column_bits`, `device_width`, `package_ranks`, `logical_ranks`, `rank_mix`, `bus_width`, `extension_bits`, `sub_channels`, `size_bytes`, `organisation`, `tck_ps`, `speed_mts`, `module_maker` (the JEDEC code, `bank 1, 0x2C`), `module_maker_name`, `location`, `mfg_date`, `date_bytes`, `serial`, `part_number`, `module_revision`, `dram_maker`, `dram_maker_name`, `dram_stepping`, `missing[]` (`part`, `need`), `notes[]` |
+| `shared` | what every module has in common, printed once: `count`, `maker`, `maker_id`, `part_number`, `memory_type`, `module_type`, `size_bytes`, `organisation`, `die_mbit` |
+| `lots` | the table of date codes of the host (the view `lots` below) |
+| `notes[]` | the differences that concern the host: serial numbers tied in reverse order, readings tied to no slot, DIMMs without a reading, no SMBIOS serial numbers |
+
+### The view `lots`
+
+`my lots --json` counts the DIMMs of a host, or of every host of a ledger, by maker code, part number and manufacturing week, the DIMMs with a finding beside those without one. The week comes from `dimm.mfg_date`, whichever source gave it. A shared week is a lead for the supplier to check and no proof that a lot is at fault.
+
+| Field | Content |
+| --- | --- |
+| `hosts` | the hosts the table counts |
+| `findings` | false when the table has no finding columns: the readings are tied to no DIMM, or they are dump files without a host; `why` says which |
+| `rows[]` | per lot key: `maker_id`, `maker`, `part_number`, `mfg_date` (empty in the last row, the DIMMs without a date code), `date_source` (`spd`, `bmc` or `inventory`), `dimms`, `with_finding`, `with_ue`, `slots` (the slots with a finding, one host) or `hosts[]` (`host`, `dimms`, `with_finding`, several hosts) |
+| `by_organisation[]` | the same counts by ranks and device width: `organisation`, `dimms`, `with_finding`, `with_ue` |
+| `lines[]` | the line of each week that at least two DIMMs with a finding share, which names both sides, and the closing sentence |
+| `grade` | the worst finding of a DIMM the table counts; `my lots` exits with it |
 
 ### Firmware records in the views
 
