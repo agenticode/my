@@ -1682,11 +1682,11 @@ The codes of the module maker and of the DRAM maker are those of JEDEC JEP106, t
 
 The 8 DDR4 and DDR5 dumps decode with good CRCs: 12 of 12 stored values equal the computed ones. `TestPublicDumps` holds every field of each to the values above, and `testdata/spd/README.md` names the files, their sources and every byte that was changed in the copies. `TestSynthetic` builds 14 dumps from the copies by changing named bytes (1Rx8, asymmetric ranks, a DDR4 multi-load stack, DDR5 3DS and DDP packages, bad CRCs, the first 128, 256 and 512 bytes, blank dumps); they hold the formulas, and no second decoder saw them. `tools/spd-fetch.sh` downloads 9 DDR5 UDIMM dumps of a repository that states no licence, and `TestFetchedDumps` decodes them where `MY_SPD_DIR` names their directory; all 9 have good CRCs and a date.
 
-The reader ran against the sysfs trees that `internal/adapter/dimmspd/spdtest` builds for the reasons and for the states of a reading, with faults put into the reads: a refused open, an error at an offset, a read that does not return. No real kernel has served a read of MemorY yet.
+The reader ran against the sysfs trees that `internal/adapter/dimmspd/spdtest` builds for the reasons and for the states of a reading, with faults put into the reads: a refused open, an error at an offset, a read that does not return. In two guests of the lab, kernel 6.19.10 on the emulated SMBus of QEMU, the probe ran against a real sysfs: `ee1004` bound its clients and every read ended in ENXIO, and `spd5118` bound none ([validation-lab.md](validation-lab.md#spd)). Those EEPROMs hold no SPD, so no read of MemorY has returned SPD bytes from a kernel yet.
 
 Not checked:
 
-- every step on a real host: the probe of a real sysfs, a read through `ee1004` or `spd5118`, the error a bus fault gives, a read while the SPD write disable bit is set, an SPD behind I3C, AMD and arm64 boards;
+- every step on a real server: a read through `ee1004` or `spd5118` that returns bytes, the error a fault of a real bus gives, a read while the SPD write disable bit is set, an SPD behind I3C, AMD and arm64 boards;
 - how long a read takes, and what it does on a bus that a BMC uses too ([performance.md](performance.md));
 - which reason a real server gives;
 - in which byte order and form firmware writes the SPD serial number into SMBIOS, which the tie rests on;

@@ -308,7 +308,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
 - 공개 SMBIOS 모음의 서버 덤프 2,044개 중 1,934개는 모든 슬롯을 프로세서, 채널, 채널 안 위치에 놓습니다. 슬롯 이름이나, 제조사 공개 문서 385개로 만든 보드 계열 표 361개를 씁니다. 나머지 110개는 자기 기록만으로 위치를 알 수 없는 까닭과 함께 따로 적어 둡니다. 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - 장착 구성 검사는 보드 계열 276개의 장착표와 규칙으로 모듈을 견줍니다. 규칙마다 제조사 공개 문서와 쪽수를 적었습니다. 실제 서버에서 확인한 규칙은 없습니다. 공개 모음의 덤프 2,044개 중 1,682개가 규칙 세트에 닿습니다([docs/rules.md](docs/rules.md#population-rules)).
-- 실제 서버에서 SPD를 읽어 본 적이 없습니다. 디코더는 DDR4와 DDR5 공개 덤프 8개로, 리더는 만들어 둔 sysfs 트리로 시험했습니다. 대부분의 서버 보드에서는 Linux에 SPD까지 가는 경로가 없고, 그때 `my spd`가 이유를 적습니다([docs/compatibility.md](docs/compatibility.md#module-spd)).
+- 실제 서버에서 SPD를 읽어 본 적이 없습니다. 디코더는 DDR4와 DDR5 공개 덤프 8개로, 리더는 만들어 둔 sysfs 트리와 EEPROM에 SPD가 없는 에뮬레이션 게스트 2대에서 시험했습니다([docs/validation-lab.md](docs/validation-lab.md#spd)). 대부분의 서버 보드에서는 Linux에 SPD까지 가는 경로가 없고, 그때 `my spd`가 이유를 적습니다([docs/compatibility.md](docs/compatibility.md#module-spd)).
 - 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵

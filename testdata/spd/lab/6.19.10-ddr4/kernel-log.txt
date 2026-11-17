@@ -1,0 +1,7 @@
+i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+i2c i2c-0: Successfully instantiated SPD at 0x50
+i2c i2c-0: Successfully instantiated SPD at 0x51
+ee1004 0-0050: Failed to select page 0 (-6)
+ee1004 0-0050: 512 byte EE1004-compliant SPD EEPROM, read-only
+ee1004 0-0051: Failed to select page 0 (-6)
+ee1004 0-0051: 512 byte EE1004-compliant SPD EEPROM, read-only

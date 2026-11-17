@@ -125,7 +125,9 @@ SPD 못 읽음: SPD 드라이버가 eeprom 파일을 내주지 않음
 == read-failed
 호스트 r12-n034  Example Systems R760  SPD 못 읽음: 읽기 실패
  SPD 장치 2개가 답하지 않음(/sys/bus/i2c/devices/0-0050/eeprom에서 ENXIO). BMC가
- 같은 버스를 함께 쓰면 이런 오류가 나기도 함.
+ 같은 버스를 함께 쓰면 이런 오류가 나기도 함. ee1004는 페이지 선택 주소 0x36,
+ 0x37에서 아무것도 답하지 않을 때도 ENXIO를 냄. 그때 커널 로그에 "Failed to
+ select page" 줄이 남음.
  SMBIOS에 슬롯 32개가 있음.
  다시 스캔. 계속되면 BMC에 물어보거나 덤프를 넘김.
 
