@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/testutil"
 )
 
@@ -308,6 +309,12 @@ func TestPopulationBoards(t *testing.T) {
 		{0, false, boardTally{all: 1135, some: 50, noChannel: 229, none: 629, wrongCPU: 5}},
 		{meFixes, true, boardTally{all: 1502, some: 51, noChannel: 239, none: 251}},
 		{meFixes, false, boardTally{all: 1567, some: 48, noChannel: 239, none: 189, wrongCPU: 8}},
+		// This release with the socket count unknown (a ledger written before
+		// the processor records were kept): one board draws a CPU its records
+		// lack, the IBM System x3650 M2 whose firmware writes one processor
+		// record and whose family table puts slots 9 to 16 on the second
+		// processor of the board.
+		{AllFixes, false, boardTally{all: 1665, some: 25, noChannel: 6, none: 347, wrongCPU: 1}},
 	} {
 		old := SetFixes(c.fixes)
 		got := tallyPopulation(lists, c.known)
@@ -332,60 +339,6 @@ func maker(v string) string {
 		}
 	}
 	return "other"
-}
-
-// TestPopulationByMaker holds, per system maker, how many dumps of the
-// public collection have every slot placed, before and after the fixes,
-// with the socket count known (testdata/population-boards.txt).
-func TestPopulationByMaker(t *testing.T) {
-	lists := readPopulation(t)
-	type row struct{ dumps, before, after int }
-	rows := map[string]*row{}
-	full := func(list []popSlot) bool {
-		for _, x := range Place(ParseDmidecodeMemory(popText(list), nil, nil), list[0].sockets, 0) {
-			if x.State != Placed {
-				return false
-			}
-		}
-		return true
-	}
-	for _, list := range lists {
-		m := maker(list[0].vendor)
-		if rows[m] == nil {
-			rows[m] = &row{}
-		}
-		r := rows[m]
-		r.dumps += list[0].dumps
-		old := SetFixes(0)
-		if full(list) {
-			r.before += list[0].dumps
-		}
-		SetFixes(meFixes)
-		if full(list) {
-			r.after += list[0].dumps
-		}
-		SetFixes(old)
-	}
-	var names []string
-	for n := range rows {
-		names = append(names, n)
-	}
-	sort.Slice(names, func(i, j int) bool {
-		if rows[names[i]].dumps != rows[names[j]].dumps {
-			return rows[names[i]].dumps > rows[names[j]].dumps
-		}
-		return names[i] < names[j]
-	})
-	var b strings.Builder
-	b.WriteString("maker\tdumps\tplaced in full before\tafter\n")
-	var tot row
-	for _, n := range names {
-		r := rows[n]
-		fmt.Fprintf(&b, "%s\t%d\t%d\t%d\n", n, r.dumps, r.before, r.after)
-		tot.dumps, tot.before, tot.after = tot.dumps+r.dumps, tot.before+r.before, tot.after+r.after
-	}
-	fmt.Fprintf(&b, "all\t%d\t%d\t%d\n", tot.dumps, tot.before, tot.after)
-	testutil.Golden(t, "population-boards.txt", []byte(b.String()))
 }
 
 // The counts of docs/compatibility.md are those of the population, with the
@@ -429,33 +382,355 @@ func commas(n int) string {
 	return s
 }
 
-// TestPopulationNames: every slot of a dump that no board family places
-// gets from the reader the place the file expects: the names spell it.
-func TestPopulationNames(t *testing.T) {
+// TestPopulationExpected: every slot of the public collection gets from the
+// reader and the checks of the board the state, reason, socket, channel,
+// channel name, position, DIMM index and way of placing the file expects.
+func TestPopulationExpected(t *testing.T) {
 	lists := readPopulation(t)
-	family := map[int]string{}
-	for _, d := range readDumps(t) {
-		family[d.list] = d.family
-	}
-	checked, dumps := 0, 0
+	slots := 0
 	for _, list := range lists {
-		if family[list[0].list] != "" {
-			continue
-		}
 		d, f := ReadSlots(WriteSlotsOf(popHost(list), slotTexts(list)), nil, nil)
 		if len(d) != len(list) {
 			t.Fatalf("list %d: %d slots, want %d", list[0].list, len(d), len(list))
 		}
+		p := PlaceBoard(d, f)
 		for i, s := range list {
 			if diff := slotDiff(d[i], f, s); diff != "" {
 				t.Errorf("list %d slot %q|%q: %s", s.list, s.locator, s.bank, diff)
 			}
-			checked++
+			got := p[i].State + "/" + p[i].Reason
+			if p[i].State == Placed && d[i].Label != "" {
+				got = Placed + "/label"
+			}
+			if want := s.state + "/" + s.reason; got != want {
+				t.Errorf("list %d slot %q|%q: %s, want %s", s.list, s.locator, s.bank, got, want)
+			}
+			slots++
 		}
-		dumps += list[0].dumps
 	}
-	if checked == 0 {
-		t.Fatal("no list without a family")
+	if slots != popSlots {
+		t.Errorf("%d slots, want %d", slots, popSlots)
 	}
-	t.Logf("%d slots of %d dumps", checked, dumps)
 }
+
+// listed is one line of testdata/explorer/population/unplaceable.tsv.
+type listed struct{ reason, evidence string }
+
+func readUnplaceable(t testing.TB) map[string]listed {
+	t.Helper()
+	b, err := os.ReadFile(fixtureRoot + "/population/unplaceable.tsv")
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := map[string]listed{}
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, "dump\t") {
+			continue
+		}
+		p := strings.Split(line, "\t")
+		if len(p) != 3 || p[2] == "" {
+			t.Fatalf("unplaceable.tsv: %q", line)
+		}
+		if _, dup := out[p[0]]; dup {
+			t.Fatalf("unplaceable.tsv: %s twice", p[0])
+		}
+		out[p[0]] = listed{p[1], p[2]}
+	}
+	return out
+}
+
+// judged is how the board takes one dump: placed in full, or the reason it
+// is not.
+type judged struct {
+	full   bool
+	reason string
+}
+
+// separateList checks the dumps against the separate list: every dump is
+// placed in full or listed with the reason the board gives; no listed dump is
+// placed in full; a listed dump without a slot list has no memory device.
+func separateList(dumps map[string]judged, list map[string]listed) []string {
+	var out []string
+	for id, j := range dumps {
+		l, ok := list[id]
+		switch {
+		case j.full && ok:
+			out = append(out, id+": placed in full, and listed as "+l.reason)
+		case !j.full && !ok:
+			out = append(out, id+": not placed in full ("+j.reason+"), and not listed")
+		case !j.full && l.reason != j.reason:
+			out = append(out, id+": listed as "+l.reason+", the board says "+j.reason)
+		}
+	}
+	for id, l := range list {
+		if _, ok := dumps[id]; !ok && l.reason != ListNoDevice {
+			out = append(out, id+": listed as "+l.reason+", and no slot list")
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// minPlacedInFull is the least number of dumps the board places in full.
+const minPlacedInFull = 1934
+
+// TestPopulationFull: every dump of the public collection is placed in full
+// by the check of the board, or stands in the separate list with the reason
+// the board gives; the counts per maker and per reason are those of
+// internal/explorer/testdata/population-boards.txt.
+func TestPopulationFull(t *testing.T) {
+	lists := readPopulation(t)
+	dumps := readDumps(t)
+	list := readUnplaceable(t)
+	byList := map[int][]string{}
+	for id, d := range dumps {
+		byList[d.list] = append(byList[d.list], id)
+	}
+	type row struct{ dumps, first, me, full, listed int }
+	rows := map[string]*row{}
+	reasons := map[string]int{}
+	judgedDumps := map[string]judged{}
+	allPlaced := func(list []popSlot) bool {
+		for _, x := range Place(ParseDmidecodeMemory(popText(list), nil, nil), list[0].sockets, 0) {
+			if x.State != Placed {
+				return false
+			}
+		}
+		return true
+	}
+	for _, sl := range lists {
+		m := maker(sl[0].vendor)
+		if rows[m] == nil {
+			rows[m] = &row{}
+		}
+		r := rows[m]
+		n := sl[0].dumps
+		r.dumps += n
+		old := SetFixes(0)
+		if allPlaced(sl) {
+			r.first += n
+		}
+		SetFixes(meFixes)
+		if allPlaced(sl) {
+			r.me += n
+		}
+		SetFixes(old)
+		d, f := ReadSlots(WriteSlotsOf(popHost(sl), slotTexts(sl)), nil, nil)
+		c := Complete(d, f, PlaceBoard(d, f))
+		if c.Full {
+			r.full += n
+		} else {
+			r.listed += n
+			reasons[c.Reason] += n
+		}
+		for _, id := range byList[sl[0].list] {
+			judgedDumps[id] = judged{c.Full, c.Reason}
+		}
+	}
+	for _, e := range separateList(judgedDumps, list) {
+		t.Error(e)
+	}
+	// The dumps without a memory device have no slot list.
+	for _, l := range list {
+		if l.reason == ListNoDevice {
+			reasons[ListNoDevice]++
+			if rows["other"] == nil {
+				rows["other"] = &row{}
+			}
+			rows["other"].dumps++
+			rows["other"].listed++
+		}
+	}
+	var names []string
+	for n := range rows {
+		names = append(names, n)
+	}
+	sort.Slice(names, func(i, j int) bool {
+		if rows[names[i]].dumps != rows[names[j]].dumps {
+			return rows[names[i]].dumps > rows[names[j]].dumps
+		}
+		return names[i] < names[j]
+	})
+	var b strings.Builder
+	b.WriteString("# The dumps of the public collection by system maker: every slot placed by the first version and by the\n")
+	b.WriteString("# first round of fixes (the checks of the first round), placed in full by this release, and in the separate list.\n")
+	b.WriteString("maker\tdumps\tfirst version\tfirst round\tplaced in full\tseparate list\n")
+	var tot row
+	for _, n := range names {
+		r := rows[n]
+		fmt.Fprintf(&b, "%s\t%d\t%d\t%d\t%d\t%d\n", n, r.dumps, r.first, r.me, r.full, r.listed)
+		tot.dumps, tot.first, tot.me, tot.full, tot.listed = tot.dumps+r.dumps, tot.first+r.first, tot.me+r.me, tot.full+r.full, tot.listed+r.listed
+	}
+	fmt.Fprintf(&b, "all\t%d\t%d\t%d\t%d\t%d\n", tot.dumps, tot.first, tot.me, tot.full, tot.listed)
+	b.WriteString("\n# The separate list by reason.\nreason\tdumps\n")
+	var rs []string
+	for r := range reasons {
+		rs = append(rs, r)
+	}
+	sort.Slice(rs, func(i, j int) bool {
+		if reasons[rs[i]] != reasons[rs[j]] {
+			return reasons[rs[i]] > reasons[rs[j]]
+		}
+		return rs[i] < rs[j]
+	})
+	for _, r := range rs {
+		fmt.Fprintf(&b, "%s\t%d\n", r, reasons[r])
+	}
+	b.WriteString("\n# How the boards are drawn when the socket count is not known (dmidecode -t memory text, a ledger written\n")
+	b.WriteString("# before the processor records were kept): every slot placed, some, without channels, none, a CPU the dump lacks.\n")
+	b.WriteString("fixes\tall\tsome\tno channels\tnone\twrong CPU\n")
+	for _, c := range []struct {
+		name  string
+		fixes Fix
+	}{{"first version", 0}, {"first round", meFixes}, {"this release", AllFixes}} {
+		old := SetFixes(c.fixes)
+		x := tallyPopulation(lists, false)
+		SetFixes(old)
+		fmt.Fprintf(&b, "%s\t%d\t%d\t%d\t%d\t%d\n", c.name, x.all, x.some, x.noChannel, x.none, x.wrongCPU)
+		// One board of two sockets whose firmware writes one processor
+		// record (TestPopulationBoards).
+		if c.fixes == AllFixes && x.wrongCPU > 1 {
+			t.Errorf("with the socket count unknown, %d boards draw a CPU the dump does not have", x.wrongCPU)
+		}
+	}
+	if tot.full < minPlacedInFull {
+		t.Errorf("%d dumps placed in full, at least %d were", tot.full, minPlacedInFull)
+	}
+	if tot.full+tot.listed != len(dumps)+1 {
+		t.Errorf("%d placed in full and %d listed, of %d dumps", tot.full, tot.listed, len(dumps)+1)
+	}
+	testutil.Golden(t, "population-boards.txt", []byte(b.String()))
+}
+
+// The check of the separate list fails when a listed dump loses its row,
+// when a listed dump is placed in full, when a dump placed in full is
+// listed, and when the reasons differ.
+func TestSeparateListCheck(t *testing.T) {
+	dumps := map[string]judged{"A": {true, ""}, "B": {false, ListUnnamed}, "C": {false, ListAbsent}}
+	list := map[string]listed{"B": {ListUnnamed, "e"}, "C": {ListAbsent, "e"}, "L": {ListNoDevice, "e"}}
+	if e := separateList(dumps, list); len(e) != 0 {
+		t.Fatalf("as listed: %v", e)
+	}
+	for name, change := range map[string]func(d map[string]judged, l map[string]listed){
+		"a row removed":         func(d map[string]judged, l map[string]listed) { delete(l, "B") },
+		"a listed dump placed":  func(d map[string]judged, l map[string]listed) { d["C"] = judged{true, ""} },
+		"a placed dump listed":  func(d map[string]judged, l map[string]listed) { l["A"] = listed{ListDuplicates, "e"} },
+		"another reason":        func(d map[string]judged, l map[string]listed) { l["C"] = listed{ListDuplicates, "e"} },
+		"a listed dump unknown": func(d map[string]judged, l map[string]listed) { l["Z"] = listed{ListAbsent, "e"} },
+	} {
+		d, l := map[string]judged{}, map[string]listed{}
+		for k, v := range dumps {
+			d[k] = v
+		}
+		for k, v := range list {
+			l[k] = v
+		}
+		change(d, l)
+		if e := separateList(d, l); len(e) == 0 {
+			t.Errorf("%s: no error", name)
+		}
+	}
+}
+
+// sampleSlot is one line of testdata/explorer/population/sample.tsv.
+type sampleSlot struct {
+	family, dump, locator, bank, processor, channel, position, source, page string
+}
+
+// TestPopulationSample: the slots placed by hand from the vendor's
+// documents, one dump of every board family that places slots. The board
+// keeps the grouping (the slots of one channel of the document share one
+// channel of the board and no other), the processors up to one offset, and
+// the positions.
+func TestPopulationSample(t *testing.T) {
+	b, err := os.ReadFile(fixtureRoot + "/population/sample.tsv")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bySample := map[[2]string][]sampleSlot{}
+	var order [][2]string
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, "family\t") {
+			continue
+		}
+		p := strings.Split(line, "\t")
+		if len(p) != 9 {
+			t.Fatalf("sample.tsv: %q", line)
+		}
+		s := sampleSlot{p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8]}
+		if _, ok := sources[s.source]; !ok || s.page == "" {
+			t.Errorf("sample of %s: source %q page %q", s.family, s.source, s.page)
+		}
+		k := [2]string{s.family, s.dump}
+		if _, ok := bySample[k]; !ok {
+			order = append(order, k)
+		}
+		bySample[k] = append(bySample[k], s)
+	}
+	families := map[string]bool{}
+	slots := 0
+	for _, k := range order {
+		samples := bySample[k]
+		list := popList(t, k[1])
+		d, f := ReadSlots(WriteSlotsOf(popHost(list), slotTexts(list)), nil, nil)
+		p := PlaceBoard(d, f)
+		docToBoard, boardToDoc := map[string]string{}, map[string]string{}
+		offset := map[int]bool{}
+		for _, s := range samples {
+			i := -1
+			bank := s.bank
+			if model.Placeholder(bank) {
+				bank = ""
+			}
+			for j, x := range list {
+				if x.locator == s.locator && x.bank == bank {
+					i = j
+				}
+			}
+			if i < 0 {
+				t.Errorf("%s %s: no slot %q|%q", k[0], k[1], s.locator, s.bank)
+				continue
+			}
+			if p[i].State != Placed {
+				t.Errorf("%s %s %s: %s/%s, the document places it", k[0], k[1], s.locator, p[i].State, p[i].Reason)
+				continue
+			}
+			slots++
+			board := fmt.Sprintf("%d/%d", p[i].Socket, p[i].Channel)
+			if f.Hub {
+				board = "hub/" + strconv.Itoa(p[i].Channel)
+			}
+			if s.channel != "-" && s.channel != "" {
+				doc := s.processor + "/" + s.channel
+				if b, ok := docToBoard[doc]; ok && b != board {
+					t.Errorf("%s %s %s: channel %s of the document is %s and %s on the board", k[0], k[1], s.locator, doc, b, board)
+				}
+				if dd, ok := boardToDoc[board]; ok && dd != doc {
+					t.Errorf("%s %s %s: board channel %s holds channels %s and %s of the document", k[0], k[1], s.locator, board, dd, doc)
+				}
+				docToBoard[doc], boardToDoc[board] = board, doc
+			}
+			if n, err := strconv.Atoi(s.processor); err == nil && !f.Hub {
+				offset[p[i].Socket-n] = true
+			}
+			if s.position != "-" && s.position != "" && s.position != strconv.Itoa(p[i].Position) {
+				t.Errorf("%s %s %s: position %d, the document %s", k[0], k[1], s.locator, p[i].Position, s.position)
+			}
+		}
+		if len(offset) > 1 {
+			t.Errorf("%s %s: the processors of the document and the board differ by %v", k[0], k[1], offset)
+		}
+		families[k[0]] = true
+	}
+	for _, fam := range families_() {
+		if fam.kind == "table" || fam.kind == "global" || fam.kind == "cards" {
+			if !families[fam.id] {
+				t.Errorf("row %s (%s) has no sample", fam.id, fam.kind)
+			}
+		}
+	}
+	t.Logf("%d samples, %d slots", len(order), slots)
+}
+
+// families_ is the table of board families, for the tests.
+func families_() []family { return families }

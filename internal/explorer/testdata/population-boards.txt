@@ -1,20 +1,43 @@
-maker	dumps	placed in full before	after
-Supermicro	550	412	413
-Dell	476	187	390
-other	337	124	213
-HP	270	235	235
-Intel	103	16	94
-Lenovo	52	8	8
-ASUS	44	11	24
-IBM	43	0	1
-Gigabyte	40	11	40
-HPE	36	32	33
-Fujitsu	33	5	7
-Huawei	27	27	27
-Quanta	11	4	7
-Tyan	7	0	0
-Inspur	5	4	4
-ASRock	4	0	4
-Cisco	4	0	1
-Sugon	1	1	1
-all	2043	1077	1502
+# The dumps of the public collection by system maker: every slot placed by the first version and by the
+# first round of fixes (the checks of the first round), placed in full by this release, and in the separate list.
+maker	dumps	first version	first round	placed in full	separate list
+Supermicro	550	412	413	525	25
+Dell	476	187	390	465	11
+other	338	124	213	297	41
+HP	270	235	235	251	19
+Intel	103	16	94	103	0
+Lenovo	52	8	8	49	3
+ASUS	44	11	24	44	0
+IBM	43	0	1	40	3
+Gigabyte	40	11	40	40	0
+HPE	36	32	33	36	0
+Fujitsu	33	5	7	33	0
+Huawei	27	27	27	26	1
+Quanta	11	4	7	10	1
+Tyan	7	0	0	2	5
+Inspur	5	4	4	4	1
+ASRock	4	0	4	4	0
+Cisco	4	0	1	4	0
+Sugon	1	1	1	1	0
+all	2044	1077	1502	1934	110
+
+# The separate list by reason.
+reason	dumps
+no-channel-in-document	38
+unnamed-empty	27
+duplicated-names	12
+board-unknown	10
+names-not-in-document	6
+no-document	5
+absent-processor	4
+no-processor-in-document	4
+processor-unknown	2
+no-memory-device	1
+processor-records-missing	1
+
+# How the boards are drawn when the socket count is not known (dmidecode -t memory text, a ledger written
+# before the processor records were kept): every slot placed, some, without channels, none, a CPU the dump lacks.
+fixes	all	some	no channels	none	wrong CPU
+first version	1135	50	229	629	5
+first round	1567	48	239	189	8
+this release	1665	25	6	347	1
