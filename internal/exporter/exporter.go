@@ -66,6 +66,12 @@ var (
 		Help: "Boots of the window of the host that stopped with an uncorrected error of the DIMM in the slot."}
 	HostCapture = &Desc{Name: "my_host_capture", Type: Gauge, Labels: []string{"host", "check"},
 		Help: "What my preflight found the latest live scan of the host would keep over a reset: 1 kept, 0 lost, by check. Checks the platform does not offer, or could not read, have no series."}
+	DIMMSPDInfo = &Desc{Name: "my_dimm_spd_info", Type: Gauge, Labels: []string{"host", "slot", "serial", "date_code", "organisation", "part_number"},
+		Help: "1 for a DIMM whose SPD was read and tied to it by serial number, with the manufacturing week (2022-W43, empty when the SPD holds no date), ranks and device width, and the part number the SPD gives."}
+	HostSPDRead = &Desc{Name: "my_host_spd_read", Type: Gauge, Labels: []string{"host"},
+		Help: "SPD readings of the host whose fields could be read (states ok, crc and short). A host whose scans never looked for the SPD has no series."}
+	HostSPDUnread = &Desc{Name: "my_host_spd_unread", Type: Gauge, Labels: []string{"host", "reason"},
+		Help: "1 with the reason when no SPD of the host was read (virtual-machine, no-i2c, spd-driver-not-loaded and the other codes of docs/compatibility.md); else the readings that failed, by state (blank, type, denied, io, timeout)."}
 	SourceGrade = &Desc{Name: "my_source_grade", Type: Gauge, Labels: []string{"host", "source", "status"},
 		Help: "Best observation grade of the error records a source gave in the latest scan: 3 A (bank, row, column), 2 B (address or rank), 1 C (counts), 0 no error records. status says how reading the source went."}
 )
@@ -86,7 +92,7 @@ var (
 var Descs = []*Desc{
 	DIMMVerdict, DIMMCorrected, DIMMUncorrected, DIMMFaults, DIMMOfflinedPages, DIMMRepairs, DIMMFirmwareEvents, DIMMStopBoots,
 	HostStops, HostStopStreak, HostCapture,
-	GPURemapBanks, GPURemapFailure, SourceGrade, SourceUnread, SourceFaults,
+	GPURemapBanks, GPURemapFailure, DIMMSPDInfo, HostSPDRead, HostSPDUnread, SourceGrade, SourceUnread, SourceFaults,
 	BuildInfo, LastScan, ScanDuration, ScanFailures,
 }
 

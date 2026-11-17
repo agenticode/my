@@ -45,6 +45,10 @@ The hex texts were printed from `illumos/ddr4-rdimm-64g-2rx4.bin` and `illumos/d
 | `illumos/forms/ddr5-rdimm-64g-2rx4.xxd.txt` | `xxd` | `ab2dbe029fb5b4abc66e3b260f9f5102a8fee28f94a58e180bbd59a1c2298356` |
 | `illumos/decode-dimms-4.4.txt` | `decode-dimms -x` over the `hexdump -C` text of the four DDR4 copies | `f3a2563ee0cfa74264538b3b1bdd95bd59c1501ad604b8b83abc07ae148a7c6f` |
 
+## Demo case
+
+[`demo`](demo/README.md) is a made host for `my spd --root testdata/spd/demo`. Its eight files `demo/spd/0-0050.bin` to `0-0057.bin` are copies of `illumos/ddr5-rdimm-64g-2rx4.bin` with the serial number of a made DIMM (bytes 517-520) and a week (bytes 515-516) written in; `TestDemoIsCurrent` in `internal/testledger/spdhost` holds them to the generator.
+
 ## Licences
 
 | Directory | Licence | Text |
@@ -52,6 +56,7 @@ The hex texts were printed from `illumos/ddr4-rdimm-64g-2rx4.bin` and `illumos/d
 | `illumos` | CDDL-1.0. The data files carry no header of their own; `usr/src/OPENSOLARIS.LICENSE` of the repository puts every file without another note under the CDDL. | [`illumos/OPENSOLARIS.LICENSE`](illumos/OPENSOLARIS.LICENSE), from commit `4a58223` |
 | `ubihazard` | MIT, Copyright Ubihazard | [`ubihazard/LICENSE.md`](ubihazard/LICENSE.md) |
 | `rigred` | MIT | [`rigred/LICENSE`](rigred/LICENSE) |
+| `demo/spd` | CDDL-1.0, as the illumos file they are copies of | [`illumos/OPENSOLARIS.LICENSE`](illumos/OPENSOLARIS.LICENSE) |
 
 ## Dumps that are not copied
 

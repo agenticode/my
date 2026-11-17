@@ -1,6 +1,6 @@
 # Contributing
 
-This page says how to report a problem, send a sample of a BMC log or the slot names of a board, how to build and test, what a change needs, and how the source tree is laid out.
+This page says how to report a problem, send a sample of a BMC log, the slot names of a board or an SPD dump, how to build and test, what a change needs, and how the source tree is laid out.
 
 ## Reporting a problem
 
@@ -17,6 +17,12 @@ The tables that read the memory messages of each BMC vendor rest on registries a
 ## Sending the slot names of a board
 
 `my board` places a slot by its SMBIOS names and, where a name gives only a slot number, by the table of the board's family; a board it cannot place is drawn without channels or as a list below the board, with a line that says why ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)). The names of such a board are worth sending: run `sudo dmidecode -t 1 -t 2 -t 4 -t 17 > dmidecode.txt`, replace every `Serial Number`, `UUID` and `Asset Tag` value with `Not Specified`, and open an issue with the file, the output of `my board --detail`, and the document of the board that shows its memory slots: the title, the number or revision of the manual, its address, and the page with the drawing or the table of the slots and channels. A family row is written only from a public document that can be cited so. The file becomes a fixture under `testdata/explorer`, and the document a row of `internal/explorer/families.tsv` and `internal/explorer/sources.tsv`.
+
+## Sending an SPD dump
+
+MemorY has read no SPD on a real server, and its decoder was checked against 8 public dumps ([docs/compatibility.md](docs/compatibility.md#module-spd)). A dump the tests lack is worth sending: a DDR5 module with 3DS or two-die packages, an MRDIMM or CUDIMM, an SPD revision above 1.0 (DDR5) or 1.2 (DDR4), or a module whose fields `my spd` gets wrong. On a host where Linux gives the SPD, copy the `eeprom` file of the module (`cp /sys/bus/i2c/devices/0-0050/eeprom 0-0050.bin`), or run `my collect host -o DIR`, which writes `spd-probe.txt` and every module under `spd/`. Elsewhere, the output of `decode-dimms` or the hex text of another tool will do.
+
+The serial number in a dump identifies the module, and with it the owner. It sits at bytes 325 to 328 (DDR4) or 517 to 520 (DDR5), outside the CRC, so writing zeros there keeps the dump readable: `printf '\0\0\0\0' | dd of=0-0050.bin bs=1 seek=517 conv=notrunc`. Do that before attaching a dump to a public issue, and leave the part number as it is: it ties the dump to a datasheet. Open an issue with the file, the output of `my spd FILE --detail`, the board, and what the label on the module says. A dump whose sender allows it to be copied becomes a fixture under `testdata/spd`, with its source in `testdata/spd/README.md`.
 
 ## Building and testing
 

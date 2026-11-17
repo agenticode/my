@@ -4,7 +4,7 @@ Releases of MemorY, the latest first. Version numbers follow [Semantic Versionin
 
 ## [Unreleased]
 
-Ledger schema 11.
+Ledger schema 12.
 
 ### Added
 
@@ -14,6 +14,10 @@ Ledger schema 11.
 - A scan runs `numactl`, `numastat` and `sar` when they are installed, each with a time limit; `my serve` and `my harvest` do not.
 - Ledger schema 10: the table `host_reading`, and the number of sockets and the processor name of a host. Bundles carry the readings.
 - Ledger schema 11: the CPUID signature of the processor of a host and which of its sockets hold a processor. The processor name is now that of the first populated socket.
+- `my spd` and a report section Module SPD show what each DIMM says about itself in its SPD EEPROM: the manufacturing week, the location code, the part and serial number, ranks and device width (x4, x8), the die capacity and the package. Each reading is tied to its slot by serial number. A table of date codes counts the DIMMs with a finding beside those without one; `my lots` prints it alone, for one host or for every host of a ledger. A scan reads the SPD from the `eeprom` files of the kernel drivers `ee1004` (DDR4) and `spd5118` (DDR5), without root and without a write, in at most 5 seconds; `--no-spd` leaves it out and `my harvest` does not read it. `my spd FILE...` and `my import` take a dump as raw bytes, hex text or `decode-dimms` output.
+- When the SPD cannot be read, the missing line, `my spd` and the report give the reason: a virtual machine, a kernel without the SMBus or SPD driver, a driver that is not loaded, no SPD device on the bus, pages that firmware blocks, a read that failed ([docs/compatibility.md](docs/compatibility.md#reasons)). The SPD changes no grade, no finding and no exit code; the engine stays at version 8.
+- Ledger schema 12: the table `spd_reading` with the bytes of each reading, and the reading kind `spd-probe` with what the scan saw of the path to the SPD. A DIMM tied to a reading takes its manufacturing week and device width from it ([docs/data-model.md](docs/data-model.md)). Bundles carry the readings; `my collect host` copies them into `spd-probe.txt` and `spd/`.
+- The exporter: `my_dimm_spd_info`, `my_host_spd_read` and `my_host_spd_unread` ([docs/exporter.md](docs/exporter.md)).
 
 ### Changed
 
@@ -24,6 +28,10 @@ Ledger schema 11.
 - Over the 2,044 server dumps of the Linux-Hardware.org DMI collection the board places 1,934 in full (the first version drew every slot of 1,077); the other 110 stand in a separate list with the reason their own records do not tell the place (`testdata/explorer/population/unplaceable.tsv`). Tests hold every slot of the collection to its expected place and the board to 1,447 slots placed by hand from the vendor documents.
 - The board is checked against its processor: no more sockets than processor records, no more channels than the processor has (46 processor families, by name or by CPUID signature), no more slots in a channel than the platform holds, no two slots in one place. A socket that fails is drawn without channels. Lines of data quality say which document a table comes from, which slots the manual names, which modules stand on an absent processor, and what could not be checked.
 - The population check: the board holds the installed modules to the population the public documents of its maker give (`internal/population/sets.tsv`, 276 rule sets, 188 with a table of slots per number of modules). It marks with `+` an empty slot the table fills for the number of modules and with `-` a module in a slot the table leaves empty, and names each finding with its rule (P-ORDER-01, P-FIRST-01, P-CPU-01, P-BAL-01, P-MIX-01 to P-MIX-05), the strength of the document's wording and the document with its page, in `my board`, in section 2 of the report and in `--json` (`population`); `my why` names a finding of the slot of the DIMM. A population finding has no grade and changes no finding, confidence or exit code; the engine stays at version 8. `--detail` and `--audience fa` add the rules not checked and the vendor's table. Over the 2,044 server dumps of the public collection 1,434 reach a rule set with a table, 248 one of general rules, 252 no rule set and 109 are not placed in full; 201 dumps have a finding (`internal/view/testdata/population-coverage.txt`). `testdata/explorer/population-demo` is the demo case. No rule was checked on a real server.
+
+### Known limits
+
+- No SPD has been read on a real server. The decoder was checked against 8 public DDR4 and DDR5 dumps and the reader against made sysfs trees. On most server boards Linux has no path to the SPD; MemorY then names the reason and reads a dump.
 
 ## [1.0.0] - 2026-11-16
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math/bits"
 	"os"
 	"path/filepath"
 	"sort"
@@ -299,6 +300,7 @@ func (ds *Dataset) WriteHostTree(root string, fl Flavor) error {
 			md.SpeedMTs, md.ConfSpeedMTs = d.SpeedMTs.Or(0), d.ConfiguredSpeedMTs.Or(0)
 			md.Manufacturer, md.Serial, md.PartNumber = d.Manufacturer, d.Serial, d.PartNumber
 			md.Ranks, md.TotalWidth, md.DataWidth = d.Ranks.Or(0), d.TotalWidth.Or(0), d.DataWidth.Or(0)
+			md.ManufacturerID = jedecWord(d.ManufacturerID)
 		} else {
 			md.Manufacturer, md.Serial, md.PartNumber = "NO DIMM", "NO DIMM", "NO DIMM"
 		}
@@ -514,4 +516,19 @@ CREATE TABLE IF NOT EXISTS memory_failure_event (id INTEGER PRIMARY KEY, timesta
 		}
 	}
 	return tx.Commit()
+}
+
+// jedecWord returns the SMBIOS word of a JEDEC maker code written as
+// "bank 1, 0x2C": the ID code in the high byte, the continuation count with
+// its odd parity bit in the low byte. It is 0 for no code.
+func jedecWord(code string) uint16 {
+	var bank, id int
+	if _, err := fmt.Sscanf(code, "bank %d, 0x%X", &bank, &id); err != nil || bank < 1 || bank > 128 || id < 0 || id > 0xFF {
+		return 0
+	}
+	count := byte(bank - 1)
+	if bits.OnesCount8(count)%2 == 0 {
+		count |= 0x80
+	}
+	return uint16(id)<<8 | uint16(count)
 }

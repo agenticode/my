@@ -15,6 +15,7 @@ import (
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/ingest"
 	"github.com/agenticode/my/internal/model"
+	"github.com/agenticode/my/internal/store"
 )
 
 // SPD is the view spd: what each memory module of a host says about itself
@@ -779,4 +780,11 @@ func DecodeFiles(lang i18n.Lang, files []FileInput) *SPDFiles {
 		v.Lots = c.LotsOfDecodes(decoded)
 	}
 	return v
+}
+
+// SPDOf builds the view spd of a host from a ledger and the result of the
+// engine for it, in English: the exporter reads its codes and values.
+func SPDOf(ctx context.Context, s *store.Store, h *engine.HostResult) (*SPD, error) {
+	c := &Case{store: s, Lang: i18n.EN}
+	return c.SPD(ctx, h)
 }
