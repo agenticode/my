@@ -3,3 +3,9 @@ MemorY
 The test data under testdata/explorer comes from public repositories under their own licences.
 testdata/explorer/README.md names the source and the licence of each file, and the licence texts
 are in testdata/explorer/LICENSES.
+
+The SPD dumps and texts under testdata/spd/illumos come from illumos-gate and are under the Common
+Development and Distribution License, version 1.0 (CDDL-1.0); the licence text is
+testdata/spd/illumos/OPENSOLARIS.LICENSE. testdata/spd/README.md names the source of each file and
+every byte that was changed in the copy. The other dumps under testdata/spd are under the MIT licence
+of their sources, whose texts stand beside them.
