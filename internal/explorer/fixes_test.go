@@ -94,6 +94,9 @@ func TestFixes(t *testing.T) {
 		{FixNameForms, func() string {
 			return dimms(board(xeonE5, 2, "CPU1_DIMM_A1|P0 CHANNEL A", "CPU2_DIMM_A1|P1 CHANNEL A"))
 		}, "0/0 1/0", "1/0 2/0"},
+		{FixBoardFamilies, func() string {
+			return where(ParseDmidecodeMemory(slotsFor("Dell Inc.", "PowerEdge R630", "", xeonE5, 2, "A1", "A5", "B1"), nil, nil))
+		}, "0/0/0 0/0/1 1/0/0", "0/A/0 0/A/1 1/B/0"},
 		{FixLetterMeaning, func() string {
 			return where(ParseDmidecodeMemory(board(xeonE5, 1, "P1-DIMM1A|P0_Node0_Channel0_Dimm0", "P1-DIMM1B|P0_Node0_Channel1_Dimm0"), nil, nil))
 		}, "0/A/0 0/B/0", "0/0/0 0/1/0"},
@@ -127,7 +130,7 @@ func TestFixes(t *testing.T) {
 			}
 		})
 	}
-	if len(Fixes()) != 22 {
+	if len(Fixes()) != 23 {
 		t.Errorf("%d fixes; every fix needs a case here", len(Fixes()))
 	}
 }

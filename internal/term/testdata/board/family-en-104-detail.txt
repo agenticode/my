@@ -1,0 +1,38 @@
+host board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  8 of 24 slots, 512 GB  DDR4 2933 MT/s
+
+ ch       5    4    3    2    1    0                            0    1    2    3    4    5
+        ···· ··░░ ··░░ ···· ··░░ ··░░ ══╡CPU 0╞══ ══╡CPU 1╞══ ░░·· ░░·· ···· ░░·· ░░·· ····
+ DIMM   1112 9 10 7 8  2 1  4 3  6 5                          1718 1516 1314 2019 2221 2423
+
+ ░░ ok   ·· empty slot
+
+ CPU 0  4 DIMMs, 256 GB
+ CPU 1  4 DIMMs, 256 GB
+
+ slot     place       size   part number   serial    CE  UE  finding
+ DIMM 11  CPU 0 ch 5                                 0   0   empty slot
+ DIMM 12  CPU 0 ch 5                                 0   0   empty slot
+ DIMM 9   CPU 0 ch 4                                 0   0   empty slot
+ DIMM 10  CPU 0 ch 4  64 GB  EXM32G32R2X4  EX000032  0   0   ok
+ DIMM 7   CPU 0 ch 3                                 0   0   empty slot
+ DIMM 8   CPU 0 ch 3  64 GB  EXM32G32R2X4  EX000026  0   0   ok
+ DIMM 2   CPU 0 ch 2                                 0   0   empty slot
+ DIMM 1   CPU 0 ch 2                                 0   0   empty slot
+ DIMM 4   CPU 0 ch 1                                 0   0   empty slot
+ DIMM 3   CPU 0 ch 1  64 GB  EXM32G32R2X4  EX000020  0   0   ok
+ DIMM 6   CPU 0 ch 0                                 0   0   empty slot
+ DIMM 5   CPU 0 ch 0  64 GB  EXM32G32R2X4  EX000014  0   0   ok
+ DIMM 17  CPU 1 ch 0  64 GB  EXM32G32R2X4  EX000038  0   0   ok
+ DIMM 18  CPU 1 ch 0                                 0   0   empty slot
+ DIMM 15  CPU 1 ch 1  64 GB  EXM32G32R2X4  EX000044  0   0   ok
+ DIMM 16  CPU 1 ch 1                                 0   0   empty slot
+ DIMM 13  CPU 1 ch 2                                 0   0   empty slot
+ DIMM 14  CPU 1 ch 2                                 0   0   empty slot
+ DIMM 20  CPU 1 ch 3  64 GB  EXM32G32R2X4  EX000050  0   0   ok
+ DIMM 19  CPU 1 ch 3                                 0   0   empty slot
+ DIMM 22  CPU 1 ch 4  64 GB  EXM32G32R2X4  EX000056  0   0   ok
+ DIMM 21  CPU 1 ch 4                                 0   0   empty slot
+ DIMM 24  CPU 1 ch 5                                 0   0   empty slot
+ DIMM 23  CPU 1 ch 5                                 0   0   empty slot
+
+ - 24 slots on the board, 0 drawn without channels, 0 set aside

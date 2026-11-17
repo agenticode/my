@@ -235,7 +235,22 @@ func tallyPopulation(lists [][]popSlot, socketsKnown bool) boardTally {
 		if socketsKnown {
 			sockets = list[0].sockets
 		}
-		p := Place(ParseDmidecodeMemory(popText(list), nil, nil), sockets, 0)
+		text := popText(list)
+		if on(FixNameForms) {
+			// The pass of the second round reads what the ledger keeps of
+			// the host: product, board and processor records.
+			h := popHost(list)
+			if !socketsKnown {
+				h.Sockets, h.Present, h.Signature, h.Processor = 0, "", "", ""
+			}
+			text = WriteSlotsOf(h, slotTexts(list))
+		}
+		var p []Placement
+		for _, x := range Place(ParseDmidecodeMemory(text, nil, nil), sockets, 0) {
+			if x.State != NotASlot {
+				p = append(p, x)
+			}
+		}
 		placed, noch, un := 0, 0, 0
 		drawn := map[int]bool{}
 		for _, x := range p {

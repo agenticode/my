@@ -90,6 +90,18 @@ func drawn(st BoardStick) string {
 	return "set aside"
 }
 
+// readBy says where the processor and the channel of a stick come from,
+// a family as "family" whatever its row.
+func readBy(st BoardStick) string {
+	f := func(s string) string {
+		if strings.HasPrefix(s, "family:") {
+			return "family"
+		}
+		return s
+	}
+	return f(st.SocketBy) + "|" + f(st.ChannelBy)
+}
+
 // The table of slot names in docs/compatibility.md is what the board draws
 // of the first slot of each fixture it names, and every pair of socket and
 // channel test that a fixture's slots fire has a row.
@@ -133,7 +145,7 @@ func TestSlotNamesOfTheDocs(t *testing.T) {
 		if got := drawn(*first); got != want {
 			t.Errorf("%s: slot %q | %q is drawn %q, the table says %q", fixture, locator, bank, got, want)
 		}
-		named[first.SocketBy+"|"+first.ChannelBy] = true
+		named[readBy(*first)] = true
 	}
 	dirs, _ := filepath.Glob(filepath.Join(root, "*"))
 	for _, dir := range dirs {
@@ -141,7 +153,7 @@ func TestSlotNamesOfTheDocs(t *testing.T) {
 			continue
 		}
 		for _, st := range sticksOf(fixtureBoard(t, dir)) {
-			if k := st.SocketBy + "|" + st.ChannelBy; !named[k] {
+			if k := readBy(st); !named[k] {
 				t.Errorf("%s: slot %q | %q is read by the tests %q, which no row of the table shows", filepath.Base(dir), st.Locator, st.BankLocator, k)
 				named[k] = true
 			}

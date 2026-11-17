@@ -2744,10 +2744,10 @@ list	dumps	sockets	vendor	product	board	processor	signature	present	populated	ty
 191	1	2	Lenovo	ThinkSystem ST650 V2	Lenovo 7Z74CTO1WW	Intel(R) Xeon(R) Silver 4309Y CPU @ 2.80GHz	6/106/6	10	0		DIMM 25	CPU 2	0	0	placed		1	6	G	1		family:lenovo-thinksystem-st650v2-32slot
 191	1	2	Lenovo	ThinkSystem ST650 V2	Lenovo 7Z74CTO1WW	Intel(R) Xeon(R) Silver 4309Y CPU @ 2.80GHz	6/106/6	10	0		DIMM 28	CPU 2	0	0	placed		1	7	H	0		family:lenovo-thinksystem-st650v2-32slot
 191	1	2	Lenovo	ThinkSystem ST650 V2	Lenovo 7Z74CTO1WW	Intel(R) Xeon(R) Silver 4309Y CPU @ 2.80GHz	6/106/6	10	0		DIMM 27	CPU 2	0	0	placed		1	7	H	1		family:lenovo-thinksystem-st650v2-32slot
-192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	0		DIMM_3	BANK 0	0	0	unplaced	board-unknown						
-192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	1	DDR3	DIMM_1	BANK 1	0	0	unplaced	board-unknown						
-192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	0		DIMM_4	BANK 2	0	0	unplaced	board-unknown						
-192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	1	DDR3	DIMM_2	BANK 3	0	0	unplaced	board-unknown						
+192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	0		DIMM_3	BANK 0	0	0	no-channel	no-table	0					
+192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	1	DDR3	DIMM_1	BANK 1	0	0	no-channel	no-table	0					
+192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	0		DIMM_4	BANK 2	0	0	no-channel	no-table	0					
+192	1	1				Intel(R) Xeon(R) CPU E3-1220 v3 @ 3.10GHz	6/60/3	1	1	DDR3	DIMM_2	BANK 3	0	0	no-channel	no-table	0					
 193	1	2	Dell Inc.	PowerEdge R510	Dell Inc. 0DPRKF	Intel(R) Xeon(R) CPU           X5670  @ 2.93GHz	6/44/1	11	1	DDR3	DIMM_A1		0	0	placed		0	0	0	0		family:dell-11g-8slot
 193	1	2	Dell Inc.	PowerEdge R510	Dell Inc. 0DPRKF	Intel(R) Xeon(R) CPU           X5670  @ 2.93GHz	6/44/1	11	1	DDR3	DIMM_A2		0	0	placed		0	1	1	0		family:dell-11g-8slot
 193	1	2	Dell Inc.	PowerEdge R510	Dell Inc. 0DPRKF	Intel(R) Xeon(R) CPU           X5670  @ 2.93GHz	6/44/1	11	1	DDR3	DIMM_A3		0	0	placed		0	2	2	0		family:dell-11g-8slot

@@ -1,0 +1,7 @@
+host board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  8 of 24 slots, 512 GB  DDR4 2933 MT/s
+
+ ch       5    4    3    2    1    0                            0    1    2    3    4    5
+        ···· ··░░ ··░░ ···· ··░░ ··░░ ══╡CPU 0╞══ ══╡CPU 1╞══ ░░·· ░░·· ···· ░░·· ░░·· ····
+ DIMM   1112 9 10 7 8  2 1  4 3  6 5                          1718 1516 1314 2019 2221 2423
+
+ ░░ ok   ·· empty slot
