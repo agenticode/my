@@ -4,7 +4,7 @@ Releases of MemorY, the latest first. Version numbers follow [Semantic Versionin
 
 ## [Unreleased]
 
-Ledger schema 10.
+Ledger schema 11.
 
 ### Added
 
@@ -13,6 +13,11 @@ Ledger schema 10.
 - `my collect host -o DIR`: what a scan reads of this host, with the memory readings, copied into a directory that `my import` and `--root` read elsewhere. `--sudo` runs `dmidecode` and `lshw` through `sudo -n`.
 - A scan runs `numactl`, `numastat` and `sar` when they are installed, each with a time limit; `my serve` and `my harvest` do not.
 - Ledger schema 10: the table `host_reading`, and the number of sockets and the processor name of a host. Bundles carry the readings.
+- Ledger schema 11: the CPUID signature of the processor of a host and which of its sockets hold a processor. The processor name is now that of the first populated socket.
+
+### Changed
+
+- The SMBIOS reader skips a memory device of type Flash, ROM, EPROM, FEPROM or EEPROM (a chip of the board) with a note, and reads once a record that a text holds twice.
 
 ## [1.0.0] - 2026-11-16
 

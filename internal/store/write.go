@@ -265,11 +265,13 @@ func (w *Writer) UpsertHost(h *model.Host) error {
 	if h.Name == "" {
 		return invalid("host: name is empty")
 	}
-	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, virtual, sockets, cpu, first_seen, last_seen)
- VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	_, err := w.exec(`INSERT INTO host (name, arch, system_vendor, system_product, board, virtual, sockets, cpu, cpu_signature, cpu_present, first_seen, last_seen)
+ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
  ON CONFLICT(name) DO UPDATE SET
   sockets        = CASE WHEN excluded.sockets        > 0  THEN excluded.sockets        ELSE sockets        END,
   cpu            = CASE WHEN excluded.cpu            != '' THEN excluded.cpu            ELSE cpu            END,
+  cpu_signature  = CASE WHEN excluded.cpu_signature  != '' THEN excluded.cpu_signature  ELSE cpu_signature  END,
+  cpu_present    = CASE WHEN excluded.cpu_present    != '' THEN excluded.cpu_present    ELSE cpu_present    END,
   arch           = CASE WHEN excluded.arch           != '' THEN excluded.arch           ELSE arch           END,
   system_vendor  = CASE WHEN excluded.system_vendor  != '' THEN excluded.system_vendor  ELSE system_vendor  END,
   system_product = CASE
@@ -285,7 +287,7 @@ func (w *Writer) UpsertHost(h *model.Host) error {
     ELSE excluded.virtual END,
   first_seen = MIN(COALESCE(first_seen, excluded.first_seen), COALESCE(excluded.first_seen, first_seen)),
   last_seen  = MAX(COALESCE(last_seen, excluded.last_seen), COALESCE(excluded.last_seen, last_seen))`,
-		h.Name, h.Arch, h.SystemVendor, h.SystemProduct, h.Board, h.Virtual, h.Sockets, h.CPU, ts(h.FirstSeen), ts(h.LastSeen))
+		h.Name, h.Arch, h.SystemVendor, h.SystemProduct, h.Board, h.Virtual, h.Sockets, h.CPU, h.CPUSignature, h.CPUPresent, ts(h.FirstSeen), ts(h.LastSeen))
 	return err
 }
 

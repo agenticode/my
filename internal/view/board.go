@@ -152,9 +152,17 @@ const (
 
 // boardHost is what the board needs of the host beyond its slots.
 type boardHost struct {
-	vendor, processor string
-	sockets           int
-	lshw, cpuCache    string
+	vendor, product, board string
+	processor, signature   string
+	sockets                int
+	present                string
+	lshw, cpuCache         string
+}
+
+// slotHost is what the readers of slots are told of the host.
+func (bh boardHost) slotHost() explorer.SlotHost {
+	return explorer.SlotHost{Vendor: bh.vendor, Product: bh.product, Board: bh.board, Processor: bh.processor,
+		Signature: bh.signature, Sockets: bh.sockets, Present: bh.present}
 }
 
 // Readers of the board, replaced by tests that make them fail.
@@ -177,7 +185,8 @@ func (c *Case) Board(ctx context.Context, h *engine.HostResult) (*Board, error) 
 	system := ""
 	for _, x := range hosts {
 		if x.Name == h.Host {
-			bh.vendor, bh.processor, bh.sockets = x.SystemVendor, x.CPU, x.Sockets
+			bh.vendor, bh.product, bh.board = x.SystemVendor, x.SystemProduct, x.Board
+			bh.processor, bh.signature, bh.sockets, bh.present = x.CPU, x.CPUSignature, x.Sockets, x.CPUPresent
 			system = strings.TrimSpace(x.SystemVendor + " " + x.SystemProduct)
 		}
 	}
@@ -229,12 +238,12 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 	for _, sl := range desc {
 		sticks = append(sticks, stickOf(h, sl))
 	}
-	host := explorer.SlotHost{Vendor: bh.vendor, Processor: bh.processor}
+	host := bh.slotHost()
 	text := make([]explorer.SlotText, len(desc))
 	for i, sl := range desc {
 		text[i] = explorer.SlotText{Locator: sl.Locator, BankLocator: sl.BankLocator, Populated: sticks[i].State != SlotEmpty && sticks[i].State != SlotUnknown}
 		if d := h.InSlot(sl.Name); d != nil && d.DIMM != nil {
-			text[i].SizeMB = d.DIMM.SizeBytes >> 20
+			text[i].SizeMB, text[i].Type = d.DIMM.SizeBytes>>20, d.DIMM.MemoryType
 		}
 	}
 	var dimms []explorer.Dimm

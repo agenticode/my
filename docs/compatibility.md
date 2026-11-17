@@ -490,12 +490,12 @@ Before the board is drawn, what the tests read is checked:
 
 The number of sockets is the number of processor records (SMBIOS type 4). `dmidecode -t memory` text and ledgers written before this release lack it; there the CPU packages of the cache reading stand in for the check of a socket no test read. Slots set aside are drawn below the board, as the slot map draws them, with the reason and an example of their names in the data quality lines.
 
-The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https://github.com/linuxhw/DMI), commit `57b21bc`, CC BY 4.0) are 2,043 dumps with memory devices, in 1,625 distinct slot lists (`testdata/explorer/population/slots.tsv`). With the processor records of each dump, the boards are drawn so:
+The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https://github.com/linuxhw/DMI), commit `57b21bc`, CC BY 4.0) are 2,043 dumps with memory devices, in 1,711 distinct slot lists (`testdata/explorer/population/slots.tsv`, each list as the ledger keeps the dump: system, board, processor records and every memory device once). With the processor records of each dump, the boards are drawn so:
 
 | Tests | Every slot placed | Some placed | Without channels | All set aside |
 | --- | --- | --- | --- | --- |
-| first version | 1,076 | 48 | 226 | 693 |
-| this release | 1,502 | 51 | 238 | 252 |
+| first version | 1,077 | 48 | 226 | 692 |
+| this release | 1,503 | 51 | 238 | 251 |
 
 The first version is how the tests read the names when they were first written, the later ones read more forms. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
 

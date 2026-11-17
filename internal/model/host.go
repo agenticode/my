@@ -17,10 +17,18 @@ type Host struct {
 	// Sockets is the number of processor records of the SMBIOS tables:
 	// the sockets of the board. 0 when no full table was read.
 	Sockets int `json:"sockets,omitzero"`
-	// CPU is the name of the processor of the first such record.
-	CPU       string    `json:"cpu,omitzero"`
-	FirstSeen time.Time `json:"first_seen,omitzero"`
-	LastSeen  time.Time `json:"last_seen,omitzero"`
+	// CPU is the name of the processor of the first such record that is
+	// populated and has a name, else of the first record.
+	CPU string `json:"cpu,omitzero"`
+	// CPUSignature is the CPUID signature of the record CPU comes from,
+	// "family/model/stepping", empty when not known.
+	CPUSignature string `json:"cpu_signature,omitzero"`
+	// CPUPresent has one character per processor record, in table order:
+	// "1" when the socket holds a processor, "0" when not. Empty when not
+	// known.
+	CPUPresent string    `json:"cpu_present,omitzero"`
+	FirstSeen  time.Time `json:"first_seen,omitzero"`
+	LastSeen   time.Time `json:"last_seen,omitzero"`
 }
 
 // Boot is one boot of a host.

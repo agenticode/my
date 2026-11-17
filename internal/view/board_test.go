@@ -1,6 +1,7 @@
 package view
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
@@ -11,6 +12,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/adapter/smbios"
 	"github.com/agenticode/my/internal/bundle"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/explorer"
@@ -240,24 +243,25 @@ func TestBoardsOfPublicDumps(t *testing.T) {
 			}
 			slots = append(slots, slotNamed(fmt.Sprintf("%s#%d", d.Locator, i), loc, d.BankLocator, hd, d.Populated))
 		}
-		sockets := strings.Count(text, "DMI type 4,")
-		vendor, processor := "", ""
-		if m := regexp.MustCompile(`System Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Manufacturer:[ \t]*([^\n]*)`).FindStringSubmatch(text); m != nil {
-			vendor = strings.TrimSpace(m[1])
+		// What the ledger keeps of the host, as the SMBIOS reader gives it.
+		var c adapter.Collected
+		smbios.NewDmidecodeFile(f, smbios.Options{}).Collect(context.Background(), &c)
+		var host model.Host
+		if len(c.Hosts) > 0 {
+			host = *c.Hosts[0]
 		}
-		if m := regexp.MustCompile(`Processor Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Version:[ \t]*([^\n]*)`).FindStringSubmatch(text); m != nil {
-			processor = strings.TrimSpace(m[1])
-		}
-		fmt.Fprintf(&out, "%s (%d slots, %d processor records)\n", filepath.Base(filepath.Dir(f)), len(slots), sockets)
+		fmt.Fprintf(&out, "%s (%d slots, %d processor records)\n", filepath.Base(filepath.Dir(f)), len(slots), host.Sockets)
 		for _, c := range []struct {
 			label string
 			fixes explorer.Fix
 			known bool
 		}{{"first", 0, true}, {"fixed", explorer.AllFixes, true}, {"fixed, sockets unknown", explorer.AllFixes, false}} {
 			old := explorer.SetFixes(c.fixes)
-			bh := boardHost{vendor: vendor, processor: processor}
+			bh := boardHost{vendor: host.SystemVendor, product: host.SystemProduct, board: host.Board}
 			if c.known {
-				bh.sockets = sockets
+				bh.processor, bh.signature, bh.sockets, bh.present = host.CPU, host.CPUSignature, host.Sockets, host.CPUPresent
+			} else {
+				bh.processor = host.CPU
 			}
 			b := boardOf(i18n.EN, h, slots, bh)
 			explorer.SetFixes(old)

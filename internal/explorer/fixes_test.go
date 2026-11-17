@@ -2,6 +2,7 @@ package explorer
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 )
@@ -85,6 +86,10 @@ func TestFixes(t *testing.T) {
 		{FixLettersFromA, func() string {
 			return dimms(slotsOf("D0", "D1", "D2", "D3")) + " | " + places(ParseLshwDimms(lshwA0, nil, nil))
 		}, "0/0 0/0 0/0 0/0 | 0/0 0/1 0/0 0/1", "3/-1 3/0 3/1 3/0 | 0/-1 0/0 0/1 0/0"},
+		{FixRepeatedTable, func() string {
+			text := fixtureText(t, "linuxhw-ts100-e7-pi4-e88885")
+			return fmt.Sprint(len(ParseDmidecodeMemory(text, nil, nil)), " slots, ", len(hintsOf(text).cpus), " processor records")
+		}, "4 slots, 1 processor records", "8 slots, 2 processor records"},
 	} {
 		t.Run(c.fix.Name(), func(t *testing.T) {
 			if got := c.run(); got != c.want {
@@ -97,9 +102,19 @@ func TestFixes(t *testing.T) {
 			}
 		})
 	}
-	if len(Fixes()) != 17 {
+	if len(Fixes()) != 18 {
 		t.Errorf("%d fixes; every fix needs a case here", len(Fixes()))
 	}
+}
+
+// fixtureText is the dmidecode text of a fixture of testdata/explorer.
+func fixtureText(t *testing.T, name string) string {
+	t.Helper()
+	b, err := os.ReadFile(fixtureRoot + "/" + name + "/dmidecode.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
 }
 
 func TestProcessorChannels(t *testing.T) {

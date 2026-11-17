@@ -56,6 +56,9 @@ const (
 	// FixLettersFromA takes the letter of A1 as the socket only when the
 	// letters start at A, and counts the slots of A0 from 0.
 	FixLettersFromA
+	// FixRepeatedTable reads once a record that stands again with the same
+	// handle and the same fields (a text that holds its table twice).
+	FixRepeatedTable
 
 	lastFix
 )
@@ -81,7 +84,7 @@ var fixNames = map[Fix]string{
 	FixDellChannels: "dell-channels", FixMoreSockets: "more-sockets", FixEdacControllers: "edac-controllers",
 	FixLineEnds: "line-ends", FixEmptyField: "empty-field", FixNumastatBlocks: "numastat-blocks",
 	FixSupermicroNode: "supermicro-node", FixSlabBySize: "slab-by-size", FixDellDimm: "dell-dimm",
-	FixChanWord: "chan-word", FixLettersFromA: "letters-from-a",
+	FixChanWord: "chan-word", FixLettersFromA: "letters-from-a", FixRepeatedTable: "repeated-table",
 }
 
 // Name is the name of a fix, as the tests list it.
@@ -113,30 +116,6 @@ func lineEnds(s string) string {
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(s, "\r\n", "\n"), "\r", "\n")
 }
-
-// textHints are what a dmidecode text says of the system that the slots
-// alone do not: its maker and the name of its processor.
-type textHints struct {
-	vendor, processor string
-}
-
-var (
-	reSystemMaker = regexp.MustCompile(`(?m)^System Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Manufacturer:[ \t]*([^\n]*)`)
-	reProcessor   = regexp.MustCompile(`(?m)^Processor Information\n(?:[ \t]+[^\n]*\n)*?[ \t]+Version:[ \t]*([^\n]*)`)
-)
-
-func hintsOf(raw string) textHints {
-	var h textHints
-	if m := reSystemMaker.FindStringSubmatch(raw); m != nil {
-		h.vendor = strings.TrimSpace(m[1])
-	}
-	if m := reProcessor.FindStringSubmatch(raw); m != nil {
-		h.processor = strings.TrimSpace(m[1])
-	}
-	return h
-}
-
-func (h textHints) dell() bool { return strings.HasPrefix(strings.ToLower(h.vendor), "dell") }
 
 var (
 	reEpyc     = regexp.MustCompile(`EPYC\s+(\d)\d{3}`)

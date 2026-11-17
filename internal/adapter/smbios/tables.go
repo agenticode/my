@@ -167,14 +167,7 @@ func moduleType(detail uint16) string {
 }
 
 // placeholder reports whether a firmware string says "nothing here".
-func placeholder(s string) bool {
-	switch strings.ToUpper(strings.TrimSpace(s)) {
-	case "", "NOT SPECIFIED", "NOT PROVIDED", "UNKNOWN", "NO DIMM", "NODIMM", "[EMPTY]", "EMPTY", "N/A", "NONE",
-		"TO BE FILLED BY O.E.M.", "DEFAULT STRING", "<BAD INDEX>", "<OUT OF SPEC>":
-		return true
-	}
-	return false
-}
+func placeholder(s string) bool { return model.Placeholder(s) }
 
 func clean(s string) string {
 	if placeholder(s) {
@@ -429,6 +422,39 @@ func (b *Builder) AddProcessor(handle uint16, version string) {
 	if version != "" {
 		strs = append(strs, version)
 		d[0x10-4] = byte(len(strs))
+	}
+	b.Add(4, handle, d, strs...)
+}
+
+// Processor describes a type 4 structure for Builder.AddProcessorRecord.
+type Processor struct {
+	Version, Maker string
+	// Family is the processor family code (0xB3 Xeon, 0x6B AMD EPYC).
+	Family byte
+	// EAX is the first word of the processor ID: the CPUID signature.
+	EAX       uint32
+	Populated bool
+}
+
+// AddProcessorRecord appends a type 4 structure with maker, family,
+// signature, version and the populated bit of its status.
+func (b *Builder) AddProcessorRecord(handle uint16, p Processor) {
+	d := make([]byte, 48-4)
+	var strs []string
+	str := func(off int, s string) {
+		if s == "" {
+			return
+		}
+		strs = append(strs, s)
+		d[off-4] = byte(len(strs))
+	}
+	d[0x05-4] = 0x03 // central processor
+	d[0x06-4] = p.Family
+	str(0x07, p.Maker)
+	binary.LittleEndian.PutUint32(d[0x08-4:], p.EAX)
+	str(0x10, p.Version)
+	if p.Populated {
+		d[0x18-4] = 0x41 // socket populated, CPU enabled
 	}
 	b.Add(4, handle, d, strs...)
 }

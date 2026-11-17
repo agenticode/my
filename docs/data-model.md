@@ -18,7 +18,7 @@ CPU1_D1|CE|53
 | --- | --- |
 | format | SQLite 3, one file |
 | application ID | `0x4D594C47` ("MYLG"); a SQLite file with another ID is refused |
-| schema version | `PRAGMA user_version`, 10 in this release |
+| schema version | `PRAGMA user_version`, 11 in this release |
 | times | UTC text of the form `2026-11-12T03:14:07.000000Z`, which sorts as text |
 | unsigned 64-bit values | physical addresses and syndromes are stored as the signed integer with the same bits |
 | column names | a column that holds a field of the FMFM runtime error log keeps the FMFM spelling (`"ErrorDT"`, `"SocketId"`, `"OsPhysicalAddress"`); what MemorY adds is in lower case ([fmfm-mapping.md](fmfm-mapping.md)) |
@@ -46,7 +46,7 @@ Identities and places:
 
 | Table | A row is |
 | --- | --- |
-| `host` | a host: name, architecture, system vendor and product, the hypervisor when it is a virtual machine, and the number of processor records of its SMBIOS tables (the sockets of the board) with the name of the first processor |
+| `host` | a host: name, architecture, system vendor and product, the board, the hypervisor when it is a virtual machine, and the number of processor records of its SMBIOS tables (the sockets of the board): `cpu` is the name of the first record that holds a processor and has a name (else of the first record), `cpu_signature` the CPUID signature of that record as `family/model/stepping`, `cpu_present` one character per record, `1` when the socket holds a processor and `0` when not. Both are empty in a ledger written before schema 11 |
 | `boot` | one boot: start time, kernel release, BIOS and BMC version, kernel command line, and how it ended when a record shows it |
 | `dimm` | a DIMM identity: manufacturer, part number, serial number, size, type, ranks, device width, speed |
 | `slot` | a physical slot of a board, with the names the sources use for it |
