@@ -507,6 +507,8 @@ var words = i18n.Catalog{
 var guides = map[string][]string{
 	"overview": {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
 	"board":    {"guide.board", "guide.grades"},
+	"spd":      {"guide.spd", "guide.lots", "guide.grades"},
+	"lots":     {"guide.lots", "guide.grades"},
 	"dimm":     {"guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.grades"},
 	"why":      {"guide.card", "guide.grades", "guide.obs"},
 	"map":      {"guide.map", "guide.obs"},
@@ -520,7 +522,7 @@ var guides = map[string][]string{
 	"report":   nil,
 	"export":   nil,
 	"import":   {"guide.slotmap", "guide.ranking", "guide.grades", "guide.obs"},
-	"reading":  {"guide.slotmap", "guide.board", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.boots", "guide.gpu", "guide.grades", "guide.obs"},
+	"reading":  {"guide.slotmap", "guide.board", "guide.ranking", "guide.card", "guide.topology", "guide.map", "guide.timeline", "guide.boots", "guide.gpu", "guide.spd", "guide.lots", "guide.grades", "guide.obs"},
 }
 
 // printGuides writes reading guides, each as a paragraph.
@@ -529,7 +531,11 @@ func printGuides(w io.Writer, lang i18n.Lang, st term.Style, codes []string) {
 		if i > 0 {
 			fmt.Fprintln(w)
 		}
-		for _, line := range st.Wrap(view.Messages.Text(lang, code, st.Glyphs()), 2) {
+		text := view.Messages.Text(lang, code, st.Glyphs())
+		if view.SPDMessages.Has(code) {
+			text = view.SPDMessages.Text(lang, code, st.Glyphs())
+		}
+		for _, line := range st.Wrap(text, 2) {
 			fmt.Fprintln(w, line)
 		}
 	}

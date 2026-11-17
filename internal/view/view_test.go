@@ -844,7 +844,9 @@ func TestOverviewSaysWhatRootWouldAdd(t *testing.T) {
 	if ov.Host.Scan == nil || ov.Host.Scan.Kind != model.ScanLive || ov.Host.Scan.Privileged {
 		t.Fatalf("scan = %+v", ov.Host.Scan)
 	}
-	if len(ov.Missing) != 1 || !strings.Contains(ov.Missing[0].Text, "smbios: not readable (permission denied; the SMBIOS tables are readable as root") {
+	// The made root has no I2C bus: the SPD source says so on the same line.
+	if len(ov.Missing) != 2 || !strings.Contains(ov.Missing[0].Text, "smbios: not readable (permission denied; the SMBIOS tables are readable as root") ||
+		ov.Missing[1].Text != "spd: not present (no I2C bus in this kernel)" {
 		t.Errorf("missing = %+v", ov.Missing)
 	}
 	if ov.Root == nil || ov.Root.Text != "This scan ran without root privileges. As root it also reads the SMBIOS tables (slot names and DIMM serial numbers)." {

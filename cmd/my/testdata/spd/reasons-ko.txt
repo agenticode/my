@@ -1,0 +1,155 @@
+== virtual-machine
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 가상 머신 (VMware)
+ 이 호스트는 가상 머신(VMware)임. 게스트에는 그 머신에 꽂힌 DIMM의 SPD로 가는
+ 버스가 없음.
+ 그 머신에서 SPD를 읽거나, 덤프를 my spd FILE에 넘김.
+
+== no-i2c
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 이 커널에 I2C 버스 없음
+ 이 커널에는 I2C 버스가 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ I2C를 지원하고 칩셋의 SMBus 드라이버가 있는 커널로 부팅.
+
+== smbus-driver-not-loaded
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: SMBus 드라이버 i2c_i801을 로드하지 않음
+ SMBus 컨트롤러 0000:00:1f.4(8086:a323)에 드라이버가 없음. 로드되지 않은 모듈:
+ i2c_i801.
+ SMBIOS에 슬롯 32개가 있음.
+ i2c_i801 모듈과 SPD 드라이버를 로드한 뒤 다시 스캔. MemorY는 모듈을 로드하지
+ 않음.
+
+== smbus-driver-not-built
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: i2c_piix4 없이 빌드한 커널
+ SMBus 컨트롤러 0000:00:14.0(1022:790b)에 드라이버가 없고, 이 커널에는 i2c_piix4
+ 모듈이 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ CONFIG_I2C_PIIX4 옵션으로 빌드한 커널로 부팅.
+
+== smbus-driver-unknown
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 드라이버 없는 SMBus 컨트롤러
+ SMBus 컨트롤러 0000:00:1f.4(8086:a323)에 드라이버가 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ 이 커널에 i2c_i801 모듈과 SPD 드라이버가 있으면 로드한 뒤 다시 스캔. MemorY는
+ 모듈을 로드하지 않음.
+
+== smbus-driver-refused
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: SMBus 드라이버가 컨트롤러에 붙지 않음
+ i801_smbus 드라이버는 로드됐지만 SMBus 컨트롤러 0000:00:1f.4에 붙지 않음.
+ 이유는 커널 로그에 나옴: 펌웨어가 차지한 영역, 설정되지 않은 기준 주소, 사용
+ 중인 버스.
+ SMBIOS에 슬롯 32개가 있음.
+ 커널 로그에서 i801_smbus 줄을 찾음.
+
+== no-smbus-controller
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: PCI에 SMBus 컨트롤러 없음
+ PCI 버스에 SMBus 컨트롤러가 없음. 일부 서버 보드는 펌웨어가 컨트롤러를 숨기고,
+ 일부 보드는 SPD를 BMC나 프로세서의 버스에 연결함. 그런 버스에는 Linux
+ 드라이버가 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ 이 호스트에는 BMC가 있음.
+ BMC에 물어봄: --bmc ADDRESS는 부품 번호와 시리얼을 읽고, BMC가 주면 생산 날짜도
+ 읽음. 또는 보드 제조사의 도구로 SPD를 읽고 덤프를 my spd FILE에 넘김.
+
+== spd-driver-not-loaded
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: SPD 드라이버 ee1004를 로드하지 않음
+ 버스에 SPD 장치 2개가 있음(0-0050, 0-0051). 로드되지 않은 드라이버: ee1004.
+ SMBIOS에 슬롯 32개가 있음.
+ ee1004 모듈을 로드하고 다시 스캔. MemorY는 모듈을 로드하지 않음.
+
+== spd-driver-not-built
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: spd5118 없이 빌드한 커널
+ 버스에 SPD 장치 1개가 있지만(0-0050) 이 커널에는 spd5118 모듈이 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ CONFIG_SENSORS_SPD5118 옵션으로 빌드한 커널로 부팅.
+
+== spd-driver-unknown
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 드라이버 없는 SPD 장치
+ 버스에 SPD 장치 1개가 있고(0-0050) 드라이버가 없음.
+ SMBIOS에 슬롯 32개가 있음.
+ 이 커널에 ee1004 모듈이 있으면 로드한 뒤 다시 스캔. MemorY는 모듈을 로드하지
+ 않음.
+
+== spd-driver-refused
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: SPD 드라이버가 붙지 않음
+ spd5118 드라이버는 로드됐지만 0-0050에 붙지 않음. DDR5에서는 드라이버가 허브의
+ 페이지 레지스터에 써야 하고, SPD 주소 쓰기를 막도록 설정된 컨트롤러는 이를
+ 거부함. root로 스캔하면 이 설정을 읽음.
+ SMBIOS에 슬롯 32개가 있음.
+ 커널 로그에서 spd5118 줄을 찾음.
+
+== write-disabled
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: 펌웨어가 SPD 페이지 선택을 막음
+ SMBus 컨트롤러가 SPD 주소 쓰기를 막음(SPD write disable, 펌웨어 설정). 첫
+ 128바이트 너머를 읽으려면 커널이 DDR5 SPD 허브의 페이지 레지스터에 써야 함.
+ SMBIOS에 슬롯 32개가 있음.
+ --bmc ADDRESS로 BMC에 물어보거나 덤프를 my spd FILE에 넘김. 이 설정은
+ 펌웨어에서만 바뀜.
+
+== write-disabled-no-client
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: 펌웨어가 SPD 페이지 선택을 막음
+ SMBus 컨트롤러가 SPD 주소 쓰기를 막음(SPD write disable, 펌웨어 설정). 첫
+ 128바이트 너머를 읽으려면 커널이 DDR5 SPD 허브의 페이지 레지스터에 써야 함.
+ SMBIOS에 슬롯 32개가 있음.
+ --bmc ADDRESS로 BMC에 물어보거나 덤프를 my spd FILE에 넘김. 이 설정은
+ 펌웨어에서만 바뀜.
+
+== no-spd-device
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 버스에 SPD 장치 없음
+ 커널이 i2c-0에서 SPD 장치를 보여주지 않음. 커널은 칩셋 SMBus의 0x50~0x57 주소에
+ DIMM마다 장치를 하나씩, 슬롯 8개까지 만드는데 답한 장치가 없음. 일부 서버
+ 보드는 SPD를 BMC나 프로세서의 버스에 연결함.
+ SMBIOS에 슬롯 32개가 있음.
+ 이 호스트에는 BMC가 있음.
+ BMC에 물어봄: --bmc ADDRESS는 부품 번호와 시리얼을 읽고, BMC가 주면 생산 날짜도
+ 읽음. 또는 보드 제조사의 도구로 SPD를 읽고 덤프를 my spd FILE에 넘김.
+
+== no-eeprom-file
+호스트 r12-n034  Example Systems R760
+SPD 못 읽음: SPD 드라이버가 eeprom 파일을 내주지 않음
+ spd5118 드라이버가 0-0050에 붙어 있지만 eeprom 파일을 내주지 않음. NVMEM 지원
+ 없이 빌드한 커널은 이 파일을 만들지 않음.
+ SMBIOS에 슬롯 32개가 있음.
+ CONFIG_NVMEM 옵션으로 빌드한 커널로 부팅하거나, 덤프를 my spd FILE에 넘김.
+
+== read-denied
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 권한 없음
+ /sys/bus/i2c/devices/0-0050/eeprom 읽기가 거부됨.
+ SMBIOS에 슬롯 32개가 있음.
+ root로 스캔.
+
+== read-failed
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 읽기 실패
+ SPD 장치 2개가 답하지 않음(/sys/bus/i2c/devices/0-0050/eeprom에서 ENXIO). BMC가
+ 같은 버스를 함께 쓰면 이런 오류가 나기도 함.
+ SMBIOS에 슬롯 32개가 있음.
+ 다시 스캔. 계속되면 BMC에 물어보거나 덤프를 넘김.
+
+== not-decoded
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 해석하지 않는 메모리 종류
+ SPD의 메모리 종류는 -. MemorY는 DDR4와 DDR5를 해석함.
+ SMBIOS에 슬롯 32개가 있음.
+
+== blank
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 0x00 또는 0xFF만 있음
+ SPD 파일에 0x00 또는 0xFF만 있음.
+ SMBIOS에 슬롯 32개가 있음.
+
+== state-io
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 읽기 실패
+ SPD 장치 1개가 답하지 않음(/sys/bus/i2c/devices/0-0050/eeprom에서 EIO). BMC가
+ 같은 버스를 함께 쓰면 이런 오류가 나기도 함.
+ SMBIOS에 슬롯 32개가 있음.
+ 다시 스캔. 계속되면 BMC에 물어보거나 덤프를 넘김.
+
+== state-timeout
+호스트 r12-n034  Example Systems R760  SPD 못 읽음: 읽기 실패
+ SPD 장치 2개가 답하지 않음(/sys/bus/i2c/devices/0-0050/eeprom에서 deadline).
+ BMC가 같은 버스를 함께 쓰면 이런 오류가 나기도 함.
+ SMBIOS에 슬롯 32개가 있음.
+ 다시 스캔. 계속되면 BMC에 물어보거나 덤프를 넘김.
+

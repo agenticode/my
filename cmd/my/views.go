@@ -30,6 +30,8 @@ var viewCommands = map[string]viewFunc{
 	"bios":      runBIOS,
 	"inventory": runInventory,
 	"board":     runBoard,
+	"spd":       runSPD,
+	"lots":      runLots,
 	"vendors":   runVendors,
 	"verify":    runVerify,
 	"export":    runExport,

@@ -25,6 +25,12 @@ func (st Style) dimmHead(p *page, c *view.Card) {
 	for _, line := range flow(fields, "  ", st.width()) {
 		p.add(line)
 	}
+	// With --detail, what the SPD of the DIMM says of its making.
+	if st.Detail && c.SPD != nil {
+		for _, l := range st.Wrap(c.SPD.Text, 0) {
+			p.add(st.dim(l))
+		}
+	}
 }
 
 // identity returns what tells the DIMM of a card apart: the module, its

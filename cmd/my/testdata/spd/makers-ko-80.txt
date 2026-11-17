@@ -1,0 +1,39 @@
+호스트 r12-n034  Example Systems R760
+DIMM 16개 중 16개의 SPD (spd5118), 시리얼로 연결
+16 x DDR5 RDIMM 64 GB 2Rx4  16 Gb 다이
+
+ 슬롯     주차      위치  시리얼    부품 번호         제조사           판정
+ CPU0_A1  2022-W43  0x06  5C331BCD  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_B1  2023-W08  0x06  7FF0C3B9  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_C1  2022-W43  0x06  56A80D01  EXM64G48R2X4-A    Micron Technol…  즉시 교체
+ CPU0_D1  2023-W08  0x06  AE2CD51D  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_E1  2023-W08  0x06  B6332238  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_F1  2023-W08  0x06  A8A64B3B  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_G1  2023-W08  0x06  1D2C9305  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU0_H1  2023-W08  0x06  DBC9CEE9  EXM64G48R2X4-A    Micron Technol…  정상
+ CPU1_A1  2023-W08  0x06  B7F782AE  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_A1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_B1  2023-W08  0x06  41102AC3  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_B1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_C1  2023-W08  0x06  D848BE33  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_C1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_D1  2022-W43  0x06  7A399A55  M321R8GA0BB0-CQK  Samsung (JEDEC…  관찰
+          CPU1_D1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_E1  2023-W08  0x06  12AE3490  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_E1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_F1  2023-W08  0x06  8671F24B  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_F1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_G1  2023-W08  0x06  B88F2453  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_G1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+ CPU1_H1  2023-W08  0x06  D6A7388B  M321R8GA0BB0-CQK  Samsung (JEDEC…  정상
+          CPU1_H1: SMBIOS의 부품 번호는 EXM64G48R2X4-A, SPD는 M321R8GA0BB0-CQK.
+
+ 날짜 코드
+ EXM64G48R2X4-A
+ 제조사                                 주차      DIMM  판정  UE  판정 있는 슬롯
+ Micron Technology (JEDEC bank 1, 0x2…  2022-W43     2     1   1  CPU0_C1
+ Samsung (JEDEC bank 1, 0xCE)           2022-W43     1     1   0  CPU1_D1
+ Micron Technology (JEDEC bank 1, 0x2…  2023-W08     6     0   0
+ Samsung (JEDEC bank 1, 0xCE)           2023-W08     7     0   0
+ 이 표는 SPD의 날짜 코드로 모듈을 센 것임. 생산 로트에 문제가 있는지는 제조사의
+ 고장 분석이 판단함.

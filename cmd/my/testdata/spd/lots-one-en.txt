@@ -1,0 +1,13 @@
+date codes  1 host: r12-n034
+ Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+ DATE      DIMMS  FINDING  UE  SLOTS WITH A FINDING
+ 2022-W43      3        2   1  CPU0_C1 CPU1_D1
+ 2023-W08     13        0   0
+ 2 of the 2 DIMMs with a finding carry 2022-W43; 1 of the 14 DIMMs without one
+ carries it too.
+ The table counts modules by the date code in their SPD. Whether a lot is at
+ fault is for the maker's failure analysis to say.
+
+ organisations
+ ORG   DIMMS  FINDING  UE
+ 2Rx4     16        2   1

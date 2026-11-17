@@ -1,0 +1,35 @@
+호스트 r12-n034  Example Systems R760
+DIMM 16개 중 10개의 SPD (spd5118), 시리얼로 연결
+9 x Micron Technology (JEDEC bank 1, 0x2C)  EXM64G48R2X4-A
+DDR5 RDIMM 64 GB 2Rx4  16 Gb 다이
+
+ 슬롯        주차      위치  시리얼    구성  판정
+ CPU0_A1     2022-W43  0x06  5C331BCD  1Rx4  정상
+             기본 CRC 불일치: 저장값 0x3353, 계산값 0x1C1B
+             CPU0_A1: SMBIOS는 64 GB, SPD는 32 GB 모듈.
+             CPU0_A1: SMBIOS의 rank 수는 2, SPD는 1.
+ CPU0_E1     2022-W43  0x06  B6332238  2Rx4  정상
+ CPU0_F1     2022-W43  0x06  A8A64B3B  2Rx4  정상
+ CPU0_G1     2022-W43  0x06  1D2C9305  2Rx4  정상
+ CPU0_H1     2022-W43  0x06  DBC9CEE9  2Rx4  정상
+ CPU1_D1     2022-W43  0x06  7A399A55  2Rx4  관찰
+ CPU1_E1     2022-W43  0x06  12AE3490  2Rx4  정상
+ CPU1_F1     2022-W43  0x06  8671F24B  2Rx4  정상
+ CPU1_G1     2022-W43  0x06  B88F2453  2Rx4  정상
+ CPU1_H1     2022-W43  0x06  D6A7388B  2Rx4  정상
+ i2c-0 0x51  128바이트만 읽음: 첫 페이지 다음 페이지를 고르지 못함
+ i2c-0 0x52  0x00만 있음
+ i2c-0 0x53  메모리 종류 DDR3, 해석하지 않음
+ i2c-1 0x50  읽기 실패(EACCES)
+ i2c-1 0x51  읽기 실패(EIO)
+ i2c-1 0x52  제한 시간 안에 읽지 못함
+
+ DIMM 16개 중 6개는 SPD 기록이 없음.
+
+ 날짜 코드
+ EXM64G48R2X4-A
+ 제조사                           주차            DIMM  판정  UE  판정 있는 슬롯
+ Micron Technology (JEDEC bank…   2022-W43           9     1   0  CPU1_D1
+ Example Memory                   날짜 코드 없음     7     1   1  CPU0_C1
+ 이 표는 SPD의 날짜 코드로 모듈을 센 것임. 생산 로트에 문제가 있는지는 제조사의
+ 고장 분석이 판단함.

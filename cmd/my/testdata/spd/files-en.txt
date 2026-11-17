@@ -1,0 +1,41 @@
+12 files, 13 SPDs decoded
+ README.md: no SPD: a text without hex rows or decode-dimms output
+
+ FILE                       DATE      LOC   SERIAL    ORG   PART NUMBER          MAKER
+ ddr4-rdimm-64g-2rx4.bin    2021-W43  0x06  4D590001  2Rx4  36ASF8G72PZ-3G2E1    Micron Technology (JED…
+ ddr4-lrdimm-128g-3ds.bin   2023-W24  0x00  BAADCAFE  2Rx4  M386AAK40B40-CWD     Samsung (JEDEC bank 1,…
+ ddr4-udimm-32g-2rx8.bin    0xDAAD    0x00  99887766  2Rx8  AQD-D4U32N32-SBW     Apacer Technology (JED…
+ ddr4-sodimm-16g-2rx8.bin   0x291D    0x00  E1BEE218  2Rx8  AQD-SD4U16GN32-SE1   Advantech (JEDEC bank…
+ ddr5-rdimm-64g-2rx4.bin    2022-W43  0x06  4D590002  2Rx4  MTC40F2046S1RC48BA1  Micron Technology (JED…
+ ddr5-rdimm-16g-1rx8.bin    0xAF82    0x00  13576428  1Rx8  AQD-D5V16GR48-SB     A-DATA Technology (JED…
+ ddr5-udimm-16g-1rx8-a.bin  2023-W37  0x00  4D590003  1Rx8  UD5-6000             Team Group (JEDEC bank…
+ ddr5-udimm-16g-1rx8-b.bin  2023-W37  0x00  4D590004  1Rx8  UD5-6000             Team Group (JEDEC bank…
+ ddr3-sodimm.bin            memory type DDR3, not decoded
+ M386AAK40B40-CWD70.spd     2023-W24  0x00  BAADCAFE  2Rx4  M386AAK40B40-CWD     Samsung (JEDEC bank 1,…
+ decode-dimms-4.4.txt#1     2021-W43  0x06  4D590001  2Rx4  36ASF8G72PZ-3G2E1    Micron Technology
+ decode-dimms-4.4.txt#2     2023-W24  -     BAADCAFE  2Rx4  M386AAK40B40-CWD     Samsung
+ decode-dimms-4.4.txt#3     0xDAAD    -     99887766  2Rx8  AQD-D4U32N32-SBW     Apacer Technology
+ decode-dimms-4.4.txt#4     2041-W29  -     E1BEE218  2Rx8  AQD-SD4U16GN32-SE1   Advantech Co Ltd
+
+ date codes
+ MAKER                                   PART NUMBER          DATE          DIMMS
+ Micron Technology                       36ASF8G72PZ-3G2E1    2021-W43          1
+ Micron Technology (JEDEC bank 1, 0x2C)  36ASF8G72PZ-3G2E1    2021-W43          1
+ Micron Technology (JEDEC bank 1, 0x2C)  MTC40F2046S1RC48BA1  2022-W43          1
+ Samsung                                 M386AAK40B40-CWD     2023-W24          1
+ Samsung (JEDEC bank 1, 0xCE)            M386AAK40B40-CWD     2023-W24          2
+ Team Group (JEDEC bank 5, 0xEF)         UD5-6000             2023-W37          2
+ Advantech Co Ltd                        AQD-SD4U16GN32-SE1   2041-W29          1
+ Apacer Technology                       AQD-D4U32N32-SBW     no date code      1
+ Advantech (JEDEC bank 11, 0xC8)         AQD-SD4U16GN32-SE1   no date code      1
+ Apacer Technology (JEDEC bank 2, 0x7A)  AQD-D4U32N32-SBW     no date code      1
+ A-DATA Technology (JEDEC bank 5, 0xCB)  AQD-D5V16GR48-SB     no date code      1
+ Dump files have no host: the table counts modules only.
+ The table counts modules by the date code in their SPD. Whether a lot is at fault is for the maker's
+ failure analysis to say.
+
+ organisations
+ ORG   DIMMS
+ 1Rx8      3
+ 2Rx4      6
+ 2Rx8      4

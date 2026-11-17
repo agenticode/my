@@ -1,0 +1,47 @@
+host r12-n034  Example Systems R760
+SPD of 16 of 16 DIMMs (spd5118), tied by serial number
+16 x DDR5 RDIMM 64 GB 2Rx4  16 Gb dies
+
+ SLOT     DATE      LOC   SERIAL    PART NUMBER       MAKER          FINDING
+ CPU0_A1  2022-W43  0x06  5C331BCD  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_B1  2023-W08  0x06  7FF0C3B9  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_C1  2022-W43  0x06  56A80D01  EXM64G48R2X4-A    Micron Techn…  replace now
+ CPU0_D1  2023-W08  0x06  AE2CD51D  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_E1  2023-W08  0x06  B6332238  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_F1  2023-W08  0x06  A8A64B3B  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_G1  2023-W08  0x06  1D2C9305  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU0_H1  2023-W08  0x06  DBC9CEE9  EXM64G48R2X4-A    Micron Techn…  ok
+ CPU1_A1  2023-W08  0x06  B7F782AE  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_A1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_B1  2023-W08  0x06  41102AC3  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_B1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_C1  2023-W08  0x06  D848BE33  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_C1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_D1  2022-W43  0x06  7A399A55  M321R8GA0BB0-CQK  Samsung (JED…  observe
+          CPU1_D1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_E1  2023-W08  0x06  12AE3490  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_E1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_F1  2023-W08  0x06  8671F24B  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_F1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_G1  2023-W08  0x06  B88F2453  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_G1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+ CPU1_H1  2023-W08  0x06  D6A7388B  M321R8GA0BB0-CQK  Samsung (JED…  ok
+          CPU1_H1: SMBIOS gives the part number EXM64G48R2X4-A, the SPD
+          M321R8GA0BB0-CQK.
+
+ date codes
+ EXM64G48R2X4-A
+ MAKER                        DATE      DIMMS  FINDING  UE  SLOTS WITH A FINDING
+ Micron Technology (JEDEC b…  2022-W43      2        1   1  CPU0_C1
+ Samsung (JEDEC bank 1, 0xC…  2022-W43      1        1   0  CPU1_D1
+ Micron Technology (JEDEC b…  2023-W08      6        0   0
+ Samsung (JEDEC bank 1, 0xC…  2023-W08      7        0   0
+ The table counts modules by the date code in their SPD. Whether a lot is at
+ fault is for the maker's failure analysis to say.

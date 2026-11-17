@@ -1,0 +1,158 @@
+== virtual-machine
+host r12-n034  Example Systems R760  SPD not read: virtual machine (VMware)
+ This host is a virtual machine (VMware). A guest has no bus to the SPD of the
+ DIMMs in the machine it runs on.
+ Read the SPD on that machine, or give a dump of it to my spd FILE.
+
+== no-i2c
+host r12-n034  Example Systems R760  SPD not read: no I2C bus in this kernel
+ This kernel registers no I2C bus.
+ SMBIOS lists 32 slots.
+ Boot a kernel with I2C support and the SMBus driver of the chipset.
+
+== smbus-driver-not-loaded
+host r12-n034  Example Systems R760
+SPD not read: SMBus driver i2c_i801 not loaded
+ The SMBus controller 0000:00:1f.4 (8086:a323) has no driver: the module
+ i2c_i801 is not loaded.
+ SMBIOS lists 32 slots.
+ Load i2c_i801 and the SPD driver, then scan again. MemorY loads no module.
+
+== smbus-driver-not-built
+host r12-n034  Example Systems R760
+SPD not read: kernel built without i2c_piix4
+ The SMBus controller 0000:00:14.0 (1022:790b) has no driver, and this kernel
+ has no module i2c_piix4.
+ SMBIOS lists 32 slots.
+ Boot a kernel built with CONFIG_I2C_PIIX4.
+
+== smbus-driver-unknown
+host r12-n034  Example Systems R760
+SPD not read: SMBus controller without driver
+ The SMBus controller 0000:00:1f.4 (8086:a323) has no driver.
+ SMBIOS lists 32 slots.
+ Load i2c_i801 and the SPD driver if this kernel has them, then scan again.
+ MemorY loads no module.
+
+== smbus-driver-refused
+host r12-n034  Example Systems R760
+SPD not read: SMBus driver did not bind the controller
+ The driver i801_smbus is loaded and did not bind the SMBus controller
+ 0000:00:1f.4. The kernel log says why: a region that firmware claims, a base
+ address that is not set, a bus that is busy.
+ SMBIOS lists 32 slots.
+ Search the kernel log for i801_smbus.
+
+== no-smbus-controller
+host r12-n034  Example Systems R760  SPD not read: no SMBus controller on PCI
+ No SMBus controller is on the PCI bus. Firmware of some server boards hides it,
+ and some boards wire the SPD to a bus of the BMC or of the processor, for which
+ Linux has no driver.
+ SMBIOS lists 32 slots.
+ The host has a BMC.
+ Ask the BMC: --bmc ADDRESS reads part and serial numbers, and the production
+ date where the BMC gives one. Or read the SPD with the tool of the board maker
+ and give the dump to my spd FILE.
+
+== spd-driver-not-loaded
+host r12-n034  Example Systems R760  SPD not read: SPD driver ee1004 not loaded
+ 2 SPD devices are on the bus (0-0050, 0-0051); the driver ee1004 is not loaded.
+ SMBIOS lists 32 slots.
+ Load the module ee1004 and scan again. MemorY loads no module.
+
+== spd-driver-not-built
+host r12-n034  Example Systems R760  SPD not read: kernel built without spd5118
+ 1 SPD device is on the bus (0-0050), and this kernel has no module spd5118.
+ SMBIOS lists 32 slots.
+ Boot a kernel built with CONFIG_SENSORS_SPD5118.
+
+== spd-driver-unknown
+host r12-n034  Example Systems R760  SPD not read: SPD device without driver
+ 1 SPD device is on the bus (0-0050) and has no driver.
+ SMBIOS lists 32 slots.
+ Load the module ee1004 if this kernel has it, then scan again. MemorY loads no
+ module.
+
+== spd-driver-refused
+host r12-n034  Example Systems R760  SPD not read: SPD driver did not bind
+ The driver spd5118 is loaded and did not bind 0-0050. On DDR5 the driver has to
+ write the page register of the hub, and a controller set to block writes to the
+ SPD addresses refuses that. A scan as root reads the setting.
+ SMBIOS lists 32 slots.
+ Search the kernel log for spd5118.
+
+== write-disabled
+host r12-n034  Example Systems R760  SPD not read: SPD pages blocked by firmware
+ The SMBus controller blocks writes to the SPD addresses (SPD write disable, a
+ firmware setting). The kernel has to write the page register of a DDR5 SPD hub
+ to read past the first 128 bytes.
+ SMBIOS lists 32 slots.
+ Ask the BMC with --bmc ADDRESS, or give a dump to my spd FILE. Only firmware
+ changes the setting.
+
+== write-disabled-no-client
+host r12-n034  Example Systems R760  SPD not read: SPD pages blocked by firmware
+ The SMBus controller blocks writes to the SPD addresses (SPD write disable, a
+ firmware setting). The kernel has to write the page register of a DDR5 SPD hub
+ to read past the first 128 bytes.
+ SMBIOS lists 32 slots.
+ Ask the BMC with --bmc ADDRESS, or give a dump to my spd FILE. Only firmware
+ changes the setting.
+
+== no-spd-device
+host r12-n034  Example Systems R760  SPD not read: no SPD device on the bus
+ The kernel shows no SPD device on i2c-0. It makes one per DIMM at the addresses
+ 0x50 to 0x57 of the SMBus of the chipset, for at most eight slots, and none
+ answered. Some server boards wire the SPD to a bus of the BMC or of the
+ processor.
+ SMBIOS lists 32 slots.
+ The host has a BMC.
+ Ask the BMC: --bmc ADDRESS reads part and serial numbers, and the production
+ date where the BMC gives one. Or read the SPD with the tool of the board maker
+ and give the dump to my spd FILE.
+
+== no-eeprom-file
+host r12-n034  Example Systems R760
+SPD not read: SPD driver gives no eeprom file
+ The driver spd5118 is bound to 0-0050 and gives no eeprom file. A kernel built
+ without NVMEM support leaves it out.
+ SMBIOS lists 32 slots.
+ Boot a kernel built with CONFIG_NVMEM, or give a dump to my spd FILE.
+
+== read-denied
+host r12-n034  Example Systems R760  SPD not read: permission denied
+ Reading /sys/bus/i2c/devices/0-0050/eeprom was denied.
+ SMBIOS lists 32 slots.
+ Scan as root.
+
+== read-failed
+host r12-n034  Example Systems R760  SPD not read: read failed
+ 2 SPD devices did not answer (ENXIO on /sys/bus/i2c/devices/0-0050/eeprom). A
+ bus that a BMC uses at the same time can give such errors.
+ SMBIOS lists 32 slots.
+ Scan again. If it stays, ask the BMC or give a dump.
+
+== not-decoded
+host r12-n034  Example Systems R760  SPD not read: memory type not decoded
+ The SPD is of memory type -. MemorY decodes DDR4 and DDR5.
+ SMBIOS lists 32 slots.
+
+== blank
+host r12-n034  Example Systems R760  SPD not read: only 0x00 or 0xFF bytes
+ The SPD files hold only 0x00 or 0xFF.
+ SMBIOS lists 32 slots.
+
+== state-io
+host r12-n034  Example Systems R760  SPD not read: read failed
+ 1 SPD device did not answer (EIO on /sys/bus/i2c/devices/0-0050/eeprom). A bus
+ that a BMC uses at the same time can give such errors.
+ SMBIOS lists 32 slots.
+ Scan again. If it stays, ask the BMC or give a dump.
+
+== state-timeout
+host r12-n034  Example Systems R760  SPD not read: read failed
+ 2 SPD devices did not answer (deadline on /sys/bus/i2c/devices/0-0050/eeprom).
+ A bus that a BMC uses at the same time can give such errors.
+ SMBIOS lists 32 slots.
+ Scan again. If it stays, ask the BMC or give a dump.
+

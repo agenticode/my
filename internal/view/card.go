@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/agenticode/my/internal/adapter/dimmspd"
 	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/model"
 	"github.com/agenticode/my/internal/store"
@@ -62,6 +63,9 @@ type Card struct {
 	Population *Text `json:"population,omitzero"`
 	// Missing lists the data the finding did not have.
 	Missing []Text `json:"missing"`
+	// SPD is what the SPD of the DIMM says of its making, for a DIMM with
+	// a tied reading.
+	SPD *Text `json:"spd,omitzero"`
 	// Next is the step that follows from the finding.
 	Next *Text `json:"next,omitzero"`
 	// Baseline says how unusual the errors are: against the past of the
@@ -233,6 +237,14 @@ func (c *Case) Card(ctx context.Context, h *engine.HostResult, d *engine.DIMMRes
 		})
 	}
 	card.Repairs = c.repairs(d)
+	if missing, line, err := c.spdCard(ctx, h, d); err != nil {
+		return nil, err
+	} else {
+		if missing != nil {
+			card.Missing = append(card.Missing, *missing)
+		}
+		card.SPD = line
+	}
 
 	// Where the DIMM has been.
 	places, err := c.store.Placements(ctx, "", d.UID)
@@ -286,7 +298,7 @@ func (c *Case) finding(card *Card, v *model.Verdict) {
 // HostCard builds the card of the host finding: what the engine makes of
 // the errors and page offlines of a host that the records tie to no DIMM.
 // It returns nil for a host without such records.
-func (c *Case) HostCard(_ context.Context, h *engine.HostResult) (*Card, error) {
+func (c *Case) HostCard(ctx context.Context, h *engine.HostResult) (*Card, error) {
 	v := h.Loose
 	if v == nil {
 		return nil, nil
@@ -306,6 +318,18 @@ func (c *Case) HostCard(_ context.Context, h *engine.HostResult) (*Card, error) 
 	// The count of the engine: it is the one the evidence states.
 	card.Pages = h.LoosePages
 	c.finding(card, v)
+	// The SPD of the modules, when the latest scan looked for it and read
+	// none: the source with its reason, as on the missing line of the
+	// overview.
+	_, srcs, err := c.latestScan(ctx, h.Host)
+	if err != nil {
+		return nil, err
+	}
+	for _, s := range srcs {
+		if s.Kind == dimmspd.Kind && (s.Status == model.SourceAbsent || s.Status == model.SourceEmpty) {
+			card.Missing = append(card.Missing, c.missingSource(s, s.Kind))
+		}
+	}
 	return card, nil
 }
 
