@@ -11,6 +11,9 @@ import (
 type processor struct {
 	name, signature string
 	populated       bool
+	// unknown is set when the record says nothing of its socket (a text
+	// without a Status line).
+	unknown bool
 }
 
 // hostCPU is the name, the signature and the populated flags the host
@@ -23,16 +26,20 @@ func hostCPU(ps []processor) (name, signature, present string) {
 	}
 	pick := ps[0]
 	for _, p := range ps {
-		if p.populated && p.name != "" {
+		if (p.populated || p.unknown) && p.name != "" {
 			pick = p
 			break
 		}
 	}
 	var b strings.Builder
 	for _, p := range ps {
-		if p.populated {
+		switch {
+		case p.unknown:
+			// One record that does not tell leaves them all unknown.
+			return pick.name, pick.signature, ""
+		case p.populated:
 			b.WriteByte('1')
-		} else {
+		default:
 			b.WriteByte('0')
 		}
 	}
@@ -98,8 +105,8 @@ var signatureRE = regexp.MustCompile(`Family (\d+), Model (\d+), Stepping (\d+)`
 // processorOfText reads a processor record of dmidecode text.
 func processorOfText(f map[string]string) processor {
 	p := processor{name: clean(f["Version"])}
-	st := strings.ToLower(f["Status"])
-	p.populated = strings.HasPrefix(st, "populated")
+	st, ok := f["Status"]
+	p.populated, p.unknown = strings.HasPrefix(strings.ToLower(st), "populated"), !ok
 	if m := signatureRE.FindStringSubmatch(f["Signature"]); m != nil {
 		p.signature = m[1] + "/" + m[2] + "/" + m[3]
 	}

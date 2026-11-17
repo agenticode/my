@@ -1,24 +1,9 @@
-host board-host  INFERIT R1G3D32  12 of 32 slots, 768 GB  DDR4 RDIMM 3200 MT/s
+host board-host  Example Systems E3  4 of 8 slots, 128 GB  DDR4 3200 MT/s
 
- 32 slots set aside, by name: 32 slots on socket numbers the board does not have, such as ChannelA-DIMM0
- / NODE 0
+ 8 slots set aside, by name: 8 slots whose names give no socket on a board of several, such as DIMM 1 /
+ Bank 1
 
-            DIMM0   DIMM1
- ChannelA   ::      ..
- ChannelB   ::      ..
- ChannelC   ::      ..
- ChannelD   ..      ..
- ChannelE   ::      ..
- ChannelF   ::      ..
- ChannelG   ::      ..
- ChannelH   ..      ..
- ChannelI   ::      ..
- ChannelJ   ::      ..
- ChannelK   ::      ..
- ChannelL   ..      ..
- ChannelM   ::      ..
- ChannelN   ::      ..
- ChannelO   ::      ..
- ChannelP   ..      ..
+        1    2    3    4    5    6    7    8
+ DIMM   ::   ..   ::   ..   ::   ..   ::   ..
 
- :: ok   .. empty slot    32 slots, 12 DIMMs
+ :: ok   .. empty slot    8 slots, 4 DIMMs

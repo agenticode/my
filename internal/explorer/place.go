@@ -11,6 +11,9 @@ const (
 	Placed    = "placed"
 	NoChannel = "no-channel"
 	Unplaced  = "unplaced"
+	// NotASlot is a memory device that is no slot of the board: the
+	// board leaves it out.
+	NotASlot = "not-a-slot"
 )
 
 // Reasons of a placement that is not Placed.
@@ -22,6 +25,8 @@ const (
 	WhyRun             = "run"              // the sockets do not run from 0 or 1 without gaps, or are more than the board has
 	WhyCrowd           = "crowd"            // more than 3 slots in one channel
 	WhyNegativeChannel = "negative-channel" // a channel below 0
+	WhyUnknownForm     = "unknown-form"     // a name no form of the name table reads
+	WhyNoTable         = "no-table"         // a slot number without a channel, on a board without a table of its family
 )
 
 // Placement is where the board draws one slot.
@@ -30,6 +35,8 @@ type Placement struct {
 	Reason  string `json:"reason,omitempty"`
 	Socket  int    `json:"socket"`
 	Channel int    `json:"channel"`
+	// Position is the place of the slot in its channel.
+	Position int `json:"position,omitempty"`
 	// Assumed is set when no test named the socket.
 	Assumed bool `json:"assumed,omitempty"`
 }
@@ -50,12 +57,26 @@ func Place(dimms []Dimm, sockets, packages int) []Placement {
 		s, ok1 := d.Socket.Int()
 		c, ok2 := d.Channel.Int()
 		switch {
+		case d.NotSlot != "":
+			p[i] = Placement{State: NotASlot, Reason: d.NotSlot}
+		case d.Aside != "":
+			// The pass of the second round placed no slot here.
+			switch d.Aside {
+			case "no-channel":
+				p[i] = Placement{State: NoChannel, Reason: WhyNoTable, Socket: s}
+			case "no-socket":
+				p[i] = Placement{State: Unplaced, Reason: WhyAssumed, Assumed: true}
+			case "no-name":
+				un(i, WhyNone)
+			default:
+				un(i, d.Aside)
+			}
 		case d.SocketBy == "" && d.ChannelBy == "":
 			un(i, WhyNone)
 		case !ok1 || !ok2:
 			un(i, WhyRange)
 		default:
-			p[i].Socket, p[i].Channel = s, c
+			p[i].Socket, p[i].Channel, p[i].Position = s, c, int(d.Position)
 		}
 	}
 	bad := map[string]bool{}

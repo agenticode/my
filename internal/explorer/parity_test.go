@@ -262,6 +262,12 @@ func strip(d any) any {
 	case map[string]any:
 		delete(x, "socketBy")
 		delete(x, "channelBy")
+		if _, slot := x["bankLocator"]; slot {
+			// What the pass of the second round adds to a slot.
+			for _, k := range []string{"position", "channelName", "placeBy", "family", "idx", "notSlot", "unnamed", "label", "aside"} {
+				delete(x, k)
+			}
+		}
 		for k, v := range x {
 			x[k] = strip(v)
 		}

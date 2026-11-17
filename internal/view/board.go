@@ -238,6 +238,14 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 	for _, sl := range desc {
 		sticks = append(sticks, stickOf(h, sl))
 	}
+	caches, source := boardCaches(bh)
+	b.Caches = source
+	// Without processor records the CPU packages of the cache reading stand
+	// in for the sockets of the board.
+	if bh.sockets == 0 && bh.present == "" {
+		bh.sockets = len(caches)
+		defer func() { b.Sockets = 0 }()
+	}
 	host := bh.slotHost()
 	text := make([]explorer.SlotText, len(desc))
 	for i, sl := range desc {
@@ -262,14 +270,11 @@ func boardOf(lang i18n.Lang, h *engine.HostResult, slots []model.Slot, bh boardH
 			dimms = *out
 		}
 	} else if bh.lshw != "" {
-		dimms, sticks = lshwSlots(h, bh.lshw, rest)
+		dimms, sticks = lshwSlots(h, bh, rest)
 		if len(sticks) > 0 {
 			rest = untied(rest, sticks)
 		}
 	}
-	caches, source := boardCaches(bh)
-	b.Caches = source
-
 	places := make([]explorer.Placement, len(sticks))
 	if fault != "" {
 		for i := range places {
@@ -407,9 +412,9 @@ func stickOf(h *engine.HostResult, sl model.Slot) BoardStick {
 
 // lshwSlots reads the banks of lshw text when no inventory described a
 // slot, and ties each to a ledger slot of the same name.
-func lshwSlots(h *engine.HostResult, lshw string, slots []model.Slot) ([]explorer.Dimm, []BoardStick) {
+func lshwSlots(h *engine.HostResult, bh boardHost, slots []model.Slot) ([]explorer.Dimm, []BoardStick) {
 	out := adapter.Guard(func() *[]explorer.Dimm {
-		d := explorer.ParseLshwDimms(lshw, nil, nil)
+		d, _ := explorer.ParseLshwDimmsOf(bh.slotHost(), bh.lshw, nil, nil)
 		return &d
 	})
 	if out == nil || len(*out) > explorer.MaxSlots {

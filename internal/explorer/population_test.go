@@ -79,6 +79,105 @@ func slotTexts(list []popSlot) []SlotText {
 	return in
 }
 
+// popDump is one line of testdata/explorer/population/dumps.tsv.
+type popDump struct {
+	list   int
+	family string
+}
+
+// readDumps reads the slot list and the board family of every dump.
+func readDumps(t testing.TB) map[string]popDump {
+	t.Helper()
+	b, err := os.ReadFile(fixtureRoot + "/population/dumps.tsv")
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := map[string]popDump{}
+	for _, line := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		if strings.HasPrefix(line, "#") || strings.HasPrefix(line, "dump\t") {
+			continue
+		}
+		p := strings.Split(line, "\t")
+		if len(p) != 3 {
+			t.Fatalf("dumps.tsv: %q", line)
+		}
+		n, _ := strconv.Atoi(p[1])
+		out[p[0]] = popDump{list: n, family: p[2]}
+	}
+	return out
+}
+
+// popList is the slot list of a dump of the collection.
+func popList(t testing.TB, dump string) []popSlot {
+	t.Helper()
+	d, ok := readDumps(t)[dump]
+	if !ok {
+		t.Fatalf("no dump %s", dump)
+	}
+	return readPopulation(t)[d.list-1]
+}
+
+// popHost is what the ledger keeps of the host of a list.
+func popHost(list []popSlot) SlotHost {
+	s := list[0]
+	return SlotHost{Vendor: s.vendor, Product: s.product, Board: s.board, Processor: s.processor, Signature: s.signature, Sockets: s.sockets, Present: s.present}
+}
+
+// readerPlaced tells a slot the reader placed before the checks.
+func readerPlaced(s popSlot) bool {
+	switch {
+	case s.state == "placed":
+		return true
+	case s.reason == "same-place" || s.reason == "run" || s.reason == "more-channels" || s.reason == "crowd":
+		return true
+	}
+	return false
+}
+
+// slotDiff is how the reader's slot differs from the expected one, "" when
+// it does not.
+func slotDiff(d Dimm, f Facts, s popSlot) string {
+	if s.state == "not-a-slot" {
+		if d.NotSlot != s.reason {
+			return fmt.Sprintf("not a slot %q, got %q", s.reason, d.NotSlot)
+		}
+		return ""
+	}
+	if d.NotSlot != "" {
+		return "got not a slot " + d.NotSlot
+	}
+	if !readerPlaced(s) {
+		if d.PlaceBy != "" {
+			return fmt.Sprintf("want %s/%s, got placed by %s at %v/%v", s.state, s.reason, d.PlaceBy, d.Socket, d.Channel)
+		}
+		if s.socket != "" && (d.SocketBy == "" || strconv.Itoa(int(d.Socket)) != s.socket) {
+			return fmt.Sprintf("want socket %s without a channel, got %v by %q", s.socket, d.Socket, d.SocketBy)
+		}
+		return ""
+	}
+	if d.PlaceBy == "" {
+		return fmt.Sprintf("want placed by %s at %s/%s, got not placed (socket by %q)", s.by, s.socket, s.channel, d.SocketBy)
+	}
+	sock := strconv.Itoa(int(d.Socket))
+	if d.PlaceBy == ByHub {
+		sock = "hub"
+	}
+	by := d.PlaceBy
+	if d.Label != "" && s.by == "label" {
+		by = "label"
+	}
+	got := fmt.Sprintf("%s %v %s %v %s %s", sock, d.Channel, d.ChannelName, d.Position, d.Idx, by)
+	want := fmt.Sprintf("%s %s %s %s %s %s", s.socket, s.channel, s.chname, s.position, s.index, s.by)
+	if got != want {
+		return "got " + got + ", want " + want
+	}
+	return ""
+}
+
+// meFixes are the fixes of the readers of the first round, with the pass
+// of the second round off.
+const meFixes = AllFixes &^ FixNameForms
+
 // The counts of the public collection that the population tests hold.
 const (
 	popLists = 1711
@@ -192,8 +291,8 @@ func TestPopulationBoards(t *testing.T) {
 	}{
 		{0, true, boardTally{all: 1077, some: 48, noChannel: 226, none: 692}},
 		{0, false, boardTally{all: 1135, some: 50, noChannel: 229, none: 629, wrongCPU: 5}},
-		{AllFixes, true, boardTally{all: 1503, some: 51, noChannel: 238, none: 251}},
-		{AllFixes, false, boardTally{all: 1568, some: 48, noChannel: 238, none: 189, wrongCPU: 8}},
+		{meFixes, true, boardTally{all: 1502, some: 51, noChannel: 239, none: 251}},
+		{meFixes, false, boardTally{all: 1567, some: 48, noChannel: 239, none: 189, wrongCPU: 8}},
 	} {
 		old := SetFixes(c.fixes)
 		got := tallyPopulation(lists, c.known)
@@ -246,7 +345,7 @@ func TestPopulationByMaker(t *testing.T) {
 		if full(list) {
 			r.before += list[0].dumps
 		}
-		SetFixes(AllFixes)
+		SetFixes(meFixes)
 		if full(list) {
 			r.after += list[0].dumps
 		}
@@ -295,7 +394,7 @@ func TestPopulationInTheDocs(t *testing.T) {
 	for _, c := range []struct {
 		row   string
 		fixes Fix
-	}{{"first version", 0}, {"this release", AllFixes}} {
+	}{{"first version", 0}, {"first round of fixes", meFixes}, {"this release", AllFixes}} {
 		old := SetFixes(c.fixes)
 		b := tallyPopulation(lists, true)
 		SetFixes(old)
@@ -313,4 +412,35 @@ func commas(n int) string {
 		s = s[:i] + "," + s[i:]
 	}
 	return s
+}
+
+// TestPopulationNames: every slot of a dump that no board family places
+// gets from the reader the place the file expects: the names spell it.
+func TestPopulationNames(t *testing.T) {
+	lists := readPopulation(t)
+	family := map[int]string{}
+	for _, d := range readDumps(t) {
+		family[d.list] = d.family
+	}
+	checked, dumps := 0, 0
+	for _, list := range lists {
+		if family[list[0].list] != "" {
+			continue
+		}
+		d, f := ReadSlots(WriteSlotsOf(popHost(list), slotTexts(list)), nil, nil)
+		if len(d) != len(list) {
+			t.Fatalf("list %d: %d slots, want %d", list[0].list, len(d), len(list))
+		}
+		for i, s := range list {
+			if diff := slotDiff(d[i], f, s); diff != "" {
+				t.Errorf("list %d slot %q|%q: %s", s.list, s.locator, s.bank, diff)
+			}
+			checked++
+		}
+		dumps += list[0].dumps
+	}
+	if checked == 0 {
+		t.Fatal("no list without a family")
+	}
+	t.Logf("%d slots of %d dumps", checked, dumps)
 }

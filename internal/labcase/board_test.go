@@ -20,8 +20,8 @@ type boardGuest struct {
 	// places are the CPU and channel the board draws each slot at, by
 	// slot name.
 	places map[string][2]int
-	// socketBy and channelBy name the tests that read the place of every
-	// slot.
+	// socketBy and channelBy say where the processor and the channel of
+	// every slot come from.
 	socketBy, channelBy string
 	// nodes is the number of NUMA nodes of numactl --hardware.
 	nodes int
@@ -30,7 +30,7 @@ type boardGuest struct {
 var boardGuests = []boardGuest{
 	{
 		dir: "6.19.10-board-two-sockets", sockets: 2, slots: 8, populated: 4, nodes: 2,
-		socketBy: explorer.ByCPU, channelBy: explorer.ByCHDimm,
+		socketBy: explorer.ByName, channelBy: explorer.ByName,
 		places: map[string][2]int{
 			"CPU0_CH0_DIMM0": {0, 0}, "CPU0_CH0_DIMM1": {0, 0}, "CPU0_CH1_DIMM0": {0, 1}, "CPU0_CH1_DIMM1": {0, 1},
 			"CPU1_CH0_DIMM0": {1, 0}, "CPU1_CH0_DIMM1": {1, 0}, "CPU1_CH1_DIMM0": {1, 1}, "CPU1_CH1_DIMM1": {1, 1},
@@ -38,12 +38,12 @@ var boardGuests = []boardGuest{
 	},
 	{
 		dir: "6.19.10-board-digits", sockets: 1, slots: 4, populated: 2, nodes: 1,
-		socketBy: explorer.ByDimmDigits, channelBy: explorer.ByDimmDigits,
+		socketBy: explorer.ByName, channelBy: explorer.ByName,
 		places: map[string][2]int{"DIMM000": {0, 0}, "DIMM001": {0, 0}, "DIMM010": {0, 1}, "DIMM011": {0, 1}},
 	},
 	{
 		dir: "6.19.10-board-letters", sockets: 1, slots: 4, populated: 2, nodes: 1,
-		socketBy: "", channelBy: explorer.ByDimmLetter,
+		socketBy: explorer.ByOneSocket, channelBy: explorer.ByName,
 		places: map[string][2]int{"DIMMA1": {0, 0}, "DIMMA2": {0, 0}, "DIMMB1": {0, 1}, "DIMMB2": {0, 1}},
 	},
 }

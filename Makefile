@@ -85,6 +85,7 @@ FUZZ_TARGETS := \
 	./internal/eventstream:FuzzLine \
 	./internal/adapter/vendorlog:FuzzCollect \
 	./internal/explorer:FuzzDimms \
+	./internal/explorer:FuzzNames \
 	./internal/explorer:FuzzCaches \
 	./internal/explorer:FuzzNuma \
 	./internal/explorer:FuzzSystem \

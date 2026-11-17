@@ -91,6 +91,16 @@ func DimmNum(d Dimm) Num {
 	return 0
 }
 
+// slotOrder is the order of a slot within its channel: its position when
+// the pass of the second round placed it and FixChannelRank is on, else
+// DimmNum.
+func slotOrder(d Dimm) Num {
+	if d.PlaceBy != "" && stage(FixChannelRank) {
+		return d.Position
+	}
+	return DimmNum(d)
+}
+
 // stickClasses are the classes of a stick: populated or empty, error, UE.
 func stickClasses(d Dimm) []string {
 	c := []string{"mb-stick-empty"}
@@ -252,7 +262,7 @@ func Board(dimms []Dimm, caches []CPUCache) Layout {
 		for _, ch := range g {
 			s := ch.slots
 			sort.SliceStable(s, func(a, b int) bool {
-				na, nb := DimmNum(dimms[s[a]]), DimmNum(dimms[s[b]])
+				na, nb := slotOrder(dimms[s[a]]), slotOrder(dimms[s[b]])
 				if desc {
 					return nb-na < 0
 				}

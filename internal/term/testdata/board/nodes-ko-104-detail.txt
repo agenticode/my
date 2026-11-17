@@ -1,0 +1,66 @@
+호스트 board-host  INFERIT R1G3D32  슬롯 32개 중 12개, 768 GB  DDR4 RDIMM 3200 MT/s
+
+ ch                7                              6                              5
+     ··             ··              ··             ░░              ··             ░░
+     ChannelH-DIMM1 ChannelH-DIMM0  ChannelG-DIMM1 ChannelG-DIMM0  ChannelF-DIMM1 ChannelF-DIMM0
+
+ ch                4                              3                              2
+     ··             ░░              ··             ··              ··             ░░
+     ChannelE-DIMM1 ChannelE-DIMM0  ChannelD-DIMM1 ChannelD-DIMM0  ChannelC-DIMM1 ChannelC-DIMM0
+
+ ch                1                              0
+     ··             ░░              ··             ░░              ══╡CPU 0╞══
+     ChannelB-DIMM1 ChannelB-DIMM0  ChannelA-DIMM1 ChannelA-DIMM0
+
+ ch                             0                              1
+     ══╡CPU 1╞══  ░░             ··              ░░             ··
+                  ChannelI-DIMM0 ChannelI-DIMM1  ChannelJ-DIMM0 ChannelJ-DIMM1
+
+ ch                2                              3                              4
+     ░░             ··              ··             ··              ░░             ··
+     ChannelK-DIMM0 ChannelK-DIMM1  ChannelL-DIMM0 ChannelL-DIMM1  ChannelM-DIMM0 ChannelM-DIMM1
+
+ ch                5                              6                              7
+     ░░             ··              ░░             ··              ··             ··
+     ChannelN-DIMM0 ChannelN-DIMM1  ChannelO-DIMM0 ChannelO-DIMM1  ChannelP-DIMM0 ChannelP-DIMM1
+
+ ░░ 정상   ·· 빈 슬롯
+
+ CPU 0  DIMM 6개, 384 GB
+ CPU 1  DIMM 6개, 384 GB
+
+ 슬롯            위치        크기   부품 번호     일련번호  CE  UE  소견
+ ChannelH-DIMM1  CPU 0 ch 7                                 0   0   빈 슬롯
+ ChannelH-DIMM0  CPU 0 ch 7                                 0   0   빈 슬롯
+ ChannelG-DIMM1  CPU 0 ch 6                                 0   0   빈 슬롯
+ ChannelG-DIMM0  CPU 0 ch 6  64 GB  EXM32G32R2X4  EX000042  0   0   정상
+ ChannelF-DIMM1  CPU 0 ch 5                                 0   0   빈 슬롯
+ ChannelF-DIMM0  CPU 0 ch 5  64 GB  EXM32G32R2X4  EX000036  0   0   정상
+ ChannelE-DIMM1  CPU 0 ch 4                                 0   0   빈 슬롯
+ ChannelE-DIMM0  CPU 0 ch 4  64 GB  EXM32G32R2X4  EX000030  0   0   정상
+ ChannelD-DIMM1  CPU 0 ch 3                                 0   0   빈 슬롯
+ ChannelD-DIMM0  CPU 0 ch 3                                 0   0   빈 슬롯
+ ChannelC-DIMM1  CPU 0 ch 2                                 0   0   빈 슬롯
+ ChannelC-DIMM0  CPU 0 ch 2  64 GB  EXM32G32R2X4  EX000024  0   0   정상
+ ChannelB-DIMM1  CPU 0 ch 1                                 0   0   빈 슬롯
+ ChannelB-DIMM0  CPU 0 ch 1  64 GB  EXM32G32R2X4  EX000018  0   0   정상
+ ChannelA-DIMM1  CPU 0 ch 0                                 0   0   빈 슬롯
+ ChannelA-DIMM0  CPU 0 ch 0  64 GB  EXM32G32R2X4  EX000012  0   0   정상
+ ChannelI-DIMM0  CPU 1 ch 0  64 GB  EXM32G32R2X4  EX000048  0   0   정상
+ ChannelI-DIMM1  CPU 1 ch 0                                 0   0   빈 슬롯
+ ChannelJ-DIMM0  CPU 1 ch 1  64 GB  EXM32G32R2X4  EX000054  0   0   정상
+ ChannelJ-DIMM1  CPU 1 ch 1                                 0   0   빈 슬롯
+ ChannelK-DIMM0  CPU 1 ch 2  64 GB  EXM32G32R2X4  EX000060  0   0   정상
+ ChannelK-DIMM1  CPU 1 ch 2                                 0   0   빈 슬롯
+ ChannelL-DIMM0  CPU 1 ch 3                                 0   0   빈 슬롯
+ ChannelL-DIMM1  CPU 1 ch 3                                 0   0   빈 슬롯
+ ChannelM-DIMM0  CPU 1 ch 4  64 GB  EXM32G32R2X4  EX000066  0   0   정상
+ ChannelM-DIMM1  CPU 1 ch 4                                 0   0   빈 슬롯
+ ChannelN-DIMM0  CPU 1 ch 5  64 GB  EXM32G32R2X4  EX000072  0   0   정상
+ ChannelN-DIMM1  CPU 1 ch 5                                 0   0   빈 슬롯
+ ChannelO-DIMM0  CPU 1 ch 6  64 GB  EXM32G32R2X4  EX000078  0   0   정상
+ ChannelO-DIMM1  CPU 1 ch 6                                 0   0   빈 슬롯
+ ChannelP-DIMM0  CPU 1 ch 7                                 0   0   빈 슬롯
+ ChannelP-DIMM1  CPU 1 ch 7                                 0   0   빈 슬롯
+
+ - 보드에 그린 슬롯 32개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개

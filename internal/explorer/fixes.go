@@ -1,10 +1,6 @@
 package explorer
 
-import (
-	"regexp"
-	"strconv"
-	"strings"
-)
+import "strings"
 
 // Fix names one correction of the first implementation of the readers.
 // Every fix is in force; a test may switch them off to show that the
@@ -59,6 +55,20 @@ const (
 	// FixRepeatedTable reads once a record that stands again with the same
 	// handle and the same fields (a text that holds its table twice).
 	FixRepeatedTable
+	// FixNameForms reads each slot name as a whole by the forms of the
+	// name table and runs the pass that decides socket, channel and
+	// position of every slot; the fixes after it are its stages.
+	FixNameForms
+	// FixLetterMeaning decides what the letter of A1 and the digit of 1A
+	// are on a board.
+	FixLetterMeaning
+	// FixSocketRules decides the processor of a slot: the processor word, a
+	// Node of the bank locator, one processor record, the processor of the
+	// slots of one channel letter, the channel letters split in order.
+	FixSocketRules
+	// FixChannelRank numbers the channels of a processor and the slots of a
+	// channel from 0 in the vendor's order.
+	FixChannelRank
 
 	lastFix
 )
@@ -78,6 +88,10 @@ func SetFixes(f Fix) Fix {
 
 func on(f Fix) bool { return fixes&f != 0 }
 
+// stage tells a stage of the pass of FixNameForms: in force when the pass
+// runs and the stage is on.
+func stage(f Fix) bool { return on(FixNameForms) && on(f) }
+
 var fixNames = map[Fix]string{
 	FixBinarySizes: "binary-sizes", FixDimmWord: "dimm-word", FixNumberingBase: "numbering-base",
 	FixLetterBeforeNode: "letter-before-node", FixCPUWithSpace: "cpu-with-space", FixPLetter: "p-letter",
@@ -85,6 +99,8 @@ var fixNames = map[Fix]string{
 	FixLineEnds: "line-ends", FixEmptyField: "empty-field", FixNumastatBlocks: "numastat-blocks",
 	FixSupermicroNode: "supermicro-node", FixSlabBySize: "slab-by-size", FixDellDimm: "dell-dimm",
 	FixChanWord: "chan-word", FixLettersFromA: "letters-from-a", FixRepeatedTable: "repeated-table",
+	FixNameForms: "name-forms", FixLetterMeaning: "letter-meaning", FixSocketRules: "socket-rules",
+	FixChannelRank: "channel-rank",
 }
 
 // Name is the name of a fix, as the tests list it.
@@ -115,53 +131,4 @@ func lineEnds(s string) string {
 		return s
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(s, "\r\n", "\n"), "\r", "\n")
-}
-
-var (
-	reEpyc     = regexp.MustCompile(`EPYC\s+(\d)\d{3}`)
-	reXeonE    = regexp.MustCompile(`\bE[57]-\d{4}`)
-	reXeonOld  = regexp.MustCompile(`\b[XEL]5[5-6]\d{2}\b`)
-	reXeonMet  = regexp.MustCompile(`(?:Gold|Silver|Bronze|Platinum)\s+\d(\d)\d{2}`)
-	reXeon6    = regexp.MustCompile(`Xeon\(R\)\s+6(\d)\d{2}`)
-	reXeonDesk = regexp.MustCompile(`\bE3-\d{4}|\bE-2\d{3}`)
-)
-
-// ProcessorChannels is the number of memory channels a processor has,
-// read from its name; ok is false for a name the table does not know.
-func ProcessorChannels(name string) (int, bool) {
-	if m := reEpyc.FindStringSubmatch(name); m != nil {
-		switch m[1] {
-		case "9":
-			return 12, true
-		case "8":
-			return 6, true
-		case "7":
-			return 8, true
-		case "4":
-			return 2, true
-		}
-		return 0, false
-	}
-	if reXeonE.MatchString(name) {
-		return 4, true
-	}
-	if reXeonOld.MatchString(name) {
-		return 3, true
-	}
-	if m := reXeonMet.FindStringSubmatch(name); m != nil {
-		if g, _ := strconv.Atoi(m[1]); g <= 2 {
-			return 6, true
-		}
-		return 8, true
-	}
-	if m := reXeon6.FindStringSubmatch(name); m != nil {
-		if m[1] == "9" {
-			return 12, true
-		}
-		return 8, true
-	}
-	if reXeonDesk.MatchString(name) {
-		return 2, true
-	}
-	return 0, false
 }
