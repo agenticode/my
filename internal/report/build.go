@@ -145,6 +145,9 @@ type Document struct {
 	// Board is the board of the host as the Memory Explorer draws it, or
 	// nil when it could not be built.
 	Board *view.Board
+	// Explorer is the memory of the host when the scan ran, in the tabs
+	// of the Memory Explorer; empty when the case holds no reading.
+	Explorer *view.Explorer
 	// Timeline is the timeline of the host, with one row per DIMM.
 	Timeline *view.Timeline
 	// Boots is the window of the latest boots of the host.
@@ -298,6 +301,13 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 	if doc.Overview, err = c.Overview(ctx, h, false); err != nil {
 		return nil, err
 	}
+	doc.Explorer = adapter.Guard(func() *view.Explorer {
+		e, err := c.Explorer(ctx, h)
+		if err != nil {
+			return nil
+		}
+		return e
+	})
 	// A board that fails leaves section 2 as the slot map draws it.
 	doc.Board = adapter.Guard(func() *view.Board {
 		b, err := c.Board(ctx, h)

@@ -111,3 +111,29 @@
     if (ev.key === 'Escape') { hide(); }
   });
 }());
+
+(function () {
+  /* The tabs of the Memory Explorer: a link shows its panel in place. */
+  var panels = document.querySelector('.mx-panels');
+  if (!panels || !document.addEventListener) { return; }
+  var tabs = document.querySelectorAll('.mx-tabs a');
+  function choose(id) {
+    var i;
+    for (i = 0; i !== tabs.length; i += 1) {
+      tabs[i].className = tabs[i].getAttribute('href') === '#' + id ? 'on' : '';
+    }
+    var list = panels.querySelectorAll('.mx-panel');
+    for (i = 0; i !== list.length; i += 1) {
+      list[i].className = list[i].id === id ? 'mx-panel on' : 'mx-panel';
+    }
+  }
+  if (tabs.length === 0) { return; }
+  panels.className = 'mx-panels js';
+  choose(tabs[0].getAttribute('href').slice(1));
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('.mx-tabs a') : null;
+    if (!a) { return; }
+    ev.preventDefault();
+    choose(a.getAttribute('href').slice(1));
+  });
+}());
