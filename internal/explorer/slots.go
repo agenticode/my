@@ -16,6 +16,26 @@ type SlotText struct {
 	SizeMB      int64 // 0 when the size is not known
 }
 
+// SlotHost is what the ledger knows of the system of the slots: the maker
+// and the name of its processor. WriteSlotsOf writes them as the System and
+// Processor records of dmidecode, which the readers take hints from.
+type SlotHost struct {
+	Vendor, Processor string
+}
+
+// WriteSlotsOf writes the system and processor records of the host, when
+// known, and then the slots as WriteSlots does.
+func WriteSlotsOf(h SlotHost, slots []SlotText) string {
+	var b strings.Builder
+	if h.Vendor != "" {
+		b.WriteString("Handle 0x0100, DMI type 1, 27 bytes\nSystem Information\n\tManufacturer: " + dmiString(h.Vendor) + "\n\n")
+	}
+	if h.Processor != "" {
+		b.WriteString("Handle 0x0400, DMI type 4, 48 bytes\nProcessor Information\n\tVersion: " + dmiString(h.Processor) + "\n\n")
+	}
+	return b.String() + WriteSlots(slots)
+}
+
 // WriteSlots writes one Memory Device block per slot with the three fields
 // the placement reads: Size, Locator and Bank Locator. A missing locator is
 // "Not Specified", as dmidecode writes it, and every byte below 0x20 or

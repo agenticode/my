@@ -2,7 +2,7 @@ package explorer
 
 import "sort"
 
-// Layout is what renderDimmMap draws, as data: the summary line, the
+// Layout is the board as the explorer draws it, as data: the summary line, the
 // badge of a memory type and speed that all modules share, and the rows of
 // the board. A row holds the bank left of the CPU, the CPU, and the bank
 // right of it; with two sockets the second CPU and its bank follow.
@@ -72,7 +72,6 @@ var (
 // DimmNum is the order of a slot within its channel: the third digit of
 // DIMM###, the number of _Dimm# of the bank locator, the number of a name
 // like A1, the number after DIMM and a letter, or the number after D.
-// getDimmNum, memory.ts 1748-1764.
 func DimmNum(d Dimm) Num {
 	if m, ok := reNumXfusion.Match(d.Locator); ok {
 		return ParseInt(m.Group(1))
@@ -93,7 +92,6 @@ func DimmNum(d Dimm) Num {
 }
 
 // stickClasses are the classes of a stick: populated or empty, error, UE.
-// buildDimmSlotHtml, memory.ts 1939-1967.
 func stickClasses(d Dimm) []string {
 	c := []string{"mb-stick-empty"}
 	if d.Populated {
@@ -108,7 +106,7 @@ func stickClasses(d Dimm) []string {
 	return c
 }
 
-// cacheLevels are the cache bars of a CPU. buildCacheHtml, memory.ts 1644-1662.
+// cacheLevels are the cache bars of a CPU.
 func cacheLevels(socket Num, caches []CPUCache) []LayoutCache {
 	out := []LayoutCache{}
 	for _, c := range caches {
@@ -160,8 +158,8 @@ func byKey(g []slotGroup) {
 // Board arranges slots as the explorer draws them: one socket with half
 // its channels left of the CPU, mirrored so that channel 0 is next to it,
 // and the rest right of it; two sockets or more as [bank] [CPU 0] [CPU 1]
-// [bank], the channels of the first mirrored. Sockets beyond the second
-// are not drawn. renderDimmMap, memory.ts 1664-1852.
+// [bank], the channels of the first mirrored. The sockets beyond the
+// second follow in rows of two (without FixMoreSockets they are not drawn).
 func Board(dimms []Dimm, caches []CPUCache) Layout {
 	l := Layout{Dimms: dimms, Rows: []LayoutRow{}}
 	if len(dimms) == 0 {
@@ -272,6 +270,26 @@ func Board(dimms []Dimm, caches []CPUCache) Layout {
 		id0, id1 := Num(s0.key), Num(s1.key)
 		l.Rows = append(l.Rows, LayoutRow{Socket: id0, Dual: true, Parts: []LayoutPart{
 			bank("left", ch0, id0), cpu(id0, s0.slots), cpu(id1, s1.slots), bank("right", ch1, id1)}})
+		if !on(FixMoreSockets) || len(sockets) == 2 {
+			return l
+		}
+		// The sockets beyond the second, two to a row; the last alone.
+		rest := []int{}
+		for _, g := range sockets[2:] {
+			rest = append(rest, g.slots...)
+		}
+		more := Board(subset(dimms, rest), caches)
+		for _, r := range more.Rows {
+			for p := range r.Parts {
+				for c := range r.Parts[p].Channels {
+					for s := range r.Parts[p].Channels[c].Sticks {
+						st := &r.Parts[p].Channels[c].Sticks[s]
+						st.Slot = rest[st.Slot]
+					}
+				}
+			}
+			l.Rows = append(l.Rows, r)
+		}
 		return l
 	}
 	s := sockets[0]
@@ -285,6 +303,14 @@ func Board(dimms []Dimm, caches []CPUCache) Layout {
 	sortSticks(right, false)
 	l.Rows = append(l.Rows, LayoutRow{Socket: id, Parts: []LayoutPart{bank("left", left, id), cpu(id, s.slots), bank("right", right, id)}})
 	return l
+}
+
+func subset(dimms []Dimm, idx []int) []Dimm {
+	out := make([]Dimm, len(idx))
+	for i, j := range idx {
+		out[i] = dimms[j]
+	}
+	return out
 }
 
 func reverse(g []slotGroup) {

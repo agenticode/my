@@ -23,6 +23,7 @@ func places(ds []Dimm) string {
 // Each test of a slot name, with a name that fires it and one that just
 // misses it. The numbers are what the reference gives (taken from node).
 func TestSlotPatterns(t *testing.T) {
+	carried(t)
 	for _, c := range []struct {
 		name, locator, bank string
 		socket, channel     float64
@@ -74,6 +75,7 @@ func slotsOf(locators ...string) string {
 // The two second passes: the channel of A1 and of PROC m DIMM n is the
 // number from 1 modulo half the slots of the socket.
 func TestSecondPasses(t *testing.T) {
+	carried(t)
 	for _, c := range []struct {
 		name string
 		text string
@@ -90,9 +92,10 @@ func TestSecondPasses(t *testing.T) {
 	}
 }
 
-// The defects of the reference, held in place: MemorY carries them as they
-// are and keeps them from a wrong picture elsewhere (the board's checks).
+// The defects of the first implementation, with the fixes switched off:
+// the readers still give its answers. TestFixes shows each fixed result.
 func TestDefectsHeld(t *testing.T) {
+	carried(t)
 	parse := func(s string) []Dimm { return ParseDmidecodeMemory(s, nil, nil) }
 	blocks := func(loc string, banks ...string) string {
 		var b strings.Builder
@@ -215,6 +218,14 @@ func TestDefectsHeld(t *testing.T) {
 
 // SocketBy and ChannelBy: empty only where the number stayed 0.
 func TestTestNames(t *testing.T) {
+	for _, f := range []Fix{0, AllFixes} {
+		old := SetFixes(f)
+		testNames(t)
+		SetFixes(old)
+	}
+}
+
+func testNames(t *testing.T) {
 	check := func(where string, ds []Dimm) {
 		for _, d := range ds {
 			if d.SocketBy == "" && d.Socket != 0 || d.ChannelBy == "" && d.Channel != 0 {
@@ -293,4 +304,10 @@ func TestBounds(t *testing.T) {
 	if n := len(ParseStatusEntries(b.String())); n != MaxProcesses {
 		t.Errorf("processes: %d", n)
 	}
+}
+
+// carried switches the fixes off for the test.
+func carried(t *testing.T) {
+	old := SetFixes(0)
+	t.Cleanup(func() { SetFixes(old) })
 }

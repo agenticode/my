@@ -104,6 +104,11 @@ func MemoryMap(in MapInput) MapResult {
 		dmi = "" // not run
 	}
 	ce, ue := ParseEdacCounts(in.EdacCE), ParseEdacCounts(in.EdacUE)
+	if on(FixEdacControllers) && (repeated(in.EdacCE) || repeated(in.EdacUE)) {
+		// Counts of several controllers have one name per controller and
+		// cannot be tied to slots by their order.
+		ce, ue = Counts{}, Counts{}
+	}
 	dimms := ParseDmidecodeMemory(dmi, ce, ue)
 	caches := ParseLshwCacheHierarchy(in.Lshw)
 	if in.SysfsCache != "" {
@@ -131,4 +136,19 @@ func orEmpty[T any](s []T) []T {
 		return []T{}
 	}
 	return s
+}
+
+// repeated tells EDAC count lines in which a name comes twice: the lines
+// of more than one memory controller.
+func repeated(raw string) bool {
+	seen := map[string]bool{}
+	for _, line := range Lines(raw) {
+		if m, ok := reEdacLine.Match(line); ok {
+			if seen[m.Group(1)] {
+				return true
+			}
+			seen[m.Group(1)] = true
+		}
+	}
+	return false
 }
