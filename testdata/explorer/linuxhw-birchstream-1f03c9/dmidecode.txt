@@ -1,0 +1,1001 @@
+# dmidecode 3.5
+Getting SMBIOS data from sysfs.
+SMBIOS 3.5.0 present.
+Table at 0x746D4000.
+
+Handle 0x0000, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 6 TB
+	Error Information Handle: Not Provided
+	Number Of Devices: 24
+
+Handle 0x0002, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0001
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_A
+	Bank Locator: BANK 0
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000002
+	Asset Tag: EXA000003
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000005
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0004, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0003
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_B
+	Bank Locator: BANK 1
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000009
+	Asset Tag: EXA000010
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000012
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0006, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0005
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_C
+	Bank Locator: BANK 2
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000016
+	Asset Tag: EXA000017
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000019
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0008, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0007
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_D
+	Bank Locator: BANK 3
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000023
+	Asset Tag: EXA000024
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000026
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x000A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0009
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_E
+	Bank Locator: BANK 4
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000030
+	Asset Tag: EXA000031
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000033
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x000C, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x000B
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_F
+	Bank Locator: BANK 5
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000037
+	Asset Tag: EXA000038
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000040
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x000E, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x000D
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_G
+	Bank Locator: BANK 6
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000044
+	Asset Tag: EXA000045
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000047
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0010, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x000F
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_H
+	Bank Locator: BANK 7
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000051
+	Asset Tag: EXA000052
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000054
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0012, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0011
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_I
+	Bank Locator: BANK 8
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000058
+	Asset Tag: EXA000059
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000061
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0014, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0013
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_J
+	Bank Locator: BANK 9
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000065
+	Asset Tag: EXA000066
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000068
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0016, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0015
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_K
+	Bank Locator: BANK 10
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000072
+	Asset Tag: EXA000073
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000075
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0018, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0017
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU0_DIMM_L
+	Bank Locator: BANK 11
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000079
+	Asset Tag: EXA000080
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000082
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x001A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0019
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_A
+	Bank Locator: BANK 12
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000086
+	Asset Tag: EXA000087
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000089
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x001C, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x001B
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_B
+	Bank Locator: BANK 13
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000093
+	Asset Tag: EXA000094
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000096
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x001E, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x001D
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_C
+	Bank Locator: BANK 14
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000100
+	Asset Tag: EXA000101
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000103
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0020, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x001F
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_D
+	Bank Locator: BANK 15
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000107
+	Asset Tag: EXA000108
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000110
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0022, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0021
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_E
+	Bank Locator: BANK 16
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000114
+	Asset Tag: EXA000115
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000117
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0024, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0023
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_F
+	Bank Locator: BANK 17
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000121
+	Asset Tag: EXA000122
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000124
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0026, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0025
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_G
+	Bank Locator: BANK 18
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000128
+	Asset Tag: EXA000129
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000131
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0028, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0027
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_H
+	Bank Locator: BANK 19
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000135
+	Asset Tag: EXA000136
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000138
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x002A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x0029
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_I
+	Bank Locator: BANK 20
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000142
+	Asset Tag: EXA000143
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000145
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x002C, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x002B
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_J
+	Bank Locator: BANK 21
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000149
+	Asset Tag: EXA000150
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000152
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x002E, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x002D
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_K
+	Bank Locator: BANK 22
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000156
+	Asset Tag: EXA000157
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000159
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0030, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x0000
+	Error Information Handle: 0x002F
+	Total Width: 80 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: Unknown
+	Set: None
+	Locator: CPU1_DIMM_L
+	Bank Locator: BANK 23
+	Type: DDR5
+	Type Detail: Unknown Synchronous
+	Speed: 8800 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000163
+	Asset Tag: EXA000164
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 8800 MT/s
+	Minimum Voltage: 1.1 V
+	Maximum Voltage: 1.1 V
+	Configured Voltage: 1.1 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000166
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: 0x0000
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x003A, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Intel Corporation
+	Product Name: BIRCHSTREAM
+	Version: 1.0
+	Serial Number: EX000169
+	UUID: 00000000-0000-4000-8000-000000000170
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0171
+	Family: Family
+
+Handle 0x003B, DMI type 2, 17 bytes
+Base Board Information
+	Manufacturer: Intel Corporation
+	Product Name: BIRCHSTREAM
+	Version: E63448-400
+	Serial Number: EX000172
+	Asset Tag: EXA000173
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: Part Component
+	Chassis Handle: 0x0000
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0049, DMI type 4, 50 bytes
+Processor Information
+	Socket Designation: CPU0
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: D1 06 0A 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 173, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) 6980P
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 3900 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: <OUT OF SPEC>
+	L1 Cache Handle: 0x0046
+	L2 Cache Handle: 0x0047
+	L3 Cache Handle: 0x0048
+	Serial Number: EX000179
+	Asset Tag: EXA000180
+	Part Number: Not Specified
+	Core Count: 128
+	Core Enabled: 128
+	Thread Count: 256
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x004D, DMI type 4, 50 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: D1 06 0A 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 173, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) 6980P
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: 3900 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: <OUT OF SPEC>
+	L1 Cache Handle: 0x004A
+	L2 Cache Handle: 0x004B
+	L3 Cache Handle: 0x004C
+	Serial Number: EX000181
+	Asset Tag: EXA000182
+	Part Number: Not Specified
+	Core Count: 128
+	Core Enabled: 128
+	Thread Count: 256
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control

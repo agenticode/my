@@ -1,0 +1,191 @@
+{
+ "fn": "collectPageStats",
+ "in": {
+  "vmstat": "@file:proc/vmstat",
+  "sarB": "@file:sar-B.txt"
+ },
+ "out": {
+  "vmstat": {
+   "pgfault": 9876543210,
+   "pgmajfault": 123456,
+   "pgsteal_kswapd": 45678,
+   "pgsteal_direct": 1234,
+   "pgdemote_kswapd": 0,
+   "pgscan_kswapd": 56789,
+   "pgscan_direct": 2345,
+   "workingset_refault_anon": 12,
+   "workingset_refault_file": 34567,
+   "workingset_activate_file": 2345
+  },
+  "sarB": [
+   {
+    "time": "00:10",
+    "values": {
+     "pgpgin/s": 12.5,
+     "pgpgout/s": 301.25,
+     "fault/s": 1537,
+     "majflt/s": 0.5,
+     "pgfree/s": 2001.75,
+     "pgscank/s": 120,
+     "pgscand/s": 3,
+     "pgsteal/s": 110,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "00:20",
+    "values": {
+     "pgpgin/s": 25,
+     "pgpgout/s": 302.25,
+     "fault/s": 1574,
+     "majflt/s": 1,
+     "pgfree/s": 2002.75,
+     "pgscank/s": 240,
+     "pgscand/s": 0,
+     "pgsteal/s": 220,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "00:30",
+    "values": {
+     "pgpgin/s": 37.5,
+     "pgpgout/s": 303.25,
+     "fault/s": 1611,
+     "majflt/s": 0,
+     "pgfree/s": 2003.75,
+     "pgscank/s": 360,
+     "pgscand/s": 3,
+     "pgsteal/s": 330,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "00:40",
+    "values": {
+     "pgpgin/s": 50,
+     "pgpgout/s": 304.25,
+     "fault/s": 1648,
+     "majflt/s": 0.5,
+     "pgfree/s": 2004.75,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "00:50",
+    "values": {
+     "pgpgin/s": 62.5,
+     "pgpgout/s": 305.25,
+     "fault/s": 1685,
+     "majflt/s": 1,
+     "pgfree/s": 2005.75,
+     "pgscank/s": 120,
+     "pgscand/s": 3,
+     "pgsteal/s": 110,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "01:00",
+    "values": {
+     "pgpgin/s": 75,
+     "pgpgout/s": 306.25,
+     "fault/s": 1722,
+     "majflt/s": 0,
+     "pgfree/s": 2006.75,
+     "pgscank/s": 240,
+     "pgscand/s": 0,
+     "pgsteal/s": 220,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "01:10",
+    "values": {
+     "pgpgin/s": 87.5,
+     "pgpgout/s": 307.25,
+     "fault/s": 1759,
+     "majflt/s": 0.5,
+     "pgfree/s": 2007.75,
+     "pgscank/s": 360,
+     "pgscand/s": 3,
+     "pgsteal/s": 330,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "01:20",
+    "values": {
+     "pgpgin/s": 100,
+     "pgpgout/s": 308.25,
+     "fault/s": 1796,
+     "majflt/s": 1,
+     "pgfree/s": 2008.75,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   },
+   {
+    "time": "01:30",
+    "values": {
+     "pgpgin/s": 112.5,
+     "pgpgout/s": 309.25,
+     "fault/s": 1833,
+     "majflt/s": 0,
+     "pgfree/s": 2009.75,
+     "pgscank/s": 120,
+     "pgscand/s": 3,
+     "pgsteal/s": 110,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "01:40",
+    "values": {
+     "pgpgin/s": 125,
+     "pgpgout/s": 310.25,
+     "fault/s": 1870,
+     "majflt/s": 0.5,
+     "pgfree/s": 2010.75,
+     "pgscank/s": 240,
+     "pgscand/s": 0,
+     "pgsteal/s": 220,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "01:50",
+    "values": {
+     "pgpgin/s": 137.5,
+     "pgpgout/s": 311.25,
+     "fault/s": 1907,
+     "majflt/s": 1,
+     "pgfree/s": 2011.75,
+     "pgscank/s": 360,
+     "pgscand/s": 3,
+     "pgsteal/s": 330,
+     "%vmeff": 91.67
+    }
+   },
+   {
+    "time": "02:00",
+    "values": {
+     "pgpgin/s": 150,
+     "pgpgout/s": 312.25,
+     "fault/s": 1944,
+     "majflt/s": 0,
+     "pgfree/s": 2012.75,
+     "pgscank/s": 0,
+     "pgscand/s": 0,
+     "pgsteal/s": 0,
+     "%vmeff": 0
+    }
+   }
+  ]
+ }
+}

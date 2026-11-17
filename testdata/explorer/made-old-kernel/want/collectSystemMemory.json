@@ -1,0 +1,44 @@
+{
+ "fn": "collectSystemMemory",
+ "in": {
+  "meminfo": "@file:proc/meminfo",
+  "vmstat": "@file:proc/vmstat",
+  "slabinfo": "@file:proc/slabinfo",
+  "pressure": null
+ },
+ "out": {
+  "totalBytes": 540226207744,
+  "freeBytes": 217441974272,
+  "availableBytes": 0,
+  "usedBytes": 124785617920,
+  "cachedBytes": 184446418944,
+  "buffersBytes": 1264196608,
+  "activeFileBytes": 92160000000,
+  "inactiveFileBytes": 90112000000,
+  "activeAnonBytes": 61440000000,
+  "inactiveAnonBytes": 2048000000,
+  "slabBytes": 15360000000,
+  "sreclaimableBytes": 12288000000,
+  "sunreclaimBytes": 3072000000,
+  "dirtyBytes": 55624704,
+  "writebackBytes": 0,
+  "shmemBytes": 1264196608,
+  "swapTotalBytes": 8589930496,
+  "swapFreeBytes": 7516188672,
+  "swapUsedBytes": 1073741824,
+  "psiSomeAvg10": 0,
+  "psiSomeAvg60": 0,
+  "psiFullAvg10": 0,
+  "psiFullAvg60": 0,
+  "hugePagesTotal": 16,
+  "hugePagesFree": 8,
+  "hugePageSize": 2097152,
+  "vmstat": {
+   "pswpin": 2345,
+   "pswpout": 6789,
+   "pgfault": 9876543210,
+   "pgmajfault": 123456
+  },
+  "topSlabs": []
+ }
+}

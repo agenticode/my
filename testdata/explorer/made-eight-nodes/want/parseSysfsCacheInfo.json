@@ -1,0 +1,32 @@
+{
+ "fn": "parseSysfsCacheInfo",
+ "in": {
+  "text": "@file:cpu-cache.txt"
+ },
+ "out": [
+  {
+   "socket": 0,
+   "l1Bytes": 81920,
+   "l2Bytes": 2097152,
+   "l3Bytes": 110100480
+  },
+  {
+   "socket": 1,
+   "l1Bytes": 81920,
+   "l2Bytes": 2097152,
+   "l3Bytes": 110100480
+  },
+  {
+   "socket": 2,
+   "l1Bytes": 81920,
+   "l2Bytes": 2097152,
+   "l3Bytes": 110100480
+  },
+  {
+   "socket": 3,
+   "l1Bytes": 81920,
+   "l2Bytes": 2097152,
+   "l3Bytes": 110100480
+  }
+ ]
+}

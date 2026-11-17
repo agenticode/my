@@ -1,0 +1,14 @@
+{
+ "fn": "parseLshwCacheHierarchy",
+ "in": {
+  "text": "@file:lshw.txt"
+ },
+ "out": [
+  {
+   "socket": 0,
+   "l1Bytes": 65536,
+   "l2Bytes": 6291456,
+   "l3Bytes": 0
+  }
+ ]
+}

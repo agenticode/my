@@ -1,0 +1,138 @@
+# dmidecode 2.12
+SMBIOS 2.5 present.
+
+Handle 0x0000, DMI type 4, 35 bytes
+Processor Information
+        Socket Designation: J1PR
+        Type: Central Processor
+        Family: Core i7
+        Manufacturer: Intel(R) Corporation
+        ID: C2 06 02 00 FF FB EB BF
+        Signature: Type 0, Family 6, Model 44, Stepping 2
+        Flags:
+                FPU (Floating-point unit on-chip)
+                VME (Virtual mode extension)
+                DE (Debugging extension)
+                PSE (Page size extension)
+                TSC (Time stamp counter)
+                MSR (Model specific registers)
+                PAE (Physical address extension)
+                MCE (Machine check exception)
+                CX8 (CMPXCHG8 instruction supported)
+                APIC (On-chip APIC hardware supported)
+                SEP (Fast system call)
+                MTRR (Memory type range registers)
+                PGE (Page global enable)
+                MCA (Machine check architecture)
+                CMOV (Conditional move instruction supported)
+                PAT (Page attribute table)
+                PSE-36 (36-bit page size extension)
+                CLFSH (CLFLUSH instruction supported)
+                DS (Debug store)
+                ACPI (ACPI supported)
+                MMX (MMX technology supported)
+                FXSR (FXSAVE and FXSTOR instructions supported)
+                SSE (Streaming SIMD extensions)
+                SSE2 (Streaming SIMD extensions 2)
+                SS (Self-snoop)
+                HTT (Multi-threading)
+                TM (Thermal monitor supported)
+                PBE (Pending break enabled)
+        Version: Intel(R) Core(TM) i7 CPU       X 980  @ 3.33GHz
+        Voltage: 1.2 V
+        External Clock: 135 MHz
+        Max Speed: 4000 MHz
+        Current Speed: 3381 MHz
+        Status: Populated, Enabled
+        Upgrade: Socket LGA1366
+        L1 Cache Handle: 0x0002
+        L2 Cache Handle: 0x0003
+        L3 Cache Handle: 0x0004
+        Serial Number: Not Specified
+        Asset Tag: Not Specified
+        Part Number: Not Specified
+
+Handle 0x0014, DMI type 16, 15 bytes
+Physical Memory Array
+        Location: System Board Or Motherboard
+        Use: System Memory
+        Error Correction Type: None
+        Maximum Capacity: 16 GB
+        Error Information Handle: Not Provided
+        Number Of Devices: 4
+
+Handle 0x0016, DMI type 17, 27 bytes
+Memory Device
+        Array Handle: 0x0014
+        Error Information Handle: Not Provided
+        Total Width: 64 bits
+        Data Width: 64 bits
+        Size: 2048 MB
+        Form Factor: DIMM
+        Set: None
+        Locator: J1MY
+        Bank Locator: CHAN A DIMM 0
+        Type: DDR3
+        Type Detail: Synchronous
+        Speed: 1333 MHz
+        Manufacturer: Example Memory
+        Serial Number: EX000002
+        Asset Tag: Unknown
+        Part Number: EXM32G32R2X4
+
+Handle 0x0017, DMI type 17, 27 bytes
+Memory Device
+        Array Handle: 0x0014
+        Error Information Handle: Not Provided
+        Total Width: Unknown
+        Data Width: Unknown
+        Size: No Module Installed
+        Form Factor: DIMM
+        Set: None
+        Locator: J2MY
+        Bank Locator: CHAN A DIMM 1
+        Type: DDR3
+        Type Detail: Synchronous
+        Speed: 1333 MHz
+        Manufacturer: NO DIMM
+        Serial Number: NO DIMM
+        Asset Tag: NO DIMM
+        Part Number: NO DIMM
+
+Handle 0x0018, DMI type 17, 27 bytes
+Memory Device
+        Array Handle: 0x0014
+        Error Information Handle: Not Provided
+        Total Width: 64 bits
+        Data Width: 64 bits
+        Size: 2048 MB
+        Form Factor: DIMM
+        Set: None
+        Locator: J3MY
+        Bank Locator: CHAN B DIMM 0
+        Type: DDR3
+        Type Detail: Synchronous
+        Speed: 1333 MHz
+        Manufacturer: Example Memory
+        Serial Number: EX000005
+        Asset Tag: Unknown
+        Part Number: EXM32G32R2X4
+
+Handle 0x0019, DMI type 17, 27 bytes
+Memory Device
+        Array Handle: 0x0014
+        Error Information Handle: Not Provided
+        Total Width: 64 bits
+        Data Width: 64 bits
+        Size: 2048 MB
+        Form Factor: DIMM
+        Set: None
+        Locator: J4MY
+        Bank Locator: CHAN C DIMM 0
+        Type: DDR3
+        Type Detail: Synchronous
+        Speed: 1333 MHz
+        Manufacturer: Example Memory
+        Serial Number: EX000008
+        Asset Tag: Unknown
+        Part Number: EXM32G32R2X4

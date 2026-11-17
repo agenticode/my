@@ -76,6 +76,18 @@ An input that fails is written to `testdata/fuzz/<Target>/` in the directory of 
 | a Redfish service made of arbitrary resources: collected by `my collect redfish`, then read as a dump | `internal/redfish/collect` | `FuzzCrawl` |
 | saved output of `racadm getsel` and `racadm lclog view`: records, wrapped messages, arguments run together, times | `internal/adapter/vendorlog` | `FuzzCollect` |
 | a line of `my export events` made of an event, an action and a firmware record with arbitrary texts, times and counts: one line of JSON that reads back to them | `internal/eventstream` | `FuzzLine` |
+| `dmidecode` memory devices and the memory banks of `lshw` text, as the Memory Explorer reads them for the board; each slot keeps the names of the tests that placed it | `internal/explorer` | `FuzzDimms` |
+| cache nodes of `lshw` text and the cache lines of sysfs | `internal/explorer` | `FuzzCaches` |
+| `numactl --hardware` and `numastat`, and the slots, nodes and caches put together | `internal/explorer` | `FuzzNuma` |
+| `/proc/meminfo`, `/proc/vmstat`, `/proc/pressure/memory`, `/proc/slabinfo` | `internal/explorer` | `FuzzSystem` |
+| the paging table of `sar -B` | `internal/explorer` | `FuzzPage` |
+| status blocks of processes, `ps` lines, PSS lines | `internal/explorer` | `FuzzProcesses` |
+| `pgrep -a java`, `jstat -gc` and the sizes on a Java command line | `internal/explorer` | `FuzzJVM` |
+| lists of open files and the lines of `fincore`, `stat` and `find` | `internal/explorer` | `FuzzFileCache` |
+| the cgroup of a process and its `memory.numa_stat` | `internal/explorer` | `FuzzProcessNuma` |
+| `/sys/kernel/mm/lru_gen/enabled` and the debug file of MGLRU | `internal/explorer` | `FuzzMglru` |
+| the load of a host: established TCP sessions, load average, CPUs, memory in use | `internal/explorer` | `FuzzLoad` |
+| byte counts and numbers as the explorer writes them | `internal/explorer` | `FuzzFormat` |
 
 ## What a target checks
 
@@ -87,6 +99,7 @@ A target fails on a panic, on a call that does not return, and when the code bre
 - A response of a vendor analyzer is refused, or every text in it is short and free of control characters, every number is within its bounds, and the rows it names as neighbours are symmetric.
 - A case bundle is refused, or the ledger that was taken out of it opens with this build.
 - `my preflight` on a copy of a host's files gives every check one of its five states and a sentence in both languages, writes its script, and changes nothing in the copy.
+- A reader of the Memory Explorer returns at most its bound of slots, nodes, lines or rows, and a slot that no test placed has socket and channel 0.
 - Text that goes to a terminal holds no control character but line breaks, tabs and the colour codes of the figures, whatever the text was and however the writes cut it up.
 
 ## What is not covered

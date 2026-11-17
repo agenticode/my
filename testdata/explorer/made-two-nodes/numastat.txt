@@ -1,0 +1,7 @@
+                           node0           node1
+numa_hit              1234567897      1234568897
+numa_miss                   1241            2241
+numa_foreign                5685            6685
+interleave_hit               130            1130
+local_node            1234500007      1234501007
+other_node                 67897           68897

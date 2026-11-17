@@ -1,0 +1,41 @@
+{
+ "fn": "parseMeminfo",
+ "in": {
+  "text": "@file:proc/meminfo"
+ },
+ "out": {
+  "MemTotal": 540226207744,
+  "MemFree": 217441974272,
+  "Buffers": 1264196608,
+  "Cached": 184446418944,
+  "SwapCached": 1048576,
+  "Active": 153600000000,
+  "Inactive": 92160000000,
+  "Active(anon)": 61440000000,
+  "Inactive(anon)": 2048000000,
+  "Active(file)": 92160000000,
+  "Inactive(file)": 90112000000,
+  "Unevictable": 12641280,
+  "Mlocked": 12641280,
+  "SwapTotal": 8589930496,
+  "SwapFree": 7516188672,
+  "Dirty": 55624704,
+  "Writeback": 0,
+  "AnonPages": 62464000000,
+  "Mapped": 2401974272,
+  "Shmem": 1264196608,
+  "KReclaimable": 12288000000,
+  "Slab": 15360000000,
+  "SReclaimable": 12288000000,
+  "SUnreclaim": 3072000000,
+  "KernelStack": 67108864,
+  "PageTables": 353974272,
+  "HugePages_Total": 16,
+  "HugePages_Free": 8,
+  "HugePages_Rsvd": 0,
+  "HugePages_Surp": 0,
+  "Hugepagesize": 2097152,
+  "Hugetlb": 33554432,
+  "DirectMap4k": 1264196608
+ }
+}

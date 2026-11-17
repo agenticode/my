@@ -1,0 +1,449 @@
+# dmidecode 2.12
+SMBIOS 2.8 present.
+141 structures occupying 4828 bytes.
+Table at 0xBFBDB000.
+
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: HP
+	Product Name: ProLiant SL4540 Gen8 
+	Version: Not Specified
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: ProLiant
+
+Handle 0x0200, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: HP
+	Product Name: Not Specified
+	Version: Not Specified
+	Serial Number: EX000004
+	Asset Tag:                                 
+	Features:
+		Board is a hosting board
+		Board is removable
+		Board is replaceable
+	Location In Chassis: Node 01
+	Chassis Handle: 0x0300
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0400, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: Proc 1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: E4 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 62, Stepping 4
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version:  Intel(R) Xeon(R) CPU E5-2407 v2 @ 2.40GHz      
+	Voltage: 1.4 V
+	External Clock: 100 MHz
+	Max Speed: 4800 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011
+	L1 Cache Handle: 0x0710
+	L2 Cache Handle: 0x0720
+	L3 Cache Handle: 0x0730
+	Serial Number: EX000006
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+
+Handle 0x0401, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: Proc 2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: E4 06 03 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 62, Stepping 4
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version:  Intel(R) Xeon(R) CPU E5-2407 v2 @ 2.40GHz      
+	Voltage: 1.4 V
+	External Clock: 100 MHz
+	Max Speed: 4800 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Idle
+	Upgrade: Socket LGA2011
+	L1 Cache Handle: 0x0716
+	L2 Cache Handle: 0x0726
+	L3 Cache Handle: 0x0736
+	Serial Number: EX000007
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 4
+	Characteristics:
+		64-bit capable
+
+Handle 0x1000, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 192 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 6
+
+Handle 0x1001, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 192 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 6
+
+Handle 0x1100, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: PROC  1 DIMM  1 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: UNKNOWN
+	Serial Number: EX000008
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1101, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 1
+	Locator: PROC  1 DIMM  2 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000011
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x1102, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: 2
+	Locator: PROC  1 DIMM  3 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: UNKNOWN
+	Serial Number: EX000013
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1103, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 3
+	Locator: PROC  1 DIMM  4 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000016
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x1104, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 4
+	Locator: PROC  1 DIMM  5 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000019
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x1105, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 5
+	Locator: PROC  1 DIMM  6 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000022
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x1106, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: 6
+	Locator: PROC  2 DIMM  1 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: UNKNOWN
+	Serial Number: EX000024
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1107, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 7
+	Locator: PROC  2 DIMM  2 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000027
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x1108, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: 8
+	Locator: PROC  2 DIMM  3 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous
+	Speed: Unknown
+	Manufacturer: UNKNOWN
+	Serial Number: EX000029
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: Unknown
+	Configured Clock Speed: Unknown
+	Minimum voltage:  Unknown
+	Maximum voltage:  Unknown
+	Configured voltage:  Unknown
+
+Handle 0x1109, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 9
+	Locator: PROC  2 DIMM  4 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000032
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x110A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 10
+	Locator: PROC  2 DIMM  5 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000035
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V
+
+Handle 0x110B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1001
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16384 MB
+	Form Factor: DIMM
+	Set: 11
+	Locator: PROC  2 DIMM  6 
+	Bank Locator: Not Specified
+	Type: DDR3
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 1600 MHz
+	Manufacturer: Example Memory
+	Serial Number: EX000038
+	Asset Tag: Not Specified
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Clock Speed: 1333 MHz
+	Minimum voltage:  1.350 V
+	Maximum voltage:  1.500 V
+	Configured voltage:  1.350 V

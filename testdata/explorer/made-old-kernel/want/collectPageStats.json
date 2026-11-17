@@ -1,0 +1,22 @@
+{
+ "fn": "collectPageStats",
+ "in": {
+  "vmstat": "@file:proc/vmstat",
+  "sarB": null
+ },
+ "out": {
+  "vmstat": {
+   "pgfault": 9876543210,
+   "pgmajfault": 123456,
+   "pgsteal_kswapd": 45678,
+   "pgsteal_direct": 1234,
+   "pgdemote_kswapd": 0,
+   "pgscan_kswapd": 56789,
+   "pgscan_direct": 2345,
+   "workingset_refault_anon": 12,
+   "workingset_refault_file": 34567,
+   "workingset_activate_file": 2345
+  },
+  "sarB": []
+ }
+}

@@ -1,0 +1,453 @@
+# dmidecode 3.5
+Getting SMBIOS data from sysfs.
+SMBIOS 3.0 present.
+91 structures occupying 4325 bytes.
+Table at 0x000ED9B0.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Lenovo
+	Product Name: RD450X
+	Version: 70FRR156CN          
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: ThinkServer RD450X
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Lenovo
+	Product Name: RD450X
+	Version: 1.3
+	Serial Number: EX000004
+	Asset Tag: EXA000005
+	97946E993916094B22613E03B8339091
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: BOTTOM
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0041, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 256 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 4
+
+Handle 0x0043, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0041
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 8 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM A0
+	Bank Locator: _Node0_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000010
+	Asset Tag: EXA000011
+	Part Number: EXM32G32R2X4
+	Rank: 1
+	Configured Memory Speed: 2400 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0045, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0041
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM A1
+	Bank Locator: _Node0_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0046, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0041
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM B0
+	Bank Locator: _Node0_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0047, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0041
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM B1
+	Bank Locator: _Node0_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0048, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 256 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 4
+
+Handle 0x004A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0048
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 8 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM C0
+	Bank Locator: _Node0_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000014
+	Asset Tag: EXA000015
+	Part Number: EXM32G32R2X4
+	Rank: 1
+	Configured Memory Speed: 2400 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x004C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0048
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM C1
+	Bank Locator: _Node0_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x004D, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0048
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM D0
+	Bank Locator: _Node0_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x004E, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0048
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1 DIMM D1
+	Bank Locator: _Node0_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x004F, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 256 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 4
+
+Handle 0x0051, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004F
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 8 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM A0
+	Bank Locator: _Node1_Channel0_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000018
+	Asset Tag: EXA000019
+	Part Number: EXM32G32R2X4
+	Rank: 1
+	Configured Memory Speed: 2400 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x0053, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004F
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM A1
+	Bank Locator: _Node1_Channel0_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0054, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004F
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM B0
+	Bank Locator: _Node1_Channel1_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0055, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x004F
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM B1
+	Bank Locator: _Node1_Channel1_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0056, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 256 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 4
+
+Handle 0x0058, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0056
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 72 bits
+	Size: 8 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM C0
+	Bank Locator: _Node1_Channel2_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+	Speed: 2667 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000022
+	Asset Tag: EXA000023
+	Part Number: EXM32G32R2X4
+	Rank: 1
+	Configured Memory Speed: 2400 MT/s
+	Minimum Voltage: Unknown
+	Maximum Voltage: Unknown
+	Configured Voltage: Unknown
+
+Handle 0x005A, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0056
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM C1
+	Bank Locator: _Node1_Channel2_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x005B, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0056
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM D0
+	Bank Locator: _Node1_Channel3_Dimm0
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x005C, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x0056
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU2 DIMM D1
+	Bank Locator: _Node1_Channel3_Dimm1
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0063, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F1 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 79, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: Unknown
+	Current Speed: 2200 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0060
+	L2 Cache Handle: 0x0061
+	L3 Cache Handle: 0x0062
+	Serial Number: EX000025
+	Asset Tag: EXA000026
+	Part Number: Not Specified
+	Core Count: 12
+	Core Enabled: 12
+	Thread Count: 24
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x0067, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel
+	ID: F1 06 04 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 79, Stepping 1
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz
+	Voltage: 0.0 V
+	External Clock: 100 MHz
+	Max Speed: Unknown
+	Current Speed: 2200 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA2011-3
+	L1 Cache Handle: 0x0064
+	L2 Cache Handle: 0x0065
+	L3 Cache Handle: 0x0066
+	Serial Number: EX000027
+	Asset Tag: EXA000028
+	Part Number: Not Specified
+	Core Count: 12
+	Core Enabled: 12
+	Thread Count: 24
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control

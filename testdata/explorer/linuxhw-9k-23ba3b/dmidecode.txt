@@ -1,0 +1,776 @@
+# dmidecode 3.6
+Getting SMBIOS data from sysfs.
+SMBIOS 3.5.0 present.
+Table at 0x6B392000.
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: ; 9k
+	Product Name: ; 9k
+	Version: ; 9k
+	Serial Number: EX000001
+	UUID: 00000000-0000-4000-8000-000000000002
+	Wake-up Type: Power Switch
+	SKU Number: EXSKU0003
+	Family: Not Specified
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: w 9k
+	Product Name: w 9k
+	Version: w 9k
+	Serial Number: EX000004
+	Asset Tag: EXA000005
+	Features:
+		Board is a hosting board
+	Location In Chassis: Not Specified
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x001D, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Single-bit ECC
+	Maximum Capacity: 12 TB
+	Error Information Handle: Not Provided
+	Number Of Devices: 32
+
+Handle 0x001E, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 0 DIMM 0 (C0A0)
+	Bank Locator: NODE 0
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000011
+	Asset Tag: EXA000012
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000014
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x001F, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 0 DIMM 1 (C0A1)
+	Bank Locator: NODE 0
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0020, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 1 DIMM 0 (C0B0)
+	Bank Locator: NODE 0
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0021, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 1 DIMM 1 (C0B1)
+	Bank Locator: NODE 0
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0022, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 2 DIMM 0 (C0C0)
+	Bank Locator: NODE 1
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000017
+	Asset Tag: EXA000018
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000020
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0023, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 2 DIMM 1 (C0C1)
+	Bank Locator: NODE 1
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0024, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 3 DIMM 0 (C0D0)
+	Bank Locator: NODE 1
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0025, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 3 DIMM 1 (C0D1)
+	Bank Locator: NODE 1
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0026, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 4 DIMM 0 (C0E0)
+	Bank Locator: NODE 2
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000023
+	Asset Tag: EXA000024
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000026
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0027, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 4 DIMM 1 (C0E1)
+	Bank Locator: NODE 2
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0028, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 5 DIMM 0 (C0F0)
+	Bank Locator: NODE 2
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0029, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 5 DIMM 1 (C0F1)
+	Bank Locator: NODE 2
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x002A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 6 DIMM 0 (C0G0)
+	Bank Locator: NODE 3
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000029
+	Asset Tag: EXA000030
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000032
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x002B, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 6 DIMM 1 (C0G1)
+	Bank Locator: NODE 3
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x002C, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 7 DIMM 0 (C0H0)
+	Bank Locator: NODE 3
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x002D, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 0 CHANNEL 7 DIMM 1 (C0H1)
+	Bank Locator: NODE 3
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x002E, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 0 DIMM 0 (C1A0)
+	Bank Locator: NODE 4
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000035
+	Asset Tag: EXA000036
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000038
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x002F, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 0 DIMM 1 (C1A1)
+	Bank Locator: NODE 4
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0030, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 1 DIMM 0 (C1B0)
+	Bank Locator: NODE 4
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0031, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 1 DIMM 1 (C1B1)
+	Bank Locator: NODE 4
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0032, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 2 DIMM 0 (C1C0)
+	Bank Locator: NODE 5
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000041
+	Asset Tag: EXA000042
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000044
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0033, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 2 DIMM 1 (C1C1)
+	Bank Locator: NODE 5
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0034, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 3 DIMM 0 (C1D0)
+	Bank Locator: NODE 5
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0035, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 3 DIMM 1 (C1D1)
+	Bank Locator: NODE 5
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0036, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 4 DIMM 0 (C1E0)
+	Bank Locator: NODE 6
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000047
+	Asset Tag: EXA000048
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000050
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x0037, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 4 DIMM 1 (C1E1)
+	Bank Locator: NODE 6
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0038, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 5 DIMM 0 (C1F0)
+	Bank Locator: NODE 6
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0039, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 5 DIMM 1 (C1F1)
+	Bank Locator: NODE 6
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x003A, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 64 GB
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 6 DIMM 0 (C1G0)
+	Bank Locator: NODE 7
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Example Memory
+	Serial Number: EX000053
+	Asset Tag: EXA000054
+	Part Number: EXM32G32R2X4
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+	Memory Technology: DRAM
+	Memory Operating Mode Capability: Volatile memory
+	Firmware Version: EX000056
+	Module Manufacturer ID: Bank 1, Hex 0x00
+	Module Product ID: Unknown
+	Memory Subsystem Controller Manufacturer ID: Unknown
+	Memory Subsystem Controller Product ID: Unknown
+	Non-Volatile Size: None
+	Volatile Size: 64 GB
+	Cache Size: None
+	Logical Size: None
+
+Handle 0x003B, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 6 DIMM 1 (C1G1)
+	Bank Locator: NODE 7
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x003C, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 7 DIMM 0 (C1H0)
+	Bank Locator: NODE 7
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x003D, DMI type 17, 92 bytes
+Memory Device
+	Array Handle: 0x001D
+	Error Information Handle: Not Provided
+	Total Width: Unknown
+	Data Width: Unknown
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: NODE 1 CHANNEL 7 DIMM 1 (C1H1)
+	Bank Locator: NODE 7
+	Type: Unknown
+	Type Detail: Unknown
+
+Handle 0x0058, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU0
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: A6 06 06 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 106, Stepping 6
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) Gold 6342 CPU @ 2.80GHz
+	Voltage: 1.6 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2800 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA4189
+	L1 Cache Handle: 0x0055
+	L2 Cache Handle: 0x0056
+	L3 Cache Handle: 0x0057
+	Serial Number: EX000058
+	Asset Tag: EXA000059
+	Part Number: Not Specified
+	Core Count: 24
+	Core Enabled: 24
+	Thread Count: 48
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
+
+Handle 0x005C, DMI type 4, 48 bytes
+Processor Information
+	Socket Designation: CPU1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel(R) Corporation
+	ID: A6 06 06 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 106, Stepping 6
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) Gold 6342 CPU @ 2.80GHz
+	Voltage: 1.6 V
+	External Clock: 100 MHz
+	Max Speed: 4000 MHz
+	Current Speed: 2800 MHz
+	Status: Populated, Enabled
+	Upgrade: Socket LGA4189
+	L1 Cache Handle: 0x0059
+	L2 Cache Handle: 0x005A
+	L3 Cache Handle: 0x005B
+	Serial Number: EX000060
+	Asset Tag: EXA000061
+	Part Number: Not Specified
+	Core Count: 24
+	Core Enabled: 24
+	Thread Count: 48
+	Characteristics:
+		64-bit capable
+		Multi-Core
+		Hardware Thread
+		Execute Protection
+		Enhanced Virtualization
+		Power/Performance Control
