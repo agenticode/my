@@ -373,6 +373,43 @@ For a BMC that published its message registries, a note names each registry with
 
 The list of sources (`my --detail`) says of a source with records its reader did not understand how many there were. Such records are counted and do not stop the run; the text of those that name memory, a DIMM or ECC is kept, and the report lists them.
 
+## Module SPD
+
+`my spd` shows what each DIMM says about itself in its SPD EEPROM, the memory on the module that the BIOS reads at boot to set up the memory controller. MemorY reads it from the `eeprom` files of the kernel drivers `ee1004` (DDR4) and `spd5118` (DDR5) and ties each reading to its slot by the serial number in SMBIOS. On most server boards Linux has no path to the SPD; the screen then names the reason and what can be done, and `my spd FILE` decodes a dump taken another way. [compatibility.md](compatibility.md#module-spd) lists the reasons and the forms of a dump.
+
+The demo case `testdata/spd/demo` is a made host of eight DIMMs. Its SPD files are one public dump with the serial number and the week of each slot written in:
+
+```
+$ my spd --root testdata/spd/demo
+host r07-n112  Example Systems R760  SPD of 8 of 8 DIMMs (spd5118), tied by serial number
+8 x Micron Technology (JEDEC bank 1, 0x2C)  MTC40F2046S1RC48BA1  DDR5 RDIMM 64 GB 2Rx4  16 Gb dies
+
+ SLOT     DATE      LOC   SERIAL    FINDING
+ CPU0_A1  2022-W43  0x06  6748F442  ok
+ CPU0_B1  2022-W43  0x06  ADCBC230  consider replacement
+ CPU0_C1  2022-W43  0x06  4B1770AF  replace now
+ CPU0_D1  2023-W08  0x06  F5903463  ok
+ CPU1_A1  2022-W43  0x06  17AFC7D1  observe
+ CPU1_B1  2022-W43  0x06  AC969700  ok
+ CPU1_C1  2023-W08  0x06  B028A3B1  ok
+ CPU1_D1  2023-W08  0x06  ED92203E  ok
+
+ date codes
+ Micron Technology (JEDEC bank 1, 0x2C)  MTC40F2046S1RC48BA1
+ DATE      DIMMS  FINDING  UE  SLOTS WITH A FINDING
+ 2022-W43      5        3   1  CPU0_B1 CPU0_C1 CPU1_A1
+ 2023-W08      3        0   0
+ 3 of the 3 DIMMs with a finding carry 2022-W43; 2 of the 5 DIMMs without one carry it too.
+ The table counts modules by the date code in their SPD. Whether a lot is at fault is for the
+ maker's failure analysis to say.
+```
+
+The head counts the DIMMs whose SPD was read, names the driver and says how the readings were tied. The line under it gives what the modules share: the maker with its JEDEC code, the part number, the type and size, the ranks and device width (`2Rx4` is two ranks of x4 devices) and the capacity of one DRAM die. A field the modules do not share moves into the table. `LOC` is the location code, a byte whose meaning each maker sets for the places it builds modules. Below the table stand a module that was not read, with its state, and each field where the SPD and SMBIOS or EDAC disagree. `--detail` adds per module the SPD revision, the CRCs, the package, the DRAM maker and the bus address. The card of `my dimm SLOT --detail` shows the week, the location code and the dies on one line.
+
+The table of date codes counts the DIMMs of each maker, part number and week: all of them, those with a finding other than ok, those with an uncorrected error on record, and the slots of those with a finding. A second table counts the same by ranks and device width when the modules differ in them. A line about a cluster is written when two or more DIMMs with a finding share a week, and it gives both counts: of the DIMMs with a finding and of those without one. `my lots` prints the table alone. Over a fleet, import each host into one ledger (`my import --ledger fleet.db COLLECTION`) and run `my open fleet.db lots`; the table then names the hosts and how many DIMMs with a finding each has.
+
+A date code is the year and week the module maker wrote into the SPD when it built the module. It names no wafer lot of the DRAM dies on the module. The last sentence of the table leaves the question of a lot to the maker's failure analysis.
+
 ## GPU memory
 
 A GPU does not report where in its memory an error was. It reports a repair budget: every bank of its memory has spare rows, a row that fails is remapped to a spare one, and a bank without a spare row cannot take another failure. `my gpu` draws one line per GPU.
@@ -400,11 +437,15 @@ Every record has an observation grade, which says how much of the place of an er
 
 ## The report
 
-`my report -o case.html` writes the same figures into one HTML file with eight sections, nine when the ledger holds memory readings of the host: summary, slot map (the board, and the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, the Memory Explorer when there are readings, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. When the BIOS or a BMC wrote about memory, the data quality section names each mapping table that classed records, with what it rests on and "not checked on real hardware" for a table no capture of a real BMC confirmed yet, the message registries the BMC published, and per source the records its reader did not understand with the reasons. The appendix then lists every firmware record: its time, slot, message ID, common event, how the event was found and its text. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.
+`my report -o case.html` writes the same figures into one HTML file with eight sections, one more when a scan read the SPD of the modules and one more when the ledger holds memory readings of the host: summary, slot map (the board, and the boots of the host when two or more boots are on record and a boot stopped or a DIMM had errors in two of them), findings, topology bars and address map, timeline, checks against a wrong diagnosis, Module SPD when there is a reading, the Memory Explorer when there are readings, data quality (with the table of `my inventory`: one line per DIMM, and the corrected errors of the operating system and the BMC side by side), and an appendix with the identity of the case (its ID, how the records were collected, the report and the engine), every finding in full and the original records. The findings section gives each finding in short, as `my why` does; its last line leads to the whole finding in the appendix. A mark of a figure leads to the records behind it in the appendix. The boots are a grid with a letter or a number in every cell and a table of the same data below it; the address map outlines the cells with errors in two or more boots. `--audience fa` adds the steps of the confidence and the faults one by one. When the BIOS or a BMC wrote about memory, the data quality section names each mapping table that classed records, with what it rests on and "not checked on real hardware" for a table no capture of a real BMC confirmed yet, the message registries the BMC published, and per source the records its reader did not understand with the reasons. The appendix then lists every firmware record: its time, slot, message ID, common event, how the event was found and its text. [examples/demo-report.html](../examples/demo-report.html) is the report of the example case.
+
+### Module SPD
+
+Section 7 holds the screen of `my spd` as tables: the modules, the lines below them and the table of date codes with its sentences. It holds no finding and changes no grade. `--audience fa` adds per module the fields of `my spd --detail` and the bytes as a hex dump that opens on a click. When the scan looked for the SPD and read none, the section is left out and the data quality section gives the reason and the step to take. A report of a case without a reading is the same file it was before MemorY read the SPD.
 
 ### Memory Explorer
 
-Section 7 holds what the kernel counted about the memory of the host when a scan or `my collect host` ran, in five tabs. A tab whose reading the ledger lacks is left out, and the data quality section names the reading. Nothing in the section changes a grade or a finding. Without a script the tabs are drawn one under the other, and a printed report shows all of them.
+Section 7, or section 8 after Module SPD, holds what the kernel counted about the memory of the host when a scan or `my collect host` ran, in five tabs. A tab whose reading the ledger lacks is left out, and the data quality section names the reading. Nothing in the section changes a grade or a finding. Without a script the tabs are drawn one under the other, and a printed report shows all of them.
 
 | Tab | What it shows | Marked |
 | --- | --- | --- |

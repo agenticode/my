@@ -174,8 +174,12 @@ func TestDescs(t *testing.T) {
 	// The labels the design allows. A row, a column, a bank or an address
 	// as a label would make the number of series grow without bound; the
 	// cause of a stop has three values and a check of preflight thirteen.
+	// The week, organisation and part number of the SPD are one value per
+	// DIMM, as the serial number is; the reason of the SPD is one of 18
+	// codes or 5 states.
 	allowed := map[string]bool{"event": true, "host": true, "slot": true, "serial": true, "mode": true, "type": true, "gpu": true, "bucket": true,
-		"source": true, "status": true, "version": true, "revision": true, "engine": true, "cause": true, "check": true}
+		"source": true, "status": true, "version": true, "revision": true, "engine": true, "cause": true, "check": true,
+		"date_code": true, "organisation": true, "part_number": true, "reason": true}
 	seen := map[string]bool{}
 	for _, d := range Descs {
 		if !name.MatchString(d.Name) || seen[d.Name] {

@@ -3,6 +3,9 @@ package exporter
 import (
 	"context"
 	"fmt"
+	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/decode/spd"
+	"github.com/agenticode/my/internal/view"
 	"strings"
 
 	"github.com/agenticode/my/internal/engine"
@@ -164,6 +167,9 @@ func Host(ctx context.Context, s *store.Store, h *engine.HostResult) (*Set, erro
 		case "lost":
 			set.Add(HostCapture, 0, host, c.Name)
 		}
+	}
+	if err := spdMetrics(ctx, set, s, h, present); err != nil {
+		return nil, fmt.Errorf("metrics of %s: spd: %w", host, err)
 	}
 	return set, nil
 }
@@ -352,6 +358,51 @@ func sourceMetrics(ctx context.Context, set *Set, s *store.Store, host string) e
 		}
 		if src.Faults > 0 {
 			set.Add(SourceFaults, float64(src.Faults), host, src.Kind)
+		}
+	}
+	return nil
+}
+
+// spdMetrics adds the SPD of the modules: per DIMM with a tied reading its
+// week, organisation and part number; per host the readings that were
+// read and, when none was, the reason, else the readings that failed by
+// state. A host whose scans never looked for the SPD has no series. A view
+// that fails leaves the metrics without them.
+func spdMetrics(ctx context.Context, set *Set, s *store.Store, h *engine.HostResult, present map[string]*engine.DIMMResult) error {
+	v := adapter.Guard(func() *view.SPD {
+		x, err := view.SPDOf(ctx, s, h)
+		if err != nil {
+			return nil
+		}
+		return x
+	})
+	if v == nil || !v.Looked && len(v.Modules) == 0 {
+		return nil
+	}
+	host := h.Host
+	set.Add(HostSPDRead, float64(v.Read), host)
+	failed := map[string]int{}
+	for _, m := range v.Modules {
+		if !spd.Read(m.State) {
+			failed[m.State]++
+			continue
+		}
+		d := present[m.DIMMUID]
+		if d == nil || m.Slot == "" {
+			continue
+		}
+		serial := ""
+		if d.DIMM != nil {
+			serial = d.DIMM.Serial
+		}
+		set.Add(DIMMSPDInfo, 1, host, m.Slot, serial, m.SPD.Date, m.SPD.Organisation, m.SPD.PartNumber)
+	}
+	switch {
+	case v.Read == 0 && v.Reason != nil:
+		set.Add(HostSPDUnread, 1, host, v.Reason.Code)
+	default:
+		for st, n := range failed {
+			set.Add(HostSPDUnread, float64(n), host, st)
 		}
 	}
 	return nil

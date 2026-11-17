@@ -264,3 +264,35 @@ func TestSPDOnOtherScreens(t *testing.T) {
 		t.Errorf("an SPD that was read is no missing source:\n%s", ov)
 	}
 }
+
+// The demo case: every SPD file has good CRCs and is tied to its slot, and
+// the screen of my spd --root testdata/spd/demo at 80 columns is its
+// golden in both languages (the capture of my.sh).
+func TestDemoCase(t *testing.T) {
+	root := testutil.Testdata(t, "spd", "demo")
+	files, err := filepath.Glob(filepath.Join(root, "spd", "*.bin"))
+	if err != nil || len(files) != 8 {
+		t.Fatalf("%d SPD files, %v", len(files), err)
+	}
+	for _, f := range files {
+		b, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if d := spd.Decode(b); d.State != spd.StateOK || !spd.GoodBase(b) || d.Date == "" {
+			t.Errorf("%s: %s, date %q", filepath.Base(f), d.State, d.Date)
+		}
+	}
+	_, js := spdScreen(t, root, "spd", "--json")
+	if strings.Count(js, `"tie": "serial"`) != 8 || strings.Contains(js, `"reason"`) {
+		t.Errorf("not every module is tied by serial:\n%s", js)
+	}
+	for _, lang := range []string{"en", "ko"} {
+		code, out := spdScreen(t, root, "spd", "--lang", lang, "--width", "80")
+		if code != 3 {
+			t.Errorf("exit %d", code)
+		}
+		checkWidth(t, "demo", out, 80)
+		testutil.Golden(t, "spd/demo-"+lang+".txt", []byte(out))
+	}
+}
