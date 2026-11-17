@@ -1,0 +1,297 @@
+# decode-dimms version 4.4
+
+Memory Serial Presence Detect Decoder
+By Philip Edelbrock, Christian Zuckschwerdt, Burkart Lingner,
+Jean Delvare, Trent Piepho and others
+
+
+Decoding EEPROM: ddr4-rdimm-64g-2rx4.hexC
+
+---=== SPD EEPROM Information ===---
+EEPROM CRC of bytes 0-125                        OK (0xA3FD)
+# of bytes written to SDRAM EEPROM               384
+Total number of bytes in EEPROM                  512
+Fundamental Memory type                          DDR4 SDRAM
+SPD Revision                                     1.2
+Module Type                                      RDIMM
+EEPROM CRC of bytes 128-253                      OK (0xF543)
+
+---=== Memory Characteristics ===---
+Maximum module speed                             3200 MT/s (PC4-25600)
+Size                                             65536 MB
+Banks x Rows x Columns x Bits                    16 x 18 x 10 x 64
+SDRAM Device Width                               4 bits
+Ranks                                            2
+Rank Mix                                         Symmetrical
+Primary Bus Width                                64 bits
+Bus Width Extension                              8 bits
+AA-RCD-RP-RAS (cycles)                           22-22-22-52
+Supported CAS Latencies                          24T, 22T, 21T, 20T, 19T, 18T, 17T, 16T, 15T, 14T, 13T, 12T, 11T, 10T
+
+---=== Timings at Standard Speeds ===---
+AA-RCD-RP-RAS (cycles) as DDR4-3200              22-22-22-52
+AA-RCD-RP-RAS (cycles) as DDR4-2933              21-21-21-47
+AA-RCD-RP-RAS (cycles) as DDR4-2666              19-19-19-43
+AA-RCD-RP-RAS (cycles) as DDR4-2400              17-17-17-39
+AA-RCD-RP-RAS (cycles) as DDR4-2133              15-15-15-35
+AA-RCD-RP-RAS (cycles) as DDR4-1866              13-13-13-30
+AA-RCD-RP-RAS (cycles) as DDR4-1600              11-11-11-26
+
+---=== Timing Parameters ===---
+Minimum Cycle Time (tCKmin)                      0.625 ns
+Maximum Cycle Time (tCKmax)                      1.600 ns
+Minimum CAS Latency Time (tAA)                   13.750 ns
+Minimum RAS to CAS Delay (tRCD)                  13.750 ns
+Minimum Row Precharge Delay (tRP)                13.750 ns
+Minimum Active to Precharge Delay (tRAS)         32.000 ns
+Minimum Active to Auto-Refresh Delay (tRC)       45.750 ns
+Minimum Recovery Delay (tRFC1)                   350.000 ns
+Minimum Recovery Delay (tRFC2)                   260.000 ns
+Minimum Recovery Delay (tRFC4)                   160.000 ns
+Minimum Four Activate Window Delay (tFAW)        10.000 ns
+Minimum Row Active to Row Active Delay (tRRD_S)  2.500 ns
+Minimum Row Active to Row Active Delay (tRRD_L)  4.900 ns
+Minimum CAS to CAS Delay (tCCD_L)                5.000 ns
+Minimum Write Recovery Time (tWR)                15.000 ns
+Minimum Write to Read Time (tWTR_S)              2.500 ns
+Minimum Write to Read Time (tWTR_L)              7.500 ns
+
+---=== Other Information ===---
+Package Type                                     Monolithic
+Maximum Activate Count (MAC)                     Unlimited
+Post Package Repair                              One row per bank group
+Soft PPR                                         Supported
+Module Nominal Voltage                           1.2 V
+Thermal Sensor                                   TSE2004 compliant
+
+---=== Physical Characteristics ===---
+Module Height                                    32 mm
+Module Thickness                                 2 mm front, 2 mm back
+Module Reference Card                            B revision 1
+
+---=== Manufacturer Data ===---
+Module Manufacturer                              Micron Technology
+DRAM Manufacturer                                Micron Technology
+Manufacturing Location Code                      0x06
+Manufacturing Date                               2021-W43
+Assembly Serial Number                           0x4D590001
+Part Number                                      36ASF8G72PZ-3G2E1   
+Revision Code                                    0x31
+
+
+Decoding EEPROM: ddr4-lrdimm-128g-3ds.hexC
+
+---=== SPD EEPROM Information ===---
+EEPROM CRC of bytes 0-125                        OK (0x5AC7)
+# of bytes written to SDRAM EEPROM               384
+Total number of bytes in EEPROM                  512
+Fundamental Memory type                          DDR4 SDRAM
+SPD Revision                                     1.2
+Module Type                                      LRDIMM
+EEPROM CRC of bytes 128-253                      OK (0x3F2B)
+
+---=== Memory Characteristics ===---
+Maximum module speed                             2666 MT/s (PC4-21300)
+Size                                             131072 MB
+Banks x Rows x Columns x Bits                    16 x 17 x 10 x 64
+SDRAM Device Width                               4 bits
+Ranks                                            2
+Rank Mix                                         Symmetrical
+Primary Bus Width                                64 bits
+Bus Width Extension                              8 bits
+AA-RCD-RP-RAS (cycles)                           22-19-19-43
+Supported CAS Latencies                          23T, 22T, 21T, 20T, 19T, 18T, 17T, 16T, 15T, 14T, 13T, 12T, 11T
+
+---=== Timings at Standard Speeds ===---
+AA-RCD-RP-RAS (cycles) as DDR4-2666              22-19-19-43
+AA-RCD-RP-RAS (cycles) as DDR4-2400              20-18-18-39
+AA-RCD-RP-RAS (cycles) as DDR4-2133              18-16-16-35
+AA-RCD-RP-RAS (cycles) as DDR4-1866              16-14-14-30
+AA-RCD-RP-RAS (cycles) as DDR4-1600              14-12-12-26
+
+---=== Timing Parameters ===---
+Minimum Cycle Time (tCKmin)                      0.750 ns
+Maximum Cycle Time (tCKmax)                      1.600 ns
+Minimum CAS Latency Time (tAA)                   16.500 ns
+Minimum RAS to CAS Delay (tRCD)                  14.250 ns
+Minimum Row Precharge Delay (tRP)                14.250 ns
+Minimum Active to Precharge Delay (tRAS)         32.000 ns
+Minimum Active to Auto-Refresh Delay (tRC)       45.750 ns
+Minimum Recovery Delay (tRFC1)                   350.000 ns
+Minimum Recovery Delay (tRFC2)                   260.000 ns
+Minimum Recovery Delay (tRFC4)                   160.000 ns
+Minimum Four Activate Window Delay (tFAW)        12.000 ns
+Minimum Row Active to Row Active Delay (tRRD_S)  3.000 ns
+Minimum Row Active to Row Active Delay (tRRD_L)  4.900 ns
+Minimum CAS to CAS Delay (tCCD_L)                5.000 ns
+Minimum Write Recovery Time (tWR)                15.000 ns
+Minimum Write to Read Time (tWTR_S)              2.500 ns
+Minimum Write to Read Time (tWTR_L)              7.500 ns
+
+---=== Other Information ===---
+Package Type                                     3DS (4 dies)
+Maximum Activate Count (MAC)                     Unlimited
+Post Package Repair                              One row per bank group
+Soft PPR                                         Supported
+Module Nominal Voltage                           1.2 V
+Thermal Sensor                                   TSE2004 compliant
+
+---=== Physical Characteristics ===---
+Module Height                                    32 mm
+Module Thickness                                 2 mm front, 2 mm back
+Module Reference Card                            A revision 0
+
+---=== Manufacturer Data ===---
+Module Manufacturer                              Samsung
+DRAM Manufacturer                                Samsung
+Manufacturing Date                               2023-W24
+Assembly Serial Number                           0xBAADCAFE
+Part Number                                      M386AAK40B40-CWD    
+Revision Code                                    0x72
+
+
+Decoding EEPROM: ddr4-udimm-32g-2rx8.hexC
+
+---=== SPD EEPROM Information ===---
+EEPROM CRC of bytes 0-125                        OK (0x58F8)
+# of bytes written to SDRAM EEPROM               384
+Total number of bytes in EEPROM                  512
+Fundamental Memory type                          DDR4 SDRAM
+SPD Revision                                     1.1
+Module Type                                      UDIMM
+EEPROM CRC of bytes 128-253                      OK (0xC6AB)
+
+---=== Memory Characteristics ===---
+Maximum module speed                             3200 MT/s (PC4-25600)
+Size                                             32768 MB
+Banks x Rows x Columns x Bits                    16 x 17 x 10 x 64
+SDRAM Device Width                               8 bits
+Ranks                                            2
+Rank Mix                                         Symmetrical
+Primary Bus Width                                64 bits
+AA-RCD-RP-RAS (cycles)                           22-22-22-52
+Supported CAS Latencies                          24T, 23T, 22T, 21T, 20T, 19T, 18T, 17T, 16T, 15T, 14T, 13T, 12T, 11T, 10T
+
+---=== Timings at Standard Speeds ===---
+AA-RCD-RP-RAS (cycles) as DDR4-3200              22-22-22-52
+AA-RCD-RP-RAS (cycles) as DDR4-2933              21-21-21-47
+AA-RCD-RP-RAS (cycles) as DDR4-2666              19-19-19-43
+AA-RCD-RP-RAS (cycles) as DDR4-2400              17-17-17-39
+AA-RCD-RP-RAS (cycles) as DDR4-2133              15-15-15-35
+AA-RCD-RP-RAS (cycles) as DDR4-1866              13-13-13-30
+AA-RCD-RP-RAS (cycles) as DDR4-1600              11-11-11-26
+
+---=== Timing Parameters ===---
+Minimum Cycle Time (tCKmin)                      0.625 ns
+Maximum Cycle Time (tCKmax)                      1.600 ns
+Minimum CAS Latency Time (tAA)                   13.750 ns
+Minimum RAS to CAS Delay (tRCD)                  13.750 ns
+Minimum Row Precharge Delay (tRP)                13.750 ns
+Minimum Active to Precharge Delay (tRAS)         32.000 ns
+Minimum Active to Auto-Refresh Delay (tRC)       45.750 ns
+Minimum Recovery Delay (tRFC1)                   550.000 ns
+Minimum Recovery Delay (tRFC2)                   350.000 ns
+Minimum Recovery Delay (tRFC4)                   260.000 ns
+Minimum Four Activate Window Delay (tFAW)        21.000 ns
+Minimum Row Active to Row Active Delay (tRRD_S)  2.500 ns
+Minimum Row Active to Row Active Delay (tRRD_L)  4.900 ns
+Minimum CAS to CAS Delay (tCCD_L)                5.000 ns
+Minimum Write Recovery Time (tWR)                15.000 ns
+Minimum Write to Read Time (tWTR_S)              2.500 ns
+Minimum Write to Read Time (tWTR_L)              7.500 ns
+
+---=== Other Information ===---
+Package Type                                     Monolithic
+Maximum Activate Count (MAC)                     Unlimited
+Post Package Repair                              One row per bank group
+Soft PPR                                         Supported
+Module Nominal Voltage                           1.2 V
+Thermal Sensor                                   No
+
+---=== Physical Characteristics ===---
+Module Height                                    32 mm
+Module Thickness                                 2 mm front, 2 mm back
+Module Reference Card                            B revision 2
+
+---=== Manufacturer Data ===---
+Module Manufacturer                              Apacer Technology
+DRAM Manufacturer                                IBM? (Invalid parity)
+Manufacturing Date                               0xDAAD
+Assembly Serial Number                           0x99887766
+Part Number                                      AQD-D4U32N32-SBW    
+Revision Code                                    0x2B
+
+
+Decoding EEPROM: ddr4-sodimm-16g-2rx8.hexC
+
+---=== SPD EEPROM Information ===---
+EEPROM CRC of bytes 0-125                        OK (0x8F80)
+# of bytes written to SDRAM EEPROM               384
+Total number of bytes in EEPROM                  512
+Fundamental Memory type                          DDR4 SDRAM
+SPD Revision                                     1.1
+Module Type                                      SO-DIMM
+EEPROM CRC of bytes 128-253                      OK (0xDBFF)
+
+---=== Memory Characteristics ===---
+Maximum module speed                             3200 MT/s (PC4-25600)
+Size                                             16384 MB
+Banks x Rows x Columns x Bits                    16 x 16 x 10 x 64
+SDRAM Device Width                               8 bits
+Ranks                                            2
+Rank Mix                                         Symmetrical
+Primary Bus Width                                64 bits
+AA-RCD-RP-RAS (cycles)                           22-22-22-52
+Supported CAS Latencies                          24T, 23T, 22T, 21T, 20T, 19T, 18T, 17T, 16T, 15T, 14T, 13T, 12T, 11T, 10T
+
+---=== Timings at Standard Speeds ===---
+AA-RCD-RP-RAS (cycles) as DDR4-3200              22-22-22-52
+AA-RCD-RP-RAS (cycles) as DDR4-2933              21-21-21-47
+AA-RCD-RP-RAS (cycles) as DDR4-2666              19-19-19-43
+AA-RCD-RP-RAS (cycles) as DDR4-2400              17-17-17-39
+AA-RCD-RP-RAS (cycles) as DDR4-2133              15-15-15-35
+AA-RCD-RP-RAS (cycles) as DDR4-1866              13-13-13-30
+AA-RCD-RP-RAS (cycles) as DDR4-1600              11-11-11-26
+
+---=== Timing Parameters ===---
+Minimum Cycle Time (tCKmin)                      0.625 ns
+Maximum Cycle Time (tCKmax)                      1.600 ns
+Minimum CAS Latency Time (tAA)                   13.750 ns
+Minimum RAS to CAS Delay (tRCD)                  13.750 ns
+Minimum Row Precharge Delay (tRP)                13.750 ns
+Minimum Active to Precharge Delay (tRAS)         32.000 ns
+Minimum Active to Auto-Refresh Delay (tRC)       45.750 ns
+Minimum Recovery Delay (tRFC1)                   350.000 ns
+Minimum Recovery Delay (tRFC2)                   260.000 ns
+Minimum Recovery Delay (tRFC4)                   160.000 ns
+Minimum Four Activate Window Delay (tFAW)        21.000 ns
+Minimum Row Active to Row Active Delay (tRRD_S)  2.500 ns
+Minimum Row Active to Row Active Delay (tRRD_L)  4.900 ns
+Minimum CAS to CAS Delay (tCCD_L)                5.000 ns
+Minimum Write Recovery Time (tWR)                15.000 ns
+Minimum Write to Read Time (tWTR_S)              2.500 ns
+Minimum Write to Read Time (tWTR_L)              7.500 ns
+
+---=== Other Information ===---
+Package Type                                     Monolithic
+Maximum Activate Count (MAC)                     Unlimited
+Post Package Repair                              One row per bank group
+Soft PPR                                         Supported
+Module Nominal Voltage                           1.2 V
+Thermal Sensor                                   No
+
+---=== Physical Characteristics ===---
+Module Height                                    30 mm
+Module Thickness                                 2 mm front, 2 mm back
+Module Reference Card                            E revision 0
+
+---=== Manufacturer Data ===---
+Module Manufacturer                              Advantech Co Ltd
+DRAM Manufacturer                                Advantech Co Ltd? (Invalid parity)
+Manufacturing Date                               2041-W29
+Assembly Serial Number                           0xE1BEE218
+Part Number                                      AQD-SD4U16GN32-SE1  
+Revision Code                                    0x45
+
+
+Number of SDRAM DIMMs detected and decoded: 4
