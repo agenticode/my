@@ -59,6 +59,11 @@ const (
 	// name table and runs the pass that decides socket, channel and
 	// position of every slot; the fixes after it are its stages.
 	FixNameForms
+	// FixBoardFamilies places the slots of a board family from its table,
+	// leaves out the records its manual has no slot for, names the empty
+	// slots without a name by the labels of the manual, and gives a board
+	// known by a part number the rule of its family.
+	FixBoardFamilies
 	// FixLetterMeaning decides what the letter of A1 and the digit of 1A
 	// are on a board.
 	FixLetterMeaning
@@ -99,8 +104,8 @@ var fixNames = map[Fix]string{
 	FixLineEnds: "line-ends", FixEmptyField: "empty-field", FixNumastatBlocks: "numastat-blocks",
 	FixSupermicroNode: "supermicro-node", FixSlabBySize: "slab-by-size", FixDellDimm: "dell-dimm",
 	FixChanWord: "chan-word", FixLettersFromA: "letters-from-a", FixRepeatedTable: "repeated-table",
-	FixNameForms: "name-forms", FixLetterMeaning: "letter-meaning", FixSocketRules: "socket-rules",
-	FixChannelRank: "channel-rank",
+	FixNameForms: "name-forms", FixBoardFamilies: "board-families", FixLetterMeaning: "letter-meaning",
+	FixSocketRules: "socket-rules", FixChannelRank: "channel-rank",
 }
 
 // Name is the name of a fix, as the tests list it.
