@@ -646,7 +646,8 @@ func whyCards(ctx context.Context, c *view.Case, h *engine.HostResult, d *engine
 		if err != nil {
 			return nil, err
 		}
-		return append(cards, card), nil
+		cards = append(cards, card)
+		return cards, c.WhyPopulation(ctx, h, cards)
 	}
 	for _, x := range h.DIMMs {
 		if !all && !view.Listed(x) {
@@ -673,7 +674,7 @@ func whyCards(ctx context.Context, c *view.Case, h *engine.HostResult, d *engine
 			cards = append(cards, hc)
 		}
 	}
-	return cards, nil
+	return cards, c.WhyPopulation(ctx, h, cards)
 }
 
 // envelope is the JSON form of a command's output.

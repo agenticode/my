@@ -59,6 +59,7 @@ func Board(w io.Writer, b *view.Board, st Style) error {
 	}
 	if len(b.Rows) > 0 {
 		st.boardLegend(p, shown, marks)
+		st.populationLines(p, b)
 	}
 	if b.Aside != nil && len(b.Aside.Rows) > 0 {
 		p.blank()
@@ -209,18 +210,34 @@ func (st Style) cpuBox(cpu *view.BoardCPU) string {
 	return "══╡" + name + "╞══"
 }
 
-func (st Style) labelWidth(prefix string, errors bool) int {
+func (st Style) labelWidth(prefix string, errors, marks bool) int {
 	w := max(Width(st.say("board.ch")), Width(prefix))
 	if errors {
 		w = max(w, Width(st.say("board.err")))
 	}
+	if marks {
+		w = max(w, Width(st.say("board.markrow")))
+	}
 	return 1 + w + 2
+}
+
+// segMarked tells a strip whose sticks carry marks of the population
+// check.
+func segMarked(seg []stripPart) bool {
+	for _, sp := range seg {
+		for _, s := range sp.sticks {
+			if s.Mark != "" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // stripWidth is the width of a strip with the given gaps.
 func (st Style) stripWidth(seg []stripPart, gapIn, gapCh int) int {
 	prefix, cell := stripLabels(seg)
-	w := st.labelWidth(prefix, true)
+	w := st.labelWidth(prefix, true, segMarked(seg))
 	for i, sp := range seg {
 		if i > 0 {
 			w += gapCh
@@ -242,11 +259,13 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 		gapIn, gapCh = minGap(seg), 1
 	}
 	prefix, cell := stripLabels(seg)
-	lw := st.labelWidth(prefix, errors)
-	var ch, mid, names, errs, chnames strings.Builder
+	marked := segMarked(seg)
+	lw := st.labelWidth(prefix, errors, marked)
+	var ch, mid, marks, names, errs, chnames strings.Builder
 	pad := func(b *strings.Builder, s string, w int) { b.WriteString(padRight(s, w)) }
 	pad(&ch, " "+st.say("board.ch"), lw)
 	pad(&mid, "", lw)
+	pad(&marks, " "+st.say("board.markrow"), lw)
 	pad(&names, " "+prefix, lw)
 	pad(&errs, " "+st.say("board.err"), lw)
 	pad(&chnames, " "+st.say("board.chname"), lw)
@@ -257,7 +276,7 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 	}
 	for i, sp := range seg {
 		if i > 0 {
-			for _, b := range []*strings.Builder{&ch, &mid, &names, &errs, &chnames} {
+			for _, b := range []*strings.Builder{&ch, &mid, &marks, &names, &errs, &chnames} {
 				b.WriteString(strings.Repeat(" ", gapCh))
 			}
 		}
@@ -266,6 +285,7 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 			bw := Width(box)
 			ch.WriteString(strings.Repeat(" ", bw))
 			mid.WriteString(st.bold(box))
+			marks.WriteString(strings.Repeat(" ", bw))
 			names.WriteString(strings.Repeat(" ", bw))
 			errs.WriteString(strings.Repeat(" ", bw))
 			chnames.WriteString(strings.Repeat(" ", bw))
@@ -290,12 +310,14 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 		centre(&chnames, truncate(name, span, ""), span)
 		for j, s := range sp.sticks {
 			if j > 0 {
-				for _, b := range []*strings.Builder{&mid, &names, &errs} {
+				for _, b := range []*strings.Builder{&mid, &marks, &names, &errs} {
 					b.WriteString(strings.Repeat(" ", gapIn))
 				}
 			}
 			glyph := st.paint(gradeColor(s.State), st.gradeGlyph(s.State))
 			mid.WriteString(glyph + strings.Repeat(" ", cell-2))
+			// The mark of the population check stands under the cell.
+			pad(&marks, s.Mark, cell)
 			name := strings.TrimPrefix(stickName(s), prefix)
 			if s.State != view.SlotEmpty && s.State != view.SlotUnknown && s.State != string(model.VerdictOK) {
 				name = st.paint(gradeColor(s.State), st.bold(name))
@@ -315,7 +337,11 @@ func (st Style) strip(seg []stripPart, errors bool) []string {
 	if anyChannel {
 		out = append(out, ch.String())
 	}
-	out = append(out, mid.String(), names.String())
+	out = append(out, mid.String())
+	if marked {
+		out = append(out, marks.String())
+	}
+	out = append(out, names.String())
 	if anyName {
 		out = append(out, strings.TrimRight(chnames.String(), " "))
 	}
@@ -348,6 +374,72 @@ func (st Style) boardLegend(p *page, shown map[string]bool, marks bool) {
 	}
 	for _, l := range flow(legend, "   ", st.width()-1) {
 		p.add(" " + l)
+	}
+}
+
+// populationLines are the legend line of the marks and one line per
+// population finding; with --detail each finding names its document and
+// page, and the lines that are no finding and the rules not checked
+// follow.
+func (st Style) populationLines(p *page, b *view.Board) {
+	pop := b.Population
+	if pop == nil {
+		return
+	}
+	marked := false
+	for _, r := range b.Rows {
+		for _, part := range r.Parts {
+			for _, ch := range part.Channels {
+				for _, s := range ch.Sticks {
+					marked = marked || s.Mark != ""
+				}
+			}
+		}
+	}
+	if marked {
+		legend := []string{"+ " + st.say("pop.legend.plus"), "- " + st.say("pop.legend.minus")}
+		for _, l := range flow(legend, "   ", st.width()-1) {
+			p.add(" " + l)
+		}
+	}
+	notes := st.Detail && (len(pop.Notes) > 0 || len(pop.Unchecked) > 0)
+	if len(pop.Findings) == 0 && !notes {
+		return
+	}
+	p.blank()
+	if st.Detail {
+		p.add(" " + st.bold(st.say("pop.title")))
+	}
+	lw := 0
+	for _, f := range pop.Findings {
+		lw = max(lw, Width(f.Rule))
+	}
+	for _, f := range pop.Findings {
+		p.labelled(f.Rule, lw, f.Text.Text, "")
+		if st.Detail {
+			p.labelled("", lw, f.StrengthText.Text+", "+f.Source.Cite, cDim)
+		}
+	}
+	if !st.Detail {
+		return
+	}
+	for _, n := range pop.Notes {
+		for i, l := range wrap(n.Text.Text, st.width()-3) {
+			if i == 0 {
+				p.add(" - " + l)
+			} else {
+				p.add("   " + l)
+			}
+		}
+	}
+	for _, u := range pop.Unchecked {
+		for i, l := range wrap(u.Text.Text, st.width()-3) {
+			if i == 0 {
+				p.add(" - " + st.dim(l))
+			} else {
+				p.add("   " + st.dim(l))
+			}
+		}
 	}
 }
 
@@ -426,9 +518,14 @@ func (st Style) boardDetail(p *page, b *view.Board) {
 	for _, line := range table(rows, st.width()) {
 		p.add(line)
 	}
-	if len(b.Lines) > 0 {
+	lines := b.Lines
+	if pop := b.Population; pop != nil && pop.Text != nil {
+		// Why the board got no population check, once.
+		lines = append(append([]view.Text{}, lines...), *pop.Text)
+	}
+	if len(lines) > 0 {
 		p.blank()
-		for _, t := range b.Lines {
+		for _, t := range lines {
 			for i, l := range wrap(t.Text, st.width()-3) {
 				if i == 0 {
 					p.add(" - " + l)

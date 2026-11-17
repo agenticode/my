@@ -1,11 +1,14 @@
 package view
 
 import (
+	"context"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/agenticode/my/internal/adapter"
+	"github.com/agenticode/my/internal/engine"
 	"github.com/agenticode/my/internal/explorer"
 	"github.com/agenticode/my/internal/i18n"
 	"github.com/agenticode/my/internal/memras"
@@ -195,7 +198,11 @@ func populationView(lang i18n.Lang, r population.Result, bh boardHost) *Populati
 		case population.Holds:
 			pn.Text = boardSay(lang, "pop.holds", "n", n.Modules, "source", src)
 		case population.NotCompared:
-			pn.Text = boardSay(lang, "pop.not_compared", "cpu", n.Socket, "n", n.Modules, "counts", countsText(lang, n.Counts))
+			code := "pop.not_compared"
+			if len(n.Counts) == 1 && n.Counts[0] == 1 {
+				code = "pop.not_compared_one"
+			}
+			pn.Text = boardSay(lang, code, "cpu", n.Socket, "n", n.Modules, "counts", countsText(lang, n.Counts))
 		case population.OtherMode:
 			pn.Text = boardSay(lang, "pop.other_mode", "cpu", n.Socket, "n", n.Modules, "mode", memras.StateText(lang, n.Mode), "source", src)
 		case population.SecondSet:
@@ -351,4 +358,31 @@ func countsText(lang i18n.Lang, counts []int) string {
 		parts[i] = strconv.Itoa(n)
 	}
 	return listText(lang, parts)
+}
+
+// WhyPopulation gives each card of a DIMM the line of the first population
+// finding of the board that names its slot, for my why. The line changes
+// no check, no confidence and no grade.
+func (c *Case) WhyPopulation(ctx context.Context, h *engine.HostResult, cards []*Card) error {
+	b, err := c.Board(ctx, h)
+	if err != nil {
+		return err
+	}
+	p := b.Population
+	if p == nil {
+		return nil
+	}
+	for _, cd := range cards {
+		if cd.Scope == ScopeHost {
+			continue
+		}
+		for _, f := range p.Findings {
+			if slices.Contains(f.Slots, cd.Slot) {
+				t := boardSay(c.Lang, "pop.why", "rule", f.Rule, "text", f.Text.Text)
+				cd.Population = &t
+				break
+			}
+		}
+	}
+	return nil
 }

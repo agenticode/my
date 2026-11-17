@@ -6,6 +6,10 @@ host board-host  Dell Inc. PowerEdge 2950  8 of 8 slots, 16 GB  DDR2 FB-DIMM 667
 
  ░░ ok
 
+ Population
+ - The 8 modules stand in the slots the table fills for this number. Dell PowerEdge 2950 Systems
+   Hardware Owner's Manual, January 2006, no revision printed, p. 89
+
  chipset  8 DIMMs, 16 GB
 
  slot   place         size  part number   serial    CE  UE  finding

@@ -21,3 +21,4 @@ host board-host  Example Systems E3  4 of 8 slots, 128 GB  DDR4 3200 MT/s
 
  - 0 slots on the board, 0 drawn without channels, 8 set aside
  - 8 slots whose names give no socket on a board of several, such as DIMM 1 / Bank 1
+ - The population was not checked: 8 slots are not placed on the board.

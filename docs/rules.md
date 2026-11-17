@@ -499,7 +499,7 @@ A rule set (`internal/population/sets.tsv`) holds for one board family of [compa
 | `asrock-am5-b650d4u-4slot` | last position | - | - | - | P-FIRST-01 recommended | `asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t` 16,32 |
 | `asrock-am4-x570-4slot` | last position | - | - | - | P-FIRST-01 recommended | `asrock-x570d4i-2t-x570d4i-manual` 22,29 |
 | `asrock-intel-ddr5-controller-4slot` | last position | - | - | - | P-FIRST-01 recommended | `asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u` 41, `asrock-ec262d4-4l-ec266d4-manual` 27 |
-| `asrock-sp2c621d32lm3-32slot` | position 0 | 1 modules | recommended | - | P-FIRST-01 required | `asrock-sp2c621d32lm3-user-manual` 29-32, `asrock-sp2c621d32lm3-user-manual` 29-31 |
+| `asrock-sp2c621d32lm3-32slot` | position 0 | 1, 2, 4, 6, 8, 12, 16 modules | recommended | - | P-FIRST-01 required | `asrock-sp2c621d32lm3-user-manual` 29-32, `asrock-sp2c621d32lm3-user-manual` 29-31 |
 | `asrock-altrad8ud-8slot` | position 0 | 1, 2, 4, 8 modules | recommended | - | - | `asrock-altrad8ud-1l2t-user-manual` 30 |
 | `msi-am5-d3051-d3052` | last position | - | - | - | P-FIRST-01 required | `msi-d3052-s3661-user-guide` 18 |
 | `tyan-s7012` | position 0 | - | - | - | P-FIRST-01 recommended | `tyan-s7012-user-manual` 26 |

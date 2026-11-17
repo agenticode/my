@@ -1,0 +1,8 @@
+host board-host  Example Systems E3  4 of 8 slots, 128 GB  DDR4 3200 MT/s
+
+ 8 slots set aside, by name: 8 slots whose names give no socket on a board of several, such as DIMM 1 / Bank 1
+
+        1    2    3    4    5    6    7    8
+ DIMM   ::   ..   ::   ..   ::   ..   ::   ..
+
+ :: ok   .. empty slot    8 slots, 4 DIMMs

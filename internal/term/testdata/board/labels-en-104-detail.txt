@@ -37,3 +37,4 @@ host board-host  Supermicro SSG-6028R-OSD072P  4 of 16 slots, 64 GB  DDR4 2133 M
 
  - 16 slots on the board, 0 drawn without channels, 0 set aside
  - 12 empty slots the firmware gives no name, drawn with the labels of the board's manual
+ - The population was not checked: 12 slots are not placed on the board.
