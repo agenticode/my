@@ -529,8 +529,8 @@ func TestMakers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(rows) < 50 {
-		t.Fatalf("%d rows", len(rows))
+	if len(rows) != 60 {
+		t.Fatalf("%d rows, want 60", len(rows))
 	}
 	form := regexp.MustCompile(`^bank \d+, 0x[0-9A-F]{2}$`)
 	for _, m := range rows {
@@ -563,6 +563,30 @@ func TestMakers(t *testing.T) {
 	d := Decode(dump(t, "ddr4-rdimm-64g-2rx4"))
 	if d.ModuleMakerName != "Micron Technology" || d.DRAMMakerName != "Micron Technology" {
 		t.Errorf("names of a decode: %q %q", d.ModuleMakerName, d.DRAMMakerName)
+	}
+	// Bank 1, 0xAD is checked through the table: its name is written in
+	// makers.tsv and nowhere else, so the test reads it from there.
+	name := ""
+	for _, line := range strings.Split(makersTSV, "\n") {
+		if f := strings.Split(line, "\t"); len(f) == 4 && f[0] == "1" && f[1] == "0xAD" {
+			name = f[2]
+		}
+	}
+	if name == "" || MakerName("bank 1, 0xAD") != name {
+		t.Errorf("bank 1, 0xAD: %q, row %q", MakerName("bank 1, 0xAD"), name)
+	}
+	if got := MakerLabel("bank 1, 0xAD"); got != name+" (JEDEC bank 1, 0xAD)" {
+		t.Errorf("label of bank 1, 0xAD: %q", got)
+	}
+	// The UDIMM copies with the DRAM maker code of their source, bytes
+	// 552-553 = 80 AD, which lie outside the CRC.
+	for _, f := range []string{"ddr5-udimm-16g-1rx8-a", "ddr5-udimm-16g-1rx8-b"} {
+		b := dump(t, f)
+		b[552], b[553] = 0x80, 0xAD
+		d := Decode(b)
+		if d.State != StateOK || d.DRAMMaker != "bank 1, 0xAD" || d.DRAMMakerName != name {
+			t.Errorf("%s with its DRAM maker code: %s %q %q", f, d.State, d.DRAMMaker, d.DRAMMakerName)
+		}
 	}
 	for _, bad := range []string{
 		"bank\tcode\tname\tsource\n1\t0xCE\tA\tdd il\n1\t0xCE\tB\tdd il\n", // twice

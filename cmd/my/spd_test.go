@@ -27,6 +27,32 @@ func spdScreen(t *testing.T, root string, args ...string) (int, string) {
 	return code, strings.ReplaceAll(out, root, "ROOT")
 }
 
+// screensHere runs my once per argument list on the files of a made host,
+// moved to a directory named ROOT, from the parent of that directory. A
+// screen then prints the path as ROOT/... and wraps it at the same place
+// on every system: a temporary directory on macOS has a longer path than
+// one on Linux. The runs are a subtest of the given name, so the working
+// directory is back when it returns (golden files are found from it).
+func screensHere(t *testing.T, name, root string, runs [][]string) (codes []int, outs []string) {
+	t.Helper()
+	t.Run(name, func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.Rename(root, filepath.Join(dir, "ROOT")); err != nil {
+			t.Fatal(err)
+		}
+		t.Chdir(dir)
+		for _, args := range runs {
+			code, out := spdScreen(t, "ROOT", args...)
+			codes = append(codes, code)
+			outs = append(outs, out)
+		}
+	})
+	if len(outs) != len(runs) {
+		t.FailNow()
+	}
+	return codes, outs
+}
+
 func checkWidth(t *testing.T, name, out string, width int) {
 	t.Helper()
 	for _, l := range strings.Split(out, "\n") {
@@ -95,25 +121,41 @@ func TestSPDScreens(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
+		// A screen: its golden file, the width it must keep (0: not
+		// checked), whether its exit code is checked, and the arguments.
+		type screen struct {
+			golden string
+			width  int
+			code   bool
+			args   []string
+		}
+		var screens []screen
 		for _, lang := range []string{"en", "ko"} {
 			for _, w := range []int{80, 104, 160} {
-				name := fmt.Sprintf("spd/%s-%s-%d.txt", c.name, lang, w)
-				code, out := spdScreen(t, root, "spd", "--lang", lang, "--width", fmt.Sprint(w))
-				if code != 3 {
-					t.Errorf("%s: exit %d, want 3 (the grade of the host)", name, code)
-				}
-				checkWidth(t, name, out, w)
-				testutil.Golden(t, name, []byte(out))
+				screens = append(screens, screen{fmt.Sprintf("spd/%s-%s-%d.txt", c.name, lang, w), w, true,
+					[]string{"spd", "--lang", lang, "--width", fmt.Sprint(w)}})
 			}
 		}
 		if c.name == "tied" {
-			_, out := spdScreen(t, root, "spd", "--lang", "en", "--width", "80", "--ascii")
-			testutil.Golden(t, "spd/tied-en-80-ascii.txt", []byte(out))
+			screens = append(screens, screen{"spd/tied-en-80-ascii.txt", 0, false, []string{"spd", "--lang", "en", "--width", "80", "--ascii"}})
 			for _, lang := range []string{"en", "ko"} {
-				_, out := spdScreen(t, root, "spd", "--lang", lang, "--width", "104", "--detail")
-				checkWidth(t, "detail", out, 104)
-				testutil.Golden(t, "spd/tied-"+lang+"-104-detail.txt", []byte(out))
+				screens = append(screens, screen{"spd/tied-" + lang + "-104-detail.txt", 104, false,
+					[]string{"spd", "--lang", lang, "--width", "104", "--detail"}})
 			}
+		}
+		runs := make([][]string, len(screens))
+		for i, s := range screens {
+			runs[i] = s.args
+		}
+		codes, outs := screensHere(t, c.name, root, runs)
+		for i, s := range screens {
+			if s.code && codes[i] != 3 {
+				t.Errorf("%s: exit %d, want 3 (the grade of the host)", s.golden, codes[i])
+			}
+			if s.width > 0 {
+				checkWidth(t, s.golden, outs[i], s.width)
+			}
+			testutil.Golden(t, s.golden, []byte(outs[i]))
 		}
 	}
 }

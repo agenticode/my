@@ -9,6 +9,7 @@
 bank	code	name	source
 1	0xCE	Samsung	dd il
 1	0x2C	Micron Technology	dd il
+1	0xAD	SK Hynix	dd il
 4	0x0B	Nanya Technology	dd il
 1	0xDA	Winbond Electronics	dd il
 11	0x91	CXMT	dd il
