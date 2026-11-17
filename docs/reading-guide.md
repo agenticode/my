@@ -103,6 +103,38 @@ The board places a slot from its two SMBIOS names, the locator and the bank loca
 
 In a report the board is the figure of section 2, the slot map. A slot shows its card when the pointer is on it or it has the focus: the slot, the DIMM, its errors and its finding; a slot with a finding leads to it.
 
+### Population
+
+```
+$ my board --root testdata/explorer/population-demo
+host localhost  HP ProLiant DL360 Gen9  2 of 24 slots, 32 GB  DDR4 RDIMM 2400 MT/s
+
+ ch                3         2         1         0
+               ·· ·· ··  ·· ·· ░░  ·· ·· ··  ·· ·· ··  ══╡CPU 0╞══
+ table                         -                   +
+ PROC 1 DIMM   6  5  4   3  2  1   7  8  9   10 11 12
+ name              4         3         2         1
+
+ ch                             0         1         2         3
+               ══╡CPU 1╞══  ·· ·· ··  ·· ·· ··  ░░ ·· ··  ·· ·· ··
+ table                      +                   -
+ PROC 2 DIMM                12 11 10  9  8  7   1  2  3   4  5  6
+ name                           1         2         3         4
+
+ ░░ ok   ·· empty slot
+ + an empty slot the vendor's table fills for this number of modules
+ - a module in a slot the table leaves empty
+
+ P-ORDER-01  CPU 0: 1 module stands in PROC 1 DIMM 1. For 1 module the table fills PROC 1 DIMM 12.
+ P-ORDER-01  CPU 1: 1 module stands in PROC 2 DIMM 1. For 1 module the table fills PROC 2 DIMM 12.
+```
+
+Where a public document of the board's maker gives a population for the board family, the board holds the installed modules against it ([rules.md](rules.md#population-rules)). The `table` line under the cells marks with `+` an empty slot the vendor's table fills for this number of modules, and with `-` a module in a slot the table leaves empty; a legend line names both. One line per population finding follows the legend: its rule id and what stands where against what the table or the document has. The demo case above is a public dump of an HP ProLiant DL360 Gen9 with one module per processor in DIMM 1, where the table of the server's user guide fills DIMM 12 first. A population finding has no grade and changes no finding and no exit code. A board whose modules stand as the table has them shows no mark and no line, and so does a board without a rule set. `--detail` adds under a title the document and page of each finding and its strength (required or recommended by the vendor), the lines that are no finding (the modules stand as the table has them, the table lists no population for this number, they stand as the table of another memory mode has them), the rules that were not checked because the inventory lacks a module type, rank count, size, rated speed or part number, and, among the lines of data quality, why a board got no population check.
+
+In the report the marks stand in a band between the sticks and their names, and a block "Population" under the board gives one line per finding with its strength and its document and page, or the line that the modules stand as the document has them. `--audience fa` adds per finding the modules it names, the vendor's table for every number of modules of each processor and the rules that were not checked.
+
+`my why` names a population finding of the slot of the DIMM in one line after the checks, `Population: P-ORDER-01, CPU 0: 2 modules stand in P1-DIMMA1, P1-DIMMC1. For 2 modules the table fills P1-DIMMA1, P1-DIMMB1.`; it changes no check and no confidence.
+
 ## Finding
 
 ```

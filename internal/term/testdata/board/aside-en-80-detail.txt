@@ -1,0 +1,25 @@
+host board-host  Example Systems E3  4 of 8 slots, 128 GB  DDR4 3200 MT/s
+
+ 8 slots set aside, by name: 8 slots whose names give no socket on a board of
+ several, such as DIMM 1 / Bank 1
+
+        1    2    3    4    5    6    7    8
+ DIMM   ░░   ··   ░░   ··   ░░   ··   ░░   ··
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok
+ ?? hold replacement   ·· empty slot    8 slots, 4 DIMMs
+
+ slot    place  size   part number   serial    CE  UE  finding
+ DIMM 1  aside  32 GB  EXM32G32R2X4  EX000000  0   0   ok
+ DIMM 2  aside                                 0   0   empty slot
+ DIMM 3  aside  32 GB  EXM32G32R2X4  EX000002  0   0   ok
+ DIMM 4  aside                                 0   0   empty slot
+ DIMM 5  aside  32 GB  EXM32G32R2X4  EX000004  0   0   ok
+ DIMM 6  aside                                 0   0   empty slot
+ DIMM 7  aside  32 GB  EXM32G32R2X4  EX000006  0   0   ok
+ DIMM 8  aside                                 0   0   empty slot
+
+ - 0 slots on the board, 0 drawn without channels, 8 set aside
+ - 8 slots whose names give no socket on a board of several, such as DIMM 1 /
+   Bank 1
+ - The population was not checked: 8 slots are not placed on the board.

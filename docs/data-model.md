@@ -324,6 +324,8 @@ The board carries the check of its modules against the population the public doc
 | `source` | the page a line stands on: `id` of `internal/explorer/sources.tsv`, `title`, `number`, `date`, `url`, `pages`, and `cite`, the title, number and page in one line |
 | `text` | the line of `no_rule` |
 
+The cards of `why` carry `population`, the line of the first population finding that names the slot of the DIMM, as a statement (`pop.why`); it changes no check and no confidence.
+
 ### Firmware records in the views
 
 The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]`, and every row of `inventory` carries `firmware[]` and `firmware_marks`. A record of `firmware[]` holds:

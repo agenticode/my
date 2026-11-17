@@ -7,6 +7,11 @@ host board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  8 of 24 slots, 512 GB 
 
  ░░ ok   ·· empty slot
 
+ Population
+ - The 8 modules stand in the slots the table fills for this number. ThinkSystem SR650 (7X05, 7X06)
+   online documentation, topics "Memory configuration", "DRAM DIMM installation rules", "Independent
+   mode", no document number; fetched
+
  CPU 0  4 DIMMs, 256 GB
  CPU 1  4 DIMMs, 256 GB
 

@@ -20,3 +20,4 @@ host host-71f73b2e  QEMU lab-arm6  6 of 6 slots, 96 GB  DDR4 RDIMM 3200 MT/s  CE
 
  - 6 slots on the board, 0 drawn without channels, 0 set aside
  - the channel count of the processor is not known: the channels of the board could not be checked against it
+ - The population was not checked: the board is not drawn in full.

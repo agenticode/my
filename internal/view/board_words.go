@@ -157,4 +157,8 @@ var BoardMessages = i18n.Catalog{
 	"pop.table_of":        {EN: "The vendor's table, CPU {cpu}", KO: "제조사 장착표, CPU {cpu}"},
 	"pop.unchecked_title": {EN: "Rules not checked", KO: "확인하지 않은 규칙"},
 	"pop.ranks":           {EN: "{n} {n|rank|ranks}", KO: "{n}랭크"},
+	"pop.why":             {EN: "Population: {rule}, {text}", KO: "장착 구성: {rule}, {text}"},
+	"board.markrow":       {EN: "table", KO: "장착표"},
+	"pop.not_compared_one": {EN: "CPU {cpu} holds {n} {n|module|modules}. The table lists the population of 1 module only, so {n|it was|these were} not compared.",
+		KO: "CPU {cpu}에 모듈이 {n}개 있습니다. 장착표에는 모듈 1개 구성만 있어 비교하지 않았습니다."},
 }

@@ -133,6 +133,8 @@ func TestBoardScreens(t *testing.T) {
 		"aside":      importBoard(t, asideBoard(t)),
 		"chipset":    importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-poweredge-2950-121ae0", "dmidecode.txt")),
 		"labels":     importBoard(t, testutil.Testdata(t, "explorer", "netbox-sm-ssg-6028r", "dmidecode.txt")),
+		// The demo case of the population check: marks and two findings.
+		"population": importBoard(t, testutil.Testdata(t, "explorer", "population-demo", "dmidecode.txt")),
 	}
 	for name, s := range cases {
 		for _, lang := range []i18n.Lang{i18n.EN, i18n.KO} {
@@ -155,8 +157,11 @@ func TestBoardScreens(t *testing.T) {
 					case style.Detail:
 						tag = "-detail"
 					}
-					// Every width of the capture; one width of the others.
-					if name != "capture" && w != 104 {
+					// Every width of the capture, of the demo case of the
+					// population check, of a board whose modules stand as
+					// its table has them (family) and of one without a
+					// rule set (aside); one width of the others.
+					if name != "capture" && name != "population" && name != "family" && name != "aside" && w != 104 {
 						continue
 					}
 					testutil.Golden(t, fmt.Sprintf("board/%s-%s-%d%s.txt", name, lang, w, tag), out.Bytes())

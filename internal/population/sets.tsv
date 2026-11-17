@@ -261,7 +261,7 @@ gigabyte-mu72-su0-xeon-w3300-8slot	gigabyte	.	family=gigabyte-mu72-su0-xeon-w330
 asrock-am5-b650d4u-4slot	asrock	.	family=asrock-am5-b650d4u-4slot	last	-	-	-	P-FIRST-01=rec asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t:16,32	-
 asrock-am4-x570-4slot	asrock	.	family=asrock-am4-x570-4slot	last	-	-	-	P-FIRST-01=rec asrock-x570d4i-2t-x570d4i-manual:22,29	-
 asrock-intel-ddr5-controller-4slot	asrock	.	family=asrock-intel-ddr5-controller-4slot	last	-	-	-	P-FIRST-01=rec asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u:41 asrock-ec262d4-4l-ec266d4-manual:27	-
-asrock-sp2c621d32lm3-32slot	asrock	.	family=asrock-sp2c621d32lm3-32slot	0	sets: 1: 1.1	rec	-	P-FIRST-01=req asrock-sp2c621d32lm3-user-manual:29-31	asrock-sp2c621d32lm3-user-manual:29-32
+asrock-sp2c621d32lm3-32slot	asrock	.	family=asrock-sp2c621d32lm3-32slot	0	sets: 1: 1.0; 2: 0.0 4.0; 4: 0.0 2.0 4.0 6.0; 6: 0.0 1.0 2.0 4.0 5.0 6.0; 8: 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0; 12: 0.0 0.1 1.0 1.1 2.0 2.1 4.0 4.1 5.0 5.1 6.0 6.1; 16: 0.0 0.1 1.0 1.1 2.0 2.1 3.0 3.1 4.0 4.1 5.0 5.1 6.0 6.1 7.0 7.1	rec	-	P-FIRST-01=req asrock-sp2c621d32lm3-user-manual:29-31	asrock-sp2c621d32lm3-user-manual:29-32
 asrock-altrad8ud-8slot	asrock	.	family=asrock-altrad8ud-8slot	0	sets: 1: 0.0; 2: 0.0 4.0; 4: 0.0 1.0 4.0 5.0; 8: 0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0	rec	-	-	asrock-altrad8ud-1l2t-user-manual:30
 msi-am5-d3051-d3052	msi	.	family=msi-am5-d3051-d3052	last	-	-	-	P-FIRST-01=req msi-d3052-s3661-user-guide:18	-
 tyan-s7012	tyan	.	family=tyan-s7012	0	-	-	-	P-FIRST-01=rec tyan-s7012-user-manual:26	-

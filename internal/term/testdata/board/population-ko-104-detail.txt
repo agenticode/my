@@ -1,0 +1,59 @@
+호스트 board-host  HP ProLiant DL360 Gen9  슬롯 24개 중 2개, 32 GB  DDR4 RDIMM 2400 MT/s
+
+ ch                3         2         1         0
+               ·· ·· ··  ·· ·· ░░  ·· ·· ··  ·· ·· ··  ══╡CPU 0╞══
+ 장착표                        -                   +
+ PROC 1 DIMM   6  5  4   3  2  1   7  8  9   10 11 12
+ 이름              4         3         2         1
+
+ ch                             0         1         2         3
+               ══╡CPU 1╞══  ·· ·· ··  ·· ·· ··  ░░ ·· ··  ·· ·· ··
+ 장착표                     +                   -
+ PROC 2 DIMM                12 11 10  9  8  7   1  2  3   4  5  6
+ 이름                           1         2         3         4
+
+ ░░ 정상   ·· 빈 슬롯
+ + 이 모듈 수에서 장착표가 채우는 빈 슬롯   - 장착표가 비워 두는 슬롯에 있는 모듈
+
+ 장착 구성
+ P-ORDER-01  CPU 0: 모듈 1개가 PROC 1 DIMM 1에 있습니다. 모듈 1개일 때 장착표는 PROC 1 DIMM 12를
+             채웁니다.
+             제조사 요구 사항, HPE ProLiant DL360 Gen9 Server User Guide, 767927-009, edition 9,
+             February 2018, p. 48
+ P-ORDER-01  CPU 1: 모듈 1개가 PROC 2 DIMM 1에 있습니다. 모듈 1개일 때 장착표는 PROC 2 DIMM 12를
+             채웁니다.
+             제조사 요구 사항, HPE ProLiant DL360 Gen9 Server User Guide, 767927-009, edition 9,
+             February 2018, p. 48
+
+ CPU 0  DIMM 1개, 16 GB
+ CPU 1  DIMM 1개, 16 GB
+
+ 슬롯            위치          크기   부품 번호     일련번호  CE  UE  소견
+ PROC 1 DIMM 6   CPU 0 ch 3 4                                 0   0   빈 슬롯
+ PROC 1 DIMM 5   CPU 0 ch 3 4                                 0   0   빈 슬롯
+ PROC 1 DIMM 4   CPU 0 ch 3 4                                 0   0   빈 슬롯
+ PROC 1 DIMM 3   CPU 0 ch 2 3                                 0   0   빈 슬롯
+ PROC 1 DIMM 2   CPU 0 ch 2 3                                 0   0   빈 슬롯
+ PROC 1 DIMM 1   CPU 0 ch 2 3  16 GB  EXM32G32R2X4  EX000009  0   0   정상
+ PROC 1 DIMM 7   CPU 0 ch 1 2                                 0   0   빈 슬롯
+ PROC 1 DIMM 8   CPU 0 ch 1 2                                 0   0   빈 슬롯
+ PROC 1 DIMM 9   CPU 0 ch 1 2                                 0   0   빈 슬롯
+ PROC 1 DIMM 10  CPU 0 ch 0 1                                 0   0   빈 슬롯
+ PROC 1 DIMM 11  CPU 0 ch 0 1                                 0   0   빈 슬롯
+ PROC 1 DIMM 12  CPU 0 ch 0 1                                 0   0   빈 슬롯
+ PROC 2 DIMM 12  CPU 1 ch 0 1                                 0   0   빈 슬롯
+ PROC 2 DIMM 11  CPU 1 ch 0 1                                 0   0   빈 슬롯
+ PROC 2 DIMM 10  CPU 1 ch 0 1                                 0   0   빈 슬롯
+ PROC 2 DIMM 9   CPU 1 ch 1 2                                 0   0   빈 슬롯
+ PROC 2 DIMM 8   CPU 1 ch 1 2                                 0   0   빈 슬롯
+ PROC 2 DIMM 7   CPU 1 ch 1 2                                 0   0   빈 슬롯
+ PROC 2 DIMM 1   CPU 1 ch 2 3  16 GB  EXM32G32R2X4  EX000046  0   0   정상
+ PROC 2 DIMM 2   CPU 1 ch 2 3                                 0   0   빈 슬롯
+ PROC 2 DIMM 3   CPU 1 ch 2 3                                 0   0   빈 슬롯
+ PROC 2 DIMM 4   CPU 1 ch 3 4                                 0   0   빈 슬롯
+ PROC 2 DIMM 5   CPU 1 ch 3 4                                 0   0   빈 슬롯
+ PROC 2 DIMM 6   CPU 1 ch 3 4                                 0   0   빈 슬롯
+
+ - 보드에 그린 슬롯 24개, 채널 없이 그린 슬롯 0개, 따로 둔 슬롯 0개
+ - 보드 계열 hp-gen9-24slot의 표로 놓은 슬롯 24개 (문서: HPE ProLiant DL360 Gen9 Server User Guide,
+   767927-009, edition 9, February 2018, February 2018, 15, 41-48)

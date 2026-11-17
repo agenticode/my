@@ -6,6 +6,10 @@
 
  ░░ 정상
 
+ 장착 구성
+ - 모듈 8개가 이 개수에서 장착표가 채우는 슬롯에 있습니다. Dell PowerEdge 2950 Systems Hardware Owner's
+   Manual, January 2006, no revision printed, p. 89
+
  칩셋  DIMM 8개, 16 GB
 
  슬롯   위치       크기  부품 번호     일련번호  CE  UE  소견

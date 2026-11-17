@@ -198,6 +198,10 @@ netbox-unknown (4 slots, 1 processor records)
   first                  placed 0, no channel 0, aside 4, CPUs 0 [unplaced none 4]
   fixed                  placed 0, no channel 4, aside 0, CPUs 1 [no-channel no-table 4]
   fixed, sockets unknown placed 0, no channel 0, aside 4, CPUs 0 [unplaced assumed 4]
+population-demo (24 slots, 2 processor records)
+  first                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 uroot-supermicro-x9dbl (6 slots, 2 processor records)
   first                  placed 6, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 6, no channel 0, aside 0, CPUs 2 []

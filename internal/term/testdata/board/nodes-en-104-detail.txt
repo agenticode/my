@@ -32,6 +32,10 @@ host board-host  INFERIT R1G3D32  12 of 32 slots, 768 GB  DDR4 RDIMM 3200 MT/s
 
  ░░ ok   ·· empty slot
 
+ Population
+ - The 12 modules stand in the slots the table fills for this number. SP2C621D32LM3 User Manual, Version
+   1.0, pp. 29-32
+
  CPU 0  6 DIMMs, 384 GB
  CPU 1  6 DIMMs, 384 GB
 
