@@ -165,6 +165,7 @@ MemorY collects no errors and acts on none. It reads what the tools that do have
 | EDAC counters | `/sys/devices/system/edac/mc` | counts per DIMM since boot |
 | mcelog daemon | `mcelog --client` | counts per DIMM |
 | SMBIOS | `/sys/firmware/dmi/tables`, or `dmidecode` output | slots, DIMM serial and part numbers |
+| Module SPD | the `eeprom` files of the kernel drivers `ee1004` (DDR4) and `spd5118` (DDR5) in `/sys/bus/i2c/devices`; a dump as raw bytes, hex text or `decode-dimms` output | per module the manufacturing week, location code, ranks and device width, die capacity; the reason when Linux gives no SPD |
 | Memory readings | `/proc/meminfo`, `/proc/vmstat`, `/proc/slabinfo`, memory pressure, the CPU caches in sysfs, `numactl --hardware`, `numastat`, `sar -B`, the state of MGLRU; `lshw` from `my collect host` | the Memory Explorer section of the report and the caches of the board; no error records |
 | BMC | `ipmitool sel` listings, Redfish dumps, the Redfish service, or saved `racadm getsel` and `racadm lclog view` output | memory events, modules that firmware disabled, sparing, repairs |
 | GPU memory | `nvidia-smi -q` and its queries | row remapping state and ECC counters per GPU |
@@ -273,6 +274,7 @@ MemorY has no telemetry and contacts no server of the project. It uses the netwo
 | what `my preflight` found a reset would lose on the host, with the files it read | |
 | the host name, its architecture and system product | |
 | readings of the error counters per DIMM, GPU memory records, ECS readings, what a BMC reported | |
+| the SPD of the DIMMs as read, 512 or 1,024 bytes per module, with manufacturing week, serial and part number, and what the scan saw of the path to it | |
 | what the kernel counted about the memory of the host at the time of the scan (memory use, slab cache sizes, page counters, NUMA node sizes), and the cache sizes of the CPUs | |
 | every source that was looked for, with the path it was read from, and what it yielded | |
 | the findings of the sender's run | |
@@ -307,6 +309,7 @@ Version 1.0.0, released on 2026-11-16. [CHANGELOG.md](CHANGELOG.md) lists what i
 - No analyzer of a memory vendor has been run against the plugin contract.
 - The board places every slot of 1,934 of the 2,044 server dumps of a public SMBIOS collection on a processor, a channel and a position, from the slot names or from the tables of 361 board families written from 385 public documents of the makers; the other 110 dumps are listed with the reason their own records do not tell the place. No board was compared with a real server ([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - The population check holds the modules of a board to the tables and rules of 276 board families, written from the public documents of their makers with the page of each fact. No rule was checked on a real server; over the public collection 1,682 of the 2,044 dumps reach a rule set ([docs/rules.md](docs/rules.md#population-rules)).
+- No SPD has been read on a real server. The decoder was checked against 8 public DDR4 and DDR5 dumps and the reader against made sysfs trees. On most server boards Linux has no path to the SPD, and `my spd` then names the reason ([docs/compatibility.md](docs/compatibility.md#module-spd)).
 - No BMC of a real server has been read. The Redfish client has run against the stand-in BMCs of the tests and against the DMTF mockup server ([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## Roadmap

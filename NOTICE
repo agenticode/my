@@ -7,5 +7,7 @@ are in testdata/explorer/LICENSES.
 The SPD dumps and texts under testdata/spd/illumos come from illumos-gate and are under the Common
 Development and Distribution License, version 1.0 (CDDL-1.0); the licence text is
 testdata/spd/illumos/OPENSOLARIS.LICENSE. testdata/spd/README.md names the source of each file and
-every byte that was changed in the copy. The other dumps under testdata/spd are under the MIT licence
-of their sources, whose texts stand beside them.
+every byte that was changed in the copy. The SPD files of the demo case under testdata/spd/demo/spd
+are copies of one of those dumps with a serial number and a week written in, and are under the
+CDDL-1.0 as well. The dumps under testdata/spd/ubihazard and testdata/spd/rigred are under the MIT
+licence of their sources, whose texts stand beside them.

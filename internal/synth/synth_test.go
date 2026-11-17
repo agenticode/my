@@ -709,3 +709,35 @@ func TestHostTreeRoundTrip(t *testing.T) {
 		t.Error("unknown flavor accepted")
 	}
 }
+
+// The maker code of a module is written into SMBIOS as the word the reader
+// turns back into the same text: the code in the high byte, the
+// continuation count with odd parity in the low byte.
+func TestJEDECWord(t *testing.T) {
+	for _, tt := range []struct {
+		code string
+		want uint16
+	}{
+		{"bank 1, 0x2C", 0x2C80},
+		{"bank 1, 0xCE", 0xCE80},
+		{"bank 2, 0x9E", 0x9E01},
+		{"bank 4, 0x43", 0x4383},
+		{"", 0},
+		{"Samsung", 0},
+		{"bank 0, 0x2C", 0},
+	} {
+		got := jedecWord(tt.code)
+		if got != tt.want {
+			t.Errorf("jedecWord(%q) = %#04x, want %#04x", tt.code, got, tt.want)
+		}
+		if got == 0 {
+			continue
+		}
+		if back := fmt.Sprintf("bank %d, 0x%02X", (got&0x7F)+1, got>>8); back != tt.code {
+			t.Errorf("%#04x reads back as %q", got, back)
+		}
+		if n := strings.Count(fmt.Sprintf("%08b", got&0xFF), "1"); n%2 != 1 {
+			t.Errorf("%#04x: low byte has even parity", got)
+		}
+	}
+}

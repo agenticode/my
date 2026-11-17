@@ -166,7 +166,7 @@ func TestQuoteComparison(t *testing.T) {
 // what the commands print for the example case.
 func TestGuidesShowRealOutput(t *testing.T) {
 	for page, n := range map[string]int{
-		"docs/reading-guide.md": 9,
+		"docs/reading-guide.md": 10,
 		// The tables the binary ships, as the page lists them.
 		"docs/vendors.md": 2,
 	} {

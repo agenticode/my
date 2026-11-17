@@ -41,6 +41,9 @@ Every series has a `host` label, the name of the machine the records belong to.
 | `my_host_capture` | gauge | `host`, `check` | what `my preflight` found the latest live scan would keep over a reset, per check: 1 kept, 0 lost; no series for a check that is none, unknown or info |
 | `my_gpu_remap_banks` | gauge | `host`, `gpu`, `bucket` | memory banks of the GPU by the spare rows they have left for row remapping: `max`, `high`, `partial`, `low`, `none`, from the latest `nvidia-smi` state |
 | `my_gpu_remap_failure` | gauge | `host`, `gpu` | 1 when a row remapping of the GPU failed (XID 64 in the kernel log, or the flag in the `nvidia-smi` state), 0 when the GPU reports none |
+| `my_dimm_spd_info` | gauge | `host`, `slot`, `serial`, `date_code`, `organisation`, `part_number` | 1 for a DIMM whose SPD was read and tied to it by serial number, with the manufacturing week (`2022-W43`, empty when the SPD holds no date), ranks and device width (`2Rx4`) and the part number of the SPD |
+| `my_host_spd_read` | gauge | `host` | SPD readings of the host whose fields could be read (states `ok`, `crc`, `short`) |
+| `my_host_spd_unread` | gauge | `host`, `reason` | 1 with the reason when no SPD was read (`virtual-machine`, `no-i2c`, `spd-driver-not-loaded` and the other codes of [compatibility.md](compatibility.md#reasons)); else the readings that failed, by state (`blank`, `type`, `denied`, `io`, `timeout`) |
 | `my_source_grade` | gauge | `host`, `source`, `status` | best observation grade of the errors a source gave in the latest scan: 3 A, 2 B, 1 C, 0 no errors. `status` says how reading the source went: `ok`, `partial`, `empty`, `absent`, `unreadable`, `error` |
 | `my_source_unread_records` | gauge | `host`, `source` | records of the source that the latest scan did not understand |
 | `my_source_reader_faults` | gauge | `host`, `source` | faults of the reader of the source that the latest scan caught |
@@ -56,6 +59,7 @@ Which series exist:
 - A GPU has `my_gpu_remap_failure` when its remapping state is known: from an `nvidia-smi` state or from XID 64. A GPU that only logged other XIDs has none.
 - A host whose ledger holds a boot has the three series of `my_host_stops` and `my_host_stop_streak`, at 0 when nothing stopped, and every DIMM in it has `my_dimm_stop_boots`. The exporter scans into a new ledger each time, so it counts the boots that the journal and the crash files still hold; the kept ledger of `my harvest` is not read by the exporter.
 - `my_host_capture` has one series per check of `my preflight` that is kept or lost, from the latest live scan.
+- A host whose latest scan looked for the SPD has `my_host_spd_read`, at 0 when it read none, and `my_host_spd_unread` with the reason or with the failed readings. Every DIMM whose SPD was read and tied by serial number has `my_dimm_spd_info`. A host whose scans never looked for the SPD (`--no-spd`, `my harvest`, a copy that holds neither `spd-probe.txt` nor `spd/`) has none of the three.
 - `serial` is empty when the scan could not read the SMBIOS tables, which need root. `gpu` is the serial number of the GPU, or its UUID, PCI address or index when the serial number is unknown.
 
 The totals are counted from error records, as in the commands. They last across a reboot as long as the source that holds the records does: the rasdaemon database does, the journal does until it rotates, and EDAC counters start again at boot. A total goes down when the DIMM is replaced or when the only source of its old records is gone. Prometheus treats that as a counter reset.

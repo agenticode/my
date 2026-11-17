@@ -1,0 +1,24 @@
+호스트 r07-n112  Example Systems R760
+DIMM 8개 중 8개의 SPD (spd5118), 시리얼로 연결
+8 x Micron Technology (JEDEC bank 1, 0x2C)  MTC40F2046S1RC48BA1
+DDR5 RDIMM 64 GB 2Rx4  16 Gb 다이
+
+ 슬롯     주차      위치  시리얼    판정
+ CPU0_A1  2022-W43  0x06  6748F442  정상
+ CPU0_B1  2022-W43  0x06  ADCBC230  교체 고려
+ CPU0_C1  2022-W43  0x06  4B1770AF  즉시 교체
+ CPU0_D1  2023-W08  0x06  F5903463  정상
+ CPU1_A1  2022-W43  0x06  17AFC7D1  관찰
+ CPU1_B1  2022-W43  0x06  AC969700  정상
+ CPU1_C1  2023-W08  0x06  B028A3B1  정상
+ CPU1_D1  2023-W08  0x06  ED92203E  정상
+
+ 날짜 코드
+ Micron Technology (JEDEC bank 1, 0x2C)  MTC40F2046S1RC48BA1
+ 주차      DIMM  판정  UE  판정 있는 슬롯
+ 2022-W43     5     3   1  CPU0_B1 CPU0_C1 CPU1_A1
+ 2023-W08     3     0   0
+ 판정이 있는 DIMM 3개 중 3개가 2022-W43이고, 판정이 없는 DIMM 5개 중 2개도
+ 2022-W43임.
+ 이 표는 SPD의 날짜 코드로 모듈을 센 것임. 생산 로트에 문제가 있는지는 제조사의
+ 고장 분석이 판단함.

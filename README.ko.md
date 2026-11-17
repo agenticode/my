@@ -164,6 +164,7 @@ MemorY는 오류를 수집하지 않고 조치도 하지 않습니다. 그 일�
 | EDAC 카운터 | `/sys/devices/system/edac/mc` | 부팅 이후 DIMM별 건수 |
 | mcelog 데몬 | `mcelog --client` | DIMM별 건수 |
 | SMBIOS | `/sys/firmware/dmi/tables` 또는 `dmidecode` 출력 | 슬롯, DIMM 시리얼과 부품번호 |
+| 모듈 SPD | 커널 드라이버 `ee1004`(DDR4)와 `spd5118`(DDR5)이 `/sys/bus/i2c/devices`에 두는 `eeprom` 파일. 덤프는 바이너리, 헥스 텍스트, `decode-dimms` 출력 | 모듈별 제조 주차, 위치 코드, rank와 장치 폭, 다이 용량. Linux가 SPD를 주지 않으면 그 이유 |
 | 메모리 측정값 | `/proc/meminfo`, `/proc/vmstat`, `/proc/slabinfo`, 메모리 압력, sysfs의 CPU 캐시, `numactl --hardware`, `numastat`, `sar -B`, MGLRU 상태, `my collect host`가 실행한 `lshw` | 리포트의 메모리 익스플로러 절과 보드의 캐시 크기. 오류 기록은 없음 |
 | BMC | `ipmitool sel` 출력, Redfish 덤프, Redfish 서비스, 저장한 `racadm getsel`과 `racadm lclog view` 출력 | 메모리 이벤트, 펌웨어가 비활성화한 모듈, sparing, 리페어 |
 | GPU 메모리 | `nvidia-smi -q`와 쿼리 출력 | GPU별 row remapping 상태와 ECC 카운터 |
@@ -272,6 +273,7 @@ MemorY에는 텔레메트리가 없고, 프로젝트가 운영하는 서버에 �
 | `my preflight`가 본, 이 호스트에서 reset 때 잃는 것과 읽은 파일 | |
 | 호스트 이름, 아키텍처, 시스템 제품명 | |
 | DIMM별 오류 카운터 값, GPU 메모리 기록, ECS 값, BMC가 보고한 내용 | |
+| 읽은 그대로의 DIMM SPD(모듈당 512바이트 또는 1,024바이트)와 그 안의 제조 주차, 시리얼, 부품번호, 그리고 스캔이 SPD까지 가는 경로에서 본 것 | |
 | 스캔 시점에 커널이 센 호스트 메모리 값(메모리 사용량, slab 캐시 크기, 페이지 카운터, NUMA 노드 크기)과 CPU 캐시 크기 | |
 | 찾아본 소스 전부와 읽은 경로, 소스별 결과 | |
 | 보낸 사람의 실행에서 나온 소견 | |
@@ -306,6 +308,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 - 메모리 벤더의 분석기를 플러그인 계약에 연결해 실행해 본 적이 없습니다.
 - 공개 SMBIOS 모음의 서버 덤프 2,044개 중 1,934개는 모든 슬롯을 프로세서, 채널, 채널 안 위치에 놓습니다. 슬롯 이름이나, 제조사 공개 문서 385개로 만든 보드 계열 표 361개를 씁니다. 나머지 110개는 자기 기록만으로 위치를 알 수 없는 까닭과 함께 따로 적어 둡니다. 실제 서버의 보드와 비교한 적은 없습니다([docs/compatibility.md](docs/compatibility.md#slot-names-of-server-vendors)).
 - 장착 구성 검사는 보드 계열 276개의 장착표와 규칙으로 모듈을 견줍니다. 규칙마다 제조사 공개 문서와 쪽수를 적었습니다. 실제 서버에서 확인한 규칙은 없습니다. 공개 모음의 덤프 2,044개 중 1,682개가 규칙 세트에 닿습니다([docs/rules.md](docs/rules.md#population-rules)).
+- 실제 서버에서 SPD를 읽어 본 적이 없습니다. 디코더는 DDR4와 DDR5 공개 덤프 8개로, 리더는 만들어 둔 sysfs 트리로 시험했습니다. 대부분의 서버 보드에서는 Linux에 SPD까지 가는 경로가 없고, 그때 `my spd`가 이유를 적습니다([docs/compatibility.md](docs/compatibility.md#module-spd)).
 - 실제 서버의 BMC는 읽어 보지 못했습니다. Redfish 클라이언트는 테스트의 대역 BMC와 DMTF 목업 서버에서만 실행했습니다([docs/redfish.md](docs/redfish.md#lab-check)).
 
 ## 로드맵
