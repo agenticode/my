@@ -51,7 +51,7 @@ var screens = []struct {
 	dimm bool
 }{
 	{"scan", false}, {"dimm", true}, {"why", false}, {"map", true}, {"timeline", false},
-	{"boots", false}, {"inventory", false}, {"bios", false}, {"preflight", false},
+	{"boots", false}, {"inventory", false}, {"board", false}, {"bios", false}, {"preflight", false},
 	{"gpu", false}, {"diff", false}, {"report-s1", false}, {"report-s3", false},
 }
 

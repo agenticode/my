@@ -1,0 +1,8 @@
+호스트 host-71f73b2e  QEMU lab-arm6  슬롯 6개 중 6개, 96 GB  DDR4 RDIMM 3200 MT/s  CE 35건, UE 1건
+
+ ch      2   1   0                3   4   5
+        ::  **  ++  ==[CPU 0]==  **  **  ::
+ CPU0_  C1  B1  A1               D1  E1  F1
+ 오류       c   c                cU  c
+
+ ** 교체 고려   ++ 관찰   :: 정상   c 정정 오류, U 정정 불가 오류

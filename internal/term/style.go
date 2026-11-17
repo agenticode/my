@@ -66,6 +66,9 @@ func (st Style) say(code string, kv ...any) string {
 			args[kv[i].(string)] = kv[i+1]
 		}
 	}
+	if view.BoardMessages.Has(code) {
+		return view.BoardMessages.Text(st.lang(), code, args)
+	}
 	return view.Messages.Text(st.lang(), code, args)
 }
 

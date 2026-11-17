@@ -1,0 +1,52 @@
+host r12-n034  Example Systems R760  16 of 32 slots, 1024 GB  DDR5 RDIMM 4800 MT/s  CE 1,284, UE 1
+
+ ch       7      6      5      4      3      2      1      0
+        ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ██  ·· ░░  ·· ░░  ══╡CPU 0╞══
+ CPU0_  H2 H1  G2 G1  F2 F1  E2 E1  D2 D1  C2 C1  B2 B1  A2 A1
+ err                                          cU
+
+ ch                    0      1      2      3      4      5      6      7
+        ══╡CPU 1╞══  ░░ ··  ░░ ··  ░░ ··  ▒▒ ··  ░░ ··  ░░ ··  ░░ ··  ░░ ··
+ CPU1_               A1 A2  B1 B2  C1 C2  D1 D2  E1 E2  F1 F2  G1 G2  H1 H2
+ err                                      c
+
+ ██ replace now   ▒▒ observe   ░░ ok   ·· empty slot   c corrected, U uncorrected errors
+
+ CPU 0  8 DIMMs, 512 GB
+ CPU 1  8 DIMMs, 512 GB
+
+ slot     place       size   part number     serial  CE    UE  finding
+ CPU0_H2  CPU 0 ch 7                                 0     0   empty slot
+ CPU0_H1  CPU 0 ch 7  64 GB  EXM64G48R2X4-A  4B3B31  0     0   ok
+ CPU0_G2  CPU 0 ch 6                                 0     0   empty slot
+ CPU0_G1  CPU 0 ch 6  64 GB  EXM64G48R2X4-A  382A8A  0     0   ok
+ CPU0_F2  CPU 0 ch 5                                 0     0   empty slot
+ CPU0_F1  CPU 0 ch 5  64 GB  EXM64G48R2X4-A  2B6332  0     0   ok
+ CPU0_E2  CPU 0 ch 4                                 0     0   empty slot
+ CPU0_E1  CPU 0 ch 4  64 GB  EXM64G48R2X4-A  E2CD51  0     0   ok
+ CPU0_D2  CPU 0 ch 3                                 0     0   empty slot
+ CPU0_D1  CPU 0 ch 3  64 GB  EXM64G48R2X4-A  80D01E  0     0   ok
+ CPU0_C2  CPU 0 ch 2                                 0     0   empty slot
+ CPU0_C1  CPU 0 ch 2  64 GB  EXM64G48R2X4-A  3B9C56  1231  1   replace now
+ CPU0_B2  CPU 0 ch 1                                 0     0   empty slot
+ CPU0_B1  CPU 0 ch 1  64 GB  EXM64G48R2X4-A  DE7FF0  0     0   ok
+ CPU0_A2  CPU 0 ch 0                                 0     0   empty slot
+ CPU0_A1  CPU 0 ch 0  64 GB  EXM64G48R2X4-A  5C331B  0     0   ok
+ CPU1_A1  CPU 1 ch 0  64 GB  EXM64G48R2X4-A  2C9305  0     0   ok
+ CPU1_A2  CPU 1 ch 0                                 0     0   empty slot
+ CPU1_B1  CPU 1 ch 1  64 GB  EXM64G48R2X4-A  DBC9CE  0     0   ok
+ CPU1_B2  CPU 1 ch 1                                 0     0   empty slot
+ CPU1_C1  CPU 1 ch 2  64 GB  EXM64G48R2X4-A  99B7F7  0     0   ok
+ CPU1_C2  CPU 1 ch 2                                 0     0   empty slot
+ CPU1_D1  CPU 1 ch 3  64 GB  EXM64G48R2X4-A  2AEB41  53    0   observe
+ CPU1_D2  CPU 1 ch 3                                 0     0   empty slot
+ CPU1_E1  CPU 1 ch 4  64 GB  EXM64G48R2X4-A  02AC34  0     0   ok
+ CPU1_E2  CPU 1 ch 4                                 0     0   empty slot
+ CPU1_F1  CPU 1 ch 5  64 GB  EXM64G48R2X4-A  848BE3  0     0   ok
+ CPU1_F2  CPU 1 ch 5                                 0     0   empty slot
+ CPU1_G1  CPU 1 ch 6  64 GB  EXM64G48R2X4-A  D7A399  0     0   ok
+ CPU1_G2  CPU 1 ch 6                                 0     0   empty slot
+ CPU1_H1  CPU 1 ch 7  64 GB  EXM64G48R2X4-A  55C12A  0     0   ok
+ CPU1_H2  CPU 1 ch 7                                 0     0   empty slot
+
+ - 32 slots on the board, 0 drawn without channels, 0 set aside

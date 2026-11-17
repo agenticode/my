@@ -1,0 +1,13 @@
+host r12-n034  Example Systems R760  16 of 32 slots, 1024 GB  DDR5 RDIMM 4800 MT/s  CE 1,284, UE 1
+
+ ch       7      6      5      4      3      2      1      0
+        ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ░░  ·· ██  ·· ░░  ·· ░░  ══╡CPU 0╞══
+ CPU0_  H2 H1  G2 G1  F2 F1  E2 E1  D2 D1  C2 C1  B2 B1  A2 A1
+ err                                          cU
+
+ ch                    0      1      2      3      4      5      6      7
+        ══╡CPU 1╞══  ░░ ··  ░░ ··  ░░ ··  ▒▒ ··  ░░ ··  ░░ ··  ░░ ··  ░░ ··
+ CPU1_               A1 A2  B1 B2  C1 C2  D1 D2  E1 E2  F1 F2  G1 G2  H1 H2
+ err                                      c
+
+ ██ replace now   ▒▒ observe   ░░ ok   ·· empty slot   c corrected, U uncorrected errors

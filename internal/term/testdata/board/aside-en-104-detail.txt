@@ -1,0 +1,62 @@
+host board-host  INFERIT R1G3D32  12 of 32 slots, 768 GB  DDR4 RDIMM 3200 MT/s
+
+ 32 slots set aside, by name: 32 slots on socket numbers the board does not have, such as ChannelA-DIMM0
+ / NODE 0
+
+            DIMM0   DIMM1
+ ChannelA   ░░      ··
+ ChannelB   ░░      ··
+ ChannelC   ░░      ··
+ ChannelD   ··      ··
+ ChannelE   ░░      ··
+ ChannelF   ░░      ··
+ ChannelG   ░░      ··
+ ChannelH   ··      ··
+ ChannelI   ░░      ··
+ ChannelJ   ░░      ··
+ ChannelK   ░░      ··
+ ChannelL   ··      ··
+ ChannelM   ░░      ··
+ ChannelN   ░░      ··
+ ChannelO   ░░      ··
+ ChannelP   ··      ··
+
+ ██ replace now   ▓▓ consider replacement   ▒▒ observe   ░░ ok   ?? hold replacement   ·· empty slot
+ 32 slots, 12 DIMMs
+
+ slot            place  size   part number   serial    CE  UE  finding
+ ChannelA-DIMM0  aside  64 GB  EXM32G32R2X4  EX000012  0   0   ok
+ ChannelA-DIMM1  aside                                 0   0   empty slot
+ ChannelB-DIMM0  aside  64 GB  EXM32G32R2X4  EX000018  0   0   ok
+ ChannelB-DIMM1  aside                                 0   0   empty slot
+ ChannelC-DIMM0  aside  64 GB  EXM32G32R2X4  EX000024  0   0   ok
+ ChannelC-DIMM1  aside                                 0   0   empty slot
+ ChannelD-DIMM0  aside                                 0   0   empty slot
+ ChannelD-DIMM1  aside                                 0   0   empty slot
+ ChannelE-DIMM0  aside  64 GB  EXM32G32R2X4  EX000030  0   0   ok
+ ChannelE-DIMM1  aside                                 0   0   empty slot
+ ChannelF-DIMM0  aside  64 GB  EXM32G32R2X4  EX000036  0   0   ok
+ ChannelF-DIMM1  aside                                 0   0   empty slot
+ ChannelG-DIMM0  aside  64 GB  EXM32G32R2X4  EX000042  0   0   ok
+ ChannelG-DIMM1  aside                                 0   0   empty slot
+ ChannelH-DIMM0  aside                                 0   0   empty slot
+ ChannelH-DIMM1  aside                                 0   0   empty slot
+ ChannelI-DIMM0  aside  64 GB  EXM32G32R2X4  EX000048  0   0   ok
+ ChannelI-DIMM1  aside                                 0   0   empty slot
+ ChannelJ-DIMM0  aside  64 GB  EXM32G32R2X4  EX000054  0   0   ok
+ ChannelJ-DIMM1  aside                                 0   0   empty slot
+ ChannelK-DIMM0  aside  64 GB  EXM32G32R2X4  EX000060  0   0   ok
+ ChannelK-DIMM1  aside                                 0   0   empty slot
+ ChannelL-DIMM0  aside                                 0   0   empty slot
+ ChannelL-DIMM1  aside                                 0   0   empty slot
+ ChannelM-DIMM0  aside  64 GB  EXM32G32R2X4  EX000066  0   0   ok
+ ChannelM-DIMM1  aside                                 0   0   empty slot
+ ChannelN-DIMM0  aside  64 GB  EXM32G32R2X4  EX000072  0   0   ok
+ ChannelN-DIMM1  aside                                 0   0   empty slot
+ ChannelO-DIMM0  aside  64 GB  EXM32G32R2X4  EX000078  0   0   ok
+ ChannelO-DIMM1  aside                                 0   0   empty slot
+ ChannelP-DIMM0  aside                                 0   0   empty slot
+ ChannelP-DIMM1  aside                                 0   0   empty slot
+
+ - 0 slots on the board, 0 drawn without channels, 32 set aside
+ - 32 slots on socket numbers the board does not have, such as ChannelA-DIMM0 / NODE 0
