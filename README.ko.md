@@ -108,17 +108,17 @@ CPU0_C1  즉시 교체  R-UE-01  UE 1건, 최근 2026-11-12 03:14 UTC, rank0 dev
 
 ## 빠른 시작
 
-[릴리스](https://github.com/agenticode/my/releases)마다 linux/amd64, linux/arm64, darwin/arm64 아카이브와 체크섬 파일이 있습니다. x86-64 서버에 1.0.0을 받는 예입니다.
+[릴리스](https://github.com/agenticode/my/releases)마다 linux/amd64, linux/arm64, darwin/arm64 아카이브와 체크섬 파일이 있습니다. x86-64 서버에 1.1.0을 받는 예입니다.
 
 ```
-curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_amd64.tar.gz
-curl -LO https://github.com/agenticode/my/releases/download/v1.0.0/SHA256SUMS
+curl -LO https://github.com/agenticode/my/releases/download/v1.1.0/my_v1.1.0_linux_amd64.tar.gz
+curl -LO https://github.com/agenticode/my/releases/download/v1.1.0/SHA256SUMS
 sha256sum -c --ignore-missing SHA256SUMS
-tar -xzf my_v1.0.0_linux_amd64.tar.gz
-sudo cp my_v1.0.0_linux_amd64/my /usr/local/bin/
+tar -xzf my_v1.1.0_linux_amd64.tar.gz
+sudo cp my_v1.1.0_linux_amd64/my /usr/local/bin/
 ```
 
-정적 링크 바이너리라서 서버에는 이 파일 하나만 있으면 됩니다. Red Hat Enterprise Linux와 그 재빌드 배포판의 `sudo`는 검색 경로에 `/usr/local/bin`을 넣지 않으므로 `sudo /usr/local/bin/my`로 실행합니다. Go 1.26 이상이 있으면 `go install github.com/agenticode/my/cmd/my@v1.0.0`으로 소스에서 빌드할 수 있고, 저장소를 체크아웃했다면 `make build`가 `bin/my`를 만듭니다.
+정적 링크 바이너리라서 서버에는 이 파일 하나만 있으면 됩니다. Red Hat Enterprise Linux와 그 재빌드 배포판의 `sudo`는 검색 경로에 `/usr/local/bin`을 넣지 않으므로 `sudo /usr/local/bin/my`로 실행합니다. Go 1.26 이상이 있으면 `go install github.com/agenticode/my/cmd/my@v1.1.0`으로 소스에서 빌드할 수 있고, 저장소를 체크아웃했다면 `make build`가 `bin/my`를 만듭니다.
 
 서버에서 실행합니다.
 
@@ -297,7 +297,7 @@ my report case.mycase -o fa.html --audience fa --plugin /opt/vendor/analyzer
 
 ## 현재 상태
 
-버전 1.0.0을 2026-11-16에 냈습니다. 담긴 내용은 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
+버전 1.1.0을 2026-11-17에 냈습니다. 담긴 내용은 [CHANGELOG.md](CHANGELOG.md)에 있습니다.
 
 - 합성 호스트와 픽스처로 시험했습니다. 고장 모드, 규칙, 입력마다 시험이 있습니다.
 - 실제 호스트 5대에서 일반 사용자와 root로 실행했습니다. x86_64와 aarch64이고 5대 모두 가상 머신입니다. 결과는 [docs/validation.md](docs/validation.md)에 있습니다.

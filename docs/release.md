@@ -15,7 +15,7 @@ The binary is pure Go, built with `CGO_ENABLED=0`, and statically linked. It nee
 
 ```
 $ my version
-my v1.0.0 (0123456789ab, 2026-11-16) go1.26.11 linux/amd64
+my v1.1.0 (0123456789ab, 2026-11-17) go1.26.11 linux/amd64
 ```
 
 The line holds the version, the commit the binary was built from, the day of that commit, the Go version and the platform. The commit above is a placeholder. `my version --json` prints the same and the versions of what the binary reads and writes: the analysis engine, the ledger schema, the case bundle format and the `--json` output.
@@ -24,13 +24,13 @@ A release build is stamped by `tools/dist`. A build with `make build` is stamped
 
 ## Reproducible archives
 
-The same commit, built with the same Go version, gives the same archives byte for byte on any machine. The `toolchain` line of `go.mod` names the Go version of the release builds and of CI (go1.26.11 for 1.0.0); the go command downloads it when the installed one is older, and uses an installed newer one as it is. What makes the archives the same:
+The same commit, built with the same Go version, gives the same archives byte for byte on any machine. The `toolchain` line of `go.mod` names the Go version of the release builds and of CI (go1.26.11 for 1.0.0 and 1.1.0); the go command downloads it when the installed one is older, and uses an installed newer one as it is. What makes the archives the same:
 
 - the binary is built with `-trimpath`, without a build ID and without the version control stamp of the toolchain, for the baseline instruction set of each architecture;
 - the version, the commit and the time of the commit are the only values stamped into it;
 - the archive is written by `tools/dist`: members in a fixed order, the time of the commit as their time, owner and group 0 without names, no file name and no time in the gzip header. GNU tar and BSD tar write different bytes for the same files, so neither is used.
 
-`make dist-check` builds the archives twice, once from the working tree and once from a copy of it in another directory with an empty build cache, and compares the checksums. CI runs it for every change. On 2026-11-15 one commit was also built on two machines with Go 1.26.0, a Linux x86-64 CI runner and a macOS arm64 machine: the three archives had the same checksums on both.
+`make dist-check` builds the archives twice, once from the working tree and once from a copy of it in another directory with an empty build cache, and compares the checksums. CI runs it for every change. On 2026-11-15 one commit was also built on two machines with Go 1.26.0, a Linux x86-64 CI runner and a macOS arm64 machine: the three archives had the same checksums on both. The archives of v1.0.0, built with Go 1.26.11 on the macOS machine and by the release workflow on a Linux x86-64 runner, had the same checksums too.
 
 To check a published release against its source:
 
