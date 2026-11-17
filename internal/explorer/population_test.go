@@ -2,15 +2,20 @@ package explorer
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/agenticode/my/internal/testutil"
 )
 
 // popSlot is one line of testdata/explorer/population/slots.tsv.
 type popSlot struct {
 	list, dumps, sockets int
+	vendor, processor    string
 	populated            bool
 	locator, bank        string
 	socket, channel      float64
@@ -40,13 +45,13 @@ func readPopulation(t testing.TB) [][]popSlot {
 			continue
 		}
 		p := strings.Split(line, "\t")
-		if len(p) != 8 {
+		if len(p) != 10 {
 			t.Fatalf("slots.tsv: %q has %d fields", line, len(p))
 		}
 		n := func(s string) int { v, _ := strconv.Atoi(s); return v }
 		fl := func(s string) float64 { v, _ := strconv.ParseFloat(s, 64); return v }
-		s := popSlot{list: n(p[0]), dumps: n(p[1]), sockets: n(p[2]), populated: p[3] == "1",
-			locator: unescapeTSV(p[4]), bank: unescapeTSV(p[5]), socket: fl(p[6]), channel: fl(p[7])}
+		s := popSlot{list: n(p[0]), dumps: n(p[1]), sockets: n(p[2]), vendor: unescapeTSV(p[3]), processor: unescapeTSV(p[4]),
+			populated: p[5] == "1", locator: unescapeTSV(p[6]), bank: unescapeTSV(p[7]), socket: fl(p[8]), channel: fl(p[9])}
 		if len(lists) < s.list {
 			lists = append(lists, nil)
 		}
@@ -63,9 +68,10 @@ func readPopulation(t testing.TB) [][]popSlot {
 // it back: each slot gets the socket and channel the reference gave it in
 // the dump itself.
 func TestPopulationPlacement(t *testing.T) {
+	carried(t)
 	lists := readPopulation(t)
-	if len(lists) != 936 {
-		t.Fatalf("%d slot lists, want 936", len(lists))
+	if len(lists) != 1625 {
+		t.Fatalf("%d slot lists, want 1625", len(lists))
 	}
 	slots, dumps := 0, 0
 	for _, list := range lists {
@@ -90,7 +96,171 @@ func TestPopulationPlacement(t *testing.T) {
 		slots += len(list)
 		dumps += list[0].dumps
 	}
-	if slots != 15103 || dumps != 2043 {
-		t.Errorf("%d slots over %d dumps, want 15103 over 2043", slots, dumps)
+	if slots != 24541 || dumps != 2043 {
+		t.Errorf("%d slots over %d dumps, want 24541 over 2043", slots, dumps)
 	}
+}
+
+// popText writes a slot list as the board writes the slots of a ledger,
+// with the system maker and the processor the ledger knows.
+func popText(list []popSlot) string {
+	in := make([]SlotText, len(list))
+	for i, s := range list {
+		in[i] = SlotText{Locator: s.locator, BankLocator: s.bank, Populated: s.populated, SizeMB: 16384}
+		if s.locator == "Not Specified" {
+			in[i].Locator = ""
+		}
+	}
+	return WriteSlotsOf(SlotHost{Vendor: list[0].vendor, Processor: list[0].processor}, in)
+}
+
+// boardTally counts the dumps of the collection by how their boards are
+// drawn.
+type boardTally struct {
+	all, some, noChannel, none, wrongCPU int
+}
+
+func tallyPopulation(lists [][]popSlot, socketsKnown bool) boardTally {
+	var b boardTally
+	for _, list := range lists {
+		sockets := 0
+		if socketsKnown {
+			sockets = list[0].sockets
+		}
+		p := Place(ParseDmidecodeMemory(popText(list), nil, nil), sockets, 0)
+		placed, noch, un := 0, 0, 0
+		drawn := map[int]bool{}
+		for _, x := range p {
+			switch x.State {
+			case Placed:
+				placed++
+			case NoChannel:
+				noch++
+			default:
+				un++
+			}
+			if x.State != Unplaced {
+				drawn[x.Socket] = true
+			}
+		}
+		n := list[0].dumps
+		switch {
+		case placed == len(p):
+			b.all += n
+		case un == len(p):
+			b.none += n
+		case noch > 0 && placed == 0:
+			b.noChannel += n
+		default:
+			b.some += n
+		}
+		if k := list[0].sockets; k > 0 && len(drawn) > 0 {
+			low, high := 1<<30, -1
+			for s := range drawn {
+				low, high = min(low, s), max(high, s)
+			}
+			if low == 1 {
+				high--
+			}
+			if len(drawn) > k || high >= k {
+				b.wrongCPU += n
+			}
+		}
+	}
+	return b
+}
+
+// TestPopulationBoards holds how the boards of the 2,043 dumps of the
+// public collection are drawn, with the socket count known (the processor
+// records) and not known, without the fixes (the numbers of the first
+// implementation with the checks of the board) and with them.
+func TestPopulationBoards(t *testing.T) {
+	lists := readPopulation(t)
+	for _, c := range []struct {
+		fixes Fix
+		known bool
+		want  boardTally
+	}{
+		{0, true, boardTally{all: 1076, some: 48, noChannel: 226, none: 693}},
+		{0, false, boardTally{all: 1134, some: 50, noChannel: 229, none: 630, wrongCPU: 5}},
+		{AllFixes, true, boardTally{all: 1502, some: 51, noChannel: 238, none: 252}},
+		{AllFixes, false, boardTally{all: 1567, some: 48, noChannel: 238, none: 190, wrongCPU: 8}},
+	} {
+		old := SetFixes(c.fixes)
+		got := tallyPopulation(lists, c.known)
+		SetFixes(old)
+		if got != c.want {
+			t.Errorf("fixes %v, sockets known %v: %+v, want %+v", c.fixes != 0, c.known, got, c.want)
+		}
+	}
+}
+
+// maker is the name a dump gives its system maker, in one form.
+func maker(v string) string {
+	l := strings.ToLower(v)
+	for _, m := range []struct{ prefix, name string }{
+		{"dell", "Dell"}, {"hpe", "HPE"}, {"hewlett packard enterprise", "HPE"}, {"hp", "HP"}, {"supermicro", "Supermicro"},
+		{"huawei", "Huawei"}, {"xfusion", "xFusion"}, {"lenovo", "Lenovo"}, {"ibm", "IBM"}, {"intel", "Intel"},
+		{"inspur", "Inspur"}, {"gigabyte", "Gigabyte"}, {"asus", "ASUS"}, {"asrock", "ASRock"}, {"quanta", "Quanta"},
+		{"sugon", "Sugon"}, {"fujitsu", "Fujitsu"}, {"cisco", "Cisco"}, {"tyan", "Tyan"},
+	} {
+		if strings.HasPrefix(l, m.prefix) {
+			return m.name
+		}
+	}
+	return "other"
+}
+
+// TestPopulationByMaker holds, per system maker, how many dumps of the
+// public collection have every slot placed, before and after the fixes,
+// with the socket count known (testdata/population-boards.txt).
+func TestPopulationByMaker(t *testing.T) {
+	lists := readPopulation(t)
+	type row struct{ dumps, before, after int }
+	rows := map[string]*row{}
+	full := func(list []popSlot) bool {
+		for _, x := range Place(ParseDmidecodeMemory(popText(list), nil, nil), list[0].sockets, 0) {
+			if x.State != Placed {
+				return false
+			}
+		}
+		return true
+	}
+	for _, list := range lists {
+		m := maker(list[0].vendor)
+		if rows[m] == nil {
+			rows[m] = &row{}
+		}
+		r := rows[m]
+		r.dumps += list[0].dumps
+		old := SetFixes(0)
+		if full(list) {
+			r.before += list[0].dumps
+		}
+		SetFixes(AllFixes)
+		if full(list) {
+			r.after += list[0].dumps
+		}
+		SetFixes(old)
+	}
+	var names []string
+	for n := range rows {
+		names = append(names, n)
+	}
+	sort.Slice(names, func(i, j int) bool {
+		if rows[names[i]].dumps != rows[names[j]].dumps {
+			return rows[names[i]].dumps > rows[names[j]].dumps
+		}
+		return names[i] < names[j]
+	})
+	var b strings.Builder
+	b.WriteString("maker\tdumps\tplaced in full before\tafter\n")
+	var tot row
+	for _, n := range names {
+		r := rows[n]
+		fmt.Fprintf(&b, "%s\t%d\t%d\t%d\n", n, r.dumps, r.before, r.after)
+		tot.dumps, tot.before, tot.after = tot.dumps+r.dumps, tot.before+r.before, tot.after+r.after
+	}
+	fmt.Fprintf(&b, "all\t%d\t%d\t%d\n", tot.dumps, tot.before, tot.after)
+	testutil.Golden(t, "population-boards.txt", []byte(b.String()))
 }

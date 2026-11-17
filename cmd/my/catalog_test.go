@@ -21,6 +21,7 @@ var catalogs = map[string]i18n.Catalog{
 	"engine":          engine.Messages,
 	"view":            view.Messages,
 	"view.inventory":  view.InventoryMessages,
+	"view.board":      view.BoardMessages,
 	"report":          report.Words,
 	"preflight":       preflight.Messages,
 	"memras":          memras.Messages,

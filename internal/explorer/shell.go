@@ -5,7 +5,9 @@ package explorer
 // it and makes the choice here, before a reader sees the text.
 
 import (
+	"math/big"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -34,10 +36,11 @@ func GrepE(text string, words ...string) string {
 	return b.String()
 }
 
-// SlabTop is what is read of /proc/slabinfo: the first line,
-// then the 20 lines with the largest third field, as
-// "head -1; sort -k3 -n -r | head -20" gives them in the C locale. Ties of
-// the field are in the reverse byte order of the whole line.
+// SlabTop is what is read of /proc/slabinfo: the first line, then the 20
+// caches that take the most memory (objects times object size). Without
+// FixSlabBySize they are the 20 lines with the largest third field, as
+// "head -1; sort -k3 -n -r | head -20" gives them in the C locale. Ties are
+// in the reverse byte order of the whole line.
 func SlabTop(text string) string {
 	lines := textLines(text)
 	if len(lines) == 0 {
@@ -49,6 +52,9 @@ func SlabTop(text string) string {
 	keys := make(map[string]sortNum, len(sorted))
 	for _, l := range sorted {
 		keys[l] = sortKey(l, 3)
+		if on(FixSlabBySize) {
+			keys[l] = slabBytes(l)
+		}
 	}
 	sort.SliceStable(sorted, func(i, j int) bool {
 		if c := compareSortNum(keys[sorted[i]], keys[sorted[j]]); c != 0 {
@@ -138,4 +144,20 @@ func compareMag(a, b sortNum) int {
 		return c
 	}
 	return strings.Compare(a.frac, b.frac)
+}
+
+// slabBytes is the memory of a line of slabinfo: the number of objects
+// (field 3) times the size of one (field 4); 0 for a line without them.
+func slabBytes(line string) sortNum {
+	f := strings.Fields(line)
+	if len(f) < 4 {
+		return sortNum{}
+	}
+	n, err1 := strconv.ParseUint(f[2], 10, 64)
+	size, err2 := strconv.ParseUint(f[3], 10, 64)
+	if err1 != nil || err2 != nil {
+		return sortNum{}
+	}
+	v := new(big.Int).Mul(new(big.Int).SetUint64(n), new(big.Int).SetUint64(size))
+	return sortNum{int: strings.TrimLeft(v.String(), "0")}
 }

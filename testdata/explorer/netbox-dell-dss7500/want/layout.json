@@ -1,0 +1,404 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "A1",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000009",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A2",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000013",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A3",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000017",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 2,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A4",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000021",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A5",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000025",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A6",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000029",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A7",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000033",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 2,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "A8",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000037",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "B1",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000041",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "B2",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000045",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "B3",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000049",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "B4",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "<OUT OF SPEC>",
+    "speed": "2400 MHz",
+    "configuredSpeed": "2133 MHz",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000053",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "12 / 12 slots populated",
+   "Total: 192 GiB"
+  ],
+  "badge": "<OUT OF SPEC> · 2133 MHz",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": true,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 3,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "A8",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "A4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 2,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "A7",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "A3",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 1,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "A6",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "A2",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "A5",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "A1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "8 DIMMs",
+        "128 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "cpu": {
+       "socket": 1,
+       "name": "CPU 1",
+       "sub": [
+        "4 DIMMs",
+        "64.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "B1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "B3",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       },
+       {
+        "channel": 1,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "B2",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "B4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

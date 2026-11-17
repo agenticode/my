@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -189,6 +190,15 @@ func run(c call) (any, error) {
 		}
 		return map[string]any{"profile": r.Profile, "estabCount": r.EstabCount, "cpuLoadRatio": r.CPULoadRatio,
 			"memUsedPct": r.MemUsedPct, "reasons": kinds}, nil
+	case "layout":
+		var lin struct {
+			Dimms  []Dimm     `json:"dimms"`
+			Caches []CPUCache `json:"caches"`
+		}
+		if err := json.Unmarshal(c.In, &lin); err != nil {
+			return nil, err
+		}
+		return layoutData(Board(lin.Dimms, lin.Caches)), nil
 	case "formatBytes":
 		return FormatBytes(numArg(c.In, "n")), nil
 	case "formatNumber":
@@ -199,6 +209,40 @@ func run(c call) (any, error) {
 		return Num(Clamp(numArg(c.In, "v"), numArg(c.In, "lo"), numArg(c.In, "hi"))), nil
 	}
 	return nil, fmt.Errorf("no Go function for %s", c.Fn)
+}
+
+// layoutData is a layout in the form the harness reads the markup of the
+// reference into.
+func layoutData(l Layout) any {
+	rows := []any{}
+	for _, r := range l.Rows {
+		parts := []any{}
+		for _, p := range r.Parts {
+			if p.CPU != nil {
+				caches := []any{}
+				for _, c := range p.CPU.Caches {
+					caches = append(caches, map[string]any{"label": c.Label, "size": c.Size})
+				}
+				parts = append(parts, map[string]any{"cpu": map[string]any{"socket": p.CPU.Socket, "name": p.CPU.Name, "sub": p.CPU.Sub, "caches": caches}})
+				continue
+			}
+			chs := []any{}
+			for _, c := range p.Channels {
+				sticks := []any{}
+				for _, s := range c.Sticks {
+					sticks = append(sticks, map[string]any{"locator": s.Locator, "classes": s.Classes, "cap": s.Cap})
+				}
+				chs = append(chs, map[string]any{"channel": c.Channel, "socket": c.Socket, "sticks": sticks})
+			}
+			parts = append(parts, map[string]any{"bank": p.Bank, "channels": chs})
+		}
+		rows = append(rows, map[string]any{"socket": r.Socket, "dual": r.Dual, "parts": parts})
+	}
+	summary := l.Summary
+	if summary == nil {
+		summary = []string{}
+	}
+	return map[string]any{"empty": l.Empty, "summary": summary, "badge": l.Badge, "rows": rows}
 }
 
 // asData turns a value into plain JSON data, without the fields the
@@ -350,6 +394,7 @@ const fixtureRoot = "../../testdata/explorer"
 // reference in testdata/explorer/<case>/want/<function>.json. Each want
 // file holds the call ("fn", "in") and the answer ("out").
 func TestReference(t *testing.T) {
+	carried(t)
 	files, err := filepath.Glob(filepath.Join(fixtureRoot, "*", "want", "*.json"))
 	if err != nil {
 		t.Fatal(err)
@@ -383,18 +428,73 @@ func TestReference(t *testing.T) {
 	t.Logf("%d want files over %d functions", len(files), len(fns))
 }
 
+// allowed is one line of the allowlist of fixes of the harness.
+type allowed struct {
+	fix       Fix
+	functions map[string]bool
+	pattern   *regexp.Regexp
+}
+
+func readAllowlist(t *testing.T, path string) map[Fix]allowed {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := map[Fix]allowed{}
+	for _, line := range strings.Split(string(b), "\n") {
+		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "fix\t") {
+			continue
+		}
+		p := strings.Split(line, "\t")
+		if len(p) != 5 {
+			t.Fatalf("allowlist: %q", line)
+		}
+		f, ok := FixNamed(p[0])
+		if !ok {
+			t.Fatalf("allowlist names no fix %q", p[0])
+		}
+		a := allowed{fix: f, functions: map[string]bool{}, pattern: regexp.MustCompile(p[3])}
+		for _, fn := range strings.Split(p[2], ",") {
+			a.functions[fn] = true
+		}
+		out[f] = a
+	}
+	for _, f := range Fixes() {
+		if _, ok := out[f]; !ok {
+			t.Errorf("allowlist has no line for the fix %s", f.Name())
+		}
+	}
+	return out
+}
+
+func outputOf(c call, f Fix) (any, error) {
+	old := SetFixes(f)
+	defer SetFixes(old)
+	got, err := run(c)
+	if err != nil {
+		return nil, err
+	}
+	return asData(got), nil
+}
+
 // TestCorpus runs the corpus of the parity harness: the directory in
-// ME_PARITY_DIR holds corpus/*.jsonl.gz, one call and answer per line.
+// ME_PARITY_DIR holds corpus/*.jsonl.gz, one call and answer per line, and
+// fixes.tsv, the allowlist of fixes. With every fix off each answer is
+// what the first implementation gave. With every fix on, an answer that
+// differs must come from fixes the allowlist names for the function and
+// whose pattern the input matches.
 func TestCorpus(t *testing.T) {
 	dir := os.Getenv("ME_PARITY_DIR")
 	if dir == "" {
 		t.Skip("ME_PARITY_DIR is not set")
 	}
+	allow := readAllowlist(t, filepath.Join(dir, "fixes.tsv"))
 	files, _ := filepath.Glob(filepath.Join(dir, "corpus", "*.jsonl.gz"))
 	if len(files) == 0 {
 		t.Fatalf("no corpus in %s", dir)
 	}
 	var report strings.Builder
+	byFix := map[Fix]int{}
 	for _, f := range files {
 		fh, err := os.Open(f)
 		if err != nil {
@@ -406,7 +506,7 @@ func TestCorpus(t *testing.T) {
 		}
 		sc := bufio.NewScanner(zr)
 		sc.Buffer(make([]byte, 0, 1<<20), 64<<20)
-		n, bad := 0, 0
+		n, carriedBad, fixed, unlisted := 0, 0, 0, 0
 		for sc.Scan() {
 			var w struct {
 				call
@@ -416,11 +516,47 @@ func TestCorpus(t *testing.T) {
 				t.Fatalf("%s line %d: %v", f, n+1, err)
 			}
 			n++
-			if !compare(t, fmt.Sprintf("%s:%d", filepath.Base(f), n), w.call, w.Out) {
-				bad++
-				if bad >= 5 {
-					t.Errorf("%s: 5 differences, the rest of the file is not compared", f)
-					break
+			name := fmt.Sprintf("%s:%d", filepath.Base(f), n)
+			want := strip(w.Out)
+			got0, err := outputOf(w.call, 0)
+			if err != nil {
+				t.Fatalf("%s: %v", name, err)
+			}
+			if d := diff(w.Fn, got0, want); d != "" {
+				carriedBad++
+				if carriedBad <= 5 {
+					t.Errorf("%s, every fix off: %s", name, d)
+				}
+			}
+			gotAll, _ := outputOf(w.call, AllFixes)
+			if diff(w.Fn, gotAll, want) == "" {
+				continue
+			}
+			fixed++
+			var acting []Fix
+			for _, fx := range Fixes() {
+				only, _ := outputOf(w.call, fx)
+				without, _ := outputOf(w.call, AllFixes&^fx)
+				if diff(w.Fn, only, want) != "" || diff(w.Fn, without, gotAll) != "" {
+					acting = append(acting, fx)
+				}
+			}
+			ok := len(acting) > 0
+			for _, fx := range acting {
+				a := allow[fx]
+				if !a.functions[w.Fn] || !a.pattern.Match(w.In) {
+					ok = false
+				}
+				byFix[fx]++
+			}
+			if !ok {
+				unlisted++
+				if unlisted <= 5 {
+					var names []string
+					for _, fx := range acting {
+						names = append(names, fx.Name())
+					}
+					t.Errorf("%s: a difference no listed fix explains (fixes acting: %v): %s", name, names, diff(w.Fn, gotAll, want))
 				}
 			}
 		}
@@ -428,10 +564,14 @@ func TestCorpus(t *testing.T) {
 			t.Fatal(err)
 		}
 		fh.Close()
-		fmt.Fprintf(&report, "%s\t%d\t%d\n", strings.TrimSuffix(filepath.Base(f), ".jsonl.gz"), n, bad)
+		fmt.Fprintf(&report, "%s\t%d\t%d\t%d\t%d\n", strings.TrimSuffix(filepath.Base(f), ".jsonl.gz"), n, carriedBad, fixed, unlisted)
+	}
+	var fixReport strings.Builder
+	for _, fx := range Fixes() {
+		fmt.Fprintf(&fixReport, "fix\t%s\t%d\n", fx.Name(), byFix[fx])
 	}
 	if out := os.Getenv("ME_PARITY_REPORT"); out != "" {
-		_ = os.WriteFile(out, []byte(report.String()), 0o644)
+		_ = os.WriteFile(out, []byte(report.String()+fixReport.String()), 0o644)
 	}
-	t.Logf("corpus:\n%s", report.String())
+	t.Logf("corpus (function, calls, differences with the fixes off, answers the fixes change, unlisted):\n%s%s", report.String(), fixReport.String())
 }

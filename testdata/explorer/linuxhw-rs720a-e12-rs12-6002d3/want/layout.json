@@ -1,0 +1,692 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "CPU1_DIMM_A1",
+    "bankLocator": "P0 CHANNEL A",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000017",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_B1",
+    "bankLocator": "P0 CHANNEL B",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000022",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_C1",
+    "bankLocator": "P0 CHANNEL C",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000027",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_D1",
+    "bankLocator": "P0 CHANNEL D",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000032",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_E1",
+    "bankLocator": "P0 CHANNEL E",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000037",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_F1",
+    "bankLocator": "P0 CHANNEL F",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000042",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_G1",
+    "bankLocator": "P0 CHANNEL G",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000047",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_H1",
+    "bankLocator": "P0 CHANNEL H",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000052",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_I1",
+    "bankLocator": "P0 CHANNEL I",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000057",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_J1",
+    "bankLocator": "P0 CHANNEL J",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000062",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_K1",
+    "bankLocator": "P0 CHANNEL K",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000067",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_DIMM_L1",
+    "bankLocator": "P0 CHANNEL L",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000072",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_A1",
+    "bankLocator": "P1 CHANNEL A",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000077",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_B1",
+    "bankLocator": "P1 CHANNEL B",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000082",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_C1",
+    "bankLocator": "P1 CHANNEL C",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000087",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_D1",
+    "bankLocator": "P1 CHANNEL D",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000092",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_E1",
+    "bankLocator": "P1 CHANNEL E",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000097",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_F1",
+    "bankLocator": "P1 CHANNEL F",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000102",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_G1",
+    "bankLocator": "P1 CHANNEL G",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000107",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_H1",
+    "bankLocator": "P1 CHANNEL H",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000112",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_I1",
+    "bankLocator": "P1 CHANNEL I",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000117",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_J1",
+    "bankLocator": "P1 CHANNEL J",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000122",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_K1",
+    "bankLocator": "P1 CHANNEL K",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000127",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU2_DIMM_L1",
+    "bankLocator": "P1 CHANNEL L",
+    "size": "96 GB",
+    "sizeBytes": 103079215104,
+    "type": "DDR5",
+    "speed": "4800 MT/s",
+    "configuredSpeed": "4800 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000132",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 3,
+    "socket": 2,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "24 / 24 slots populated",
+   "Total: 2.25 TiB"
+  ],
+  "badge": "DDR5 · 4800 MT/s",
+  "rows": [
+   {
+    "socket": 1,
+    "dual": true,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 3,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "CPU1_DIMM_D1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_A1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_B1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_C1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_E1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_F1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_G1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_H1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_I1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_J1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_K1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU1_DIMM_L1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 1,
+       "name": "CPU 1",
+       "sub": [
+        "12 DIMMs",
+        "1.13 TiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "cpu": {
+       "socket": 2,
+       "name": "CPU 2",
+       "sub": [
+        "12 DIMMs",
+        "1.13 TiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 3,
+        "socket": 2,
+        "sticks": [
+         {
+          "locator": "CPU2_DIMM_A1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_B1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_C1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_E1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_F1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_G1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_H1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_I1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_J1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_K1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_L1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         },
+         {
+          "locator": "CPU2_DIMM_D1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "96.0 GiB"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

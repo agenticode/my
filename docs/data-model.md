@@ -278,6 +278,26 @@ The commands that write a file (`bundle`, `report`, `import -o`, `export`, `coll
 
 The overview, `dimm` and `why` carry `stops` and `recurrence`: the summary above, and the window as the engine sees it (per DIMM `cells`, `places` and the boots each had uncorrected errors in). The topology of `dimm` adds `window` and `boots` to the levels, the address map `window`, `boots` and `ue_boots`, and `my map --boots` per line the `boots` and `ue_boots` of each cell.
 
+### The view `board`
+
+`my board --json` holds the board of a host as the Memory Explorer draws it. The placement is made from the slot rows of the ledger each time the view is built and is stored nowhere; the ledger decides what a slot holds.
+
+| Field | Content |
+| --- | --- |
+| `host`, `slots`, `populated` | the host, its slots and the slots that hold a module |
+| `bytes`, `size` | the size of all modules, in bytes and as text |
+| `ce`, `ue` | the corrected and uncorrected errors of the modules on record |
+| `badge` | the memory type and speed every module shares, when they share one |
+| `sockets` | the number of sockets of the board (its processor records), when the ledger knows it |
+| `rows[]` | per row of the board `parts[]`: a bank (`bank` `left` or `right`, `socket`, `no_channels`, `channels[]`) or a CPU (`cpu`: `socket`, `dimms`, `bytes`, `size`, `caches[]` with `level`, `bytes`, `size`) |
+| `rows[].parts[].channels[]` | `channel` (left out when the socket is drawn without channels) and `sticks[]` in drawing order |
+| `sticks[]`, `unplaced[]` | per slot: `slot`, `state` (the grade of the finding of its DIMM, `empty` or `unknown`), `dimm_uid`, `ce`, `ue`, `size`, `bytes`, `module` (`maker`, `part_number`, `serial`, `type`, `speed_mts`, `configured_mts`, `ranks`), `locator`, `bank_locator`, `place` (`state` `placed`, `no-channel` or `unplaced`, `reason`, `socket`, `channel`, `assumed`), `socket_by` and `channel_by` (the names of the tests that read the socket and the channel from the names) |
+| `aside` | the slots set aside and those the ledger knows only by a name a source used, as the slot map draws them (the fields of the slot map of `overview`) |
+| `counts` | `placed`, `no_channel`, `unplaced` |
+| `reasons[]` | per reason a slot was drawn without channels or set aside: `state`, `reason`, `count`, an example `locator` and `bank_locator`, and the sentence in `text` |
+| `caches` | where the cache sizes were read: `lshw` or `sysfs` |
+| `lines[]` | the lines of data quality of the board, as statements |
+
 ### Firmware records in the views
 
 The card of a DIMM (`dimm`, `why`), its timeline and its boots carry `firmware[]`, and every row of `inventory` carries `firmware[]` and `firmware_marks`. A record of `firmware[]` holds:

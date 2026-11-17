@@ -1,6 +1,9 @@
 package explorer
 
-import "sort"
+import (
+	"regexp"
+	"sort"
+)
 
 // NumaNode is one NUMA node, its size and its numastat counters.
 type NumaNode struct {
@@ -20,6 +23,8 @@ var (
 	reNumaSize   = jsre(`node\s+(\d+)\s+size:\s+(\d+)\s+MB`, "i")
 	reNumaFree   = jsre(`node\s+(\d+)\s+free:\s+(\d+)\s+MB`, "i")
 	reNumaHeader = jsre(`node(\d+)`, "i")
+	// reNumaBlockHead is the first word of a line that names nodes.
+	reNumaBlockHead = regexp.MustCompile(`^[Nn][Oo][Dd][Ee]\d+$`)
 )
 
 // numaFields are the rows of numastat that are read.
@@ -33,8 +38,9 @@ var numaFields = map[string]func(*NumaNode) *Num{
 }
 
 // ParseNumaInfo reads the node sizes of "numactl --hardware" and the
-// counters of numastat. Only the first line of the numastat text names the
-// nodes; a second block of nodes is read under the names of the first.
+// counters of numastat. A line that starts with node0 names the nodes of
+// the lines below it; without FixNumastatBlocks only the first such line
+// does, and a second block is read under the names of the first.
 // Without numactl text there are no nodes.
 func ParseNumaInfo(numaHw, numaStat string) []NumaNode {
 	if Trim(numaHw) == "" {
@@ -73,6 +79,14 @@ func ParseNumaInfo(numaHw, numaStat string) []NumaNode {
 		}
 		for _, line := range lines[min(1, len(lines)):] {
 			parts := SplitSpace(line)
+			if on(FixNumastatBlocks) && reNumaBlockHead.MatchString(parts[0]) {
+				// A later block of nodes names its own nodes.
+				ids = ids[:0]
+				for _, m := range reNumaHeader.All(line) {
+					ids = append(ids, float64(ParseInt(m.Group(1))))
+				}
+				continue
+			}
 			if len(parts) < 2 {
 				continue
 			}

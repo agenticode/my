@@ -1,0 +1,674 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "Dimm 1",
+    "bankLocator": "CPU 1",
+    "size": "16 GB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2133 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000006",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 2",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000009",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 3",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000011",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 4",
+    "bankLocator": "CPU 1",
+    "size": "16 GB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2133 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000014",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 5",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000017",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 6",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000019",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 7",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000021",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 8",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000023",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 9",
+    "bankLocator": "CPU 1",
+    "size": "32 GB",
+    "sizeBytes": 34359738368,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000026",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 10",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000029",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 11",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000031",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 12",
+    "bankLocator": "CPU 1",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000033",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 13",
+    "bankLocator": "CPU 2",
+    "size": "16 GB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2133 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000036",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 14",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000039",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 15",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000041",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 16",
+    "bankLocator": "CPU 2",
+    "size": "16 GB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2133 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000044",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 17",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000047",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 18",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000049",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 19",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000051",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 20",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000053",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 21",
+    "bankLocator": "CPU 2",
+    "size": "32 GB",
+    "sizeBytes": 34359738368,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "EX000056",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 22",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000059",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 23",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000061",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "Dimm 24",
+    "bankLocator": "CPU 2",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "NO DIMM",
+    "serialNumber": "EX000063",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "6 / 24 slots populated",
+   "Total: 128 GiB"
+  ],
+  "badge": "DDR4 · 2133 MT/s",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": false,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "Dimm 1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "Dimm 2",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 3",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "Dimm 5",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 6",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 7",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 8",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 9",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "32.0 GiB"
+         },
+         {
+          "locator": "Dimm 10",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 11",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 12",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 13",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "Dimm 14",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 15",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 16",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "Dimm 17",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 18",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 19",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 20",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 21",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "32.0 GiB"
+         },
+         {
+          "locator": "Dimm 22",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 23",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         },
+         {
+          "locator": "Dimm 24",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "6 DIMMs",
+        "128 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": []
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,161 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "PROC 1 DIMM 1",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2400 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "Not Specified",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC 1 DIMM 2",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2400 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "Not Specified",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC 1 DIMM 3",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2400 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "Not Specified",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "PROC 1 DIMM 4",
+    "bankLocator": "Not Specified",
+    "size": "16384 MB",
+    "sizeBytes": 17179869184,
+    "type": "DDR4",
+    "speed": "2400 MT/s",
+    "configuredSpeed": "2133 MT/s",
+    "manufacturer": "Example Memory",
+    "serialNumber": "Not Specified",
+    "partNumber": "EXM32G32R2X4",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": []
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "4 / 4 slots populated",
+   "Total: 64.0 GiB"
+  ],
+  "badge": "DDR4 · 2133 MT/s",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": false,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "PROC 1 DIMM 1",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "PROC 1 DIMM 3",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "4 DIMMs",
+        "64.0 GiB"
+       ],
+       "caches": []
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 1,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "PROC 1 DIMM 2",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         },
+         {
+          "locator": "PROC 1 DIMM 4",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "16.0 GiB"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

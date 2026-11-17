@@ -1,6 +1,9 @@
 package explorer
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // Bounds of what the readers of slots return. A reader stops one entry
 // past its bound, so that a caller sees that the bound was reached.
@@ -36,28 +39,36 @@ type Dimm struct {
 	// tests hold no such fields.
 	SocketBy  string `json:"socketBy,omitempty"`
 	ChannelBy string `json:"channelBy,omitempty"`
+
+	// What the second passes need of the first.
+	rawSocket, rawNode, rawChannel Num
+	dellNumber                     Num
+	hasDell, notLetter             bool
 }
 
 // Names of the tests of the readers of slots.
 const (
-	ByPNodeChannelDimm = "p-node-channel-dimm" // bank locator P0_Node0_Channel0_Dimm0
-	ByNodeChannelDimm  = "node-channel-dimm"   // bank locator _Node0_Channel0_Dimm0
-	ByDimmDigits       = "dimm-digits"         // DIMM000: socket, channel, slot
-	ByLetterNumber     = "letter-number"       // A1: socket from the letter
-	ByProc             = "proc"                // PROC 1 (from 1)
-	ByCPU              = "cpu"                 // CPU0 (from 0)
-	ByPOrNode          = "p-or-node"           // P1 or Node 1 (from 1)
-	ByP                = "p"                   // lshw: P1 at the start (from 1)
-	ByNode             = "node"                // lshw: Node 0 (from 0); channel: Node 0
-	ByCD               = "c-d"                 // _C0D1
-	ByCHDimm           = "ch-dimm"             // _CH0_DIMM1
-	ByBankChannel      = "bank-channel"        // bank locator Channel 0
-	ByBankNode         = "bank-node"           // bank locator Node 0
-	ByDimmLetter       = "dimm-letter"         // DIMMA1
-	ByChannelLetter    = "channel-letter"      // ChannelA or _A
-	ByBankChannelChar  = "bank-channel-char"   // bank locator CHANNEL A or CH 0
-	ByLetterNumberPass = "letter-number-pass"  // channel from the number of A1, second pass
-	ByProcDimmPass     = "proc-dimm-pass"      // channel from DIMM n of PROC m DIMM n, second pass
+	ByPNodeChannelDimm = "p-node-channel-dimm"    // bank locator P0_Node0_Channel0_Dimm0
+	ByNodeChannelDimm  = "node-channel-dimm"      // bank locator _Node0_Channel0_Dimm0
+	ByDimmDigits       = "dimm-digits"            // DIMM000: socket, channel, slot
+	ByLetterNumber     = "letter-number"          // A1: socket from the letter
+	ByProc             = "proc"                   // PROC 1 (from 1)
+	ByCPU              = "cpu"                    // CPU0 (from 0)
+	ByPOrNode          = "p-or-node"              // P1 or Node 1 (from 1)
+	ByP                = "p"                      // lshw: P1 at the start (from 1)
+	ByNode             = "node"                   // lshw: Node 0 (from 0); channel: Node 0
+	ByCD               = "c-d"                    // _C0D1
+	ByCHDimm           = "ch-dimm"                // _CH0_DIMM1
+	ByBankChannel      = "bank-channel"           // bank locator Channel 0
+	ByBankNode         = "bank-node"              // bank locator Node 0
+	ByDimmLetter       = "dimm-letter"            // DIMMA1
+	ByChannelLetter    = "channel-letter"         // ChannelA or _A
+	ByBankChannelChar  = "bank-channel-char"      // bank locator CHANNEL A or CH 0
+	ByLetterNumberPass = "letter-number-pass"     // channel from the number of A1, second pass
+	ByCPUSpaced        = "cpu-space"              // CPU 1 (from 1, or from 0 when a CPU 0 is there)
+	ByPLetter          = "dimm-p-letter"          // DIMM_P0_A0: socket 0, channel A
+	ByDellDimm         = "dimm-underscore-letter" // DIMM_A1 of a Dell system: socket A
+	ByProcDimmPass     = "proc-dimm-pass"         // channel from DIMM n of PROC m DIMM n, second pass
 )
 
 // Patterns of parseDmidecodeMemory and parseLshwDimms.
@@ -77,6 +88,11 @@ var (
 	reChannelLetter   = jsre(`(?:Channel\s*|_)([A-Z])(\d*)`, "i")
 	reBankChannelChar = jsre(`(?:Channel\s*|CH\s*)([A-Z0-9])`, "i")
 	reDmiSize         = jsre(`(\d+)\s*(MB|GB|TB)`, "i")
+	reDmiSizeBinary   = jsre(`(\d+)\s*(MiB|GiB|TiB|MB|GB|TB)`, "i")
+	reDimmPLetter     = jsre(`^DIMM_P(\d+)_([A-Z])\d+$`, "i")
+	reDellDimm        = jsre(`^DIMM_([A-Z])(\d+)$`, "i")
+	reCPUSpace        = jsre(`CPU\s+(\d+)`, "i")
+	reBankChanChar    = jsre(`(?:Channel\s*|CHAN\s+|CH\s*)([A-Z0-9])`, "i")
 	reDellLocator     = jsre(`^[A-Z]\d+$`, "i")
 	reHPLocator       = jsre(`PROC\s*\d+\s*DIMM\s*\d+`, "i")
 	reDimmNumber      = jsre(`DIMM\s*(\d+)`, "i")
@@ -101,18 +117,29 @@ var (
 // fieldGetters reads "Key: value": the first
 // line that starts with the key, white space before it allowed, and the
 // value after any white space, the end of the line included.
-type fieldGetters map[string]*jsRegexp
+type fieldGetters struct {
+	carried, fixed map[string]*jsRegexp
+}
+
+// hspace is the white space of JavaScript without the line terminators.
+const hspace = `[\t\v\f \x{00A0}\x{1680}\x{2000}-\x{200A}\x{202F}\x{205F}\x{3000}\x{FEFF}]`
 
 func newFields(keys ...string) fieldGetters {
-	g := fieldGetters{}
+	g := fieldGetters{carried: map[string]*jsRegexp{}, fixed: map[string]*jsRegexp{}}
 	for _, k := range keys {
-		g[k] = jsre(`^\s*`+k+`:\s*(.+)`, "m")
+		g.carried[k] = jsre(`^\s*`+k+`:\s*(.+)`, "m")
+		// With FixEmptyField the value is the rest of the line, empty or not.
+		g.fixed[k] = &jsRegexp{re: regexp.MustCompile(`(?m:^)` + hspace + `*` + regexp.QuoteMeta(k) + `:` + hspace + `*(` + dotClass + `*)`), multiline: true}
 	}
 	return g
 }
 
 func (g fieldGetters) get(block, key string) string {
-	m, ok := g[key].Match(block)
+	re := g.carried[key]
+	if on(FixEmptyField) {
+		re = g.fixed[key]
+	}
+	m, ok := re.Match(block)
 	if !ok {
 		return ""
 	}
@@ -151,9 +178,11 @@ func (c Counts) get(key string) Num { return Or(c[key], 0) }
 
 // ParseDmidecodeMemory reads the Memory Device blocks of dmidecode text.
 func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
+	raw = lineEnds(raw)
 	if Trim(raw) == "" {
 		return nil
 	}
+	hints := hintsOf(raw)
 	var dimms []Dimm
 	dimmIndex := 0
 	for _, section := range strings.Split(raw, "Memory Device\n") {
@@ -168,100 +197,19 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 		populated := sizeStr != "" && sizeStr != "No Module Installed" && sizeStr != "Not Installed"
 		var sizeBytes Num
 		if populated {
-			if m, ok := reDmiSize.Match(sizeStr); ok {
-				val := float64(ParseInt(m.Group(1)))
-				switch upperASCII(m.Group(2)) {
-				case "MB":
-					sizeBytes = Num(val * 1024 * 1024)
-				case "GB":
-					sizeBytes = Num(val * 1024 * 1024 * 1024)
-				case "TB":
-					sizeBytes = Num(val * 1024 * 1024 * 1024 * 1024)
-				}
+			re := reDmiSize
+			if on(FixBinarySizes) {
+				re = reDmiSizeBinary
+			}
+			if m, ok := re.Match(sizeStr); ok {
+				sizeBytes = sizeOf(ParseInt(m.Group(1)), m.Group(2))
 			}
 		}
 		locator := get("Locator")
 		bank := get("Bank Locator")
 
-		var socket, channel Num
-		var socketBy, channelBy string
-		pNode, isPNode := reBankPNode.Match(bank)
-		var nodeCh jsMatch
-		isNodeCh := false
-		if !isPNode {
-			nodeCh, isNodeCh = reBankNodeChannel.Match(bank)
-		}
-		dimmNum, isDimmNum := reDimmNumeric.Match(locator)
-		switch {
-		case isPNode:
-			socket = ParseInt(pNode.Group(1))
-			node := float64(ParseInt(pNode.Group(2)))
-			ch := float64(ParseInt(pNode.Group(3)))
-			channel = Num(node*4 + ch)
-			socketBy, channelBy = ByPNodeChannelDimm, ByPNodeChannelDimm
-		case isNodeCh:
-			socket = ParseInt(nodeCh.Group(1))
-			channel = ParseInt(nodeCh.Group(2))
-			socketBy, channelBy = ByNodeChannelDimm, ByNodeChannelDimm
-		case isDimmNum:
-			socket = ParseInt(dimmNum.Group(1))
-			channel = ParseInt(dimmNum.Group(2))
-			socketBy, channelBy = ByDimmDigits, ByDimmDigits
-		default:
-			dell, isDell := reDell.Match(locator)
-			cpu, isCPU := reCPU.Match(locator)
-			if !isCPU {
-				cpu, isCPU = reCPU.Match(bank)
-			}
-			pn, isPN := rePNode.Match(locator)
-			if !isPN {
-				pn, isPN = rePNode.Match(bank)
-			}
-			proc, isProc := reProc.Match(locator)
-			switch {
-			case isDell:
-				socket = Num(upperASCII(dell.Group(1))[0]) - 65
-				socketBy = ByLetterNumber
-			case isProc:
-				socket = ParseInt(proc.Group(1)) - 1
-				socketBy = ByProc
-			case isCPU:
-				socket = ParseInt(cpu.Group(1))
-				socketBy = ByCPU
-			case isPN:
-				socket = ParseInt(pn.Group(1)) - 1
-				socketBy = ByPOrNode
-			}
-			if m, ok := reCxDx.Match(locator); ok {
-				channel, channelBy = ParseInt(m.Group(1)), ByCD
-			} else if m, ok := reCHxDIMMx.Match(locator); ok {
-				channel, channelBy = ParseInt(m.Group(1)), ByCHDimm
-			} else if m, ok := reBankChannelNum.Match(bank); ok {
-				channel, channelBy = ParseInt(m.Group(1)), ByBankChannel
-			} else if m, ok := reBankNodeNum.Match(bank); ok {
-				channel, channelBy = ParseInt(m.Group(1)), ByBankNode
-			} else {
-				m, ok := reDimmLetter.Match(locator)
-				by := ByDimmLetter
-				if !ok {
-					m, ok = reChannelLetter.Match(locator)
-					by = ByChannelLetter
-				}
-				if !ok {
-					m, ok = reBankChannelChar.Match(bank)
-					by = ByBankChannelChar
-				}
-				if ok {
-					ch := upperASCII(m.Group(1))
-					if ch >= "0" && ch <= "9" {
-						channel = ParseInt(ch)
-					} else {
-						channel = Num(ch[0]) - 65
-					}
-					channelBy = by
-				}
-			}
-		}
+		d := Dimm{Locator: locator, BankLocator: bank}
+		placeDmidecode(&d, locator, bank, hints)
 
 		ceCount := ce.get("dimm" + itoa(dimmIndex))
 		ueCount := ue.get("dimm" + itoa(dimmIndex))
@@ -269,37 +217,205 @@ func ParseDmidecodeMemory(raw string, ce, ue Counts) []Dimm {
 		if cfg == "" {
 			cfg = get("Configured Clock Speed")
 		}
-		dimms = append(dimms, Dimm{
-			Locator:         locator,
-			BankLocator:     bank,
-			Size:            sizeStr,
-			SizeBytes:       sizeBytes,
-			Type:            orUnknown(get("Type")),
-			Speed:           orUnknown(get("Speed")),
-			ConfiguredSpeed: orUnknown(cfg),
-			Manufacturer:    orUnknown(get("Manufacturer")),
-			SerialNumber:    orUnknown(get("Serial Number")),
-			PartNumber:      orUnknown(get("Part Number")),
-			Rank:            orUnknown(get("Rank")),
-			Channel:         channel,
-			Socket:          socket,
-			Populated:       populated,
-			CeCount:         ceCount,
-			UeCount:         ueCount,
-			ErrorCount:      ceCount + ueCount,
-			SocketBy:        socketBy,
-			ChannelBy:       channelBy,
-		})
+		d.Size, d.SizeBytes, d.Populated = sizeStr, sizeBytes, populated
+		d.Type, d.Speed, d.ConfiguredSpeed = orUnknown(get("Type")), orUnknown(get("Speed")), orUnknown(cfg)
+		d.Manufacturer, d.SerialNumber = orUnknown(get("Manufacturer")), orUnknown(get("Serial Number"))
+		d.PartNumber, d.Rank = orUnknown(get("Part Number")), orUnknown(get("Rank"))
+		d.CeCount, d.UeCount, d.ErrorCount = ceCount, ueCount, ceCount+ueCount
+		dimms = append(dimms, d)
 		dimmIndex++
 	}
-	secondPasses(dimms)
+	secondPasses(dimms, hints)
 	return dimms
+}
+
+// sizeOf is a size with its unit in bytes; 0 for a unit it does not know.
+func sizeOf(val Num, unit string) Num {
+	v := float64(val)
+	switch upperASCII(unit) {
+	case "MB", "MIB":
+		return Num(v * 1024 * 1024)
+	case "GB", "GIB":
+		return Num(v * 1024 * 1024 * 1024)
+	case "TB", "TIB":
+		return Num(v * 1024 * 1024 * 1024 * 1024)
+	}
+	return 0
+}
+
+// letterChannel is the channel of a letter or digit: A is 0, 7 is 7.
+func letterChannel(s string) Num {
+	ch := upperASCII(s)
+	if ch >= "0" && ch <= "9" {
+		return ParseInt(ch)
+	}
+	return Num(ch[0]) - 65
+}
+
+// channelLetter finds the channel letter of a locator such as
+// ChannelA-DIMM0 or CPU0_DIMM_A1. With FixDimmWord a letter that begins
+// the word DIMM or DIM is passed over.
+func channelLetter(locator string) (jsMatch, bool) {
+	if !on(FixDimmWord) {
+		return reChannelLetter.Match(locator)
+	}
+	for _, m := range reChannelLetter.All(locator) {
+		rest := strings.ToUpper(locator[m.End():])
+		if strings.EqualFold(m.Group(1), "D") && m.Group(2) == "" && strings.HasPrefix(rest, "IM") {
+			continue
+		}
+		return m, true
+	}
+	return jsMatch{}, false
+}
+
+// placeDmidecode sets the socket and the channel of a slot from its
+// locator and bank locator, with the names of the tests that fired.
+func placeDmidecode(d *Dimm, locator, bank string, hints textHints) {
+	pNode, isPNode := reBankPNode.Match(bank)
+	var nodeCh jsMatch
+	isNodeCh := false
+	if !isPNode {
+		nodeCh, isNodeCh = reBankNodeChannel.Match(bank)
+	}
+	dimmNum, isDimmNum := reDimmNumeric.Match(locator)
+	var pLetter jsMatch
+	isPLetter := false
+	if on(FixPLetter) {
+		pLetter, isPLetter = reDimmPLetter.Match(locator)
+	}
+	switch {
+	case isPNode:
+		d.Socket = ParseInt(pNode.Group(1))
+		d.rawNode, d.rawChannel = ParseInt(pNode.Group(2)), ParseInt(pNode.Group(3))
+		d.Channel = Num(float64(d.rawNode)*4 + float64(d.rawChannel))
+		d.SocketBy, d.ChannelBy = ByPNodeChannelDimm, ByPNodeChannelDimm
+		return
+	case isNodeCh:
+		d.Socket, d.Channel = ParseInt(nodeCh.Group(1)), ParseInt(nodeCh.Group(2))
+		d.SocketBy, d.ChannelBy = ByNodeChannelDimm, ByNodeChannelDimm
+		return
+	case isDimmNum:
+		d.Socket, d.Channel = ParseInt(dimmNum.Group(1)), ParseInt(dimmNum.Group(2))
+		d.SocketBy, d.ChannelBy = ByDimmDigits, ByDimmDigits
+		return
+	case isPLetter:
+		d.Socket, d.Channel = ParseInt(pLetter.Group(1)), letterChannel(pLetter.Group(2))
+		d.SocketBy, d.ChannelBy = ByPLetter, ByPLetter
+		return
+	}
+	dell, isDell := reDell.Match(locator)
+	var dellDimm jsMatch
+	isDellDimm := false
+	if on(FixDellDimm) && !isDell && hints.dell() {
+		dellDimm, isDellDimm = reDellDimm.Match(locator)
+	}
+	cpu, isCPU := reCPU.Match(locator)
+	if !isCPU {
+		cpu, isCPU = reCPU.Match(bank)
+	}
+	var cpuSp jsMatch
+	isCPUSp := false
+	if on(FixCPUWithSpace) && !isCPU {
+		if cpuSp, isCPUSp = reCPUSpace.Match(locator); !isCPUSp {
+			cpuSp, isCPUSp = reCPUSpace.Match(bank)
+		}
+	}
+	pn, isPN := rePNode.Match(locator)
+	if !isPN {
+		pn, isPN = rePNode.Match(bank)
+	}
+	proc, isProc := reProc.Match(locator)
+	switch {
+	case isDell:
+		d.Socket, d.SocketBy = Num(upperASCII(dell.Group(1))[0])-65, ByLetterNumber
+	case isDellDimm:
+		d.Socket, d.SocketBy = Num(upperASCII(dellDimm.Group(1))[0])-65, ByDellDimm
+		d.dellNumber, d.hasDell = ParseInt(dellDimm.Group(2)), true
+	case isProc:
+		d.Socket, d.SocketBy = ParseInt(proc.Group(1))-1, ByProc
+	case isCPU:
+		d.Socket, d.SocketBy = ParseInt(cpu.Group(1)), ByCPU
+	case isCPUSp:
+		d.rawSocket = ParseInt(cpuSp.Group(1))
+		d.Socket, d.SocketBy = d.rawSocket-1, ByCPUSpaced
+	case isPN:
+		d.rawSocket = ParseInt(pn.Group(1))
+		d.Socket, d.SocketBy = d.rawSocket-1, ByPOrNode
+	}
+	if m, ok := reCxDx.Match(locator); ok {
+		d.Channel, d.ChannelBy = ParseInt(m.Group(1)), ByCD
+		return
+	}
+	if m, ok := reCHxDIMMx.Match(locator); ok {
+		d.Channel, d.ChannelBy = ParseInt(m.Group(1)), ByCHDimm
+		return
+	}
+	if m, ok := reBankChannelNum.Match(bank); ok {
+		d.Channel, d.ChannelBy = ParseInt(m.Group(1)), ByBankChannel
+		return
+	}
+	letters := func() bool {
+		if m, ok := reDimmLetter.Match(locator); ok {
+			d.Channel, d.ChannelBy = letterChannel(m.Group(1)), ByDimmLetter
+			return true
+		}
+		if m, ok := channelLetter(locator); ok {
+			d.Channel, d.ChannelBy = letterChannel(m.Group(1)), ByChannelLetter
+			return true
+		}
+		return false
+	}
+	if on(FixLetterBeforeNode) && letters() {
+		return
+	}
+	if m, ok := reBankNodeNum.Match(bank); ok {
+		d.Channel, d.ChannelBy = ParseInt(m.Group(1)), ByBankNode
+		return
+	}
+	if !on(FixLetterBeforeNode) && letters() {
+		return
+	}
+	re := reBankChannelChar
+	if on(FixChanWord) {
+		re = reBankChanChar
+	}
+	if m, ok := re.Match(bank); ok {
+		d.Channel, d.ChannelBy = letterChannel(m.Group(1)), ByBankChannelChar
+	}
 }
 
 // secondPasses gives the slots named like A1 and like PROC 1 DIMM 9 their
 // channels: the number of the slot, counted from 1, modulo half the slots
-// of its socket.
-func secondPasses(dimms []Dimm) {
+// of its socket. Then the fixes that look at all the slots of a text.
+func secondPasses(dimms []Dimm, hints textHints) {
+	isLetter := func(d *Dimm) bool {
+		return reDellLocator.Test(d.Locator) || d.hasDell
+	}
+	if on(FixLettersFromA) {
+		// A letter is a socket only when the letters of the text start at A.
+		low := byte('Z' + 1)
+		for i := range dimms {
+			if d := &dimms[i]; d.SocketBy == ByLetterNumber || d.SocketBy == ByDellDimm {
+				if c := upperASCII(d.Locator)[firstLetter(d)]; c < low {
+					low = c
+				}
+			}
+		}
+		if low != 'A' && low <= 'Z' {
+			for i := range dimms {
+				if d := &dimms[i]; d.SocketBy == ByLetterNumber || d.SocketBy == ByDellDimm {
+					d.Socket, d.SocketBy, d.hasDell, d.notLetter = 0, "", false, true
+				}
+			}
+		}
+	}
+	channelsOf := func(n int) float64 { return maxf(1, ceil(float64(n)/2)) }
+	if on(FixDellChannels) {
+		if c, ok := ProcessorChannels(hints.processor); ok {
+			channelsOf = func(int) float64 { return float64(c) }
+		}
+	}
 	pass := func(match func(d *Dimm) bool, number func(d *Dimm) (Num, bool), by string) {
 		groups := map[float64][]*Dimm{}
 		var order []float64
@@ -317,16 +433,32 @@ func secondPasses(dimms []Dimm) {
 		for _, key := range order {
 			group := groups[key]
 			numChannels := maxf(1, ceil(float64(len(group))/2))
+			from := 1.0
+			if by == ByLetterNumberPass {
+				numChannels = channelsOf(len(group))
+				if on(FixLettersFromA) {
+					for _, d := range group {
+						if n, ok := number(d); ok && n == 0 {
+							from = 0
+						}
+					}
+				}
+			}
 			for _, d := range group {
 				if slot, ok := number(d); ok {
-					d.Channel = Num(Mod(float64(slot)-1, numChannels))
+					d.Channel = Num(Mod(float64(slot)-from, numChannels))
 					d.ChannelBy = by
 				}
 			}
 		}
 	}
-	pass(func(d *Dimm) bool { return reDellLocator.Test(d.Locator) },
-		func(d *Dimm) (Num, bool) { return ParseInt(d.Locator[1:]), true }, ByLetterNumberPass)
+	pass(func(d *Dimm) bool { return isLetter(d) && !d.notLetter },
+		func(d *Dimm) (Num, bool) {
+			if d.hasDell {
+				return d.dellNumber, true
+			}
+			return ParseInt(d.Locator[1:]), true
+		}, ByLetterNumberPass)
 	pass(func(d *Dimm) bool { return reHPLocator.Test(d.Locator) },
 		func(d *Dimm) (Num, bool) {
 			m, ok := reDimmNumber.Match(d.Locator)
@@ -335,6 +467,47 @@ func secondPasses(dimms []Dimm) {
 			}
 			return ParseInt(m.Group(1)), true
 		}, ByProcDimmPass)
+	if on(FixNumberingBase) {
+		zero := map[string]bool{}
+		for _, d := range dimms {
+			if counted(d.SocketBy) && d.rawSocket == 0 {
+				zero[d.SocketBy] = true
+			}
+		}
+		for i := range dimms {
+			if d := &dimms[i]; counted(d.SocketBy) && zero[d.SocketBy] {
+				d.Socket = d.rawSocket
+			}
+		}
+	}
+	if on(FixSupermicroNode) {
+		first := map[float64]float64{}
+		for _, d := range dimms {
+			if d.ChannelBy != ByPNodeChannelDimm {
+				continue
+			}
+			s := float64(d.Socket) + 0
+			if n, ok := first[s]; !ok || float64(d.rawNode) < n {
+				first[s] = float64(d.rawNode)
+			}
+		}
+		for i := range dimms {
+			if d := &dimms[i]; d.ChannelBy == ByPNodeChannelDimm {
+				d.Channel = Num((float64(d.rawNode)-first[float64(d.Socket)+0])*4 + float64(d.rawChannel))
+			}
+		}
+	}
+}
+
+// counted tells the socket tests whose numbers may count from 0 or 1.
+func counted(by string) bool { return by == ByPOrNode || by == ByCPUSpaced || by == ByP }
+
+// firstLetter is the offset of the letter that names the socket.
+func firstLetter(d *Dimm) int {
+	if d.SocketBy == ByDellDimm {
+		return len("DIMM_")
+	}
+	return 0
 }
 
 // lshwMemorySection is the text from the first *-memory node to the next
@@ -375,6 +548,7 @@ func blocks(text string, start, end *jsRegexp, max int) []string {
 
 // ParseLshwDimms reads the banks of the memory node of lshw text.
 func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
+	raw = lineEnds(raw)
 	if Trim(raw) == "" {
 		return nil
 	}
@@ -403,7 +577,7 @@ func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
 				}
 			}
 		}
-		var socket, channel Num
+		var socket, channel, rawSocket Num
 		var socketBy, channelBy string
 		if m, ok := reLshwDimmSlot.Match(slotStr); ok {
 			socket, channel = ParseInt(m.Group(1)), ParseInt(m.Group(2))
@@ -422,7 +596,8 @@ func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
 			case isCPU:
 				socket, socketBy = ParseInt(cpu.Group(1)), ByCPU
 			case isP:
-				socket, socketBy = ParseInt(p.Group(1))-1, ByP
+				rawSocket = ParseInt(p.Group(1))
+				socket, socketBy = rawSocket-1, ByP
 			case isNode:
 				socket, socketBy = ParseInt(node.Group(1)), ByNode
 			}
@@ -463,9 +638,9 @@ func ParseLshwDimms(raw string, ce, ue Counts) []Dimm {
 			Manufacturer: orUnknown(get("vendor")), SerialNumber: orUnknown(get("serial")),
 			PartNumber: orUnknown(get("product")), Rank: "Unknown", Channel: channel, Socket: socket,
 			Populated: populated, CeCount: ceCount, UeCount: ueCount, ErrorCount: ceCount + ueCount,
-			SocketBy: socketBy, ChannelBy: channelBy,
+			SocketBy: socketBy, ChannelBy: channelBy, rawSocket: rawSocket,
 		})
 	}
-	secondPasses(dimms)
+	secondPasses(dimms, textHints{})
 	return dimms
 }
