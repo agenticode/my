@@ -134,3 +134,19 @@ svg.spark { vertical-align: -3px; margin-right: 8px; }
 .g-consider .mb-stick-cap, .g-hold .mb-stick-cap, .g-ok .mb-stick-cap { fill: var(--ink); }
 .mb-cpu-die:hover .mb-die { stroke: var(--ink); }
 svg.board .slot .cell { pointer-events: visible; }
+
+/* The Memory Explorer: the parts of the memory, the nodes, the charts. */
+.seg-anonymous { fill: var(--h3); background: var(--h3); }
+.seg-shared { fill: var(--h1); background: var(--h1); }
+.seg-page-cache { fill: var(--series); background: var(--series); }
+.seg-slab-r { fill: var(--consider); background: var(--consider); }
+.seg-slab-u { fill: var(--replace); background: var(--replace); }
+.seg-other { fill: var(--axis); background: var(--axis); }
+.seg-free { fill: var(--ok); background: var(--ok); }
+.mx-node.n-ok rect { fill: var(--series); }
+.mx-node.n-warning rect { fill: var(--consider); }
+.mx-node.n-critical rect { fill: var(--replace); }
+.mx-line { fill: none; stroke: var(--series); stroke-width: 1.6; }
+.c-fault .mx-line { stroke: var(--consider); }
+.c-pgscand .mx-line { stroke: var(--replace); }
+.mx-dot-pt { fill: var(--series); }

@@ -175,3 +175,31 @@ footer p { margin: 2px 0; }
 .board-summary { margin: 0 0 0.4rem; }
 .mb-ddr-badge { display: inline-block; font-family: var(--mono); font-size: 0.8rem; border: 1px solid var(--axis); border-radius: 4px; padding: 0 0.35rem; white-space: nowrap; }
 @media print { .mx-hover { display: none; } }
+
+/* Section 7, the Memory Explorer: a tab bar of links, one panel shown. */
+.mx-tabs { list-style: none; display: flex; flex-wrap: wrap; gap: 0.3rem; padding: 0; margin: 0.6rem 0; }
+.mx-tabs a { display: inline-block; padding: 0.2rem 0.7rem; border: 1px solid var(--axis); border-radius: 4px; text-decoration: none; }
+.mx-tabs a.on { background: var(--ink); color: var(--surface); }
+.mx-panel { display: none; }
+.mx-panels:not(.js) .mx-panel:target, .mx-panels:not(.js):not(:has(.mx-panel:target)) .mx-panel:first-child { display: block; }
+.mx-panels.js .mx-panel { display: none; }
+.mx-panels.js .mx-panel.on { display: block; }
+.mx-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+.mx-kpi { border: 1px solid var(--line); border-radius: 6px; padding: 0.4rem 0.6rem; }
+.mx-kpi dt { color: var(--ink3); font-size: 0.8rem; }
+.mx-kpi dd { margin: 0.1rem 0 0; font-family: var(--mono); overflow-wrap: anywhere; min-width: 0; }
+.mx-kpi.kpi-warning { border-color: var(--consider); }
+.mx-kpi.kpi-critical { border-color: var(--replace); border-width: 2px; }
+.mx-hints li.hint-critical { color: var(--replace); }
+.mx-hints li.hint-warning { color: #8a5d00; }
+.mx-dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.3rem; vertical-align: -0.05rem; }
+.v-moderate { color: #8a5d00; }
+.v-high { color: var(--replace); font-weight: 600; }
+.assess-ok { color: #2f6b2f; }
+.assess-warn { color: #8a5d00; }
+.assess-bad { color: var(--replace); }
+.mx-warn { color: #8a5d00; }
+@media print {
+  .mx-tabs { display: none; }
+  .mx-panel, .mx-panels.js .mx-panel { display: block; break-inside: avoid-page; }
+}

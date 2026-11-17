@@ -1056,7 +1056,8 @@ func TestWords(t *testing.T) {
 	build, _ := os.ReadFile("build.go")
 	boots, _ := os.ReadFile("boots.go")
 	board, _ := os.ReadFile("board.go")
-	src = append(append(append(append(src, more...), build...), boots...), board...)
+	mx, _ := os.ReadFile("explorer.go")
+	src = append(append(append(append(append(src, more...), build...), boots...), board...), mx...)
 	for _, m := range regexp.MustCompile(`doc\.say\("([a-z0-9_.]+)"`).FindAllSubmatch(src, -1) {
 		if code := string(m[1]); !Words.Has(code) && !strings.HasSuffix(code, ".") {
 			t.Errorf("the report asks for %q, which the catalog lacks", code)

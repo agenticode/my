@@ -916,6 +916,8 @@ section#s6.sec
 section#s7.sec
   ## 7 Data quality
   p.how: What the findings rest on: every source that was looked for, what it yielded, and how much of the location of an error it reports. A finding only says what the observation grade of its records allows.
+  ### How the board was drawn
+  li: 32 slots on the board, 0 drawn without channels, 0 set aside
   ### Errors by observation grade
   figure
     svg.fig.obsbar: Errors of host r12-n034 by observation grade

@@ -76,16 +76,25 @@ func (doc *Document) html() (*node, error) {
 		return nil, err
 	}
 	sheet.add(el("main",
-		doc.summary(), doc.slotMap(), doc.findings(), doc.where(), doc.timelines(), doc.checks(), doc.quality(), appendix),
+		doc.summary(), doc.slotMap(), doc.findings(), doc.where(), doc.timelines(), doc.checks(), doc.explorerPart(), doc.quality(), appendix),
 		el("footer", el("p", doc.say("footer")), el("p", A{"class", "mono"}, doc.Tool)))
 	body := el("body", sheet, doc.panel(), el("script", rawText(script)))
 	return el("html", A{"lang", string(doc.Lang)}, head, body), nil
 }
 
-// section starts one of the eight sections of the report.
+// section starts one of the sections of the report: eight, or nine with
+// the Memory Explorer.
 func (doc *Document) section(n int) *node {
 	return el("section", A{"id", "s" + strconv.Itoa(n), "class", "sec"},
-		el("h2", el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.say("sec."+strconv.Itoa(n))))
+		el("h2", el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.secWord(n)))
+}
+
+// explorerPart is section 7 when the case holds readings, else nothing.
+func (doc *Document) explorerPart() any {
+	if !doc.hasExplorer() {
+		return nil
+	}
+	return doc.explorerSection()
 }
 
 // how is a line that says how to read a figure.
@@ -288,8 +297,8 @@ func (doc *Document) summary() *node {
 	s.add(facts)
 
 	toc := el("ol", A{"class", "toc"})
-	for n := 2; n <= 8; n++ {
-		toc.add(el("li", el("a", A{"href", "#s" + strconv.Itoa(n)}, el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.say("sec."+strconv.Itoa(n)))))
+	for n := 2; n <= doc.secAppendix(); n++ {
+		toc.add(el("li", el("a", A{"href", "#s" + strconv.Itoa(n)}, el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.secWord(n))))
 	}
 	s.add(el("nav", A{"aria-label", doc.say("contents")}, toc))
 	return s
@@ -1220,8 +1229,20 @@ func (doc *Document) checks() *node {
 // quality is section 7: the sources, what each yielded, and how much of
 // the location of an error the records carry.
 func (doc *Document) quality() *node {
-	s := doc.section(7)
+	s := doc.section(doc.secQuality())
 	s.add(how(doc.say("cap.quality")))
+	// How the board was drawn, and the readings of the explorer the case
+	// lacks.
+	if b := doc.Board; boardDrawn(b) {
+		ul := el("ul", A{"class", "dq-board"})
+		for _, l := range b.Lines {
+			ul.add(el("li", l.Text))
+		}
+		s.add(el("h3", doc.say("dq.board")), ul)
+	}
+	if doc.hasExplorer() && len(doc.Explorer.Missing) > 0 {
+		s.add(el("p", doc.say("dq.readings_missing", "kinds", strings.Join(doc.Explorer.Missing, ", "))))
+	}
 	host := doc.Overview.Host
 
 	if host.CE+host.UE > 0 {
@@ -1489,10 +1510,10 @@ func (doc *Document) recordRows(r *Record) *node {
 		el("tr", A{"class", "raw"}, rawCell))
 }
 
-// appendix is section 8: the records the report points at, with their
+// appendix is the last section: the records the report points at, with their
 // original text, and the error records with FMFM field names.
 func (doc *Document) appendix() (*node, error) {
-	s := doc.section(8)
+	s := doc.section(doc.secAppendix())
 	s.add(el("h3", A{"id", "about"}, doc.say("app.about")), doc.about(), el("p", A{"class", "how"}, doc.say("sum.finding")))
 	if len(doc.DIMMs) > 0 || doc.Host != nil {
 		s.add(el("h3", A{"id", "findings-full"}, doc.say("app.findings")))
