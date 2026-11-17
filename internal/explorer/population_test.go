@@ -355,7 +355,7 @@ func TestPopulationInTheDocs(t *testing.T) {
 		dumps += l[0].dumps
 	}
 	for _, want := range []string{commas(dumps) + " dumps with memory devices", commas(len(lists)) + " distinct slot lists", "commit `57b21bc`",
-		commas(len(families)) + " rows", commas(len(sourceOrder)) + " documents"} {
+		commas(len(families)) + " rows", commas(len(familyCited())) + " documents"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("docs/compatibility.md lacks %q", want)
 		}

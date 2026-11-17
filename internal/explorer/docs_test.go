@@ -221,7 +221,11 @@ func TestFamiliesInTheDocs(t *testing.T) {
 	docSection(t, "families", b.String())
 	var d strings.Builder
 	d.WriteString("| Document | Maker | Title | Number or revision | Date | Pages | Address |\n| --- | --- | --- | --- | --- | --- | --- |\n")
+	cited := familyCited()
 	for _, id := range sourceOrder {
+		if !cited[id] {
+			continue // a document of the population rules: docs/rules.md lists it
+		}
 		s := sources[id]
 		addr := "not recorded"
 		if s.URL != "" {

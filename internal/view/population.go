@@ -301,7 +301,9 @@ func citeOf(refs []population.Ref, product string) PopulationSource {
 	if out.Number != "" {
 		parts = append(parts, out.Number)
 	}
-	parts = append(parts, pagesText(out.Pages))
+	if pg := pagesText(out.Pages); pg != "" {
+		parts = append(parts, pg)
+	}
 	out.Cite = strings.Join(parts, ", ")
 	return out
 }
@@ -309,7 +311,10 @@ func citeOf(refs []population.Ref, product string) PopulationSource {
 // pagesText writes pages as the documents' language does: "p. 48",
 // "pp. 41, 47", "pp. 41-48".
 func pagesText(pages string) string {
-	if strings.ContainsAny(pages, ",-") {
+	switch {
+	case pages == "" || pages == "topic":
+		return ""
+	case strings.ContainsAny(pages, ",-"):
 		return "pp. " + strings.ReplaceAll(pages, ",", ", ")
 	}
 	return "p. " + pages

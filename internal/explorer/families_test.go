@@ -2,6 +2,7 @@ package explorer
 
 import (
 	"fmt"
+	"github.com/agenticode/my/internal/population"
 	"sort"
 	"strings"
 	"testing"
@@ -40,15 +41,21 @@ func TestFamilyTable(t *testing.T) {
 	if errs := checkFamilies(families, sources); len(errs) > 0 {
 		t.Errorf("families.tsv: %v", errs)
 	}
-	cited := map[string]bool{}
-	for _, f := range families {
-		for _, s := range f.source {
-			cited[s] = true
+	cited := familyCited()
+	byRules := map[string]bool{}
+	for _, set := range population.Sets() {
+		for _, r := range set.Source {
+			byRules[r.ID] = true
+		}
+		for _, rule := range set.Rules {
+			for _, r := range rule.Source {
+				byRules[r.ID] = true
+			}
 		}
 	}
 	for _, id := range sourceOrder {
-		if !cited[id] {
-			t.Errorf("sources.tsv: %s is cited by no row", id)
+		if !cited[id] && !byRules[id] {
+			t.Errorf("sources.tsv: %s is cited by no row of families.tsv and no rule set", id)
 		}
 		// A document whose copy was read without its address names its
 		// number or date instead.
@@ -68,9 +75,21 @@ func TestFamilyTable(t *testing.T) {
 	if _, err := parseFamilies("x\tdell\t(\t\t\t\ttable\t\t\t\tdell-e26s\n"); err == nil {
 		t.Error("a match that does not compile was taken")
 	}
-	if len(families) != 361 || len(sourceOrder) != 385 {
-		t.Errorf("%d rows, %d documents", len(families), len(sourceOrder))
+	if len(families) != 361 || len(cited) != 385 {
+		t.Errorf("%d rows, %d documents", len(families), len(cited))
 	}
+}
+
+// familyCited are the documents the rows of families.tsv cite; the others
+// of sources.tsv are cited by the population rule sets.
+func familyCited() map[string]bool {
+	cited := map[string]bool{}
+	for _, f := range families {
+		for _, s := range f.source {
+			cited[s] = true
+		}
+	}
+	return cited
 }
 
 // A row of a maker matches no board of another known maker.
