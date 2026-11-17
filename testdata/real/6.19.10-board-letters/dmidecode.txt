@@ -1,0 +1,80 @@
+# dmidecode 3.7
+Getting SMBIOS data from sysfs.
+SMBIOS 2.8 present.
+
+Handle 0x1100, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMMA1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0001
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1101, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMMB1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0002
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1102, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMMA2
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x1103, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: DIMMB2
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+

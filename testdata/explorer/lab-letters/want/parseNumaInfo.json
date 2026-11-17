@@ -1,0 +1,21 @@
+{
+ "fn": "parseNumaInfo",
+ "in": {
+  "hw": "@file:numactl-hardware.txt",
+  "stat": "@file:numastat.txt"
+ },
+ "out": [
+  {
+   "nodeId": 0,
+   "totalBytes": 33643560960,
+   "freeBytes": 33176944640,
+   "usedBytes": 466616320,
+   "numaHit": 441380,
+   "numaMiss": 0,
+   "numaForeign": 0,
+   "interleaveHit": 1765,
+   "localNode": 441380,
+   "otherNode": 0
+  }
+ ]
+}

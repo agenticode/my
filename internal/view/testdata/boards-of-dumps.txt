@@ -10,6 +10,18 @@ ironlib-dmidecode (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+lab-digits (4 slots, 1 processor records)
+  first                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+lab-letters (4 slots, 1 processor records)
+  first                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
+lab-two-sockets (8 slots, 2 processor records)
+  first                  placed 8, no channel 0, aside 0, CPUs 2 []
+  fixed                  placed 8, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 8, no channel 0, aside 0, CPUs 2 []
 linuxhw-1288h-v5-c98b42 (24 slots, 2 processor records)
   first                  placed 24, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 24, no channel 0, aside 0, CPUs 2 []

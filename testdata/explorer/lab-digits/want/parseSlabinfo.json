@@ -1,0 +1,3494 @@
+{
+ "fn": "parseSlabinfo",
+ "in": {
+  "text": "@file:proc/slabinfo"
+ },
+ "out": [
+  {
+   "name": "fat_inode_cache",
+   "activeObjs": 21,
+   "totalObjs": 21,
+   "objSize": 776,
+   "totalSize": 16296
+  },
+  {
+   "name": "fat_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 40,
+   "totalSize": 0
+  },
+  {
+   "name": "zspage-zram0",
+   "activeObjs": 73,
+   "totalObjs": 73,
+   "objSize": 56,
+   "totalSize": 4088
+  },
+  {
+   "name": "zs_handle-zram0",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 8,
+   "totalSize": 4096
+  },
+  {
+   "name": "AF_VSOCK",
+   "activeObjs": 12,
+   "totalObjs": 12,
+   "objSize": 1280,
+   "totalSize": 15360
+  },
+  {
+   "name": "fuse_request",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 176,
+   "totalSize": 0
+  },
+  {
+   "name": "fuse_inode",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 896,
+   "totalSize": 0
+  },
+  {
+   "name": "btrfs_prelim_ref",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 80,
+   "totalSize": 0
+  },
+  {
+   "name": "btrfs_delayed_extent_op",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "btrfs_delayed_ref_node",
+   "activeObjs": 252,
+   "totalObjs": 252,
+   "objSize": 112,
+   "totalSize": 28224
+  },
+  {
+   "name": "btrfs_delayed_ref_head",
+   "activeObjs": 224,
+   "totalObjs": 224,
+   "objSize": 128,
+   "totalSize": 28672
+  },
+  {
+   "name": "btrfs_inode_defrag",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "btrfs_delayed_node",
+   "activeObjs": 221,
+   "totalObjs": 221,
+   "objSize": 312,
+   "totalSize": 68952
+  },
+  {
+   "name": "btrfs_ordered_extent",
+   "activeObjs": 57,
+   "totalObjs": 57,
+   "objSize": 416,
+   "totalSize": 23712
+  },
+  {
+   "name": "btrfs_extent_map",
+   "activeObjs": 2769,
+   "totalObjs": 2769,
+   "objSize": 104,
+   "totalSize": 287976
+  },
+  {
+   "name": "bio-336",
+   "activeObjs": 21,
+   "totalObjs": 21,
+   "objSize": 384,
+   "totalSize": 8064
+  },
+  {
+   "name": "bio-400",
+   "activeObjs": 144,
+   "totalObjs": 144,
+   "objSize": 448,
+   "totalSize": 64512
+  },
+  {
+   "name": "btrfs_extent_buffer",
+   "activeObjs": 680,
+   "totalObjs": 680,
+   "objSize": 240,
+   "totalSize": 163200
+  },
+  {
+   "name": "btrfs_extent_state",
+   "activeObjs": 560,
+   "totalObjs": 560,
+   "objSize": 72,
+   "totalSize": 40320
+  },
+  {
+   "name": "btrfs_free_space_bitmap",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 4096,
+   "totalSize": 32768
+  },
+  {
+   "name": "btrfs_free_space",
+   "activeObjs": 507,
+   "totalObjs": 507,
+   "objSize": 104,
+   "totalSize": 52728
+  },
+  {
+   "name": "btrfs_path",
+   "activeObjs": 72,
+   "totalObjs": 72,
+   "objSize": 112,
+   "totalSize": 8064
+  },
+  {
+   "name": "btrfs_trans_handle",
+   "activeObjs": 48,
+   "totalObjs": 48,
+   "objSize": 168,
+   "totalSize": 8064
+  },
+  {
+   "name": "bio-416",
+   "activeObjs": 18,
+   "totalObjs": 18,
+   "objSize": 448,
+   "totalSize": 8064
+  },
+  {
+   "name": "btrfs_inode",
+   "activeObjs": 3440,
+   "totalObjs": 3440,
+   "objSize": 1024,
+   "totalSize": 3522560
+  },
+  {
+   "name": "bio-448",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 512,
+   "totalSize": 49152
+  },
+  {
+   "name": "fsverity_info",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 264,
+   "totalSize": 0
+  },
+  {
+   "name": "fscrypt_inode_info",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "can_receiver",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 80,
+   "totalSize": 0
+  },
+  {
+   "name": "MPTCPv6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2176,
+   "totalSize": 0
+  },
+  {
+   "name": "ip6-frags",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 184,
+   "totalSize": 0
+  },
+  {
+   "name": "fib6_node",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "ip6_dst_cache",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "mfc6_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "PINGv6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1344,
+   "totalSize": 0
+  },
+  {
+   "name": "RAWv6",
+   "activeObjs": 36,
+   "totalObjs": 36,
+   "objSize": 1344,
+   "totalSize": 48384
+  },
+  {
+   "name": "UDPLITEv6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1472,
+   "totalSize": 0
+  },
+  {
+   "name": "UDPv6",
+   "activeObjs": 44,
+   "totalObjs": 44,
+   "objSize": 1472,
+   "totalSize": 64768
+  },
+  {
+   "name": "tw_sock_TCPv6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 280,
+   "totalSize": 0
+  },
+  {
+   "name": "request_sock_TCPv6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 328,
+   "totalSize": 0
+  },
+  {
+   "name": "TCPv6",
+   "activeObjs": 12,
+   "totalObjs": 12,
+   "objSize": 2560,
+   "totalSize": 30720
+  },
+  {
+   "name": "dm_snap_pending_exception",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "dm_exception",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "kcopyd_job",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 3240,
+   "totalSize": 0
+  },
+  {
+   "name": "io",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "dm_uevent",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2888,
+   "totalSize": 0
+  },
+  {
+   "name": "uhci_urb_priv",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "scsi_sense_cache",
+   "activeObjs": 352,
+   "totalObjs": 352,
+   "objSize": 128,
+   "totalSize": 45056
+  },
+  {
+   "name": "bio-136",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "btree_node",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "io_kiocb",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "bfq_io_cq",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1232,
+   "totalSize": 0
+  },
+  {
+   "name": "bfq_queue",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 576,
+   "totalSize": 0
+  },
+  {
+   "name": "bio-264",
+   "activeObjs": 24,
+   "totalObjs": 24,
+   "objSize": 320,
+   "totalSize": 7680
+  },
+  {
+   "name": "mqueue_inode_cache",
+   "activeObjs": 17,
+   "totalObjs": 17,
+   "objSize": 960,
+   "totalSize": 16320
+  },
+  {
+   "name": "jbd2_transaction_s",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "jbd2_inode",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "jbd2_journal_handle",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "jbd2_journal_head",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 120,
+   "totalSize": 0
+  },
+  {
+   "name": "jbd2_revoke_table_s",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 16,
+   "totalSize": 0
+  },
+  {
+   "name": "jbd2_revoke_record_s",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_fc_dentry_update",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 104,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_inode_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1152,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_free_data",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_allocation_context",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 168,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_prealloc_space",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 112,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_system_zone",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 40,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_io_end_vec",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "ext4_io_end",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "bio_post_read_ctx",
+   "activeObjs": 170,
+   "totalObjs": 170,
+   "objSize": 48,
+   "totalSize": 8160
+  },
+  {
+   "name": "pending_reservation",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "extent_status",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 40,
+   "totalSize": 0
+  },
+  {
+   "name": "mb_cache_entry",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "kioctx",
+   "activeObjs": 14,
+   "totalObjs": 14,
+   "objSize": 576,
+   "totalSize": 8064
+  },
+  {
+   "name": "aio_kiocb",
+   "activeObjs": 21,
+   "totalObjs": 21,
+   "objSize": 192,
+   "totalSize": 4032
+  },
+  {
+   "name": "userfaultfd_ctx_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "fanotify_mnt_event",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "fanotify_perm_event",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 112,
+   "totalSize": 0
+  },
+  {
+   "name": "fanotify_path_event",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "fanotify_fid_event",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 72,
+   "totalSize": 0
+  },
+  {
+   "name": "fanotify_mark",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 80,
+   "totalSize": 0
+  },
+  {
+   "name": "dnotify_mark",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 80,
+   "totalSize": 0
+  },
+  {
+   "name": "dnotify_struct",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "dio",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 640,
+   "totalSize": 0
+  },
+  {
+   "name": "fasync_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 48,
+   "totalSize": 0
+  },
+  {
+   "name": "audit_tree_mark",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 80,
+   "totalSize": 0
+  },
+  {
+   "name": "pid_namespace",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 456,
+   "totalSize": 0
+  },
+  {
+   "name": "xsk_generic_xmit_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "UNIX-STREAM",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 1152,
+   "totalSize": 129024
+  },
+  {
+   "name": "UNIX",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 1152,
+   "totalSize": 96768
+  },
+  {
+   "name": "ip4-frags",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 200,
+   "totalSize": 0
+  },
+  {
+   "name": "mfc_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "UDP-Lite",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1344,
+   "totalSize": 0
+  },
+  {
+   "name": "MPTCP",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2048,
+   "totalSize": 0
+  },
+  {
+   "name": "request_sock_subflow_v6",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 400,
+   "totalSize": 0
+  },
+  {
+   "name": "request_sock_subflow_v4",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 400,
+   "totalSize": 0
+  },
+  {
+   "name": "tcp_bind2_bucket",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "tcp_bind_bucket",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "inet_peer",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "xfrm_dst",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 320,
+   "totalSize": 0
+  },
+  {
+   "name": "xfrm_state",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 832,
+   "totalSize": 0
+  },
+  {
+   "name": "ip_fib_trie",
+   "activeObjs": 170,
+   "totalObjs": 170,
+   "objSize": 48,
+   "totalSize": 8160
+  },
+  {
+   "name": "ip_fib_alias",
+   "activeObjs": 146,
+   "totalObjs": 146,
+   "objSize": 56,
+   "totalSize": 8176
+  },
+  {
+   "name": "rtable",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "PING",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1088,
+   "totalSize": 0
+  },
+  {
+   "name": "RAW",
+   "activeObjs": 26,
+   "totalObjs": 26,
+   "objSize": 1216,
+   "totalSize": 31616
+  },
+  {
+   "name": "UDP",
+   "activeObjs": 24,
+   "totalObjs": 24,
+   "objSize": 1344,
+   "totalSize": 32256
+  },
+  {
+   "name": "tw_sock_TCP",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 280,
+   "totalSize": 0
+  },
+  {
+   "name": "request_sock_TCP",
+   "activeObjs": 12,
+   "totalObjs": 12,
+   "objSize": 328,
+   "totalSize": 3936
+  },
+  {
+   "name": "TCP",
+   "activeObjs": 26,
+   "totalObjs": 26,
+   "objSize": 2432,
+   "totalSize": 63232
+  },
+  {
+   "name": "hugetlbfs_inode_cache",
+   "activeObjs": 50,
+   "totalObjs": 50,
+   "objSize": 632,
+   "totalSize": 31600
+  },
+  {
+   "name": "dquot",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "bio-280",
+   "activeObjs": 36,
+   "totalObjs": 36,
+   "objSize": 320,
+   "totalSize": 11520
+  },
+  {
+   "name": "backing_aio",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "ep_head",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "eventpoll_pwq",
+   "activeObjs": 320,
+   "totalObjs": 320,
+   "objSize": 64,
+   "totalSize": 20480
+  },
+  {
+   "name": "eventpoll_epi",
+   "activeObjs": 468,
+   "totalObjs": 480,
+   "objSize": 128,
+   "totalSize": 61440
+  },
+  {
+   "name": "inotify_inode_mark",
+   "activeObjs": 204,
+   "totalObjs": 204,
+   "objSize": 80,
+   "totalSize": 16320
+  },
+  {
+   "name": "dax_cache",
+   "activeObjs": 21,
+   "totalObjs": 21,
+   "objSize": 768,
+   "totalSize": 16128
+  },
+  {
+   "name": "sgpool-128",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "sgpool-64",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "sgpool-32",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "sgpool-16",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "sgpool-8",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 256,
+   "totalSize": 24576
+  },
+  {
+   "name": "bio_crypt_ctx",
+   "activeObjs": 204,
+   "totalObjs": 204,
+   "objSize": 40,
+   "totalSize": 8160
+  },
+  {
+   "name": "bio_integrity_data",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 128,
+   "totalSize": 4096
+  },
+  {
+   "name": "request_queue",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 992,
+   "totalSize": 31744
+  },
+  {
+   "name": "blkdev_ioc",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 88,
+   "totalSize": 0
+  },
+  {
+   "name": "bio-200",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 256,
+   "totalSize": 20480
+  },
+  {
+   "name": "biovec-max",
+   "activeObjs": 80,
+   "totalObjs": 96,
+   "objSize": 4096,
+   "totalSize": 393216
+  },
+  {
+   "name": "biovec-128",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2048,
+   "totalSize": 0
+  },
+  {
+   "name": "biovec-64",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 1024,
+   "totalSize": 98304
+  },
+  {
+   "name": "biovec-16",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 256,
+   "totalSize": 16384
+  },
+  {
+   "name": "msg_msg-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-4k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 4096,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-2k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2048,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-1k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1024,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-512",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 512,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-256",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-128",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-64",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-32",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-16",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 16,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-8",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-192",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "msg_msg-96",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 96,
+   "totalSize": 0
+  },
+  {
+   "name": "damon_region",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "mm_slot",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 40,
+   "totalSize": 0
+  },
+  {
+   "name": "ksm_mm_slot",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 48,
+   "totalSize": 0
+  },
+  {
+   "name": "ksm_stable_node",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "ksm_rmap_item",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "memdup_user-8k",
+   "activeObjs": 4,
+   "totalObjs": 4,
+   "objSize": 8192,
+   "totalSize": 32768
+  },
+  {
+   "name": "memdup_user-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "memdup_user-2k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 2048,
+   "totalSize": 32768
+  },
+  {
+   "name": "memdup_user-1k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 1024,
+   "totalSize": 16384
+  },
+  {
+   "name": "memdup_user-512",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 512,
+   "totalSize": 0
+  },
+  {
+   "name": "memdup_user-256",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "memdup_user-128",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "memdup_user-64",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 64,
+   "totalSize": 8192
+  },
+  {
+   "name": "memdup_user-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "memdup_user-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "memdup_user-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "memdup_user-192",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "memdup_user-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "user_namespace",
+   "activeObjs": 40,
+   "totalObjs": 40,
+   "objSize": 784,
+   "totalSize": 31360
+  },
+  {
+   "name": "uid_cache",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "iommu_iova_magazine",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1024,
+   "totalSize": 0
+  },
+  {
+   "name": "iommu_iova",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "dmaengine-unmap-256",
+   "activeObjs": 15,
+   "totalObjs": 15,
+   "objSize": 2112,
+   "totalSize": 31680
+  },
+  {
+   "name": "dmaengine-unmap-128",
+   "activeObjs": 15,
+   "totalObjs": 15,
+   "objSize": 1088,
+   "totalSize": 16320
+  },
+  {
+   "name": "dmaengine-unmap-16",
+   "activeObjs": 21,
+   "totalObjs": 21,
+   "objSize": 192,
+   "totalSize": 4032
+  },
+  {
+   "name": "dmaengine-unmap-2",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 64,
+   "totalSize": 4096
+  },
+  {
+   "name": "audit_buffer",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 72,
+   "totalSize": 8064
+  },
+  {
+   "name": "sock_inode_cache",
+   "activeObjs": 266,
+   "totalObjs": 266,
+   "objSize": 832,
+   "totalSize": 221312
+  },
+  {
+   "name": "skbuff_ext_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "skbuff_small_head",
+   "activeObjs": 230,
+   "totalObjs": 253,
+   "objSize": 704,
+   "totalSize": 178112
+  },
+  {
+   "name": "skbuff_fclone_cache",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "skbuff_head_cache",
+   "activeObjs": 176,
+   "totalObjs": 176,
+   "objSize": 256,
+   "totalSize": 45056
+  },
+  {
+   "name": "tracefs_inode_cache",
+   "activeObjs": 204,
+   "totalObjs": 204,
+   "objSize": 656,
+   "totalSize": 133824
+  },
+  {
+   "name": "debugfs_inode_cache",
+   "activeObjs": 324,
+   "totalObjs": 324,
+   "objSize": 640,
+   "totalSize": 207360
+  },
+  {
+   "name": "configfs_dir_cache",
+   "activeObjs": 46,
+   "totalObjs": 46,
+   "objSize": 88,
+   "totalSize": 4048
+  },
+  {
+   "name": "file_lease_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 160,
+   "totalSize": 0
+  },
+  {
+   "name": "file_lock_cache",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "file_lock_ctx",
+   "activeObjs": 146,
+   "totalObjs": 146,
+   "objSize": 56,
+   "totalSize": 8176
+  },
+  {
+   "name": "fsnotify_mark_connector",
+   "activeObjs": 340,
+   "totalObjs": 340,
+   "objSize": 24,
+   "totalSize": 8160
+  },
+  {
+   "name": "posix_timers_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 384,
+   "totalSize": 0
+  },
+  {
+   "name": "buffer_head",
+   "activeObjs": 117,
+   "totalObjs": 117,
+   "objSize": 104,
+   "totalSize": 12168
+  },
+  {
+   "name": "task_delay_info",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "taskstats",
+   "activeObjs": 28,
+   "totalObjs": 28,
+   "objSize": 560,
+   "totalSize": 15680
+  },
+  {
+   "name": "mem_cgroup_per_node",
+   "activeObjs": 102,
+   "totalObjs": 102,
+   "objSize": 1920,
+   "totalSize": 195840
+  },
+  {
+   "name": "mem_cgroup",
+   "activeObjs": 98,
+   "totalObjs": 98,
+   "objSize": 2304,
+   "totalSize": 225792
+  },
+  {
+   "name": "pidfs_xattr_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 16,
+   "totalSize": 0
+  },
+  {
+   "name": "pidfs_attr_cache",
+   "activeObjs": 192,
+   "totalObjs": 192,
+   "objSize": 64,
+   "totalSize": 12288
+  },
+  {
+   "name": "proc_dir_entry",
+   "activeObjs": 462,
+   "totalObjs": 462,
+   "objSize": 192,
+   "totalSize": 88704
+  },
+  {
+   "name": "pde_opener",
+   "activeObjs": 204,
+   "totalObjs": 204,
+   "objSize": 40,
+   "totalSize": 8160
+  },
+  {
+   "name": "proc_inode_cache",
+   "activeObjs": 1136,
+   "totalObjs": 1150,
+   "objSize": 696,
+   "totalSize": 800400
+  },
+  {
+   "name": "seq_file",
+   "activeObjs": 68,
+   "totalObjs": 68,
+   "objSize": 120,
+   "totalSize": 8160
+  },
+  {
+   "name": "sigqueue",
+   "activeObjs": 102,
+   "totalObjs": 102,
+   "objSize": 80,
+   "totalSize": 8160
+  },
+  {
+   "name": "bdev_cache",
+   "activeObjs": 40,
+   "totalObjs": 40,
+   "objSize": 1600,
+   "totalSize": 64000
+  },
+  {
+   "name": "shmem_inode_cache",
+   "activeObjs": 1302,
+   "totalObjs": 1302,
+   "objSize": 776,
+   "totalSize": 1010352
+  },
+  {
+   "name": "kernfs_iattrs_cache",
+   "activeObjs": 918,
+   "totalObjs": 918,
+   "objSize": 80,
+   "totalSize": 73440
+  },
+  {
+   "name": "kernfs_node_cache",
+   "activeObjs": 34740,
+   "totalObjs": 34740,
+   "objSize": 136,
+   "totalSize": 4724640
+  },
+  {
+   "name": "mnt_cache",
+   "activeObjs": 398,
+   "totalObjs": 441,
+   "objSize": 384,
+   "totalSize": 169344
+  },
+  {
+   "name": "bfilp",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "filp",
+   "activeObjs": 885,
+   "totalObjs": 1029,
+   "objSize": 192,
+   "totalSize": 197568
+  },
+  {
+   "name": "inode_cache",
+   "activeObjs": 7722,
+   "totalObjs": 7722,
+   "objSize": 624,
+   "totalSize": 4818528
+  },
+  {
+   "name": "dentry",
+   "activeObjs": 15057,
+   "totalObjs": 15057,
+   "objSize": 192,
+   "totalSize": 2890944
+  },
+  {
+   "name": "net_namespace",
+   "activeObjs": 5,
+   "totalObjs": 5,
+   "objSize": 6080,
+   "totalSize": 30400
+  },
+  {
+   "name": "ima_iint_cache",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 104,
+   "totalSize": 0
+  },
+  {
+   "name": "hashtab_node",
+   "activeObjs": 21080,
+   "totalObjs": 21080,
+   "objSize": 24,
+   "totalSize": 505920
+  },
+  {
+   "name": "ebitmap_node",
+   "activeObjs": 51712,
+   "totalObjs": 51712,
+   "objSize": 64,
+   "totalSize": 3309568
+  },
+  {
+   "name": "avtab_extended_perms",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 40,
+   "totalSize": 0
+  },
+  {
+   "name": "avtab_node",
+   "activeObjs": 94860,
+   "totalObjs": 94860,
+   "objSize": 24,
+   "totalSize": 2276640
+  },
+  {
+   "name": "extended_perms_data",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "avc_xperms_decision_node",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 48,
+   "totalSize": 0
+  },
+  {
+   "name": "avc_xperms_node",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 56,
+   "totalSize": 0
+  },
+  {
+   "name": "avc_node",
+   "activeObjs": 643,
+   "totalObjs": 728,
+   "objSize": 72,
+   "totalSize": 52416
+  },
+  {
+   "name": "lsm_inode_cache",
+   "activeObjs": 14212,
+   "totalObjs": 14212,
+   "objSize": 120,
+   "totalSize": 1705440
+  },
+  {
+   "name": "lsm_file_cache",
+   "activeObjs": 1036,
+   "totalObjs": 1152,
+   "objSize": 32,
+   "totalSize": 36864
+  },
+  {
+   "name": "key_jar",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 256,
+   "totalSize": 20480
+  },
+  {
+   "name": "uts_namespace",
+   "activeObjs": 26,
+   "totalObjs": 26,
+   "objSize": 600,
+   "totalSize": 15600
+  },
+  {
+   "name": "nsproxy",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 72,
+   "totalSize": 8064
+  },
+  {
+   "name": "vm_area_struct",
+   "activeObjs": 2353,
+   "totalObjs": 3003,
+   "objSize": 192,
+   "totalSize": 576576
+  },
+  {
+   "name": "fs_cache",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 64,
+   "totalSize": 8192
+  },
+  {
+   "name": "files_cache",
+   "activeObjs": 69,
+   "totalObjs": 69,
+   "objSize": 704,
+   "totalSize": 48576
+  },
+  {
+   "name": "signal_cache",
+   "activeObjs": 156,
+   "totalObjs": 182,
+   "objSize": 1152,
+   "totalSize": 209664
+  },
+  {
+   "name": "sighand_cache",
+   "activeObjs": 165,
+   "totalObjs": 165,
+   "objSize": 2112,
+   "totalSize": 348480
+  },
+  {
+   "name": "task_struct",
+   "activeObjs": 150,
+   "totalObjs": 150,
+   "objSize": 12736,
+   "totalSize": 1910400
+  },
+  {
+   "name": "cred",
+   "activeObjs": 357,
+   "totalObjs": 357,
+   "objSize": 192,
+   "totalSize": 68544
+  },
+  {
+   "name": "anon_vma_chain",
+   "activeObjs": 1350,
+   "totalObjs": 1536,
+   "objSize": 64,
+   "totalSize": 98304
+  },
+  {
+   "name": "anon_vma",
+   "activeObjs": 1014,
+   "totalObjs": 1014,
+   "objSize": 104,
+   "totalSize": 105456
+  },
+  {
+   "name": "pid",
+   "activeObjs": 189,
+   "totalObjs": 189,
+   "objSize": 192,
+   "totalSize": 36288
+  },
+  {
+   "name": "Acpi-Operand",
+   "activeObjs": 1680,
+   "totalObjs": 1680,
+   "objSize": 72,
+   "totalSize": 120960
+  },
+  {
+   "name": "Acpi-ParseExt",
+   "activeObjs": 78,
+   "totalObjs": 78,
+   "objSize": 104,
+   "totalSize": 8112
+  },
+  {
+   "name": "Acpi-Parse",
+   "activeObjs": 102,
+   "totalObjs": 102,
+   "objSize": 80,
+   "totalSize": 8160
+  },
+  {
+   "name": "Acpi-State",
+   "activeObjs": 306,
+   "totalObjs": 306,
+   "objSize": 80,
+   "totalSize": 24480
+  },
+  {
+   "name": "Acpi-Namespace",
+   "activeObjs": 425,
+   "totalObjs": 425,
+   "objSize": 48,
+   "totalSize": 20400
+  },
+  {
+   "name": "shared_policy_node",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 48,
+   "totalSize": 0
+  },
+  {
+   "name": "numa_policy",
+   "activeObjs": 15,
+   "totalObjs": 15,
+   "objSize": 272,
+   "totalSize": 4080
+  },
+  {
+   "name": "perf_event",
+   "activeObjs": 12,
+   "totalObjs": 12,
+   "objSize": 1352,
+   "totalSize": 16224
+  },
+  {
+   "name": "trace_event_file",
+   "activeObjs": 1974,
+   "totalObjs": 1974,
+   "objSize": 96,
+   "totalSize": 189504
+  },
+  {
+   "name": "ftrace_event_field",
+   "activeObjs": 5475,
+   "totalObjs": 5475,
+   "objSize": 56,
+   "totalSize": 306600
+  },
+  {
+   "name": "pool_workqueue",
+   "activeObjs": 208,
+   "totalObjs": 208,
+   "objSize": 512,
+   "totalSize": 106496
+  },
+  {
+   "name": "radix_tree_node",
+   "activeObjs": 2780,
+   "totalObjs": 2786,
+   "objSize": 584,
+   "totalSize": 1627024
+  },
+  {
+   "name": "task_group",
+   "activeObjs": 69,
+   "totalObjs": 69,
+   "objSize": 704,
+   "totalSize": 48576
+  },
+  {
+   "name": "maple_node",
+   "activeObjs": 916,
+   "totalObjs": 1088,
+   "objSize": 256,
+   "totalSize": 278528
+  },
+  {
+   "name": "mm_struct",
+   "activeObjs": 54,
+   "totalObjs": 54,
+   "objSize": 1792,
+   "totalSize": 96768
+  },
+  {
+   "name": "vmap_area",
+   "activeObjs": 1344,
+   "totalObjs": 1344,
+   "objSize": 72,
+   "totalSize": 96768
+  },
+  {
+   "name": "kmalloc_buckets",
+   "activeObjs": 36,
+   "totalObjs": 36,
+   "objSize": 112,
+   "totalSize": 4032
+  },
+  {
+   "name": "kmalloc-cg-8k",
+   "activeObjs": 4,
+   "totalObjs": 4,
+   "objSize": 8192,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-cg-4k",
+   "activeObjs": 48,
+   "totalObjs": 48,
+   "objSize": 4096,
+   "totalSize": 196608
+  },
+  {
+   "name": "kmalloc-cg-2k",
+   "activeObjs": 431,
+   "totalObjs": 480,
+   "objSize": 2048,
+   "totalSize": 983040
+  },
+  {
+   "name": "kmalloc-cg-1k",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 1024,
+   "totalSize": 131072
+  },
+  {
+   "name": "kmalloc-cg-512",
+   "activeObjs": 160,
+   "totalObjs": 160,
+   "objSize": 512,
+   "totalSize": 81920
+  },
+  {
+   "name": "kmalloc-cg-256",
+   "activeObjs": 48,
+   "totalObjs": 48,
+   "objSize": 256,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-cg-128",
+   "activeObjs": 344,
+   "totalObjs": 448,
+   "objSize": 128,
+   "totalSize": 57344
+  },
+  {
+   "name": "kmalloc-cg-64",
+   "activeObjs": 645,
+   "totalObjs": 1088,
+   "objSize": 64,
+   "totalSize": 69632
+  },
+  {
+   "name": "kmalloc-cg-32",
+   "activeObjs": 2325,
+   "totalObjs": 2432,
+   "objSize": 32,
+   "totalSize": 77824
+  },
+  {
+   "name": "kmalloc-cg-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-cg-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-cg-192",
+   "activeObjs": 230,
+   "totalObjs": 378,
+   "objSize": 192,
+   "totalSize": 72576
+  },
+  {
+   "name": "kmalloc-cg-96",
+   "activeObjs": 2233,
+   "totalObjs": 2268,
+   "objSize": 96,
+   "totalSize": 217728
+  },
+  {
+   "name": "dma-kmalloc-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-4k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 4096,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-2k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2048,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-1k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1024,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-512",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 512,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-256",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-128",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 128,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-64",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-32",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-16",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 16,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-8",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-192",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "dma-kmalloc-96",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 96,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-4k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 4096,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-2k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 2048,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-1k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 1024,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-512",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 512,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-256",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 256,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rcl-64",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 64,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-32",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 32,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-16",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 16,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-8",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-192",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 192,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rcl-96",
+   "activeObjs": 168,
+   "totalObjs": 168,
+   "objSize": 96,
+   "totalSize": 16128
+  },
+  {
+   "name": "kmalloc-rnd-15-8k",
+   "activeObjs": 4,
+   "totalObjs": 4,
+   "objSize": 8192,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-15-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-15-2k",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 2048,
+   "totalSize": 131072
+  },
+  {
+   "name": "kmalloc-rnd-15-1k",
+   "activeObjs": 48,
+   "totalObjs": 48,
+   "objSize": 1024,
+   "totalSize": 49152
+  },
+  {
+   "name": "kmalloc-rnd-15-512",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 512,
+   "totalSize": 40960
+  },
+  {
+   "name": "kmalloc-rnd-15-256",
+   "activeObjs": 368,
+   "totalObjs": 368,
+   "objSize": 256,
+   "totalSize": 94208
+  },
+  {
+   "name": "kmalloc-rnd-15-128",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 128,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-15-64",
+   "activeObjs": 384,
+   "totalObjs": 384,
+   "objSize": 64,
+   "totalSize": 24576
+  },
+  {
+   "name": "kmalloc-rnd-15-32",
+   "activeObjs": 6784,
+   "totalObjs": 6784,
+   "objSize": 32,
+   "totalSize": 217088
+  },
+  {
+   "name": "kmalloc-rnd-15-16",
+   "activeObjs": 6912,
+   "totalObjs": 6912,
+   "objSize": 16,
+   "totalSize": 110592
+  },
+  {
+   "name": "kmalloc-rnd-15-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-15-192",
+   "activeObjs": 168,
+   "totalObjs": 168,
+   "objSize": 192,
+   "totalSize": 32256
+  },
+  {
+   "name": "kmalloc-rnd-15-96",
+   "activeObjs": 126,
+   "totalObjs": 126,
+   "objSize": 96,
+   "totalSize": 12096
+  },
+  {
+   "name": "kmalloc-rnd-14-8k",
+   "activeObjs": 20,
+   "totalObjs": 20,
+   "objSize": 8192,
+   "totalSize": 163840
+  },
+  {
+   "name": "kmalloc-rnd-14-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-14-2k",
+   "activeObjs": 48,
+   "totalObjs": 48,
+   "objSize": 2048,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-14-1k",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 1024,
+   "totalSize": 114688
+  },
+  {
+   "name": "kmalloc-rnd-14-512",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 512,
+   "totalSize": 57344
+  },
+  {
+   "name": "kmalloc-rnd-14-256",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 256,
+   "totalSize": 24576
+  },
+  {
+   "name": "kmalloc-rnd-14-128",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 128,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-14-64",
+   "activeObjs": 448,
+   "totalObjs": 448,
+   "objSize": 64,
+   "totalSize": 28672
+  },
+  {
+   "name": "kmalloc-rnd-14-32",
+   "activeObjs": 384,
+   "totalObjs": 384,
+   "objSize": 32,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-14-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-14-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-14-192",
+   "activeObjs": 105,
+   "totalObjs": 105,
+   "objSize": 192,
+   "totalSize": 20160
+  },
+  {
+   "name": "kmalloc-rnd-14-96",
+   "activeObjs": 2268,
+   "totalObjs": 2268,
+   "objSize": 96,
+   "totalSize": 217728
+  },
+  {
+   "name": "kmalloc-rnd-13-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-13-4k",
+   "activeObjs": 24,
+   "totalObjs": 24,
+   "objSize": 4096,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-13-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-13-1k",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 1024,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-13-512",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 512,
+   "totalSize": 49152
+  },
+  {
+   "name": "kmalloc-rnd-13-256",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 256,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-13-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-13-64",
+   "activeObjs": 5760,
+   "totalObjs": 5760,
+   "objSize": 64,
+   "totalSize": 368640
+  },
+  {
+   "name": "kmalloc-rnd-13-32",
+   "activeObjs": 384,
+   "totalObjs": 1024,
+   "objSize": 32,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-13-16",
+   "activeObjs": 5888,
+   "totalObjs": 5888,
+   "objSize": 16,
+   "totalSize": 94208
+  },
+  {
+   "name": "kmalloc-rnd-13-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-13-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-13-96",
+   "activeObjs": 168,
+   "totalObjs": 168,
+   "objSize": 96,
+   "totalSize": 16128
+  },
+  {
+   "name": "kmalloc-rnd-12-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-12-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-12-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-12-1k",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 1024,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-12-512",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-12-256",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-12-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-12-64",
+   "activeObjs": 320,
+   "totalObjs": 320,
+   "objSize": 64,
+   "totalSize": 20480
+  },
+  {
+   "name": "kmalloc-rnd-12-32",
+   "activeObjs": 1386,
+   "totalObjs": 1408,
+   "objSize": 32,
+   "totalSize": 45056
+  },
+  {
+   "name": "kmalloc-rnd-12-16",
+   "activeObjs": 3550,
+   "totalObjs": 3584,
+   "objSize": 16,
+   "totalSize": 57344
+  },
+  {
+   "name": "kmalloc-rnd-12-8",
+   "activeObjs": 2048,
+   "totalObjs": 2048,
+   "objSize": 8,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-12-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-12-96",
+   "activeObjs": 593,
+   "totalObjs": 630,
+   "objSize": 96,
+   "totalSize": 60480
+  },
+  {
+   "name": "kmalloc-rnd-11-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rnd-11-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-11-2k",
+   "activeObjs": 119,
+   "totalObjs": 144,
+   "objSize": 2048,
+   "totalSize": 294912
+  },
+  {
+   "name": "kmalloc-rnd-11-1k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-11-512",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 512,
+   "totalSize": 40960
+  },
+  {
+   "name": "kmalloc-rnd-11-256",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-11-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-11-64",
+   "activeObjs": 448,
+   "totalObjs": 448,
+   "objSize": 64,
+   "totalSize": 28672
+  },
+  {
+   "name": "kmalloc-rnd-11-32",
+   "activeObjs": 4480,
+   "totalObjs": 4480,
+   "objSize": 32,
+   "totalSize": 143360
+  },
+  {
+   "name": "kmalloc-rnd-11-16",
+   "activeObjs": 7936,
+   "totalObjs": 7936,
+   "objSize": 16,
+   "totalSize": 126976
+  },
+  {
+   "name": "kmalloc-rnd-11-8",
+   "activeObjs": 4608,
+   "totalObjs": 4608,
+   "objSize": 8,
+   "totalSize": 36864
+  },
+  {
+   "name": "kmalloc-rnd-11-192",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 192,
+   "totalSize": 16128
+  },
+  {
+   "name": "kmalloc-rnd-11-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-10-8k",
+   "activeObjs": 12,
+   "totalObjs": 12,
+   "objSize": 8192,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-10-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-10-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-10-1k",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 1024,
+   "totalSize": 81920
+  },
+  {
+   "name": "kmalloc-rnd-10-512",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 512,
+   "totalSize": 57344
+  },
+  {
+   "name": "kmalloc-rnd-10-256",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 256,
+   "totalSize": 28672
+  },
+  {
+   "name": "kmalloc-rnd-10-128",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 128,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-10-64",
+   "activeObjs": 192,
+   "totalObjs": 192,
+   "objSize": 64,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-10-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-10-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-10-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-10-192",
+   "activeObjs": 252,
+   "totalObjs": 252,
+   "objSize": 192,
+   "totalSize": 48384
+  },
+  {
+   "name": "kmalloc-rnd-10-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-09-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-09-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-09-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-09-1k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-09-512",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 512,
+   "totalSize": 49152
+  },
+  {
+   "name": "kmalloc-rnd-09-256",
+   "activeObjs": 160,
+   "totalObjs": 160,
+   "objSize": 256,
+   "totalSize": 40960
+  },
+  {
+   "name": "kmalloc-rnd-09-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-09-64",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 64,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-09-32",
+   "activeObjs": 1152,
+   "totalObjs": 1152,
+   "objSize": 32,
+   "totalSize": 36864
+  },
+  {
+   "name": "kmalloc-rnd-09-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-09-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-09-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-09-96",
+   "activeObjs": 588,
+   "totalObjs": 588,
+   "objSize": 96,
+   "totalSize": 56448
+  },
+  {
+   "name": "kmalloc-rnd-08-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-08-4k",
+   "activeObjs": 24,
+   "totalObjs": 24,
+   "objSize": 4096,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-08-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-08-1k",
+   "activeObjs": 288,
+   "totalObjs": 288,
+   "objSize": 1024,
+   "totalSize": 294912
+  },
+  {
+   "name": "kmalloc-rnd-08-512",
+   "activeObjs": 160,
+   "totalObjs": 160,
+   "objSize": 512,
+   "totalSize": 81920
+  },
+  {
+   "name": "kmalloc-rnd-08-256",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 256,
+   "totalSize": 20480
+  },
+  {
+   "name": "kmalloc-rnd-08-128",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 128,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-08-64",
+   "activeObjs": 192,
+   "totalObjs": 192,
+   "objSize": 64,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-08-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-08-16",
+   "activeObjs": 7168,
+   "totalObjs": 7168,
+   "objSize": 16,
+   "totalSize": 114688
+  },
+  {
+   "name": "kmalloc-rnd-08-8",
+   "activeObjs": 2048,
+   "totalObjs": 2048,
+   "objSize": 8,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-08-192",
+   "activeObjs": 63,
+   "totalObjs": 63,
+   "objSize": 192,
+   "totalSize": 12096
+  },
+  {
+   "name": "kmalloc-rnd-08-96",
+   "activeObjs": 378,
+   "totalObjs": 378,
+   "objSize": 96,
+   "totalSize": 36288
+  },
+  {
+   "name": "kmalloc-rnd-07-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rnd-07-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-07-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-07-1k",
+   "activeObjs": 144,
+   "totalObjs": 144,
+   "objSize": 1024,
+   "totalSize": 147456
+  },
+  {
+   "name": "kmalloc-rnd-07-512",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-07-256",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 256,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-07-128",
+   "activeObjs": 160,
+   "totalObjs": 160,
+   "objSize": 128,
+   "totalSize": 20480
+  },
+  {
+   "name": "kmalloc-rnd-07-64",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 64,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-07-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-07-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-07-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-07-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-07-96",
+   "activeObjs": 126,
+   "totalObjs": 126,
+   "objSize": 96,
+   "totalSize": 12096
+  },
+  {
+   "name": "kmalloc-rnd-06-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-06-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-06-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-06-1k",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 1024,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-06-512",
+   "activeObjs": 240,
+   "totalObjs": 240,
+   "objSize": 512,
+   "totalSize": 122880
+  },
+  {
+   "name": "kmalloc-rnd-06-256",
+   "activeObjs": 141,
+   "totalObjs": 192,
+   "objSize": 256,
+   "totalSize": 49152
+  },
+  {
+   "name": "kmalloc-rnd-06-128",
+   "activeObjs": 1312,
+   "totalObjs": 1312,
+   "objSize": 128,
+   "totalSize": 167936
+  },
+  {
+   "name": "kmalloc-rnd-06-64",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 64,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-06-32",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 32,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-06-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-06-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-06-192",
+   "activeObjs": 1428,
+   "totalObjs": 1428,
+   "objSize": 192,
+   "totalSize": 274176
+  },
+  {
+   "name": "kmalloc-rnd-06-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-05-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-05-4k",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 4096,
+   "totalSize": 458752
+  },
+  {
+   "name": "kmalloc-rnd-05-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-05-1k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-05-512",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-05-256",
+   "activeObjs": 80,
+   "totalObjs": 80,
+   "objSize": 256,
+   "totalSize": 20480
+  },
+  {
+   "name": "kmalloc-rnd-05-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-05-64",
+   "activeObjs": 384,
+   "totalObjs": 384,
+   "objSize": 64,
+   "totalSize": 24576
+  },
+  {
+   "name": "kmalloc-rnd-05-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-05-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-05-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-05-192",
+   "activeObjs": 147,
+   "totalObjs": 147,
+   "objSize": 192,
+   "totalSize": 28224
+  },
+  {
+   "name": "kmalloc-rnd-05-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-04-8k",
+   "activeObjs": 0,
+   "totalObjs": 0,
+   "objSize": 8192,
+   "totalSize": 0
+  },
+  {
+   "name": "kmalloc-rnd-04-4k",
+   "activeObjs": 24,
+   "totalObjs": 24,
+   "objSize": 4096,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-04-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-04-1k",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 1024,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-04-512",
+   "activeObjs": 160,
+   "totalObjs": 160,
+   "objSize": 512,
+   "totalSize": 81920
+  },
+  {
+   "name": "kmalloc-rnd-04-256",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-04-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-04-64",
+   "activeObjs": 576,
+   "totalObjs": 576,
+   "objSize": 64,
+   "totalSize": 36864
+  },
+  {
+   "name": "kmalloc-rnd-04-32",
+   "activeObjs": 384,
+   "totalObjs": 384,
+   "objSize": 32,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-04-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-04-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-04-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-04-96",
+   "activeObjs": 294,
+   "totalObjs": 294,
+   "objSize": 96,
+   "totalSize": 28224
+  },
+  {
+   "name": "kmalloc-rnd-03-8k",
+   "activeObjs": 4,
+   "totalObjs": 4,
+   "objSize": 8192,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-03-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-03-2k",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 2048,
+   "totalSize": 131072
+  },
+  {
+   "name": "kmalloc-rnd-03-1k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-03-512",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-03-256",
+   "activeObjs": 864,
+   "totalObjs": 864,
+   "objSize": 256,
+   "totalSize": 221184
+  },
+  {
+   "name": "kmalloc-rnd-03-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-03-64",
+   "activeObjs": 954,
+   "totalObjs": 1024,
+   "objSize": 64,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-03-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-03-16",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 16,
+   "totalSize": 4096
+  },
+  {
+   "name": "kmalloc-rnd-03-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-03-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-03-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-02-8k",
+   "activeObjs": 4,
+   "totalObjs": 4,
+   "objSize": 8192,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-02-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-02-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-02-1k",
+   "activeObjs": 96,
+   "totalObjs": 96,
+   "objSize": 1024,
+   "totalSize": 98304
+  },
+  {
+   "name": "kmalloc-rnd-02-512",
+   "activeObjs": 181,
+   "totalObjs": 240,
+   "objSize": 512,
+   "totalSize": 122880
+  },
+  {
+   "name": "kmalloc-rnd-02-256",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 256,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-02-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-02-64",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 64,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-02-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-02-16",
+   "activeObjs": 1280,
+   "totalObjs": 1280,
+   "objSize": 16,
+   "totalSize": 20480
+  },
+  {
+   "name": "kmalloc-rnd-02-8",
+   "activeObjs": 1536,
+   "totalObjs": 1536,
+   "objSize": 8,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-02-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-02-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-rnd-01-8k",
+   "activeObjs": 13,
+   "totalObjs": 32,
+   "objSize": 8192,
+   "totalSize": 262144
+  },
+  {
+   "name": "kmalloc-rnd-01-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-01-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-rnd-01-1k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 1024,
+   "totalSize": 32768
+  },
+  {
+   "name": "kmalloc-rnd-01-512",
+   "activeObjs": 144,
+   "totalObjs": 144,
+   "objSize": 512,
+   "totalSize": 73728
+  },
+  {
+   "name": "kmalloc-rnd-01-256",
+   "activeObjs": 272,
+   "totalObjs": 272,
+   "objSize": 256,
+   "totalSize": 69632
+  },
+  {
+   "name": "kmalloc-rnd-01-128",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 128,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-rnd-01-64",
+   "activeObjs": 128,
+   "totalObjs": 128,
+   "objSize": 64,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-01-32",
+   "activeObjs": 256,
+   "totalObjs": 256,
+   "objSize": 32,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-01-16",
+   "activeObjs": 768,
+   "totalObjs": 768,
+   "objSize": 16,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-rnd-01-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-rnd-01-192",
+   "activeObjs": 126,
+   "totalObjs": 126,
+   "objSize": 192,
+   "totalSize": 24192
+  },
+  {
+   "name": "kmalloc-rnd-01-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-8k",
+   "activeObjs": 8,
+   "totalObjs": 8,
+   "objSize": 8192,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-4k",
+   "activeObjs": 16,
+   "totalObjs": 16,
+   "objSize": 4096,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-2k",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 2048,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmalloc-1k",
+   "activeObjs": 112,
+   "totalObjs": 112,
+   "objSize": 1024,
+   "totalSize": 114688
+  },
+  {
+   "name": "kmalloc-512",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 512,
+   "totalSize": 16384
+  },
+  {
+   "name": "kmalloc-256",
+   "activeObjs": 32,
+   "totalObjs": 32,
+   "objSize": 256,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-128",
+   "activeObjs": 64,
+   "totalObjs": 64,
+   "objSize": 128,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-64",
+   "activeObjs": 768,
+   "totalObjs": 768,
+   "objSize": 64,
+   "totalSize": 49152
+  },
+  {
+   "name": "kmalloc-32",
+   "activeObjs": 384,
+   "totalObjs": 384,
+   "objSize": 32,
+   "totalSize": 12288
+  },
+  {
+   "name": "kmalloc-16",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 16,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-8",
+   "activeObjs": 1024,
+   "totalObjs": 1024,
+   "objSize": 8,
+   "totalSize": 8192
+  },
+  {
+   "name": "kmalloc-192",
+   "activeObjs": 42,
+   "totalObjs": 42,
+   "objSize": 192,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmalloc-96",
+   "activeObjs": 84,
+   "totalObjs": 84,
+   "objSize": 96,
+   "totalSize": 8064
+  },
+  {
+   "name": "kmem_cache_node",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 128,
+   "totalSize": 65536
+  },
+  {
+   "name": "kmem_cache",
+   "activeObjs": 512,
+   "totalObjs": 512,
+   "objSize": 256,
+   "totalSize": 131072
+  }
+ ]
+}

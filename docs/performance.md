@@ -50,6 +50,24 @@ Mac mini M4 (10 cores, 16 GB), macOS 26.4, internal SSD with APFS; `my` of commi
 
 On the fleet, where no host has more than 146,787 errors, time grows in step with the input. On the one host it grows faster from 300,000 errors on. At 1,000,000 the temporary ledger of the scan is 2.15 GB, about 1.1 KB per event row; in the ledger of the 100,000 host the original records take 43%, the event table 33% and its indexes 19%. The passes that link boots, slots, DIMMs and duplicates each go over every row of the host; at that size a sample of the process (macOS `sample`) showed them waiting on reads from the disk. 10,000,000 errors were not measured: the scan of 1,000,000 took more than five minutes, and the time grew faster than the input.
 
+## Memory readings of a scan
+
+A scan of a running host makes the readings of the Memory Explorer and runs `numactl --hardware`, `numastat` and `sar -B` where they are installed. `TestTimeOfTheReadings` in `internal/adapter/hostmem` measures the adapter on the host it runs on, 21 times with the programs and 21 times without:
+
+```
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o hostmem.test ./internal/adapter/hostmem
+sudo MY_READINGS_TIME=1 ./hostmem.test -test.run TestTimeOfTheReadings -test.v
+```
+
+On the lab host of [validation-lab.md](validation-lab.md) (a VMware guest with an AMD Ryzen Threadripper 1950X, one socket, two NUMA nodes, Fedora 44, kernel 7.3.0, as root), on 2026-11-17, with `numactl` and `numastat` installed and `sar` not:
+
+| Run | With the programs: median | shortest | longest | Without: median | shortest | longest |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| lab host idle | 11.1 ms | 8.5 ms | 39.5 ms | 2.6 ms | 2.0 ms | 9.6 ms |
+| three emulated guests booting on it | 14.0 ms | 8.3 ms | 39.8 ms | 3.3 ms | 2.5 ms | 5.6 ms |
+
+The two programs add 8.5 ms to the median there, 10.7 ms with the guests running. `numactl` and `numastat` are stopped after 5 seconds and `sar` after 15, so programs that hang add at most 25 seconds.
+
 ## Small hosts
 
 At start the binary sets a soft limit for the Go heap: a quarter of the memory the process may use (`MemTotal` of `/proc/meminfo`, or the smallest limit of its control groups when that is less: `memory.max` of version 2, `memory.limit_in_bytes` of version 1, as in a container or a systemd unit with `MemoryMax=`), at least 64 MiB. `GOMEMLIMIT` overrides it. On a host with 765 MiB the limit is 191 MiB, and `-gomemlimit 191MiB` runs the commands that way on any machine:

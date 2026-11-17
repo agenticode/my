@@ -1,0 +1,327 @@
+{
+ "fn": "layout",
+ "in": {
+  "dimms": [
+   {
+    "locator": "CPU0_CH0_DIMM0",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0001",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU0_CH1_DIMM0",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0002",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_CH0_DIMM0",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0003",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 0,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_CH1_DIMM0",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0004",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 1,
+    "socket": 1,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU0_CH0_DIMM1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "Unknown",
+    "serialNumber": "Unknown",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU0_CH1_DIMM1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "Unknown",
+    "serialNumber": "Unknown",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 1,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_CH0_DIMM1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "Unknown",
+    "serialNumber": "Unknown",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 1,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "CPU1_CH1_DIMM1",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "QEMU",
+    "serialNumber": "ds=nocloud;s=http://10.0.2.2:8061/",
+    "partNumber": "Not Specified",
+    "rank": "Unknown",
+    "channel": 1,
+    "socket": 1,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "caches": [
+   {
+    "socket": 0,
+    "l1Bytes": 65536,
+    "l2Bytes": 4194304,
+    "l3Bytes": 16777216
+   },
+   {
+    "socket": 1,
+    "l1Bytes": 65536,
+    "l2Bytes": 4194304,
+    "l3Bytes": 16777216
+   }
+  ]
+ },
+ "out": {
+  "empty": false,
+  "summary": [
+   "4 / 8 slots populated",
+   "Total: 0 B"
+  ],
+  "badge": "DDR4 · 3200 MT/s",
+  "rows": [
+   {
+    "socket": 0,
+    "dual": true,
+    "parts": [
+     {
+      "bank": "left",
+      "channels": [
+       {
+        "channel": 1,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "CPU0_CH1_DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "0 B"
+         },
+         {
+          "locator": "CPU0_CH1_DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       },
+       {
+        "channel": 0,
+        "socket": 0,
+        "sticks": [
+         {
+          "locator": "CPU0_CH0_DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "0 B"
+         },
+         {
+          "locator": "CPU0_CH0_DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "cpu": {
+       "socket": 0,
+       "name": "CPU 0",
+       "sub": [
+        "2 DIMMs",
+        "0 B"
+       ],
+       "caches": [
+        {
+         "label": "L1",
+         "size": "64.0 KiB"
+        },
+        {
+         "label": "L2",
+         "size": "4.00 MiB"
+        },
+        {
+         "label": "L3",
+         "size": "16.0 MiB"
+        }
+       ]
+      }
+     },
+     {
+      "cpu": {
+       "socket": 1,
+       "name": "CPU 1",
+       "sub": [
+        "2 DIMMs",
+        "0 B"
+       ],
+       "caches": [
+        {
+         "label": "L1",
+         "size": "64.0 KiB"
+        },
+        {
+         "label": "L2",
+         "size": "4.00 MiB"
+        },
+        {
+         "label": "L3",
+         "size": "16.0 MiB"
+        }
+       ]
+      }
+     },
+     {
+      "bank": "right",
+      "channels": [
+       {
+        "channel": 0,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "CPU1_CH0_DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "0 B"
+         },
+         {
+          "locator": "CPU1_CH0_DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       },
+       {
+        "channel": 1,
+        "socket": 1,
+        "sticks": [
+         {
+          "locator": "CPU1_CH1_DIMM0",
+          "classes": [
+           "mb-stick-populated"
+          ],
+          "cap": "0 B"
+         },
+         {
+          "locator": "CPU1_CH1_DIMM1",
+          "classes": [
+           "mb-stick-empty"
+          ],
+          "cap": ""
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

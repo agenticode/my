@@ -1,0 +1,114 @@
+{
+ "fn": "collectMemoryMap",
+ "in": {
+  "dmidecode": "@file:dmidecode.txt",
+  "numactl": "@file:numactl-hardware.txt",
+  "numastat": "@file:numastat.txt",
+  "edacCe": "",
+  "edacUe": "",
+  "lshw": "@file:lshw.txt",
+  "sysfsCache": "@file:cpu-cache.txt"
+ },
+ "out": {
+  "dimms": [
+   {
+    "locator": "DIMM000",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0001",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 0,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM010",
+    "bankLocator": "Not Specified",
+    "size": "16 GiB",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "3200 MT/s",
+    "configuredSpeed": "3200 MT/s",
+    "manufacturer": "Lab Memory",
+    "serialNumber": "LABB0002",
+    "partNumber": "LABDDR4-16G",
+    "rank": "2",
+    "channel": 1,
+    "socket": 0,
+    "populated": true,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM001",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "Unknown",
+    "serialNumber": "Unknown",
+    "partNumber": "Unknown",
+    "rank": "Unknown",
+    "channel": 0,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   },
+   {
+    "locator": "DIMM011",
+    "bankLocator": "Not Specified",
+    "size": "No Module Installed",
+    "sizeBytes": 0,
+    "type": "DDR4",
+    "speed": "Unknown",
+    "configuredSpeed": "Unknown",
+    "manufacturer": "QEMU",
+    "serialNumber": "ds=nocloud;s=http://10.0.2.2:8062/",
+    "partNumber": "Not Specified",
+    "rank": "Unknown",
+    "channel": 1,
+    "socket": 0,
+    "populated": false,
+    "ceCount": 0,
+    "ueCount": 0,
+    "errorCount": 0
+   }
+  ],
+  "numa": [
+   {
+    "nodeId": 0,
+    "totalBytes": 33643560960,
+    "freeBytes": 33168556032,
+    "usedBytes": 475004928,
+    "numaHit": 443055,
+    "numaMiss": 0,
+    "numaForeign": 0,
+    "interleaveHit": 1777,
+    "localNode": 443055,
+    "otherNode": 0
+   }
+  ],
+  "cpuCaches": [
+   {
+    "socket": 0,
+    "l1Bytes": 65536,
+    "l2Bytes": 4194304,
+    "l3Bytes": 16777216
+   }
+  ]
+ }
+}

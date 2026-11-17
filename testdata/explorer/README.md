@@ -76,6 +76,16 @@ The directories `made-*` hold text written by hand after the output formats of n
 | `made-sar-12h` | `sar -B` with a 12-hour clock and a second head line |
 | `made-old-kernel` | no `MemAvailable`, no pressure file, slab text with its head line only, MGLRU off |
 
+## Lab guests
+
+The directories `lab-*` hold what x86 guests of the lab printed (`tools/lab/boards.sh`, [docs/validation-lab.md](../../docs/validation-lab.md#boards)): QEMU 10.2.2 without hardware virtualization, the Fedora 44 cloud image, and SMBIOS memory devices that `tools/lab/smbios17.py` wrote with slot names no public dump above has. `dmidecode.txt` is the whole `dmidecode` output of the guest; the other files are what `my collect host` copied and ran there. `tools/lab/sanitize.py` replaced the host's addresses and IDs; the serial numbers `LABB0001` and up are made up. The full captures are under `testdata/real/6.19.10-board-*`.
+
+| Directory | Guest | Slots |
+| --- | --- | --- |
+| `lab-two-sockets` | 2 sockets of 2 cores, 2 NUMA nodes of 32 GiB | `CPU0_CH0_DIMM0` to `CPU1_CH1_DIMM1`, the `DIMM0` slots populated |
+| `lab-digits` | 1 socket, 2 CPUs, 32 GiB | `DIMM000` and `DIMM010` populated, `DIMM001` and `DIMM011` empty |
+| `lab-letters` | 1 socket, 2 CPUs, 32 GiB | `DIMMA1` and `DIMMB1` populated, `DIMMA2` and `DIMMB2` empty |
+
 ## The population
 
 `population/slots.tsv` is derived from the server dumps of the Linux-Hardware.org DMI collection (github.com/linuxhw/DMI, commit 57b21bc, CC BY 4.0): 2,044 dumps, of which 2,043 describe memory devices. It holds each list of slots once (1,625 lists, 24,541 slots), with the number of dumps that have it, the number of processor records (SMBIOS type 4), the system maker and the processor name of those dumps, and per slot whether it holds a module, its locator and bank locator, and the socket and channel the first implementation of the readers gives it. It holds no module identity and no serial number. `TestPopulationPlacement` writes each list as the board writes the slots of a ledger and reads it back; `TestPopulationBoards` and `TestPopulationByMaker` count how the boards are drawn, without and with the fixes of the readers.

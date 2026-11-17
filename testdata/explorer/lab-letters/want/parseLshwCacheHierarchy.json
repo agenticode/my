@@ -1,0 +1,7 @@
+{
+ "fn": "parseLshwCacheHierarchy",
+ "in": {
+  "text": "@file:lshw.txt"
+ },
+ "out": []
+}

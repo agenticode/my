@@ -1,0 +1,7 @@
+host facts: 15 files
+error records: dmesg, sys/devices/system/edac/mc
+SMBIOS: the raw tables
+memory readings: 9 of 10
+  not there: mcelog-client.txt
+  no answer in time: lshw.txt
+written to /root/my-lab/cap/board-two-sockets, with collect.json; my --root /root/my-lab/cap/board-two-sockets reads it

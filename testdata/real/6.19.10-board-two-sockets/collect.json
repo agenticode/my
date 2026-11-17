@@ -1,0 +1,247 @@
+{
+ "tool": "my dev (unknown) go1.26.11 linux/amd64",
+ "made": "2026-11-17T06:15:28.442370108Z",
+ "entries": [
+  {
+   "group": "host",
+   "what": "proc/stat",
+   "from": "/proc/stat",
+   "state": "ok",
+   "bytes": 1293,
+   "ms": 13
+  },
+  {
+   "group": "host",
+   "what": "proc/uptime",
+   "from": "/proc/uptime",
+   "state": "ok",
+   "bytes": 14,
+   "ms": 5
+  },
+  {
+   "group": "host",
+   "what": "proc/version",
+   "from": "/proc/version",
+   "state": "ok",
+   "bytes": 210,
+   "ms": 5
+  },
+  {
+   "group": "host",
+   "what": "proc/cmdline",
+   "from": "/proc/cmdline",
+   "state": "ok",
+   "bytes": 201,
+   "ms": 5
+  },
+  {
+   "group": "host",
+   "what": "proc/cpuinfo",
+   "from": "/proc/cpuinfo",
+   "state": "ok",
+   "bytes": 3960,
+   "ms": 5
+  },
+  {
+   "group": "host",
+   "what": "proc/sys/kernel/hostname",
+   "from": "/proc/sys/kernel/hostname",
+   "state": "ok",
+   "bytes": 16,
+   "ms": 7
+  },
+  {
+   "group": "host",
+   "what": "proc/sys/kernel/osrelease",
+   "from": "/proc/sys/kernel/osrelease",
+   "state": "ok",
+   "bytes": 24,
+   "ms": 4
+  },
+  {
+   "group": "host",
+   "what": "proc/sys/kernel/arch",
+   "from": "/proc/sys/kernel/arch",
+   "state": "ok",
+   "bytes": 7,
+   "ms": 9
+  },
+  {
+   "group": "host",
+   "what": "proc/sys/kernel/random/boot_id",
+   "from": "/proc/sys/kernel/random/boot_id",
+   "state": "ok",
+   "bytes": 37,
+   "ms": 10
+  },
+  {
+   "group": "host",
+   "what": "etc/hostname",
+   "from": "/etc/hostname",
+   "state": "ok",
+   "bytes": 16,
+   "ms": 11
+  },
+  {
+   "group": "host",
+   "what": "sys/class/dmi/id/sys_vendor",
+   "from": "/sys/class/dmi/id/sys_vendor",
+   "state": "ok",
+   "bytes": 5,
+   "ms": 10
+  },
+  {
+   "group": "host",
+   "what": "sys/class/dmi/id/product_name",
+   "from": "/sys/class/dmi/id/product_name",
+   "state": "ok",
+   "bytes": 16,
+   "ms": 4
+  },
+  {
+   "group": "host",
+   "what": "sys/class/dmi/id/bios_vendor",
+   "from": "/sys/class/dmi/id/bios_vendor",
+   "state": "ok",
+   "bytes": 8,
+   "ms": 4
+  },
+  {
+   "group": "host",
+   "what": "sys/class/dmi/id/bios_version",
+   "from": "/sys/class/dmi/id/bios_version",
+   "state": "ok",
+   "bytes": 15,
+   "ms": 3
+  },
+  {
+   "group": "host",
+   "what": "sys/class/dmi/id/bios_date",
+   "from": "/sys/class/dmi/id/bios_date",
+   "state": "ok",
+   "bytes": 11,
+   "ms": 3
+  },
+  {
+   "group": "errors",
+   "what": "dmesg",
+   "from": "/dev/kmsg",
+   "state": "ok",
+   "bytes": 59375,
+   "ms": 127
+  },
+  {
+   "group": "errors",
+   "what": "sys/devices/system/edac/mc",
+   "from": "/sys/devices/system/edac/mc",
+   "state": "ok",
+   "bytes": 21,
+   "ms": 45,
+   "note": "5 files"
+  },
+  {
+   "group": "smbios",
+   "what": "sys/firmware/dmi/tables/DMI",
+   "from": "/sys/firmware/dmi/tables/DMI",
+   "state": "ok",
+   "bytes": 1405,
+   "ms": 25
+  },
+  {
+   "group": "smbios",
+   "what": "sys/firmware/dmi/tables/smbios_entry_point",
+   "from": "/sys/firmware/dmi/tables/smbios_entry_point",
+   "state": "ok",
+   "bytes": 31,
+   "ms": 5
+  },
+  {
+   "group": "readings",
+   "what": "proc/meminfo",
+   "from": "/proc/meminfo",
+   "state": "ok",
+   "bytes": 1615,
+   "ms": 5
+  },
+  {
+   "group": "readings",
+   "what": "proc/vmstat",
+   "from": "/proc/vmstat",
+   "state": "ok",
+   "bytes": 3957,
+   "ms": 5
+  },
+  {
+   "group": "readings",
+   "what": "proc/pressure/memory",
+   "from": "/proc/pressure/memory",
+   "state": "ok",
+   "bytes": 98,
+   "ms": 6
+  },
+  {
+   "group": "readings",
+   "what": "proc/slabinfo",
+   "from": "/proc/slabinfo",
+   "state": "ok",
+   "bytes": 53793,
+   "ms": 25
+  },
+  {
+   "group": "readings",
+   "what": "sys/kernel/mm/lru_gen/enabled",
+   "from": "/sys/kernel/mm/lru_gen/enabled",
+   "state": "ok",
+   "bytes": 7,
+   "ms": 12
+  },
+  {
+   "group": "readings",
+   "what": "sys/devices/system/cpu",
+   "from": "/sys/devices/system/cpu",
+   "state": "ok",
+   "bytes": 132,
+   "ms": 225,
+   "note": "28 files"
+  },
+  {
+   "group": "readings",
+   "what": "numactl-hardware.txt",
+   "from": "numactl --hardware",
+   "state": "ok",
+   "bytes": 214,
+   "ms": 63
+  },
+  {
+   "group": "readings",
+   "what": "numastat.txt",
+   "from": "numastat",
+   "state": "ok",
+   "bytes": 343,
+   "ms": 47
+  },
+  {
+   "group": "readings",
+   "what": "sar-B.txt",
+   "from": "sar -B",
+   "state": "ok",
+   "bytes": 863,
+   "ms": 96
+  },
+  {
+   "group": "readings",
+   "what": "lshw.txt",
+   "from": "lshw -c memory -c processor",
+   "state": "timeout",
+   "ms": 15042,
+   "note": "no answer within 15s"
+  },
+  {
+   "group": "mcelog",
+   "what": "mcelog-client.txt",
+   "from": "mcelog --client",
+   "state": "absent",
+   "note": "mcelog is not installed"
+  }
+ ]
+}

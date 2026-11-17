@@ -1,0 +1,236 @@
+{
+  "view": "overview",
+  "version": 1,
+  "lang": "en",
+  "host": "lab-digits",
+  "grade": "ok",
+  "exit_code": 0,
+  "data": {
+    "host": {
+      "name": "lab-digits",
+      "system": "QEMU lab-digits",
+      "virtual": "QEMU",
+      "from": "2026-11-17T06:17:53Z",
+      "to": "2026-11-17T06:24:14.151612Z",
+      "ce": 0,
+      "ue": 0,
+      "records": 0,
+      "grade_a": 0,
+      "grade_b": 0,
+      "grade_c": 0,
+      "grade": "ok",
+      "grade_text": "ok",
+      "boots": 1,
+      "scan": {
+        "kind": "live",
+        "at": "2026-11-17T06:24:12.078283Z",
+        "privileged": true,
+        "tool_version": "dev"
+      }
+    },
+    "slot_map": {
+      "rows": [
+        {
+          "channels": [
+            {
+              "slots": [
+                {
+                  "slot": "DIMM000",
+                  "label": "DIMM000",
+                  "state": "ok",
+                  "serial": "LABB0001"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "DIMM001",
+                  "label": "DIMM001",
+                  "state": "empty"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "DIMM010",
+                  "label": "DIMM010",
+                  "state": "ok",
+                  "serial": "LABB0002"
+                }
+              ]
+            },
+            {
+              "slots": [
+                {
+                  "slot": "DIMM011",
+                  "label": "DIMM011",
+                  "state": "empty"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "slots": 4,
+      "populated": 2
+    },
+    "ranking": [],
+    "quiet": 2,
+    "recurrence": {
+      "boots": [
+        {
+          "index": 1,
+          "boot_id": "2d1fdbead97a4f0e9e5e0ccd3afebcd8",
+          "started_at": "2026-11-17T06:17:53Z",
+          "start_quality": "exact",
+          "ran_seconds": 379,
+          "end": "running"
+        }
+      ],
+      "boots_on_record": 1,
+      "stops": 0
+    },
+    "sources": [
+      {
+        "kind": "hostinfo",
+        "name": "hostinfo",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 2,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "rasdaemon",
+        "name": "rasdaemon",
+        "origin": "/var/lib/rasdaemon/ras-mc_event.db",
+        "status": "absent",
+        "status_text": "not present",
+        "detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "klog",
+        "name": "klog (journal)",
+        "origin": "journalctl -o json _TRANSPORT=kernel + SYSLOG_IDENTIFIER=mcelog",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "699 lines read",
+          "its lines run from 2026-11-17 06:18 to 2026-11-17 06:21 UTC"
+        ]
+      },
+      {
+        "kind": "klog",
+        "name": "klog (ring buffer)",
+        "origin": "/dev/kmsg",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "699 lines read",
+          "its lines run from 2026-11-17 06:17 to 2026-11-17 06:21 UTC"
+        ]
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/sys/fs/pstore)",
+        "origin": "/sys/fs/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "pstore",
+        "name": "pstore (/var/lib/systemd/pstore)",
+        "origin": "/var/lib/systemd/pstore",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no dump of the kernel log",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "edac-sysfs",
+        "name": "edac-sysfs",
+        "origin": "/sys/devices/system/edac/mc",
+        "status": "empty",
+        "status_text": "no records",
+        "detail": "no memory controller is registered; no EDAC driver is loaded for this platform (usual in virtual machines)",
+        "records": 0,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0
+      },
+      {
+        "kind": "smbios",
+        "name": "smbios",
+        "origin": "/sys/firmware/dmi/tables",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 4,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "SMBIOS 2.8",
+          "4 memory slots, 2 populated"
+        ]
+      },
+      {
+        "kind": "host-memory",
+        "name": "host-memory",
+        "origin": "/",
+        "status": "ok",
+        "status_text": "ok",
+        "records": 9,
+        "events": 0,
+        "actions": 0,
+        "skipped": 0,
+        "notes": [
+          "lshw: lshw runs only in my collect host"
+        ]
+      }
+    ],
+    "missing": [
+      {
+        "code": "missing.source_detail",
+        "args": {
+          "detail": "no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only",
+          "kind": "rasdaemon",
+          "status": "@status.absent"
+        },
+        "text": "rasdaemon: not present (no rasdaemon database: rasdaemon is not installed or has stored nothing. Error records then come from the kernel log and the counters only)"
+      }
+    ],
+    "notes": [
+      {
+        "code": "missing.virtual",
+        "args": {
+          "what": "QEMU"
+        },
+        "text": "this host is a virtual machine (QEMU): a guest is not shown the corrected errors of the machine it runs on, and of the uncorrected ones at most those that hit its own memory"
+      }
+    ]
+  }
+}

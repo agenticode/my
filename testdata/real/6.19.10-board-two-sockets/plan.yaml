@@ -1,0 +1,7 @@
+# Injection plan: what was put into the host, where and how many times.
+format: 1
+scenario: board-two-sockets
+summary: "no injection: a board of 4 populated and 4 empty slots"
+method: none
+kernel: 6.19.10-300.fc44.x86_64
+injections: []

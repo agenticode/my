@@ -22,6 +22,9 @@ Each directory holds what one host recorded after a known set of errors was inje
 | `6.19.10-mce-loop-kdump` | the same guest with a crash kernel loaded | one fatal machine check; the crash kernel saves the log, the next boot reads the bank |
 | `6.19.10-bert-loop` | the same guest with a boot error region made by hand | one fatal memory error of DIMM 0 with row and column, read by each of three boots |
 | `6.19.10-ghes-loop-spread` | an aarch64 guest with six DIMMs, in a crash loop | a fatal firmware error record on another DIMM in each of three boots; the panic text in EFI variables |
+| `6.19.10-board-two-sockets` | an x86 guest with two sockets and two NUMA nodes, slots named `CPU0_CH0_DIMM0` | nothing; the board and the memory readings of `my collect host` |
+| `6.19.10-board-digits` | an x86 guest with one socket, slots named `DIMM000` | nothing |
+| `6.19.10-board-letters` | an x86 guest with one socket, slots named `DIMMA1` | nothing |
 
 The number in a name is the kernel version; every directory has a `README.md` with the versions of everything that took part.
 
@@ -44,6 +47,7 @@ my open testdata/real/7.3.0-mce/my/case.mycase
 | `proc/`, `sys/class/dmi/id/` | what names the host and its boot |
 | `plan.yaml` | the injection plan: what, where, how many times |
 | `capture.env` | the time of the capture and the versions |
+| `collect.json`, `collect.txt`, `numactl-hardware.txt`, `numastat.txt`, `sar-B.txt` | in the board captures: what `my collect host` wrote and ran |
 | `my/` | what `my` printed on the host as root: `scan.json`, `scan.txt`, `timeline.txt`, and the bundle `case.mycase` written with `--anonymize` |
 | `extra/` | what the injectors printed, what the kernel counts itself (`/proc/meminfo`, the table of the corrected error collector) and the output of `ras-mc-ctl` |
 | `formats/` | in `7.3.0-hwpoison` and `6.19.10-ghes`: the kernel log of the boot in seven more forms |

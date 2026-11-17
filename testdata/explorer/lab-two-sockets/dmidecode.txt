@@ -1,0 +1,280 @@
+# dmidecode 3.7
+Getting SMBIOS data from sysfs.
+SMBIOS 2.8 present.
+18 structures occupying 1405 bytes.
+Table at 0x7FFFFA80.
+
+Handle 0x0000, DMI type 0, 24 bytes
+Platform Firmware Information
+	Vendor: SeaBIOS
+	Version: 1.17.0-10.fc44
+	Release Date: 06/10/2025
+	Address: 0xE8000
+	Runtime Size: 96 KiB
+	ROM Size: 64 KiB
+	Characteristics:
+		Firmware characteristics not supported
+		Targeted content distribution is supported
+	Platform Firmware Revision: 0.0
+
+Handle 0x1100, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_CH0_DIMM0
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0001
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1101, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_CH1_DIMM0
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0002
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1102, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_CH0_DIMM0
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0003
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1103, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 16 GiB
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_CH1_DIMM0
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous Registered (Buffered)
+	Speed: 3200 MT/s
+	Manufacturer: Lab Memory
+	Serial Number: LABB0004
+	Asset Tag: Not Specified
+	Part Number: LABDDR4-16G
+	Rank: 2
+	Configured Memory Speed: 3200 MT/s
+	Minimum Voltage: 1.2 V
+	Maximum Voltage: 1.2 V
+	Configured Voltage: 1.2 V
+
+Handle 0x1104, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_CH0_DIMM1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x1105, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU0_CH1_DIMM1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x1106, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_CH0_DIMM1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x1107, DMI type 17, 40 bytes
+Memory Device
+	Array Handle: 0x1000
+	Error Information Handle: Not Provided
+	Total Width: 64 bits
+	Data Width: 64 bits
+	Size: No Module Installed
+	Form Factor: DIMM
+	Set: None
+	Locator: CPU1_CH1_DIMM1
+	Bank Locator: Not Specified
+	Type: DDR4
+	Type Detail: Synchronous
+
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: QEMU
+	Product Name: lab-two-sockets
+	Version: pc-q35-10.2
+	Serial Number: ds=nocloud;s=http://10.0.2.2:8061/
+	UUID: Not Settable
+	Wake-up Type: Power Switch
+	SKU Number: Not Specified
+	Family: Not Specified
+
+Handle 0x0300, DMI type 3, 22 bytes
+Chassis Information
+	Manufacturer: QEMU
+	Type: Other
+	Lock: Not Present
+	Version: pc-q35-10.2
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Boot-up State: Safe
+	Power Supply State: Safe
+	Thermal State: Safe
+	Security Status: Unknown
+	OEM Information: 0x00000000
+	Height: Unspecified
+	Number Of Power Cords: Unspecified
+	Contained Elements: 0
+	SKU Number: Not Specified
+
+Handle 0x0400, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU 0
+	Type: Central Processor
+	Family: Other
+	Manufacturer: QEMU
+	ID: 54 06 05 00 FD FB 8B 17
+	Version: pc-q35-10.2
+	External Clock: Unknown
+	Max Speed: 2000 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: Other
+	L1 Cache Handle: Not Provided
+	L2 Cache Handle: Not Provided
+	L3 Cache Handle: Not Provided
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 2
+	Core Enabled: 2
+	Thread Count: 2
+	Characteristics: None
+
+Handle 0x0401, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU 1
+	Type: Central Processor
+	Family: Other
+	Manufacturer: QEMU
+	ID: 54 06 05 00 FD FB 8B 17
+	Version: pc-q35-10.2
+	External Clock: Unknown
+	Max Speed: 2000 MHz
+	Current Speed: 2000 MHz
+	Status: Populated, Enabled
+	Upgrade: Other
+	L1 Cache Handle: Not Provided
+	L2 Cache Handle: Not Provided
+	L3 Cache Handle: Not Provided
+	Serial Number: Not Specified
+	Asset Tag: Not Specified
+	Part Number: Not Specified
+	Core Count: 2
+	Core Enabled: 2
+	Thread Count: 2
+	Characteristics: None
+
+Handle 0x1000, DMI type 16, 23 bytes
+Physical Memory Array
+	Location: Other
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 64 GiB
+	Error Information Handle: Not Provided
+	Number Of Devices: 1
+
+Handle 0x1300, DMI type 19, 31 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x0007FFFFFFF
+	Range Size: 2 GiB
+	Physical Array Handle: 0x1000
+	Partition Width: 1
+
+Handle 0x1301, DMI type 19, 31 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00100000000
+	Ending Address: 0x0107FFFFFFF
+	Range Size: 62 GiB
+	Physical Array Handle: 0x1000
+	Partition Width: 1
+
+Handle 0x2000, DMI type 32, 11 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x7F00, DMI type 127, 4 bytes
+End Of Table
+
