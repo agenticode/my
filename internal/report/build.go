@@ -148,6 +148,11 @@ type Document struct {
 	// Explorer is the memory of the host when the scan ran, in the tabs
 	// of the Memory Explorer; empty when the case holds no reading.
 	Explorer *view.Explorer
+	// SPD is what the modules say in their SPD EEPROM, and spdRaw the
+	// bytes of each reading by origin, for the hex dump of the report for
+	// failure analysis.
+	SPD    *view.SPD
+	spdRaw map[string][]byte
 	// Timeline is the timeline of the host, with one row per DIMM.
 	Timeline *view.Timeline
 	// Boots is the window of the latest boots of the host.
@@ -308,6 +313,23 @@ func Build(ctx context.Context, c *view.Case, h *engine.HostResult, opts Options
 		}
 		return e
 	})
+	// The SPD of the modules; a view that fails leaves the report as it
+	// is without one.
+	doc.SPD = adapter.Guard(func() *view.SPD {
+		v, err := c.SPD(ctx, h)
+		if err != nil {
+			return nil
+		}
+		return v
+	})
+	if doc.hasSPD() && doc.Audience == FA {
+		doc.spdRaw = map[string][]byte{}
+		if rs, err := s.SPDReadings(ctx, h.Host); err == nil {
+			for _, r := range rs {
+				doc.spdRaw[r.Origin] = r.Raw
+			}
+		}
+	}
 	// A board that fails leaves section 2 as the slot map draws it.
 	doc.Board = adapter.Guard(func() *view.Board {
 		b, err := c.Board(ctx, h)

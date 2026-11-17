@@ -61,7 +61,7 @@ func (doc *Document) html() (*node, error) {
 		el("meta", A{"name", "color-scheme", "content", "light"}),
 		el("meta", A{"name", "generator", "content", doc.Tool}),
 		el("title", doc.say("title.page", "host", host.Name, "grade", host.GradeText)),
-		el("style", rawText(styleSheet+figureSheet)),
+		el("style", rawText(styleSheet+figureSheet+doc.spdStyle())),
 	)
 	sheet := el("div", A{"class", "sheet"},
 		el("header", A{"class", "top"},
@@ -76,14 +76,14 @@ func (doc *Document) html() (*node, error) {
 		return nil, err
 	}
 	sheet.add(el("main",
-		doc.summary(), doc.slotMap(), doc.findings(), doc.where(), doc.timelines(), doc.checks(), doc.explorerPart(), doc.quality(), appendix),
+		doc.summary(), doc.slotMap(), doc.findings(), doc.where(), doc.timelines(), doc.checks(), doc.spdPart(), doc.explorerPart(), doc.quality(), appendix),
 		el("footer", el("p", doc.say("footer")), el("p", A{"class", "mono"}, doc.Tool)))
 	body := el("body", sheet, doc.panel(), el("script", rawText(script)))
 	return el("html", A{"lang", string(doc.Lang)}, head, body), nil
 }
 
-// section starts one of the sections of the report: eight, or nine with
-// the Memory Explorer.
+// section starts one of the sections of the report: eight, nine or ten
+// with the sections Module SPD and Memory Explorer.
 func (doc *Document) section(n int) *node {
 	return el("section", A{"id", "s" + strconv.Itoa(n), "class", "sec"},
 		el("h2", el("span", A{"class", "num"}, strconv.Itoa(n)), " "+doc.secWord(n)))
@@ -1254,6 +1254,7 @@ func (doc *Document) quality() *node {
 	if doc.hasExplorer() && len(doc.Explorer.Missing) > 0 {
 		s.add(el("p", doc.say("dq.readings_missing", "kinds", strings.Join(doc.Explorer.Missing, ", "))))
 	}
+	s.add(doc.spdQuality()...)
 	host := doc.Overview.Host
 
 	if host.CE+host.UE > 0 {
