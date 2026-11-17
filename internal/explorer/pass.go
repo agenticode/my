@@ -55,9 +55,13 @@ type Facts struct {
 	PerChannel int    `json:"perChannel,omitempty"`
 	ChannelsBy string `json:"channelsBy,omitempty"`
 	// Family is the board family whose row acted; Alias the row of a board
-	// known by its part number that sent it there.
-	Family string `json:"family,omitempty"`
-	Alias  string `json:"alias,omitempty"`
+	// known by its part number that sent it there; Labels the row that named
+	// the empty slots without a name; PhantomRow the row that names records
+	// the manual has no slot for.
+	Family     string `json:"family,omitempty"`
+	Alias      string `json:"alias,omitempty"`
+	Labels     string `json:"labels,omitempty"`
+	PhantomRow string `json:"phantomRow,omitempty"`
 	// Aside is the reason of a family row that sets every slot aside.
 	Aside string `json:"aside,omitempty"`
 	// Hub is set for memory on the chipset.

@@ -127,7 +127,8 @@ func TestBoardScreens(t *testing.T) {
 		"capture":    capture,
 		"demo":       testledger.Open(t, "demo", 1, ""),
 		"2x24":       importBoard(t, twoBy24(t)),
-		"nochannels": importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0", "dmidecode.txt")),
+		"family":     importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0", "dmidecode.txt")),
+		"nochannels": importBoard(t, testutil.Testdata(t, "explorer", "netbox-hp-proliant-bl460c-gen10-graphics-exp", "dmidecode.txt")),
 		"nodes":      importBoard(t, testutil.Testdata(t, "explorer", "linuxhw-r1g3d32-ec54ac", "dmidecode.txt")),
 		"aside":      importBoard(t, asideBoard(t)),
 	}

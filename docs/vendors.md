@@ -117,7 +117,7 @@ No reader is written without a public description of the format and a sample to 
 | Inspur IDL download | one memory event with its code |
 | Cisco tech-support files and UCS faults | the place of the SEL in the archive; one memory fault with its life cycle |
 
-The names of the memory slots, which `my board` reads to place a DIMM by CPU and channel, differ by server maker as well; [compatibility.md](compatibility.md#slot-names-of-server-vendors) has a table of the forms that are read.
+The names of the memory slots, which `my board` reads to place a DIMM by CPU and channel, differ by server maker as well; [compatibility.md](compatibility.md#slot-names-of-server-vendors) has a table of the forms that are read. Where a name gives a slot number and no channel, the channel comes from the table of the board's family in `internal/explorer/families.tsv`, written from the maker's documents that `internal/explorer/sources.tsv` lists.
 
 ## Sending a sample
 

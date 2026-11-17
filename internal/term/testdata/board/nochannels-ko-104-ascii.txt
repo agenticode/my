@@ -1,6 +1,10 @@
-호스트 board-host  Lenovo ThinkSystem SR650 -[7X06CTO1WW]-  슬롯 24개 중 8개, 512 GB  DDR4 2933 MT/s
+호스트 board-host  HPE ProLiant BL460c Gen10 Graphics Exp  슬롯 16개 중 4개, 128 GB
+DDR4 RDIMM 2666 MT/s
 
-        .. .. .. :: .. :: .. .. .. :: .. :: ==[CPU 0]== ==[CPU 1]== :: .. :: .. .. .. :: .. :: .. .. ..
- DIMM   11 12 9  10 7  8  2  1  4  3  6  5                          17 18 15 16 13 14 20 19 22 21 24 23
+               ..  ..  ..  ..  ..  ::  ::  ..  ==[CPU 0]==
+ PROC 1 DIMM   8   7   6   5   4   3   2   1
+
+               ==[CPU 1]==  ..  ::  ::  ..  ..  ..  ..  ..
+ PROC 2 DIMM                1   2   3   4   5   6   7   8
 
  :: 정상   .. 빈 슬롯

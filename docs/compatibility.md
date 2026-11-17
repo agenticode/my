@@ -462,9 +462,10 @@ The board places a slot by its locator and bank locator, the two names SMBIOS gi
 | Huawei, Sugon, Inspur, Lenovo RD450X: node and channel in the bank locator | `DIMM000` | `_Node0_Channel0_Dimm0` | CPU 0, channel 0 | `linuxhw-1288h-v5-c98b42` |
 | socket, channel and slot as three digits | `DIMM000` | `Not Specified` | CPU 0, channel 0 | `lab-digits` |
 | Dell PowerEdge: a letter and a slot number | `A1` | `Not Specified` | CPU 0, no channels | `netbox-dell-poweredge-m630` |
-| older Dell PowerEdge | `DIMM_A1` | `Not Specified` | CPU 0, no channels | `dselans-dell-centos65` |
-| HPE ProLiant: processor and a running slot number | `PROC 1 DIMM 1` | `Not Specified` | CPU 0, no channels | `netbox-hp-bl460c-gen10` |
-| HPE ProLiant Gen8, two spaces | `PROC  1 DIMM  1` | `Not Specified` | CPU 0, no channels | `netbox-hp-dl380p-gen8` |
+| older Dell PowerEdge: the letter is the processor, the table of the family gives the channel | `DIMM_A1` | `Not Specified` | CPU 0, channel 0 | `dselans-dell-centos65` |
+| HPE ProLiant: processor and a running slot number, the table of the family gives the channel | `PROC 1 DIMM 1` | `Not Specified` | CPU 0, channel 2 | `netbox-hp-bl460c-gen10` |
+| HPE ProLiant Gen8, two spaces | `PROC  1 DIMM  1` | `Not Specified` | CPU 0, channel 2 | `netbox-hp-dl380p-gen8` |
+| HPE ProLiant blade without a table of its family | `PROC 1 DIMM 8` | `Not Specified` | CPU 0, no channels | `netbox-hp-proliant-bl460c-gen10-graphics-exp` |
 | Intel and ASUS boards: `CPU` and a channel letter | `CPU0_DIMM_A1` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m50cyp2sbstd-d50fc4` |
 | `CPU` counted from 1 and a channel letter, bank locator `P0 CHANNEL A` | `CPU1_DIMM_A1` | `P0 CHANNEL A` | CPU 0, channel 0 | `linuxhw-rs720a-e12-rs12-6002d3` |
 | Intel reference boards, Inspur M5 and M6: `_C` channel `D` slot | `CPU0_C0D0` | `NODE 0` | CPU 0, channel 0 | `linuxhw-m70klp2sb-m90598-001-373530` |
@@ -476,11 +477,12 @@ The board places a slot by its locator and bank locator, the two names SMBIOS gi
 | one socket: channel letter in the bank locator | `DIMM A1` | `CHANNEL A` | CPU 0, channel 0 | `netbox-qct-x10e-9n` |
 | one socket: `DIMM` and a channel letter | `DIMMA1` | `Not Specified` | CPU 0, channel 0 | `lab-letters` |
 | lshw only, no SMBIOS text: four slots of one letter | `A0` | | CPU 0, no channels | `coreboot-ga-g41m-es2l` |
-| Lenovo ThinkSystem and System x: `DIMM n`, socket in the bank locator | `DIMM 1` | `CPU 1` | CPU 0, no channels | `linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0` |
+| Lenovo ThinkSystem and System x: `DIMM n`, socket in the bank locator, the table of the family gives the channel | `DIMM 1` | `CPU 1` | CPU 0, channel 2 | `linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0` |
 | node, channel and slot in the locator, node in the bank locator | `NODE 0 CHANNEL 0 DIMM 0 (C0A0)` | `NODE 0` | CPU 0, channel 0 | `linuxhw-9k-23ba3b` |
 | memory controller and channel letter in the locator, node in the bank locator | `P0_MC0_DIM_CH_A0` | `NODE 1` | CPU 0, channel 0 | `linuxhw-b7109f77dv14hr-2t-n-91971d` |
 | `ChannelA-DIMM0` with `NODE 0` to `NODE 7` on two sockets: four memory controllers to a processor | `ChannelA-DIMM0` | `NODE 0` | CPU 0, channel 0 | `linuxhw-r1g3d32-ec54ac` |
-| no socket and no channel in the names | `DIMM 1` | `Bank 1` | set aside | `linuxhw-system-x3550-m4-7914b2a-05b91b` |
+| IBM System x: numbers that run over both processors, the table of the family gives processor and channel | `DIMM 1` | `Bank 1` | CPU 0, channel 0 | `linuxhw-system-x3550-m4-7914b2a-05b91b` |
+| empty slots the firmware gives no name, on a board without the labels of its manual | `NO DIMM` | `NO DIMM` | set aside | `linuxhw-sa5212m4-4250b0` |
 | a name of no form beside a channel and slot in the bank locator, on one socket | `J1MY` | `CHAN A DIMM 0` | set aside | `ironic-dmi-data` |
 
 Before the board is drawn, what the names gave is checked:
@@ -498,13 +500,15 @@ The server dumps of the Linux-Hardware.org DMI collection ([linuxhw/DMI](https:/
 | --- | --- | --- | --- | --- |
 | first version | 1,077 | 48 | 226 | 692 |
 | first round of fixes | 1,502 | 51 | 239 | 251 |
-| this release | 1,038 | 110 | 873 | 22 |
+| this release | 1,946 | 2 | 12 | 83 |
 
-The first version is how the names were read when the board was first written; the first round of fixes read more parts of a name and took the channel of a numbered slot from the slot number. This release reads every name by the table of forms and draws a numbered slot without channels where no table of the board says its channel, so fewer boards are drawn in full and none puts a slot into a channel the names do not give. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
+The first version is how the names were read when the board was first written; the first round of fixes read more parts of a name and took the channel of a numbered slot from the slot number. This release reads every name by the table of forms and takes the place of a numbered slot from the table of its board family; a numbered slot of a board without such a table is drawn without channels. Memory devices that are chips of the board (flash) and records the manual has no slot for count in none of the columns. `internal/explorer/testdata/population-boards.txt` has the counts by system maker.
 
 What the checks cannot see:
 
-- Names with a slot number and no channel (Dell `A7`, HPE `PROC 1 DIMM 9`, Lenovo `DIMM 7`): the channel stands only in the vendor's slot table. The board draws such a socket without channels.
+- Names with a slot number and no channel (Dell `A7`, HPE `PROC 1 DIMM 9`, Lenovo `DIMM 7`): the channel stands only in the vendor's slot table. The board takes it from the table of the board's family; a board whose family table is not known is drawn without channels.
+
+The tables of the board families are in `internal/explorer/families.tsv`: 361 rows, each written from a public document of the board's maker that `internal/explorer/sources.tsv` names with title, number or revision, date, address and the pages read (385 documents). A row says which slot number sits on which processor and channel, which word of the names is which processor, how many channels a processor of the board has and how many slots a channel holds, which empty slots the manual labels where the firmware gives them no name, and which records the firmware writes for slots the board does not have. A row ties products to their document by the system product and the board name; a board named only by its part number takes the row of the family whose named dumps carry the same part number. Rows whose document does not settle the place set the slots of the board aside with the reason. The tables keep the facts of the documents in MemorY's own form; no text, table or drawing of a document is copied.
 - A processor word the firmware counts in another way than the board's labels: the board takes the word as the names give it.
 
 ## Memory Explorer readings

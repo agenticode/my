@@ -1,7 +1,7 @@
 dselans-dell-centos65 (8 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 8, CPUs 0 [unplaced assumed 8]
-  fixed                  placed 0, no channel 8, aside 0, CPUs 2 [no-channel crowd 8]
-  fixed, sockets unknown placed 0, no channel 8, aside 0, CPUs 1 [no-channel crowd 8]
+  fixed                  placed 8, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 8, no channel 0, aside 0, CPUs 2 []
 ironic-dmi-data (4 slots, 1 processor records)
   first                  placed 0, no channel 0, aside 4, CPUs 0 [unplaced crowd 4]
   fixed                  placed 0, no channel 0, aside 4, CPUs 0 [unplaced unknown-form 4]
@@ -76,16 +76,16 @@ linuxhw-nf5280m6-48e15d (32 slots, 2 processor records)
   fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 2 []
 linuxhw-poweredge-r6615-71a1f0 (12 slots, 1 processor records)
   first                  placed 12, no channel 0, aside 0, CPUs 1 []
-  fixed                  placed 0, no channel 12, aside 0, CPUs 1 [no-channel crowd 12]
-  fixed, sockets unknown placed 0, no channel 12, aside 0, CPUs 1 [no-channel crowd 12]
+  fixed                  placed 12, no channel 0, aside 0, CPUs 1 []
+  fixed, sockets unknown placed 12, no channel 0, aside 0, CPUs 1 []
 linuxhw-poweredge-r7625-292f80 (24 slots, 2 processor records)
   first                  placed 24, no channel 0, aside 0, CPUs 2 []
-  fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel crowd 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 1 [no-channel crowd 24]
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 linuxhw-proliant-dl380-gen11-89bbba (32 slots, 2 processor records)
   first                  placed 32, no channel 0, aside 0, CPUs 2 []
-  fixed                  placed 0, no channel 32, aside 0, CPUs 2 [no-channel no-table 32]
-  fixed, sockets unknown placed 0, no channel 32, aside 0, CPUs 2 [no-channel no-table 32]
+  fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 2 []
 linuxhw-r1g3d32-ec54ac (32 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 32, CPUs 0 [unplaced negative 32]
   fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
@@ -120,20 +120,20 @@ linuxhw-sys-620u-tnr-8efbd8 (32 slots, 2 processor records)
   fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 2 []
 linuxhw-system-x3550-m4-7914b2a-05b91b (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced none 24]
-  fixed                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced assumed 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 1 [no-channel no-table 24]
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 linuxhw-system-x3550-m5-8869ac1-3e3013 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced none 24]
-  fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 linuxhw-thinksystem-sr645-d77032 (32 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 32, CPUs 0 [unplaced none 32]
-  fixed                  placed 0, no channel 32, aside 0, CPUs 2 [no-channel no-table 32]
-  fixed, sockets unknown placed 0, no channel 32, aside 0, CPUs 2 [no-channel no-table 32]
+  fixed                  placed 32, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 32, no channel 0, aside 0, CPUs 2 []
 linuxhw-thinksystem-sr650-7x06cto1ww-5d8ab0 (24 slots, 2 processor records)
   first                  placed 0, no channel 0, aside 24, CPUs 0 [unplaced none 24]
-  fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 linuxhw-ts100-e7-pi4-e88885 (4 slots, 1 processor records)
   first                  placed 4, no channel 0, aside 0, CPUs 1 []
   fixed                  placed 4, no channel 0, aside 0, CPUs 1 []
@@ -152,16 +152,16 @@ netbox-dell-poweredge-m630 (24 slots, 2 processor records)
   fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 1 [no-channel crowd 24]
 netbox-hp-bl460c-gen10 (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
-  fixed                  placed 0, no channel 16, aside 0, CPUs 2 [no-channel no-table 16]
-  fixed, sockets unknown placed 0, no channel 16, aside 0, CPUs 2 [no-channel no-table 16]
+  fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 16, no channel 0, aside 0, CPUs 2 []
 netbox-hp-bl460c-gen9 (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
-  fixed                  placed 0, no channel 16, aside 0, CPUs 2 [no-channel no-table 16]
-  fixed, sockets unknown placed 0, no channel 16, aside 0, CPUs 2 [no-channel no-table 16]
+  fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 16, no channel 0, aside 0, CPUs 2 []
 netbox-hp-dl380p-gen8 (24 slots, 2 processor records)
   first                  placed 24, no channel 0, aside 0, CPUs 2 []
-  fixed                  placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
-  fixed, sockets unknown placed 0, no channel 24, aside 0, CPUs 2 [no-channel no-table 24]
+  fixed                  placed 24, no channel 0, aside 0, CPUs 2 []
+  fixed, sockets unknown placed 24, no channel 0, aside 0, CPUs 2 []
 netbox-hp-proliant-bl460c-gen10-graphics-exp (16 slots, 2 processor records)
   first                  placed 16, no channel 0, aside 0, CPUs 2 []
   fixed                  placed 0, no channel 16, aside 0, CPUs 2 [no-channel no-table 16]
@@ -180,7 +180,7 @@ netbox-qct-x10e-9n (4 slots, 1 processor records)
   fixed, sockets unknown placed 4, no channel 0, aside 0, CPUs 1 []
 netbox-sm-ssg-6028r (16 slots, 2 processor records)
   first                  placed 4, no channel 0, aside 12, CPUs 1 [unplaced none 12]
-  fixed                  placed 4, no channel 0, aside 12, CPUs 1 [unplaced none 12]
+  fixed                  placed 16, no channel 0, aside 0, CPUs 2 []
   fixed, sockets unknown placed 4, no channel 0, aside 12, CPUs 1 [unplaced none 12]
 netbox-sm-sys-6018r (8 slots, 2 processor records)
   first                  placed 8, no channel 0, aside 0, CPUs 2 []

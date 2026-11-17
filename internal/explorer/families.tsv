@@ -1,0 +1,377 @@
+# Board families of the slot reader: one row per family, written from the public documents of the board makers
+# in the form of MemorY (no text, table or drawing of a document). Rows are tried in order; the first whose maker,
+# match, forms and conditions fit a board decides. Columns:
+#   id       family id
+#   maker    the maker the reader finds for the board, or *
+#   match    expression over "system product|board" (letters of any case)
+#   forms    the locator forms the row reads (internal/explorer/names.go); every named slot must have one
+#   when     S=n processor records, slots=n memory devices, per=n slots of every processor, cpu=family
+#   socket   where the processor of a slot comes from: cpu, letter, bank, one, hub, or map:WORDn=socket,...
+#   kind     table, global, cards, names, hub, labels, phantoms, alias, aside
+#   arg      names and hub: channels,slots per channel; cards: cards per processor; alias: the family; aside: the reason
+#   channels the channel names of one processor in the order of the document; ? marks a group the document does not name
+#   map      table: n=channel.position (s2: starts a second processor); global: n=processor.channel.position;
+#            labels: the slot labels of the manual; phantoms: the records the manual has no slot for
+#   source   ids of internal/explorer/sources.tsv; none for an aside row whose reason is that no document was found
+id	maker	match	forms	when	socket	kind	arg	channels	map	source
+dell-cs24-sc	dell	^CS24-SC\|				aside	no-document			
+board-strings-broken	*	^\|$	dimm-u-letter	S=2		aside	board-unknown			
+dell-board-unknown	dell	^(?:|CounterACT|OmniCube CN-3400-1|AWS Elemental Appliance)\|(?:.* )?(?:04N3DF|0XWDCF|04F3CJ|0024FG)$				aside	board-unknown			
+dell-pn-0pxxhp	dell	\|(?:.* )?0PXXHP$				alias	dell-12g-24slot			dell-e14s
+dell-pn-0jp31p	dell	\|(?:.* )?0JP31P$				alias	dell-12g-24slot			dell-e14s
+dell-pn-0vrcy5	dell	\|(?:.* )?0VRCY5$				alias	dell-12g-24slot			dell-e14s
+dell-pn-04jn2k	dell	\|(?:.* )?04JN2K$				alias	dell-14g-16slot			dell-e45s
+fujitsu-d2709-phantoms	fujitsu	^PRIMERGY TX200 S5\|				phantoms			DIMM-3A,DIMM-3B,DIMM-3C,DIMM-3D,DIMM-3E,DIMM-3F	fujitsu-d2709-tx200-s5
+sm-x10dr-16-labels	supermicro	X10DRi\b|X10DRH|X10DRW		S=2;slots=16		labels			P1-DIMMA1 P1-DIMMA2 P1-DIMMB1 P1-DIMMB2 P1-DIMMC1 P1-DIMMC2 P1-DIMMD1 P1-DIMMD2 P2-DIMME1 P2-DIMME2 P2-DIMMF1 P2-DIMMF2 P2-DIMMG1 P2-DIMMG2 P2-DIMMH1 P2-DIMMH2	sm-mnl-1491;sm-mnl-1628
+sm-x10drg-24-labels	supermicro	X10DRG		S=2;slots=24		labels			P1-DIMMA1 P1-DIMMA2 P1-DIMMA3 P1-DIMMB1 P1-DIMMB2 P1-DIMMB3 P1-DIMMC1 P1-DIMMC2 P1-DIMMC3 P1-DIMMD1 P1-DIMMD2 P1-DIMMD3 P2-DIMME1 P2-DIMME2 P2-DIMME3 P2-DIMMF1 P2-DIMMF2 P2-DIMMF3 P2-DIMMG1 P2-DIMMG2 P2-DIMMG3 P2-DIMMH1 P2-DIMMH2 P2-DIMMH3	sm-mnl-1780
+sm-x10sra-8-labels	supermicro	X10SRA		S=1;slots=8		labels			DIMMA1 DIMMA2 DIMMB1 DIMMB2 DIMMC1 DIMMC2 DIMMD1 DIMMD2	sm-mnl-1643
+gigabyte-mu71-su0-phantoms	gigabyte	^MU71-SU0-00\|				phantoms			DIMM_P1_G0,DIMM_P1_G1,DIMM_P1_H0,DIMM_P1_I0,DIMM_P1_J0,DIMM_P1_J1,DIMM_P1_K0,DIMM_P1_L0	gigabyte-mu71-su0-user-manual
+gigabyte-c621-su8-phantoms	gigabyte	^C621-SU8				phantoms			CPU1_DIMM_B2,CPU1_DIMM_C2,CPU1_DIMM_E2,CPU1_DIMM_F2,CPU2_DIMM_A1,CPU2_DIMM_A2,CPU2_DIMM_B1,CPU2_DIMM_B2,CPU2_DIMM_C1,CPU2_DIMM_C2,CPU2_DIMM_D1,CPU2_DIMM_D2,CPU2_DIMM_E1,CPU2_DIMM_E2,CPU2_DIMM_F1,CPU2_DIMM_F2	gigabyte-c621-su8-user-manual
+gigabyte-c621-sd8-phantoms	gigabyte	^C621-SD8				phantoms			CPU1_DIMM_A2,CPU1_DIMM_B2,CPU1_DIMM_C1,CPU1_DIMM_C2,CPU1_DIMM_D2,CPU1_DIMM_E2,CPU1_DIMM_F1,CPU1_DIMM_F2,CPU2_DIMM_A2,CPU2_DIMM_B2,CPU2_DIMM_C1,CPU2_DIMM_C2,CPU2_DIMM_D2,CPU2_DIMM_E2,CPU2_DIMM_F1,CPU2_DIMM_F2	gigabyte-c621-sd8-user-manual
+tyan-s4985-ck8	tyan	^CK8\|(?:.* )?S4985$				aside	names-not-in-document			tyan-s4985-user-manual;tyan-m4985-user-manual
+msi-ms9661-mcp55	msi	^MCP55\|(?:.* )?MS-9661$				aside	no-channel-in-document			msi-ms9661-manual
+msi-ms9280	msi	^MS-9280\|(?:.* )?MS-9280$				aside	no-document			
+aopw-plus	*	^AOPW-PLUS\|(?:.* )?AOPW-PLUS$				aside	no-document			
+gmktec-nucbox8	*	^NucBox8\|(?:.* )?GMKtec$				aside	no-document			
+dell-13g-24slot	dell	^PowerEdge R630\||^\|(?:.* )?PowerEdge R630$|^PowerEdge R730xd\||^\|(?:.* )?PowerEdge R730xd$|^PowerEdge R730\||^\|(?:.* )?PowerEdge R730$|^PowerEdge T630\||^\|(?:.* )?PowerEdge T630$|^PowerEdge R730XD\||^\|(?:.* )?PowerEdge R730XD$|^OmniCube CN-3400-1\||^\|(?:.* )?OmniCube CN-3400-1$	letter-number		letter	table		0,1,2,3	1=0.0 2=1.0 3=2.0 4=3.0 5=0.1 6=1.1 7=2.1 8=3.1 9=0.2 10=1.2 11=2.2 12=3.2	dell-e26s
+dell-12g-24slot	dell	^PowerEdge R720\||^\|(?:.* )?PowerEdge R720$|^PowerEdge R620\||^\|(?:.* )?PowerEdge R620$|^PowerEdge R720xd\||^\|(?:.* )?PowerEdge R720xd$|^PowerEdge T620\||^\|(?:.* )?PowerEdge T620$|^OEM-R 720xd\||^\|(?:.* )?OEM-R 720xd$	dimm-u-letter		letter	table		0,1,2,3	1=0.0 2=1.0 3=2.0 4=3.0 5=0.1 6=1.1 7=2.1 8=3.1 9=0.2 10=1.2 11=2.2 12=3.2	dell-e14s
+dell-12g-e5-2400-2s-12slot	dell	^PowerEdge R520\||^\|(?:.* )?PowerEdge R520$|^PowerEdge R420\||^\|(?:.* )?PowerEdge R420$|^PowerEdge T420\||^\|(?:.* )?PowerEdge T420$	dimm-u-letter		letter	table		1,2,3	1=1.0 2=2.0 3=3.0 4=1.1 5=2.1 6=3.1	dell-e18s
+dell-12g-e5-2400-1s-6slot	dell	^PowerEdge T320\||^\|(?:.* )?PowerEdge T320$|^PowerEdge R320\||^\|(?:.* )?PowerEdge R320$	dimm-u-letter		letter	table		1,2,3	1=1.0 2=2.0 3=3.0 4=1.1 5=2.1 6=3.1	dell-e20s
+dell-13g-12slot	dell	^PowerEdge R430\||^\|(?:.* )?PowerEdge R430$|^PowerEdge R530\||^\|(?:.* )?PowerEdge R530$|^PowerEdge T430\||^\|(?:.* )?PowerEdge T430$	letter-number		letter	table		0,1,2,3	1=0.0 2=1.0 3=2.0 4=3.0 5=0.1 6=1.1 7=2.1 8=3.1; s2: 1=0.0 2=1.0 3=2.0 4=3.0	dell-e28s
+dell-11g-18slot	dell	^PowerEdge R710\||^\|(?:.* )?PowerEdge R710$|^PowerEdge T710\||^\|(?:.* )?PowerEdge T710$	dimm-u-letter		letter	table		?1,?2,?3	1=?1.0 4=?1.1 7=?1.2 2=?2.0 5=?2.1 8=?2.2 3=?3.0 6=?3.1 9=?3.2	dell-r710-owner-manual
+dell-11g-12slot	dell	^PowerEdge R610\||^\|(?:.* )?PowerEdge R610$|^PowerEdge T610\||^\|(?:.* )?PowerEdge T610$	dimm-u-letter		letter	table		?1,?2,?3	1=?1.0 4=?1.1 2=?2.0 5=?2.1 3=?3.0 6=?3.1	dell-r610-owner-manual
+dell-11g-8slot	dell	^PowerEdge R510\||^\|(?:.* )?PowerEdge R510$|^PowerEdge R410\||^\|(?:.* )?PowerEdge R410$|^PowerEdge T410\||^\|(?:.* )?PowerEdge T410$	dimm-u-letter		letter	table		0,1,2	1=0.0 2=1.0 3=2.0 4=0.1	dell-r410-owner-manual
+dell-11g-x3400-6slot	dell	^PowerEdge T310\||^\|(?:.* )?PowerEdge T310$|^PowerEdge R310\||^\|(?:.* )?PowerEdge R310$	dimm-u-letter		letter	table		A,B	1=A.0 3=A.1 5=A.2 2=B.0 4=B.1 6=B.2	dell-t310-owner-manual
+dell-11g-x3400-4slot	dell	^PowerEdge R210\||^\|(?:.* )?PowerEdge R210$|^PowerEdge T110\||^\|(?:.* )?PowerEdge T110$	dimm-u-letter,dimm-number		letter	table		?g1,?g2	1=?g1.0 3=?g1.1 2=?g2.0 4=?g2.1	dell-r210-owner-manual
+dell-e3-4slot-lettered	dell	^PowerEdge R210 II\||^\|(?:.* )?PowerEdge R210 II$|^PowerEdge T110 II\||^\|(?:.* )?PowerEdge T110 II$				names				dell-e10s
+dell-12g-r220	dell	^PowerEdge R220\||^\|(?:.* )?PowerEdge R220$	dimm-number		one	table		1,2	1=1.0 3=1.1 2=2.0 4=2.1	dell-e10s-2
+dell-13g-1s-4slot	dell	^PowerEdge R230\||^\|(?:.* )?PowerEdge R230$|^PowerEdge T330\||^\|(?:.* )?PowerEdge T330$|^PowerEdge T130\||^\|(?:.* )?PowerEdge T130$|^PowerEdge R330\||^\|(?:.* )?PowerEdge R330$	letter-number		letter	table		0,1	1=0.0 3=0.1 2=1.0 4=1.1	dell-e33s
+dell-14g-1s-4slot	dell	^PowerEdge R340\||^\|(?:.* )?PowerEdge R340$|^PowerEdge R240\||^\|(?:.* )?PowerEdge R240$|^PowerEdge T340\||^\|(?:.* )?PowerEdge T340$|^PowerEdge T140\||^\|(?:.* )?PowerEdge T140$	letter-number		letter	table		0,1	1=0.0 3=0.1 2=1.0 4=1.1	dell-e57s
+dell-15g-1s-4slot	dell	^PowerEdge T150\||^\|(?:.* )?PowerEdge T150$|^PowerEdge R350\||^\|(?:.* )?PowerEdge R350$	letter-number		letter	table		0,1	1=0.0 3=0.1 2=1.0 4=1.1	dell-e80s
+dell-14g-24slot	dell	^PowerEdge R740\||^\|(?:.* )?PowerEdge R740$|^PowerEdge R640\||^\|(?:.* )?PowerEdge R640$|^PowerEdge R740xd\||^\|(?:.* )?PowerEdge R740xd$|^PowerEdge T640\||^\|(?:.* )?PowerEdge T640$|^XC640-10 CORE\||^\|(?:.* )?XC640-10 CORE$|^XC740xd-12 CORE\||^\|(?:.* )?XC740xd-12 CORE$	letter-number		letter	table		0,1,2,3,4,5	1=0.0 2=1.0 3=2.0 4=3.0 5=4.0 6=5.0 7=0.1 8=1.1 9=2.1 10=3.1 11=4.1 12=5.1	dell-e38s
+dell-14g-16slot	dell	^PowerEdge R440\||^\|(?:.* )?PowerEdge R440$|^PowerEdge T440\||^\|(?:.* )?PowerEdge T440$|^PowerEdge R540\||^\|(?:.* )?PowerEdge R540$|^PowerEdge R740xd2\||^\|(?:.* )?PowerEdge R740xd2$	letter-number		letter	table		0,1,2,3,4,5	1=0.0 2=1.0 3=2.0 4=3.0 5=4.0 6=5.0 7=0.1 8=1.1 9=3.1 10=4.1; s2: 1=0.0 2=1.0 3=2.0 4=3.0 5=4.0 6=5.0	dell-e45s
+dell-14g-epyc7001-32slot	dell	^PowerEdge R7425\||^\|(?:.* )?PowerEdge R7425$	letter-number		letter	table		0,1,2,3,4,5,6,7	1=0.0 2=1.0 3=2.0 4=3.0 5=4.0 6=5.0 7=6.0 8=7.0 9=0.1 10=1.1 11=2.1 12=3.1 13=4.1 14=5.1 15=6.1 16=7.1	dell-e38s-2
+dell-15g-epyc-1s-16slot	dell	^PowerEdge R6515\||^\|(?:.* )?PowerEdge R6515$|^PowerEdge R7515\||^\|(?:.* )?PowerEdge R7515$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=D.0 2=C.0 3=H.0 4=G.0 5=B.0 6=A.0 7=F.0 8=E.0 9=D.1 10=C.1 11=B.1 12=A.1 13=H.1 14=G.1 15=F.1 16=E.1	dell-e45s-2
+dell-15g-epyc-2s-32slot	dell	^PowerEdge R7525\||^\|(?:.* )?PowerEdge R7525$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=D.0 2=C.0 3=H.0 4=G.0 5=B.0 6=A.0 7=F.0 8=E.0 9=D.1 10=C.1 11=B.1 12=A.1 13=H.1 14=G.1 15=F.1 16=E.1	dell-e68s
+dell-15g-icx-32slot	dell	^PowerEdge R750\||^\|(?:.* )?PowerEdge R750$|^PowerEdge R650\||^\|(?:.* )?PowerEdge R650$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=A.0 2=E.0 3=C.0 4=G.0 5=B.0 6=F.0 7=D.0 8=H.0 9=A.1 10=E.1 11=C.1 12=G.1 13=B.1 14=F.1 15=D.1 16=H.1	dell-e70s
+dell-15g-icx-16slot	dell	^PowerEdge R450\||^\|(?:.* )?PowerEdge R450$|^PowerEdge T550\||^\|(?:.* )?PowerEdge T550$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=A.0 2=E.0 3=C.0 4=G.0 5=B.0 6=F.0 7=D.0 8=H.0	dell-e74s
+dell-16g-epyc9004-2s-24slot	dell	^PowerEdge R7625\||^\|(?:.* )?PowerEdge R7625$	letter-number		letter	table		A,B,C,D,E,F,G,H,I,J,K,L	1=A.0 2=G.0 3=C.0 4=I.0 5=B.0 6=H.0 7=E.0 8=K.0 9=D.0 10=J.0 11=F.0 12=L.0	dell-e94s
+dell-16g-epyc9004-1s-12slot	dell	^PowerEdge R6615\||^\|(?:.* )?PowerEdge R6615$	letter-number		letter	table		A,B,C,D,E,F,G,H,I,J,K,L	1=A.0 2=G.0 3=C.0 4=I.0 5=B.0 6=H.0 7=E.0 8=K.0 9=D.0 10=J.0 11=F.0 12=L.0	dell-e97s
+dell-16g-spr-16slot	dell	^PowerEdge R660xs\||^\|(?:.* )?PowerEdge R660xs$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=A.0 2=G.0 3=C.0 4=E.0 5=D.0 6=F.0 7=B.0 8=H.0	dell-e87s
+dell-xr4510c	dell	^PowerEdge XR4510c\||^\|(?:.* )?PowerEdge XR4510c$	letter-number		letter	table		A1,A2,A3,A4	1=A1.0 2=A2.0 3=A3.0 4=A4.0	dell-xr4510c-installation-service-manual
+dell-precision-7920-tower	dell	^Precision 7920 Tower\||^\|(?:.* )?Precision 7920 Tower$	dimm-cpu		cpu	table		Ch0,Ch1,Ch2,Ch3,Ch4,Ch5	1=Ch2.0 7=Ch2.1 2=Ch5.0 8=Ch5.1 3=Ch1.0 9=Ch1.1 4=Ch4.0 10=Ch4.1 5=Ch0.0 11=Ch0.1 6=Ch3.0 12=Ch3.1	dell-d04x
+dell-precision-7820-tower	dell	^Precision 7820 Tower\||^\|(?:.* )?Precision 7820 Tower$	dimm-cpu		cpu	table		Ch0,Ch1,Ch2,Ch3,Ch4,Ch5	1=Ch2.0 2=Ch5.0 3=Ch1.0 4=Ch4.0 5=Ch0.0 6=Ch3.0	dell-d02t
+dell-precision-rack-7910	dell	^Precision Rack 7910\||^\|(?:.* )?Precision Rack 7910$	letter-number		letter	table		0,1,2,3	1=0.0 5=0.1 9=0.2 2=1.0 6=1.1 10=1.2 3=2.0 7=2.1 11=2.2 4=3.0 8=3.1 12=3.2	dell-e31s
+dell-precision-7920-rack	dell	^Precision 7920 Rack\||^\|(?:.* )?Precision 7920 Rack$	letter-number		letter	table		0,1,2,3,4,5	1=0.0 7=0.1 2=1.0 8=1.1 3=2.0 9=2.1 4=3.0 10=3.1 5=4.0 11=4.1 6=5.0 12=5.1	dell-e38s-3
+dell-precision-7960-rack	dell	^Precision 7960 Rack\||^\|(?:.* )?Precision 7960 Rack$	letter-number		letter	table		CH_A,CH_B,CH_C,CH_D,CH_E,CH_F,CH_G,CH_H	1=CH_A.0 9=CH_A.1 7=CH_B.0 15=CH_B.1 3=CH_C.0 11=CH_C.1 5=CH_D.0 13=CH_D.1 4=CH_E.0 12=CH_E.1 6=CH_F.0 14=CH_F.1 2=CH_G.0 10=CH_G.1 8=CH_H.0 16=CH_H.1	dell-e82s
+dell-c4140	dell	^PowerEdge C4140\||^\|(?:.* )?PowerEdge C4140$	letter-number		letter	table		0,1,2,3,4,5	1=0.0 7=0.1 2=1.0 8=1.1 3=2.0 9=2.1 4=3.0 10=3.1 5=4.0 11=4.1 6=5.0 12=5.1	dell-e53s
+dell-c6520	dell	^PowerEdge C6520\||^\|(?:.* )?PowerEdge C6520$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=A.0 2=E.0 3=C.0 4=G.0 5=B.0 6=F.0 7=D.0 8=H.0	dell-e64s
+dell-c6525	dell	^PowerEdge C6525\||^\|(?:.* )?PowerEdge C6525$	letter-number		letter	table		A,B,C,D,E,F,G,H	1=D.0 2=C.0 3=H.0 4=G.0 5=B.0 6=A.0 7=F.0 8=E.0	dell-e63s
+dell-c6220ii-c8220	dell	^PowerEdge C6220 II\||^\|(?:.* )?PowerEdge C6220 II$|^PowerEdge C8220\||^\|(?:.* )?PowerEdge C8220$	dimm-u-letter		letter	table		CHA,CHB,CHC,CHD	1=CHA.0 5=CHA.1 2=CHB.0 6=CHB.1 3=CHC.0 7=CHC.1 4=CHD.0 8=CHD.1	dell-c6220-owner-manual
+dell-c6320	dell	^PowerEdge C6320\||^\|(?:.* )?PowerEdge C6320$	letter-number		letter	table		CHA,CHB,CHC,CHD	1=CHA.0 5=CHA.1 2=CHB.0 6=CHB.1 3=CHC.0 7=CHC.1 4=CHD.0 8=CHD.1	dell-b08s
+dell-c5220	dell	^PowerEdge C5220\||^\|(?:.* )?PowerEdge C5220$				aside	no-channel-in-document			dell-b04s
+dell-c6100-numbered	dell	^C6100\||^\|(?:.* )?C6100$|^XS23-TY35\||^\|(?:.* )?XS23-TY35$			bank	aside	names-not-in-document			dell-c6100-owner-manual
+dell-xs23-ty3-spelled	dell	^XS23-TY3\||^\|(?:.* )?XS23-TY3$				names				dell-c6100-owner-manual
+dell-c1100-cs24-ty	dell	^CS24-TY\||^\|(?:.* )?CS24-TY$				names				dell-c1100-owner-manual
+dell-pe-1950-2950	dell	^PowerEdge 1950\||^\|(?:.* )?PowerEdge 1950$|^PowerEdge 2950\||^\|(?:.* )?PowerEdge 2950$	dimm-number		hub	table		0,1,2,3	1=0.0 5=0.1 2=1.0 6=1.1 3=2.0 7=2.1 4=3.0 8=3.1	dell-1950-owner-manual
+dell-pe-2900	dell	^PowerEdge 2900\||^\|(?:.* )?PowerEdge 2900$	dimm-number		hub	table		0,1,2,3	1=0.0 5=0.1 9=0.2 2=1.0 6=1.1 10=1.2 3=2.0 7=2.1 11=2.2 4=3.0 8=3.1 12=3.2	dell-2900-owner-manual
+dell-pe-sc1430	dell	^PowerEdge SC1430\||^\|(?:.* )?PowerEdge SC1430$	dimm-number		hub	table		0,1	1=0.0 5=0.1 2=1.0 6=1.1	dell-sc1430-owner-manual
+dell-precision-r5400	dell	^Precision WorkStation R5400\||^\|(?:.* )?Precision WorkStation R5400$			hub	aside	no-channel-in-document			dell-r5400-service-manual
+dell-pe-t300	dell	^PowerEdge T300\||^\|(?:.* )?PowerEdge T300$	dimm-number		hub	table		A,B	1=A.0 3=A.1 5=A.2 2=B.0 4=B.1 6=B.2	dell-t300-owner-manual
+dell-pe-840-860-r200	dell	^PowerEdge 840\||^\|(?:.* )?PowerEdge 840$|^PowerEdge 860\||^\|(?:.* )?PowerEdge 860$|^PowerEdge R200\||^\|(?:.* )?PowerEdge R200$			hub	hub	2,2			dell-860-owner-manual
+dell-pe-2850-sc1425	dell	^PowerEdge 2850\||^\|(?:.* )?PowerEdge 2850$|^PowerEdge SC1425\||^\|(?:.* )?PowerEdge SC1425$			hub	hub	2,3			dell-2850-installation-guide
+dell-pe-2970	dell	^PowerEdge 2970\||^\|(?:.* )?PowerEdge 2970$				aside	no-channel-in-document			dell-2970-owner-manual
+dell-pe-r805	dell	^PowerEdge R805\||^\|(?:.* )?PowerEdge R805$				aside	no-channel-in-document			dell-r805-owner-manual
+dell-pe-r900	dell	^PowerEdge R900\||^\|(?:.* )?PowerEdge R900$	dimm-u-letter		hub	hub	4,8	0	1=0.0 2=0.1 3=0.2 4=0.3 5=0.4 6=0.5 7=0.6 8=0.7	dell-r900-owner-manual
+dell-pe-r910	dell	^PowerEdge R910\||^\|(?:.* )?PowerEdge R910$			letter	aside	no-processor-in-document			dell-e06s
+dell-pe-r810	dell	^PowerEdge R810\||^\|(?:.* )?PowerEdge R810$	dimm-u-letter		letter	table		?c1,?c2,?c3,?c4	1=?c1.0 5=?c1.1 3=?c2.0 7=?c2.1 2=?c3.0 6=?c3.1 4=?c4.0 8=?c4.1	dell-e05s
+dell-pe-r815-r715	dell	^PowerEdge R815\||^\|(?:.* )?PowerEdge R815$|^PowerEdge R715\||^\|(?:.* )?PowerEdge R715$	dimm-u-letter		letter	table		?c1,?c2,?c3,?c4	1=?c1.0 5=?c1.1 2=?c2.0 6=?c2.1 3=?c3.0 7=?c3.1 4=?c4.0 8=?c4.1	dell-e05s-2
+dell-pe-r515	dell	^PowerEdge R515\||^\|(?:.* )?PowerEdge R515$	dimm-u-letter		letter	table		?c1,?c2	1=?c1.0 3=?c1.1 2=?c2.0 4=?c2.1	dell-r515-owner-manual
+dell-pe-r820	dell	^PowerEdge R820\||^\|(?:.* )?PowerEdge R820$	dimm-u-letter		letter	table		0,1,2,3	1=0.0 5=0.1 9=0.2 2=1.0 6=1.1 10=1.2 3=2.0 7=2.1 11=2.2 4=3.0 8=3.1 12=3.2	dell-e21s
+hp-gen9-24slot	hp	^ProLiant DL360 Gen9\||^\|(?:.* )?ProLiant DL360 Gen9$|^ProLiant DL380 Gen9\||^\|(?:.* )?ProLiant DL380 Gen9$	proc-dimm		cpu	table		1,2,3,4	1=3.0 2=3.1 3=3.2 4=4.0 5=4.1 6=4.2 7=2.2 8=2.1 9=2.0 10=1.2 11=1.1 12=1.0	hpe-767927-009;hpe-768830-401a
+hp-gen8-24slot	hp	^ProLiant DL380p Gen8\||^\|(?:.* )?ProLiant DL380p Gen8$|^ProLiant DL360p Gen8\||^\|(?:.* )?ProLiant DL360p Gen8$	proc-dimm		cpu	table		1,2,3,4	1=3.0 2=3.1 3=3.2 4=4.0 5=4.1 6=4.2 7=2.2 8=2.1 9=2.0 10=1.2 11=1.1 12=1.0	hpe-dl380p-gen8-user-guide;hpe-664724-006;hpe-ddr3-gen8
+hp-gen8-e5-2400-12slot	hp	^ProLiant DL360e Gen8\||^\|(?:.* )?ProLiant DL360e Gen8$|^ProLiant DL380e Gen8\||^\|(?:.* )?ProLiant DL380e Gen8$	proc-dimm		cpu	table		1,2,3	1=1.0 2=1.1 3=2.0 4=2.1 5=3.0 6=3.1	hpe-675786-006;hpe-676151-006;hpe-ddr3-gen8
+hp-gen10-24slot	hp	^ProLiant DL360 Gen10\||^\|(?:.* )?ProLiant DL360 Gen10$|^ProLiant DL380 Gen10\||^\|(?:.* )?ProLiant DL380 Gen10$	proc-dimm		cpu	table		CH1,CH2,CH3,CH4,CH5,CH6	1=CH6.0 2=CH6.1 3=CH5.0 4=CH5.1 5=CH4.0 6=CH4.1 7=CH1.1 8=CH1.0 9=CH2.1 10=CH2.0 11=CH3.1 12=CH3.0	hpe-population-gen10-technical;hpe-dl380-gen10-user-guide;hpe-dl360-gen10-maintenance-service-guide
+hp-ml350-gen10	hp	^ProLiant ML350 Gen10\||^\|(?:.* )?ProLiant ML350 Gen10$	proc-dimm		cpu	table		CH1,CH2,CH3,CH4,CH5,CH6	1=CH6.0 2=CH6.1 3=CH5.0 4=CH5.1 5=CH4.0 6=CH4.1 7=CH1.1 8=CH1.0 9=CH2.1 10=CH2.0 11=CH3.1 12=CH3.0	hpe-population-gen10-technical;hpe-ml350-gen10-user-guide;hpe-870691-007
+hp-bl460c-gen8	hp	^ProLiant BL460c Gen8\||^\|(?:.* )?ProLiant BL460c Gen8$	proc-dimm		cpu	table		1,2,3,4	1=1.0 2=1.1 3=2.0 4=2.1 5=4.1 6=4.0 7=3.1 8=3.0	hpe-656396-004;hpe-656396-002;hpe-ddr3-gen8
+hp-bl460c-gen9	hp	^ProLiant BL460c Gen9\||^\|(?:.* )?ProLiant BL460c Gen9$	proc-dimm		cpu	table		1,2,3,4	1=1.0 2=1.1 3=2.0 4=2.1 5=4.1 6=4.0 7=3.1 8=3.0	hpe-768826-007
+hp-bl460c-gen10	hp	^ProLiant BL460c Gen10\||^\|(?:.* )?ProLiant BL460c Gen10$	proc-dimm		cpu	table		CH1,CH2,CH3,CH4,CH5,CH6	1=CH3.0 2=CH2.0 3=CH1.0 4=CH1.1 5=CH4.1 6=CH4.0 7=CH5.0 8=CH6.0	hpe-876833-006;hpe-population-gen10-technical
+hp-microserver-gen10	hp	^ProLiant MicroServer Gen10\||^\|(?:.* )?ProLiant MicroServer Gen10$	dimm-number		one	table		A,B	1=A.0 2=B.0	hpe-872677-004;hpe-gen10-maintenance-service-guide;hpe-gen10
+hp-ml10-gen9	hp	^ML10Gen9\||^\|(?:.* )?ML10Gen9$				names				hpe-833836-073;hpe-833835-004;hpe-ml10-generation9-gen9
+hp-dl60-gen9	hp	^ProLiant DL60 Gen9\||^\|(?:.* )?ProLiant DL60 Gen9$	proc-dimm		cpu	table		1,2,3,4	1=1.0 2=2.0 3=4.0 4=3.0	hpe-786245-003
+hp-dl20-gen9	hp	^ProLiant DL20 Gen9\||^\|(?:.* )?ProLiant DL20 Gen9$	proc-dimm		cpu	table		1,2	1=2.0 2=2.1 3=1.0 4=1.1	hpe-826318-003a
+hp-dl160-gen8	hp	^ProLiant DL160 Gen8\||^\|(?:.* )?ProLiant DL160 Gen8$	proc-dimm		cpu	table		1,2,3,4	1=1.0 2=1.1 3=1.2 4=2.0 5=2.1 6=2.2 7=4.2 8=4.1 9=4.0 10=3.2 11=3.1 12=3.0; s2: 1=3.0 2=3.1 3=3.2 4=4.0 5=4.1 6=4.2 7=2.2 8=2.1 9=2.0 10=1.2 11=1.1 12=1.0	hpe-670519-006;hpe-670554-007
+hp-dl385p-gen8	hp	^ProLiant DL385p Gen8\||^\|(?:.* )?ProLiant DL385p Gen8$	proc-dimm-letter		cpu	table		Ch1,Ch2,Ch3,Ch4	1=Ch1.0 2=Ch1.2 3=Ch1.1 4=Ch2.0 5=Ch2.2 6=Ch2.1 7=Ch3.0 8=Ch3.2 9=Ch3.1 10=Ch4.0 11=Ch4.2 12=Ch4.1	hpe-dl385p-gen8-user-guide
+hp-gen9-16slot	hp	^ProLiant DL160 Gen9\||^\|(?:.* )?ProLiant DL160 Gen9$|^ProLiant DL180 Gen9\||^\|(?:.* )?ProLiant DL180 Gen9$	proc-dimm		cpu	table		1,2,3,4	1=3.0 2=3.1 3=4.0 4=4.1 5=2.1 6=2.0 7=1.1 8=1.0	hpe-775786-004;hpe-775439-004
+hp-dl120-gen9	hp	^ProLiant DL120 Gen9\||^\|(?:.* )?ProLiant DL120 Gen9$	proc-dimm		cpu	table		1,2,3,4	1=1.0 2=1.1 3=2.0 4=2.1 5=4.1 6=4.0 7=3.1 8=3.0	hpe-781878-003
+hp-g6g7-18slot-lettered	hp	^ProLiant DL360 G7\||^\|(?:.* )?ProLiant DL360 G7$|^ProLiant DL380 G7\||^\|(?:.* )?ProLiant DL380 G7$|^ProLiant DL380 G6\||^\|(?:.* )?ProLiant DL380 G6$	proc-dimm-letter		cpu	table		1,2,3	3=1.0 2=1.1 1=1.2 6=2.0 5=2.1 4=2.2 9=3.0 8=3.1 7=3.2	hpe-495624-003
+hp-dl360-g6-18slot-unlettered	hp	^ProLiant DL360 G6\||^\|(?:.* )?ProLiant DL360 G6$	proc-dimm		cpu	table		1,2,3	3=1.0 2=1.1 1=1.2 6=2.0 5=2.1 4=2.2 9=3.0 8=3.1 7=3.2	hpe-517689-005
+hp-g5-fbdimm-8slot	hp	^ProLiant DL360 G5\||^\|(?:.* )?ProLiant DL360 G5$|^ProLiant DL380 G5\||^\|(?:.* )?ProLiant DL380 G5$			hub	aside	no-channel-in-document			hpe-406316-002
+hp-z6-g4	hp	^HP Z6 G4 Workstation\||^\|(?:.* )?HP Z6 G4 Workstation$	cpu-dimm-number		cpu	table		0.0,0.1,0.2,1.0,1.1,1.2	1=0.2.0 2=0.1.0 3=0.0.0 4=1.0.0 5=1.1.0 6=1.2.0; s2: 1=1.2.0 2=1.1.0 3=1.0.0 4=0.0.0 5=0.1.0 6=0.2.0	hpe-setup-z6-g4-z8-g4;hp-z6-g4-tech-wp;hp-z6-g4-quickspecs;hp-z6-g4-msg
+hp-z8-g4	hp	^HP Z8 G4 Workstation\||^\|(?:.* )?HP Z8 G4 Workstation$	cpu-dimm-number		cpu	table		0.0,0.1,0.2,1.0,1.1,1.2	1=0.2.0 2=0.2.1 3=0.1.0 4=0.1.1 5=0.0.0 6=0.0.1 7=1.0.1 8=1.0.0 9=1.1.1 10=1.1.0 11=1.2.1 12=1.2.0; s2: 1=1.2.0 2=1.2.1 3=1.1.0 4=1.1.1 5=1.0.0 6=1.0.1 7=0.0.1 8=0.0.0 9=0.1.1 10=0.1.0 11=0.2.1 12=0.2.0	hpe-setup-z6-g4-z8-g4
+hp-dl320-g6-9slot	hp	^ProLiant DL320 G6\||^\|(?:.* )?ProLiant DL320 G6$	proc-dimm-letter		cpu	table		1,2,3	3=1.0 2=1.1 1=1.2 6=2.0 5=2.1 4=2.2 9=3.0 8=3.1 7=3.2	hpe-530514-002
+hp-dl160-g6-18slot	hp	^ProLiant DL160 G6\||^\|(?:.* )?ProLiant DL160 G6$	proc-dimm-letter		cpu	table		Chnl1,Chnl2,Chnl3	3=Chnl1.0 2=Chnl1.1 1=Chnl1.2 6=Chnl2.0 5=Chnl2.1 4=Chnl2.2 9=Chnl3.0 8=Chnl3.1 7=Chnl3.2	hpe-dl160-6-g6
+hp-dl180-g6-12slot	hp	^ProLiant DL180 G6\||^\|(?:.* )?ProLiant DL180 G6$	proc-dimm-letter		cpu	table		Chnl1,Chnl2,Chnl3	2=Chnl1.0 1=Chnl1.1 4=Chnl2.0 3=Chnl2.1 6=Chnl3.0 5=Chnl3.1	hpe-dl180-6-g6
+hp-bl460c-g6g7-12slot	hp	^ProLiant BL460c G6\||^\|(?:.* )?ProLiant BL460c G6$|^ProLiant BL460c G7\||^\|(?:.* )?ProLiant BL460c G7$	proc-dimm-letter		cpu	table		1,2,3	2=1.0 1=1.1 4=2.0 3=2.1 6=3.0 5=3.1	hpe-501274-002
+hp-dl120-g6-6slot	hp	^ProLiant DL120 G6\||^\|(?:.* )?ProLiant DL120 G6$	dimm-digit-letter		one	table		1,2	3=1.0 2=1.1 1=1.2 6=2.0 5=2.1 4=2.2	hpe-579574-004
+hp-dl120-g7-4slot	hp	^ProLiant DL120 G7\||^\|(?:.* )?ProLiant DL120 G7$	dimm-number		one	table		A,B	2=A.0 1=A.1 4=B.0 3=B.1	hpe-638025-003a
+hp-dl385-g7-24slot	hp	^ProLiant DL385 G7\||^\|(?:.* )?ProLiant DL385 G7$	proc-dimm-letter		cpu	table		A,B,C,D	1=A.0 3=A.1 2=A.2 4=B.0 6=B.1 5=B.2 7=C.0 9=C.1 8=C.2 10=D.0 12=D.1 11=D.2	hpe-588708-001
+hp-dl585-g7-48slot	hp	^ProLiant DL585 G7\||^\|(?:.* )?ProLiant DL585 G7$	proc-dimm-letter		cpu	table		A,B,C,D	1=A.0 3=A.1 2=A.2 4=B.0 6=B.1 5=B.2 7=C.0 9=C.1 8=C.2 10=D.0 12=D.1 11=D.2	hpe-617692-004
+hp-bl685c-g7-32slot	hp	^ProLiant BL685c G7\||^\|(?:.* )?ProLiant BL685c G7$	proc-dimm-letter		cpu	table		1,2,3,4	1=1.0 2=1.1 3=2.0 4=2.1 5=3.0 6=3.1 7=4.0 8=4.1	hpe-593961-001
+hp-dl165-g7-24slot	hp	^ProLiant DL165 G7\||^\|(?:.* )?ProLiant DL165 G7$	proc-dimm		cpu	table		A,B,C,D	1=A.0 3=A.1 2=A.2 4=B.0 6=B.1 5=B.2 7=C.0 9=C.1 8=C.2 10=D.0 12=D.1 11=D.2	hpe-601465-003
+hp-dl145-g3-8slot	hp	^ProLiant DL145 G3\||^\|(?:.* )?ProLiant DL145 G3$			global	aside	no-channel-in-document			hpe-430047-004
+hp-dl580-g7-cartridges	hp	^ProLiant DL580 G7\||^\|(?:.* )?ProLiant DL580 G7$	board-dimm			cards	2		1=0.0 2=0.1 3=1.0 4=1.1 8=2.0 7=2.1 6=3.0 5=3.1	hpe-595656-005
+hp-dl140-g2-8slot	hp	^ProLiant DL140 G2\||^\|(?:.* )?ProLiant DL140 G2$			hub	aside	no-channel-in-document			hpe-381737-004
+hp-g4-ddr2-6slot	hp	^ProLiant DL360 G4p\||^\|(?:.* )?ProLiant DL360 G4p$|^ProLiant DL380 G4\||^\|(?:.* )?ProLiant DL380 G4$			hub	aside	no-channel-in-document			hpe-359226-008
+hp-compaq-dl380-g1-4slot	hp	^ProLiant DL380\||^\|(?:.* )?ProLiant DL380$			hub	aside	no-channel-in-document			hpe-136363-004
+hp-superdome-x-bl920s-gen8	hp	^Superdome2 16s x86\||^\|(?:.* )?Superdome2 16s x86$				aside	no-channel-in-document			hpe-hpe-integrity-superdome
+hp-netserver-lh4-memory-boards	hp	^HP NetServer\||^\|(?:.* )?HP NetServer$			hub	aside	no-channel-in-document			hpe-4-4r-user-guide
+ibm-x3550m3-x3650m3-18slot	ibm	^System x3550 M3 -\[2145CG8\]-\||^\|(?:.* )?System x3550 M3 -\[2145CG8\]-$|^System x3550 M3 -\[7944AC1\]-\||^\|(?:.* )?System x3550 M3 -\[7944AC1\]-$|^System x3550 M3 -\[7042CR6\]-\||^\|(?:.* )?System x3550 M3 -\[7042CR6\]-$|^System x3550 M3 -\[7944KFG\]-\||^\|(?:.* )?System x3550 M3 -\[7944KFG\]-$|^System x3550 M3 -\[7944SCP\]-\||^\|(?:.* )?System x3550 M3 -\[7944SCP\]-$|^System x3550 M3 -\[7944KAG\]-\||^\|(?:.* )?System x3550 M3 -\[7944KAG\]-$|^System x3650 M3 -\[7945AC1\]-\||^\|(?:.* )?System x3650 M3 -\[7945AC1\]-$|^System x3650 M3 -\[7945YBU\]-\||^\|(?:.* )?System x3650 M3 -\[7945YBU\]-$|^System x3650 M3 -\[794562M\]-\||^\|(?:.* )?System x3650 M3 -\[794562M\]-$|^System x3650 M3 -\[794522U\]-\||^\|(?:.* )?System x3650 M3 -\[794522U\]-$	dimm-number		global	global		CH0,CH1,CH2	1=0.CH0.2 2=0.CH0.1 3=0.CH0.0 4=0.CH1.2 5=0.CH1.1 6=0.CH1.0 7=0.CH2.2 8=0.CH2.1 9=0.CH2.0 10=1.CH0.2 11=1.CH0.1 12=1.CH0.0 13=1.CH1.2 14=1.CH1.1 15=1.CH1.0 16=1.CH2.2 17=1.CH2.1 18=1.CH2.0	ibm-x3550-m3-4254-7944-installation
+ibm-x3550m2-x3650m2-16slot	ibm	^IBM System x -\[79463AM\]-\||^\|(?:.* )?IBM System x -\[79463AM\]-$|^System x3550 M2 -\[794644M\]-\||^\|(?:.* )?System x3550 M2 -\[794644M\]-$|^System x3550 M2 -\[794622V\]-\||^\|(?:.* )?System x3550 M2 -\[794622V\]-$|^System x3650 M2 -\[7947AC1\]-\||^\|(?:.* )?System x3650 M2 -\[7947AC1\]-$	dimm-number		global	global		CH0,CH1,CH2	1=0.CH0.2 2=0.CH0.1 3=0.CH0.0 4=0.CH1.2 5=0.CH1.1 6=0.CH1.0 7=0.CH2.1 8=0.CH2.0 9=1.CH0.2 10=1.CH0.1 11=1.CH0.0 12=1.CH1.2 13=1.CH1.1 14=1.CH1.0 15=1.CH2.1 16=1.CH2.0	ibm-x3550-m2-4198-7946-installation
+ibm-x3400m3-16slot	ibm	^IBM System x3400 M3 Server -\[737958G\]-\||^\|(?:.* )?IBM System x3400 M3 Server -\[737958G\]-$	dimm-number		global	global		CH0,CH1,CH2	1=0.CH0.2 2=0.CH0.1 3=0.CH0.0 4=0.CH1.2 5=0.CH1.1 6=0.CH1.0 7=0.CH2.1 8=0.CH2.0 9=1.CH0.2 10=1.CH0.1 11=1.CH0.0 12=1.CH1.2 13=1.CH1.1 14=1.CH1.0 15=1.CH2.1 16=1.CH2.0	ibm-x3400-m3-7378-7379-installation
+ibm-x3550m4-x3650m4-24slot	ibm	^IBM System x3650 M4: -\[2145DH8\]-\||^\|(?:.* )?IBM System x3650 M4: -\[2145DH8\]-$|^IBM System x3550 M4 Server -\[7914AC1\]-\||^\|(?:.* )?IBM System x3550 M4 Server -\[7914AC1\]-$|^System x3550 M4 -\[7914B2A\]-\||^\|(?:.* )?System x3550 M4 -\[7914B2A\]-$|^System x3650 M4 -\[7915E1G\]-\||^\|(?:.* )?System x3650 M4 -\[7915E1G\]-$|^IBM System x3550 M4 Server -\[7914Z5Q\]-\||^\|(?:.* )?IBM System x3550 M4 Server -\[7914Z5Q\]-$	dimm-number		global	global		Ch0,Ch1,Ch2,Ch3	1=0.Ch0.0 2=0.Ch0.1 3=0.Ch0.2 4=0.Ch1.0 5=0.Ch1.1 6=0.Ch1.2 7=0.Ch3.2 8=0.Ch3.1 9=0.Ch3.0 10=0.Ch2.2 11=0.Ch2.1 12=0.Ch2.0 13=1.Ch0.0 14=1.Ch0.1 15=1.Ch0.2 16=1.Ch1.0 17=1.Ch1.1 18=1.Ch1.2 19=1.Ch3.2 20=1.Ch3.1 21=1.Ch3.0 22=1.Ch2.2 23=1.Ch2.1 24=1.Ch2.0	ibm-x3550-m4-7914-installation-x3550
+ibm-x3300m4-12slot	ibm	^System x3300 M4 -\[7382E4G\]-\||^\|(?:.* )?System x3300 M4 -\[7382E4G\]-$|^System x3300 M4 -\[7382E3G\]-\||^\|(?:.* )?System x3300 M4 -\[7382E3G\]-$	dimm-number		global	global		0,1,2	1=0.0.0 2=0.0.1 3=0.1.0 4=0.1.1 5=0.2.0 6=0.2.1 7=1.0.0 8=1.0.1 9=1.1.0 10=1.1.1 11=1.2.0 12=1.2.1	ibm-x3300-m4-7382
+ibm-flex-x220-12slot	ibm	^Flex System x220 Compute Node -\[7906D2G\]-\||^\|(?:.* )?Flex System x220 Compute Node -\[7906D2G\]-$	dimm-number		global	global		A,B,C,D,E,F	1=0.A.0 2=0.A.1 3=0.B.0 4=0.B.1 5=0.C.0 6=0.C.1 7=1.F.1 8=1.F.0 9=1.E.1 10=1.E.0 11=1.D.1 12=1.D.0	ibm-x220-installation-service-guide-7906
+ibm-flex-x240-24slot	ibm	^Flex System x240 Compute Node -\[8737AC1\]-\||^\|(?:.* )?Flex System x240 Compute Node -\[8737AC1\]-$	dimm-number		global	global		A,B,C,D	1=0.B.0 2=0.B.1 3=0.B.2 4=0.A.0 5=0.A.1 6=0.A.2 7=0.C.2 8=0.C.1 9=0.C.0 10=0.D.2 11=0.D.1 12=0.D.0 13=1.C.0 14=1.C.1 15=1.C.2 16=1.D.0 17=1.D.1 18=1.D.2 19=1.B.2 20=1.B.1 21=1.B.0 22=1.A.2 23=1.A.1 24=1.A.0	ibm-x240-7863-8737-8738-8956
+ibm-bladecenter-hs23-16slot	ibm	^BladeCenter HS23 -\[7875MFM\]-\||^\|(?:.* )?BladeCenter HS23 -\[7875MFM\]-$	dimm-number		global	global		0,1,2,3	1=0.1.0 2=0.1.1 3=0.2.0 4=0.2.1 5=0.3.0 6=0.3.1 7=0.0.0 8=0.0.1 9=1.2.0 10=1.2.1 11=1.3.0 12=1.3.1 13=1.1.1 14=1.1.0 15=1.0.1 16=1.0.0	ibm-hs23-installation-user-guide-7875
+ibm-idataplex-dx360m4-16slot	ibm	^IBM System X iDataPlex dx360 M4 Server -\[7912AC1\]-\||^\|(?:.* )?IBM System X iDataPlex dx360 M4 Server -\[7912AC1\]-$	dimm-number		global	global		0,1,2,3	1=0.2.0 2=0.2.1 3=0.3.0 4=0.3.1 5=0.1.1 6=0.1.0 7=0.0.1 8=0.0.0 9=1.2.0 10=1.2.1 11=1.3.0 12=1.3.1 13=1.1.1 14=1.1.0 15=1.0.1 16=1.0.0	ibm-dx360-m4-7912-7913-user
+ibm-x3250m3-6slot	ibm	^System x3250 M3 -\[4252K4G\]-\||^\|(?:.* )?System x3250 M3 -\[4252K4G\]-$|^System x3250 M3 -\[4252PAW\]-\||^\|(?:.* )?System x3250 M3 -\[4252PAW\]-$	dimm-number		one	table		X,Y	1=X.0 2=X.1 3=X.2 4=Y.0 5=Y.1 6=Y.2	ibm-x3250-m3-4251-4252-4261
+ibm-x3250m4-4slot	ibm	^IBM System X3250 M4 -\[2583AC1\]-\||^\|(?:.* )?IBM System X3250 M4 -\[2583AC1\]-$	dimm-number		one	table		X,Y	1=X.0 2=X.1 3=Y.0 4=Y.1	ibm-x3250-m4-installation-service-guide
+ibm-x3200m2-4slot	ibm	^IBM System x3200 M2 -\[4368IGS\]-\||^\|(?:.* )?IBM System x3200 M2 -\[4368IGS\]-$	dimm-number		hub	table		0,1	1=0.0 2=0.1 3=1.0 4=1.1	ibm-x3200-m2-4367-4368-installation
+ibm-x3650-7979-12slot	ibm	^IBM System x3650 -\[7979AC1\]-\||^\|(?:.* )?IBM System x3650 -\[7979AC1\]-$|^IBM System x3650 -\[7979B9U\]-\||^\|(?:.* )?IBM System x3650 -\[7979B9U\]-$	dimm-number		hub	table		0,1,2,3	1=0.0 2=0.1 3=0.2 4=1.0 5=1.1 6=1.2 7=2.0 8=2.1 9=2.2 10=3.0 11=3.1 12=3.2	ibm-x3650-7979-user-guide
+ibm-xseries235-6slot	ibm	^eserver xSeries 235 -\[86712AX\]-\||^\|(?:.* )?eserver xSeries 235 -\[86712AX\]-$			hub	aside	no-channel-in-document			ibm-235-8671-installation-guide
+ibm-x3850x5-64slot	ibm	^System x3850 X5 -\[7143Y61\]-\||^\|(?:.* )?System x3850 X5 -\[7143Y61\]-$				aside	no-channel-in-document			ibm-x3850-x5-x3950-x5-7145
+intel-s5000-fbd-8slot	*	^S5000PSL\||^\|(?:.* )?S5000PSL$|^S5000PAL\||^\|(?:.* )?S5000PAL$|^S5000XVN\||^\|(?:.* )?S5000XVN$			hub	hub	4,2			intel-s5000psl-s5000xsl-technical
+intel-s5000vsa	*	^S5000VSA\||^\|(?:.* )?S5000VSA$|^PR1710N\||^\|(?:.* )?PR1710N$			hub	hub	2,4			intel-s5000vsa-technical
+intel-s5000vcl	*	^S5000VCL\||^\|(?:.* )?S5000VCL$			hub	hub	2,3			intel-s5000vcl-technical
+intel-s3210sh	*	^S3210SH\||^\|(?:.* )?S3210SH$			hub	hub	2,2			intel-e14960-009
+intel-se7501wv2	*	^SE7501WV2S\||^\|(?:.* )?SE7501WV2S$	dimm-digit-letter		hub	hub	2,3	A,B	1=A.0 2=A.1 3=A.2 1=B.0 2=B.1 3=B.2	intel-se7501wv2-technical
+intel-s5520-12slot	intel	^S5520HC\||^\|(?:.* )?S5520HC$|^S5520SC\||^\|(?:.* )?S5520SC$				names				intel-e39529-013
+intel-s5500hcv	intel	^S5500HCV\||^\|(?:.* )?S5500HCV$				names				intel-e39529-013
+intel-s5520ur	intel	^S5520UR\||^\|(?:.* )?S5520UR$				names				intel-e44031-012
+intel-s5500bc	intel	^S5500BC\||^\|(?:.* )?S5500BC$				names				intel-e42249-009
+intel-s3420gp	intel	^S3420GP\||^\|(?:.* )?S3420GP$|^\.\.\.\.\.\.\.\||^\|(?:.* )?\.\.\.\.\.\.\.$|^S3420GPV\||^\|(?:.* )?S3420GPV$				names				intel-e65697-010
+intel-s1200bt	intel	^S1200BTL\||^\|(?:.* )?S1200BTL$				names				intel-s1200bt-technical
+intel-s1200v3rp	intel	^S1200RP\||^\|(?:.* )?S1200RP$|^S1200RP_SE\||^\|(?:.* )?S1200RP_SE$				names				intel-s1200v3rp-technical
+intel-s1200sp	intel	^S1200SP\||^\|(?:.* )?S1200SP$|^ParX T404i G6 Server\||^\|(?:.* )?ParX T404i G6 Server$|^ParX T100c G6 Server\||^\|(?:.* )?ParX T100c G6 Server$				names				intel-s1200sp-technical
+intel-s2600gz	intel	^S2600GZ\||^\|(?:.* )?S2600GZ$				names				intel-s2600gz-technical
+intel-s2600cp-w2600cr	intel	^S2600CP\||^\|(?:.* )?S2600CP$|^CYPRESS11\||^\|(?:.* )?CYPRESS11$|^S2600CP \.\.\.\.\.\.\.\.\.\.\||^\|(?:.* )?S2600CP \.\.\.\.\.\.\.\.\.\.$|^W2600CR\||^\|(?:.* )?W2600CR$|^W2600CR \.\.\.\.\.\.\.\.\.\.\||^\|(?:.* )?W2600CR \.\.\.\.\.\.\.\.\.\.$				names				intel-s2600cp-p4000cp-technical
+intel-s4600lh2	intel	^S4600LH\||^\|(?:.* )?S4600LH$|^LH Pass\||^\|(?:.* )?LH Pass$				names				intel-s4600lh2-t2-technical
+intel-s2600wt	intel	^S2600WTTR\||^\|(?:.* )?S2600WTTR$				names				intel-s2600wt-technical-tps
+intel-s2600cw	intel	^S2600CW\||^\|(?:.* )?S2600CW$				names				intel-s2600cw-technical
+intel-s2600wf	intel	^S2600WFT\||^\|(?:.* )?S2600WFT$				names				intel-s2600wf-technical
+intel-s2600st	intel	^S2600STB\||^\|(?:.* )?S2600STB$				names				intel-s2600st-technical
+intel-m50cyp	intel	^M50CYP2SBSTD\||^\|(?:.* )?M50CYP2SBSTD$				names				intel-m50cyp2sb-technical
+intel-whitley-ref	intel	^WHITLEY\||^\|(?:.* )?WHITLEY$				names				intel-m50cyp2sb-technical
+intel-m70klp	intel	^M70KLP2SB M90598-001\||^\|(?:.* )?M70KLP2SB M90598-001$				names				intel-m70klp-technical
+intel-eaglestream-ref	intel	^ArcherCity\||^\|(?:.* )?ArcherCity$|^EAGLESTREAM\||^\|(?:.* )?EAGLESTREAM$|^AST2600EVB\||^\|(?:.* )?AST2600EVB$				names				intel-m50fcp2sbstd-technical
+intel-birchstream-ref	intel	^BIRCHSTREAM\||^\|(?:.* )?BIRCHSTREAM$				names				intel-no-document-of
+amd-ethanol-x	*	^ETHANOL_DEBUG_X\||^\|(?:.* )?ETHANOL_DEBUG_X$				names				amd-population-7003
+amd-volcano	*	^Volcano\||^\|(?:.* )?Volcano$				names				amd-9004-population
+asus-p8b-m	asus	^\|(?:.* )?P8B-M Series$|^TERRA_PC\||^\|(?:.* )?TERRA_PC$|^Flagman TP100\.3\||^\|(?:.* )?Flagman TP100\.3$				names				asus-rs100-e7-pi2-user-guide
+asus-p8b-x-e	asus	^TS100-E7-PI4\||^\|(?:.* )?TS100-E7-PI4$|^TS300-E7-PS4\||^\|(?:.* )?TS300-E7-PS4$|^\|(?:.* )?P8B-E Series$				names				asus-ts300-e7-ps4-user-guide
+asus-p9d-4slot	asus	^TS110-E8-PI4\||^\|(?:.* )?TS110-E8-PI4$|^TERRA_SERVER\||^\|(?:.* )?TERRA_SERVER$|^P9D-X Series\||^\|(?:.* )?P9D-X Series$|^P9D-V Series\||^\|(?:.* )?P9D-V Series$|^P9D-M Series\||^\|(?:.* )?P9D-M Series$				names				asus-p9d-user-guide
+asus-p12r	asus	^RS300-E11-PS4\||^\|(?:.* )?RS300-E11-PS4$|^RS100-E11-PI2\||^\|(?:.* )?RS100-E11-PI2$|^\|(?:.* )?P12R-E Series$				names				asus-e28203
+asus-e3-2slot	asus	^P9D-I Series\||^\|(?:.* )?P9D-I Series$|^P10S-I Series\||^\|(?:.* )?P10S-I Series$				names				asus-p9d-user-guide-2
+asus-z9-8slot	asus	^Z9PA-D8 Series\||^\|(?:.* )?Z9PA-D8 Series$|^Z9PE-D8 WS\||^\|(?:.* )?Z9PE-D8 WS$				names				asus-z9pa-d8-user-guide
+asus-z10-8slot	asus	^Z10PA-D8 Series\||^\|(?:.* )?Z10PA-D8 Series$|^Z10PE-D8 WS\||^\|(?:.* )?Z10PE-D8 WS$				names				asus-e13692
+asus-z9-16slot	asus	^ESC4000 G2 Series\||^\|(?:.* )?ESC4000 G2 Series$|^Z9PE-D16 Series\||^\|(?:.* )?Z9PE-D16 Series$|^GEG\||^\|(?:.* )?GEG$				names				asus-z9pe-d16-10g-user-guide
+asus-z10-16slot	asus	^Z10PE-D16 WS\||^\|(?:.* )?Z10PE-D16 WS$|^Silverback WS\||^\|(?:.* )?Silverback WS$|^GX4\||^\|(?:.* )?GX4$|^RS400-E8-PS2-F\||^\|(?:.* )?RS400-E8-PS2-F$				names				asus-e13683
+asus-z9pr-d12	asus	^RS700-X7-PS4\||^\|(?:.* )?RS700-X7-PS4$				names				asus-rs700-x7-ps4-user-guide
+asus-z9na-d6	asus	^Z9NA-D6\||^\|(?:.* )?Z9NA-D6$				names				asus-z9na-d6-user-manual
+asus-wsc621e-sage	asus	^WS-C621E-SAGE Series\||^\|(?:.* )?WS-C621E-SAGE Series$				names				asus-e16279
+asus-z11ph-d12	asus	^RS720Q-E9-RS24-S\||^\|(?:.* )?RS720Q-E9-RS24-S$				names				asus-e16292
+asus-z11pg-d16	asus	^Z11PG-D16 Series\||^\|(?:.* )?Z11PG-D16 Series$|^ESC4000 G4\||^\|(?:.* )?ESC4000 G4$				names				asus-e16560
+asus-z11pg-d24	asus	^ESC8000 G4\||^\|(?:.* )?ESC8000 G4$|^ESC8000 G4-10G\||^\|(?:.* )?ESC8000 G4-10G$				names				asus-e21686
+asus-prows-c621-64l	asus	^Pro WS C621-64L SAGE-10G Series\||^\|(?:.* )?Pro WS C621-64L SAGE-10G Series$				names				asus-e16276
+asus-krpg-u8	asus	^ESC4000A-E10\||^\|(?:.* )?ESC4000A-E10$				names				asus-e21771
+asus-k14pp-d24	asus	^RS720A-E12-RS12\||^\|(?:.* )?RS720A-E12-RS12$				names				asus-e28170
+lenovo-thinkstation-p920	lenovo	^30BDS0RA00\||^\|(?:.* )?30BDS0RA00$|^30BDS0RB00\||^\|(?:.* )?30BDS0RB00$|^30BDS2H804\||^\|(?:.* )?30BDS2H804$|^30BC001DGE\||^\|(?:.* )?30BC001DGE$|^30BC0048US\||^\|(?:.* )?30BC0048US$|^30BC000QGE\||^\|(?:.* )?30BC000QGE$|^30BC003KUS\||^\|(?:.* )?30BC003KUS$|^30BDS0N700\||^\|(?:.* )?30BDS0N700$	cpu-dimm-number		cpu	table		?c1,?c2,?c3,?c4,?c5,?c6	3=?c3.0 7=?c3.1 5=?c5.0 1=?c1.0 4=?c4.0 8=?c4.1 6=?c6.0 2=?c2.0	lenovo-p920-p720
+lenovo-thinkstation-p720	lenovo	^30BBS1PF00\||^\|(?:.* )?30BBS1PF00$|^30BACTO1WW\||^\|(?:.* )?30BACTO1WW$|^30BBS6NG00\||^\|(?:.* )?30BBS6NG00$|^30BBS21C01\||^\|(?:.* )?30BBS21C01$	cpu-dimm-number		cpu	table		?c1,?c2,?c3,?c4,?c5,?c6	1=?c1.0 2=?c2.0 3=?c3.0 4=?c4.0 5=?c5.0 6=?c6.0	lenovo-p920-p720
+lenovo-thinksystem-sr590-sr570-16slot	lenovo	^ThinkSystem SR590 -\[7X99CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR590 -\[7X99CTO1WW\]-$|^ThinkSystem SR570 -\[7Y03CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR570 -\[7Y03CTO1WW\]-$	dimm-number		global	global		0.0,0.1,0.2,1.0,1.1,1.2	1=0.0.2.0 2=0.0.1.0 3=0.0.0.0 4=0.0.0.1 5=0.1.0.1 6=0.1.0.0 7=0.1.1.0 8=0.1.2.0 9=1.0.2.0 10=1.0.1.0 11=1.0.0.0 12=1.0.0.1 13=1.1.0.1 14=1.1.0.0 15=1.1.1.0 16=1.1.2.0	lenovo-sr590-7x98-7x99-installation-installation
+lenovo-thinksystem-sr650-sr630-24slot	lenovo	^ThinkSystem SR650 -\[7X06CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR650 -\[7X06CTO1WW\]-$|^ThinkSystem SR630 -\[7X02CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR630 -\[7X02CTO1WW\]-$	dimm-number		global	global		0.0,0.1,0.2,1.0,1.1,1.2	1=0.0.2.0 2=0.0.2.1 3=0.0.1.0 4=0.0.1.1 5=0.0.0.0 6=0.0.0.1 7=0.1.0.1 8=0.1.0.0 9=0.1.1.1 10=0.1.1.0 11=0.1.2.1 12=0.1.2.0 13=1.0.2.0 14=1.0.2.1 15=1.0.1.0 16=1.0.1.1 17=1.0.0.0 18=1.0.0.1 19=1.1.0.1 20=1.1.0.0 21=1.1.1.1 22=1.1.1.0 23=1.1.2.1 24=1.1.2.0	lenovo-sr650-7x05-7x06-installation
+lenovo-thinksystem-sr530-12slot	lenovo	^ThinkSystem SR530 -\[7X08CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR530 -\[7X08CTO1WW\]-$	dimm-number		global	global		?c1,?c2,?c3,?c4,?c5,?c6,?c7,?c8,?c9,?c10,?c11,?c12	1=0.?c1.0 2=0.?c2.0 3=0.?c3.0 4=0.?c4.0 5=0.?c5.0 6=0.?c6.0 7=1.?c7.0 8=1.?c8.0 9=1.?c9.0 10=1.?c10.0 11=1.?c11.0 12=1.?c12.0	lenovo-sr530-7x07-7x08-installation
+lenovo-thinksystem-sr650v2-sr630v2-32slot	lenovo	^ThinkSystem SR650 V2\||^\|(?:.* )?ThinkSystem SR650 V2$|^ThinkSystem SR630 V2\||^\|(?:.* )?ThinkSystem SR630 V2$	dimm-number		global	global		A,B,C,D,E,F,G,H	1=0.B.0 2=0.B.1 3=0.A.0 4=0.A.1 5=0.D.0 6=0.D.1 7=0.C.0 8=0.C.1 9=0.G.1 10=0.G.0 11=0.H.1 12=0.H.0 13=0.E.1 14=0.E.0 15=0.F.1 16=0.F.0 17=1.B.0 18=1.B.1 19=1.A.0 20=1.A.1 21=1.D.0 22=1.D.1 23=1.C.0 24=1.C.1 25=1.G.1 26=1.G.0 27=1.H.1 28=1.H.0 29=1.E.1 30=1.E.0 31=1.F.1 32=1.F.0	lenovo-sr650-v2-installation
+lenovo-thinksystem-st650v2-32slot	lenovo	^ThinkSystem ST650 V2\||^\|(?:.* )?ThinkSystem ST650 V2$	dimm-number		global	global		A,B,C,D,E,F,G,H	1=0.F.0 2=0.F.1 3=0.E.0 4=0.E.1 5=0.H.0 6=0.H.1 7=0.G.0 8=0.G.1 9=0.C.1 10=0.C.0 11=0.D.1 12=0.D.0 13=0.A.1 14=0.A.0 15=0.B.1 16=0.B.0 17=1.B.0 18=1.B.1 19=1.A.0 20=1.A.1 21=1.D.0 22=1.D.1 23=1.C.0 24=1.C.1 25=1.G.1 26=1.G.0 27=1.H.1 28=1.H.0 29=1.E.1 30=1.E.0 31=1.F.1 32=1.F.0	lenovo-st650-v2-technical
+lenovo-thinksystem-sr645-32slot	lenovo	^ThinkSystem SR645\||^\|(?:.* )?ThinkSystem SR645$	dimm-number		global	global		A,B,C,D,E,F,G,H	1=0.H.0 2=0.H.1 3=0.G.0 4=0.G.1 5=0.F.0 6=0.F.1 7=0.E.0 8=0.E.1 9=0.A.1 10=0.A.0 11=0.B.1 12=0.B.0 13=0.C.1 14=0.C.0 15=0.D.1 16=0.D.0 17=1.H.0 18=1.H.1 19=1.G.0 20=1.G.1 21=1.F.0 22=1.F.1 23=1.E.0 24=1.E.1 25=1.A.1 26=1.A.0 27=1.B.1 28=1.B.0 29=1.C.1 30=1.C.0 31=1.D.1 32=1.D.0	lenovo-sr645-installation
+lenovo-thinksystem-sr950v3-128slot	lenovo	^ThinkSystem SR950 V3\||^\|(?:.* )?ThinkSystem SR950 V3$				names				lenovo-sr950-v3-installation-installation
+lenovo-thinksystem-sn550-24slot	lenovo	^ThinkSystem SN550 -\[7X16CTO1WW\]-\||^\|(?:.* )?ThinkSystem SN550 -\[7X16CTO1WW\]-$	dimm-number		global	global		0.0,0.1,0.2,1.0,1.1,1.2	1=0.0.2.0 2=0.0.2.1 3=0.0.1.0 4=0.0.1.1 5=0.0.0.0 6=0.0.0.1 7=0.1.0.1 8=0.1.0.0 9=0.1.1.1 10=0.1.1.0 11=0.1.2.1 12=0.1.2.0 24=1.0.2.0 23=1.0.2.1 22=1.0.1.0 21=1.0.1.1 20=1.0.0.0 19=1.0.0.1 18=1.1.0.1 17=1.1.0.0 16=1.1.1.1 15=1.1.1.0 14=1.1.2.1 13=1.1.2.0	lenovo-sn550
+lenovo-systemx-m5-24slot	lenovo	^System x3650 M5: -\[8871AC1\]-\||^\|(?:.* )?System x3650 M5: -\[8871AC1\]-$|^System x3650 M5: -\[5462IC1\]-\||^\|(?:.* )?System x3650 M5: -\[5462IC1\]-$|^System x3550 M5: -\[8869AC1\]-\||^\|(?:.* )?System x3550 M5: -\[8869AC1\]-$|^System x3550 M5: -\[5463AC1\]-\||^\|(?:.* )?System x3550 M5: -\[5463AC1\]-$	dimm-number		global	global		Ch0,Ch1,Ch2,Ch3	1=0.Ch0.0 2=0.Ch0.1 3=0.Ch0.2 4=0.Ch1.0 5=0.Ch1.1 6=0.Ch1.2 7=0.Ch3.2 8=0.Ch3.1 9=0.Ch3.0 10=0.Ch2.2 11=0.Ch2.1 12=0.Ch2.0 13=1.Ch0.0 14=1.Ch0.1 15=1.Ch0.2 16=1.Ch1.0 17=1.Ch1.1 18=1.Ch1.2 19=1.Ch3.2 20=1.Ch3.1 21=1.Ch3.0 22=1.Ch2.2 23=1.Ch2.1 24=1.Ch2.0	lenovo-x3650-m5-5462-installation-service
+lenovo-flex-x240m5-24slot	lenovo	^Lenovo Flex System x240 M5 Compute Node -\[9532AC1\]-\||^\|(?:.* )?Lenovo Flex System x240 M5 Compute Node -\[9532AC1\]-$	dimm-number		global	global		A,B,C,D	1=0.B.0 2=0.B.1 3=0.B.2 4=0.A.0 5=0.A.1 6=0.A.2 7=0.C.2 8=0.C.1 9=0.C.0 10=0.D.2 11=0.D.1 12=0.D.0 13=1.D.0 14=1.D.1 15=1.D.2 16=1.C.0 17=1.C.1 18=1.C.2 19=1.A.2 20=1.A.1 21=1.A.0 22=1.B.2 23=1.B.1 24=1.B.0	lenovo-x240-m5-9532-2951-installation
+lenovo-systemx-x3250m6-4slot	lenovo	^LENOVO System x3250 M6 -\[3943AC1\]-\||^\|(?:.* )?LENOVO System x3250 M6 -\[3943AC1\]-$				aside	no-channel-in-document			lenovo-x3250-m6-installation-service-guide
+lenovo-thinksystem-sr250-4slot	lenovo	^ThinkSystem SR250 -\[7Y51CTO1WW\]-\||^\|(?:.* )?ThinkSystem SR250 -\[7Y51CTO1WW\]-$				aside	no-channel-in-document			lenovo-sr250-installation
+lenovo-thinksystem-sr250v2-4slot	lenovo	^ThinkSystem SR250 V2\||^\|(?:.* )?ThinkSystem SR250 V2$				aside	no-channel-in-document			lenovo-sr250-v2-technical
+sun-x4170-x4270-gen1	sun	^SUN FIRE X4270 SERVER\||^\|(?:.* )?SUN FIRE X4270 SERVER$				aside	duplicated-names			oracle-820-5830-13
+sun-x4170-x4270-m2	sun	^SUN FIRE X4170 M2 SERVER\||^\|(?:.* )?SUN FIRE X4170 M2 SERVER$|^SUN FIRE X4270 M2 SERVER\||^\|(?:.* )?SUN FIRE X4270 M2 SERVER$	letter-number		bank	table		0,1,2	2=0.0 1=0.1 0=0.2 5=1.0 4=1.1 3=1.2 8=2.0 7=2.1 6=2.2	oracle-e22369-02;oracle-e21671-04
+sun-x4170-x4270-m3	sun	^SUN FIRE X4170 M3\||^\|(?:.* )?SUN FIRE X4170 M3$|^SUN FIRE X4270 M3\||^\|(?:.* )?SUN FIRE X4270 M3$	letter-number		bank	table		A,B,C,D	0=C.0 1=C.1 2=D.0 3=D.1 5=B.0 4=B.1 7=A.0 6=A.1	oracle-e22313-13;oracle-e23396-15
+sun-x4-2	sun	^SUN SERVER X4-2\||^\|(?:.* )?SUN SERVER X4-2$	letter-number		bank	table		A,B,C,D	0=C.0 1=C.1 2=D.0 3=D.1 5=B.0 4=B.1 7=A.0 6=A.1	oracle-e38041-07
+sun-x5-2	sun	^ORACLE SERVER X5-2\||^\|(?:.* )?ORACLE SERVER X5-2$	letter-number		bank	table		A,B,C,D	0=C.0 1=C.1 2=C.2 3=D.0 4=D.1 5=D.2 8=B.0 7=B.1 6=B.2 11=A.0 10=A.1 9=A.2	oracle-e48320-10
+sun-x2270	sun	^SUN FIRE X2270\||^\|(?:.* )?SUN FIRE X2270$				aside	no-channel-in-document			oracle-820-5607-11;oracle-821-1345
+sun-x2200-m2	sun	^Sun Fire X2200 M2\||^\|(?:.* )?Sun Fire X2200 M2$|^Sun Fire X2200 M2 with Quad Core Processor\||^\|(?:.* )?Sun Fire X2200 M2 with Quad Core Processor$				aside	no-channel-in-document			oracle-819-6597-12;oracle-819-6601-22
+sun-ultra40-m2	sun	^Sun Ultra 40 M2 Workstation\||^\|(?:.* )?Sun Ultra 40 M2 Workstation$				aside	no-channel-in-document			oracle-820-0123-13
+sun-ultra20-m2	sun	^Ultra20 M2\||^\|(?:.* )?Ultra20 M2$				aside	no-channel-in-document			oracle-819-6584-11
+fujitsu-d2619-18slot	fujitsu	^PRIMERGY RX300 S5\||^\|(?:.* )?PRIMERGY RX300 S5$|^PRIMERGY TX300 S5\||^\|(?:.* )?PRIMERGY TX300 S5$|^PRIMERGY TX300 S6\||^\|(?:.* )?PRIMERGY TX300 S6$				names				fujitsu-d2619-tx300-s5-technical-manual;fujitsu-d2619-tx300-s6-technical-manual;fujitsu-rx300-s5-guide
+fujitsu-d2709-12slot	fujitsu	^PRIMERGY TX200 S5\||^\|(?:.* )?PRIMERGY TX200 S5$				names				fujitsu-d2709-tx200-s5
+fujitsu-d3031-12slot	fujitsu	^PRIMERGY RX200 S6\||^\|(?:.* )?PRIMERGY RX200 S6$				names				fujitsu-rx200-s6-guide;fujitsu-5600
+fujitsu-d2759-6slot	fujitsu	^PRIMERGY TX150 S7\||^\|(?:.* )?PRIMERGY TX150 S7$				names				fujitsu-d2759-tx150-s7-technical-manual
+fujitsu-d2863-4slot	fujitsu	^PRIMERGY RX100 S6\||^\|(?:.* )?PRIMERGY RX100 S6$				names				fujitsu-d2863-rx100-s6-technical-manual
+fujitsu-d3049-4slot	fujitsu	^PRIMERGY TX140 S1p\||^\|(?:.* )?PRIMERGY TX140 S1p$				names				fujitsu-d3049-tx140-s1-tx120-s3;fujitsu-tx140-s1-maintenance-manual
+fujitsu-d3239-4slot	fujitsu	^PRIMERGY TX1320 M1\||^\|(?:.* )?PRIMERGY TX1320 M1$|^PRIMERGY TX1330 M1\||^\|(?:.* )?PRIMERGY TX1330 M1$				names				fujitsu-tx1320-m1-maintenance-manual;fujitsu-tx1330-m1-maintenance-manual
+fujitsu-e5-2600-24slot-labelled	fujitsu	^PRIMERGY RX200 S7\||^\|(?:.* )?PRIMERGY RX200 S7$|^PRIMERGY RX200 S8\||^\|(?:.* )?PRIMERGY RX200 S8$|^PRIMERGY RX2530 M1\||^\|(?:.* )?PRIMERGY RX2530 M1$				names				fujitsu-rx200-s8-maintenance-manual;fujitsu-rx200-s7-maintenance-manual;fujitsu-rx2530-m1-maintenance-manual
+fujitsu-d2939-24slot-node-names	fujitsu	^PRIMERGY RX300 S7\||^\|(?:.* )?PRIMERGY RX300 S7$|^PRIMERGY RX300 S8\||^\|(?:.* )?PRIMERGY RX300 S8$	node-dimm		cpu	table		A,B,C,D,E,F,G,H	0=A.0 1=A.1 2=A.2 3=B.0 4=B.1 5=B.2 6=C.0 7=C.1 8=C.2 9=D.0 10=D.1 11=D.2; s2: 0=E.0 1=E.1 2=E.2 3=F.0 4=F.1 5=F.2 6=G.0 7=G.1 8=G.2 9=H.0 10=H.1 11=H.2	fujitsu-rx300-s8-maintenance-manual
+fujitsu-d3099-12slot-node-names	fujitsu	^PRIMERGY TX2540 M1\||^\|(?:.* )?PRIMERGY TX2540 M1$	node-dimm		cpu	table		A,B,C,D,E,F	0=A.0 1=A.1 2=B.0 3=B.1 4=C.0 5=C.1; s2: 0=D.0 1=D.1 2=E.0 3=E.1 4=F.0 5=F.1	fujitsu-tx2540-m1-maintenance-manual
+fujitsu-d2119-fbdimm-8slot	fujitsu	^PRIMERGY RX300 S3\||^\|(?:.* )?PRIMERGY RX300 S3$			hub	hub	4,2			fujitsu-d2119-rx300-s3-technical-manual;fujitsu-rx300-s3-guide
+fujitsu-d3384-24slot	fujitsu	^PRIMERGY RX2540 M4\||^\|(?:.* )?PRIMERGY RX2540 M4$				names				fujitsu-rx2540-m4-guide
+fujitsu-d4129-24slot	fujitsu	^PRIMERGY RX2450 M2\||^\|(?:.* )?PRIMERGY RX2450 M2$				names				fujitsu-rx2450-m2-guide
+nec-r120b-1	nec	^Express5800/R120b-1 \[N8100-1660F\]\||^\|(?:.* )?Express5800/R120b-1 \[N8100-1660F\]$	cpu-dimm-number		cpu	table		CH0,CH1,CH2	1=CH0.0 4=CH0.1 2=CH1.0 5=CH1.1 3=CH2.0 6=CH2.1	nec-express5800-r120b-1-user-guide
+cisco-ucs-c220-c240-m4	cisco	^UCSC-C220-M4S\||^\|(?:.* )?UCSC-C220-M4S$|^UCSC-C240-M4L\||^\|(?:.* )?UCSC-C240-M4L$				names				cisco-c220-m4-installation-service-guide;cisco-c220-m4;cisco-c240-m4-installation-service-guide;cisco-c240-m4
+supermicro-x8dtu-12slot	supermicro	^X8DTU\||^\|(?:.* )?X8DTU$	p-digit-letter	S=2	map:P1=0,P0=1	names				sm-mnl-1081
+supermicro-x8-dp-12slot	supermicro	^X8DT6\||^\|(?:.* )?X8DT6$|^X8DT3\||^\|(?:.* )?X8DT3$|^X8DTH-i/6/iF/6F\|(?:.* )?X8DTH$|^X8DTT\||^\|(?:.* )?X8DTT$|^X8DTT-H\||^\|(?:.* )?X8DTT-H$|^X8DTG-D\||^\|(?:.* )?X8DTG-D$				names				sm-mnl-1062
+supermicro-x8da3-12slot	supermicro	^X8DA3\||^\|(?:.* )?X8DA3$				names				sm-mnl-1031
+supermicro-x8dtl-6slot	supermicro	^X8DTL\||^\|(?:.* )?X8DTL$				names				sm-mnl-1076
+supermicro-x8-dp-18slot	supermicro	^X8DTN\+-F\||^\|(?:.* )?X8DTN\+-F$|^X8DTN\||^\|(?:.* )?X8DTN$|^X8DTU-6\+\||^\|(?:.* )?X8DTU-6\+$|^X8DTU-LN4\+\||^\|(?:.* )?X8DTU-LN4\+$				names				sm-mnl-1199
+supermicro-x8dah-18slot-before-pcb2	supermicro	^X8DAH\||^\|(?:.* )?X8DAH$				names				sm-mnl-1060
+supermicro-x8dah-18slot-pcb2	supermicro	^iX4224-846E16\|(?:.* )?X8DAH$				names				sm-mnl-1060
+supermicro-h8-g34-dp-16slot	supermicro	^H8DG6/H8DGi\||^\|(?:.* )?H8DG6/H8DGi$|^H8DGU\||^\|(?:.* )?H8DGU$|^H8DGT\||^\|(?:.* )?H8DGT$				names				sm-mnl-h8dg
+supermicro-h8qg6-32slot	supermicro	^H8QG6\||^\|(?:.* )?H8QG6$				names				sm-mnl-h8qg-6
+supermicro-h8qgl-16slot	supermicro	^H8QGL\|(?:.* )?H8QGL-6F$				names				sm-mnl-h8qgl-6
+supermicro-h8sgl-8slot	supermicro	^H8SGL\||^\|(?:.* )?H8SGL$				names				sm-mnl-h8sgl-f
+supermicro-h8scm-4slot	supermicro	^H8SCM\||^\|(?:.* )?H8SCM$				names				sm-mnl-h8scm-f
+supermicro-h8dcl-8slot	supermicro	^H8DCL\||^\|(?:.* )?H8DCL$				names				sm-mnl-h8dcl
+supermicro-x9dbl-6slot	supermicro	^X9DBL-3F/X9DBL-iF\||^\|(?:.* )?X9DBL-3F/X9DBL-iF$				names				sm-mnl-1307
+supermicro-x9-dp-16slot	supermicro	^X9DRW\||^\|(?:.* )?X9DRW$|^X9DRD-7LN4F\|(?:.* )?X9DRD-7LN4F$|^X9DRD-7LN4F\(-JBOD\)/X9DRD-EF\|(?:.* )?X9DRD-7LN4F$|^X9DRFR\||^\|(?:.* )?X9DRFR$|^X9DRW-7/iTPF\||^\|(?:.* )?X9DRW-7/iTPF$				names				sm-mnl-1278
+supermicro-x9-dp-24slot	supermicro	^X9DRi-LN4\+/X9DR3-LN4\+\||^\|(?:.* )?X9DRi-LN4\+/X9DR3-LN4\+$|^X9DRW-7TPF\+\||^\|(?:.* )?X9DRW-7TPF\+$|^X9DRE-TF\+/X9DR7-TF\+\||^\|(?:.* )?X9DRE-TF\+/X9DR7-TF\+$				names				sm-mnl-1258
+supermicro-x9-dp-8slot	supermicro	^X9DRT\||^\|(?:.* )?X9DRT$|^HYVE-ZEUS\|(?:.* )?X9DRD-iF$|^X9DRD-iF/LF\|(?:.* )?X9DRD-iF$				names				sm-mnl-1488
+supermicro-x9-up-8slot	supermicro	^X9SRE/X9SRE-3F/X9SRi/X9SRi-3F\||^\|(?:.* )?X9SRE/X9SRE-3F/X9SRi/X9SRi-3F$|^X9SRL-F\||^\|(?:.* )?X9SRL-F$|^X9SRH-7F/7TF\||^\|(?:.* )?X9SRH-7F/7TF$				names				sm-mnl-1284
+supermicro-x9sra-8slot	supermicro	^X9SRA/X9SRA-3\||^\|(?:.* )?X9SRA/X9SRA-3$				names				sm-mnl-1281
+supermicro-x10-dp-16slot	supermicro	^Super Server\|(?:.* )?X10DRW-i$|^SYS-6018R-WTR\|(?:.* )?X10DRW-i$|^CALLEO\|(?:.* )?X10DRW-i$|^SYS-6028R-WTR\|(?:.* )?X10DRW-i$|^SYS-6028R-WTRT\|(?:.* )?X10DRW-iT$|^SYS-1028TP-DC1R\|(?:.* )?X10DRT-P$|^SYS-6028TP-DNCR\|(?:.* )?X10DRT-P$|^Rackform_R4422\.v6\|(?:.* )?X10DRT-P$|^Super Server\|(?:.* )?X10DRX-CS045$				names				sm-mnl-1557
+supermicro-x10dri-x10drh-16slot	supermicro	^X10DRi\||^\|(?:.* )?X10DRi$|^X10DRi\|(?:.* )?X10DRI-T$|^X10DRH\|(?:.* )?X10DRH-i$|^X10DRH\|(?:.* )?X10DRH-iT$|^SSG-2028R-E1CR24L\|(?:.* )?X10DRH-iT$|^SSG-6048R-E1CR24H\|(?:.* )?X10DRH-iT$				names				sm-mnl-1491
+supermicro-x10-dp-24slot	supermicro	^Super Server\|(?:.* )?X10DRU-i\+$|^transtec CALLEO\|(?:.* )?X10DRC-LN4\+$|^Super Server\|(?:.* )?X10DRC-LN4\+$|^CALLEO\|(?:.* )?X10DRi-LN4\+$				names				sm-mnl-1560
+supermicro-x10drg-24slot	supermicro	^SYS-4028GR-TR\|(?:.* )?X10DRG-O\+-CPU$|^SYS-4028GR-TR2\|(?:.* )?X10DRG-O\+-CPU$				names				sm-mnl-1780
+supermicro-x10-dp-8slot	supermicro	^Super Server\|(?:.* )?X10DRL-i$|^Rackform R309\.v5\|(?:.* )?X10DRL-i$|^Super Server\|(?:.* )?X10DRL-CT$|^Super Server\|(?:.* )?X10DAL-i$				names				sm-mnl-1566
+supermicro-x10-up-8slot	supermicro	^Super Server\|(?:.* )?X10SRi-F$|^Super Server\|(?:.* )?X10SRL-F$|^Super Server\|(?:.* )?X10SRH-CF$				names				sm-mnl-1586
+supermicro-x10sra-8slot	supermicro	^X10SRA\||^\|(?:.* )?X10SRA$|^X10SRA-F\||^\|(?:.* )?X10SRA-F$				names				sm-mnl-1643
+supermicro-x10srm-4slot	supermicro	^Super Server\|(?:.* )?X10SRM-TF$|^Super Server\|(?:.* )?X10SRM-F$				names				sm-mnl-1845
+supermicro-x10sll-x10slm-4slot	supermicro	^X10SLL-F\||^\|(?:.* )?X10SLL-F$|^X10SLM-F\||^\|(?:.* )?X10SLM-F$|^X10SLL-HF-CKD\||^\|(?:.* )?X10SLL-HF-CKD$				names				sm-mnl-1428
+supermicro-x10sl7-4slot	supermicro	^X10SL7-F\||^\|(?:.* )?X10SL7-F$				names				sm-mnl-1463
+supermicro-x10slh-x10slmplus-4slot	supermicro	^X10SLH-F/X10SLM\+-F\||^\|(?:.* )?X10SLH-F/X10SLM\+-F$|^X10SLM\+-LN4F\||^\|(?:.* )?X10SLM\+-LN4F$				names				sm-mnl-1464
+supermicro-x10sae-4slot	supermicro	^X10SAE\||^\|(?:.* )?X10SAE$				names				sm-mnl-1479
+supermicro-x10sdv-4slot	supermicro	^Super Server\|(?:.* )?X10SDV-4C-TLN2F$|^Super Server\|(?:.* )?X10SDV-2C-TLN2F$|^Super Server\|(?:.* )?X10SDV-TLN4F$|^Super Server\|(?:.* )?X10SDV-8C-TLN4F$|^Super Server\|(?:.* )?X10SDV-8C-TLN4F\+$|^Super Server\|(?:.* )?X10SDV-8C\+-LN2F$|^SYS-5018D-FN8T\|(?:.* )?X10SDV-TP8F$|^Super Server\|(?:.* )?X10SDV-TP8F$|^Super Server\|(?:.* )?X10SDV-2C-TP4F$|^Super Server\|(?:.* )?X10SDV-2C-7TP4F$				names				sm-mnl-1726
+supermicro-x11-lga1151-4slot-b2-first	supermicro	^Super Server\|(?:.* )?X11SSL-F$|^410041\|(?:.* )?X11SSL-F$|^Super Server\|(?:.* )?X11SSL-CF$|^Super Server\|(?:.* )?X11SSM-F$|^Super Server\|(?:.* )?X11SSH-F$|^Super Server\|(?:.* )?X11SSH-LN4F$|^Super Server\|(?:.* )?X11SSH-CTF$|^Super Server\|(?:.* )?X11SCL-F$|^SYS-5039MC-H12TRF\|(?:.* )?X11SCE-F$|^Super Server\|(?:.* )?X11SCH-F$|^Super Server\|(?:.* )?X11SSA-F$|^Super Server\|(?:.* )?X11SSZ-TLN4F$|^Super Server\|(?:.* )?X11SAE-M$				names				sm-mnl-1778
+supermicro-x11-lga1151-4slot-a2-first	supermicro	^PCplus T600-C246\|(?:.* )?X11SCA$|^Super Server\|(?:.* )?X11SCA-F$|^Super Server\|(?:.* )?X11SCA-W$|^Super Server\|(?:.* )?X11SAE$|^Super Server\|(?:.* )?X11SAE-F$|^Super Server\|(?:.* )?X11SCZ-Q$				names				sm-mnl-2087
+supermicro-x11scl-if-2slot	supermicro	^Super Server\|(?:.* )?X11SCL-IF$				names				sm-mnl-2088
+supermicro-x11ssv-q-2slot	supermicro	^X11SSV-Q\||^\|(?:.* )?X11SSV-Q$				names				sm-mnl-1795
+supermicro-x11-dp-16slot	supermicro	^X11DPi-N\|(?:.* )?X11DPi-NT$|^X11DPi-N\(T\)\|(?:.* )?X11DPi-NT$|^X11DPi-N\|(?:.* )?X11DPi-N$|^X11DPi-N\(T\)\|(?:.* )?X11DPi-N$|^SYS-6029P-TR\|(?:.* )?X11DPi-N$|^SYS-7049P-TR\|(?:.* )?X11DPi-N$|^SYS-7049GP-TRT\|(?:.* )?X11DPG-QT$|^Super Server\|(?:.* )?X11DPG-QT$|^Super Server\|(?:.* )?X11DPH-T$|^Joyent-S10G5\|(?:.* )?X11DPH-T$|^SSG-6049P-E1CR36L\|(?:.* )?X11DPH-T$|^Super Server\|(?:.* )?X11DPH-i$|^SYS-7039A-I\|(?:.* )?X11DAi-N$|^X11DAi-N\||^\|(?:.* )?X11DAi-N$				names				sm-mnl-1773
+supermicro-x11-dp-24slot	supermicro	^Super Server\|(?:.* )?X11DPU$|^SYS-1029U-TR25M\|(?:.* )?X11DPU$|^SYS-2029U-TN24R4T\|(?:.* )?X11DPU$|^SYS-6019U-TN4R4T\|(?:.* )?X11DPU$|^SYS-1029U-TRT\|(?:.* )?X11DPU$|^SYS-1029U-TR25M-BK-LC019\|(?:.* )?X11DPU-LC019$|^SYS-2029BT-HNR-NS2-WW001\|(?:.* )?X11DPT-B$|^X11DPG-OT\|(?:.* )?X11DPG-OT-CPU$|^SYS-4029GP-TRT2\|(?:.* )?X11DPG-OT-CPU$|^SYS-4029GP-TRT\|(?:.* )?X11DPG-OT-CPU$				names				sm-x11-user-guide
+supermicro-x11ddw-12slot	supermicro	^SYS-1029P-WTR\|(?:.* )?X11DDW-L$|^SYS-6029P-WTR\|(?:.* )?X11DDW-L$|^SYS-6019P-WTR\|(?:.* )?X11DDW-L$|^SYS-6019P-WT\|(?:.* )?X11DDW-L$|^SYS-6029P-WTRT\|(?:.* )?X11DDW-NT$|^iPC-12-210\|(?:.* )?X11DDW-NT$|^Super Server\|(?:.* )?X11DDW-NT$				names				sm-mnl-1907
+supermicro-x11dpl-8slot	supermicro	^Super Server\|(?:.* )?X11DPL-i$				names				sm-mnl-1946
+supermicro-x11qph-48slot	supermicro	^SYS-2049U-TR4\|(?:.* )?X11QPH\+$				names				sm-mnl-1983
+supermicro-x11-up-8slot	supermicro	^Super Server\|(?:.* )?X11SPi-TF$|^Super Server\|(?:.* )?X11SPL-F$|^SSG-5029P-E1CTR12L\|(?:.* )?X11SPH-nCTF$				names				sm-mnl-1900
+supermicro-x11-up-6slot	supermicro	^Super Server\|(?:.* )?X11SPM-F$|^X11-SPM-TF\|(?:.* )?X11SPM-TF$|^egino BTO Konfig Server\|(?:.* )?X11SPM-TF$|^SYS-5019P-WTR\|(?:.* )?X11SPW-TF$|^SYS-5029P-WTR\|(?:.* )?X11SPW-TF$|^SYS-1019P-WTR\|(?:.* )?X11SPW-TF$				names				sm-mnl-1939
+supermicro-b11spe-12slot	supermicro	^SBI-6119P-T3N\|(?:.* )?B11SPE-CPU-TF$				names				sm-mnl-2135
+supermicro-x11sra-8slot	supermicro	^Super Server\|(?:.* )?X11SRA-RF$				names				sm-mnl-2005
+supermicro-x11sdv-4slot	supermicro	^Super Server\|(?:.* )?X11SDV-8C-TLN2F$|^Super Server\|(?:.* )?X11SDV-4C-TP8F$|^SYS-E300-9D-8CN8TP\|(?:.* )?X11SDV-8C-TP8F$|^Prime Server Pro\|(?:.* )?X11SDV-8C-TP8F$				names				sm-mnl-2019
+supermicro-a2sd-4slot	supermicro	^Super Server\|(?:.* )?A2SDi-4C-HLN4F$|^Super Server\|(?:.* )?A2SDi-8C-HLN4F$|^Super Server\|(?:.* )?A2SDV-4C-LN8F$				names				sm-mnl-1951
+supermicro-a1sa2-4slot	supermicro	^A1SA2-2750F\||^\|(?:.* )?A1SA2-2750F$				names				sm-mnl-1600
+supermicro-a1sam-a1srm-4slot	supermicro	^A1SAM-2550F\||^\|(?:.* )?A1SAM-2550F$|^A1SRM-2558F\||^\|(?:.* )?A1SRM-2558F$				names				sm-mnl-1561
+supermicro-x12dpi-18slot	supermicro	^Super Server\|(?:.* )?X12DPi-N6$				names				sm-mnl-2233
+supermicro-x12-dp-16slot	supermicro	^X12DAi-N6\||^\|(?:.* )?X12DAi-N6$|^SYS-620C-TN12R\|(?:.* )?X12DDW-A6$				names				sm-mnl-2239
+supermicro-x12dpu-32slot	supermicro	^SYS-620U-TNR\|(?:.* )?X12DPU-6$				names				sm-mnl-2234
+supermicro-x12-up-8slot	supermicro	^Super Server\|(?:.* )?X12SPL-F$|^SYS-510P-MR\|(?:.* )?X12SPO-F$				names				sm-mnl-2270
+supermicro-x12sae-4slot	supermicro	^Super Server\|(?:.* )?X12SAE-5$				names				sm-mnl-2358
+supermicro-x12sdv-sp6f-4slot	supermicro	^Super Server\|(?:.* )?X12SDV-8C-SP6F$				names				sm-mnl-2362
+supermicro-x12sdv-spt8f-4slot	supermicro	^Super Server\|(?:.* )?X12SDV-16C-SPT8F$				names				sm-mnl-2440
+supermicro-x13-dp-16slot	supermicro	^Flagman KvX229\.7\|(?:.* )?X13DEI$|^Super Server\|(?:.* )?X13DEI$|^SYS-751A-I\|(?:.* )?X13DAI-T$				names				sm-mnl-2509
+supermicro-x13sew-8slot	supermicro	^SYS-511E-WR\|(?:.* )?X13SEW-F$				names				sm-mnl-2413
+supermicro-x13sae-4slot	supermicro	^Super Server\|(?:.* )?X13SAE-F$				names				sm-mnl-2425
+supermicro-x13san-2slot	supermicro	^Super Server\|(?:.* )?X13SAN-L$				names				sm-mnl-2517
+supermicro-h11dsi-16slot	supermicro	^Super Server\|(?:.* )?H11DSi$|^Super Server\|(?:.* )?H11DSi-NT$				names				sm-mnl-2027
+supermicro-h12dsi-16slot	supermicro	^Super Server\|(?:.* )?H12DSi-N6$|^Super Server\|(?:.* )?H12DSi-NT6$				names				sm-mnl-2363
+supermicro-h11ssl-8slot	supermicro	^Super Server\|(?:.* )?H11SSL-i$|^Super Server\|(?:.* )?H11SSL-C$|^GN\#16917\|(?:.* )?H11SSL-NC$|^Super Server\|(?:.* )?H11SSL-NC$				names				sm-mnl-2085
+supermicro-h12-up-8slot	supermicro	^Super Server\|(?:.* )?H12SSL-i$|^Supermicro motherboard-H12 Series\|(?:.* )?H12SSL-i$|^Super Server\|(?:.* )?H12SSL-NT$|^Super Server\|(?:.* )?H12SSL-CT$|^AS -1014S-WTRT\|(?:.* )?H12SSW-NT$|^520012\|(?:.* )?H12SSW-NT$|^Super Server\|(?:.* )?H12SSW-NT$				names				sm-mnl-2314
+supermicro-h12dsg-32slot	supermicro	^AS -4124GS-TNR\|(?:.* )?H12DSG-O-CPU$				names				sm-mnl-2299
+supermicro-h13sae-mf-4slot	supermicro	^Super Server\|(?:.* )?H13SAE-MF$				names				sm-mnl-2627
+supermicro-m11sdv-4slot	supermicro	^Super Server\|(?:.* )?M11SDV-8C-LN4F$|^Super Server\|(?:.* )?M11SDV-8CT-LN4F$				names				sm-mnl-2172
+supermicro-m12swa-8slot	supermicro	^AS -5014A-TT\|(?:.* )?M12SWA-TF$|^M12SWA-TF\||^\|(?:.* )?M12SWA-TF$|^Super Server\|(?:.* )?M12SWA-TF$				names				sm-mnl-2336
+supermicro-c7x99-oce-8slot	supermicro	^C7X99-OCE\||^\|(?:.* )?C7X99-OCE$				names				sm-mnl-1646
+supermicro-c9x299-pg300f-8slot	supermicro	^C9X299-PG300F\||^\|(?:.* )?C9X299-PG300F$				names				sm-mnl-2117
+supermicro-c7-c9-lga1151-4slot	supermicro	^C7Z170-M\||^\|(?:.* )?C7Z170-M$|^C7Z270-CG-L\||^\|(?:.* )?C7Z270-CG-L$|^C7Z270-CG-M\||^\|(?:.* )?C7Z270-CG-M$|^C7Z270-PG\||^\|(?:.* )?C7Z270-PG$|^C9Z390-PGW\||^\|(?:.* )?C9Z390-PGW$				names				sm-mnl-1813
+supermicro-c7-c9-lga1151-2slot	supermicro	^C7Z370-CG-IW\||^\|(?:.* )?C7Z370-CG-IW$|^C9Z390-CG-IW\||^\|(?:.* )?C9Z390-CG-IW$				names				sm-mnl-2018
+gigabyte-epyc-sp3-2s-16ch-2dpc	gigabyte	^R182-Z90-00\|(?:.* )?MZ92-FS0-00$|^R182-Z91-00\|(?:.* )?MZ92-FS0-00$|^G482-Z54-00\|(?:.* )?MZ52-G41-00$				names				gigabyte-r182-z90-r182-z91-r182
+gigabyte-epyc-sp3-1s-8ch-2dpc	gigabyte	^MZ31-AR0-00\||^\|(?:.* )?MZ31-AR0-00$|^MZ32-AR0-00\||^\|(?:.* )?MZ32-AR0-00$|^R162-ZA0-00\|(?:.* )?MZA2-CE0-00$|^R262-ZA2-00\|(?:.* )?MZA2-CE0-00$				names				gigabyte-mz32-ar0-user-manual;gigabyte-mz31-ar0-user-manual;gigabyte-r162-za0-user-manual;gigabyte-r262-za1-za2-user-manual
+gigabyte-ampere-mp32-8ch-2dpc	gigabyte	^MP32-AR1-SW-HZ-001\|(?:.* )?MP32-AR1-00$|^E252-P30-00\|(?:.* )?MP32-AR1-00$|^MP32-AR1-00\||^\|(?:.* )?MP32-AR1-00$|^MP32-AR0\||^\|(?:.* )?MP32-AR0$				names				gigabyte-e252-p30-user-manual
+gigabyte-mx33-xeon-e2300-4slot	gigabyte	^MX33-BS0-00\||^\|(?:.* )?MX33-BS0-00$|^MX33-BS1-V1\||^\|(?:.* )?MX33-BS1-V1$				names				gigabyte-mx33-bs0-user-manual
+gigabyte-epyc-sp3-2s-16ch-1dpc	gigabyte	^MZ71-CE0-00\||^\|(?:.* )?MZ71-CE0-00$|^MZ71-CE1-00\||^\|(?:.* )?MZ71-CE1-00$|^MZ72-HB0-00\||^\|(?:.* )?MZ72-HB0-00$				names				gigabyte-mz71-ce0-mz71-ce1-user;gigabyte-mz72-hb0-user-manual
+gigabyte-epyc3000-mj11-4slot	gigabyte	^G431-MM0-OT\|(?:.* )?MJ11-EC1-OT$				names				gigabyte-g431-mm0-user-manual
+gigabyte-am4-am5-mc1x-4slot	gigabyte	^MC13-LE0-000\||^\|(?:.* )?MC13-LE0-000$|^MC13-LE1-000\||^\|(?:.* )?MC13-LE1-000$|^MC12-LE0-00\||^\|(?:.* )?MC12-LE0-00$				names				gigabyte-mc13-le0-mc13-le1-user
+gigabyte-mu71-su0-xeon-w3200-8slot	gigabyte	^MU71-SU0-00\||^\|(?:.* )?MU71-SU0-00$				names				gigabyte-mu71-su0-user-manual
+gigabyte-c621-su8-8slot	gigabyte	^C621-SU8 M18818\||^\|(?:.* )?C621-SU8 M18818$				names				gigabyte-c621-su8-user-manual
+gigabyte-c621-sd8-8slot	gigabyte	^C621-SD8 M18802\||^\|(?:.* )?C621-SD8 M18802$				names				gigabyte-c621-sd8-user-manual
+gigabyte-mw50-sv0-e5-1s-8slot	gigabyte	^MW50-SV0\||^\|(?:.* )?MW50-SV0$|^OEM-F7342-00\|(?:.* )?MW50-SV0$				names				gigabyte-mw50-sv0-user-manual
+gigabyte-mg51-g21-xeon-sp-2s-24slot	gigabyte	^G291-280-00\|(?:.* )?MG51-G21-00$|^G291-281-00\|(?:.* )?MG51-G21-00$				names				gigabyte-g291-280-g291-281-user
+gigabyte-e5-2s-4ch-3dpc-24slot	gigabyte	^R280-G2O-XX\|(?:.* )?MD90-FS0-XX$|^G250-G52-Sample-Dalco-002-XX\|(?:.* )?MG50-G21-XX$				names				gigabyte-r280-f2o-r280-g2o-user
+gigabyte-mu70-su0-e5-1s-12slot	gigabyte	^MU70-SU0-NV-XX\||^\|(?:.* )?MU70-SU0-NV-XX$				names				gigabyte-mu70-su0-user-manual
+gigabyte-xeon-sp-2s-6ch-uneven-16slot	gigabyte	^Relion XE2142\|(?:.* )?MH61-HD3-ZB$				names				gigabyte-h261-h60-user-manual
+gigabyte-md72-hb0-xeon-sp3-2s-16slot	gigabyte	^SS4000HD\|(?:.* )?MD72-HB0-00$				names				gigabyte-md72-hb0-md72-hb1-user
+gigabyte-mu72-su0-xeon-w3300-8slot	gigabyte	^MU72-SU0-00\||^\|(?:.* )?MU72-SU0-00$				names				gigabyte-mu72-su0-user-manual
+gigabyte-6pxsv-e5-1s-8slot	gigabyte	^GA-6PXSV1\||^\|(?:.* )?GA-6PXSV1$				names				gigabyte-6pxsvl-user-manual
+gigabyte-mz12-hd3-epyc-1s-8slot	gigabyte	^G242-Z11-00\|(?:.* )?MZ12-HD3-00$				names				gigabyte-g242-z10-g242-z11-user
+gigabyte-mc62-g40-trpro-8slot	gigabyte	^MC62-G40-00\||^\|(?:.* )?MC62-G40-00$				names				gigabyte-mc62-g40-user-manual
+asrock-am5-b650d4u-4slot	asrock	^B650D4U-2L2T/BCM\||^\|(?:.* )?B650D4U-2L2T/BCM$|^\|(?:.* )?B650D4U$|^B650D4U\||^\|(?:.* )?B650D4U$				names				asrock-b650d4u-b650d4u-2l2t-b650d4u-2l2t
+asrock-am4-x570-4slot	asrock	^X570D4U\||^\|(?:.* )?X570D4U$|^X570D4U-2L2T\||^\|(?:.* )?X570D4U-2L2T$|^X570D4U-2L2T/BCM\|(?:.* )?X570D4U-2L2T$|^X570D4I-2T\||^\|(?:.* )?X570D4I-2T$				names				asrock-x570d4u-x570d4u-2l2t-x570d4u-2l2t
+asrock-romed8-2t-8slot	asrock	^ROMED8-2T\||^\|(?:.* )?ROMED8-2T$|^\|(?:.* )?ROMED8-2T/OVH$|^\|(?:.* )?ROMED8-2T$				names				asrock-romed8-2t-romed8-romed8-2t
+asrock-rome2d16-2t-16slot	asrock	^ROME2D16-2T\||^\|(?:.* )?ROME2D16-2T$				names				asrock-rome2d16-2t-rome2d16-rome2d16-2l
+asrock-genoad12m3-12slot	asrock	^GENOAD12M3-2Q/H\||^\|(?:.* )?GENOAD12M3-2Q/H$				names				asrock-genoad12m3-2q-user-manual-genoad12m3
+asrock-intel-ddr5-controller-4slot	asrock	^\|(?:.* )?W680D4U-1L$|^Z690D4U-2L2T/G5\||^\|(?:.* )?Z690D4U-2L2T/G5$|^EC266D4-4L\||^\|(?:.* )?EC266D4-4L$				names				asrock-z690d4u-2l2t-w680d4u-2l2t-w680d4u
+asrock-sp2c621d32lm3-32slot	asrock	^R1G3D32\|(?:.* )?SP2C621D32LM3$				names				asrock-sp2c621d32lm3-user-manual
+asrock-altrad8ud-8slot	asrock	^ALTRAD8UD-1L2T\||^\|(?:.* )?ALTRAD8UD-1L2T$				names				asrock-altrad8ud-1l2t-user-manual
+msi-am5-d3051-d3052	msi	^MSIS336 MS-S336\||^\|(?:.* )?MSIS336 MS-S336$|^MSIS366\||^\|(?:.* )?MSIS366$				names				msi-d3052-s3661-user-guide
+tyan-s7012	tyan	^\|(?:.* )?S7012$				names				tyan-s7012-user-manual
+tyan-s7010	tyan	^\|(?:.* )?S7010$				names				tyan-s7010-user-manual
+tyan-s8026	tyan	^\|(?:.* )?S8026GM2NRE$|^\|(?:.* )?S8026GM2NRE-HOV-B$				names				tyan-s8026-user-manual
+tyan-s8036	tyan	^B8036T65AV4E24HR-HOV-1\|(?:.* )?B8036GM2NE$				names				tyan-s8036-user-manual
+tyan-s7109	tyan	^B7109F77DV14HR-2T-N\|(?:.* )?S7109GM2NR-2T$				names				tyan-s7106-user-manual
+tyan-s8812	tyan	^\|(?:.* )?S8812$				aside	names-not-in-document			tyan-s8812-user-manual
+tyan-s4882	tyan	^S4882\|(?:.* )?S4882$	c-dimm		cpu	table		high64,low64	0=low64.0 1=high64.0 2=low64.1 3=high64.1	tyan-k8qs-s4882-user-manual
+huawei-rh-v3-16slot	huawei	^RH1288 V3\||^\|(?:.* )?RH1288 V3$|^RH2288 V3\||^\|(?:.* )?RH2288 V3$				names				huawei-rh1288-v3-user-guide;huawei-rh2288-v3-user-guide
+huawei-rh2288hv3-24slot	huawei	^RH2288H V3\||^\|(?:.* )?RH2288H V3$				names				huawei-rh2288h-v3-user-guide
+huawei-v5-24slot	huawei	^1288H V5\|(?:.* )?BC11SPSC0$|^1288H V5\|(?:.* )?BC11SPSCC0$|^2288H V5\||^\|(?:.* )?2288H V5$				names				huawei-1288h-v5-user-guide;huawei-2288h-v5-user-guide
+lenovo-thinkserver-rd330	lenovo	^Lenovo ThinkServer RD330\||^\|(?:.* )?Lenovo ThinkServer RD330$				names				lenovo-rd330-maintenance-manual
+lenovo-thinkserver-rd450	lenovo	^ThinkServer RD450\||^\|(?:.* )?ThinkServer RD450$				names				lenovo-rd450-user-guide-maintenance-manual
+lenovo-thinkstation-px	lenovo	^30EUA0EG00\||^\|(?:.* )?30EUA0EG00$	cpu-dimm-number		cpu	table		1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16	1=1.0 2=2.0 3=3.0 4=4.0 5=5.0 6=6.0 7=7.0 8=8.0; s2: 9=9.0 10=10.0 11=11.0 12=12.0 13=13.0 14=14.0 15=15.0 16=16.0	lenovo-memory-configurator-lenovo;lenovo-thinkstation-px-user-guide
+fujitsu-d3521-tx1310m3	fujitsu	^PRIMERGY TX1310 M3\||^\|(?:.* )?PRIMERGY TX1310 M3$				names				fujitsu-tx1310-m3-guide
+fujitsu-mx130s2-sample	fujitsu	^PRIMERGY MX130 S2\||^\|(?:.* )?PRIMERGY MX130 S2$				names				fujitsu-mx130-s2-maintenance-manual
+inspur-nf5280m6-32slot	inspur	^NF5280M6\|				names				inspur-nf5280m-lm6-user-manual
+inspur-sa5212m4-16slot	inspur	^SA5212M4\|Inspur Shuyu$				names				inspur-sa5212m4-sa5212m4-user-manual
+quanta-t22hf-s5hf-16slot	quanta	^QuantaPlex T22HF-1U\||^\|(?:.* )?QuantaPlex T22HF-1U$				names				quanta-t22hf-1u-service-guide
+huawei-taishan200-2280-kunpeng920	huawei	^TaiShan 200\||^\|(?:.* )?TaiShan 200$|^TaiShan 200 \(Model 2280\)\||^\|(?:.* )?TaiShan 200 \(Model 2280\)$|^TaiShan 2280 V2\||^\|(?:.* )?TaiShan 2280 V2$				names				huawei-200-maintenance-service-guide-2280
+huawei-atlas500pro-3000	huawei	^Atlas 500 Pro\||^\|(?:.* )?Atlas 500 Pro$|^Atlas 500 Pro \(Model 3000\)\||^\|(?:.* )?Atlas 500 Pro \(Model 3000\)$				names				huawei-500-maintenance-service-guide-3000
+quanta-ocp-leopard-16slot	quanta	^Leopard ORv2-DDR4\||^\|(?:.* )?Leopard ORv2-DDR4$				names				quanta-v3-1
+quanta-ocp-windmill-winterfell-16slot	quanta	^Freedom\|(?:.* )?Quanta Winterfell$	letter-number		bank	table		0,1,2,3	0=0.0 1=0.1 2=1.0 3=1.1 4=2.0 5=2.1 6=3.0 7=3.1; s2: 0=0.0 1=0.1 2=1.0 3=1.1 4=2.0 5=2.1 6=3.0 7=3.1	quanta-v2-0
+lenovo-thinkserver-rd450x	lenovo	^RD450X\||^\|(?:.* )?RD450X$				names				lenovo-rd450-user-guide-maintenance-manual
+hp-dl360-gen10plus-32slot	hp	^ProLiant DL360 Gen10 Plus\||^\|(?:.* )?ProLiant DL360 Gen10 Plus$	proc-dimm		cpu	table		CH0,CH1,CH2,CH3,CH4,CH5,CH6,CH7	1=CH5.0 2=CH5.1 3=CH4.0 4=CH4.1 5=CH7.0 6=CH7.1 7=CH6.0 8=CH6.1 9=CH2.1 10=CH2.0 11=CH3.1 12=CH3.0 13=CH0.1 14=CH0.0 15=CH1.1 16=CH1.0	hpe-population-gen10-3rd-technical;hpe-dl360-gen10-maintenance-service-guide-2
+hp-dl385-gen10plus-32slot	hp	^ProLiant DL385 Gen10 Plus\||^\|(?:.* )?ProLiant DL385 Gen10 Plus$|^ProLiant DL385 Gen10 Plus v2\||^\|(?:.* )?ProLiant DL385 Gen10 Plus v2$	proc-dimm		cpu	table		A,B,C,D,E,F,G,H	1=H.0 2=H.1 3=G.0 4=G.1 5=F.0 6=F.1 7=E.0 8=E.1 9=A.1 10=A.0 11=B.1 12=B.0 13=C.1 14=C.0 15=D.1 16=D.0	hpe-population-gen10-gen10-7002-7003;hpe-dl385-gen10-maintenance-service-guide;hpe-dl385-gen10-v2-maintenance-service
+hp-dl380-gen11-32slot	hp	^ProLiant DL380 Gen11\||^\|(?:.* )?ProLiant DL380 Gen11$	proc-dimm		cpu	table		pair1_2,pair3_4,pair5_6,pair7_8,pair9_10,pair11_12,pair13_14,pair15_16	1=pair1_2.0 2=pair1_2.1 3=pair3_4.0 4=pair3_4.1 5=pair5_6.0 6=pair5_6.1 7=pair7_8.0 8=pair7_8.1 9=pair9_10.1 10=pair9_10.0 11=pair11_12.1 12=pair11_12.0 13=pair13_14.1 14=pair13_14.0 15=pair15_16.1 16=pair15_16.0	hpe-population-gen11-5th-technical;hpe-population-gen11-4th;hpe-dl380-gen11;hpe-dl380-gen11-maintenance-service-guide
+hp-dl160-gen10-16slot	hp	^ProLiant DL160 Gen10\||^\|(?:.* )?ProLiant DL160 Gen10$	proc-dimm		cpu	table		CH1,CH2,CH3,CH4,CH5,CH6	1=CH3.0 2=CH2.0 3=CH1.0 4=CH1.1 5=CH4.1 6=CH4.0 7=CH5.0 8=CH6.0	hpe-dl160-gen10;hpe-876833-006-2
+hp-dl20-gen10plus-4slot	hp	^ProLiant DL20 Gen10 Plus\||^\|(?:.* )?ProLiant DL20 Gen10 Plus$	proc-dimm		cpu	table		CH1,CH2	1=CH2.0 2=CH2.1 3=CH1.0 4=CH1.1	hpe-population-gen10-2300-technical
+hp-cray-xd665-24slot	hp	^HPE Cray SC XD665\|(?:.* )?HPE Cray XD665 MB PCA$				names				hpe-xd665-maintenance-service-guide;hpe-xd665
+gigabyte-mr92-fs1-32slot	*	^R182-N20-UNI\|(?:NULL )?MR92-FS1-UNI$				names				gigabyte-r182-n20-r182-na0-3rd
+huawei-2288hv5-bc11spscb-unbranded	*	^2288H V5\|-- BC11SPSCB0$|^FPD-8-SP-H2K288G5-CTO\|-- BC11SPSCB10$				names				huawei-2288h-v5-user-guide
+huawei-rh2288hv3-bc11hgsa-hve	*	^3DGFX\|HVE BC11HGSA0$				names				huawei-rh2288h-v3-user-guide-2
+asrock-sp2c621d32tm3-32slot-inferit	*	^RS224 R1G3D32RU\|INF SP2C621D32TM3$				names				asrock-sp2c621d32tm3-user-manual
+aic-libra-16slot	*	^SB302-LB\|AIC LIBRA$				aside	names-not-in-document			other-user-manual
+geekom-intel-h-2sodimm	*	^(?:GT13 Pro|IT12|IT13|XT12 Pro|XT13 Pro)\|(?:GT13 Pro|IT12|IT13|XT12 Pro|XT13 Pro)$				names				other-12th-1
+neousys-nuvo-9000-10000-2sodimm	*	^Nuvo-9000 Series\|(?:.* )?NVS-9000$|^Nuvo-10000 Series\|(?:.* )?NVS-10000$				names				other-9000-user-manual
+geekom-miniair11-jsl-2sodimm	*	^MiniAir 11\|GEEKOM MiniAir 11$				names				other-11
+neousys-nuvo-2600-1sodimm	*	^Nuvo-2600 Series\|				names				other-2600-user-manual
+geekom-miniair12-n100	*	^Mini Air12\|				names				other-1
+ekf-sc9-toccata-tgl	*	^CompactPCI Serial\|EKF Elektronik GmbH SC9-TOCCATA$				names				other-631121-012
+adlink-aadp-com-hpc-alt-6slot	*	^Ampere Altra Developer Platform\|ADLINK Ampere Altra Developer Platform$	socket-dimm		cpu	table		MCU0,MCU1,MCU2,MCU4,MCU5,MCU6	0=MCU0.0 1=MCU1.0 2=MCU2.0 3=MCU4.0 4=MCU5.0 5=MCU6.0	other-user-guide
+besstar-atb15-2sodimm	*	^(?:X300|X400|X500)\|BESSTAR TECH ATB15$				names				other-x300-x400-x500-user-manual
+gigabyte-rmb-mr91-openyard	*	^RS201I\|OpenYard RMB-MR91$				names				gigabyte-r182-n20-r182-na0-user
+powerleader-psc621di-16f	*	^PR2710P-24\|OEM PSC621DI-16F$				names				other-rs5230-user-manual-pr2710p-manual
+quanta-d52b-1u-nokia-airframe	*	^AR-S5008A-5A/AF1294\.05\|				names				quanta-d52b
+graviton-onega-16slot	*	^Server Graviton\|Graviton ONEGA$				names				other-2041-2122
+yadro-vegman-rx20g2-32slot	*	^; 9k\|w 9k w 9k$				names				other-rx20-g2
+etegro-rs125g4-quanta-s2ms-16slot	*	^Hyperion RS125 G4\|ETegro Technologies ETRS125G4$				names				other-rs125-g4
+etegro-rs130g4-quanta-s2rq-24slot	*	^Hyperion RS130 G4\|ETegro Technologies ETRS130G4$				names				other-rs130-g4
