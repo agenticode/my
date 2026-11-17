@@ -100,6 +100,7 @@ type collectOptions struct {
 	noLogs   bool
 	parallel int
 	quiet    bool
+	sudo     bool
 }
 
 func newCollectOptions() *collectOptions {
@@ -116,6 +117,7 @@ func newCollectOptions() *collectOptions {
 	o.fs.BoolVar(&o.noLogs, "no-logs", false, "")
 	o.fs.IntVar(&o.parallel, "parallel", 4, "")
 	o.fs.BoolVar(&o.quiet, "quiet", false, "")
+	o.fs.BoolVar(&o.sudo, "sudo", false, "")
 	o.fs.Var(&o.maps, "event-map", "")
 	o.fs.StringVar(&o.lang, "lang", "", "")
 	o.fs.BoolVar(&o.asJSON, "json", false, "")
@@ -297,6 +299,13 @@ func runCollect(ctx context.Context, env *cli.Env, args []string) int {
 		return o.usageError(env, lang, "%s", say(lang, "err.collect_what"))
 	case pos[0] == "support":
 		return o.support(env, lang, pos[1:])
+	case pos[0] == "host":
+		if len(pos) > 1 {
+			return o.usageError(env, lang, "%s", say(lang, "err.extra", "arg", pos[1]))
+		}
+		return o.host(ctx, env, lang)
+	case o.sudo:
+		return o.usageError(env, lang, "%s", say(lang, "err.collect_sudo"))
 	case pos[0] != "redfish":
 		return o.usageError(env, lang, "%s", say(lang, "err.collect_unknown", "what", pos[0]))
 	case len(pos) > 1:
